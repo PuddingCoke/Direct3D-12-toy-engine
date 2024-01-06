@@ -1,0 +1,15 @@
+#include<Gear/Core/DX/Resource/Resource.h>
+
+ID3D12Resource* Resource::getResource()
+{
+	return resource.Get();
+}
+
+Resource::~Resource()
+{
+}
+
+Resource::Resource(const D3D12_HEAP_PROPERTIES* properties, D3D12_HEAP_FLAGS flags, const D3D12_RESOURCE_DESC* desc, D3D12_RESOURCE_STATES initialState, const D3D12_CLEAR_VALUE* clearValues)
+{
+	GraphicsDevice::get()->CreateCommittedResource(properties, flags, desc, initialState, clearValues, IID_PPV_ARGS(&resource));
+}
