@@ -7,28 +7,45 @@
 
 #include"UploadHeap.h"
 
-enum BufferUsage
-{
-	STATIC,
-	DYNAMIC
-};
-
-class Buffer:public Resource
+class Buffer :public Resource
 {
 public:
 
-	Buffer(const UINT size,const BufferUsage usage);
+	Buffer(const UINT size, const ResourceUsage usage, const bool cpuWrite);
+
+	Buffer(const Buffer&);
+
+	void operator=(const Buffer&) = delete;
 
 	void update(const void* const data, const UINT dataSize);
 
 	virtual ~Buffer();
 
-private: 
+	void updateGlobalStates() override;
 
-	UploadHeap* uploadHeaps;
+	void resetInternalStates() override;
+
+private:
+
+	friend class CopyEngine;
+
+	friend class RenderEngine;
+
+	std::shared_ptr<UploadHeap> uploadHeaps;
 
 	UINT uploadHeapIndex;
 
+	std::shared_ptr<UINT> globalState;
+
+	UINT internalState;
+
+};
+
+struct PendingBufferBarrier
+{
+	Buffer* buffer;
+
+	UINT afterState;
 };
 
 #endif // !_BUFFER_H_

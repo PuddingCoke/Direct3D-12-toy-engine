@@ -51,7 +51,13 @@
     <ClInclude Include="Inc\Gear\Core\CopyEngine.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Inc\Gear\Core\DX\Resource\Texture.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
     <ClInclude Include="Inc\Gear\Core\RenderPass.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Gear\Core\RenderEngine.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -87,6 +93,18 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Src\Gear\Core\DX\Buffer.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gear\Core\GraphicsSettings.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gear\Core\DX\Texture.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gear\Core\RenderPass.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gear\Core\RenderEngine.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

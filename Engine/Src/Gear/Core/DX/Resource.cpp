@@ -9,7 +9,9 @@ Resource::~Resource()
 {
 }
 
-Resource::Resource(const D3D12_HEAP_PROPERTIES* properties, D3D12_HEAP_FLAGS flags, const D3D12_RESOURCE_DESC* desc, D3D12_RESOURCE_STATES initialState, const D3D12_CLEAR_VALUE* clearValues)
+Resource::Resource(const D3D12_HEAP_PROPERTIES* properties, D3D12_HEAP_FLAGS flags, const D3D12_RESOURCE_DESC* desc,
+	const ResourceUsage usage, D3D12_RESOURCE_STATES initialState, const D3D12_CLEAR_VALUE* clearValues):
+	usage(usage)
 {
 	GraphicsDevice::get()->CreateCommittedResource(properties, flags, desc, initialState, clearValues, IID_PPV_ARGS(&resource));
 }

@@ -16,13 +16,13 @@ public:
 
 	void Reset();
 
-	ID3D12GraphicsCommandList* get();
+	ID3D12GraphicsCommandList7* get();
 
 private:
 
 	CommandAllocator* allocators;
 
-	ComPtr<ID3D12GraphicsCommandList> commandList;
+	ComPtr<ID3D12GraphicsCommandList7> commandList;
 
 };
 
