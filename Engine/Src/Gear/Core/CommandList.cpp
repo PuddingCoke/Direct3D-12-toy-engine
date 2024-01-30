@@ -3,7 +3,7 @@
 CommandList::CommandList(const D3D12_COMMAND_LIST_TYPE type) :
 	allocators(new CommandAllocator[GraphicsSettings::FrameBufferCount]{ CommandAllocator(type),CommandAllocator(type),CommandAllocator(type)})
 {
-	GraphicsDevice::get()->CreateCommandList(0, type, allocators[GraphicsSettings::frameIndex].get(), nullptr, IID_PPV_ARGS(&commandList));
+	GraphicsDevice::get()->CreateCommandList(0, type, allocators[GraphicsSettings::getFrameIndex()].get(), nullptr, IID_PPV_ARGS(&commandList));
 
 	commandList->Close();
 }
@@ -15,12 +15,12 @@ CommandList::~CommandList()
 
 void CommandList::Reset()
 {
-	allocators[GraphicsSettings::frameIndex].get()->Reset();
+	allocators[GraphicsSettings::getFrameIndex()].get()->Reset();
 
-	commandList->Reset(allocators[GraphicsSettings::frameIndex].get(), nullptr);
+	commandList->Reset(allocators[GraphicsSettings::getFrameIndex()].get(), nullptr);
 }
 
-ID3D12GraphicsCommandList* CommandList::get()
+ID3D12GraphicsCommandList7* CommandList::get()
 {
 	return commandList.Get();
 }

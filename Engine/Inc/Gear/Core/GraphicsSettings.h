@@ -3,16 +3,22 @@
 #ifndef _GRAPHICSSETTINGS_H_
 #define _GRAPHICSSETTINGS_H_
 
-#include<windef.h>
+#include<Windows.h>
 
-namespace GraphicsSettings
+class GraphicsSettings
 {
+public:
 
-	constexpr UINT FrameBufferCount = 3;
+	static constexpr UINT FrameBufferCount = 3;
 
-	UINT frameIndex = 0;
+	static UINT getFrameIndex();
 
-}
+private:
+
+	friend class Gear;
+
+	static UINT frameIndex;
+
+};
 
 #endif // !_GRAPHICSSETTINGS_H_
-
