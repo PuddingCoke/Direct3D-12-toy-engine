@@ -43,12 +43,35 @@ void Texture::updateGlobalStates()
 	{
 		(*globalState).allState = internalState.allState;
 	}
-
-	for (UINT i = 0; i < mipLevels; i++)
+	else
 	{
-		if (internalState.mipLevelStates[i] != D3D12_RESOURCE_STATE_UNKNOWN)
+		UINT tempState = internalState.mipLevelStates[0];
+
+		if (tempState != D3D12_RESOURCE_STATE_UNKNOWN)
 		{
-			(*globalState).mipLevelStates[i] = internalState.mipLevelStates[i];
+			bool uniformState = true;
+
+			for (UINT mipSlice = 0; mipSlice < mipLevels; mipSlice++)
+			{
+				if (internalState.mipLevelStates[mipSlice] != tempState)
+				{
+					uniformState = false;
+					break;
+				}
+			}
+
+			if (uniformState)
+			{
+				(*globalState).allState = tempState;
+			}
+		}
+	}
+
+	for (UINT mipSlice = 0; mipSlice < mipLevels; mipSlice++)
+	{
+		if (internalState.mipLevelStates[mipSlice] != D3D12_RESOURCE_STATE_UNKNOWN)
+		{
+			(*globalState).mipLevelStates[mipSlice] = internalState.mipLevelStates[mipSlice];
 		}
 	}
 }
