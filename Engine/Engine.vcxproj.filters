@@ -36,7 +36,7 @@
     <ClInclude Include="Inc\Gear\Core\DX\Resource\Buffer.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Inc\Gear\Core\GraphicsSettings.h">
+    <ClInclude Include="Inc\Gear\Core\Graphics.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="Inc\Gear\Core\DX\Resource\UploadHeap.h">
@@ -58,6 +58,15 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="Inc\Gear\Core\RenderEngine.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Gear\Core\DescriptorHeap.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Gear\Core\GlobalDescriptorHeap.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Gear\Core\GlobalRootSignature.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -95,7 +104,7 @@
     <ClCompile Include="Src\Gear\Core\DX\Buffer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Core\GraphicsSettings.cpp">
+    <ClCompile Include="Src\Gear\Core\Graphics.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Src\Gear\Core\DX\Texture.cpp">
@@ -105,6 +114,15 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Src\Gear\Core\RenderEngine.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gear\Core\DescriptorHeap.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gear\Core\GlobalDescriptorHeap.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gear\Core\GlobalRootSignature.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

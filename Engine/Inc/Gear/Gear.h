@@ -3,6 +3,9 @@
 #ifndef _GEAR_H_
 #define _GEAR_H_
 
+#include<Gear/Core/CopyEngine.h>
+#include<Gear/Core/RenderEngine.h>
+#include<Gear/Core/Graphics.h>
 #include<Gear/Window/Win32Form.h>
 #include<Gear/Configuration.h>
 #include<Gear/Game.h>
@@ -40,8 +43,6 @@ private:
 
 	void runGame();
 
-	void runEncode();
-
 	void destroy();
 
 	Gear();
@@ -61,8 +62,6 @@ private:
 	static constexpr DWORD wallpaperWndStyle = WS_POPUP;
 
 	static LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-
-	static LRESULT CALLBACK WallpaperProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 };
 
