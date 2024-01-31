@@ -143,12 +143,15 @@
     <ClInclude Include="Inc\Gear\Core\CommandList.h" />
     <ClInclude Include="Inc\Gear\Core\CopyEngine.h" />
     <ClInclude Include="Inc\Gear\Core\CommandAllocator.h" />
+    <ClInclude Include="Inc\Gear\Core\DescriptorHeap.h" />
     <ClInclude Include="Inc\Gear\Core\DX\Resource\Texture.h" />
     <ClInclude Include="Inc\Gear\Core\DX\Resource\Buffer.h" />
     <ClInclude Include="Inc\Gear\Core\DX\Resource\Resource.h" />
     <ClInclude Include="Inc\Gear\Core\DX\Resource\UploadHeap.h" />
+    <ClInclude Include="Inc\Gear\Core\GlobalDescriptorHeap.h" />
+    <ClInclude Include="Inc\Gear\Core\GlobalRootSignature.h" />
     <ClInclude Include="Inc\Gear\Core\GraphicsDevice.h" />
-    <ClInclude Include="Inc\Gear\Core\GraphicsSettings.h" />
+    <ClInclude Include="Inc\Gear\Core\Graphics.h" />
     <ClInclude Include="Inc\Gear\Core\RenderEngine.h" />
     <ClInclude Include="Inc\Gear\Core\RenderPass.h" />
     <ClInclude Include="Inc\Gear\Game.h" />
@@ -156,10 +159,13 @@
     <ClInclude Include="Inc\Gear\Window\Win32Form.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Src\Gear\Core\DescriptorHeap.cpp" />
+    <ClCompile Include="Src\Gear\Core\GlobalDescriptorHeap.cpp" />
+    <ClCompile Include="Src\Gear\Core\GlobalRootSignature.cpp" />
     <ClCompile Include="Src\Gear\Core\RenderEngine.cpp" />
     <ClCompile Include="Src\Gear\Core\RenderPass.cpp" />
     <ClCompile Include="Src\Gear\Core\DX\Texture.cpp" />
-    <ClCompile Include="Src\Gear\Core\GraphicsSettings.cpp" />
+    <ClCompile Include="Src\Gear\Core\Graphics.cpp" />
     <ClCompile Include="Src\Gear\Core\DX\Buffer.cpp" />
     <ClCompile Include="Src\Gear\Core\CommandAllocator.cpp" />
     <ClCompile Include="Src\Gear\Configuration.cpp" />

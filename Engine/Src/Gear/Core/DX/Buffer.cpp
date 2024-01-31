@@ -2,7 +2,7 @@
 
 Buffer::Buffer(const UINT size, const ResourceUsage usage, const bool cpuWrite) :
 	Resource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE, &CD3DX12_RESOURCE_DESC::Buffer(size), usage, D3D12_RESOURCE_STATE_COPY_DEST, nullptr),
-	uploadHeaps(cpuWrite ? (new UploadHeap[GraphicsSettings::FrameBufferCount]{ UploadHeap(size),UploadHeap(size), UploadHeap(size) }) : nullptr),
+	uploadHeaps(cpuWrite ? (new UploadHeap[Graphics::FrameBufferCount]{ UploadHeap(size),UploadHeap(size), UploadHeap(size) }) : nullptr),
 	uploadHeapIndex(0),
 	globalState(std::make_shared<UINT>(D3D12_RESOURCE_STATE_COPY_DEST)),
 	internalState(D3D12_RESOURCE_STATE_COPY_DEST)

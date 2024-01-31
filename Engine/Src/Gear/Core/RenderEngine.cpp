@@ -1,5 +1,12 @@
 #include<Gear/Core/RenderEngine.h>
 
+RenderEngine* RenderEngine::instance = nullptr;
+
+RenderEngine* RenderEngine::get()
+{
+	return instance;
+}
+
 void RenderEngine::submitRenderPass(RenderPass* const pass)
 {
 	std::vector<D3D12_RESOURCE_BARRIER> barriers;
@@ -135,16 +142,38 @@ void RenderEngine::submitRenderPass(RenderPass* const pass)
 
 		pass->transitionCMD->get()->Close();
 
-		ID3D12CommandList* const commandLists[2] = { pass->transitionCMD->get(),pass->renderCMD->get() };
-
-		commandQueue->ExecuteCommandLists(2, commandLists);
+		commandLists.push_back(pass->transitionCMD->get());
+		commandLists.push_back(pass->renderCMD->get());
 	}
 	else
 	{
-		ID3D12CommandList* const commandLists[] = { pass->renderCMD->get() };
-
-		commandQueue->ExecuteCommandLists(1, commandLists);
+		commandLists.push_back(pass->renderCMD->get());
 	}
 
 	pass->updateRefResStates();
+}
+
+void RenderEngine::processCommandLists()
+{
+	commandQueue->ExecuteCommandLists(commandLists.size(), commandLists.data());
+	commandLists.clear();
+}
+
+void RenderEngine::present()
+{
+	swapChain->Present(1, 0);
+
+	const UINT64 currentFenceValue = fenceValues[Graphics::frameIndex];
+
+	commandQueue->Signal(fence.Get(), currentFenceValue);
+
+	Graphics::frameIndex = swapChain->GetCurrentBackBufferIndex();
+
+	if (fence->GetCompletedValue() < fenceValues[Graphics::frameIndex])
+	{
+		fence->SetEventOnCompletion(fenceValues[Graphics::frameIndex], fenceEvent);
+		WaitForSingleObjectEx(fenceEvent, INFINITE, FALSE);
+	}
+
+	fenceValues[Graphics::frameIndex] = currentFenceValue + 1;
 }

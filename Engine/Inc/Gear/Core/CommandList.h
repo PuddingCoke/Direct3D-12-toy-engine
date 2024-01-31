@@ -4,7 +4,7 @@
 #define _COMMANDLIST_H_
 
 #include"CommandAllocator.h"
-#include"GraphicsSettings.h"
+#include"Graphics.h"
 
 class CommandList
 {

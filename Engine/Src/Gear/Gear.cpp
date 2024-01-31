@@ -37,7 +37,6 @@ void Gear::iniGame(Game* const game)
 		break;
 
 	case Configuration::EngineUsage::VIDEOPLAYBACK:
-		runEncode();
 		break;
 	}
 
@@ -50,15 +49,22 @@ void Gear::runGame()
 
 	while (winform->pollEvents())
 	{
-		const std::chrono::high_resolution_clock::time_point timeStart = clock.now();
+		const std::chrono::high_resolution_clock::time_point startPoint = clock.now();
 
-		const std::chrono::high_resolution_clock::time_point timeEnd = clock.now();
+		game->update(0.f);
+
+		game->render();
+
+		RenderEngine::get()->processCommandLists();
+
+		RenderEngine::get()->present();
+
+		const std::chrono::high_resolution_clock::time_point endPoint = clock.now();
+
+		Graphics::time.deltaTime = std::chrono::duration_cast<std::chrono::milliseconds>(endPoint - startPoint).count() / 1000.f;
+		Graphics::time.timeElapsed += Graphics::time.deltaTime;
 	}
 
-}
-
-void Gear::runEncode()
-{
 }
 
 void Gear::destroy()
@@ -94,29 +100,6 @@ void Gear::iniWindow(const std::wstring& title, const UINT& width, const UINT& h
 }
 
 LRESULT Gear::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
-{
-	switch (uMsg)
-	{
-	case WM_PAINT:
-	{
-		PAINTSTRUCT ps;
-		BeginPaint(hWnd, &ps);
-		EndPaint(hWnd, &ps);
-	}
-	break;
-
-	case WM_DESTROY:
-		PostQuitMessage(0);
-		break;
-
-	default:
-		return DefWindowProc(hWnd, uMsg, wParam, lParam);
-	}
-
-	return 0;
-}
-
-LRESULT Gear::WallpaperProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)
 	{

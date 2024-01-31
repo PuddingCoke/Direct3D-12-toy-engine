@@ -4,7 +4,7 @@
 #define _UPLOADHEAP_H_
 
 #include<Gear/Core/GraphicsDevice.h>
-#include<Gear/Core/GraphicsSettings.h>
+#include<Gear/Core/Graphics.h>
 
 #include"Resource.h"
 

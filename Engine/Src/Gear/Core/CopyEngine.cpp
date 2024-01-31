@@ -1,5 +1,7 @@
 #include<Gear/Core/CopyEngine.h>
 
+CopyEngine* CopyEngine::instance = nullptr;
+
 void CopyEngine::pushResourceCopy(Resource* const dstRes, Resource* const srcRes)
 {
 	std::lock_guard<std::mutex> guard(instance->updateMutex);
