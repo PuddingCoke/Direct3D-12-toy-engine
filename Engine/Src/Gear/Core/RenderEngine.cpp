@@ -4,48 +4,49 @@ void RenderEngine::submitRenderPass(RenderPass* const pass)
 {
 	std::vector<D3D12_RESOURCE_BARRIER> barriers;
 
-	pass->transitionCMD->Reset();
-
-	for (UINT i = 0; i < pass->pendingBufferBarrier.size(); i++)
+	for (UINT bufferIdx = 0; bufferIdx < pass->pendingBufferBarrier.size(); bufferIdx++)
 	{
+		PendingBufferBarrier pendingBarrier = pass->pendingBufferBarrier[bufferIdx];
+
 		D3D12_RESOURCE_BARRIER barrier = {};
 		barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 		barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+		barrier.Transition.pResource = pendingBarrier.buffer->getResource();
 
-		if ((*(pass->pendingBufferBarrier[i].buffer->globalState)) != pass->pendingBufferBarrier[i].afterState)
+		if ((*(pendingBarrier.buffer->globalState)) != pendingBarrier.afterState)
 		{
-			barrier.Transition.pResource = pass->pendingBufferBarrier[i].buffer->getResource();
-			barrier.Transition.StateBefore = static_cast<D3D12_RESOURCE_STATES>(*(pass->pendingBufferBarrier[i].buffer->globalState));
-			barrier.Transition.StateAfter = static_cast<D3D12_RESOURCE_STATES>(pass->pendingBufferBarrier[i].afterState);
+			barrier.Transition.StateBefore = static_cast<D3D12_RESOURCE_STATES>(*(pendingBarrier.buffer->globalState));
+			barrier.Transition.StateAfter = static_cast<D3D12_RESOURCE_STATES>(pendingBarrier.afterState);
 			barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 
 			barriers.push_back(barrier);
 		}
-
 	}
 
 	pass->pendingBufferBarrier.clear();
 
-	for (UINT i = 0; i < pass->pendingTextureBarrier.size(); i++)
+	for (UINT textureIdx = 0; textureIdx < pass->pendingTextureBarrier.size(); textureIdx++)
 	{
+		PendingTextureBarrier pendingBarrier = pass->pendingTextureBarrier[textureIdx];
+
 		D3D12_RESOURCE_BARRIER barrier = {};
 		barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 		barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-		barrier.Transition.pResource = pass->pendingTextureBarrier[i].texture->getResource();
+		barrier.Transition.pResource = pendingBarrier.texture->getResource();
 
-		if (pass->pendingTextureBarrier[i].mipSlice == D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES)
+		if (pendingBarrier.mipSlice == D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES)
 		{
-			if (pass->pendingTextureBarrier[i].texture->mipLevels > 1)
+			if (pendingBarrier.texture->mipLevels > 1)
 			{
 				bool uniformState = true;
 
-				if ((*(pass->pendingTextureBarrier[i].texture->globalState)).allState == D3D12_RESOURCE_STATE_UNKNOWN)
+				if ((*(pendingBarrier.texture->globalState)).allState == D3D12_RESOURCE_STATE_UNKNOWN)
 				{
-					UINT tempState = (*(pass->pendingTextureBarrier[i].texture->globalState)).mipLevelStates[0];
+					UINT tempState = (*(pendingBarrier.texture->globalState)).mipLevelStates[0];
 
-					for (UINT j = 0; j < pass->pendingTextureBarrier[i].texture->mipLevels; j++)
+					for (UINT mipSlice = 0; mipSlice < pendingBarrier.texture->mipLevels; mipSlice++)
 					{
-						if ((*(pass->pendingTextureBarrier[i].texture->globalState)).mipLevelStates[j] != tempState)
+						if ((*(pendingBarrier.texture->globalState)).mipLevelStates[mipSlice] != tempState)
 						{
 							uniformState = false;
 							break;
@@ -55,41 +56,40 @@ void RenderEngine::submitRenderPass(RenderPass* const pass)
 
 				if (uniformState)
 				{
-					if ((*(pass->pendingTextureBarrier[i].texture->globalState)).mipLevelStates[0] != pass->pendingTextureBarrier[i].afterState)
+					if ((*(pendingBarrier.texture->globalState)).mipLevelStates[0] != pendingBarrier.afterState)
 					{
 						barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-						barrier.Transition.StateBefore = static_cast<D3D12_RESOURCE_STATES>((*(pass->pendingTextureBarrier[i].texture->globalState)).mipLevelStates[0]);
-						barrier.Transition.StateAfter = static_cast<D3D12_RESOURCE_STATES>(pass->pendingTextureBarrier[i].afterState);
+						barrier.Transition.StateBefore = static_cast<D3D12_RESOURCE_STATES>((*(pendingBarrier.texture->globalState)).mipLevelStates[0]);
+						barrier.Transition.StateAfter = static_cast<D3D12_RESOURCE_STATES>(pendingBarrier.afterState);
 
 						barriers.push_back(barrier);
 					}
 				}
 				else
 				{
-					for (UINT j = 0; j < pass->pendingTextureBarrier[i].texture->mipLevels; j++)
+					for (UINT mipSlice = 0; mipSlice < pendingBarrier.texture->mipLevels; mipSlice++)
 					{
-						if ((*(pass->pendingTextureBarrier[i].texture->globalState)).mipLevelStates[j] != pass->pendingTextureBarrier[i].afterState)
+						if ((*(pendingBarrier.texture->globalState)).mipLevelStates[mipSlice] != pendingBarrier.afterState)
 						{
-							for (UINT k = 0; k < pass->pendingTextureBarrier[i].texture->arraySize; k++)
+							for (UINT arraySlice = 0; arraySlice < pendingBarrier.texture->arraySize; arraySlice++)
 							{
-								barrier.Transition.Subresource = D3D12CalcSubresource(j, k, 0, pass->pendingTextureBarrier[i].texture->mipLevels, pass->pendingTextureBarrier[i].texture->arraySize);
-								barrier.Transition.StateBefore = static_cast<D3D12_RESOURCE_STATES>((*(pass->pendingTextureBarrier[i].texture->globalState)).mipLevelStates[j]);
-								barrier.Transition.StateAfter = static_cast<D3D12_RESOURCE_STATES>(pass->pendingTextureBarrier[i].afterState);
+								barrier.Transition.Subresource = D3D12CalcSubresource(mipSlice, arraySlice, 0, pendingBarrier.texture->mipLevels, pendingBarrier.texture->arraySize);
+								barrier.Transition.StateBefore = static_cast<D3D12_RESOURCE_STATES>((*(pendingBarrier.texture->globalState)).mipLevelStates[mipSlice]);
+								barrier.Transition.StateAfter = static_cast<D3D12_RESOURCE_STATES>(pendingBarrier.afterState);
 
 								barriers.push_back(barrier);
 							}
 						}
 					}
 				}
-
 			}
 			else
 			{
-				if ((*(pass->pendingTextureBarrier[i].texture->globalState)).allState != pass->pendingTextureBarrier[i].afterState)
+				if ((*(pendingBarrier.texture->globalState)).allState != pendingBarrier.afterState)
 				{
 					barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-					barrier.Transition.StateBefore = static_cast<D3D12_RESOURCE_STATES>((*(pass->pendingTextureBarrier[i].texture->globalState)).allState);
-					barrier.Transition.StateAfter = static_cast<D3D12_RESOURCE_STATES>(pass->pendingTextureBarrier[i].afterState);
+					barrier.Transition.StateBefore = static_cast<D3D12_RESOURCE_STATES>((*(pendingBarrier.texture->globalState)).allState);
+					barrier.Transition.StateAfter = static_cast<D3D12_RESOURCE_STATES>(pendingBarrier.afterState);
 
 					barriers.push_back(barrier);
 				}
@@ -97,30 +97,54 @@ void RenderEngine::submitRenderPass(RenderPass* const pass)
 		}
 		else
 		{
-			if ((*(pass->pendingTextureBarrier[i].texture->globalState)).mipLevelStates[pass->pendingTextureBarrier[i].mipSlice] != pass->pendingTextureBarrier[i].afterState)
+			if (pendingBarrier.texture->mipLevels > 1)
 			{
-				for (UINT j = 0; j < pass->pendingTextureBarrier[i].texture->arraySize; j++)
+				if ((*(pendingBarrier.texture->globalState)).mipLevelStates[pendingBarrier.mipSlice] != pendingBarrier.afterState)
 				{
-					barrier.Transition.Subresource = D3D12CalcSubresource(pass->pendingTextureBarrier[i].mipSlice, j, 0, pass->pendingTextureBarrier[i].texture->mipLevels, pass->pendingTextureBarrier[i].texture->arraySize);
-					barrier.Transition.StateBefore = static_cast<D3D12_RESOURCE_STATES>((*(pass->pendingTextureBarrier[i].texture->globalState)).mipLevelStates[pass->pendingTextureBarrier[i].mipSlice]);
-					barrier.Transition.StateAfter = static_cast<D3D12_RESOURCE_STATES>(pass->pendingTextureBarrier[i].afterState);
+					for (UINT arraySlice = 0; arraySlice < pendingBarrier.texture->arraySize; arraySlice++)
+					{
+						barrier.Transition.Subresource = D3D12CalcSubresource(pendingBarrier.mipSlice, arraySlice, 0, pendingBarrier.texture->mipLevels, pendingBarrier.texture->arraySize);
+						barrier.Transition.StateBefore = static_cast<D3D12_RESOURCE_STATES>((*(pendingBarrier.texture->globalState)).mipLevelStates[pendingBarrier.mipSlice]);
+						barrier.Transition.StateAfter = static_cast<D3D12_RESOURCE_STATES>(pendingBarrier.afterState);
+
+						barriers.push_back(barrier);
+					}
+				}
+			}
+			else
+			{
+				if ((*(pendingBarrier.texture->globalState)).allState != pendingBarrier.afterState)
+				{
+					barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+					barrier.Transition.StateBefore = static_cast<D3D12_RESOURCE_STATES>((*(pendingBarrier.texture->globalState)).allState);
+					barrier.Transition.StateAfter = static_cast<D3D12_RESOURCE_STATES>(pendingBarrier.afterState);
 
 					barriers.push_back(barrier);
 				}
 			}
 		}
-
 	}
 
 	pass->pendingTextureBarrier.clear();
 
-	pass->transitionCMD->get()->ResourceBarrier(barriers.size(), barriers.data());
+	if (barriers.size() > 0)
+	{
+		pass->transitionCMD->Reset();
 
-	pass->transitionCMD->get()->Close();
+		pass->transitionCMD->get()->ResourceBarrier(barriers.size(), barriers.data());
 
-	ID3D12CommandList* const commandLists[2] = { pass->transitionCMD->get(),pass->renderCMD->get() };
+		pass->transitionCMD->get()->Close();
 
-	commandQueue->ExecuteCommandLists(2, commandLists);
+		ID3D12CommandList* const commandLists[2] = { pass->transitionCMD->get(),pass->renderCMD->get() };
+
+		commandQueue->ExecuteCommandLists(2, commandLists);
+	}
+	else
+	{
+		ID3D12CommandList* const commandLists[] = { pass->renderCMD->get() };
+
+		commandQueue->ExecuteCommandLists(1, commandLists);
+	}
 
 	pass->updateRefResStates();
 }
