@@ -3,7 +3,7 @@
 #ifndef _GLOBALROOTSIGNATURE_H_
 #define _GLOBALROOTSIGNATURE_H_
 
-#include<Gear/Core/GraphicsDevice.h>
+#include<Gear/Core/RootSignature.h>
 
 class GlobalRootSignature
 {
@@ -21,7 +21,9 @@ private:
 
 	GlobalRootSignature();
 
-	ComPtr<ID3D12RootSignature> rootSignature;
+	RootSignature* graphicsRootSignature;
+
+	RootSignature* computeRootSignature;
 
 };
 
