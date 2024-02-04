@@ -5,7 +5,11 @@
 
 #include<Gear/Core/DescriptorHeap.h>
 
-class GlobalDescriptorHeap :public DescriptorHeap
+using StaticDescriptorHandle = DescriptorHeap::StaticDescriptorHandle;
+
+using DynamicDescriptorHandle = DescriptorHeap::DynamicDescriptorHandle;
+
+class GlobalDescriptorHeap
 {
 public:
 
@@ -15,13 +19,23 @@ public:
 
 private:
 
-	GlobalDescriptorHeap();
+	friend class Gear;
 
 	static GlobalDescriptorHeap* instance;
 
-	static constexpr UINT DescriptorHeapSize = 1000000;
+	GlobalDescriptorHeap();
 
-	static constexpr UINT PerSubRegionSize = 1000;
+	~GlobalDescriptorHeap();
+
+	DescriptorHeap* resourceHeap;
+
+	DescriptorHeap* samplerHeap;
+
+	DescriptorHeap* renderTargetHeap;
+
+	DescriptorHeap* depthStencilHeap;
+
+	DescriptorHeap* indexBufferHeap;
 
 };
 

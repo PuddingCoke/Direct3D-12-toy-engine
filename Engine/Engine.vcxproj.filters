@@ -63,13 +63,13 @@
     <ClInclude Include="Inc\Gear\Core\DescriptorHeap.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Inc\Gear\Core\GlobalDescriptorHeap.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="Inc\Gear\Core\GlobalRootSignature.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="Inc\Gear\Core\RootSignature.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Gear\Core\GlobalDescriptorHeap.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -122,13 +122,13 @@
     <ClCompile Include="Src\Gear\Core\DescriptorHeap.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Core\GlobalDescriptorHeap.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="Src\Gear\Core\GlobalRootSignature.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Src\Gear\Core\RootSignature.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gear\Core\GlobalDescriptorHeap.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

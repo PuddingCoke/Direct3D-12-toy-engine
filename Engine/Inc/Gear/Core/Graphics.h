@@ -49,8 +49,6 @@ private:
 
 	static Graphics* instance;
 
-	ComPtr<ID3D12RootSignature> graphicsRootSignature;
-
 };
 
 #endif // !_GRAPHICS_H_

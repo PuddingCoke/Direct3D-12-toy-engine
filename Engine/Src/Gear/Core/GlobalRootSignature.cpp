@@ -2,6 +2,16 @@
 
 GlobalRootSignature* GlobalRootSignature::instance = nullptr;
 
+RootSignature* GlobalRootSignature::getGraphicsRootSignature()
+{
+	return graphicsRootSignature;
+}
+
+RootSignature* GlobalRootSignature::getComputeRootSignature()
+{
+	return computeRootSignature;
+}
+
 GlobalRootSignature::GlobalRootSignature()
 {
 	CD3DX12_STATIC_SAMPLER_DESC samplerDesc[7] = {};
@@ -76,12 +86,12 @@ GlobalRootSignature::GlobalRootSignature()
 	}
 
 	{
+		samplerDesc[6].Filter = D3D12_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR;
 		samplerDesc[6].AddressU = D3D12_TEXTURE_ADDRESS_MODE_BORDER;
 		samplerDesc[6].AddressV = D3D12_TEXTURE_ADDRESS_MODE_BORDER;
 		samplerDesc[6].AddressW = D3D12_TEXTURE_ADDRESS_MODE_BORDER;
 		samplerDesc[6].BorderColor = D3D12_STATIC_BORDER_COLOR_OPAQUE_BLACK;
 		samplerDesc[6].ComparisonFunc = D3D12_COMPARISON_FUNC_GREATER;
-		samplerDesc[6].Filter = D3D12_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR;
 		samplerDesc[6].MinLOD = 0.f;
 		samplerDesc[6].MaxLOD = D3D12_FLOAT32_MAX;
 	}
@@ -109,7 +119,7 @@ GlobalRootSignature::GlobalRootSignature()
 
 		graphicsRootSignature = new RootSignature(rootSignatureDesc);
 	}
-
+	
 	{
 		CD3DX12_ROOT_PARAMETER1 rootParameters[4] = {};
 		//global constant buffer that can be accessed by any shader stage at any time
@@ -125,5 +135,18 @@ GlobalRootSignature::GlobalRootSignature()
 		rootSignatureDesc.Init_1_1(_countof(rootParameters), rootParameters, _countof(samplerDesc), samplerDesc, D3D12_ROOT_SIGNATURE_FLAG_CBV_SRV_UAV_HEAP_DIRECTLY_INDEXED | D3D12_ROOT_SIGNATURE_FLAG_SAMPLER_HEAP_DIRECTLY_INDEXED);
 	
 		computeRootSignature = new RootSignature(rootSignatureDesc);
+	}
+}
+
+GlobalRootSignature::~GlobalRootSignature()
+{
+	if (graphicsRootSignature)
+	{
+		delete graphicsRootSignature;
+	}
+
+	if (computeRootSignature)
+	{
+		delete computeRootSignature;
 	}
 }
