@@ -156,6 +156,7 @@ void RenderEngine::submitRenderPass(RenderPass* const pass)
 void RenderEngine::processCommandLists()
 {
 	commandQueue->ExecuteCommandLists(commandLists.size(), commandLists.data());
+
 	commandLists.clear();
 }
 
@@ -172,6 +173,7 @@ void RenderEngine::present()
 	if (fence->GetCompletedValue() < fenceValues[Graphics::frameIndex])
 	{
 		fence->SetEventOnCompletion(fenceValues[Graphics::frameIndex], fenceEvent);
+
 		WaitForSingleObjectEx(fenceEvent, INFINITE, FALSE);
 	}
 

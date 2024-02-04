@@ -13,6 +13,10 @@ public:
 
 	void operator=(const GlobalRootSignature&) = delete;
 
+	RootSignature* getGraphicsRootSignature();
+
+	RootSignature* getComputeRootSignature();
+
 private:
 
 	friend class Gear;
@@ -20,6 +24,8 @@ private:
 	static GlobalRootSignature* instance;
 
 	GlobalRootSignature();
+
+	~GlobalRootSignature();
 
 	RootSignature* graphicsRootSignature;
 

@@ -9,7 +9,7 @@ class Texture :public Resource
 {
 public:
 
-	Texture(const UINT width, const UINT height, const DXGI_FORMAT format, const UINT arraySize, const UINT mipLevels, const ResourceUsage usage);
+	Texture(const UINT width, const UINT height, const DXGI_FORMAT format, const UINT arraySize, const UINT mipLevels, const bool stateTracking);
 
 	Texture(const Texture&);
 

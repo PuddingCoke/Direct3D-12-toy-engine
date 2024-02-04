@@ -1,7 +1,7 @@
 #include<Gear/Core/DX/Resource/Texture.h>
 
-Texture::Texture(const UINT width, const UINT height, const DXGI_FORMAT format, const UINT arraySize, const UINT mipLevels, const ResourceUsage usage) :
-	Resource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE, &CD3DX12_RESOURCE_DESC::Tex2D(format, width, height, arraySize, mipLevels), usage, D3D12_RESOURCE_STATE_COPY_DEST, nullptr),
+Texture::Texture(const UINT width, const UINT height, const DXGI_FORMAT format, const UINT arraySize, const UINT mipLevels, const bool stateTracking) :
+	Resource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE, &CD3DX12_RESOURCE_DESC::Tex2D(format, width, height, arraySize, mipLevels), stateTracking, D3D12_RESOURCE_STATE_COPY_DEST, nullptr),
 	width(width),
 	height(height),
 	arraySize(arraySize),

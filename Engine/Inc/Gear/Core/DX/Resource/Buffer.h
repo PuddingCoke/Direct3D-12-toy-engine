@@ -11,7 +11,7 @@ class Buffer :public Resource
 {
 public:
 
-	Buffer(const UINT size, const ResourceUsage usage, const bool cpuWrite);
+	Buffer(const UINT size, const bool stateTracking, const bool cpuWritable);
 
 	Buffer(const Buffer&);
 
