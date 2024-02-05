@@ -4,6 +4,7 @@
 #define _RENDERENGINE_H_
 
 #include<Gear/Core/RenderPass.h>
+#include<Gear/Core/Graphics.h>
 
 #include<dxgi1_6.h>
 
@@ -24,6 +25,10 @@ private:
 	friend class Gear;
 
 	static RenderEngine* instance;
+
+	RenderEngine(HWND hwnd);
+
+	~RenderEngine();
 
 	ComPtr<IDXGISwapChain4> swapChain;
 

@@ -42,3 +42,28 @@ GlobalDescriptorHeap::~GlobalDescriptorHeap()
 		delete indexBufferHeap;
 	}
 }
+
+DescriptorHeap* GlobalDescriptorHeap::getResourceHeap()
+{
+	return instance->resourceHeap;
+}
+
+DescriptorHeap* GlobalDescriptorHeap::getSamplerHeap()
+{
+	return instance->samplerHeap;
+}
+
+DescriptorHeap* GlobalDescriptorHeap::getRenderTargetHeap()
+{
+	return instance->renderTargetHeap;
+}
+
+DescriptorHeap* GlobalDescriptorHeap::getDepthStencilHeap()
+{
+	return instance->depthStencilHeap;
+}
+
+DescriptorHeap* GlobalDescriptorHeap::getIndexBufferHeap()
+{
+	return instance->indexBufferHeap;
+}

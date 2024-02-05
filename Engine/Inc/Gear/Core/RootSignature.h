@@ -17,7 +17,7 @@ public:
 
 	virtual ~RootSignature();
 
-	ID3D12RootSignature* get();
+	ID3D12RootSignature* get() const;
 
 private:
 

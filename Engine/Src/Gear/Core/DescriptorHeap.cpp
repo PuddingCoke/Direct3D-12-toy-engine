@@ -1,10 +1,7 @@
 #include<Gear/Core/DescriptorHeap.h>
 
 DescriptorHeap::DescriptorHeap(const UINT numDescriptors, const UINT subRegionSize, const D3D12_DESCRIPTOR_HEAP_TYPE type, const D3D12_DESCRIPTOR_HEAP_FLAGS flags) :
-	numDescriptors(numDescriptors), 
-	subRegionSize(subRegionSize), 
-	type(type), 
-	incrementSize(GraphicsDevice::get()->GetDescriptorHandleIncrementSize(type))
+	numDescriptors(numDescriptors), subRegionSize(subRegionSize), type(type), incrementSize(GraphicsDevice::get()->GetDescriptorHandleIncrementSize(type))
 {
 	D3D12_DESCRIPTOR_HEAP_DESC desc = {};
 	desc.NodeMask = 0;
@@ -90,7 +87,7 @@ DescriptorHeap::StaticDescriptorHandle::StaticDescriptorHandle(const CD3DX12_CPU
 {
 }
 
-CD3DX12_CPU_DESCRIPTOR_HANDLE DescriptorHeap::StaticDescriptorHandle::getHandle()
+CD3DX12_CPU_DESCRIPTOR_HANDLE DescriptorHeap::StaticDescriptorHandle::getHandle() const
 {
 	return handle;
 }

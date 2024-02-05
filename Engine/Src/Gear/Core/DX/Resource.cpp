@@ -1,6 +1,6 @@
 #include<Gear/Core/DX/Resource/Resource.h>
 
-ID3D12Resource* Resource::getResource()
+ID3D12Resource* Resource::getResource() const
 {
 	return resource.Get();
 }
@@ -14,4 +14,9 @@ Resource::Resource(const D3D12_HEAP_PROPERTIES* properties, D3D12_HEAP_FLAGS fla
 	stateTracking(stateTracking)
 {
 	GraphicsDevice::get()->CreateCommittedResource(properties, flags, desc, initialState, clearValues, IID_PPV_ARGS(&resource));
+}
+
+void Resource::setStateTracking(const bool state)
+{
+	stateTracking = state;
 }

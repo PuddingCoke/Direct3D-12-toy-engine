@@ -3,8 +3,10 @@
 #ifndef _COMMANDLIST_H_
 #define _COMMANDLIST_H_
 
-#include"CommandAllocator.h"
-#include"Graphics.h"
+#include<Gear/Core/CommandAllocator.h>
+#include<Gear/Core/Graphics.h>
+#include<Gear/Core/GlobalDescriptorHeap.h>
+#include<Gear/Core/GlobalRootSignature.h>
 
 class CommandList
 {
@@ -14,15 +16,21 @@ public:
 
 	~CommandList();
 
-	void Reset();
+	void reset();
 
-	ID3D12GraphicsCommandList7* get();
+	void setDescriptorHeap(DescriptorHeap* const resourceHeap, DescriptorHeap* const samplerHeap);
+
+	void setGraphicsRootSignature(RootSignature* const rootSignature);
+
+	void setComputeRootSignature(RootSignature* const rootSignature);
+
+	ID3D12GraphicsCommandList6* get();
 
 private:
 
-	CommandAllocator* allocators;
+	CommandAllocator* allocators[Graphics::FrameBufferCount];
 
-	ComPtr<ID3D12GraphicsCommandList7> commandList;
+	ComPtr<ID3D12GraphicsCommandList6> commandList;
 
 };
 

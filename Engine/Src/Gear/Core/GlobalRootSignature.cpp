@@ -4,12 +4,12 @@ GlobalRootSignature* GlobalRootSignature::instance = nullptr;
 
 RootSignature* GlobalRootSignature::getGraphicsRootSignature()
 {
-	return graphicsRootSignature;
+	return instance->graphicsRootSignature;
 }
 
 RootSignature* GlobalRootSignature::getComputeRootSignature()
 {
-	return computeRootSignature;
+	return instance->computeRootSignature;
 }
 
 GlobalRootSignature::GlobalRootSignature()

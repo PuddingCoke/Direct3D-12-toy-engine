@@ -3,7 +3,6 @@
 #ifndef _GEAR_H_
 #define _GEAR_H_
 
-#include<Gear/Core/CopyEngine.h>
 #include<Gear/Core/RenderEngine.h>
 #include<Gear/Core/Graphics.h>
 #include<Gear/Window/Win32Form.h>

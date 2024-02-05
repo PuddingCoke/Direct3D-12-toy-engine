@@ -141,7 +141,6 @@
   <ItemGroup>
     <ClInclude Include="Inc\Gear\Configuration.h" />
     <ClInclude Include="Inc\Gear\Core\CommandList.h" />
-    <ClInclude Include="Inc\Gear\Core\CopyEngine.h" />
     <ClInclude Include="Inc\Gear\Core\CommandAllocator.h" />
     <ClInclude Include="Inc\Gear\Core\DescriptorHeap.h" />
     <ClInclude Include="Inc\Gear\Core\DX\Resource\Texture.h" />
@@ -171,7 +170,6 @@
     <ClCompile Include="Src\Gear\Core\CommandAllocator.cpp" />
     <ClCompile Include="Src\Gear\Configuration.cpp" />
     <ClCompile Include="Src\Gear\Core\CommandList.cpp" />
-    <ClCompile Include="Src\Gear\Core\CopyEngine.cpp" />
     <ClCompile Include="Src\Gear\Core\DX\Resource.cpp" />
     <ClCompile Include="Src\Gear\Core\DX\UploadHeap.cpp" />
     <ClCompile Include="Src\Gear\Core\GraphicsDevice.cpp" />

@@ -12,22 +12,22 @@ std::future<void> RenderPass::getPassResult()
 
 void RenderPass::setFixedStates()
 {
-	renderCMD->Reset();
+	renderCMD->reset();
 
-	/*
-	* GraphicsRootSignature
-	* ComputeRootSignature
-	* DescriptorHeap
-	*/
+	renderCMD->setDescriptorHeap(GlobalDescriptorHeap::getResourceHeap(), GlobalDescriptorHeap::getSamplerHeap());
+
+	renderCMD->setGraphicsRootSignature(GlobalRootSignature::getGraphicsRootSignature());
+
+	renderCMD->setComputeRootSignature(GlobalRootSignature::getComputeRootSignature());
 }
 
 void RenderPass::updateRefResStates()
 {
-	for (Resource* res : refResources)
+	for (Resource* res : referredResources)
 	{
 		res->updateGlobalStates();
 		res->resetInternalStates();
 	}
 
-	refResources.clear();
+	referredResources.clear();
 }

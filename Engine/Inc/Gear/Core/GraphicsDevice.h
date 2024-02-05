@@ -20,7 +20,7 @@ public:
 
 private:
 
-	friend class Gear;
+	friend class RenderEngine;
 
 	GraphicsDevice();
 

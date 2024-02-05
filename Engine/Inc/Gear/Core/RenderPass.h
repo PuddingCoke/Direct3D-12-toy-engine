@@ -18,6 +18,34 @@ public:
 
 	std::future<void> getPassResult();
 
+protected:
+
+	//per frame
+	void setGraphicsGlobalIndexBuffer();
+
+	//per frame
+	void setComputeGlobalIndexBuffer();
+
+	void setGraphicsConstants();
+
+	void setComputeConstants();
+
+	void setVertexIndexBuffer();
+
+	void setHullIndexBuffer();
+
+	void setGeometryIndexBuffer();
+
+	void setDomainIndexBuffer();
+
+	void setPixelIndexBuffer();
+
+	void setComputeIndexBuffer();
+
+	void setMeshIndexBuffer();
+
+	void setAmplificationIndexBuffer();
+
 private:
 
 	friend class RenderEngine;
@@ -30,7 +58,9 @@ private:
 
 	void updateRefResStates();
 
-	std::unordered_set<Resource*> refResources;
+	std::unordered_set<Resource*> referredResources;
+
+	std::vector<Resource*> transientResources;
 
 	std::vector<PendingBufferBarrier> pendingBufferBarrier;
 

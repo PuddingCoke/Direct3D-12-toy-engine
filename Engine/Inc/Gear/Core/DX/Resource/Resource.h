@@ -13,7 +13,7 @@ class Resource
 {
 public:
 
-	ID3D12Resource* getResource();
+	ID3D12Resource* getResource() const;
 
 	Resource() = delete;
 
@@ -26,11 +26,13 @@ public:
 
 	virtual void resetInternalStates() = 0;
 
+	void setStateTracking(const bool state);
+
 private:
 
 	ComPtr<ID3D12Resource> resource;
 
-	const bool stateTracking;
+	bool stateTracking;
 
 };
 
