@@ -27,9 +27,9 @@ public:
 
 private:
 
-	friend class RenderEngine;
-
 	friend class Gear;
+
+	friend class RenderEngine;
 
 	static UINT frameIndex;
 

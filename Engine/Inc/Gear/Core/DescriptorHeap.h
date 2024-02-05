@@ -18,7 +18,7 @@ public:
 
 		StaticDescriptorHandle(const CD3DX12_CPU_DESCRIPTOR_HANDLE handle, const DescriptorHeap* const descriptorHeap);
 
-		CD3DX12_CPU_DESCRIPTOR_HANDLE getHandle();
+		CD3DX12_CPU_DESCRIPTOR_HANDLE getHandle() const;
 
 		virtual void move();
 

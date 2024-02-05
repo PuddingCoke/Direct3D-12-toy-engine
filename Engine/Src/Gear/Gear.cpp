@@ -21,6 +21,8 @@ int Gear::iniEngine(const Configuration& config, const int& argc, const char* ar
 
 	iniWindow(config.title, config.width, config.height);
 
+	RenderEngine::instance = new RenderEngine(winform->getHandle());
+
 	return 0;
 }
 
@@ -51,7 +53,7 @@ void Gear::runGame()
 	{
 		const std::chrono::high_resolution_clock::time_point startPoint = clock.now();
 
-		game->update(0.f);
+		game->update(Graphics::time.deltaTime);
 
 		game->render();
 
@@ -62,6 +64,7 @@ void Gear::runGame()
 		const std::chrono::high_resolution_clock::time_point endPoint = clock.now();
 
 		Graphics::time.deltaTime = std::chrono::duration_cast<std::chrono::milliseconds>(endPoint - startPoint).count() / 1000.f;
+
 		Graphics::time.timeElapsed += Graphics::time.deltaTime;
 	}
 

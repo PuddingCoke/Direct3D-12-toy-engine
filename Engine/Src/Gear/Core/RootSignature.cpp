@@ -13,7 +13,7 @@ RootSignature::~RootSignature()
 {
 }
 
-ID3D12RootSignature* RootSignature::get()
+ID3D12RootSignature* RootSignature::get() const
 {
 	return rootSignature.Get();
 }

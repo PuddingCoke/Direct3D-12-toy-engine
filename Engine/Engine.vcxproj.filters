@@ -48,9 +48,6 @@
     <ClInclude Include="Inc\Gear\Core\CommandAllocator.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Inc\Gear\Core\CopyEngine.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="Inc\Gear\Core\DX\Resource\Texture.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -99,9 +96,6 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Src\Gear\Core\CommandAllocator.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Gear\Core\CopyEngine.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Src\Gear\Core\DX\Buffer.cpp">

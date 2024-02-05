@@ -136,7 +136,7 @@ void RenderEngine::submitRenderPass(RenderPass* const pass)
 
 	if (barriers.size() > 0)
 	{
-		pass->transitionCMD->Reset();
+		pass->transitionCMD->reset();
 
 		pass->transitionCMD->get()->ResourceBarrier(barriers.size(), barriers.data());
 
@@ -160,6 +160,7 @@ void RenderEngine::processCommandLists()
 	commandLists.clear();
 }
 
+//1 2 3 
 void RenderEngine::present()
 {
 	swapChain->Present(1, 0);
@@ -178,4 +179,78 @@ void RenderEngine::present()
 	}
 
 	fenceValues[Graphics::frameIndex] = currentFenceValue + 1;
+}
+
+RenderEngine::RenderEngine(HWND hwnd):
+	fenceValues{},fenceEvent(nullptr)
+{
+	ComPtr<IDXGIFactory7> factory;
+
+	CreateDXGIFactory2(0, IID_PPV_ARGS(&factory));
+
+	ComPtr<IDXGIAdapter4> adapter;
+
+	for (UINT adapterIndex = 0; 
+		SUCCEEDED(factory->EnumAdapterByGpuPreference(adapterIndex, DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE, IID_PPV_ARGS(&adapter))); 
+		adapterIndex++)
+	{
+		DXGI_ADAPTER_DESC3 desc = {};
+
+		adapter->GetDesc3(&desc);
+
+		if (desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE)
+		{
+			continue;
+		}
+
+		if (SUCCEEDED(D3D12CreateDevice(adapter.Get(), D3D_FEATURE_LEVEL_11_0, _uuidof(ID3D12Device), nullptr)))
+		{
+			break;
+		}
+	}
+
+	{
+		GraphicsDevice::instance = new GraphicsDevice();
+
+		D3D12CreateDevice(adapter.Get(), D3D_FEATURE_LEVEL_12_2, IID_PPV_ARGS(&(GraphicsDevice::instance->device)));
+
+		D3D12_COMMAND_QUEUE_DESC queueDesc = {};
+		queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
+		queueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
+
+		GraphicsDevice::get()->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&commandQueue));
+	}
+
+	GlobalDescriptorHeap::instance = new GlobalDescriptorHeap();
+
+	GlobalRootSignature::instance = new GlobalRootSignature();
+
+	{
+		DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
+		swapChainDesc.BufferCount = Graphics::FrameBufferCount;
+		swapChainDesc.Width = Graphics::getWidth();
+		swapChainDesc.Height = Graphics::getHeight();
+		swapChainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+		swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+		swapChainDesc.SampleDesc.Count = 1;
+
+		ComPtr<IDXGISwapChain1> swapChain1;
+
+		factory->CreateSwapChainForHwnd(commandQueue.Get(), hwnd, &swapChainDesc, nullptr, nullptr, &swapChain1);
+
+		factory->MakeWindowAssociation(hwnd, DXGI_MWA_NO_ALT_ENTER);
+
+		swapChain1.As(&swapChain);
+	}
+
+	GraphicsDevice::get()->CreateFence(fenceValues[Graphics::frameIndex], D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
+
+	fenceValues[Graphics::frameIndex]++;
+
+	fenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+}
+
+RenderEngine::~RenderEngine()
+{
 }

@@ -17,9 +17,19 @@ public:
 
 	void operator=(const GlobalDescriptorHeap&) = delete;
 
+	static DescriptorHeap* getResourceHeap();
+
+	static DescriptorHeap* getSamplerHeap();
+
+	static DescriptorHeap* getRenderTargetHeap();
+
+	static DescriptorHeap* getDepthStencilHeap();
+
+	static DescriptorHeap* getIndexBufferHeap();
+
 private:
 
-	friend class Gear;
+	friend class RenderEngine;
 
 	static GlobalDescriptorHeap* instance;
 
