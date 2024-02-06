@@ -7,6 +7,15 @@
 
 #include"UploadHeap.h"
 
+class Buffer;
+
+struct PendingBufferBarrier
+{
+	Buffer* buffer;
+
+	UINT afterState;
+};
+
 class Buffer :public Resource
 {
 public:
@@ -25,6 +34,10 @@ public:
 
 	void resetInternalStates() override;
 
+	void resetTransitionStates() override;
+
+	void pushBarriersAndStateChanging(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers, std::vector<PendingBufferBarrier>& pendingBarriers);
+
 private:
 
 	friend class CopyEngine;
@@ -39,13 +52,8 @@ private:
 
 	UINT internalState;
 
-};
+	UINT transitionState;
 
-struct PendingBufferBarrier
-{
-	Buffer* buffer;
-
-	UINT afterState;
 };
 
 #endif // !_BUFFER_H_

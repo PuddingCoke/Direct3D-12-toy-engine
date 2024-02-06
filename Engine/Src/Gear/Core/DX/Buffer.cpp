@@ -39,3 +39,39 @@ void Buffer::resetInternalStates()
 {
 	internalState = D3D12_RESOURCE_STATE_UNKNOWN;
 }
+
+void Buffer::resetTransitionStates()
+{
+	transitionState = D3D12_RESOURCE_STATE_UNKNOWN;
+}
+
+void Buffer::pushBarriersAndStateChanging(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers, std::vector<PendingBufferBarrier>& pendingBarriers)
+{
+	if (internalState == D3D12_RESOURCE_STATE_UNKNOWN)
+	{
+		PendingBufferBarrier barrier = {};
+		barrier.buffer = this;
+		barrier.afterState = transitionState;
+
+		pendingBarriers.push_back(barrier);
+
+		internalState = transitionState;
+	}
+	else
+	{
+		if (internalState != transitionState)
+		{
+			D3D12_RESOURCE_BARRIER barrier = {};
+			barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+			barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+			barrier.Transition.pResource = getResource();
+			barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+			barrier.Transition.StateBefore = static_cast<D3D12_RESOURCE_STATES>(internalState);
+			barrier.Transition.StateAfter = static_cast<D3D12_RESOURCE_STATES>(transitionState);
+
+			transitionBarriers.push_back(barrier);
+
+			internalState = transitionState;
+		}
+	}
+}

@@ -16,15 +16,19 @@ public:
 	{
 	public:
 
-		StaticDescriptorHandle(const CD3DX12_CPU_DESCRIPTOR_HANDLE handle, const DescriptorHeap* const descriptorHeap);
+		StaticDescriptorHandle(const CD3DX12_CPU_DESCRIPTOR_HANDLE cpuHandle, const CD3DX12_GPU_DESCRIPTOR_HANDLE gpuHandle, const DescriptorHeap* const descriptorHeap);
 
-		CD3DX12_CPU_DESCRIPTOR_HANDLE getHandle() const;
+		CD3DX12_CPU_DESCRIPTOR_HANDLE getCPUHandle() const;
+
+		CD3DX12_GPU_DESCRIPTOR_HANDLE getGPUHandle() const;
 
 		virtual void move();
 
 	protected:
 
-		CD3DX12_CPU_DESCRIPTOR_HANDLE handle;
+		CD3DX12_CPU_DESCRIPTOR_HANDLE cpuHandle;
+
+		CD3DX12_GPU_DESCRIPTOR_HANDLE gpuHandle;
 
 		const DescriptorHeap* const descriptorHeap;
 
@@ -34,7 +38,7 @@ public:
 	{
 	public:
 
-		DynamicDescriptorHandle(const CD3DX12_CPU_DESCRIPTOR_HANDLE handle, const DescriptorHeap* const descriptorHeap);
+		DynamicDescriptorHandle(const CD3DX12_CPU_DESCRIPTOR_HANDLE cpuHandle, const CD3DX12_GPU_DESCRIPTOR_HANDLE gpuHandle, const DescriptorHeap* const descriptorHeap);
 
 		void move() override;
 
@@ -68,17 +72,25 @@ private:
 
 	ComPtr<ID3D12DescriptorHeap> descriptorHeap;
 
-	CD3DX12_CPU_DESCRIPTOR_HANDLE staticDescriptorPointer;
+	CD3DX12_CPU_DESCRIPTOR_HANDLE staticCPUPointer;
 
-	CD3DX12_CPU_DESCRIPTOR_HANDLE dynamicDescriptorPointer;
+	CD3DX12_CPU_DESCRIPTOR_HANDLE dynamicCPUPointer;
 
-	CD3DX12_CPU_DESCRIPTOR_HANDLE staticDescriptorPointerStart;
+	CD3DX12_CPU_DESCRIPTOR_HANDLE staticCPUPointerStart;
 
-	CD3DX12_CPU_DESCRIPTOR_HANDLE dynamicDescriptorPointerStart;
+	CD3DX12_CPU_DESCRIPTOR_HANDLE dynamicCPUPointerStart;
 
-	std::mutex staticDescriptorLock;
+	CD3DX12_GPU_DESCRIPTOR_HANDLE staticGPUPointer;
 
-	std::mutex dynamicDescriptorLock;
+	CD3DX12_GPU_DESCRIPTOR_HANDLE dynamicGPUPointer;
+
+	CD3DX12_GPU_DESCRIPTOR_HANDLE staticGPUPointerStart;
+
+	CD3DX12_GPU_DESCRIPTOR_HANDLE dynamicGPUPointerStart;
+
+	std::mutex staticPointerLock;
+
+	std::mutex dynamicPointerLock;
 
 };
 
