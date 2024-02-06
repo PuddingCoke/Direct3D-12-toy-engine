@@ -25,6 +25,8 @@ public:
 	virtual void updateGlobalStates() = 0;
 
 	virtual void resetInternalStates() = 0;
+	
+	virtual void resetTransitionStates() = 0;
 
 	void setStateTracking(const bool state);
 

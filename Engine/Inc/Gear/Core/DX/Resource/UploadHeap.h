@@ -24,6 +24,8 @@ public:
 
 	void resetInternalStates() override;
 
+	void resetTransitionStates() override;
+
 };
 
 #endif // !_UPLOADHEAP_H_

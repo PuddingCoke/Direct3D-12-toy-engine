@@ -22,3 +22,7 @@ void UploadHeap::updateGlobalStates()
 void UploadHeap::resetInternalStates()
 {
 }
+
+void UploadHeap::resetTransitionStates()
+{
+}

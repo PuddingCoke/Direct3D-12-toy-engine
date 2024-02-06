@@ -5,6 +5,17 @@
 
 #include"Resource.h"
 
+class Texture;
+
+struct PendingTextureBarrier
+{
+	Texture* texture;
+
+	UINT mipSlice;
+
+	UINT afterState;
+};
+
 class Texture :public Resource
 {
 public:
@@ -18,6 +29,10 @@ public:
 	void updateGlobalStates() override;
 
 	void resetInternalStates() override;
+
+	void resetTransitionStates() override;
+
+	void pushBarriersAndStateChanging(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers, std::vector<PendingTextureBarrier>& pendingBarriers);
 
 private:
 
@@ -44,15 +59,8 @@ private:
 
 	STATES internalState;
 
-};
+	STATES transitionState;
 
-struct PendingTextureBarrier
-{
-	Texture* texture;
-
-	UINT mipSlice;
-
-	UINT afterState;
 };
 
 #endif // !_TEXTURE_H_

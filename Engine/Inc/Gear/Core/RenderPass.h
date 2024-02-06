@@ -60,7 +60,13 @@ private:
 
 	std::unordered_set<Resource*> referredResources;
 
+	std::unordered_set<Buffer*> transitionBuffers;
+
+	std::unordered_set<Texture*> transitionTextures;
+
 	std::vector<Resource*> transientResources;
+
+	std::vector<D3D12_RESOURCE_BARRIER> transitionBarriers;
 
 	std::vector<PendingBufferBarrier> pendingBufferBarrier;
 
