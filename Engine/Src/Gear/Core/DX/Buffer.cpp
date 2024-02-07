@@ -5,7 +5,8 @@ Buffer::Buffer(const UINT size, const bool stateTracking, const bool cpuWritable
 	uploadHeaps(cpuWritable ? (new UploadHeap[Graphics::FrameBufferCount]{ UploadHeap(size),UploadHeap(size), UploadHeap(size) }) : nullptr),
 	uploadHeapIndex(0),
 	globalState(std::make_shared<UINT>(D3D12_RESOURCE_STATE_COPY_DEST)),
-	internalState(D3D12_RESOURCE_STATE_COPY_DEST)
+	internalState(D3D12_RESOURCE_STATE_COPY_DEST),
+	transitionState(D3D12_RESOURCE_STATE_UNKNOWN)
 {
 }
 
@@ -14,7 +15,8 @@ Buffer::Buffer(const Buffer& buff) :
 	uploadHeaps(buff.uploadHeaps),
 	uploadHeapIndex(buff.uploadHeapIndex),
 	globalState(buff.globalState),
-	internalState(D3D12_RESOURCE_STATE_UNKNOWN)
+	internalState(D3D12_RESOURCE_STATE_UNKNOWN),
+	transitionState(D3D12_RESOURCE_STATE_UNKNOWN)
 {
 }
 

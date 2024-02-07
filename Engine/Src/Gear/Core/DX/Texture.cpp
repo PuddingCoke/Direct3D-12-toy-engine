@@ -8,12 +8,14 @@ Texture::Texture(const UINT width, const UINT height, const DXGI_FORMAT format, 
 	mipLevels(mipLevels),
 	format(format),
 	globalState(std::make_shared<STATES>(STATES{ D3D12_RESOURCE_STATE_COPY_DEST,std::vector<UINT>(mipLevels) })),
-	internalState(STATES{ D3D12_RESOURCE_STATE_COPY_DEST,std::vector<UINT>(mipLevels) })
+	internalState(STATES{ D3D12_RESOURCE_STATE_COPY_DEST,std::vector<UINT>(mipLevels) }),
+	transitionState(STATES{ D3D12_RESOURCE_STATE_UNKNOWN,std::vector<UINT>(mipLevels) })
 {
 	for (UINT i = 0; i < mipLevels; i++)
 	{
 		(*globalState).mipLevelStates[i] = D3D12_RESOURCE_STATE_COPY_DEST;
 		internalState.mipLevelStates[i] = D3D12_RESOURCE_STATE_COPY_DEST;
+		transitionState.mipLevelStates[i] = D3D12_RESOURCE_STATE_UNKNOWN;
 	}
 }
 
@@ -25,11 +27,13 @@ Texture::Texture(const Texture& tex) :
 	mipLevels(tex.mipLevels),
 	format(tex.format),
 	globalState(tex.globalState),
-	internalState(STATES{ D3D12_RESOURCE_STATE_UNKNOWN,std::vector<UINT>(mipLevels) })
+	internalState(STATES{ D3D12_RESOURCE_STATE_UNKNOWN,std::vector<UINT>(mipLevels) }),
+	transitionState(STATES{ D3D12_RESOURCE_STATE_UNKNOWN,std::vector<UINT>(mipLevels) })
 {
 	for (UINT i = 0; i < mipLevels; i++)
 	{
 		internalState.mipLevelStates[i] = D3D12_RESOURCE_STATE_UNKNOWN;
+		transitionState.mipLevelStates[i] = D3D12_RESOURCE_STATE_UNKNOWN;
 	}
 }
 
