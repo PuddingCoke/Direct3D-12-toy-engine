@@ -2,17 +2,24 @@
 
 Buffer::Buffer(const UINT size, const bool stateTracking, const bool cpuWritable) :
 	Resource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE, &CD3DX12_RESOURCE_DESC::Buffer(size), (cpuWritable ? true : false) | stateTracking, D3D12_RESOURCE_STATE_COPY_DEST, nullptr),
-	uploadHeaps(cpuWritable ? (new UploadHeap[Graphics::FrameBufferCount]{ UploadHeap(size),UploadHeap(size), UploadHeap(size) }) : nullptr),
+	uploadHeaps{},
 	uploadHeapIndex(0),
 	globalState(std::make_shared<UINT>(D3D12_RESOURCE_STATE_COPY_DEST)),
 	internalState(D3D12_RESOURCE_STATE_COPY_DEST),
 	transitionState(D3D12_RESOURCE_STATE_UNKNOWN)
 {
+	if (cpuWritable)
+	{
+		for (UINT i = 0; i < Graphics::FrameBufferCount; i++)
+		{
+			uploadHeaps[i] = new UploadHeap(size, D3D12_HEAP_FLAG_NONE);
+		}
+	}
 }
 
-Buffer::Buffer(const Buffer& buff) :
+Buffer::Buffer(Buffer& buff) :
 	Resource(buff),
-	uploadHeaps(buff.uploadHeaps),
+	uploadHeaps{},
 	uploadHeapIndex(buff.uploadHeapIndex),
 	globalState(buff.globalState),
 	internalState(D3D12_RESOURCE_STATE_UNKNOWN),
@@ -20,13 +27,20 @@ Buffer::Buffer(const Buffer& buff) :
 {
 }
 
-void Buffer::update(const void* const data, const UINT dataSize)
+void Buffer::update(const void* const data, const UINT dataSize) const
 {
-	uploadHeaps.get()[uploadHeapIndex].update(data, dataSize);
+	uploadHeaps[uploadHeapIndex]->update(data, dataSize);
 }
 
 Buffer::~Buffer()
 {
+	for (UINT i = 0; i < Graphics::FrameBufferCount; i++)
+	{
+		if (uploadHeaps[i])
+		{
+			delete uploadHeaps[i];
+		}
+	}
 }
 
 void Buffer::updateGlobalStates()

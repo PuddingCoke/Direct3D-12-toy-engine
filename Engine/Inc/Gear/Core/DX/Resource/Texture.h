@@ -22,7 +22,11 @@ public:
 
 	Texture(const UINT width, const UINT height, const DXGI_FORMAT format, const UINT arraySize, const UINT mipLevels, const bool stateTracking);
 
-	Texture(const Texture&);
+	Texture(Texture&);
+
+	void operator=(const Texture&) = delete;
+
+	Texture(const Texture&) = delete;
 
 	virtual ~Texture();
 

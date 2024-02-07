@@ -12,13 +12,15 @@ class UploadHeap :public Resource
 {
 public:
 
-	UploadHeap() = delete;
+	UploadHeap(const UINT size, const D3D12_HEAP_FLAGS flags = D3D12_HEAP_FLAG_NONE);
+
+	UploadHeap(UploadHeap&);
 
 	void operator=(const UploadHeap&) = delete;
 
-	UploadHeap(const UINT size, const D3D12_HEAP_FLAGS flags = D3D12_HEAP_FLAG_NONE);
+	UploadHeap(const UploadHeap&) = delete;
 
-	void update(const void* const data, const UINT dataSize);
+	void update(const void* const data, const UINT dataSize) const;
 
 	void updateGlobalStates() override;
 
