@@ -19,7 +19,7 @@ Texture::Texture(const UINT width, const UINT height, const DXGI_FORMAT format, 
 	}
 }
 
-Texture::Texture(const Texture& tex) :
+Texture::Texture(Texture& tex) :
 	Resource(tex),
 	width(tex.width),
 	height(tex.height),

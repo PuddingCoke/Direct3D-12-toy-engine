@@ -15,12 +15,16 @@ public:
 
 	ID3D12Resource* getResource() const;
 
-	Resource() = delete;
-
 	virtual ~Resource();
 
 	Resource(const D3D12_HEAP_PROPERTIES* properties, D3D12_HEAP_FLAGS flags, const D3D12_RESOURCE_DESC* desc,
 		const bool stateTracking, D3D12_RESOURCE_STATES initialState, const D3D12_CLEAR_VALUE* clearValues);
+
+	Resource(Resource&);
+
+	Resource(const Resource&) = delete;
+
+	void operator=(const Resource&) = delete;
 
 	virtual void updateGlobalStates() = 0;
 
@@ -30,11 +34,15 @@ public:
 
 	void setStateTracking(const bool state);
 
+	bool isSharedResource() const;
+
 private:
 
 	ComPtr<ID3D12Resource> resource;
 
 	bool stateTracking;
+
+	bool sharedResource;
 
 };
 

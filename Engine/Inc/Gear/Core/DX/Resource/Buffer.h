@@ -22,11 +22,13 @@ public:
 
 	Buffer(const UINT size, const bool stateTracking, const bool cpuWritable);
 
-	Buffer(const Buffer&);
+	Buffer(Buffer&);
+
+	Buffer(const Buffer&) = delete;
 
 	void operator=(const Buffer&) = delete;
 
-	void update(const void* const data, const UINT dataSize);
+	void update(const void* const data, const UINT dataSize) const;
 
 	virtual ~Buffer();
 
@@ -44,7 +46,7 @@ private:
 
 	friend class RenderEngine;
 
-	std::shared_ptr<UploadHeap> uploadHeaps;
+	UploadHeap* uploadHeaps[Graphics::FrameBufferCount];
 
 	UINT uploadHeapIndex;
 
