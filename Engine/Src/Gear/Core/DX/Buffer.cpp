@@ -1,7 +1,7 @@
 #include<Gear/Core/DX/Resource/Buffer.h>
 
 Buffer::Buffer(const UINT size, const bool stateTracking, const bool cpuWritable) :
-	Resource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE, &CD3DX12_RESOURCE_DESC::Buffer(size), (cpuWritable ? true : false) | stateTracking, D3D12_RESOURCE_STATE_COPY_DEST, nullptr),
+	Resource(CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE, CD3DX12_RESOURCE_DESC::Buffer(size), cpuWritable | stateTracking, D3D12_RESOURCE_STATE_COPY_DEST, nullptr),
 	uploadHeaps{},
 	uploadHeapIndex(0),
 	globalState(std::make_shared<UINT>(D3D12_RESOURCE_STATE_COPY_DEST)),

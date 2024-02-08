@@ -1,7 +1,7 @@
 #include<Gear/Core/DX/Resource/Texture.h>
 
 Texture::Texture(const UINT width, const UINT height, const DXGI_FORMAT format, const UINT arraySize, const UINT mipLevels, const bool stateTracking) :
-	Resource(&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE, &CD3DX12_RESOURCE_DESC::Tex2D(format, width, height, arraySize, mipLevels), stateTracking, D3D12_RESOURCE_STATE_COPY_DEST, nullptr),
+	Resource(CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE, CD3DX12_RESOURCE_DESC::Tex2D(format, width, height, arraySize, mipLevels), stateTracking, D3D12_RESOURCE_STATE_COPY_DEST, nullptr),
 	width(width),
 	height(height),
 	arraySize(arraySize),
@@ -49,7 +49,7 @@ void Texture::updateGlobalStates()
 	}
 	else
 	{
-		UINT tempState = internalState.mipLevelStates[0];
+		const UINT tempState = internalState.mipLevelStates[0];
 
 		if (tempState != D3D12_RESOURCE_STATE_UNKNOWN)
 		{
@@ -86,7 +86,7 @@ void Texture::resetInternalStates()
 
 	for (UINT i = 0; i < mipLevels; i++)
 	{
-		internalState.mipLevelStates[mipLevels] = D3D12_RESOURCE_STATE_UNKNOWN;
+		internalState.mipLevelStates[i] = D3D12_RESOURCE_STATE_UNKNOWN;
 	}
 }
 
