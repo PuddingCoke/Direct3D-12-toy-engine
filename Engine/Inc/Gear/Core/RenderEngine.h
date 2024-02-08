@@ -6,7 +6,16 @@
 #include<Gear/Core/RenderPass.h>
 #include<Gear/Core/Graphics.h>
 
+#include<iostream>
 #include<dxgi1_6.h>
+
+enum class GPUVendor
+{
+	NVIDIA,
+	AMD,
+	INTEL,
+	UNKNOWN
+};
 
 class RenderEngine
 {
@@ -18,7 +27,11 @@ public:
 
 	void processCommandLists();
 
+	void waitForGPU();
+
 	void present();
+
+	GPUVendor getVendor() const;
 
 private:
 
@@ -29,6 +42,8 @@ private:
 	RenderEngine(HWND hwnd);
 
 	~RenderEngine();
+
+	GPUVendor vendor;
 
 	ComPtr<IDXGISwapChain4> swapChain;
 

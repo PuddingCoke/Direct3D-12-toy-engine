@@ -6,6 +6,7 @@
 #include<Gear/Core/RenderEngine.h>
 #include<Gear/Core/Graphics.h>
 #include<Gear/Window/Win32Form.h>
+#include<Gear/Utils/Utils.h>
 #include<Gear/Configuration.h>
 #include<Gear/Game.h>
 
@@ -13,14 +14,6 @@
 #include<chrono>
 #include<future>
 #include<windowsx.h>
-
-enum class GPUVendor
-{
-	NVIDIA,
-	AMD,
-	INTEL,
-	UNKNOWN
-};
 
 class Gear
 {
@@ -30,23 +23,21 @@ public:
 
 	void operator=(const Gear&) = delete;
 
-	static Gear& get();
+	static Gear* get();
 
-	int iniEngine(const Configuration& config, const int& argc, const char* argv[]);
+	int iniEngine(const Configuration config, const int argc, const char* argv[]);
 
-	void iniGame(Game* const game);
+	void iniGame(Game* const gamePtr);
 
 private:
 
-	static Gear instance;
+	static Gear* instance;
 
 	void runGame();
 
 	void destroy();
 
 	Gear();
-
-	GPUVendor vendor;
 
 	Win32Form* winform;
 
@@ -57,8 +48,6 @@ private:
 	void iniWindow(const std::wstring& title, const UINT& width, const UINT& height);
 
 	static constexpr DWORD normalWndStyle = WS_CAPTION | WS_SYSMENU;
-
-	static constexpr DWORD wallpaperWndStyle = WS_POPUP;
 
 	static LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 

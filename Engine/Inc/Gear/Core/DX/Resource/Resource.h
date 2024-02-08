@@ -17,6 +17,8 @@ public:
 
 	virtual ~Resource();
 
+	Resource();
+
 	Resource(const D3D12_HEAP_PROPERTIES properties, const D3D12_HEAP_FLAGS flags, const D3D12_RESOURCE_DESC desc,
 		const bool stateTracking, const D3D12_RESOURCE_STATES initialState, const D3D12_CLEAR_VALUE* clearValues);
 
@@ -36,6 +38,13 @@ public:
 
 	bool isSharedResource() const;
 
+protected:
+
+	void createResource(const D3D12_HEAP_PROPERTIES properties, const D3D12_HEAP_FLAGS flags, const D3D12_RESOURCE_DESC desc,
+		const bool stateTracking, const D3D12_RESOURCE_STATES initialState, const D3D12_CLEAR_VALUE* clearValues);
+
+	ID3D12Resource** releaseAndGet();
+
 private:
 
 	ComPtr<ID3D12Resource> resource;
@@ -43,7 +52,6 @@ private:
 	bool stateTracking;
 
 	bool sharedResource;
-
 };
 
 #endif // !_RESOURCE_H_

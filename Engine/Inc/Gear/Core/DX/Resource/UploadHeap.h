@@ -16,6 +16,8 @@ public:
 
 	UploadHeap(UploadHeap&);
 
+	virtual ~UploadHeap();
+
 	void operator=(const UploadHeap&) = delete;
 
 	UploadHeap(const UploadHeap&) = delete;

@@ -50,9 +50,7 @@ private:
 
 	friend class RenderEngine;
 
-	//bind fixed state for each commandlist
-	//root signature & descriptor heap and etc.
-	void setFixedStates();
+	void begin();
 
 	virtual void recordCommand() = 0;
 
@@ -64,7 +62,7 @@ private:
 
 	std::unordered_set<Texture*> transitionTextures;
 
-	std::vector<Resource*> transientResources;
+	std::vector<Resource*> transientResources[Graphics::FrameBufferCount];
 
 	std::vector<D3D12_RESOURCE_BARRIER> transitionBarriers;
 

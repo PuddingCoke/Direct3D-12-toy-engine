@@ -22,7 +22,7 @@ private:
 
 	friend class RenderEngine;
 
-	GraphicsDevice();
+	GraphicsDevice(IUnknown* const adapter);
 
 	static GraphicsDevice* instance;
 

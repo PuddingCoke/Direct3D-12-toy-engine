@@ -122,13 +122,13 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <WarningLevel>Level4</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <WarningLevel>Level3</WarningLevel>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -155,6 +155,10 @@
     <ClInclude Include="Inc\Gear\Core\RootSignature.h" />
     <ClInclude Include="Inc\Gear\Game.h" />
     <ClInclude Include="Inc\Gear\Gear.h" />
+    <ClInclude Include="Inc\Gear\Utils\Math.h" />
+    <ClInclude Include="Inc\Gear\Utils\Random.h" />
+    <ClInclude Include="Inc\Gear\Utils\Timer.h" />
+    <ClInclude Include="Inc\Gear\Utils\Utils.h" />
     <ClInclude Include="Inc\Gear\Window\Win32Form.h" />
   </ItemGroup>
   <ItemGroup>
@@ -175,6 +179,10 @@
     <ClCompile Include="Src\Gear\Core\RootSignature.cpp" />
     <ClCompile Include="Src\Gear\Game.cpp" />
     <ClCompile Include="Src\Gear\Gear.cpp" />
+    <ClCompile Include="Src\Gear\Utils\Math.cpp" />
+    <ClCompile Include="Src\Gear\Utils\Random.cpp" />
+    <ClCompile Include="Src\Gear\Utils\Timer.cpp" />
+    <ClCompile Include="Src\Gear\Utils\Utils.cpp" />
     <ClCompile Include="Src\Gear\Window\Win32Form.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

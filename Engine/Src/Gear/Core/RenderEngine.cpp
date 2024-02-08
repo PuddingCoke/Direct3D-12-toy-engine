@@ -174,6 +174,17 @@ void RenderEngine::processCommandLists()
 	commandLists.clear();
 }
 
+void RenderEngine::waitForGPU()
+{
+	commandQueue->Signal(fence.Get(), fenceValues[Graphics::frameIndex]);
+
+	fence->SetEventOnCompletion(fenceValues[Graphics::frameIndex], fenceEvent);
+
+	WaitForSingleObjectEx(fenceEvent, INFINITE, FALSE);
+
+	fenceValues[Graphics::frameIndex]++;
+}
+
 void RenderEngine::present()
 {
 	swapChain->Present(1, 0);
@@ -194,8 +205,13 @@ void RenderEngine::present()
 	fenceValues[Graphics::frameIndex] = currentFenceValue + 1;
 }
 
-RenderEngine::RenderEngine(HWND hwnd):
-	fenceValues{},fenceEvent(nullptr)
+GPUVendor RenderEngine::getVendor() const
+{
+	return vendor;
+}
+
+RenderEngine::RenderEngine(HWND hwnd) :
+	fenceValues{}, fenceEvent(nullptr), vendor(GPUVendor::UNKNOWN)
 {
 	ComPtr<IDXGIFactory7> factory;
 
@@ -203,8 +219,8 @@ RenderEngine::RenderEngine(HWND hwnd):
 
 	ComPtr<IDXGIAdapter4> adapter;
 
-	for (UINT adapterIndex = 0; 
-		SUCCEEDED(factory->EnumAdapterByGpuPreference(adapterIndex, DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE, IID_PPV_ARGS(&adapter))); 
+	for (UINT adapterIndex = 0;
+		SUCCEEDED(factory->EnumAdapterByGpuPreference(adapterIndex, DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE, IID_PPV_ARGS(&adapter)));
 		adapterIndex++)
 	{
 		DXGI_ADAPTER_DESC3 desc = {};
@@ -218,14 +234,37 @@ RenderEngine::RenderEngine(HWND hwnd):
 
 		if (SUCCEEDED(D3D12CreateDevice(adapter.Get(), D3D_FEATURE_LEVEL_11_0, _uuidof(ID3D12Device), nullptr)))
 		{
+			const UINT vendorID = desc.VendorId;
+
+			std::cout << "[class RenderEngine] GPU VendorID 0x" << std::hex << vendorID << std::dec << " Vendor:";
+
+			if (vendorID == 0x10DE)
+			{
+				std::cout << "NVIDIA\n";
+				vendor = GPUVendor::NVIDIA;
+			}
+			else if (vendorID == 0x1002 || vendorID == 0x1022)
+			{
+				std::cout << "AMD\n";
+				vendor = GPUVendor::AMD;
+			}
+			else if (vendorID == 0x163C || vendorID == 0x8086 || vendorID == 0x8087)
+			{
+				std::cout << "INTEL\n";
+				vendor = GPUVendor::INTEL;
+			}
+			else
+			{
+				std::cout << "UNKNOWN\n";
+				vendor = GPUVendor::UNKNOWN;
+			}
+
 			break;
 		}
 	}
 
 	{
-		GraphicsDevice::instance = new GraphicsDevice();
-
-		D3D12CreateDevice(adapter.Get(), D3D_FEATURE_LEVEL_12_2, IID_PPV_ARGS(&(GraphicsDevice::instance->device)));
+		GraphicsDevice::instance = new GraphicsDevice(adapter.Get());
 
 		D3D12_COMMAND_QUEUE_DESC queueDesc = {};
 		queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;

@@ -10,6 +10,10 @@ UploadHeap::UploadHeap(UploadHeap& heap) :
 {
 }
 
+UploadHeap::~UploadHeap()
+{
+}
+
 void UploadHeap::update(const void* const data, const UINT dataSize) const
 {
 	const CD3DX12_RANGE readRange(0, 0);

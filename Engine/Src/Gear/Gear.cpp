@@ -1,13 +1,13 @@
 #include<Gear/Gear.h>
 
-Gear Gear::instance;
+Gear* Gear::instance = nullptr;
 
-Gear& Gear::get()
+Gear* Gear::get()
 {
 	return instance;
 }
 
-int Gear::iniEngine(const Configuration& config, const int& argc, const char* argv[])
+int Gear::iniEngine(const Configuration config, const int argc, const char* argv[])
 {
 	std::wcout.imbue(std::locale(""));
 
@@ -15,6 +15,8 @@ int Gear::iniEngine(const Configuration& config, const int& argc, const char* ar
 		std::string exeRootPath = argv[0];
 
 		std::cout << typeid(*this).name() << " executable path " << exeRootPath << "\n";
+
+		Utils::exeRootPath = exeRootPath;
 	}
 
 	usage = config.usage;
@@ -26,21 +28,25 @@ int Gear::iniEngine(const Configuration& config, const int& argc, const char* ar
 	return 0;
 }
 
-void Gear::iniGame(Game* const game)
+void Gear::iniGame(Game* const gamePtr)
 {
-	this->game = game;
+	game = gamePtr;
+
+	RenderEngine::get()->processCommandLists();
+
+	RenderEngine::get()->waitForGPU();
 
 	switch (usage)
 	{
 	default:
-	case Configuration::EngineUsage::WALLPAPER:
 	case Configuration::EngineUsage::NORMAL:
 		runGame();
 		break;
-
 	case Configuration::EngineUsage::VIDEOPLAYBACK:
 		break;
 	}
+
+	RenderEngine::get()->waitForGPU();
 
 	destroy();
 }
@@ -89,9 +95,6 @@ void Gear::iniWindow(const std::wstring& title, const UINT& width, const UINT& h
 	case Configuration::EngineUsage::NORMAL:
 		std::cout << typeid(*this).name() << " usage normal\n";
 		winform = new Win32Form(title, width, height, normalWndStyle, Gear::WindowProc);
-		break;
-
-	case Configuration::EngineUsage::WALLPAPER:
 		break;
 
 	case Configuration::EngineUsage::VIDEOPLAYBACK:

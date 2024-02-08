@@ -1,6 +1,6 @@
 #include<Gear/Core/DX/Resource/Buffer.h>
 
-Buffer::Buffer(const UINT size, const bool stateTracking, const bool cpuWritable) :
+Buffer::Buffer(const UINT size, const bool stateTracking, const bool cpuWritable, const void* const data, ID3D12GraphicsCommandList6* commandList, std::vector<Resource*>& transientResourcePool) :
 	Resource(CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE, CD3DX12_RESOURCE_DESC::Buffer(size), cpuWritable | stateTracking, D3D12_RESOURCE_STATE_COPY_DEST, nullptr),
 	uploadHeaps{},
 	uploadHeapIndex(0),
@@ -8,6 +8,17 @@ Buffer::Buffer(const UINT size, const bool stateTracking, const bool cpuWritable
 	internalState(D3D12_RESOURCE_STATE_COPY_DEST),
 	transitionState(D3D12_RESOURCE_STATE_UNKNOWN)
 {
+	if (data)
+	{
+		UploadHeap* uploadHeap = new UploadHeap(size);
+
+		transientResourcePool.push_back(uploadHeap);
+
+		uploadHeap->update(data, size);
+
+		commandList->CopyResource(getResource(), uploadHeap->getResource());
+	}
+
 	if (cpuWritable)
 	{
 		for (UINT i = 0; i < Graphics::FrameBufferCount; i++)
@@ -61,7 +72,7 @@ void Buffer::resetTransitionStates()
 	transitionState = D3D12_RESOURCE_STATE_UNKNOWN;
 }
 
-void Buffer::pushBarriersAndStateChanging(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers, std::vector<PendingBufferBarrier>& pendingBarriers)
+void Buffer::pushBarriers(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers, std::vector<PendingBufferBarrier>& pendingBarriers)
 {
 	if (internalState == D3D12_RESOURCE_STATE_UNKNOWN)
 	{
@@ -90,4 +101,6 @@ void Buffer::pushBarriersAndStateChanging(std::vector<D3D12_RESOURCE_BARRIER>& t
 			internalState = transitionState;
 		}
 	}
+
+	resetTransitionStates();
 }

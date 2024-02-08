@@ -20,7 +20,7 @@ class Buffer :public Resource
 {
 public:
 
-	Buffer(const UINT size, const bool stateTracking, const bool cpuWritable);
+	Buffer(const UINT size, const bool stateTracking, const bool cpuWritable, const void* const data, ID3D12GraphicsCommandList6* commandList, std::vector<Resource*>& transientResourcePool);
 
 	Buffer(Buffer&);
 
@@ -38,7 +38,7 @@ public:
 
 	void resetTransitionStates() override;
 
-	void pushBarriersAndStateChanging(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers, std::vector<PendingBufferBarrier>& pendingBarriers);
+	void pushBarriers(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers, std::vector<PendingBufferBarrier>& pendingBarriers);
 
 private:
 
