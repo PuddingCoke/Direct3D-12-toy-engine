@@ -4,14 +4,21 @@ std::future<void> RenderPass::getPassResult()
 {
 	return std::async(std::launch::async, [&]
 		{
-			setFixedStates();
+			begin();
 
 			recordCommand();
 		});
 }
 
-void RenderPass::setFixedStates()
+void RenderPass::begin()
 {
+	for (Resource* res : transientResources[Graphics::getFrameIndex()])
+	{
+		delete res;
+	}
+
+	transientResources[Graphics::getFrameIndex()].clear();
+
 	renderCMD->reset();
 
 	renderCMD->setDescriptorHeap(GlobalDescriptorHeap::getResourceHeap(), GlobalDescriptorHeap::getSamplerHeap());

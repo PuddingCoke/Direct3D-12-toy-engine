@@ -12,7 +12,6 @@ public:
 	const enum class EngineUsage
 	{
 		NORMAL,
-		WALLPAPER,
 		VIDEOPLAYBACK
 	} usage;
 
@@ -22,7 +21,7 @@ public:
 
 	const std::wstring title;
 
-	Configuration(const int& width, const int& height, const std::wstring& title, const EngineUsage& usage = EngineUsage::NORMAL);
+	Configuration(const int width, const int height, const std::wstring title, const EngineUsage usage = EngineUsage::NORMAL);
 
 };
 
