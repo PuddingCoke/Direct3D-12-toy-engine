@@ -16,11 +16,12 @@ struct PendingTextureBarrier
 	UINT afterState;
 };
 
+//SRV/UAV/RTV or DSV/SRV
+//TextureCube RTV/SRV 
+
 class Texture :public Resource
 {
 public:
-
-	Texture(const UINT width, const UINT height, const DXGI_FORMAT format, const UINT arraySize, const UINT mipLevels, const bool stateTracking);
 
 	Texture(Texture&);
 
@@ -39,6 +40,8 @@ public:
 	void pushBarriersAndStateChanging(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers, std::vector<PendingTextureBarrier>& pendingBarriers);
 
 private:
+
+	Texture(const UINT width, const UINT height, const DXGI_FORMAT format, const UINT arraySize, const UINT mipLevels, const bool stateTracking);
 
 	friend class RenderEngine;
 

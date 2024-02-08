@@ -13,7 +13,7 @@ void RenderEngine::submitRenderPass(RenderPass* const pass)
 
 	for (UINT bufferIdx = 0; bufferIdx < pass->pendingBufferBarrier.size(); bufferIdx++)
 	{
-		PendingBufferBarrier pendingBarrier = pass->pendingBufferBarrier[bufferIdx];
+		const PendingBufferBarrier pendingBarrier = pass->pendingBufferBarrier[bufferIdx];
 
 		if ((*(pendingBarrier.buffer->globalState)) != pendingBarrier.afterState)
 		{
@@ -33,7 +33,7 @@ void RenderEngine::submitRenderPass(RenderPass* const pass)
 
 	for (UINT textureIdx = 0; textureIdx < pass->pendingTextureBarrier.size(); textureIdx++)
 	{
-		PendingTextureBarrier pendingBarrier = pass->pendingTextureBarrier[textureIdx];
+		const PendingTextureBarrier pendingBarrier = pass->pendingTextureBarrier[textureIdx];
 
 		if (pendingBarrier.mipSlice == D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES)
 		{
@@ -43,7 +43,7 @@ void RenderEngine::submitRenderPass(RenderPass* const pass)
 
 				if ((*(pendingBarrier.texture->globalState)).allState == D3D12_RESOURCE_STATE_UNKNOWN)
 				{
-					UINT tempState = (*(pendingBarrier.texture->globalState)).mipLevelStates[0];
+					const UINT tempState = (*(pendingBarrier.texture->globalState)).mipLevelStates[0];
 
 					for (UINT mipSlice = 0; mipSlice < pendingBarrier.texture->mipLevels; mipSlice++)
 					{
@@ -174,7 +174,6 @@ void RenderEngine::processCommandLists()
 	commandLists.clear();
 }
 
-//1 2 3 
 void RenderEngine::present()
 {
 	swapChain->Present(1, 0);
