@@ -7,7 +7,39 @@ std::future<void> RenderPass::getPassResult()
 			begin();
 
 			recordCommand();
+
+			end();
 		});
+}
+
+RenderPass::RenderPass() :
+	renderCMD(new CommandList(D3D12_COMMAND_LIST_TYPE_DIRECT)),
+	transitionCMD(new CommandList(D3D12_COMMAND_LIST_TYPE_DIRECT))
+{
+}
+
+RenderPass::~RenderPass()
+{
+	if (renderCMD)
+	{
+		delete renderCMD;
+	}
+
+	if (transitionCMD)
+	{
+		delete transitionCMD;
+	}
+
+	for (std::vector<Resource*>& transientPool : transientResources)
+	{
+		if (transientPool.size())
+		{
+			for (Resource* res : transientPool)
+			{
+				delete res;
+			}
+		}
+	}
 }
 
 void RenderPass::begin()
@@ -28,13 +60,43 @@ void RenderPass::begin()
 	renderCMD->setComputeRootSignature(GlobalRootSignature::getComputeRootSignature());
 }
 
-void RenderPass::updateRefResStates()
+void RenderPass::end()
+{
+	renderCMD->get()->Close();
+}
+
+void RenderPass::updateReferredResStates()
 {
 	for (Resource* res : referredResources)
 	{
 		res->updateGlobalStates();
-		res->resetInternalStates();
+
+		if (res->isSharedResource())
+		{
+			res->resetInternalStates();
+		}
 	}
 
 	referredResources.clear();
+}
+
+void RenderPass::flushTransitionResources()
+{
+	for (Buffer* buff : transitionBuffers)
+	{
+		buff->transition(transitionBarriers, pendingBufferBarrier);
+	}
+
+	transitionBuffers.clear();
+
+	for (Texture* tex : transitionTextures)
+	{
+		tex->transition(transitionBarriers, pendingTextureBarrier);
+	}
+
+	transitionTextures.clear();
+
+	renderCMD->get()->ResourceBarrier(transitionBarriers.size(), transitionBarriers.data());
+
+	transitionBarriers.clear();
 }

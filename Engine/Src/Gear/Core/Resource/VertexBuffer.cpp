@@ -1,0 +1,30 @@
+#include<Gear/Core/Resource/VertexBuffer.h>
+
+VertexBuffer::VertexBuffer(const UINT perVertexSize, const UINT size, const bool stateTracking, const bool cpuWritable, const void* const data, ID3D12GraphicsCommandList6* commandList, std::vector<Resource*>& transientResourcePool)
+{
+	buffer = new Buffer(size, stateTracking, cpuWritable, data, commandList, transientResourcePool);
+
+	vertexBufferView.BufferLocation = buffer->getGPUAddress();
+	vertexBufferView.SizeInBytes = size;
+	vertexBufferView.StrideInBytes = perVertexSize;
+}
+
+VertexBuffer::VertexBuffer(const VertexBuffer& vb) :
+	vertexBufferView(vb.vertexBufferView),
+	buffer(new Buffer(*(vb.buffer)))
+{
+}
+
+VertexBuffer::~VertexBuffer()
+{
+}
+
+D3D12_VERTEX_BUFFER_VIEW VertexBuffer::getVertexBufferView() const
+{
+	return vertexBufferView;
+}
+
+Buffer* VertexBuffer::getBuffer()
+{
+	return buffer;
+}

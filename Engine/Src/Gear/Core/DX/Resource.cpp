@@ -29,6 +29,11 @@ Resource::Resource(Resource& res) :
 	res.sharedResource = true;
 }
 
+D3D12_GPU_VIRTUAL_ADDRESS Resource::getGPUAddress() const
+{
+	return resource->GetGPUVirtualAddress();
+}
+
 void Resource::setStateTracking(const bool state)
 {
 	stateTracking = state;

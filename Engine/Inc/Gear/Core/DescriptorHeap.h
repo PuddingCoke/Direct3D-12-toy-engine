@@ -18,6 +18,8 @@ public:
 
 		StaticDescriptorHandle(const CD3DX12_CPU_DESCRIPTOR_HANDLE cpuHandle, const CD3DX12_GPU_DESCRIPTOR_HANDLE gpuHandle, const DescriptorHeap* const descriptorHeap);
 
+		UINT getCurrentIndex() const;
+
 		CD3DX12_CPU_DESCRIPTOR_HANDLE getCPUHandle() const;
 
 		CD3DX12_GPU_DESCRIPTOR_HANDLE getGPUHandle() const;

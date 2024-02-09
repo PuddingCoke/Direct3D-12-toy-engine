@@ -487,6 +487,7 @@ void Texture::transition(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers
 		}
 		else
 		{
+			throw "Transition texture with only 1 miplevel transition states' all state must be known\n";
 			//in this case transition state's all state is unknown
 			//but for texture has only 1 miplevel transition state's all state must be known
 			//so not handling this part 
@@ -494,4 +495,29 @@ void Texture::transition(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers
 	}
 
 	resetTransitionStates();
+}
+
+UINT Texture::getWidth() const
+{
+	return width;
+}
+
+UINT Texture::getHeight() const
+{
+	return height;
+}
+
+UINT Texture::getArraySize() const
+{
+	return arraySize;
+}
+
+UINT Texture::getMipLevels() const
+{
+	return mipLevels;
+}
+
+DXGI_FORMAT Texture::getFormat() const
+{
+	return format;
 }

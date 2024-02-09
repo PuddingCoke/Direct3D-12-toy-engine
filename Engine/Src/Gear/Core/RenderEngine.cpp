@@ -130,6 +130,7 @@ void RenderEngine::submitRenderPass(RenderPass* const pass)
 			}
 			else
 			{
+				throw "Transition texture however its pending mipslice is not D3D12_TRANSITION_ALL_MIPLEVELS is not allowed!\n";
 				//in this case target mipslice is not D3D12_TRANSITION_ALL_MIPLEVELS for texture has only 1 miplevel
 				//but for transition texture only has 1 miplevel target mipslice should be D3D12_TRANSITION_ALL_MIPLEVELS
 				//so not handling this case
@@ -155,7 +156,7 @@ void RenderEngine::submitRenderPass(RenderPass* const pass)
 		commandLists.push_back(pass->renderCMD->get());
 	}
 
-	pass->updateRefResStates();
+	pass->updateReferredResStates();
 }
 
 void RenderEngine::processCommandLists()

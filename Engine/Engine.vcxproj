@@ -152,6 +152,9 @@
     <ClInclude Include="Inc\Gear\Core\Graphics.h" />
     <ClInclude Include="Inc\Gear\Core\RenderEngine.h" />
     <ClInclude Include="Inc\Gear\Core\RenderPass.h" />
+    <ClInclude Include="Inc\Gear\Core\Resource\ConstantBuffer.h" />
+    <ClInclude Include="Inc\Gear\Core\Resource\TextureRenderTarget.h" />
+    <ClInclude Include="Inc\Gear\Core\Resource\VertexBuffer.h" />
     <ClInclude Include="Inc\Gear\Core\RootSignature.h" />
     <ClInclude Include="Inc\Gear\Game.h" />
     <ClInclude Include="Inc\Gear\Gear.h" />
@@ -176,6 +179,9 @@
     <ClCompile Include="Src\Gear\Core\DX\Resource.cpp" />
     <ClCompile Include="Src\Gear\Core\DX\UploadHeap.cpp" />
     <ClCompile Include="Src\Gear\Core\GraphicsDevice.cpp" />
+    <ClCompile Include="Src\Gear\Core\Resource\ConstantBuffer.cpp" />
+    <ClCompile Include="Src\Gear\Core\Resource\TextureRenderTarget.cpp" />
+    <ClCompile Include="Src\Gear\Core\Resource\VertexBuffer.cpp" />
     <ClCompile Include="Src\Gear\Core\RootSignature.cpp" />
     <ClCompile Include="Src\Gear\Game.cpp" />
     <ClCompile Include="Src\Gear\Gear.cpp" />
