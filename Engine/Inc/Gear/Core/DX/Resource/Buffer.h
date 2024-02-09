@@ -38,11 +38,9 @@ public:
 
 	void resetTransitionStates() override;
 
-	void pushBarriers(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers, std::vector<PendingBufferBarrier>& pendingBarriers);
+	void transition(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers, std::vector<PendingBufferBarrier>& pendingBarriers);
 
 private:
-
-	friend class CopyEngine;
 
 	friend class RenderEngine;
 

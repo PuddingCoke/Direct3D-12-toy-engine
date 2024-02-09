@@ -72,7 +72,7 @@ void Buffer::resetTransitionStates()
 	transitionState = D3D12_RESOURCE_STATE_UNKNOWN;
 }
 
-void Buffer::pushBarriers(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers, std::vector<PendingBufferBarrier>& pendingBarriers)
+void Buffer::transition(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers, std::vector<PendingBufferBarrier>& pendingBarriers)
 {
 	if (internalState == D3D12_RESOURCE_STATE_UNKNOWN)
 	{

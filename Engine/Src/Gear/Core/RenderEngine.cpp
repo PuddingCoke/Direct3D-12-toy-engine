@@ -35,7 +35,7 @@ void RenderEngine::submitRenderPass(RenderPass* const pass)
 	{
 		const PendingTextureBarrier pendingBarrier = pass->pendingTextureBarrier[textureIdx];
 
-		if (pendingBarrier.mipSlice == D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES)
+		if (pendingBarrier.mipSlice == D3D12_TRANSITION_ALL_MIPLEVELS)
 		{
 			if (pendingBarrier.texture->mipLevels > 1)
 			{
@@ -130,18 +130,9 @@ void RenderEngine::submitRenderPass(RenderPass* const pass)
 			}
 			else
 			{
-				if ((*(pendingBarrier.texture->globalState)).allState != pendingBarrier.afterState)
-				{
-					D3D12_RESOURCE_BARRIER barrier = {};
-					barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-					barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-					barrier.Transition.pResource = pendingBarrier.texture->getResource();
-					barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-					barrier.Transition.StateBefore = static_cast<D3D12_RESOURCE_STATES>((*(pendingBarrier.texture->globalState)).allState);
-					barrier.Transition.StateAfter = static_cast<D3D12_RESOURCE_STATES>(pendingBarrier.afterState);
-
-					barriers.push_back(barrier);
-				}
+				//in this case target mipslice is not D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES for texture has only 1 miplevel
+				//but for transition texture only has 1 miplevel target mipslice should be D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES
+				//so not handling this case
 			}
 		}
 	}

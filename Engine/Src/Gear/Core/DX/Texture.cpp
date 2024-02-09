@@ -19,7 +19,8 @@ Texture::Texture(const UINT width, const UINT height, const DXGI_FORMAT format, 
 	}
 }
 
-Texture::Texture(const std::string filePath, ID3D12GraphicsCommandList6* commandList, std::vector<Resource*>& transientResourcePool,const bool stateTracking)
+Texture::Texture(const std::string filePath, ID3D12GraphicsCommandList6* commandList, std::vector<Resource*>& transientResourcePool, const bool stateTracking) :
+	Resource(stateTracking)
 {
 	std::string fileExtension = Utils::File::getExtension(filePath);
 
@@ -34,8 +35,8 @@ Texture::Texture(const std::string filePath, ID3D12GraphicsCommandList6* command
 
 		unsigned char* pixels = stbi_load(filePath.c_str(), &textureWidth, &textureHeight, &channels, 4);
 
-		width = textureWidth;
-		height = textureHeight;
+		width = static_cast<UINT>(textureWidth);
+		height = static_cast<UINT>(textureHeight);
 		format = DXGI_FORMAT_R8G8B8A8_UNORM;
 		mipLevels = 1;
 		arraySize = 1;
@@ -43,8 +44,8 @@ Texture::Texture(const std::string filePath, ID3D12GraphicsCommandList6* command
 		if (pixels)
 		{
 			D3D12_RESOURCE_DESC desc = {};
-			desc.Width = static_cast<UINT>(textureWidth);
-			desc.Height = static_cast<UINT>(textureHeight);
+			desc.Width = width;
+			desc.Height = height;
 			desc.DepthOrArraySize = arraySize;
 			desc.MipLevels = mipLevels;
 			desc.Flags = D3D12_RESOURCE_FLAG_NONE;
@@ -53,7 +54,7 @@ Texture::Texture(const std::string filePath, ID3D12GraphicsCommandList6* command
 			desc.SampleDesc.Count = 1;
 			desc.SampleDesc.Quality = 0;
 
-			createResource(CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE, desc, stateTracking, D3D12_RESOURCE_STATE_COPY_DEST, nullptr);
+			createResource(CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE, desc, D3D12_RESOURCE_STATE_COPY_DEST, nullptr);
 
 			const UINT64 uploadHeapSize = GetRequiredIntermediateSize(getResource(), 0, 1);
 
@@ -81,8 +82,8 @@ Texture::Texture(const std::string filePath, ID3D12GraphicsCommandList6* command
 
 		float* pixels = stbi_loadf(filePath.c_str(), &textureWidth, &textureHeight, &channels, 4);
 
-		width = textureWidth;
-		height = textureHeight;
+		width = static_cast<UINT>(textureWidth);
+		height = static_cast<UINT>(textureHeight);
 		format = DXGI_FORMAT_R32G32B32A32_FLOAT;
 		mipLevels = 1;
 		arraySize = 1;
@@ -90,8 +91,8 @@ Texture::Texture(const std::string filePath, ID3D12GraphicsCommandList6* command
 		if (pixels)
 		{
 			D3D12_RESOURCE_DESC desc = {};
-			desc.Width = static_cast<UINT>(textureWidth);
-			desc.Height = static_cast<UINT>(textureHeight);
+			desc.Width = width;
+			desc.Height = height;
 			desc.DepthOrArraySize = arraySize;
 			desc.MipLevels = mipLevels;
 			desc.Flags = D3D12_RESOURCE_FLAG_NONE;
@@ -100,7 +101,7 @@ Texture::Texture(const std::string filePath, ID3D12GraphicsCommandList6* command
 			desc.SampleDesc.Count = 1;
 			desc.SampleDesc.Quality = 0;
 
-			createResource(CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE, desc, stateTracking, D3D12_RESOURCE_STATE_COPY_DEST, nullptr);
+			createResource(CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE, desc, D3D12_RESOURCE_STATE_COPY_DEST, nullptr);
 
 			const UINT64 uploadHeapSize = GetRequiredIntermediateSize(getResource(), 0, 1);
 
@@ -146,11 +147,9 @@ Texture::Texture(const std::string filePath, ID3D12GraphicsCommandList6* command
 
 		width = desc.Width;
 		height = desc.Height;
-		mipLevels = desc.MipLevels;
 		arraySize = desc.DepthOrArraySize;
+		mipLevels = desc.MipLevels;
 		format = desc.Format;
-
-		setStateTracking(stateTracking);
 	}
 	else
 	{
@@ -250,7 +249,7 @@ void Texture::resetTransitionStates()
 	}
 }
 
-void Texture::pushBarriers(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers, std::vector<PendingTextureBarrier>& pendingBarriers)
+void Texture::transition(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers, std::vector<PendingTextureBarrier>& pendingBarriers)
 {
 	if (transitionState.allState == D3D12_RESOURCE_STATE_UNKNOWN)
 	{
@@ -299,7 +298,7 @@ void Texture::pushBarriers(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarrie
 			{
 				PendingTextureBarrier barrier = {};
 				barrier.texture = this;
-				barrier.mipSlice = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+				barrier.mipSlice = D3D12_TRANSITION_ALL_MIPLEVELS;
 				barrier.afterState = transitionState.allState;
 
 				pendingBarriers.push_back(barrier);
@@ -392,7 +391,7 @@ void Texture::pushBarriers(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarrie
 			{
 				PendingTextureBarrier barrier = {};
 				barrier.texture = this;
-				barrier.mipSlice = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+				barrier.mipSlice = D3D12_TRANSITION_ALL_MIPLEVELS;
 				barrier.afterState = transitionState.allState;
 
 				pendingBarriers.push_back(barrier);
