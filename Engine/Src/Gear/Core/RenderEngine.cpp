@@ -130,8 +130,8 @@ void RenderEngine::submitRenderPass(RenderPass* const pass)
 			}
 			else
 			{
-				//in this case target mipslice is not D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES for texture has only 1 miplevel
-				//but for transition texture only has 1 miplevel target mipslice should be D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES
+				//in this case target mipslice is not D3D12_TRANSITION_ALL_MIPLEVELS for texture has only 1 miplevel
+				//but for transition texture only has 1 miplevel target mipslice should be D3D12_TRANSITION_ALL_MIPLEVELS
 				//so not handling this case
 			}
 		}
@@ -277,6 +277,7 @@ RenderEngine::RenderEngine(HWND hwnd) :
 		swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 		swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 		swapChainDesc.SampleDesc.Count = 1;
+		swapChainDesc.SampleDesc.Quality = 0;
 
 		ComPtr<IDXGISwapChain1> swapChain1;
 
