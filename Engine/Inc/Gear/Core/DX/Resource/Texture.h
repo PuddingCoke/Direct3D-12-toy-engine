@@ -13,6 +13,8 @@
 
 class Texture;
 
+constexpr UINT D3D12_TRANSITION_ALL_MIPLEVELS = 0xFFFFFFFF;
+
 struct PendingTextureBarrier
 {
 	Texture* texture;
@@ -43,7 +45,7 @@ public:
 
 	void resetTransitionStates() override;
 
-	void pushBarriers(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers, std::vector<PendingTextureBarrier>& pendingBarriers);
+	void transition(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers, std::vector<PendingTextureBarrier>& pendingBarriers);
 
 private:
 
