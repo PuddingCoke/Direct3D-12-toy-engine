@@ -15,6 +15,14 @@ class Texture;
 
 constexpr UINT D3D12_TRANSITION_ALL_MIPLEVELS = 0xFFFFFFFF;
 
+enum TextureCreationFlags
+{
+	D3D12_TEXTURE_CREATE_SRV = 0x1L,
+	D3D12_TEXTURE_CREATE_UAV = 0x2L,
+	D3D12_TEXTURE_CREATE_RTV = 0x4L,
+	D3D12_TEXTURE_CREATE_DSV = 0x8L,
+};
+
 struct PendingTextureBarrier
 {
 	Texture* texture;
@@ -30,6 +38,10 @@ struct PendingTextureBarrier
 class Texture :public Resource
 {
 public:
+
+	Texture(const UINT width, const UINT height, const DXGI_FORMAT format, const UINT arraySize, const UINT mipLevels, const bool stateTracking);
+
+	Texture(const std::string filePath, ID3D12GraphicsCommandList6* commandList, std::vector<Resource*>& transientResourcePool, const bool stateTracking);
 
 	Texture(Texture&);
 
@@ -47,13 +59,17 @@ public:
 
 	void transition(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers, std::vector<PendingTextureBarrier>& pendingBarriers);
 
-private:
+	UINT getWidth() const;
 
-	Texture(const UINT width, const UINT height, const DXGI_FORMAT format, const UINT arraySize, const UINT mipLevels, const bool stateTracking);
+	UINT getHeight() const;
 
-	Texture(const std::string filePath, ID3D12GraphicsCommandList6* commandList, std::vector<Resource*>& transientResourcePool,const bool stateTracking);
+	UINT getArraySize() const;
 
-	friend class RenderEngine;
+	UINT getMipLevels() const;
+
+	DXGI_FORMAT getFormat() const;
+
+protected:
 
 	struct STATES
 	{
@@ -61,6 +77,12 @@ private:
 
 		std::vector<UINT> mipLevelStates;
 	};
+
+	STATES transitionState;
+
+private:
+
+	friend class RenderEngine;
 
 	UINT width;
 
@@ -75,8 +97,6 @@ private:
 	std::shared_ptr<STATES> globalState;
 
 	STATES internalState;
-
-	STATES transitionState;
 
 };
 

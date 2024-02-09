@@ -111,6 +111,11 @@ DescriptorHeap::StaticDescriptorHandle::StaticDescriptorHandle(const CD3DX12_CPU
 {
 }
 
+UINT DescriptorHeap::StaticDescriptorHandle::getCurrentIndex() const
+{
+	return static_cast<UINT>(cpuHandle.ptr - descriptorHeap->staticCPUPointerStart.ptr) / descriptorHeap->incrementSize;
+}
+
 CD3DX12_CPU_DESCRIPTOR_HANDLE DescriptorHeap::StaticDescriptorHandle::getCPUHandle() const
 {
 	return cpuHandle;

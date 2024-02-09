@@ -4,6 +4,7 @@
 #define _RESOURCE_H_
 
 #include<Gear/Core/GraphicsDevice.h>
+#include<Gear/Core/GlobalDescriptorHeap.h>
 
 #include<memory>
 
@@ -35,6 +36,8 @@ public:
 	virtual void resetInternalStates() = 0;
 
 	virtual void resetTransitionStates() = 0;
+
+	D3D12_GPU_VIRTUAL_ADDRESS getGPUAddress() const;
 
 	void setStateTracking(const bool state);
 

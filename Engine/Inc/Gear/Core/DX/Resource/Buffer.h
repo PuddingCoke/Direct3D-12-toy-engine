@@ -40,6 +40,10 @@ public:
 
 	void transition(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers, std::vector<PendingBufferBarrier>& pendingBarriers);
 
+protected:
+
+	UINT transitionState;
+
 private:
 
 	friend class RenderEngine;
@@ -51,8 +55,6 @@ private:
 	std::shared_ptr<UINT> globalState;
 
 	UINT internalState;
-
-	UINT transitionState;
 
 };
 

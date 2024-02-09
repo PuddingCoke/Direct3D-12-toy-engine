@@ -18,6 +18,10 @@ public:
 
 	std::future<void> getPassResult();
 
+	RenderPass();
+
+	virtual ~RenderPass();
+
 protected:
 
 	//per frame
@@ -46,15 +50,19 @@ protected:
 
 	void setAmplificationIndexBuffer();
 
+	void begin();
+
+	void end();
+
+	virtual void recordCommand() = 0;
+
 private:
 
 	friend class RenderEngine;
 
-	void begin();
+	void updateReferredResStates();
 
-	virtual void recordCommand() = 0;
-
-	void updateRefResStates();
+	void flushTransitionResources();
 
 	std::unordered_set<Resource*> referredResources;
 
@@ -62,13 +70,13 @@ private:
 
 	std::unordered_set<Texture*> transitionTextures;
 
-	std::vector<Resource*> transientResources[Graphics::FrameBufferCount];
-
 	std::vector<D3D12_RESOURCE_BARRIER> transitionBarriers;
 
 	std::vector<PendingBufferBarrier> pendingBufferBarrier;
 
 	std::vector<PendingTextureBarrier> pendingTextureBarrier;
+
+	std::vector<Resource*> transientResources[Graphics::FrameBufferCount];
 
 	CommandList* transitionCMD;
 

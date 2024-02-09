@@ -81,6 +81,15 @@
     <ClInclude Include="Inc\Gear\Utils\Utils.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Inc\Gear\Core\Resource\TextureRenderTarget.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Gear\Core\Resource\VertexBuffer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Gear\Core\Resource\ConstantBuffer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Gear\Window\Win32Form.cpp">
@@ -147,6 +156,15 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Src\Gear\Utils\Utils.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gear\Core\Resource\TextureRenderTarget.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gear\Core\Resource\ConstantBuffer.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gear\Core\Resource\VertexBuffer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
