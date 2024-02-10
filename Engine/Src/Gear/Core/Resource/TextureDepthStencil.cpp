@@ -407,29 +407,64 @@ TextureDepthStencil::~TextureDepthStencil()
 	}
 }
 
-UINT TextureDepthStencil::getAllDepthIndex() const
+TransitionDesc TextureDepthStencil::getAllDepthIndex() const
 {
-	return allDepthIndex;
+	TransitionDesc desc = {};
+	desc.type = TransitionDesc::TEXTURE;
+	desc.state = TransitionDesc::SRV;
+	desc.texture.texture = texture;
+	desc.texture.mipSlice = D3D12_TRANSITION_ALL_MIPLEVELS;
+	desc.texture.resourceIndex = allDepthIndex;
+
+	return desc;
 }
 
-UINT TextureDepthStencil::getAllStencilIndex() const
+TransitionDesc TextureDepthStencil::getAllStencilIndex() const
 {
-	return allStencilIndex;
+	TransitionDesc desc = {};
+	desc.type = TransitionDesc::TEXTURE;
+	desc.state = TransitionDesc::SRV;
+	desc.texture.texture = texture;
+	desc.texture.mipSlice = D3D12_TRANSITION_ALL_MIPLEVELS;
+	desc.texture.resourceIndex = allStencilIndex;
+
+	return desc;
 }
 
-UINT TextureDepthStencil::getDepthMipIndex(const UINT mipSlice) const
+TransitionDesc TextureDepthStencil::getDepthMipIndex(const UINT mipSlice) const
 {
-	return depthSliceStart + mipSlice;
+	TransitionDesc desc = {};
+	desc.type = TransitionDesc::TEXTURE;
+	desc.state = TransitionDesc::SRV;
+	desc.texture.texture = texture;
+	desc.texture.mipSlice = mipSlice;
+	desc.texture.resourceIndex = depthSliceStart + mipSlice;
+
+	return desc;
 }
 
-UINT TextureDepthStencil::getStencilMipIndex(const UINT mipSlice) const
+TransitionDesc TextureDepthStencil::getStencilMipIndex(const UINT mipSlice) const
 {
-	return stencilSliceStart + mipSlice;
+	TransitionDesc desc = {};
+	desc.type = TransitionDesc::TEXTURE;
+	desc.state = TransitionDesc::SRV;
+	desc.texture.texture = texture;
+	desc.texture.mipSlice = mipSlice;
+	desc.texture.resourceIndex = stencilSliceStart + mipSlice;
+
+	return desc;
 }
 
-D3D12_CPU_DESCRIPTOR_HANDLE TextureDepthStencil::getDSVMipHandle(const UINT mipSlice) const
+TransitionDesc TextureDepthStencil::getDSVMipHandle(const UINT mipSlice) const
 {
-	return dsvMipHandles[mipSlice];
+	TransitionDesc desc = {};
+	desc.type = TransitionDesc::TEXTURE;
+	desc.state = TransitionDesc::DSV;
+	desc.texture.texture = texture;
+	desc.texture.mipSlice = mipSlice;
+	desc.texture.handle = dsvMipHandles[mipSlice];
+
+	return desc;
 }
 
 Texture* TextureDepthStencil::getTexture() const

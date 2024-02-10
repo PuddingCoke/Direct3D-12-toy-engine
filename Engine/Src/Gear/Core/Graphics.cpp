@@ -10,8 +10,6 @@ FLOAT Graphics::aspectRatio = 0.f;
 
 Graphics::Time Graphics::time = { 1.f / 60.f,0.f,0u,0.f };
 
-Graphics* Graphics::instance = nullptr;
-
 UINT Graphics::getFrameIndex()
 {
 	return frameIndex;

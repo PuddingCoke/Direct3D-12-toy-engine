@@ -17,15 +17,15 @@ public:
 
 	~TextureDepthStencil();
 
-	UINT getAllDepthIndex() const;
+	TransitionDesc getAllDepthIndex() const;
 
-	UINT getAllStencilIndex() const;
+	TransitionDesc getAllStencilIndex() const;
 
-	UINT getDepthMipIndex(const UINT mipSlice) const;
+	TransitionDesc getDepthMipIndex(const UINT mipSlice) const;
 
-	UINT getStencilMipIndex(const UINT mipSlice) const;
+	TransitionDesc getStencilMipIndex(const UINT mipSlice) const;
 
-	D3D12_CPU_DESCRIPTOR_HANDLE getDSVMipHandle(const UINT mipSlice) const;
+	TransitionDesc getDSVMipHandle(const UINT mipSlice) const;
 
 	Texture* getTexture() const;
 
