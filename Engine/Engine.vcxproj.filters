@@ -110,13 +110,13 @@
     <ClCompile Include="Src\Gear\Game.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Core\DX\Resource.cpp">
+    <ClCompile Include="Src\Gear\Core\DX\Resource\Resource.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Src\Gear\Core\GraphicsDevice.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Core\DX\UploadHeap.cpp">
+    <ClCompile Include="Src\Gear\Core\DX\Resource\UploadHeap.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Src\Gear\Core\CommandList.cpp">
@@ -125,13 +125,13 @@
     <ClCompile Include="Src\Gear\Core\CommandAllocator.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Core\DX\Buffer.cpp">
+    <ClCompile Include="Src\Gear\Core\DX\Resource\Buffer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Src\Gear\Core\Graphics.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Core\DX\Texture.cpp">
+    <ClCompile Include="Src\Gear\Core\DX\Resource\Texture.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Src\Gear\Core\RenderPass.cpp">
