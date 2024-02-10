@@ -15,7 +15,7 @@ public:
 
 	~ConstantBuffer();
 
-	UINT getBufferIndex() const;
+	TransitionDesc getBufferIndex() const;
 
 	Buffer* getBuffer() const;
 

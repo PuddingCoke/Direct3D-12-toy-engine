@@ -29,9 +29,15 @@ ConstantBuffer::~ConstantBuffer()
 	}
 }
 
-UINT ConstantBuffer::getBufferIndex() const
+TransitionDesc ConstantBuffer::getBufferIndex() const
 {
-	return bufferIndex;
+	TransitionDesc desc = {};
+	desc.type = TransitionDesc::BUFFER;
+	desc.state = TransitionDesc::CBV;
+	desc.buffer.buffer = buffer;
+	desc.buffer.resourceIndex = bufferIndex;
+
+	return desc;
 }
 
 Buffer* ConstantBuffer::getBuffer() const

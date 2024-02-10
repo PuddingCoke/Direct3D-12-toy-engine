@@ -11,7 +11,7 @@ TextureRenderTarget::TextureRenderTarget(const TextureViewCreationFlags flags, c
 	{
 		throw "Without SRV flag set is not allowed here";
 	}
-	else if (flags == TEXTURE_VIEW_CREATE_SRV)
+	else if ((!hasRTV) && (!hasUAV))
 	{
 		throw "With only SRV flag set is not allowed here";
 	}
@@ -34,7 +34,7 @@ TextureRenderTarget::TextureRenderTarget(const TextureViewCreationFlags flags, c
 		throw "Without SRV flag set is not allowed here";
 	}
 
-	if (flags == TEXTURE_VIEW_CREATE_SRV)
+	if ((!hasRTV) && (!hasUAV))
 	{
 		//stateTracking is disabled here because flags is set to D3D12_TEXTURE_CREATE_SRV
 		texture = new Texture(filePath, commandList, transientResourcePool, false);
@@ -64,24 +64,52 @@ TextureRenderTarget::~TextureRenderTarget()
 	}
 }
 
-UINT TextureRenderTarget::getAllSRVIndex() const
+TransitionDesc TextureRenderTarget::getAllSRVIndex() const
 {
-	return allSRVIndex;
+	TransitionDesc desc = {};
+	desc.type = TransitionDesc::TEXTURE;
+	desc.state = TransitionDesc::SRV;
+	desc.texture.texture = texture;
+	desc.texture.mipSlice = D3D12_TRANSITION_ALL_MIPLEVELS;
+	desc.texture.resourceIndex = allSRVIndex;
+
+	return desc;
 }
 
-UINT TextureRenderTarget::getSRVMipIndex(const UINT mipSlice) const
+TransitionDesc TextureRenderTarget::getSRVMipIndex(const UINT mipSlice) const
 {
-	return srvSliceStart + mipSlice;
+	TransitionDesc desc = {};
+	desc.type = TransitionDesc::TEXTURE;
+	desc.state = TransitionDesc::SRV;
+	desc.texture.texture = texture;
+	desc.texture.mipSlice = mipSlice;
+	desc.texture.resourceIndex = srvSliceStart + mipSlice;
+
+	return desc;
 }
 
-UINT TextureRenderTarget::getUAVMipIndex(const UINT mipSlice) const
+TransitionDesc TextureRenderTarget::getUAVMipIndex(const UINT mipSlice) const
 {
-	return uavSliceStart + mipSlice;
+	TransitionDesc desc = {};
+	desc.type = TransitionDesc::TEXTURE;
+	desc.state = TransitionDesc::UAV;
+	desc.texture.texture = texture;
+	desc.texture.mipSlice = mipSlice;
+	desc.texture.resourceIndex = uavSliceStart + mipSlice;
+
+	return desc;
 }
 
-D3D12_CPU_DESCRIPTOR_HANDLE TextureRenderTarget::getRTVMipHandle(const UINT mipSlice) const
+TransitionDesc TextureRenderTarget::getRTVMipHandle(const UINT mipSlice) const
 {
-	return rtvMipHandles[mipSlice];
+	TransitionDesc desc = {};
+	desc.type = TransitionDesc::TEXTURE;
+	desc.state = TransitionDesc::RTV;
+	desc.texture.texture = texture;
+	desc.texture.mipSlice = mipSlice;
+	desc.texture.handle = rtvMipHandles[mipSlice];
+
+	return desc;
 }
 
 Texture* TextureRenderTarget::getTexture() const

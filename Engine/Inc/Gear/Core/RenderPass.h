@@ -7,6 +7,7 @@
 #include<Gear/Core/DX/Resource/Resource.h>
 #include<Gear/Core/DX/Resource/Buffer.h>
 #include<Gear/Core/DX/Resource/Texture.h>
+#include<Gear/Core/Resource/IndexConstantBuffer.h>
 
 #include<future>
 #include<vector>
@@ -25,30 +26,30 @@ public:
 protected:
 
 	//per frame
-	void setGraphicsGlobalIndexBuffer();
+	void setGraphicsGlobalIndexBuffer(const IndexConstantBuffer& globalIndexBuffer);
 
 	//per frame
-	void setComputeGlobalIndexBuffer();
+	void setComputeGlobalIndexBuffer(const IndexConstantBuffer& globalIndexBuffer);
 
 	void setGraphicsConstants();
 
 	void setComputeConstants();
 
-	void setVertexIndexBuffer();
+	void setVertexIndexBuffer(const IndexConstantBuffer& indexBuffer);
 
-	void setHullIndexBuffer();
+	void setHullIndexBuffer(const IndexConstantBuffer& indexBuffer);
 
-	void setGeometryIndexBuffer();
+	void setGeometryIndexBuffer(const IndexConstantBuffer& indexBuffer);
 
-	void setDomainIndexBuffer();
+	void setDomainIndexBuffer(const IndexConstantBuffer& indexBuffer);
 
-	void setPixelIndexBuffer();
+	void setPixelIndexBuffer(const IndexConstantBuffer& indexBuffer);
 
-	void setComputeIndexBuffer();
+	void setComputeIndexBuffer(const IndexConstantBuffer& indexBuffer);
 
-	void setMeshIndexBuffer();
+	void setMeshIndexBuffer(const IndexConstantBuffer& indexBuffer);
 
-	void setAmplificationIndexBuffer();
+	void setAmplificationIndexBuffer(const IndexConstantBuffer& indexBuffer);
 
 	void begin();
 

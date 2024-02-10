@@ -47,8 +47,6 @@ private:
 		FLOAT floatSeed;
 	} time;
 
-	static Graphics* instance;
-
 };
 
 #endif // !_GRAPHICS_H_

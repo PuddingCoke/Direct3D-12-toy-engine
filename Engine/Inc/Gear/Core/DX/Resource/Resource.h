@@ -8,7 +8,62 @@
 
 #include<memory>
 
+//texture transition requirement
+//getRTV texture mipSlice RTV rtvHandle
+//getDSV texture mipSlice DSV dsvHandle
+//getSRV texture mipSlice SRV resourceIndex
+//getUAV texture mipSlice UAV resourceIndex
+
+
+//buffer transition requirement
+//getSRV buffer state resourceIndex
+//getUAV buffer state resourceIndex
+
 constexpr UINT D3D12_RESOURCE_STATE_UNKNOWN = 0xFFFFFFFF;
+
+class Buffer;
+class Texture;
+
+struct TransitionDesc
+{
+	enum TransitionTypes
+	{
+		BUFFER,
+		TEXTURE
+	} type;
+
+	enum TransitionStates
+	{
+		SRV,
+		UAV,
+		RTV,
+		DSV,
+		CBV
+	} state;
+
+	struct TextureTransitionDesc
+	{
+		Texture* texture;
+		UINT mipSlice;
+		union
+		{
+			D3D12_CPU_DESCRIPTOR_HANDLE handle;
+			UINT resourceIndex;
+		};
+	};
+
+	struct BufferTransitionDesc
+	{
+		Buffer* buffer;
+		UINT resourceIndex;
+	};
+
+	union
+	{
+		TextureTransitionDesc texture;
+		BufferTransitionDesc buffer;
+	};
+};
 
 class Resource
 {
