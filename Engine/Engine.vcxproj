@@ -153,6 +153,8 @@
     <ClInclude Include="Inc\Gear\Core\RenderEngine.h" />
     <ClInclude Include="Inc\Gear\Core\RenderPass.h" />
     <ClInclude Include="Inc\Gear\Core\Resource\ConstantBuffer.h" />
+    <ClInclude Include="Inc\Gear\Core\Resource\IndexBuffer.h" />
+    <ClInclude Include="Inc\Gear\Core\Resource\TextureDepthStencil.h" />
     <ClInclude Include="Inc\Gear\Core\Resource\TextureRenderTarget.h" />
     <ClInclude Include="Inc\Gear\Core\Resource\VertexBuffer.h" />
     <ClInclude Include="Inc\Gear\Core\RootSignature.h" />
@@ -180,6 +182,8 @@
     <ClCompile Include="Src\Gear\Core\DX\UploadHeap.cpp" />
     <ClCompile Include="Src\Gear\Core\GraphicsDevice.cpp" />
     <ClCompile Include="Src\Gear\Core\Resource\ConstantBuffer.cpp" />
+    <ClCompile Include="Src\Gear\Core\Resource\IndexBuffer.cpp" />
+    <ClCompile Include="Src\Gear\Core\Resource\TextureDepthStencil.cpp" />
     <ClCompile Include="Src\Gear\Core\Resource\TextureRenderTarget.cpp" />
     <ClCompile Include="Src\Gear\Core\Resource\VertexBuffer.cpp" />
     <ClCompile Include="Src\Gear\Core\RootSignature.cpp" />
