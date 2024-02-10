@@ -15,14 +15,6 @@ class Texture;
 
 constexpr UINT D3D12_TRANSITION_ALL_MIPLEVELS = 0xFFFFFFFF;
 
-enum TextureCreationFlags
-{
-	D3D12_TEXTURE_CREATE_SRV = 0x1L,
-	D3D12_TEXTURE_CREATE_UAV = 0x2L,
-	D3D12_TEXTURE_CREATE_RTV = 0x4L,
-	D3D12_TEXTURE_CREATE_DSV = 0x8L,
-};
-
 struct PendingTextureBarrier
 {
 	Texture* texture;
@@ -31,9 +23,6 @@ struct PendingTextureBarrier
 
 	UINT afterState;
 };
-
-//SRV/UAV/RTV or DSV/SRV
-//TextureCube RTV/SRV 
 
 class Texture :public Resource
 {
