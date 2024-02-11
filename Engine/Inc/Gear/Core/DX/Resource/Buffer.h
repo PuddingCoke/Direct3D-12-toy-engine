@@ -48,6 +48,8 @@ private:
 
 	friend class RenderEngine;
 
+	friend class RenderPass;
+
 	UploadHeap* uploadHeaps[Graphics::FrameBufferCount];
 
 	UINT uploadHeapIndex;
