@@ -20,7 +20,7 @@ class Buffer :public Resource
 {
 public:
 
-	Buffer(const UINT size, const bool stateTracking, const bool cpuWritable, const void* const data, ID3D12GraphicsCommandList6* commandList, std::vector<Resource*>& transientResourcePool);
+	Buffer(const UINT size, const bool stateTracking, const bool cpuWritable, const void* const data, ID3D12GraphicsCommandList6* commandList, std::vector<Resource*>& transientResourcePool, const D3D12_RESOURCE_STATES finalState);
 
 	Buffer(Buffer&);
 

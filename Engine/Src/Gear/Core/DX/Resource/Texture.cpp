@@ -156,15 +156,41 @@ Texture::Texture(const std::string filePath, ID3D12GraphicsCommandList6* command
 		throw "Format not supported";
 	}
 
-	globalState = std::make_shared<STATES>(STATES{ D3D12_RESOURCE_STATE_COPY_DEST,std::vector<UINT>(mipLevels) });
-	internalState = STATES{ D3D12_RESOURCE_STATE_COPY_DEST,std::vector<UINT>(mipLevels) };
-	transitionState = STATES{ D3D12_RESOURCE_STATE_UNKNOWN,std::vector<UINT>(mipLevels) };
-
-	for (UINT i = 0; i < mipLevels; i++)
+	if (stateTracking)
 	{
-		(*globalState).mipLevelStates[i] = D3D12_RESOURCE_STATE_COPY_DEST;
-		internalState.mipLevelStates[i] = D3D12_RESOURCE_STATE_COPY_DEST;
-		transitionState.mipLevelStates[i] = D3D12_RESOURCE_STATE_UNKNOWN;
+		globalState = std::make_shared<STATES>(STATES{ D3D12_RESOURCE_STATE_COPY_DEST,std::vector<UINT>(mipLevels) });
+		internalState = STATES{ D3D12_RESOURCE_STATE_COPY_DEST,std::vector<UINT>(mipLevels) };
+		transitionState = STATES{ D3D12_RESOURCE_STATE_UNKNOWN,std::vector<UINT>(mipLevels) };
+
+		for (UINT i = 0; i < mipLevels; i++)
+		{
+			(*globalState).mipLevelStates[i] = D3D12_RESOURCE_STATE_COPY_DEST;
+			internalState.mipLevelStates[i] = D3D12_RESOURCE_STATE_COPY_DEST;
+			transitionState.mipLevelStates[i] = D3D12_RESOURCE_STATE_UNKNOWN;
+		}
+	}
+	else
+	{
+		globalState = std::make_shared<STATES>(STATES{ D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE,std::vector<UINT>(mipLevels) });
+		internalState = STATES{ D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE,std::vector<UINT>(mipLevels) };
+		transitionState = STATES{ D3D12_RESOURCE_STATE_UNKNOWN,std::vector<UINT>(mipLevels) };
+
+		for (UINT i = 0; i < mipLevels; i++)
+		{
+			(*globalState).mipLevelStates[i] = D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE;
+			internalState.mipLevelStates[i] = D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE;
+			transitionState.mipLevelStates[i] = D3D12_RESOURCE_STATE_UNKNOWN;
+		}
+
+		D3D12_RESOURCE_BARRIER barrier = {};
+		barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+		barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+		barrier.Transition.pResource = getResource();
+		barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+		barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
+		barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE;
+
+		commandList->ResourceBarrier(1, &barrier);
 	}
 }
 
