@@ -19,7 +19,7 @@ IndexConstantBuffer::IndexConstantBuffer(const std::initializer_list<TransitionD
 		}
 	}
 
-	buffer = new Buffer(sizeof(UINT) * indices.size(), false, cpuWritable, indices.data(), commandList, transientResourcePool);
+	buffer = new Buffer(sizeof(UINT) * indices.size(), cpuWritable, cpuWritable, indices.data(), commandList, transientResourcePool, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
 }
 
 IndexConstantBuffer::IndexConstantBuffer(const IndexConstantBuffer& icb) :

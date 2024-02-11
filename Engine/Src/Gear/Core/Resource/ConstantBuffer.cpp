@@ -2,7 +2,7 @@
 
 ConstantBuffer::ConstantBuffer(const UINT size, const bool stateTracking, const bool cpuWritable, const void* const data, ID3D12GraphicsCommandList6* commandList, std::vector<Resource*>& transientResourcePool)
 {
-	buffer = new Buffer(size, stateTracking, cpuWritable, data, commandList, transientResourcePool);
+	buffer = new Buffer(size, stateTracking, cpuWritable, data, commandList, transientResourcePool, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
 
 	D3D12_CONSTANT_BUFFER_VIEW_DESC desc = {};
 	desc.BufferLocation = buffer->getGPUAddress();
