@@ -4,10 +4,11 @@
 #define _RENDERPASS_H_
 
 #include<Gear/Core/CommandList.h>
-#include<Gear/Core/DX/Resource/Resource.h>
-#include<Gear/Core/DX/Resource/Buffer.h>
-#include<Gear/Core/DX/Resource/Texture.h>
 #include<Gear/Core/Resource/IndexConstantBuffer.h>
+#include<Gear/Core/Resource/TextureRenderTarget.h>
+#include<Gear/Core/Resource/TextureDepthStencil.h>
+#include<Gear/Core/Resource/VertexBuffer.h>
+#include<Gear/Core/Resource/IndexBuffer.h>
 
 #include<future>
 #include<vector>
@@ -25,31 +26,55 @@ public:
 
 protected:
 
-	//per frame
-	void setGraphicsGlobalIndexBuffer(const IndexConstantBuffer& globalIndexBuffer);
+	//per frame transition immediate
+	void setGraphicsGlobalIndexBuffer(const IndexConstantBuffer* const globalIndexBuffer);
 
-	//per frame
-	void setComputeGlobalIndexBuffer(const IndexConstantBuffer& globalIndexBuffer);
+	//per frame transition immediate
+	void setComputeGlobalIndexBuffer(const IndexConstantBuffer* const globalIndexBuffer);
+
+	//per draw call transition immediate
+	void setComputeIndexBuffer(const IndexConstantBuffer* const indexBuffer);
 
 	void setGraphicsConstants();
 
 	void setComputeConstants();
 
-	void setVertexIndexBuffer(const IndexConstantBuffer& indexBuffer);
+	//deferred because a srv might be read in pixel shader or non pixel shader so the final state is pending
+	//but for compute shader index buffer and global graphics&compute index buffer transition state is deterministic
 
-	void setHullIndexBuffer(const IndexConstantBuffer& indexBuffer);
+	//per draw call transition deferred
+	void setVertexIndexBuffer(const IndexConstantBuffer* const indexBuffer);
 
-	void setGeometryIndexBuffer(const IndexConstantBuffer& indexBuffer);
+	//per draw call transition deferred
+	void setHullIndexBuffer(const IndexConstantBuffer* const indexBuffer);
 
-	void setDomainIndexBuffer(const IndexConstantBuffer& indexBuffer);
+	//per draw call transition deferred
+	void setGeometryIndexBuffer(const IndexConstantBuffer* const indexBuffer);
 
-	void setPixelIndexBuffer(const IndexConstantBuffer& indexBuffer);
+	//per draw call transition deferred
+	void setDomainIndexBuffer(const IndexConstantBuffer* const indexBuffer);
 
-	void setComputeIndexBuffer(const IndexConstantBuffer& indexBuffer);
+	//per draw call transition deferred
+	void setPixelIndexBuffer(const IndexConstantBuffer* const indexBuffer);
 
-	void setMeshIndexBuffer(const IndexConstantBuffer& indexBuffer);
+	//per draw call transition deferred
+	void setMeshIndexBuffer(const IndexConstantBuffer* const indexBuffer);
 
-	void setAmplificationIndexBuffer(const IndexConstantBuffer& indexBuffer);
+	//per draw call transition deferred
+	void setAmplificationIndexBuffer(const IndexConstantBuffer* const indexBuffer);
+
+	void finishGraphicsStageIndexBuffer();
+
+	void setRenderTargets(const std::initializer_list<TransitionDesc>& renderTargets,const std::initializer_list<TransitionDesc>& depthStencils);
+
+	void setVertexBuffers(const UINT startSlot,const std::initializer_list<VertexBuffer*>& vertexBuffers);
+
+	void setIndexBuffers(const std::initializer_list<IndexBuffer*>& indexBuffers);
+
+	void setTopology(const D3D12_PRIMITIVE_TOPOLOGY topology);
+
+	//when create a buffer cpuWritable should be true
+	void updateBuffer(Buffer* const buffer, const void* const dataPtr, const UINT dataSize);
 
 	void begin();
 
@@ -64,6 +89,12 @@ private:
 	void updateReferredResStates();
 
 	void flushTransitionResources();
+
+	void pushGraphicsStageIndexBuffer(UINT rootParameterIndex, const IndexConstantBuffer* const indexBuffer,const UINT targetSRVState);
+
+	void pushResourceTrackList(Texture* const texture);
+
+	void pushResourceTrackList(Buffer* const buffer);
 
 	std::unordered_set<Resource*> referredResources;
 

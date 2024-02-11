@@ -96,6 +96,8 @@ public:
 
 	void setStateTracking(const bool state);
 
+	bool getStateTracking() const;
+
 	bool isSharedResource() const;
 
 protected:

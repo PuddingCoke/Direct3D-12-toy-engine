@@ -73,6 +73,8 @@ private:
 
 	friend class RenderEngine;
 
+	friend class RenderPass;
+
 	UINT width;
 
 	UINT height;

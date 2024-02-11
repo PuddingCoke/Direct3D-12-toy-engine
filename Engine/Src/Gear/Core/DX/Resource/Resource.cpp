@@ -39,6 +39,11 @@ void Resource::setStateTracking(const bool state)
 	stateTracking = state;
 }
 
+bool Resource::getStateTracking() const
+{
+	return stateTracking;
+}
+
 bool Resource::isSharedResource() const
 {
 	return sharedResource;
