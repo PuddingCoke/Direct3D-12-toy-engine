@@ -65,7 +65,7 @@ protected:
 
 	void finishGraphicsStageIndexBuffer();
 
-	void setRenderTargets(const std::initializer_list<TransitionDesc>& renderTargets,const std::initializer_list<TransitionDesc>& depthStencils);
+	void setRenderTargets(const std::initializer_list<RenderTargetDesc>& renderTargets,const std::initializer_list<DepthStencilDesc>& depthStencils);
 
 	void setVertexBuffers(const UINT startSlot,const std::initializer_list<VertexBuffer*>& vertexBuffers);
 

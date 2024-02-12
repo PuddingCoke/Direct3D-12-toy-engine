@@ -29,13 +29,13 @@ ConstantBuffer::~ConstantBuffer()
 	}
 }
 
-TransitionDesc ConstantBuffer::getBufferIndex() const
+ShaderResourceDesc ConstantBuffer::getBufferIndex() const
 {
-	TransitionDesc desc = {};
-	desc.type = TransitionDesc::BUFFER;
-	desc.state = TransitionDesc::CBV;
-	desc.buffer.buffer = buffer;
-	desc.buffer.resourceIndex = bufferIndex;
+	ShaderResourceDesc desc = {};
+	desc.type = ShaderResourceDesc::BUFFER;
+	desc.state = ShaderResourceDesc::CBV;
+	desc.bufferDesc.buffer = buffer;
+	desc.bufferDesc.resourceIndex = bufferIndex;
 
 	return desc;
 }

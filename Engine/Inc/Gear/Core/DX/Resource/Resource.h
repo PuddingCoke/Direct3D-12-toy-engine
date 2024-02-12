@@ -24,20 +24,18 @@ constexpr UINT D3D12_RESOURCE_STATE_UNKNOWN = 0xFFFFFFFF;
 class Buffer;
 class Texture;
 
-struct TransitionDesc
+struct ShaderResourceDesc
 {
-	enum TransitionTypes
+	enum ResourceType
 	{
 		BUFFER,
 		TEXTURE
 	} type;
 
-	enum TransitionStates
+	enum TargetStates
 	{
 		SRV,
 		UAV,
-		RTV,
-		DSV,
 		CBV
 	} state;
 
@@ -45,11 +43,7 @@ struct TransitionDesc
 	{
 		Texture* texture;
 		UINT mipSlice;
-		union
-		{
-			D3D12_CPU_DESCRIPTOR_HANDLE handle;
-			UINT resourceIndex;
-		};
+		UINT resourceIndex;
 	};
 
 	struct BufferTransitionDesc
@@ -60,9 +54,23 @@ struct TransitionDesc
 
 	union
 	{
-		TextureTransitionDesc texture;
-		BufferTransitionDesc buffer;
+		TextureTransitionDesc textureDesc;
+		BufferTransitionDesc bufferDesc;
 	};
+};
+
+struct RenderTargetDesc
+{
+	Texture* texture;
+	UINT mipSlice;
+	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle;
+};
+
+struct DepthStencilDesc
+{
+	Texture* texture;
+	UINT mipSlice;
+	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle;
 };
 
 class Resource

@@ -12,7 +12,6 @@ GlobalDescriptorHeap::GlobalDescriptorHeap()
 
 	depthStencilHeap = new DescriptorHeap(100000, 100, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, D3D12_DESCRIPTOR_HEAP_FLAG_NONE);
 
-	indexBufferHeap = new DescriptorHeap(300000, 300, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, D3D12_DESCRIPTOR_HEAP_FLAG_NONE);
 }
 
 GlobalDescriptorHeap::~GlobalDescriptorHeap()
@@ -36,11 +35,6 @@ GlobalDescriptorHeap::~GlobalDescriptorHeap()
 	{
 		delete depthStencilHeap;
 	}
-
-	if (indexBufferHeap)
-	{
-		delete indexBufferHeap;
-	}
 }
 
 DescriptorHeap* GlobalDescriptorHeap::getResourceHeap()
@@ -61,9 +55,4 @@ DescriptorHeap* GlobalDescriptorHeap::getRenderTargetHeap()
 DescriptorHeap* GlobalDescriptorHeap::getDepthStencilHeap()
 {
 	return instance->depthStencilHeap;
-}
-
-DescriptorHeap* GlobalDescriptorHeap::getIndexBufferHeap()
-{
-	return instance->indexBufferHeap;
 }

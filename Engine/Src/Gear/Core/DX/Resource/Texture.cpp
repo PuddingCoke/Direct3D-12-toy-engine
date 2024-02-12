@@ -483,32 +483,34 @@ void Texture::transition(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers
 				}
 			}
 
-			if (internalState.allState == D3D12_RESOURCE_STATE_UNKNOWN)
+
+			bool uniformState = true;
+
+			const UINT tempState = internalState.mipLevelStates[0];
+
+			if (tempState == D3D12_RESOURCE_STATE_UNKNOWN)
 			{
-				bool uniformState = true;
-
-				const UINT tempState = internalState.mipLevelStates[0];
-
-				if (tempState == D3D12_RESOURCE_STATE_UNKNOWN)
+				uniformState = false;
+			}
+			else
+			{
+				for (UINT i = 0; i < mipLevels; i++)
 				{
-					uniformState = false;
-				}
-				else
-				{
-					for (UINT i = 0; i < mipLevels; i++)
+					if (tempState != internalState.mipLevelStates[i])
 					{
-						if (tempState != internalState.mipLevelStates[i])
-						{
-							uniformState = false;
-							break;
-						}
+						uniformState = false;
+						break;
 					}
 				}
+			}
 
-				if (uniformState)
-				{
-					internalState.allState = internalState.mipLevelStates[0];
-				}
+			if (uniformState)
+			{
+				internalState.allState = internalState.mipLevelStates[0];
+			}
+			else
+			{
+				internalState.allState = D3D12_RESOURCE_STATE_UNKNOWN;
 			}
 		}
 		else
