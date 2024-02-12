@@ -1,21 +1,21 @@
 #include<Gear/Core/Resource/IndexConstantBuffer.h>
 
-IndexConstantBuffer::IndexConstantBuffer(const std::initializer_list<TransitionDesc>& transitionDescs, const bool cpuWritable, ID3D12GraphicsCommandList6* commandList, std::vector<Resource*>& transientResourcePool)
+IndexConstantBuffer::IndexConstantBuffer(const std::initializer_list<ShaderResourceDesc>& transitionDescs, const bool cpuWritable, ID3D12GraphicsCommandList6* commandList, std::vector<Resource*>& transientResourcePool)
 {
-	for (const TransitionDesc& desc : transitionDescs)
+	for (const ShaderResourceDesc& desc : transitionDescs)
 	{
 		descs.push_back(desc);
 	}
 
 	for (UINT i = 0; i < descs.size(); i++)
 	{
-		if (descs[i].type == TransitionDesc::BUFFER)
+		if (descs[i].type == ShaderResourceDesc::BUFFER)
 		{
-			indices.push_back(descs[i].buffer.resourceIndex);
+			indices.push_back(descs[i].bufferDesc.resourceIndex);
 		}
 		else
 		{
-			indices.push_back(descs[i].texture.resourceIndex);
+			indices.push_back(descs[i].textureDesc.resourceIndex);
 		}
 	}
 

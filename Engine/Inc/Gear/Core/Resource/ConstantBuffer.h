@@ -15,7 +15,7 @@ public:
 
 	~ConstantBuffer();
 
-	TransitionDesc getBufferIndex() const;
+	ShaderResourceDesc getBufferIndex() const;
 
 	Buffer* getBuffer() const;
 

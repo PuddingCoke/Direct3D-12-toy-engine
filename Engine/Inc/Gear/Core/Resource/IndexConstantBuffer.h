@@ -18,7 +18,7 @@ class IndexConstantBuffer
 {
 public:
 
-	IndexConstantBuffer(const std::initializer_list<TransitionDesc>& transitionDescs, const bool cpuWritable, ID3D12GraphicsCommandList6* commandList, std::vector<Resource*>& transientResourcePool);
+	IndexConstantBuffer(const std::initializer_list<ShaderResourceDesc>& transitionDescs, const bool cpuWritable, ID3D12GraphicsCommandList6* commandList, std::vector<Resource*>& transientResourcePool);
 
 	IndexConstantBuffer(const IndexConstantBuffer&);
 
@@ -32,7 +32,7 @@ private:
 
 	std::vector<UINT> indices;
 
-	std::vector<TransitionDesc> descs;
+	std::vector<ShaderResourceDesc> descs;
 
 };
 

@@ -33,13 +33,13 @@ public:
 
 	~TextureRenderTarget();
 
-	TransitionDesc getAllSRVIndex() const;
+	ShaderResourceDesc getAllSRVIndex() const;
 
-	TransitionDesc getSRVMipIndex(const UINT mipSlice) const;
+	ShaderResourceDesc getSRVMipIndex(const UINT mipSlice) const;
 
-	TransitionDesc getUAVMipIndex(const UINT mipSlice) const;
+	ShaderResourceDesc getUAVMipIndex(const UINT mipSlice) const;
 
-	TransitionDesc getRTVMipHandle(const UINT mipSlice) const;
+	RenderTargetDesc getRTVMipHandle(const UINT mipSlice) const;
 
 	Texture* getTexture() const;
 

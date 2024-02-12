@@ -25,8 +25,6 @@ public:
 
 	static DescriptorHeap* getDepthStencilHeap();
 
-	static DescriptorHeap* getIndexBufferHeap();
-
 private:
 
 	friend class RenderEngine;
@@ -44,8 +42,6 @@ private:
 	DescriptorHeap* renderTargetHeap;
 
 	DescriptorHeap* depthStencilHeap;
-
-	DescriptorHeap* indexBufferHeap;
 
 };
 

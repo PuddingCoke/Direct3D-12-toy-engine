@@ -64,50 +64,48 @@ TextureRenderTarget::~TextureRenderTarget()
 	}
 }
 
-TransitionDesc TextureRenderTarget::getAllSRVIndex() const
+ShaderResourceDesc TextureRenderTarget::getAllSRVIndex() const
 {
-	TransitionDesc desc = {};
-	desc.type = TransitionDesc::TEXTURE;
-	desc.state = TransitionDesc::SRV;
-	desc.texture.texture = texture;
-	desc.texture.mipSlice = D3D12_TRANSITION_ALL_MIPLEVELS;
-	desc.texture.resourceIndex = allSRVIndex;
+	ShaderResourceDesc desc = {};
+	desc.type = ShaderResourceDesc::TEXTURE;
+	desc.state = ShaderResourceDesc::SRV;
+	desc.textureDesc.texture = texture;
+	desc.textureDesc.mipSlice = D3D12_TRANSITION_ALL_MIPLEVELS;
+	desc.textureDesc.resourceIndex = allSRVIndex;
 
 	return desc;
 }
 
-TransitionDesc TextureRenderTarget::getSRVMipIndex(const UINT mipSlice) const
+ShaderResourceDesc TextureRenderTarget::getSRVMipIndex(const UINT mipSlice) const
 {
-	TransitionDesc desc = {};
-	desc.type = TransitionDesc::TEXTURE;
-	desc.state = TransitionDesc::SRV;
-	desc.texture.texture = texture;
-	desc.texture.mipSlice = mipSlice;
-	desc.texture.resourceIndex = srvSliceStart + mipSlice;
+	ShaderResourceDesc desc = {};
+	desc.type = ShaderResourceDesc::TEXTURE;
+	desc.state = ShaderResourceDesc::SRV;
+	desc.textureDesc.texture = texture;
+	desc.textureDesc.mipSlice = mipSlice;
+	desc.textureDesc.resourceIndex = srvSliceStart + mipSlice;
 
 	return desc;
 }
 
-TransitionDesc TextureRenderTarget::getUAVMipIndex(const UINT mipSlice) const
+ShaderResourceDesc TextureRenderTarget::getUAVMipIndex(const UINT mipSlice) const
 {
-	TransitionDesc desc = {};
-	desc.type = TransitionDesc::TEXTURE;
-	desc.state = TransitionDesc::UAV;
-	desc.texture.texture = texture;
-	desc.texture.mipSlice = mipSlice;
-	desc.texture.resourceIndex = uavSliceStart + mipSlice;
+	ShaderResourceDesc desc = {};
+	desc.type = ShaderResourceDesc::TEXTURE;
+	desc.state = ShaderResourceDesc::UAV;
+	desc.textureDesc.texture = texture;
+	desc.textureDesc.mipSlice = mipSlice;
+	desc.textureDesc.resourceIndex = uavSliceStart + mipSlice;
 
 	return desc;
 }
 
-TransitionDesc TextureRenderTarget::getRTVMipHandle(const UINT mipSlice) const
+RenderTargetDesc TextureRenderTarget::getRTVMipHandle(const UINT mipSlice) const
 {
-	TransitionDesc desc = {};
-	desc.type = TransitionDesc::TEXTURE;
-	desc.state = TransitionDesc::RTV;
-	desc.texture.texture = texture;
-	desc.texture.mipSlice = mipSlice;
-	desc.texture.handle = rtvMipHandles[mipSlice];
+	RenderTargetDesc desc = {};
+	desc.texture = texture;
+	desc.mipSlice = mipSlice;
+	desc.rtvHandle = rtvMipHandles[mipSlice];
 
 	return desc;
 }
