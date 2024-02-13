@@ -28,6 +28,8 @@ private:
 
 	friend class RenderPass;
 
+	void setTransitionResources(const std::initializer_list<ShaderResourceDesc>& transitionDescs);
+
 	Buffer* buffer;
 
 	std::vector<UINT> indices;
