@@ -29,6 +29,29 @@ IndexConstantBuffer::IndexConstantBuffer(const IndexConstantBuffer& icb) :
 {
 }
 
+void IndexConstantBuffer::setTransitionResources(const std::initializer_list<ShaderResourceDesc>& transitionDescs)
+{
+	descs.clear();
+	indices.clear();
+
+	for (const ShaderResourceDesc& desc : transitionDescs)
+	{
+		descs.push_back(desc);
+	}
+
+	for (UINT i = 0; i < descs.size(); i++)
+	{
+		if (descs[i].type == ShaderResourceDesc::BUFFER)
+		{
+			indices.push_back(descs[i].bufferDesc.resourceIndex);
+		}
+		else
+		{
+			indices.push_back(descs[i].textureDesc.resourceIndex);
+		}
+	}
+}
+
 IndexConstantBuffer::~IndexConstantBuffer()
 {
 	if (buffer)
