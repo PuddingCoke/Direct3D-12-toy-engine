@@ -59,13 +59,13 @@ void Gear::runGame()
 	{
 		const std::chrono::high_resolution_clock::time_point startPoint = clock.now();
 
+		RenderEngine::get()->begin();
+
 		game->update(Graphics::time.deltaTime);
 
 		game->render();
 
-		RenderEngine::get()->processCommandLists();
-
-		RenderEngine::get()->present();
+		RenderEngine::get()->end();
 
 		const std::chrono::high_resolution_clock::time_point endPoint = clock.now();
 

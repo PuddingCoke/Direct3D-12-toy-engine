@@ -5,6 +5,7 @@
 
 #include<Gear/Core/RenderPass.h>
 #include<Gear/Core/Graphics.h>
+#include<Gear/Core/Camera.h>
 
 #include<iostream>
 #include<dxgi1_6.h>
@@ -23,13 +24,15 @@ public:
 
 	static RenderEngine* get();
 
+	void begin();
+
 	void submitRenderPass(RenderPass* const pass);
 
 	void processCommandLists();
 
 	void waitForGPU();
 
-	void present();
+	void end();
 
 	GPUVendor getVendor() const;
 
@@ -39,7 +42,7 @@ private:
 
 	static RenderEngine* instance;
 
-	RenderEngine(HWND hwnd);
+	RenderEngine(const HWND hwnd);
 
 	~RenderEngine();
 
@@ -56,6 +59,22 @@ private:
 	UINT64 fenceValues[Graphics::FrameBufferCount];
 
 	HANDLE fenceEvent;
+
+	//two commandlists handle global resources transition
+	//beginCommandList handle resources creation
+
+	CommandList* beginCommandlist;
+
+	CommandList* endCommandList;
+
+	ConstantBuffer* timeConstBuffer;
+
+	ConstantBuffer* cameraConstBuffer;
+
+	ComPtr<ID3D12Resource> backBufferResources[Graphics::FrameBufferCount];
+
+	std::vector<Resource*> transientResources[Graphics::FrameBufferCount];
+
 };
 
 #endif // !_RENDERENGINE_H_

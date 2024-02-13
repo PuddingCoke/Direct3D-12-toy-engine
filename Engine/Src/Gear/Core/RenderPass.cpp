@@ -1,5 +1,7 @@
 #include<Gear/Core/RenderPass.h>
 
+IndexConstantBuffer* RenderPass::globalIndexConstantBuffer = nullptr;
+
 std::future<void> RenderPass::getPassResult()
 {
 	return std::async(std::launch::async, [&]
@@ -409,6 +411,13 @@ void RenderPass::setRenderTargets(const std::initializer_list<RenderTargetDesc>&
 	}
 }
 
+void RenderPass::setDefRenderTarget()
+{
+	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = Graphics::getBackBufferHandle();
+
+	renderCMD->get()->OMSetRenderTargets(1, &rtvHandle, FALSE, nullptr);
+}
+
 void RenderPass::setVertexBuffers(const UINT startSlot, const std::initializer_list<VertexBuffer*>& vertexBuffers)
 {
 	std::vector<D3D12_VERTEX_BUFFER_VIEW> vbvs;
@@ -525,6 +534,10 @@ void RenderPass::begin()
 	renderCMD->setGraphicsRootSignature(GlobalRootSignature::getGraphicsRootSignature());
 
 	renderCMD->setComputeRootSignature(GlobalRootSignature::getComputeRootSignature());
+
+	renderCMD->get()->SetGraphicsRootConstantBufferView(0, globalIndexConstantBuffer->buffer->getGPUAddress());
+
+	renderCMD->get()->SetComputeRootConstantBufferView(0, globalIndexConstantBuffer->buffer->getGPUAddress());
 }
 
 void RenderPass::end()
