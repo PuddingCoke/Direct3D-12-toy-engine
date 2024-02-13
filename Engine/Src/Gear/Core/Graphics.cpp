@@ -10,6 +10,8 @@ FLOAT Graphics::aspectRatio = 0.f;
 
 Graphics::Time Graphics::time = { 1.f / 60.f,0.f,0u,0.f };
 
+std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> Graphics::backBufferHandles;
+
 UINT Graphics::getFrameIndex()
 {
 	return frameIndex;
@@ -38,4 +40,9 @@ UINT Graphics::getHeight()
 FLOAT Graphics::getAspectRatio()
 {
 	return aspectRatio;
+}
+
+D3D12_CPU_DESCRIPTOR_HANDLE Graphics::getBackBufferHandle()
+{
+	return backBufferHandles[Graphics::frameIndex];
 }

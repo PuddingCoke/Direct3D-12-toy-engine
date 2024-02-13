@@ -139,6 +139,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Inc\Gear\Configuration.h" />
+    <ClInclude Include="Inc\Gear\Core\Camera.h" />
     <ClInclude Include="Inc\Gear\Core\CommandList.h" />
     <ClInclude Include="Inc\Gear\Core\CommandAllocator.h" />
     <ClInclude Include="Inc\Gear\Core\DescriptorHeap.h" />
@@ -168,6 +169,7 @@
     <ClInclude Include="Inc\Gear\Window\Win32Form.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Src\Gear\Core\Camera.cpp" />
     <ClCompile Include="Src\Gear\Core\DescriptorHeap.cpp" />
     <ClCompile Include="Src\Gear\Core\GlobalDescriptorHeap.cpp" />
     <ClCompile Include="Src\Gear\Core\GlobalRootSignature.cpp" />

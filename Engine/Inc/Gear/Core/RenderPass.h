@@ -83,6 +83,8 @@ protected:
 
 	void setRenderTargets(const std::initializer_list<RenderTargetDesc>& renderTargets,const std::initializer_list<DepthStencilDesc>& depthStencils);
 
+	void setDefRenderTarget();
+
 	void setVertexBuffers(const UINT startSlot,const std::initializer_list<VertexBuffer*>& vertexBuffers);
 
 	void setIndexBuffers(const std::initializer_list<IndexBuffer*>& indexBuffers);
@@ -113,6 +115,8 @@ protected:
 private:
 
 	friend class RenderEngine;
+
+	static IndexConstantBuffer* globalIndexConstantBuffer;
 
 	void updateReferredResStates();
 

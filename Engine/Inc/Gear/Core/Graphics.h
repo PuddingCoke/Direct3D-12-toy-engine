@@ -25,11 +25,15 @@ public:
 
 	static FLOAT getAspectRatio();
 
+	static D3D12_CPU_DESCRIPTOR_HANDLE getBackBufferHandle();
+
 private:
 
 	friend class Gear;
 
 	friend class RenderEngine;
+
+	static std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> backBufferHandles;
 
 	static UINT frameIndex;
 
