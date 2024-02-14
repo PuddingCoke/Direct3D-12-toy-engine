@@ -398,4 +398,46 @@ RenderEngine::RenderEngine(const HWND hwnd) :
 
 RenderEngine::~RenderEngine()
 {
+	if (GlobalDescriptorHeap::instance)
+	{
+		delete GlobalDescriptorHeap::instance;
+	}
+
+	if (GlobalRootSignature::instance)
+	{
+		delete GlobalRootSignature::instance;
+	}
+
+	if (RenderPass::globalIndexConstantBuffer)
+	{
+		delete RenderPass::globalIndexConstantBuffer;
+	}
+
+	if (beginCommandlist)
+	{
+		delete beginCommandlist;
+	}
+
+	if (endCommandList)
+	{
+		delete endCommandList;
+	}
+
+	if (timeConstBuffer)
+	{
+		delete timeConstBuffer;
+	}
+
+	if (cameraConstBuffer)
+	{
+		delete timeConstBuffer;
+	}
+
+	for (UINT i = 0; i < Graphics::FrameBufferCount; i++)
+	{
+		for (Resource* const res : transientResources[i])
+		{
+			delete res;
+		}
+	}
 }

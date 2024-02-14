@@ -162,6 +162,9 @@
     <ClInclude Include="Inc\Gear\Core\RootSignature.h" />
     <ClInclude Include="Inc\Gear\Game.h" />
     <ClInclude Include="Inc\Gear\Gear.h" />
+    <ClInclude Include="Inc\Gear\Input\Event.h" />
+    <ClInclude Include="Inc\Gear\Input\Keyboard.h" />
+    <ClInclude Include="Inc\Gear\Input\Mouse.h" />
     <ClInclude Include="Inc\Gear\Utils\Math.h" />
     <ClInclude Include="Inc\Gear\Utils\Random.h" />
     <ClInclude Include="Inc\Gear\Utils\Timer.h" />
@@ -193,6 +196,9 @@
     <ClCompile Include="Src\Gear\Core\RootSignature.cpp" />
     <ClCompile Include="Src\Gear\Game.cpp" />
     <ClCompile Include="Src\Gear\Gear.cpp" />
+    <ClCompile Include="Src\Gear\Input\Event.cpp" />
+    <ClCompile Include="Src\Gear\Input\Keyboard.cpp" />
+    <ClCompile Include="Src\Gear\Input\Mouse.cpp" />
     <ClCompile Include="Src\Gear\Utils\Math.cpp" />
     <ClCompile Include="Src\Gear\Utils\Random.cpp" />
     <ClCompile Include="Src\Gear\Utils\Timer.cpp" />

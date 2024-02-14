@@ -44,7 +44,7 @@ protected:
 	VertexBuffer* CreateVertexBuffer(const UINT perVertexSize, const UINT size, const bool stateTracking, const bool cpuWritable, const void* const data);
 
 	//per frame global resources transition immediate
-	void setGlobalIndexBuffer(const IndexConstantBuffer* const globalIndexBuffer);
+	void setGlobalIndexBuffer(const IndexConstantBuffer* const indexBuffer);
 
 	//per draw call transition immediate
 	void setComputeIndexBuffer(const IndexConstantBuffer* const indexBuffer);

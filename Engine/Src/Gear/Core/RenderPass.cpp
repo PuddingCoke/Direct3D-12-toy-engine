@@ -85,9 +85,9 @@ VertexBuffer* RenderPass::CreateVertexBuffer(const UINT perVertexSize, const UIN
 	return new VertexBuffer(perVertexSize, size, stateTracking, cpuWritable, data, renderCMD->get(), transientResources[Graphics::getFrameIndex()]);
 }
 
-void RenderPass::setGlobalIndexBuffer(const IndexConstantBuffer* const globalIndexBuffer)
+void RenderPass::setGlobalIndexBuffer(const IndexConstantBuffer* const indexBuffer)
 {
-	for (const ShaderResourceDesc& desc : globalIndexBuffer->descs)
+	for (const ShaderResourceDesc& desc : indexBuffer->descs)
 	{
 		if (desc.type == ShaderResourceDesc::BUFFER)
 		{
@@ -177,7 +177,7 @@ void RenderPass::setGlobalIndexBuffer(const IndexConstantBuffer* const globalInd
 		}
 	}
 
-	Buffer* const buffer = globalIndexBuffer->buffer;
+	Buffer* const buffer = indexBuffer->buffer;
 
 	if (buffer->getStateTracking())
 	{

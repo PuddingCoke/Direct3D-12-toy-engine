@@ -102,6 +102,15 @@
     <ClInclude Include="Inc\Gear\Core\Camera.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Inc\Gear\Input\Event.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Gear\Input\Keyboard.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Gear\Input\Mouse.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Gear\Window\Win32Form.cpp">
@@ -189,6 +198,15 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Src\Gear\Core\Camera.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gear\Input\Event.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gear\Input\Keyboard.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gear\Input\Mouse.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
