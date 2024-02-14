@@ -129,6 +129,8 @@
       <ConformanceMode>true</ConformanceMode>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <WarningLevel>Level3</WarningLevel>
+      <AdditionalIncludeDirectories>$(ProjectDir)External\D3D12Headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -138,6 +140,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="External\DDSTextureLoader\DDSTextureLoader12.h" />
+    <ClInclude Include="External\stb_image\stb_image.h" />
+    <ClInclude Include="External\stb_image\stb_image_write.h" />
     <ClInclude Include="Inc\Gear\Configuration.h" />
     <ClInclude Include="Inc\Gear\Core\Camera.h" />
     <ClInclude Include="Inc\Gear\Core\CommandList.h" />
@@ -172,6 +177,8 @@
     <ClInclude Include="Inc\Gear\Window\Win32Form.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="External\DDSTextureLoader\DDSTextureLoader12.cpp" />
+    <ClCompile Include="External\stb_image\stb_image.cpp" />
     <ClCompile Include="Src\Gear\Core\Camera.cpp" />
     <ClCompile Include="Src\Gear\Core\DescriptorHeap.cpp" />
     <ClCompile Include="Src\Gear\Core\GlobalDescriptorHeap.cpp" />

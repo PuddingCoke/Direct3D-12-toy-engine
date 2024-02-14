@@ -5,8 +5,24 @@
 
 #include<D3D12Headers/d3dx12.h>
 #include<wrl/client.h>
+#include<iostream>
+#include<comdef.h>
 
 using Microsoft::WRL::ComPtr;
+
+#define CHECKERROR(x) \
+{\
+HRESULT hr = x;\
+if(FAILED(hr))\
+{\
+std::cout<<__FILE__<<" Line:"<<__LINE__<<"\n";\
+std::cout<<"Function name "<<__FUNCTION__ <<"\n";\
+std::cout<<"Failed with 0x"<<std::hex<<hr<<std::dec<<"\n";\
+_com_error err(hr);\
+std::wcout<<"Failed reason "<<err.ErrorMessage()<<"\n";\
+__debugbreak();\
+}\
+}\
 
 class GraphicsDevice
 {

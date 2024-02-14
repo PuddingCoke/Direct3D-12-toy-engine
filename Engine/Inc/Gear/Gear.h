@@ -32,6 +32,10 @@ public:
 
 	void iniGame(Game* const gamePtr);
 
+	static void initialize();
+
+	static void release();
+
 private:
 
 	static Gear* instance;
@@ -41,6 +45,8 @@ private:
 	void destroy();
 
 	Gear();
+
+	~Gear();
 
 	Win32Form* winform;
 

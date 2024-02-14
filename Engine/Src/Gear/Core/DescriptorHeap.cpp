@@ -54,7 +54,7 @@ UINT DescriptorHeap::getIncrementSize() const
 
 ID3D12DescriptorHeap* DescriptorHeap::get() const
 {
-	descriptorHeap.Get();
+	return descriptorHeap.Get();
 }
 
 DescriptorHeap::StaticDescriptorHandle DescriptorHeap::allocStaticDescriptor(UINT num)
