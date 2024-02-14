@@ -55,6 +55,16 @@ void Gear::iniGame(Game* const gamePtr)
 	destroy();
 }
 
+void Gear::initialize()
+{
+	Gear::instance = new Gear();
+}
+
+void Gear::release()
+{
+	delete Gear::instance;
+}
+
 void Gear::runGame()
 {
 	std::chrono::high_resolution_clock clock;
@@ -89,9 +99,17 @@ void Gear::destroy()
 	delete game;
 
 	delete winform;
+
+	delete RenderEngine::instance;
 }
 
-Gear::Gear()
+Gear::Gear() :
+	game(nullptr), winform(nullptr), usage(Configuration::EngineUsage::NORMAL)
+{
+
+}
+
+Gear::~Gear()
 {
 
 }

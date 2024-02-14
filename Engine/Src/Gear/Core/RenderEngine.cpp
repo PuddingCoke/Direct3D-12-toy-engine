@@ -267,9 +267,16 @@ GPUVendor RenderEngine::getVendor() const
 RenderEngine::RenderEngine(const HWND hwnd) :
 	fenceValues{}, fenceEvent(nullptr), vendor(GPUVendor::UNKNOWN)
 {
+
+	ComPtr<ID3D12Debug> debugController;
+
+	D3D12GetDebugInterface(IID_PPV_ARGS(&debugController));
+
+	debugController->EnableDebugLayer();
+
 	ComPtr<IDXGIFactory7> factory;
 
-	CreateDXGIFactory2(0, IID_PPV_ARGS(&factory));
+	CreateDXGIFactory2(DXGI_CREATE_FACTORY_DEBUG, IID_PPV_ARGS(&factory));
 
 	ComPtr<IDXGIAdapter4> adapter;
 
@@ -439,5 +446,10 @@ RenderEngine::~RenderEngine()
 		{
 			delete res;
 		}
+	}
+
+	if (GraphicsDevice::instance)
+	{
+		delete GraphicsDevice::instance;
 	}
 }

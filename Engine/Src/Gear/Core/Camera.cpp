@@ -1,5 +1,11 @@
 #include<Gear/Core/Camera.h>
 
+DirectX::XMMATRIX Camera::projMatrix;
+
+DirectX::XMMATRIX Camera::viewMatrix;
+
+Camera::CameraMatrices Camera::matrices;
+
 const DirectX::XMMATRIX Camera::getProj()
 {
 	return matrices.proj;
