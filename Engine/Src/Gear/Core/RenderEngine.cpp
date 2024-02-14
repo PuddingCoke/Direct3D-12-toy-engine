@@ -362,11 +362,19 @@ RenderEngine::RenderEngine(const HWND hwnd) :
 
 	beginCommandlist->reset();
 
-	timeConstBuffer = new ConstantBuffer(sizeof(Graphics::Time), false, true, &Graphics::time, beginCommandlist->get(), transientResources[Graphics::getFrameIndex()]);
+	timeConstBuffer = new ConstantBuffer(sizeof(Graphics::Time), false, true, nullptr, beginCommandlist->get(), transientResources[Graphics::getFrameIndex()]);
 
-	cameraConstBuffer = new ConstantBuffer(sizeof(Camera::CameraMatrices), false, true, &Camera::matrices, beginCommandlist->get(), transientResources[Graphics::getFrameIndex()]);
+	cameraConstBuffer = new ConstantBuffer(sizeof(Camera::CameraMatrices), false, true, nullptr, beginCommandlist->get(), transientResources[Graphics::getFrameIndex()]);
 
-	RenderPass::globalIndexConstantBuffer = new IndexConstantBuffer({ timeConstBuffer->getBufferIndex(),cameraConstBuffer->getBufferIndex() }, false, beginCommandlist->get(), transientResources[Graphics::getFrameIndex()]);
+	std::vector<UINT> indices = { 
+		timeConstBuffer->getBufferIndex().bufferDesc.resourceIndex,
+		cameraConstBuffer->getBufferIndex().bufferDesc.resourceIndex,
+		0,
+		0
+	};
+
+	RenderPass::globalIndexConstantBuffer = new Buffer(sizeof(UINT) * indices.size(), false, false, indices.data(), 
+		beginCommandlist->get(), transientResources[Graphics::getFrameIndex()], D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
 
 	beginCommandlist->get()->Close();
 

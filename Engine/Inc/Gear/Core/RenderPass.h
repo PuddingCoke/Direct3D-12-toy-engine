@@ -85,6 +85,8 @@ protected:
 
 	void setDefRenderTarget();
 
+	void clearDefRenderTarget(const FLOAT clearValue[4]);
+
 	void setVertexBuffers(const UINT startSlot,const std::initializer_list<VertexBuffer*>& vertexBuffers);
 
 	void setIndexBuffers(const std::initializer_list<IndexBuffer*>& indexBuffers);
@@ -104,6 +106,10 @@ protected:
 	//when create a buffer cpuWritable should be true
 	void updateBuffer(Buffer* const buffer, const void* const dataPtr, const UINT dataSize);
 
+	void clearRenderTarget(const RenderTargetDesc desc, const FLOAT clearValue[4]);
+
+	void clearDepthStencil(const DepthStencilDesc desc, const D3D12_CLEAR_FLAGS flags, const FLOAT depth, const UINT8 stencil);
+
 	void updateIndexConstantBuffer(IndexConstantBuffer* const buffer, const std::initializer_list<ShaderResourceDesc>& transitionDescs);
 
 	void begin();
@@ -116,7 +122,7 @@ private:
 
 	friend class RenderEngine;
 
-	static IndexConstantBuffer* globalIndexConstantBuffer;
+	static Buffer* globalIndexConstantBuffer;
 
 	void updateReferredResStates();
 

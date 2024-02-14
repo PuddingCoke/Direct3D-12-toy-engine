@@ -1,6 +1,6 @@
 #include<Gear/Core/RenderPass.h>
 
-IndexConstantBuffer* RenderPass::globalIndexConstantBuffer = nullptr;
+Buffer* RenderPass::globalIndexConstantBuffer = nullptr;
 
 std::future<void> RenderPass::getPassResult()
 {
@@ -247,7 +247,7 @@ void RenderPass::setComputeIndexBuffer(const IndexConstantBuffer* const indexBuf
 						}
 						else
 						{
-							texture->transitionState.allState = D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE;
+							texture->transitionState.allState = D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
 
 							texture->transitionState.mipLevelStates[desc.textureDesc.mipSlice] = D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
 						}
@@ -418,6 +418,13 @@ void RenderPass::setDefRenderTarget()
 	renderCMD->get()->OMSetRenderTargets(1, &rtvHandle, FALSE, nullptr);
 }
 
+void RenderPass::clearDefRenderTarget(const FLOAT clearValue[4])
+{
+	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = Graphics::getBackBufferHandle();
+
+	renderCMD->get()->ClearRenderTargetView(rtvHandle, clearValue, 0, nullptr);
+}
+
 void RenderPass::setVertexBuffers(const UINT startSlot, const std::initializer_list<VertexBuffer*>& vertexBuffers)
 {
 	std::vector<D3D12_VERTEX_BUFFER_VIEW> vbvs;
@@ -511,6 +518,16 @@ void RenderPass::updateBuffer(Buffer* const buffer, const void* const dataPtr, c
 	buffer->uploadHeapIndex = (buffer->uploadHeapIndex + 1) % Graphics::FrameBufferCount;
 }
 
+void RenderPass::clearRenderTarget(const RenderTargetDesc desc, const FLOAT clearValue[4])
+{
+	renderCMD->get()->ClearRenderTargetView(desc.rtvHandle, clearValue, 0, nullptr);
+}
+
+void RenderPass::clearDepthStencil(const DepthStencilDesc desc, const D3D12_CLEAR_FLAGS flags, const FLOAT depth, const UINT8 stencil)
+{
+	renderCMD->get()->ClearDepthStencilView(desc.dsvHandle, flags, depth, stencil, 0, nullptr);
+}
+
 void RenderPass::updateIndexConstantBuffer(IndexConstantBuffer* const buffer, const std::initializer_list<ShaderResourceDesc>& transitionDescs)
 {
 	buffer->setTransitionResources(transitionDescs);
@@ -535,9 +552,9 @@ void RenderPass::begin()
 
 	renderCMD->setComputeRootSignature(GlobalRootSignature::getComputeRootSignature());
 
-	renderCMD->get()->SetGraphicsRootConstantBufferView(0, globalIndexConstantBuffer->buffer->getGPUAddress());
+	renderCMD->get()->SetGraphicsRootConstantBufferView(0, globalIndexConstantBuffer->getGPUAddress());
 
-	renderCMD->get()->SetComputeRootConstantBufferView(0, globalIndexConstantBuffer->buffer->getGPUAddress());
+	renderCMD->get()->SetComputeRootConstantBufferView(0, globalIndexConstantBuffer->getGPUAddress());
 }
 
 void RenderPass::end()
@@ -628,16 +645,25 @@ void RenderPass::pushGraphicsStageIndexBuffer(UINT rootParameterIndex, const Ind
 					{
 						if (texture->transitionState.allState == D3D12_RESOURCE_STATE_UNKNOWN)
 						{
-							for (UINT i = 0; i < texture->mipLevels; i++)
+							if (texture->mipLevels > 1)
 							{
-								if (texture->transitionState.mipLevelStates[i] == D3D12_RESOURCE_STATE_UNKNOWN)
+								for (UINT i = 0; i < texture->mipLevels; i++)
 								{
-									texture->transitionState.mipLevelStates[i] = targetSRVState;
+									if (texture->transitionState.mipLevelStates[i] == D3D12_RESOURCE_STATE_UNKNOWN)
+									{
+										texture->transitionState.mipLevelStates[i] = targetSRVState;
+									}
+									else
+									{
+										texture->transitionState.mipLevelStates[i] = (texture->transitionState.mipLevelStates[i] | targetSRVState);
+									}
 								}
-								else
-								{
-									texture->transitionState.mipLevelStates[i] = (texture->transitionState.mipLevelStates[i] | targetSRVState);
-								}
+							}
+							else
+							{
+								texture->transitionState.allState = targetSRVState;
+
+								texture->transitionState.mipLevelStates[0] = targetSRVState;
 							}
 						}
 						else
