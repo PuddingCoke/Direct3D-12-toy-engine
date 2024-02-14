@@ -23,6 +23,10 @@ int Gear::iniEngine(const Configuration config, const int argc, const char* argv
 
 	iniWindow(config.title, config.width, config.height);
 
+	Graphics::width = config.width;
+	Graphics::height = config.height;
+	Graphics::aspectRatio = static_cast<float>(Graphics::width) / static_cast<float>(Graphics::height);
+
 	RenderEngine::instance = new RenderEngine(winform->getHandle());
 
 	return 0;
@@ -72,6 +76,10 @@ void Gear::runGame()
 		Graphics::time.deltaTime = std::chrono::duration_cast<std::chrono::milliseconds>(endPoint - startPoint).count() / 1000.f;
 
 		Graphics::time.timeElapsed += Graphics::time.deltaTime;
+
+		Graphics::time.uintSeed = Random::Uint();
+
+		Graphics::time.floatSeed = Random::Float();
 	}
 
 }
@@ -116,6 +124,59 @@ LRESULT Gear::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		EndPaint(hWnd, &ps);
 	}
 	break;
+
+	case WM_MOUSEMOVE:
+	{
+		const float curX = (float)GET_X_LPARAM(lParam);
+		const float curY = (float)Graphics::getHeight() - (float)GET_Y_LPARAM(lParam);
+
+		Mouse::dx = curX - Mouse::x;
+		Mouse::dy = curY - Mouse::y;
+		Mouse::x = curX;
+		Mouse::y = curY;
+
+		Mouse::moveEvent();
+
+	}
+	break;
+
+	case WM_LBUTTONDOWN:
+		Mouse::leftDown = true;
+		Mouse::leftDownEvent();
+		break;
+
+	case WM_RBUTTONDOWN:
+		Mouse::rightDown = true;
+		Mouse::rightDownEvent();
+		break;
+
+	case WM_LBUTTONUP:
+		Mouse::leftDown = false;
+		Mouse::leftUpEvent();
+		break;
+
+	case WM_RBUTTONUP:
+		Mouse::rightDown = false;
+		Mouse::rightUpEvent();
+		break;
+
+	case WM_MOUSEWHEEL:
+		Mouse::wheelDelta = (float)GET_WHEEL_DELTA_WPARAM(wParam) / 120.f;
+		Mouse::scrollEvent();
+		break;
+
+	case WM_KEYDOWN:
+		if ((HIWORD(lParam) & KF_REPEAT) == 0)
+		{
+			Keyboard::keyDownMap[(Keyboard::Key)wParam] = true;
+			Keyboard::keyDownEvents[(Keyboard::Key)wParam]();
+		}
+		break;
+
+	case WM_KEYUP:
+		Keyboard::keyDownMap[(Keyboard::Key)wParam] = false;
+		Keyboard::keyUpEvents[(Keyboard::Key)wParam]();
+		break;
 
 	case WM_DESTROY:
 		PostQuitMessage(0);

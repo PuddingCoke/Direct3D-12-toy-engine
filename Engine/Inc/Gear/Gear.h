@@ -7,6 +7,9 @@
 #include<Gear/Core/Graphics.h>
 #include<Gear/Window/Win32Form.h>
 #include<Gear/Utils/Utils.h>
+#include<Gear/Utils/Random.h>
+#include<Gear/Input/Keyboard.h>
+#include<Gear/Input/Mouse.h>
 #include<Gear/Configuration.h>
 #include<Gear/Game.h>
 
