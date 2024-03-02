@@ -1,7 +1,8 @@
 #include<Gear/Core/DescriptorHeap.h>
 
 DescriptorHeap::DescriptorHeap(const UINT numDescriptors, const UINT subRegionSize, const D3D12_DESCRIPTOR_HEAP_TYPE type, const D3D12_DESCRIPTOR_HEAP_FLAGS flags) :
-	numDescriptors(numDescriptors), subRegionSize(subRegionSize), type(type), incrementSize(GraphicsDevice::get()->GetDescriptorHandleIncrementSize(type))
+	numDescriptors(numDescriptors), subRegionSize(subRegionSize), type(type), 
+	incrementSize(GraphicsDevice::get()->GetDescriptorHandleIncrementSize(type))
 {
 	D3D12_DESCRIPTOR_HEAP_DESC desc = {};
 	desc.NodeMask = 0;
@@ -21,15 +22,28 @@ DescriptorHeap::DescriptorHeap(const UINT numDescriptors, const UINT subRegionSi
 
 	dynamicCPUPointer = dynamicCPUPointerStart;
 
-	staticGPUPointerStart = descriptorHeap->GetGPUDescriptorHandleForHeapStart();
+	if (flags == D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE)
+	{
+		staticGPUPointerStart = descriptorHeap->GetGPUDescriptorHandleForHeapStart();
 
-	dynamicGPUPointerStart = descriptorHeap->GetGPUDescriptorHandleForHeapStart();
+		dynamicGPUPointerStart = descriptorHeap->GetGPUDescriptorHandleForHeapStart();
 
-	dynamicGPUPointerStart.Offset(numDescriptors - Graphics::FrameBufferCount * subRegionSize, incrementSize);
+		dynamicGPUPointerStart.Offset(numDescriptors - Graphics::FrameBufferCount * subRegionSize, incrementSize);
 
-	staticGPUPointer = staticGPUPointerStart;
+		staticGPUPointer = staticGPUPointerStart;
 
-	dynamicGPUPointer = dynamicGPUPointerStart;
+		dynamicGPUPointer = dynamicGPUPointerStart;
+	}
+	else
+	{
+		staticGPUPointerStart = CD3DX12_GPU_DESCRIPTOR_HANDLE();
+
+		dynamicGPUPointerStart = CD3DX12_GPU_DESCRIPTOR_HANDLE();
+
+		staticGPUPointer = CD3DX12_GPU_DESCRIPTOR_HANDLE();
+
+		dynamicGPUPointer = CD3DX12_GPU_DESCRIPTOR_HANDLE();
+	}
 }
 
 UINT DescriptorHeap::getNumDescriptors() const
@@ -141,7 +155,7 @@ DescriptorHeap::DynamicDescriptorHandle::DynamicDescriptorHandle(const CD3DX12_C
 void DescriptorHeap::DynamicDescriptorHandle::move()
 {
 	cpuHandle.Offset(1, descriptorHeap->incrementSize);
-	
+
 	gpuHandle.Offset(1, descriptorHeap->incrementSize);
 
 	UINT location = static_cast<UINT>(cpuHandle.ptr - descriptorHeap->staticCPUPointerStart.ptr) / descriptorHeap->incrementSize;

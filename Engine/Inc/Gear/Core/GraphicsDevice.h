@@ -24,6 +24,8 @@ __debugbreak();\
 }\
 }\
 
+#define ALIGN(value) ((value + 255) & ~255)
+
 class GraphicsDevice
 {
 public:
@@ -35,6 +37,8 @@ public:
 	static ID3D12Device9* get();
 
 private:
+
+	friend class Gear;
 
 	friend class RenderEngine;
 

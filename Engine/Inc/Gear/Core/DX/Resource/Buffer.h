@@ -20,15 +20,13 @@ class Buffer :public Resource
 {
 public:
 
-	Buffer(const UINT size, const bool stateTracking, const bool cpuWritable, const void* const data, ID3D12GraphicsCommandList6* commandList, std::vector<Resource*>& transientResourcePool, const D3D12_RESOURCE_STATES finalState);
+	Buffer(const UINT size, const bool stateTracking, const void* const data, ID3D12GraphicsCommandList6* commandList, std::vector<Resource*>* transientResourcePool, const D3D12_RESOURCE_STATES finalState);
 
 	Buffer(Buffer&);
 
 	Buffer(const Buffer&) = delete;
 
 	void operator=(const Buffer&) = delete;
-
-	void update(const void* const data, const UINT dataSize) const;
 
 	virtual ~Buffer();
 
@@ -49,10 +47,6 @@ private:
 	friend class RenderEngine;
 
 	friend class RenderPass;
-
-	UploadHeap* uploadHeaps[Graphics::FrameBufferCount];
-
-	UINT uploadHeapIndex;
 
 	std::shared_ptr<UINT> globalState;
 

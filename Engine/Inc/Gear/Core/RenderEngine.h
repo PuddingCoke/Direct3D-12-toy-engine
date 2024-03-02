@@ -24,13 +24,13 @@ public:
 
 	static RenderEngine* get();
 
-	void begin();
-
 	void submitRenderPass(RenderPass* const pass);
 
 	void processCommandLists();
 
 	void waitForGPU();
+
+	void begin();
 
 	void end();
 
@@ -67,13 +67,15 @@ private:
 
 	CommandList* endCommandList;
 
-	ConstantBuffer* timeConstBuffer;
-
-	ConstantBuffer* cameraConstBuffer;
-
 	ComPtr<ID3D12Resource> backBufferResources[Graphics::FrameBufferCount];
 
 	std::vector<Resource*> transientResources[Graphics::FrameBufferCount];
+
+	struct PerFrameResource
+	{
+		Graphics::Time time;
+		Camera::CameraMatrices matrices;
+	} perFrameResource;
 
 };
 

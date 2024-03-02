@@ -9,7 +9,7 @@ class VertexBuffer
 {
 public:
 
-	VertexBuffer(const UINT perVertexSize,const UINT size, const bool stateTracking, const bool cpuWritable, const void* const data, ID3D12GraphicsCommandList6* commandList, std::vector<Resource*>& transientResourcePool);
+	VertexBuffer(const UINT perVertexSize,const UINT size, const bool stateTracking, const bool cpuWritable, const void* const data, ID3D12GraphicsCommandList6* commandList, std::vector<Resource*>* transientResourcePool);
 
 	VertexBuffer(const VertexBuffer&);
 

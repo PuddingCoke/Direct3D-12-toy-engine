@@ -17,6 +17,7 @@
 #include<chrono>
 #include<future>
 #include<windowsx.h>
+#include<dxgidebug.h>
 
 class Gear
 {
@@ -43,6 +44,8 @@ private:
 	void runGame();
 
 	void destroy();
+
+	void reportLiveObjects();
 
 	Gear();
 

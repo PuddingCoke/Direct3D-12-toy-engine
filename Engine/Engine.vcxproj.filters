@@ -120,6 +120,9 @@
     <ClInclude Include="External\DDSTextureLoader\DDSTextureLoader12.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Inc\Gear\Core\ConstantBufferPool.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Gear\Window\Win32Form.cpp">
@@ -222,6 +225,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="External\DDSTextureLoader\DDSTextureLoader12.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gear\Core\ConstantBufferPool.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

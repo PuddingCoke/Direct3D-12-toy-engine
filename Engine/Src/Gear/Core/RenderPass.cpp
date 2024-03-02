@@ -1,6 +1,6 @@
 #include<Gear/Core/RenderPass.h>
 
-Buffer* RenderPass::globalIndexConstantBuffer = nullptr;
+ConstantBuffer* RenderPass::globalConstantBuffer = nullptr;
 
 std::future<void> RenderPass::getPassResult()
 {
@@ -48,21 +48,24 @@ RenderPass::~RenderPass()
 
 ConstantBuffer* RenderPass::CreateConstantBuffer(const UINT size, const bool cpuWritable, const void* const data)
 {
-	const bool stateTracking = cpuWritable;
-
-	return new ConstantBuffer(size, stateTracking, cpuWritable, data, renderCMD->get(), transientResources[Graphics::getFrameIndex()]);
+	return new ConstantBuffer(size, cpuWritable, data, renderCMD->get(), &transientResources[Graphics::getFrameIndex()]);
 }
 
 IndexBuffer* RenderPass::CreateIndexBuffer(const DXGI_FORMAT format, const UINT size, const bool cpuWritable, const void* const data)
 {
 	const bool stateTracking = cpuWritable;
 
-	return new IndexBuffer(format, size, stateTracking, cpuWritable, data, renderCMD->get(), transientResources[Graphics::getFrameIndex()]);
+	return new IndexBuffer(format, size, stateTracking, cpuWritable, data, renderCMD->get(), &transientResources[Graphics::getFrameIndex()]);
 }
 
 IndexConstantBuffer* RenderPass::CreateIndexConstantBuffer(const std::initializer_list<ShaderResourceDesc>& descs, const bool cpuWritable)
 {
-	return new IndexConstantBuffer(descs, cpuWritable, renderCMD->get(), transientResources[Graphics::getFrameIndex()]);
+	return new IndexConstantBuffer(descs, cpuWritable, renderCMD->get(), &transientResources[Graphics::getFrameIndex()]);
+}
+
+IndexConstantBuffer* RenderPass::CreateIndexConstantBuffer(const UINT indicesNum, const bool cpuWritable)
+{
+	return new IndexConstantBuffer(indicesNum, cpuWritable);
 }
 
 TextureDepthStencil* RenderPass::CreateTextureDepthStencil(const UINT width, const UINT height, const DXGI_FORMAT resFormat, const UINT arraySize, const UINT mipLevels, const bool isTextureCube)
@@ -77,12 +80,12 @@ TextureRenderTarget* RenderPass::CreateTextureRenderTarget(const TextureViewCrea
 
 TextureRenderTarget* RenderPass::CreateTextureRenderTarget(const TextureViewCreationFlags flags, const std::string filePath, const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat, const bool isTextureCube)
 {
-	return new TextureRenderTarget(flags, filePath, renderCMD->get(), transientResources[Graphics::getFrameIndex()], srvFormat, uavFormat, rtvFormat, isTextureCube);
+	return new TextureRenderTarget(flags, filePath, renderCMD->get(), &transientResources[Graphics::getFrameIndex()], srvFormat, uavFormat, rtvFormat, isTextureCube);
 }
 
 VertexBuffer* RenderPass::CreateVertexBuffer(const UINT perVertexSize, const UINT size, const bool stateTracking, const bool cpuWritable, const void* const data)
 {
-	return new VertexBuffer(perVertexSize, size, stateTracking, cpuWritable, data, renderCMD->get(), transientResources[Graphics::getFrameIndex()]);
+	return new VertexBuffer(perVertexSize, size, stateTracking, cpuWritable, data, renderCMD->get(), &transientResources[Graphics::getFrameIndex()]);
 }
 
 void RenderPass::setGlobalIndexBuffer(const IndexConstantBuffer* const indexBuffer)
@@ -93,7 +96,7 @@ void RenderPass::setGlobalIndexBuffer(const IndexConstantBuffer* const indexBuff
 		{
 			Buffer* const buffer = desc.bufferDesc.buffer;
 
-			if (buffer->getStateTracking())
+			if (buffer->getStateTracking() && desc.state != ShaderResourceDesc::CBV)
 			{
 				pushResourceTrackList(buffer);
 
@@ -104,10 +107,6 @@ void RenderPass::setGlobalIndexBuffer(const IndexConstantBuffer* const indexBuff
 				else if (desc.state == ShaderResourceDesc::UAV)
 				{
 					buffer->transitionState = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
-				}
-				else if (desc.state == ShaderResourceDesc::CBV)
-				{
-					buffer->transitionState = D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER;
 				}
 			}
 		}
@@ -177,19 +176,10 @@ void RenderPass::setGlobalIndexBuffer(const IndexConstantBuffer* const indexBuff
 		}
 	}
 
-	Buffer* const buffer = indexBuffer->buffer;
-
-	if (buffer->getStateTracking())
-	{
-		pushResourceTrackList(buffer);
-
-		buffer->transitionState = D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER;
-	}
-
 	flushTransitionResources();
 
-	renderCMD->get()->SetGraphicsRootConstantBufferView(2, buffer->getGPUAddress());
-	renderCMD->get()->SetComputeRootConstantBufferView(2, buffer->getGPUAddress());
+	renderCMD->get()->SetGraphicsRootConstantBufferView(2, indexBuffer->getGPUAddress());
+	renderCMD->get()->SetComputeRootConstantBufferView(2, indexBuffer->getGPUAddress());
 }
 
 void RenderPass::setComputeIndexBuffer(const IndexConstantBuffer* const indexBuffer)
@@ -200,7 +190,7 @@ void RenderPass::setComputeIndexBuffer(const IndexConstantBuffer* const indexBuf
 		{
 			Buffer* const buffer = desc.bufferDesc.buffer;
 
-			if (buffer->getStateTracking())
+			if (buffer->getStateTracking() && desc.state != ShaderResourceDesc::CBV)
 			{
 				pushResourceTrackList(buffer);
 
@@ -211,10 +201,6 @@ void RenderPass::setComputeIndexBuffer(const IndexConstantBuffer* const indexBuf
 				else if (desc.state == ShaderResourceDesc::UAV)
 				{
 					buffer->transitionState = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
-				}
-				else if (desc.state == ShaderResourceDesc::CBV)
-				{
-					buffer->transitionState = D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER;
 				}
 			}
 		}
@@ -284,18 +270,9 @@ void RenderPass::setComputeIndexBuffer(const IndexConstantBuffer* const indexBuf
 		}
 	}
 
-	Buffer* const buffer = indexBuffer->buffer;
-
-	if (buffer->getStateTracking())
-	{
-		pushResourceTrackList(buffer);
-
-		buffer->transitionState = D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER;
-	}
-
 	flushTransitionResources();
 
-	renderCMD->get()->SetComputeRootConstantBufferView(3, buffer->getGPUAddress());
+	renderCMD->get()->SetComputeRootConstantBufferView(3, indexBuffer->getGPUAddress());
 }
 
 void RenderPass::setGraphicsConstants(const UINT numValues, const void* const data, const UINT offset)
@@ -503,21 +480,6 @@ void RenderPass::setPipelineState(ID3D12PipelineState* const pipelineState)
 	renderCMD->get()->SetPipelineState(pipelineState);
 }
 
-void RenderPass::updateBuffer(Buffer* const buffer, const void* const dataPtr, const UINT dataSize)
-{
-	pushResourceTrackList(buffer);
-
-	buffer->transitionState = D3D12_RESOURCE_STATE_COPY_DEST;
-
-	flushTransitionResources();
-
-	buffer->update(dataPtr, dataSize);
-
-	renderCMD->get()->CopyResource(buffer->getResource(), buffer->uploadHeaps[buffer->uploadHeapIndex]->getResource());
-
-	buffer->uploadHeapIndex = (buffer->uploadHeapIndex + 1) % Graphics::FrameBufferCount;
-}
-
 void RenderPass::clearRenderTarget(const RenderTargetDesc desc, const FLOAT clearValue[4])
 {
 	renderCMD->get()->ClearRenderTargetView(desc.rtvHandle, clearValue, 0, nullptr);
@@ -526,13 +488,6 @@ void RenderPass::clearRenderTarget(const RenderTargetDesc desc, const FLOAT clea
 void RenderPass::clearDepthStencil(const DepthStencilDesc desc, const D3D12_CLEAR_FLAGS flags, const FLOAT depth, const UINT8 stencil)
 {
 	renderCMD->get()->ClearDepthStencilView(desc.dsvHandle, flags, depth, stencil, 0, nullptr);
-}
-
-void RenderPass::updateIndexConstantBuffer(IndexConstantBuffer* const buffer, const std::initializer_list<ShaderResourceDesc>& transitionDescs)
-{
-	buffer->setTransitionResources(transitionDescs);
-
-	updateBuffer(buffer->buffer, buffer->indices.data(), sizeof(UINT) * buffer->indices.size());
 }
 
 void RenderPass::begin()
@@ -552,9 +507,9 @@ void RenderPass::begin()
 
 	renderCMD->setComputeRootSignature(GlobalRootSignature::getComputeRootSignature());
 
-	renderCMD->get()->SetGraphicsRootConstantBufferView(0, globalIndexConstantBuffer->getGPUAddress());
+	renderCMD->get()->SetGraphicsRootConstantBufferView(0, globalConstantBuffer->getGPUAddress());
 
-	renderCMD->get()->SetComputeRootConstantBufferView(0, globalIndexConstantBuffer->getGPUAddress());
+	renderCMD->get()->SetComputeRootConstantBufferView(0, globalConstantBuffer->getGPUAddress());
 }
 
 void RenderPass::end()
@@ -606,7 +561,7 @@ void RenderPass::pushGraphicsStageIndexBuffer(UINT rootParameterIndex, const Ind
 		{
 			Buffer* const buffer = desc.bufferDesc.buffer;
 
-			if (buffer->getStateTracking())
+			if (buffer->getStateTracking() && desc.state != ShaderResourceDesc::CBV)
 			{
 				pushResourceTrackList(buffer);
 
@@ -624,10 +579,6 @@ void RenderPass::pushGraphicsStageIndexBuffer(UINT rootParameterIndex, const Ind
 				else if (desc.state == ShaderResourceDesc::UAV)
 				{
 					buffer->transitionState = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
-				}
-				else if (desc.state == ShaderResourceDesc::CBV)
-				{
-					buffer->transitionState = D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER;
 				}
 			}
 		}
@@ -750,16 +701,7 @@ void RenderPass::pushGraphicsStageIndexBuffer(UINT rootParameterIndex, const Ind
 		}
 	}
 
-	Buffer* const buffer = indexBuffer->buffer;
-
-	if (buffer->getStateTracking())
-	{
-		pushResourceTrackList(buffer);
-
-		buffer->transitionState = D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER;
-	}
-
-	renderCMD->get()->SetGraphicsRootConstantBufferView(rootParameterIndex, buffer->getGPUAddress());
+	renderCMD->get()->SetGraphicsRootConstantBufferView(rootParameterIndex, indexBuffer->getGPUAddress());
 }
 
 void RenderPass::pushResourceTrackList(Texture* const texture)

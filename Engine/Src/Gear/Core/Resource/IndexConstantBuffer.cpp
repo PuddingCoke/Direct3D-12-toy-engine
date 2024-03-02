@@ -1,6 +1,6 @@
 #include<Gear/Core/Resource/IndexConstantBuffer.h>
 
-IndexConstantBuffer::IndexConstantBuffer(const std::initializer_list<ShaderResourceDesc>& transitionDescs, const bool cpuWritable, ID3D12GraphicsCommandList6* commandList, std::vector<Resource*>& transientResourcePool)
+IndexConstantBuffer::IndexConstantBuffer(const std::initializer_list<ShaderResourceDesc>& transitionDescs, const bool cpuWritable, ID3D12GraphicsCommandList6* commandList, std::vector<Resource*>* transientResourcePool)
 {
 	for (const ShaderResourceDesc& desc : transitionDescs)
 	{
@@ -19,19 +19,25 @@ IndexConstantBuffer::IndexConstantBuffer(const std::initializer_list<ShaderResou
 		}
 	}
 
-	buffer = new Buffer(sizeof(UINT) * indices.size(), cpuWritable, cpuWritable, indices.data(), commandList, transientResourcePool, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
+	constantBuffer = std::make_shared<ConstantBuffer>(ConstantBuffer(sizeof(UINT) * indices.size(), cpuWritable, indices.data(), commandList, transientResourcePool));
+}
+
+IndexConstantBuffer::IndexConstantBuffer(const UINT indicesNum, const bool cpuWritable)
+{
+	constantBuffer = std::make_shared<ConstantBuffer>(ConstantBuffer(sizeof(UINT) * indicesNum, cpuWritable, indices.data(), nullptr, nullptr));
 }
 
 IndexConstantBuffer::IndexConstantBuffer(const IndexConstantBuffer& icb) :
-	buffer(new Buffer(*(icb.buffer))),
 	descs(icb.descs),
-	indices(icb.indices)
+	indices(icb.indices),
+	constantBuffer(icb.constantBuffer)
 {
 }
 
 void IndexConstantBuffer::setTransitionResources(const std::initializer_list<ShaderResourceDesc>& transitionDescs)
 {
 	descs.clear();
+
 	indices.clear();
 
 	for (const ShaderResourceDesc& desc : transitionDescs)
@@ -50,12 +56,15 @@ void IndexConstantBuffer::setTransitionResources(const std::initializer_list<Sha
 			indices.push_back(descs[i].textureDesc.resourceIndex);
 		}
 	}
+
+	constantBuffer->update(indices.data(), sizeof(UINT) * indices.size());
 }
 
 IndexConstantBuffer::~IndexConstantBuffer()
 {
-	if (buffer)
-	{
-		delete buffer;
-	}
+}
+
+D3D12_GPU_VIRTUAL_ADDRESS IndexConstantBuffer::getGPUAddress() const
+{
+	return constantBuffer->getGPUAddress();
 }
