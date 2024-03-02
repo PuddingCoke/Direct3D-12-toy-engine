@@ -166,6 +166,7 @@
     <ClInclude Include="Inc\Gear\Core\Resource\TextureRenderTarget.h" />
     <ClInclude Include="Inc\Gear\Core\Resource\VertexBuffer.h" />
     <ClInclude Include="Inc\Gear\Core\RootSignature.h" />
+    <ClInclude Include="Inc\Gear\Core\Shader.h" />
     <ClInclude Include="Inc\Gear\Game.h" />
     <ClInclude Include="Inc\Gear\Gear.h" />
     <ClInclude Include="Inc\Gear\Input\Event.h" />
@@ -203,6 +204,7 @@
     <ClCompile Include="Src\Gear\Core\Resource\TextureRenderTarget.cpp" />
     <ClCompile Include="Src\Gear\Core\Resource\VertexBuffer.cpp" />
     <ClCompile Include="Src\Gear\Core\RootSignature.cpp" />
+    <ClCompile Include="Src\Gear\Core\Shader.cpp" />
     <ClCompile Include="Src\Gear\Game.cpp" />
     <ClCompile Include="Src\Gear\Gear.cpp" />
     <ClCompile Include="Src\Gear\Input\Event.cpp" />
