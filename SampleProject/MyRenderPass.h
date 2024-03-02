@@ -20,7 +20,7 @@ protected:
 
 	void recordCommand() override
 	{
-		float clearValue[4] = { 0.f,0.f,1.f,1.f };
+		float clearValue[4] = { sinf(Graphics::getTimeElapsed()) * 0.5f + 0.5f,cosf(Graphics::getTimeElapsed()) * 0.5f + 0.5f,0.f,1.f };
 		clearDefRenderTarget(clearValue);
 	}
 

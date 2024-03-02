@@ -33,6 +33,8 @@ protected:
 
 	IndexConstantBuffer* CreateIndexConstantBuffer(const std::initializer_list<ShaderResourceDesc>& descs, const bool cpuWritable);
 
+	IndexConstantBuffer* CreateIndexConstantBuffer(const UINT indicesNum, const bool cpuWritable);
+
 	TextureDepthStencil* CreateTextureDepthStencil(const UINT width, const UINT height, const DXGI_FORMAT resFormat, const UINT arraySize, const UINT mipLevels, const bool isTextureCube);
 
 	TextureRenderTarget* CreateTextureRenderTarget(const TextureViewCreationFlags flags, const UINT width, const UINT height, const DXGI_FORMAT resFormat, const UINT arraySize, const UINT mipLevels,
@@ -103,14 +105,9 @@ protected:
 
 	void setPipelineState(ID3D12PipelineState* const pipelineState);
 
-	//when create a buffer cpuWritable should be true
-	void updateBuffer(Buffer* const buffer, const void* const dataPtr, const UINT dataSize);
-
 	void clearRenderTarget(const RenderTargetDesc desc, const FLOAT clearValue[4]);
 
 	void clearDepthStencil(const DepthStencilDesc desc, const D3D12_CLEAR_FLAGS flags, const FLOAT depth, const UINT8 stencil);
-
-	void updateIndexConstantBuffer(IndexConstantBuffer* const buffer, const std::initializer_list<ShaderResourceDesc>& transitionDescs);
 
 	void begin();
 
@@ -122,7 +119,7 @@ private:
 
 	friend class RenderEngine;
 
-	static Buffer* globalIndexConstantBuffer;
+	static ConstantBuffer* globalConstantBuffer;
 
 	void updateReferredResStates();
 

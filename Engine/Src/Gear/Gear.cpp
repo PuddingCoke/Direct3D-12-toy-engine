@@ -101,6 +101,23 @@ void Gear::destroy()
 	delete winform;
 
 	delete RenderEngine::instance;
+
+	reportLiveObjects();
+
+	if (GraphicsDevice::instance)
+	{
+		delete GraphicsDevice::instance;
+	}
+}
+
+void Gear::reportLiveObjects()
+{
+	ComPtr<IDXGIDebug1> dxgiDebug;
+
+	if (SUCCEEDED(DXGIGetDebugInterface1(0, IID_PPV_ARGS(&dxgiDebug))))
+	{
+		dxgiDebug->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_FLAGS(DXGI_DEBUG_RLO_DETAIL | DXGI_DEBUG_RLO_IGNORE_INTERNAL));
+	}
 }
 
 Gear::Gear() :

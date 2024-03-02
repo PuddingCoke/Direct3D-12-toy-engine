@@ -19,7 +19,7 @@ Texture::Texture(const UINT width, const UINT height, const DXGI_FORMAT format, 
 	}
 }
 
-Texture::Texture(const std::string filePath, ID3D12GraphicsCommandList6* commandList, std::vector<Resource*>& transientResourcePool, const bool stateTracking) :
+Texture::Texture(const std::string filePath, ID3D12GraphicsCommandList6* commandList, std::vector<Resource*>* transientResourcePool, const bool stateTracking) :
 	Resource(stateTracking)
 {
 	std::string fileExtension = Utils::File::getExtension(filePath);
@@ -60,7 +60,7 @@ Texture::Texture(const std::string filePath, ID3D12GraphicsCommandList6* command
 
 			UploadHeap* uploadHeap = new UploadHeap(uploadHeapSize);
 
-			transientResourcePool.push_back(uploadHeap);
+			transientResourcePool->push_back(uploadHeap);
 
 			D3D12_SUBRESOURCE_DATA subresourceData = {};
 			subresourceData.pData = pixels;
@@ -107,7 +107,7 @@ Texture::Texture(const std::string filePath, ID3D12GraphicsCommandList6* command
 
 			UploadHeap* uploadHeap = new UploadHeap(uploadHeapSize);
 
-			transientResourcePool.push_back(uploadHeap);
+			transientResourcePool->push_back(uploadHeap);
 
 			D3D12_SUBRESOURCE_DATA subresourceData = {};
 			subresourceData.pData = pixels;
@@ -137,7 +137,7 @@ Texture::Texture(const std::string filePath, ID3D12GraphicsCommandList6* command
 
 		UploadHeap* uploadHeap = new UploadHeap(uploadHeapSize);
 
-		transientResourcePool.push_back(uploadHeap);
+		transientResourcePool->push_back(uploadHeap);
 
 		UpdateSubresources(commandList, getResource(), uploadHeap->getResource(), 0, 0, static_cast<UINT>(subresources.size()), subresources.data());
 

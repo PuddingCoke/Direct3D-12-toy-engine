@@ -3,7 +3,9 @@
 #ifndef _INDEXCONSTANTBUFFER_H_
 #define _INDEXCONSTANTBUFFER_H_
 
-#include<Gear/Core/DX/Resource/Buffer.h>
+#include<Gear/Core/Resource/ConstantBuffer.h>
+
+#include<memory>
 
 //Buffer SRV/UAV/CBV
 //Texture SRV/UAV
@@ -11,26 +13,29 @@
 //IndexConstantBuffer* icb=new IndexConstantBuffer({srv->getSRV(),});
 
 //specialized constant buffer for indexing resources in CBV/SRV/UAV heap
-//stored in non shader visible heap
 //texture mipSlice srvIndexInHeap
 //buffer cbvIndexInHeap
 class IndexConstantBuffer
 {
 public:
 
-	IndexConstantBuffer(const std::initializer_list<ShaderResourceDesc>& transitionDescs, const bool cpuWritable, ID3D12GraphicsCommandList6* commandList, std::vector<Resource*>& transientResourcePool);
+	IndexConstantBuffer(const std::initializer_list<ShaderResourceDesc>& transitionDescs, const bool cpuWritable, ID3D12GraphicsCommandList6* commandList, std::vector<Resource*>* transientResourcePool);
+
+	IndexConstantBuffer(const UINT indicesNum, const bool cpuWritable);
 
 	IndexConstantBuffer(const IndexConstantBuffer&);
 
 	~IndexConstantBuffer();
 
+	D3D12_GPU_VIRTUAL_ADDRESS getGPUAddress() const;
+
+	void setTransitionResources(const std::initializer_list<ShaderResourceDesc>& transitionDescs);
+
 private:
 
 	friend class RenderPass;
 
-	void setTransitionResources(const std::initializer_list<ShaderResourceDesc>& transitionDescs);
-
-	Buffer* buffer;
+	std::shared_ptr<ConstantBuffer> constantBuffer;
 
 	std::vector<UINT> indices;
 

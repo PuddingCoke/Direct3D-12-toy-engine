@@ -9,7 +9,7 @@ class IndexBuffer
 {
 public:
 
-	IndexBuffer(const DXGI_FORMAT format, const UINT size, const bool stateTracking, const bool cpuWritable, const void* const data, ID3D12GraphicsCommandList6* commandList, std::vector<Resource*>& transientResourcePool);
+	IndexBuffer(const DXGI_FORMAT format, const UINT size, const bool stateTracking, const bool cpuWritable, const void* const data, ID3D12GraphicsCommandList6* commandList, std::vector<Resource*>* transientResourcePool);
 
 	IndexBuffer(const IndexBuffer&);
 
