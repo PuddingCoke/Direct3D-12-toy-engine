@@ -21,9 +21,11 @@ public:
 
 	IndexConstantBuffer(const std::initializer_list<ShaderResourceDesc>& transitionDescs, const bool cpuWritable, ID3D12GraphicsCommandList6* commandList, std::vector<Resource*>* transientResourcePool);
 
-	IndexConstantBuffer(const UINT indicesNum, const bool cpuWritable);
+	IndexConstantBuffer(const UINT indicesNum);
 
-	IndexConstantBuffer(const IndexConstantBuffer&);
+	IndexConstantBuffer(const IndexConstantBuffer&) = delete;
+
+	void operator=(const IndexConstantBuffer&) = delete;
 
 	~IndexConstantBuffer();
 
@@ -35,7 +37,7 @@ private:
 
 	friend class RenderPass;
 
-	std::shared_ptr<ConstantBuffer> constantBuffer;
+	ConstantBuffer* constantBuffer;
 
 	std::vector<UINT> indices;
 

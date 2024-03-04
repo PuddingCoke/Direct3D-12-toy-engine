@@ -348,9 +348,9 @@ RenderEngine::RenderEngine(const HWND hwnd) :
 	GlobalRootSignature::instance = new GlobalRootSignature();
 
 	{
-		ConstantBuffer::bufferPools[0] = new ConstantBufferPool(256, 2048);
+		ConstantBuffer::bufferPools[0] = new ConstantBufferPool(256, 1024);
 
-		ConstantBuffer::bufferPools[1] = new ConstantBufferPool(512, 2048);
+		ConstantBuffer::bufferPools[1] = new ConstantBufferPool(512, 1024);
 
 		ConstantBuffer::bufferPools[2] = new ConstantBufferPool(1024, 1024);
 	}

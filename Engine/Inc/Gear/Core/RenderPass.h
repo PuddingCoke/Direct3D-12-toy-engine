@@ -33,7 +33,7 @@ protected:
 
 	IndexConstantBuffer* CreateIndexConstantBuffer(const std::initializer_list<ShaderResourceDesc>& descs, const bool cpuWritable);
 
-	IndexConstantBuffer* CreateIndexConstantBuffer(const UINT indicesNum, const bool cpuWritable);
+	IndexConstantBuffer* CreateIndexConstantBuffer(const UINT indicesNum);
 
 	TextureDepthStencil* CreateTextureDepthStencil(const UINT width, const UINT height, const DXGI_FORMAT resFormat, const UINT arraySize, const UINT mipLevels, const bool isTextureCube);
 

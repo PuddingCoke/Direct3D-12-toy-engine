@@ -6,13 +6,17 @@
 #include<Gear/Core/DX/Resource/Buffer.h>
 #include<Gear/Core/ConstantBufferPool.h>
 
+//we use a very effective way to achieve state sync for constant buffer
+//so feel free to just copy constant buffer pointer
 class ConstantBuffer
 {
 public:
 
 	ConstantBuffer(const UINT size, const bool cpuWritable, const void* const data, ID3D12GraphicsCommandList6* commandList, std::vector<Resource*>* transientResourcePool);
 
-	ConstantBuffer(const ConstantBuffer&);
+	ConstantBuffer(const ConstantBuffer&) = delete;
+
+	void operator=(const ConstantBuffer&) = delete;
 
 	void update(const void* const data, const UINT size);
 

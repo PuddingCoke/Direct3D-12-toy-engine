@@ -44,6 +44,8 @@ ConstantBufferPool::ConstantBufferPool(const UINT subRegionSize, const UINT subR
 			descriptorHandle.move();
 		}
 	}
+
+	std::cout << "[class ConstantBufferPool] create constant buffer pool with region size " << subRegionSize << "bytes and region number " << subRegionNum << " succeeded\n";
 }
 
 ConstantBufferPool::~ConstantBufferPool()
@@ -88,7 +90,9 @@ void ConstantBufferPool::updateSubRegion(const UINT descriptorIndex, const void*
 {
 	const UINT subRegionIndex = descriptorIndex - baseDescriptorIndex;
 
-	uploadHeaps[subRegionIndex][uploadHeapIndices[subRegionIndex]]->update(data, size);
+	const UINT uploadHeapIndex = uploadHeapIndices[subRegionIndex];
+
+	uploadHeaps[subRegionIndex][uploadHeapIndex]->update(data, size);
 
 	updateIndicator[subRegionIndex] = true;
 }

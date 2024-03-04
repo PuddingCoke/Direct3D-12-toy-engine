@@ -56,22 +56,6 @@ ConstantBuffer::ConstantBuffer(const UINT size, const bool cpuWritable, const vo
 	}
 }
 
-ConstantBuffer::ConstantBuffer(const ConstantBuffer& cb) :
-	size(cb.size),
-	gpuAddress(cb.gpuAddress),
-	bufferIndex(cb.bufferIndex),
-	poolIndex(cb.poolIndex)
-{
-	if (cb.buffer)
-	{
-		buffer = new Buffer(*(cb.buffer));
-	}
-	else
-	{
-		buffer = nullptr;
-	}
-}
-
 void ConstantBuffer::update(const void* const data, const UINT size)
 {
 	bufferPools[poolIndex]->updateSubRegion(bufferIndex, data, size);
