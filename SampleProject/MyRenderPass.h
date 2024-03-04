@@ -2,18 +2,27 @@
 
 #include<Gear/Core/RenderPass.h>
 
-class MyRenderPass:public RenderPass
+#include<Gear/Core/Resource/TextureRenderTarget.h>
+
+class MyRenderPass :public RenderPass
 {
 public:
 
 	MyRenderPass()
 	{
-		
+		begin();
+
+		myTexture = CreateTextureRenderTarget(TEXTURE_VIEW_CREATE_SRV, "est.png",
+			DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, false);
+
+		end();
+
+		RenderEngine::get()->submitRenderPass(this);
 	}
 
 	~MyRenderPass()
 	{
-
+		delete myTexture;
 	}
 
 protected:
@@ -25,5 +34,7 @@ protected:
 	}
 
 private:
+
+	TextureRenderTarget* myTexture;
 
 };

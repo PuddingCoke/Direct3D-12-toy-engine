@@ -192,6 +192,8 @@ Texture::Texture(const std::string filePath, ID3D12GraphicsCommandList6* command
 
 		commandList->ResourceBarrier(1, &barrier);
 	}
+
+	std::cout << "[class Texture] create texture at " << filePath << " succeeded\n";
 }
 
 Texture::Texture(Texture& tex) :

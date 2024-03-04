@@ -94,6 +94,18 @@ TextureDepthStencil::TextureDepthStencil(const UINT width, const UINT height, co
 			stencilSliceStart = UINT_MAX;
 		}
 
+		std::cout << "[class TextureDepthStencil] //////////\n";
+		std::cout << "[class TextureDepthStencil] Resource format " << resFormat << "\n";
+		std::cout << "[class TextureDepthStencil] Depth SRV format " << depthSRVFormat << "\n";
+		std::cout << "[class TextureDepthStencil] Stencil SRV format " << stencilSRVFormat << "\n";
+		std::cout << "[class TextureDepthStencil] DSV format " << dsvFormat << "\n";
+		std::cout << "[class TextureDepthStencil] miplevels " << texture->getMipLevels() << "\n";
+		std::cout << "[class TextureDepthStencil] all depth index " << allDepthIndex << "\n";
+		std::cout << "[class TextureDepthStencil] depth slice start " << depthSliceStart << "\n";
+		std::cout << "[class TextureDepthStencil] all stencil start " << allStencilIndex << "\n";
+		std::cout << "[class TextureDepthStencil] stencil slice start " << stencilSliceStart << "\n";
+		std::cout << "[class TextureDepthStencil] //////////\n";
+
 		//create depth srvs
 		if (isTextureCube)
 		{
