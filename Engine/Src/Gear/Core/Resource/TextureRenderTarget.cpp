@@ -141,6 +141,16 @@ void TextureRenderTarget::createViews(const TextureViewCreationFlags flags, cons
 			uavSliceStart = UINT_MAX;
 		}
 
+		std::cout << "[class TextureRenderTarget] //////////\n";
+		std::cout << "[class TextureRenderTarget] srv creation flag " << hasSRV << "\n";
+		std::cout << "[class TextureRenderTarget] uav creation flag " << hasUAV << "\n";
+		std::cout << "[class TextureRenderTarget] rtv creation flag " << hasRTV << "\n";
+		std::cout << "[class TextureRenderTarget] miplevels " << texture->getMipLevels() << "\n";
+		std::cout << "[class TextureRenderTarget] all srv index " << allSRVIndex << "\n";
+		std::cout << "[class TextureRenderTarget] srv slice start " << srvSliceStart << "\n";
+		std::cout << "[class TextureRenderTarget] uav slice start " << uavSliceStart << "\n";
+		std::cout << "[class TextureRenderTarget] //////////\n";
+
 		if (isTextureCube) //TextureCube srv creation
 		{
 			const UINT cubeNum = texture->getArraySize() / 6;
