@@ -19,19 +19,12 @@ IndexConstantBuffer::IndexConstantBuffer(const std::initializer_list<ShaderResou
 		}
 	}
 
-	constantBuffer = std::make_shared<ConstantBuffer>(ConstantBuffer(sizeof(UINT) * indices.size(), cpuWritable, indices.data(), commandList, transientResourcePool));
+	constantBuffer = new ConstantBuffer(sizeof(UINT) * indices.size(), cpuWritable, indices.data(), commandList, transientResourcePool);
 }
 
-IndexConstantBuffer::IndexConstantBuffer(const UINT indicesNum, const bool cpuWritable)
+IndexConstantBuffer::IndexConstantBuffer(const UINT indicesNum)
 {
-	constantBuffer = std::make_shared<ConstantBuffer>(ConstantBuffer(sizeof(UINT) * indicesNum, cpuWritable, indices.data(), nullptr, nullptr));
-}
-
-IndexConstantBuffer::IndexConstantBuffer(const IndexConstantBuffer& icb) :
-	descs(icb.descs),
-	indices(icb.indices),
-	constantBuffer(icb.constantBuffer)
-{
+	constantBuffer = new ConstantBuffer(sizeof(UINT) * indicesNum, true, nullptr, nullptr, nullptr);
 }
 
 void IndexConstantBuffer::setTransitionResources(const std::initializer_list<ShaderResourceDesc>& transitionDescs)

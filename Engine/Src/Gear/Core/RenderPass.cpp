@@ -63,9 +63,9 @@ IndexConstantBuffer* RenderPass::CreateIndexConstantBuffer(const std::initialize
 	return new IndexConstantBuffer(descs, cpuWritable, renderCMD->get(), &transientResources[Graphics::getFrameIndex()]);
 }
 
-IndexConstantBuffer* RenderPass::CreateIndexConstantBuffer(const UINT indicesNum, const bool cpuWritable)
+IndexConstantBuffer* RenderPass::CreateIndexConstantBuffer(const UINT indicesNum)
 {
-	return new IndexConstantBuffer(indicesNum, cpuWritable);
+	return new IndexConstantBuffer(indicesNum);
 }
 
 TextureDepthStencil* RenderPass::CreateTextureDepthStencil(const UINT width, const UINT height, const DXGI_FORMAT resFormat, const UINT arraySize, const UINT mipLevels, const bool isTextureCube)

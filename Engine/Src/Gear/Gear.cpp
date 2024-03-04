@@ -14,7 +14,7 @@ int Gear::iniEngine(const Configuration config, const int argc, const char* argv
 	{
 		std::string exeRootPath = argv[0];
 
-		std::cout << typeid(*this).name() << " executable path " << exeRootPath << "\n";
+		std::cout << "[class Gear] executable path " << exeRootPath << "\n";
 
 		Utils::exeRootPath = exeRootPath;
 	}
@@ -28,6 +28,10 @@ int Gear::iniEngine(const Configuration config, const int argc, const char* argv
 	Graphics::aspectRatio = static_cast<float>(Graphics::width) / static_cast<float>(Graphics::height);
 
 	RenderEngine::instance = new RenderEngine(winform->getHandle());
+
+	std::cout << "[class Gear] resolution " << Graphics::width << "x" << Graphics::height << "\n";
+	std::cout << "[class Gear] aspect ratio " << Graphics::aspectRatio << "\n";
+	std::cout << "[class Gear] back buffer count " << Graphics::FrameBufferCount << "\n";
 
 	return 0;
 }
@@ -44,9 +48,11 @@ void Gear::iniGame(Game* const gamePtr)
 	{
 	default:
 	case Configuration::EngineUsage::NORMAL:
+		std::cout << "[class Gear] usage normal\n";
 		runGame();
 		break;
 	case Configuration::EngineUsage::VIDEOPLAYBACK:
+		std::cout << "[class Gear] usage video playback\n";
 		break;
 	}
 
@@ -136,7 +142,6 @@ void Gear::iniWindow(const std::wstring& title, const UINT& width, const UINT& h
 	switch (usage)
 	{
 	case Configuration::EngineUsage::NORMAL:
-		std::cout << typeid(*this).name() << " usage normal\n";
 		winform = new Win32Form(title, width, height, normalWndStyle, Gear::WindowProc);
 		break;
 

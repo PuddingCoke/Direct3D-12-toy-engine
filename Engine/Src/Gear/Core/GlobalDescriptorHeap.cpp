@@ -11,6 +11,8 @@ GlobalDescriptorHeap::GlobalDescriptorHeap()
 	renderTargetHeap = new DescriptorHeap(200000, 500, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, D3D12_DESCRIPTOR_HEAP_FLAG_NONE);
 
 	depthStencilHeap = new DescriptorHeap(200000, 500, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, D3D12_DESCRIPTOR_HEAP_FLAG_NONE);
+
+	std::cout << "[class GlobalDescriptorHeap] create global descriptor heaps succeeded\n";
 }
 
 GlobalDescriptorHeap::~GlobalDescriptorHeap()
