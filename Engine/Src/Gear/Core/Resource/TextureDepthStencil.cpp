@@ -127,7 +127,7 @@ TextureDepthStencil::TextureDepthStencil(const UINT width, const UINT height, co
 					desc.TextureCubeArray.MipLevels = 1;
 					desc.TextureCubeArray.MostDetailedMip = i;
 					desc.TextureCubeArray.NumCubes = numCube;
-					desc.TextureCubeArray.ResourceMinLODClamp = static_cast<float>(i);
+					desc.TextureCubeArray.ResourceMinLODClamp = 0.f;
 
 					GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCPUHandle());
 
@@ -158,7 +158,7 @@ TextureDepthStencil::TextureDepthStencil(const UINT width, const UINT height, co
 					desc.Format = depthSRVFormat;
 					desc.TextureCube.MipLevels = 1;
 					desc.TextureCube.MostDetailedMip = i;
-					desc.TextureCube.ResourceMinLODClamp = static_cast<float>(i);
+					desc.TextureCube.ResourceMinLODClamp = 0.f;
 
 					GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCPUHandle());
 
@@ -198,7 +198,7 @@ TextureDepthStencil::TextureDepthStencil(const UINT width, const UINT height, co
 					desc.Texture2DArray.MipLevels = 1;
 					desc.Texture2DArray.MostDetailedMip = i;
 					desc.Texture2DArray.PlaneSlice = 0;
-					desc.Texture2DArray.ResourceMinLODClamp = static_cast<float>(i);
+					desc.Texture2DArray.ResourceMinLODClamp = 0.f;
 
 					GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCPUHandle());
 
@@ -230,7 +230,7 @@ TextureDepthStencil::TextureDepthStencil(const UINT width, const UINT height, co
 					desc.Texture2D.MipLevels = 1;
 					desc.Texture2D.MostDetailedMip = i;
 					desc.Texture2D.PlaneSlice = 0;
-					desc.Texture2D.ResourceMinLODClamp = static_cast<float>(i);
+					desc.Texture2D.ResourceMinLODClamp = 0.f;
 
 					GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCPUHandle());
 
@@ -274,7 +274,7 @@ TextureDepthStencil::TextureDepthStencil(const UINT width, const UINT height, co
 						desc.TextureCubeArray.MipLevels = 1;
 						desc.TextureCubeArray.MostDetailedMip = i;
 						desc.TextureCubeArray.NumCubes = numCube;
-						desc.TextureCubeArray.ResourceMinLODClamp = static_cast<float>(i);
+						desc.TextureCubeArray.ResourceMinLODClamp = 0.f;
 
 						GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCPUHandle());
 
@@ -305,7 +305,7 @@ TextureDepthStencil::TextureDepthStencil(const UINT width, const UINT height, co
 						desc.Format = stencilSRVFormat;
 						desc.TextureCube.MipLevels = 1;
 						desc.TextureCube.MostDetailedMip = i;
-						desc.TextureCube.ResourceMinLODClamp = static_cast<float>(i);
+						desc.TextureCube.ResourceMinLODClamp = 0.f;
 
 						GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCPUHandle());
 
@@ -345,7 +345,7 @@ TextureDepthStencil::TextureDepthStencil(const UINT width, const UINT height, co
 						desc.Texture2DArray.MipLevels = 1;
 						desc.Texture2DArray.MostDetailedMip = i;
 						desc.Texture2DArray.PlaneSlice = 0;
-						desc.Texture2DArray.ResourceMinLODClamp = static_cast<float>(i);
+						desc.Texture2DArray.ResourceMinLODClamp = 0.f;
 
 						GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCPUHandle());
 
@@ -377,7 +377,7 @@ TextureDepthStencil::TextureDepthStencil(const UINT width, const UINT height, co
 						desc.Texture2D.MipLevels = 1;
 						desc.Texture2D.MostDetailedMip = i;
 						desc.Texture2D.PlaneSlice = 0;
-						desc.Texture2D.ResourceMinLODClamp = static_cast<float>(i);
+						desc.Texture2D.ResourceMinLODClamp = 0.f;
 
 						GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCPUHandle());
 
