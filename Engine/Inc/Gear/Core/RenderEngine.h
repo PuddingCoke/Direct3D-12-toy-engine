@@ -60,21 +60,17 @@ private:
 
 	HANDLE fenceEvent;
 
-	//two commandlists handle global resources transition
-	//beginCommandList handle resources creation
-
 	CommandList* beginCommandlist;
 
 	CommandList* endCommandList;
 
 	ComPtr<ID3D12Resource> backBufferResources[Graphics::FrameBufferCount];
 
-	std::vector<Resource*> transientResources[Graphics::FrameBufferCount];
-
 	struct PerFrameResource
 	{
 		Graphics::Time time;
 		Camera::CameraMatrices matrices;
+		DirectX::XMFLOAT4 padding[10];
 	} perFrameResource;
 
 };

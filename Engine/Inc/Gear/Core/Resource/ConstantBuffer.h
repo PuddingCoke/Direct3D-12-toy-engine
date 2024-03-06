@@ -32,8 +32,6 @@ private:
 
 	friend class RenderEngine;
 
-	const UINT size;
-
 	D3D12_GPU_VIRTUAL_ADDRESS gpuAddress;
 
 	UINT bufferIndex;

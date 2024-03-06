@@ -7,15 +7,19 @@ IndexConstantBuffer::IndexConstantBuffer(const std::initializer_list<ShaderResou
 		descs.push_back(desc);
 	}
 
+	const UINT indicesNum = ((descs.size() + 63) & ~63);
+
+	indices = std::vector<UINT>(indicesNum);
+
 	for (UINT i = 0; i < descs.size(); i++)
 	{
 		if (descs[i].type == ShaderResourceDesc::BUFFER)
 		{
-			indices.push_back(descs[i].bufferDesc.resourceIndex);
+			indices[i] = descs[i].bufferDesc.resourceIndex;
 		}
 		else
 		{
-			indices.push_back(descs[i].textureDesc.resourceIndex);
+			indices[i] = descs[i].textureDesc.resourceIndex;
 		}
 	}
 
@@ -24,14 +28,16 @@ IndexConstantBuffer::IndexConstantBuffer(const std::initializer_list<ShaderResou
 
 IndexConstantBuffer::IndexConstantBuffer(const UINT indicesNum)
 {
-	constantBuffer = new ConstantBuffer(sizeof(UINT) * indicesNum, true, nullptr, nullptr, nullptr);
+	const UINT alignedIndicesNum = ((indicesNum + 63) & ~63);
+
+	indices = std::vector<UINT>(alignedIndicesNum);
+
+	constantBuffer = new ConstantBuffer(sizeof(UINT) * alignedIndicesNum, true, nullptr, nullptr, nullptr);
 }
 
 void IndexConstantBuffer::setTransitionResources(const std::initializer_list<ShaderResourceDesc>& transitionDescs)
 {
 	descs.clear();
-
-	indices.clear();
 
 	for (const ShaderResourceDesc& desc : transitionDescs)
 	{
@@ -42,11 +48,11 @@ void IndexConstantBuffer::setTransitionResources(const std::initializer_list<Sha
 	{
 		if (descs[i].type == ShaderResourceDesc::BUFFER)
 		{
-			indices.push_back(descs[i].bufferDesc.resourceIndex);
+			indices[i] = descs[i].bufferDesc.resourceIndex;
 		}
 		else
 		{
-			indices.push_back(descs[i].textureDesc.resourceIndex);
+			indices[i] = descs[i].textureDesc.resourceIndex;
 		}
 	}
 
@@ -55,6 +61,7 @@ void IndexConstantBuffer::setTransitionResources(const std::initializer_list<Sha
 
 IndexConstantBuffer::~IndexConstantBuffer()
 {
+	delete constantBuffer;
 }
 
 D3D12_GPU_VIRTUAL_ADDRESS IndexConstantBuffer::getGPUAddress() const

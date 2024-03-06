@@ -1,7 +1,7 @@
 #include<Gear/Core/DX/Resource/Texture.h>
 
-Texture::Texture(const UINT width, const UINT height, const DXGI_FORMAT format, const UINT arraySize, const UINT mipLevels, const bool stateTracking) :
-	Resource(CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE, CD3DX12_RESOURCE_DESC::Tex2D(format, width, height, arraySize, mipLevels), stateTracking, D3D12_RESOURCE_STATE_COPY_DEST, nullptr),
+Texture::Texture(const UINT width, const UINT height, const DXGI_FORMAT format, const UINT arraySize, const UINT mipLevels, const bool stateTracking, const D3D12_RESOURCE_FLAGS resFlags) :
+	Resource(CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE, CD3DX12_RESOURCE_DESC::Tex2D(format, width, height, arraySize, mipLevels, 1, 0, resFlags), stateTracking, D3D12_RESOURCE_STATE_COPY_DEST, nullptr),
 	width(width),
 	height(height),
 	arraySize(arraySize),
@@ -19,7 +19,7 @@ Texture::Texture(const UINT width, const UINT height, const DXGI_FORMAT format, 
 	}
 }
 
-Texture::Texture(const std::string filePath, ID3D12GraphicsCommandList6* commandList, std::vector<Resource*>* transientResourcePool, const bool stateTracking) :
+Texture::Texture(const std::string filePath, ID3D12GraphicsCommandList6* commandList, std::vector<Resource*>* transientResourcePool, const bool stateTracking, const D3D12_RESOURCE_FLAGS resFlags) :
 	Resource(stateTracking)
 {
 	std::string fileExtension = Utils::File::getExtension(filePath);
@@ -53,6 +53,7 @@ Texture::Texture(const std::string filePath, ID3D12GraphicsCommandList6* command
 			desc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
 			desc.SampleDesc.Count = 1;
 			desc.SampleDesc.Quality = 0;
+			desc.Flags = resFlags;
 
 			createResource(CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE, desc, D3D12_RESOURCE_STATE_COPY_DEST, nullptr);
 
@@ -100,6 +101,7 @@ Texture::Texture(const std::string filePath, ID3D12GraphicsCommandList6* command
 			desc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
 			desc.SampleDesc.Count = 1;
 			desc.SampleDesc.Quality = 0;
+			desc.Flags = resFlags;
 
 			createResource(CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE, desc, D3D12_RESOURCE_STATE_COPY_DEST, nullptr);
 
@@ -131,7 +133,7 @@ Texture::Texture(const std::string filePath, ID3D12GraphicsCommandList6* command
 
 		std::vector<D3D12_SUBRESOURCE_DATA> subresources;
 
-		DirectX::LoadDDSTextureFromFile(GraphicsDevice::get(), wFilePath.c_str(), releaseAndGet(), ddsData, subresources);
+		DirectX::LoadDDSTextureFromFileEx(GraphicsDevice::get(), wFilePath.c_str(), 0, resFlags, DirectX::DDS_LOADER_DEFAULT, releaseAndGet(), ddsData, subresources);
 
 		const UINT64 uploadHeapSize = GetRequiredIntermediateSize(getResource(), 0, static_cast<UINT>(subresources.size()));
 

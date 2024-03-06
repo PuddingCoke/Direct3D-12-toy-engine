@@ -23,31 +23,31 @@ CommandList::~CommandList()
 	}
 }
 
-void CommandList::reset()
+void CommandList::reset() const
 {
 	allocators[Graphics::getFrameIndex()]->get()->Reset();
 
 	commandList->Reset(allocators[Graphics::getFrameIndex()]->get(), nullptr);
 }
 
-void CommandList::setDescriptorHeap(DescriptorHeap* const resourceHeap, DescriptorHeap* const samplerHeap)
+void CommandList::setDescriptorHeap(DescriptorHeap* const resourceHeap, DescriptorHeap* const samplerHeap) const
 {
 	ID3D12DescriptorHeap* descriptorHeaps[2] = { resourceHeap->get(),samplerHeap->get() };
 
 	commandList->SetDescriptorHeaps(2, descriptorHeaps);
 }
 
-void CommandList::setGraphicsRootSignature(RootSignature* const rootSignature)
+void CommandList::setGraphicsRootSignature(RootSignature* const rootSignature) const
 {
 	commandList->SetGraphicsRootSignature(rootSignature->get());
 }
 
-void CommandList::setComputeRootSignature(RootSignature* const rootSignature)
+void CommandList::setComputeRootSignature(RootSignature* const rootSignature) const
 {
 	commandList->SetComputeRootSignature(rootSignature->get());
 }
 
-ID3D12GraphicsCommandList6* CommandList::get()
+ID3D12GraphicsCommandList6* CommandList::get() const
 {
 	return commandList.Get();
 }

@@ -182,13 +182,6 @@ void RenderEngine::waitForGPU()
 
 void RenderEngine::begin()
 {
-	for (Resource* res : transientResources[Graphics::getFrameIndex()])
-	{
-		delete res;
-	}
-
-	transientResources[Graphics::getFrameIndex()].clear();
-
 	beginCommandlist->reset();
 
 	commandLists.push_back(beginCommandlist->get());
@@ -400,7 +393,7 @@ RenderEngine::RenderEngine(const HWND hwnd) :
 
 		commandLists.push_back(beginCommandlist->get());
 
-		RenderPass::globalConstantBuffer = new ConstantBuffer(ALIGN(sizeof(PerFrameResource)), true, nullptr, nullptr, nullptr);
+		RenderPass::globalConstantBuffer = new ConstantBuffer(sizeof(PerFrameResource), true, nullptr, nullptr, nullptr);
 	}
 
 	{
@@ -444,14 +437,6 @@ RenderEngine::~RenderEngine()
 	if (endCommandList)
 	{
 		delete endCommandList;
-	}
-
-	for (UINT i = 0; i < Graphics::FrameBufferCount; i++)
-	{
-		for (Resource* const res : transientResources[i])
-		{
-			delete res;
-		}
 	}
 
 	for (UINT i = 0; i < 3; i++)

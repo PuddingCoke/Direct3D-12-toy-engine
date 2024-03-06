@@ -22,11 +22,11 @@ class TextureRenderTarget
 {
 public:
 
-	TextureRenderTarget(const TextureViewCreationFlags flags, const UINT width, const UINT height, const DXGI_FORMAT resFormat, const UINT arraySize, const UINT mipLevels,
+	TextureRenderTarget(const int flags, const UINT width, const UINT height, const DXGI_FORMAT resFormat, const UINT arraySize, const UINT mipLevels,
 		const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat, const bool isTextureCube);
 
 	//png jpg hdr dds
-	TextureRenderTarget(const TextureViewCreationFlags flags, const std::string filePath, ID3D12GraphicsCommandList6* commandList, std::vector<Resource*>* transientResourcePool,
+	TextureRenderTarget(const int flags, const std::string filePath, ID3D12GraphicsCommandList6* commandList, std::vector<Resource*>* transientResourcePool,
 		const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat, const bool isTextureCube);
 
 	TextureRenderTarget(const TextureRenderTarget&);
@@ -45,7 +45,7 @@ public:
 
 private:
 
-	void createViews(const TextureViewCreationFlags flags, const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat, const bool isTextureCube);
+	void createViews(const int flags, const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat, const bool isTextureCube);
 
 	//offset 1 for each mipslice
 	//since 0th position is all srv

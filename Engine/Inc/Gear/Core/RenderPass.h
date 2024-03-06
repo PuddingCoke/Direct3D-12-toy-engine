@@ -31,19 +31,19 @@ protected:
 
 	IndexBuffer* CreateIndexBuffer(const DXGI_FORMAT format, const UINT size, const bool cpuWritable, const void* const data);
 
+	VertexBuffer* CreateVertexBuffer(const UINT perVertexSize, const UINT size, const bool stateTracking, const bool cpuWritable, const void* const data);
+
 	IndexConstantBuffer* CreateIndexConstantBuffer(const std::initializer_list<ShaderResourceDesc>& descs, const bool cpuWritable);
 
 	IndexConstantBuffer* CreateIndexConstantBuffer(const UINT indicesNum);
 
 	TextureDepthStencil* CreateTextureDepthStencil(const UINT width, const UINT height, const DXGI_FORMAT resFormat, const UINT arraySize, const UINT mipLevels, const bool isTextureCube);
 
-	TextureRenderTarget* CreateTextureRenderTarget(const TextureViewCreationFlags flags, const UINT width, const UINT height, const DXGI_FORMAT resFormat, const UINT arraySize, const UINT mipLevels,
+	TextureRenderTarget* CreateTextureRenderTarget(const int flags, const UINT width, const UINT height, const DXGI_FORMAT resFormat, const UINT arraySize, const UINT mipLevels,
 		const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat, const bool isTextureCube);
 
-	TextureRenderTarget* CreateTextureRenderTarget(const TextureViewCreationFlags flags, const std::string filePath,
+	TextureRenderTarget* CreateTextureRenderTarget(const int flags, const std::string filePath,
 		const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat, const bool isTextureCube);
-
-	VertexBuffer* CreateVertexBuffer(const UINT perVertexSize, const UINT size, const bool stateTracking, const bool cpuWritable, const void* const data);
 
 	//per frame global resources transition immediate
 	void setGlobalIndexBuffer(const IndexConstantBuffer* const indexBuffer);
@@ -53,9 +53,9 @@ protected:
 
 	//beware use of these two method provide resourceIndex as long as resource's stateTracking is disabled
 
-	void setGraphicsConstants(const UINT numValues, const void* const data, const UINT offset);
+	void setGraphicsConstants(const UINT numValues, const void* const data, const UINT offset) const;
 
-	void setComputeConstants(const UINT numValues, const void* const data, const UINT offset);
+	void setComputeConstants(const UINT numValues, const void* const data, const UINT offset) const;
 
 	//deferred because a srv might be read in pixel shader or non pixel shader so the final state is pending
 	//but for compute shader index buffer and global graphics&compute index buffer transition state is deterministic
@@ -85,15 +85,15 @@ protected:
 
 	void setRenderTargets(const std::initializer_list<RenderTargetDesc>& renderTargets,const std::initializer_list<DepthStencilDesc>& depthStencils);
 
-	void setDefRenderTarget();
+	void setDefRenderTarget() const;
 
-	void clearDefRenderTarget(const FLOAT clearValue[4]);
+	void clearDefRenderTarget(const FLOAT clearValue[4]) const;
 
 	void setVertexBuffers(const UINT startSlot,const std::initializer_list<VertexBuffer*>& vertexBuffers);
 
 	void setIndexBuffers(const std::initializer_list<IndexBuffer*>& indexBuffers);
 
-	void setTopology(const D3D12_PRIMITIVE_TOPOLOGY topology);
+	void setTopology(const D3D12_PRIMITIVE_TOPOLOGY topology) const;
 
 	void setViewport(const float width, const float height);
 
@@ -103,11 +103,13 @@ protected:
 
 	void setScissorRect(const float left, const float top, const float right, const float bottom);
 
-	void setPipelineState(ID3D12PipelineState* const pipelineState);
+	void setPipelineState(ID3D12PipelineState* const pipelineState) const;
 
 	void clearRenderTarget(const RenderTargetDesc desc, const FLOAT clearValue[4]);
 
 	void clearDepthStencil(const DepthStencilDesc desc, const D3D12_CLEAR_FLAGS flags, const FLOAT depth, const UINT8 stencil);
+
+	void draw(const UINT vertexCountPerInstance, const UINT instanceCount, const UINT startVertexLocation, const UINT startInstanceLocation);
 
 	void begin();
 

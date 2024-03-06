@@ -16,15 +16,15 @@ public:
 
 	~CommandList();
 
-	void reset();
+	void reset() const;
 
-	void setDescriptorHeap(DescriptorHeap* const resourceHeap, DescriptorHeap* const samplerHeap);
+	void setDescriptorHeap(DescriptorHeap* const resourceHeap, DescriptorHeap* const samplerHeap) const;
 
-	void setGraphicsRootSignature(RootSignature* const rootSignature);
+	void setGraphicsRootSignature(RootSignature* const rootSignature) const;
 
-	void setComputeRootSignature(RootSignature* const rootSignature);
+	void setComputeRootSignature(RootSignature* const rootSignature) const;
 
-	ID3D12GraphicsCommandList6* get();
+	ID3D12GraphicsCommandList6* get() const;
 
 private:
 

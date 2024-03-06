@@ -58,6 +58,11 @@ IndexBuffer* RenderPass::CreateIndexBuffer(const DXGI_FORMAT format, const UINT 
 	return new IndexBuffer(format, size, stateTracking, cpuWritable, data, renderCMD->get(), &transientResources[Graphics::getFrameIndex()]);
 }
 
+VertexBuffer* RenderPass::CreateVertexBuffer(const UINT perVertexSize, const UINT size, const bool stateTracking, const bool cpuWritable, const void* const data)
+{
+	return new VertexBuffer(perVertexSize, size, stateTracking, cpuWritable, data, renderCMD->get(), &transientResources[Graphics::getFrameIndex()]);
+}
+
 IndexConstantBuffer* RenderPass::CreateIndexConstantBuffer(const std::initializer_list<ShaderResourceDesc>& descs, const bool cpuWritable)
 {
 	return new IndexConstantBuffer(descs, cpuWritable, renderCMD->get(), &transientResources[Graphics::getFrameIndex()]);
@@ -73,19 +78,14 @@ TextureDepthStencil* RenderPass::CreateTextureDepthStencil(const UINT width, con
 	return new TextureDepthStencil(width, height, resFormat, arraySize, mipLevels, isTextureCube);
 }
 
-TextureRenderTarget* RenderPass::CreateTextureRenderTarget(const TextureViewCreationFlags flags, const UINT width, const UINT height, const DXGI_FORMAT resFormat, const UINT arraySize, const UINT mipLevels, const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat, const bool isTextureCube)
+TextureRenderTarget* RenderPass::CreateTextureRenderTarget(const int flags, const UINT width, const UINT height, const DXGI_FORMAT resFormat, const UINT arraySize, const UINT mipLevels, const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat, const bool isTextureCube)
 {
 	return new TextureRenderTarget(flags, width, height, resFormat, arraySize, mipLevels, srvFormat, uavFormat, rtvFormat, isTextureCube);
 }
 
-TextureRenderTarget* RenderPass::CreateTextureRenderTarget(const TextureViewCreationFlags flags, const std::string filePath, const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat, const bool isTextureCube)
+TextureRenderTarget* RenderPass::CreateTextureRenderTarget(const int flags, const std::string filePath, const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat, const bool isTextureCube)
 {
 	return new TextureRenderTarget(flags, filePath, renderCMD->get(), &transientResources[Graphics::getFrameIndex()], srvFormat, uavFormat, rtvFormat, isTextureCube);
-}
-
-VertexBuffer* RenderPass::CreateVertexBuffer(const UINT perVertexSize, const UINT size, const bool stateTracking, const bool cpuWritable, const void* const data)
-{
-	return new VertexBuffer(perVertexSize, size, stateTracking, cpuWritable, data, renderCMD->get(), &transientResources[Graphics::getFrameIndex()]);
 }
 
 void RenderPass::setGlobalIndexBuffer(const IndexConstantBuffer* const indexBuffer)
@@ -275,12 +275,12 @@ void RenderPass::setComputeIndexBuffer(const IndexConstantBuffer* const indexBuf
 	renderCMD->get()->SetComputeRootConstantBufferView(3, indexBuffer->getGPUAddress());
 }
 
-void RenderPass::setGraphicsConstants(const UINT numValues, const void* const data, const UINT offset)
+void RenderPass::setGraphicsConstants(const UINT numValues, const void* const data, const UINT offset) const
 {
 	renderCMD->get()->SetGraphicsRoot32BitConstants(1, numValues, data, offset);
 }
 
-void RenderPass::setComputeConstants(const UINT numValues, const void* const data, const UINT offset)
+void RenderPass::setComputeConstants(const UINT numValues, const void* const data, const UINT offset) const
 {
 	renderCMD->get()->SetComputeRoot32BitConstants(1, numValues, data, offset);
 }
@@ -388,14 +388,14 @@ void RenderPass::setRenderTargets(const std::initializer_list<RenderTargetDesc>&
 	}
 }
 
-void RenderPass::setDefRenderTarget()
+void RenderPass::setDefRenderTarget() const
 {
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = Graphics::getBackBufferHandle();
 
 	renderCMD->get()->OMSetRenderTargets(1, &rtvHandle, FALSE, nullptr);
 }
 
-void RenderPass::clearDefRenderTarget(const FLOAT clearValue[4])
+void RenderPass::clearDefRenderTarget(const FLOAT clearValue[4]) const
 {
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = Graphics::getBackBufferHandle();
 
@@ -442,7 +442,7 @@ void RenderPass::setIndexBuffers(const std::initializer_list<IndexBuffer*>& inde
 	renderCMD->get()->IASetIndexBuffer(ibvs.data());
 }
 
-void RenderPass::setTopology(const D3D12_PRIMITIVE_TOPOLOGY topology)
+void RenderPass::setTopology(const D3D12_PRIMITIVE_TOPOLOGY topology) const
 {
 	renderCMD->get()->IASetPrimitiveTopology(topology);
 }
@@ -475,7 +475,7 @@ void RenderPass::setScissorRect(const float left, const float top, const float r
 	setScissorRect(static_cast<UINT>(left), static_cast<UINT>(top), static_cast<UINT>(right), static_cast<UINT>(bottom));
 }
 
-void RenderPass::setPipelineState(ID3D12PipelineState* const pipelineState)
+void RenderPass::setPipelineState(ID3D12PipelineState* const pipelineState) const
 {
 	renderCMD->get()->SetPipelineState(pipelineState);
 }
@@ -488,6 +488,11 @@ void RenderPass::clearRenderTarget(const RenderTargetDesc desc, const FLOAT clea
 void RenderPass::clearDepthStencil(const DepthStencilDesc desc, const D3D12_CLEAR_FLAGS flags, const FLOAT depth, const UINT8 stencil)
 {
 	renderCMD->get()->ClearDepthStencilView(desc.dsvHandle, flags, depth, stencil, 0, nullptr);
+}
+
+void RenderPass::draw(const UINT vertexCountPerInstance, const UINT instanceCount, const UINT startVertexLocation, const UINT startInstanceLocation)
+{
+	renderCMD->get()->DrawInstanced(vertexCountPerInstance, instanceCount, startVertexLocation, startInstanceLocation);
 }
 
 void RenderPass::begin()
