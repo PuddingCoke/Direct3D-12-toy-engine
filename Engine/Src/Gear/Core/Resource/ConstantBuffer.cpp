@@ -2,9 +2,13 @@
 
 ConstantBufferPool* ConstantBuffer::bufferPools[3] = { nullptr,nullptr,nullptr };
 
-ConstantBuffer::ConstantBuffer(const UINT size, const bool cpuWritable, const void* const data, ID3D12GraphicsCommandList6* commandList, std::vector<Resource*>* transientResourcePool) :
-	size(size)
+ConstantBuffer::ConstantBuffer(const UINT size, const bool cpuWritable, const void* const data, ID3D12GraphicsCommandList6* commandList, std::vector<Resource*>* transientResourcePool)
 {
+	if (size % 256 != 0)
+	{
+		throw "size of constant buffer must be multiply of 256";
+	}
+
 	if (cpuWritable)
 	{
 		buffer = nullptr;
@@ -30,6 +34,11 @@ ConstantBuffer::ConstantBuffer(const UINT size, const bool cpuWritable, const vo
 		gpuAddress = availableDescriptor.gpuAddress;
 
 		bufferIndex = availableDescriptor.descriptorIndex;
+
+		if (data)
+		{
+			update(data, size);
+		}
 	}
 	else
 	{

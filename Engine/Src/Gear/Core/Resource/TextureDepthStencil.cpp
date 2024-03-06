@@ -2,7 +2,7 @@
 
 TextureDepthStencil::TextureDepthStencil(const UINT width, const UINT height, const DXGI_FORMAT resFormat, const UINT arraySize, const UINT mipLevels, const bool isTextureCube)
 {
-	texture = new Texture(width, height, resFormat, arraySize, mipLevels, true);
+	texture = new Texture(width, height, resFormat, arraySize, mipLevels, true, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL);
 
 	//R32_TYPELESS R16_TYPELESS R32G8X24_TYPELESS R24G8_TYPELESS
 

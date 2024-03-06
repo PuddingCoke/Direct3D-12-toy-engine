@@ -14,9 +14,9 @@ int Gear::iniEngine(const Configuration config, const int argc, const char* argv
 	{
 		std::string exeRootPath = argv[0];
 
-		std::cout << "[class Gear] executable path " << exeRootPath << "\n";
+		Utils::exeRootPath = Utils::File::backslashToSlash(Utils::File::getParentFolder(exeRootPath));
 
-		Utils::exeRootPath = exeRootPath;
+		std::cout << "[class Gear] executable path " << Utils::exeRootPath << "\n";
 	}
 
 	usage = config.usage;
@@ -33,6 +33,17 @@ int Gear::iniEngine(const Configuration config, const int argc, const char* argv
 	std::cout << "[class Gear] aspect ratio " << Graphics::aspectRatio << "\n";
 	std::cout << "[class Gear] back buffer count " << Graphics::FrameBufferCount << "\n";
 
+	switch (usage)
+	{
+	default:
+	case Configuration::EngineUsage::NORMAL:
+		std::cout << "[class Gear] usage normal\n";
+		break;
+	case Configuration::EngineUsage::VIDEOPLAYBACK:
+		std::cout << "[class Gear] usage video playback\n";
+		break;
+	}
+
 	return 0;
 }
 
@@ -48,11 +59,9 @@ void Gear::iniGame(Game* const gamePtr)
 	{
 	default:
 	case Configuration::EngineUsage::NORMAL:
-		std::cout << "[class Gear] usage normal\n";
 		runGame();
 		break;
 	case Configuration::EngineUsage::VIDEOPLAYBACK:
-		std::cout << "[class Gear] usage video playback\n";
 		break;
 	}
 

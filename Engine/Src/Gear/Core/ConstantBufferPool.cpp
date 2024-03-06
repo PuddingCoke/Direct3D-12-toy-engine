@@ -17,11 +17,10 @@ ConstantBufferPool::ConstantBufferPool(const UINT subRegionSize, const UINT subR
 
 		uploadHeaps[i] = new UploadHeap * [Graphics::FrameBufferCount];
 
-		uploadHeaps[i][0] = new UploadHeap(subRegionSize);
-
-		uploadHeaps[i][1] = new UploadHeap(subRegionSize);
-
-		uploadHeaps[i][2] = new UploadHeap(subRegionSize);
+		for (UINT j = 0; j < Graphics::FrameBufferCount; j++)
+		{
+			uploadHeaps[i][j] = new UploadHeap(subRegionSize);
+		}
 	}
 
 	buffer = new Buffer(subRegionSize * subRegionNum, false, nullptr, nullptr, nullptr, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
@@ -54,9 +53,10 @@ ConstantBufferPool::~ConstantBufferPool()
 
 	for (UINT i = 0; i < subRegionNum; i++)
 	{
-		delete uploadHeaps[i][0];
-		delete uploadHeaps[i][1];
-		delete uploadHeaps[i][2];
+		for (UINT j = 0; j < Graphics::FrameBufferCount; j++)
+		{
+			delete uploadHeaps[i][j];
+		}
 
 		delete[] uploadHeaps[i];
 	}
