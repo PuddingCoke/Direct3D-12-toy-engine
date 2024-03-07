@@ -53,7 +53,11 @@ protected:
 
 	//beware use of these two method provide resourceIndex as long as resource's stateTracking is disabled
 
+	void setGraphicsConstants(const std::initializer_list<ShaderResourceDesc> descs, const UINT offset);
+
 	void setGraphicsConstants(const UINT numValues, const void* const data, const UINT offset) const;
+
+	void setComputeConstants(const std::initializer_list<ShaderResourceDesc> descs, const UINT offset);
 
 	void setComputeConstants(const UINT numValues, const void* const data, const UINT offset) const;
 
