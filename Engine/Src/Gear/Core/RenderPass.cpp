@@ -275,9 +275,215 @@ void RenderPass::setComputeIndexBuffer(const IndexConstantBuffer* const indexBuf
 	renderCMD->get()->SetComputeRootConstantBufferView(3, indexBuffer->getGPUAddress());
 }
 
+void RenderPass::setGraphicsConstants(const std::initializer_list<ShaderResourceDesc> descs, const UINT offset)
+{
+	UINT index = 0;
+
+	UINT indices[16] = {};
+
+	for (const ShaderResourceDesc& desc : descs)
+	{
+		if (desc.type == ShaderResourceDesc::BUFFER)
+		{
+			indices[index] = desc.bufferDesc.resourceIndex;
+
+			Buffer* const buffer = desc.bufferDesc.buffer;
+
+			if (buffer->getStateTracking() && desc.state != ShaderResourceDesc::CBV)
+			{
+				pushResourceTrackList(buffer);
+
+				if (desc.state == ShaderResourceDesc::SRV)
+				{
+					buffer->transitionState = D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE;
+				}
+				else if (desc.state == ShaderResourceDesc::UAV)
+				{
+					buffer->transitionState = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
+				}
+			}
+		}
+		else if (desc.type == ShaderResourceDesc::TEXTURE)
+		{
+			indices[index] = desc.textureDesc.resourceIndex;
+
+			Texture* const texture = desc.textureDesc.texture;
+
+			if (texture->getStateTracking())
+			{
+				pushResourceTrackList(texture);
+
+				if (desc.state == ShaderResourceDesc::SRV)
+				{
+					if (desc.textureDesc.mipSlice == D3D12_TRANSITION_ALL_MIPLEVELS)
+					{
+						texture->transitionState.allState = D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE;
+
+						for (UINT i = 0; i < texture->mipLevels; i++)
+						{
+							texture->transitionState.mipLevelStates[i] = D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE;
+						}
+					}
+					else
+					{
+						if (texture->mipLevels > 1)
+						{
+							texture->transitionState.allState = D3D12_RESOURCE_STATE_UNKNOWN;
+
+							texture->transitionState.mipLevelStates[desc.textureDesc.mipSlice] = D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE;
+						}
+						else
+						{
+							texture->transitionState.allState = D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE;
+
+							texture->transitionState.mipLevelStates[desc.textureDesc.mipSlice] = D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE;
+						}
+					}
+				}
+				else if (desc.state == ShaderResourceDesc::UAV)
+				{
+					if (desc.textureDesc.mipSlice == D3D12_TRANSITION_ALL_MIPLEVELS)
+					{
+						texture->transitionState.allState = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
+
+						for (UINT i = 0; i < texture->mipLevels; i++)
+						{
+							texture->transitionState.mipLevelStates[i] = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
+						}
+					}
+					else
+					{
+						if (texture->mipLevels > 1)
+						{
+							texture->transitionState.allState = D3D12_RESOURCE_STATE_UNKNOWN;
+
+							texture->transitionState.mipLevelStates[desc.textureDesc.mipSlice] = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
+						}
+						else
+						{
+							texture->transitionState.allState = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
+
+							texture->transitionState.mipLevelStates[desc.textureDesc.mipSlice] = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
+						}
+					}
+				}
+			}
+		}
+
+		index++;
+	}
+
+	flushTransitionResources();
+
+	setGraphicsConstants(descs.size(), indices, offset);
+}
+
 void RenderPass::setGraphicsConstants(const UINT numValues, const void* const data, const UINT offset) const
 {
 	renderCMD->get()->SetGraphicsRoot32BitConstants(1, numValues, data, offset);
+}
+
+void RenderPass::setComputeConstants(const std::initializer_list<ShaderResourceDesc> descs, const UINT offset)
+{
+	UINT index = 0;
+
+	UINT indices[16] = {};
+
+	for (const ShaderResourceDesc& desc : descs)
+	{
+		if (desc.type == ShaderResourceDesc::BUFFER)
+		{
+			indices[index] = desc.bufferDesc.resourceIndex;
+
+			Buffer* const buffer = desc.bufferDesc.buffer;
+
+			if (buffer->getStateTracking() && desc.state != ShaderResourceDesc::CBV)
+			{
+				pushResourceTrackList(buffer);
+
+				if (desc.state == ShaderResourceDesc::SRV)
+				{
+					buffer->transitionState = D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
+				}
+				else if (desc.state == ShaderResourceDesc::UAV)
+				{
+					buffer->transitionState = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
+				}
+			}
+		}
+		else if (desc.type == ShaderResourceDesc::TEXTURE)
+		{
+			indices[index] = desc.textureDesc.resourceIndex;
+
+			Texture* const texture = desc.textureDesc.texture;
+
+			if (texture->getStateTracking())
+			{
+				pushResourceTrackList(texture);
+
+				if (desc.state == ShaderResourceDesc::SRV)
+				{
+					if (desc.textureDesc.mipSlice == D3D12_TRANSITION_ALL_MIPLEVELS)
+					{
+						texture->transitionState.allState = D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
+
+						for (UINT i = 0; i < texture->mipLevels; i++)
+						{
+							texture->transitionState.mipLevelStates[i] = D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
+						}
+					}
+					else
+					{
+						if (texture->mipLevels > 1)
+						{
+							texture->transitionState.allState = D3D12_RESOURCE_STATE_UNKNOWN;
+
+							texture->transitionState.mipLevelStates[desc.textureDesc.mipSlice] = D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
+						}
+						else
+						{
+							texture->transitionState.allState = D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
+
+							texture->transitionState.mipLevelStates[desc.textureDesc.mipSlice] = D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
+						}
+					}
+				}
+				else if (desc.state == ShaderResourceDesc::UAV)
+				{
+					if (desc.textureDesc.mipSlice == D3D12_TRANSITION_ALL_MIPLEVELS)
+					{
+						texture->transitionState.allState = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
+
+						for (UINT i = 0; i < texture->mipLevels; i++)
+						{
+							texture->transitionState.mipLevelStates[i] = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
+						}
+					}
+					else
+					{
+						if (texture->mipLevels > 1)
+						{
+							texture->transitionState.allState = D3D12_RESOURCE_STATE_UNKNOWN;
+
+							texture->transitionState.mipLevelStates[desc.textureDesc.mipSlice] = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
+						}
+						else
+						{
+							texture->transitionState.allState = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
+
+							texture->transitionState.mipLevelStates[desc.textureDesc.mipSlice] = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
+						}
+					}
+				}
+			}
+		}
+
+		index++;
+	}
+
+	flushTransitionResources();
+
+	setComputeConstants(descs.size(), indices, offset);
 }
 
 void RenderPass::setComputeConstants(const UINT numValues, const void* const data, const UINT offset) const

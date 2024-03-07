@@ -16,12 +16,6 @@ public:
 		myTexture = CreateTextureRenderTarget(TEXTURE_VIEW_CREATE_SRV, "est.png",
 			DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, false);
 
-		texture0 = CreateTextureRenderTarget(TEXTURE_VIEW_CREATE_SRV | TEXTURE_VIEW_CREATE_RTV,
-			1920, 1080, DXGI_FORMAT_R8G8B8A8_UNORM, 1, 1,
-			DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_R8G8B8A8_UNORM,false);
-
-		icb = CreateIndexConstantBuffer({ texture0->getAllSRVIndex() }, false);
-
 		end();
 
 		RenderEngine::get()->submitRenderPass(this);
@@ -53,8 +47,6 @@ public:
 	~MyRenderPass()
 	{
 		delete myTexture;
-		delete texture0;
-		delete icb;
 		delete vertexShader;
 		delete pixelShader;
 	}
@@ -79,10 +71,6 @@ protected:
 private:
 
 	TextureRenderTarget* myTexture;
-
-	TextureRenderTarget* texture0;
-
-	IndexConstantBuffer* icb;
 
 	ComPtr<ID3D12PipelineState> pipelineState;
 
