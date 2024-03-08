@@ -31,7 +31,7 @@ protected:
 
 	IndexBuffer* CreateIndexBuffer(const DXGI_FORMAT format, const UINT size, const bool cpuWritable, const void* const data);
 
-	VertexBuffer* CreateVertexBuffer(const UINT perVertexSize, const UINT size, const bool stateTracking, const bool cpuWritable, const void* const data);
+	VertexBuffer* CreateVertexBuffer(const UINT perVertexSize, const UINT size, const bool cpuWritable, const void* const data);
 
 	IndexConstantBuffer* CreateIndexConstantBuffer(const std::initializer_list<ShaderResourceDesc>& descs, const bool cpuWritable);
 
@@ -44,6 +44,10 @@ protected:
 
 	TextureRenderTarget* CreateTextureRenderTarget(const std::string filePath, const bool isTextureCube,
 		const DXGI_FORMAT srvFormat = DXGI_FORMAT_UNKNOWN, const DXGI_FORMAT uavFormat = DXGI_FORMAT_UNKNOWN, const DXGI_FORMAT rtvFormat = DXGI_FORMAT_UNKNOWN);
+
+	void updateBuffer(VertexBuffer* const vb, const void* const data, const UINT size);
+
+	void updateBuffer(IndexBuffer* const ib, const void* const data, const UINT size);
 
 	//per frame global resources transition immediate
 	void setGlobalIndexBuffer(const IndexConstantBuffer* const indexBuffer);

@@ -22,7 +22,7 @@ public:
 
 	UploadHeap(const UploadHeap&) = delete;
 
-	void update(const void* const data, const UINT dataSize) const;
+	void update(const void* const data, const UINT size) const;
 
 	void updateGlobalStates() override;
 

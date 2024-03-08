@@ -13,7 +13,7 @@ float3 hash(uint3 x)
 
 float4 main(float2 texCoord : TEXCOORD) : SV_TARGET
 {
-    uint3 coor = uint3(uint2(floor(texCoord * float2(1920.0, 1080.0))), perframeResource.uintSeed);
+    uint3 coor = uint3(uint2(floor(texCoord * perframeResource.screenSize)), perframeResource.uintSeed);
     
     return float4(hash(coor), 1.0);
 }
