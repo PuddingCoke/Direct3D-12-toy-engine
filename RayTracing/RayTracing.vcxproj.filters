@@ -28,7 +28,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="FullScreenVS.hlsl" />
     <FxCompile Include="AccumulateShader.hlsl" />
     <FxCompile Include="DisplayShader.hlsl" />
   </ItemGroup>

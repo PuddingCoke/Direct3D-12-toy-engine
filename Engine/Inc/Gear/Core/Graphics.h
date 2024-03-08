@@ -27,6 +27,8 @@ public:
 
 	static D3D12_CPU_DESCRIPTOR_HANDLE getBackBufferHandle();
 
+	static DXGI_FORMAT getBackBufferFormat();
+
 private:
 
 	friend class Gear;
@@ -34,6 +36,8 @@ private:
 	friend class RenderEngine;
 
 	static std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> backBufferHandles;
+
+	static DXGI_FORMAT backBufferFormat;
 
 	static UINT frameIndex;
 

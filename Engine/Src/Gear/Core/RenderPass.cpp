@@ -78,14 +78,14 @@ TextureDepthStencil* RenderPass::CreateTextureDepthStencil(const UINT width, con
 	return new TextureDepthStencil(width, height, resFormat, arraySize, mipLevels, isTextureCube);
 }
 
-TextureRenderTarget* RenderPass::CreateTextureRenderTarget(const int flags, const UINT width, const UINT height, const DXGI_FORMAT resFormat, const UINT arraySize, const UINT mipLevels, const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat, const bool isTextureCube)
+TextureRenderTarget* RenderPass::CreateTextureRenderTarget(const UINT width, const UINT height, const DXGI_FORMAT resFormat, const UINT arraySize, const UINT mipLevels, const bool isTextureCube, const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat)
 {
-	return new TextureRenderTarget(flags, width, height, resFormat, arraySize, mipLevels, srvFormat, uavFormat, rtvFormat, isTextureCube);
+	return new TextureRenderTarget(width, height, resFormat, arraySize, mipLevels, isTextureCube, srvFormat, uavFormat, rtvFormat);
 }
 
-TextureRenderTarget* RenderPass::CreateTextureRenderTarget(const int flags, const std::string filePath, const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat, const bool isTextureCube)
+TextureRenderTarget* RenderPass::CreateTextureRenderTarget(const std::string filePath, const bool isTextureCube, const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat)
 {
-	return new TextureRenderTarget(flags, filePath, renderCMD->get(), &transientResources[Graphics::getFrameIndex()], srvFormat, uavFormat, rtvFormat, isTextureCube);
+	return new TextureRenderTarget(filePath, renderCMD->get(), &transientResources[Graphics::getFrameIndex()], isTextureCube, srvFormat, uavFormat, rtvFormat);
 }
 
 void RenderPass::setGlobalIndexBuffer(const IndexConstantBuffer* const indexBuffer)
@@ -696,6 +696,23 @@ void RenderPass::clearDepthStencil(const DepthStencilDesc desc, const D3D12_CLEA
 	renderCMD->get()->ClearDepthStencilView(desc.dsvHandle, flags, depth, stencil, 0, nullptr);
 }
 
+void RenderPass::uavBarrier(std::initializer_list<Resource*> resources)
+{
+	std::vector<D3D12_RESOURCE_BARRIER> barriers;
+
+	for (const Resource* const resource : resources)
+	{
+		D3D12_RESOURCE_BARRIER barrier = {};
+		barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+		barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_UAV;
+		barrier.UAV.pResource = resource->getResource();
+
+		barriers.push_back(barrier);
+	}
+
+	renderCMD->get()->ResourceBarrier(barriers.size(), barriers.data());
+}
+
 void RenderPass::draw(const UINT vertexCountPerInstance, const UINT instanceCount, const UINT startVertexLocation, const UINT startInstanceLocation)
 {
 	renderCMD->get()->DrawInstanced(vertexCountPerInstance, instanceCount, startVertexLocation, startInstanceLocation);
@@ -730,7 +747,7 @@ void RenderPass::end()
 
 void RenderPass::updateReferredResStates()
 {
-	for (Resource* res : referredResources)
+	for (Resource* const res : referredResources)
 	{
 		res->updateGlobalStates();
 
@@ -745,21 +762,24 @@ void RenderPass::updateReferredResStates()
 
 void RenderPass::flushTransitionResources()
 {
-	for (Buffer* buff : transitionBuffers)
+	for (Buffer* const buff : transitionBuffers)
 	{
 		buff->transition(transitionBarriers, pendingBufferBarrier);
 	}
 
 	transitionBuffers.clear();
 
-	for (Texture* tex : transitionTextures)
+	for (Texture* const tex : transitionTextures)
 	{
 		tex->transition(transitionBarriers, pendingTextureBarrier);
 	}
 
 	transitionTextures.clear();
 
-	renderCMD->get()->ResourceBarrier(transitionBarriers.size(), transitionBarriers.data());
+	if (transitionBarriers.size())
+	{
+		renderCMD->get()->ResourceBarrier(transitionBarriers.size(), transitionBarriers.data());
+	}
 
 	transitionBarriers.clear();
 }

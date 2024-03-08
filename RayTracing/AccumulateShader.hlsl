@@ -1,3 +1,5 @@
+#include"Common.hlsli"
+
 #define FOVANGLEY 0.78539816339744
 #define BIG_EPSILON 1e-3
 #define SMALL_EPSILON 1e-8
@@ -365,8 +367,10 @@ float4 main(float2 texCoord : TEXCOORD, float4 pixelCoord : SV_POSITION) : SV_TA
 {
     hashSeed = float(BaseHash(asuint(pixelCoord.xy))) / float(0xffffffffU) + drawCallParam.floatSeed;
     
-    float2 planePos = (floor(pixelCoord.xy) + Hash2(hashSeed)) / float2(1920.0, 1080.0) * 2.0 - 1.0;
-    planePos.x *= 16.0 / 9.0;
+    float2 screenSize = perframeResource.screenSize;
+    
+    float2 planePos = (floor(pixelCoord.xy) + Hash2(hashSeed)) / screenSize * 2.0 - 1.0;
+    planePos.x *= screenSize.x / screenSize.y;
     
     float3 cameraPos = float3(cos(drawCallParam.phi) * cos(drawCallParam.theta), sin(drawCallParam.phi), cos(drawCallParam.phi) * sin(drawCallParam.theta)) * drawCallParam.radius;
     

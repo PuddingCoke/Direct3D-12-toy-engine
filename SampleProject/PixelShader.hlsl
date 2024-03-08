@@ -1,14 +1,4 @@
-SamplerState samplerState : register(s0);
-
-struct Time
-{
-    float deltaTime;
-    float timeElapsed;
-    uint uintSeed;
-    float floatSeed;
-};
-
-ConstantBuffer<Time> perFrameResource : register(b0);
+#include"Common.hlsli"
 
 //https://www.shadertoy.com/view/XlXcW4
 
@@ -23,7 +13,7 @@ float3 hash(uint3 x)
 
 float4 main(float2 texCoord : TEXCOORD) : SV_TARGET
 {
-    uint3 coor = uint3(uint2(floor(texCoord * float2(1920.0, 1080.0))), perFrameResource.uintSeed);
+    uint3 coor = uint3(uint2(floor(texCoord * float2(1920.0, 1080.0))), perframeResource.uintSeed);
     
     return float4(hash(coor), 1.0);
 }

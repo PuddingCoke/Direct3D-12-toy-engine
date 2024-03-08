@@ -1,19 +1,18 @@
 #include<Gear/Core/Resource/TextureRenderTarget.h>
 
-TextureRenderTarget::TextureRenderTarget(const int flags, const UINT width, const UINT height, const DXGI_FORMAT resFormat, const UINT arraySize, const UINT mipLevels,
-	const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat, const bool isTextureCube)
+TextureRenderTarget::TextureRenderTarget(const UINT width, const UINT height, const DXGI_FORMAT resFormat, const UINT arraySize, const UINT mipLevels, const bool isTextureCube,
+	const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat)
 {
-	const bool hasSRV = (flags & TEXTURE_VIEW_CREATE_SRV);
-	const bool hasRTV = (flags & TEXTURE_VIEW_CREATE_RTV);
-	const bool hasUAV = (flags & TEXTURE_VIEW_CREATE_UAV);
+	const bool hasRTV = (rtvFormat != DXGI_FORMAT_UNKNOWN);
+	const bool hasUAV = (uavFormat != DXGI_FORMAT_UNKNOWN);
 
-	if (!hasSRV)
-	{
-		throw "Without SRV flag set is not allowed here";
-	}
-	else if ((!hasRTV) && (!hasUAV))
+	if ((!hasRTV) && (!hasUAV))
 	{
 		throw "With only SRV flag set is not allowed here";
+	}
+	else if (srvFormat == DXGI_FORMAT_UNKNOWN)
+	{
+		throw "SRV format cannot be DXGI_FORMAT_UNKNOWN";
 	}
 
 	D3D12_RESOURCE_FLAGS resFlags = D3D12_RESOURCE_FLAG_NONE;
@@ -31,20 +30,14 @@ TextureRenderTarget::TextureRenderTarget(const int flags, const UINT width, cons
 	//stateTracking must be true because use this method to create a texture must combine SRV with other flags(UAV or RTV)
 	texture = new Texture(width, height, resFormat, arraySize, mipLevels, true, resFlags);
 
-	createViews(flags, srvFormat, uavFormat, rtvFormat, isTextureCube);
+	createViews(srvFormat, uavFormat, rtvFormat, isTextureCube);
 }
 
-TextureRenderTarget::TextureRenderTarget(const int flags, const std::string filePath, ID3D12GraphicsCommandList6* commandList, std::vector<Resource*>* transientResourcePool,
-	const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat, const bool isTextureCube)
+TextureRenderTarget::TextureRenderTarget(const std::string filePath, ID3D12GraphicsCommandList6* commandList, std::vector<Resource*>* transientResourcePool, const bool isTextureCube,
+	const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat)
 {
-	const bool hasSRV = (flags & TEXTURE_VIEW_CREATE_SRV);
-	const bool hasRTV = (flags & TEXTURE_VIEW_CREATE_RTV);
-	const bool hasUAV = (flags & TEXTURE_VIEW_CREATE_UAV);
-
-	if (!hasSRV)
-	{
-		throw "Without SRV flag set is not allowed here";
-	}
+	const bool hasRTV = (rtvFormat != DXGI_FORMAT_UNKNOWN);
+	const bool hasUAV = (uavFormat != DXGI_FORMAT_UNKNOWN);
 
 	if ((!hasRTV) && (!hasUAV))
 	{
@@ -68,7 +61,14 @@ TextureRenderTarget::TextureRenderTarget(const int flags, const std::string file
 		texture = new Texture(filePath, commandList, transientResourcePool, true, resFlags);
 	}
 
-	createViews(flags, srvFormat, uavFormat, rtvFormat, isTextureCube);
+	if (srvFormat == DXGI_FORMAT_UNKNOWN)
+	{
+		createViews(texture->getFormat(), DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, isTextureCube);
+	}
+	else
+	{
+		createViews(srvFormat, uavFormat, rtvFormat, isTextureCube);
+	}
 }
 
 TextureRenderTarget::TextureRenderTarget(const TextureRenderTarget& trt) :
@@ -139,11 +139,10 @@ Texture* TextureRenderTarget::getTexture() const
 	return texture;
 }
 
-void TextureRenderTarget::createViews(const int flags, const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat, const bool isTextureCube)
+void TextureRenderTarget::createViews(const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat, const bool isTextureCube)
 {
-	const bool hasSRV = (flags & TEXTURE_VIEW_CREATE_SRV);
-	const bool hasRTV = (flags & TEXTURE_VIEW_CREATE_RTV);
-	const bool hasUAV = (flags & TEXTURE_VIEW_CREATE_UAV);
+	const bool hasRTV = (rtvFormat != DXGI_FORMAT_UNKNOWN);
+	const bool hasUAV = (uavFormat != DXGI_FORMAT_UNKNOWN);
 
 	//create srv uav descriptors
 	{
@@ -167,7 +166,6 @@ void TextureRenderTarget::createViews(const int flags, const DXGI_FORMAT srvForm
 
 		std::cout << "[class TextureRenderTarget] //////////\n";
 		std::cout << "[class TextureRenderTarget] stateTracking " << texture->getStateTracking() << "\n";
-		std::cout << "[class TextureRenderTarget] srv creation flag " << hasSRV << "\n";
 
 		if (texture->getStateTracking())
 		{
@@ -175,6 +173,7 @@ void TextureRenderTarget::createViews(const int flags, const DXGI_FORMAT srvForm
 			std::cout << "[class TextureRenderTarget] rtv creation flag " << hasRTV << "\n";
 		}
 
+		std::cout << "[class TextureRenderTarget] isTexturecube " << isTextureCube << "\n";
 		std::cout << "[class TextureRenderTarget] miplevels " << texture->getMipLevels() << "\n";
 		std::cout << "[class TextureRenderTarget] arraysize " << texture->getArraySize() << "\n";
 		std::cout << "[class TextureRenderTarget] all srv index " << allSRVIndex << "\n";
