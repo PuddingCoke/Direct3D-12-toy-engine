@@ -53,14 +53,12 @@ ConstantBuffer* RenderPass::CreateConstantBuffer(const UINT size, const bool cpu
 
 IndexBuffer* RenderPass::CreateIndexBuffer(const DXGI_FORMAT format, const UINT size, const bool cpuWritable, const void* const data)
 {
-	const bool stateTracking = cpuWritable;
-
-	return new IndexBuffer(format, size, stateTracking, cpuWritable, data, renderCMD->get(), &transientResources[Graphics::getFrameIndex()]);
+	return new IndexBuffer(format, size, cpuWritable, data, renderCMD->get(), &transientResources[Graphics::getFrameIndex()]);
 }
 
-VertexBuffer* RenderPass::CreateVertexBuffer(const UINT perVertexSize, const UINT size, const bool stateTracking, const bool cpuWritable, const void* const data)
+VertexBuffer* RenderPass::CreateVertexBuffer(const UINT perVertexSize, const UINT size, const bool cpuWritable, const void* const data)
 {
-	return new VertexBuffer(perVertexSize, size, stateTracking, cpuWritable, data, renderCMD->get(), &transientResources[Graphics::getFrameIndex()]);
+	return new VertexBuffer(perVertexSize, size, cpuWritable, data, renderCMD->get(), &transientResources[Graphics::getFrameIndex()]);
 }
 
 IndexConstantBuffer* RenderPass::CreateIndexConstantBuffer(const std::initializer_list<ShaderResourceDesc>& descs, const bool cpuWritable)
@@ -86,6 +84,44 @@ TextureRenderTarget* RenderPass::CreateTextureRenderTarget(const UINT width, con
 TextureRenderTarget* RenderPass::CreateTextureRenderTarget(const std::string filePath, const bool isTextureCube, const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat)
 {
 	return new TextureRenderTarget(filePath, renderCMD->get(), &transientResources[Graphics::getFrameIndex()], isTextureCube, srvFormat, uavFormat, rtvFormat);
+}
+
+void RenderPass::updateBuffer(VertexBuffer* const vb, const void* const data, const UINT size)
+{
+	Buffer* const buffer = vb->getBuffer();
+
+	pushResourceTrackList(buffer);
+
+	buffer->transitionState = D3D12_RESOURCE_STATE_COPY_DEST;
+
+	flushTransitionResources();
+
+	UploadHeap* const uploadHeap = vb->uploadHeaps[vb->uploadHeapIndex];
+
+	uploadHeap->update(data, size);
+
+	renderCMD->get()->CopyBufferRegion(buffer->getResource(), 0, uploadHeap->getResource(), 0, size);
+
+	vb->uploadHeapIndex = (vb->uploadHeapIndex + 1) % Graphics::FrameBufferCount;
+}
+
+void RenderPass::updateBuffer(IndexBuffer* const ib, const void* const data, const UINT size)
+{
+	Buffer* const buffer = ib->getBuffer();
+
+	pushResourceTrackList(buffer);
+
+	buffer->transitionState = D3D12_RESOURCE_STATE_COPY_DEST;
+
+	flushTransitionResources();
+
+	UploadHeap* const uploadHeap = ib->uploadHeaps[ib->uploadHeapIndex];
+
+	uploadHeap->update(data, size);
+
+	renderCMD->get()->CopyBufferRegion(buffer->getResource(), 0, uploadHeap->getResource(), 0, size);
+
+	ib->uploadHeapIndex = (ib->uploadHeapIndex + 1) % Graphics::FrameBufferCount;
 }
 
 void RenderPass::setGlobalIndexBuffer(const IndexConstantBuffer* const indexBuffer)
