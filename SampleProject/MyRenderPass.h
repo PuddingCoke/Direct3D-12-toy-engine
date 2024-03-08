@@ -11,15 +11,6 @@ public:
 
 	MyRenderPass()
 	{
-		begin();
-
-		myTexture = CreateTextureRenderTarget(TEXTURE_VIEW_CREATE_SRV, "est.png",
-			DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, false);
-
-		end();
-
-		RenderEngine::get()->submitRenderPass(this);
-
 		vertexShader = new Shader(Utils::getRootFolder() + "VertexShader.cso");
 
 		pixelShader = new Shader(Utils::getRootFolder() + "PixelShader.cso");
@@ -37,7 +28,7 @@ public:
 			desc.SampleMask = UINT_MAX;
 			desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 			desc.NumRenderTargets = 1;
-			desc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
+			desc.RTVFormats[0] = Graphics::getBackBufferFormat();
 			desc.SampleDesc.Count = 1;
 
 			GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&pipelineState));
@@ -46,7 +37,6 @@ public:
 
 	~MyRenderPass()
 	{
-		delete myTexture;
 		delete vertexShader;
 		delete pixelShader;
 	}
@@ -69,8 +59,6 @@ protected:
 	}
 
 private:
-
-	TextureRenderTarget* myTexture;
 
 	ComPtr<ID3D12PipelineState> pipelineState;
 

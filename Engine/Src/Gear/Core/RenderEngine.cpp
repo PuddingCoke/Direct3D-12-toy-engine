@@ -191,6 +191,10 @@ void RenderEngine::begin()
 
 		perFrameResource.matrices = Camera::matrices;
 
+		perFrameResource.screenSize = DirectX::XMFLOAT2(Graphics::getWidth(), Graphics::getHeight());
+
+		perFrameResource.screenTexelSize = DirectX::XMFLOAT2(1.f / Graphics::getWidth(), 1.f / Graphics::getHeight());
+
 		RenderPass::globalConstantBuffer->update(&perFrameResource, sizeof(PerFrameResource));
 	}
 }
@@ -348,12 +352,16 @@ RenderEngine::RenderEngine(const HWND hwnd) :
 		ConstantBuffer::bufferPools[2] = new ConstantBufferPool(1024, 1024);
 	}
 
+	Shader::createGlobalShaders();
+
 	{
+		Graphics::backBufferFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
+
 		DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
 		swapChainDesc.BufferCount = Graphics::FrameBufferCount;
 		swapChainDesc.Width = Graphics::getWidth();
 		swapChainDesc.Height = Graphics::getHeight();
-		swapChainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		swapChainDesc.Format = Graphics::getBackBufferFormat();
 		swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 		swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 		swapChainDesc.SampleDesc.Count = 1;
@@ -428,6 +436,8 @@ RenderEngine::~RenderEngine()
 	{
 		delete RenderPass::globalConstantBuffer;
 	}
+
+	Shader::releaseGlobalShaders();
 
 	if (beginCommandlist)
 	{

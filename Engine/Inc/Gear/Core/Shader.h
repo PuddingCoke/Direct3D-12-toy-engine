@@ -7,6 +7,8 @@
 
 #include<Gear/Utils/Utils.h>
 
+#include<Gear/CompiledShaders/FullScreenVS.h>
+
 class Shader
 {
 public:
@@ -17,11 +19,19 @@ public:
 
 	D3D12_SHADER_BYTECODE getByteCode() const;
 
+	static Shader* fullScreenVS;
+
 private:
+
+	friend class RenderEngine;
 
 	D3D12_SHADER_BYTECODE shaderByteCode;
 
-	std::vector<char> codes;
+	std::vector<BYTE> codes;
+
+	static void createGlobalShaders();
+
+	static void releaseGlobalShaders();
 
 };
 

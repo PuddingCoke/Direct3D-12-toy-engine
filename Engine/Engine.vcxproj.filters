@@ -237,4 +237,10 @@
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Shaders\FullScreen\FullScreenVS.hlsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shaders\Common.hlsli" />
+  </ItemGroup>
 </Project>

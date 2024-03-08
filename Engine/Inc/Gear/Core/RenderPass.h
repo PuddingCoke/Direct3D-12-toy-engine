@@ -39,11 +39,11 @@ protected:
 
 	TextureDepthStencil* CreateTextureDepthStencil(const UINT width, const UINT height, const DXGI_FORMAT resFormat, const UINT arraySize, const UINT mipLevels, const bool isTextureCube);
 
-	TextureRenderTarget* CreateTextureRenderTarget(const int flags, const UINT width, const UINT height, const DXGI_FORMAT resFormat, const UINT arraySize, const UINT mipLevels,
-		const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat, const bool isTextureCube);
+	TextureRenderTarget* CreateTextureRenderTarget(const UINT width, const UINT height, const DXGI_FORMAT resFormat, const UINT arraySize, const UINT mipLevels, const bool isTextureCube,
+		const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat);
 
-	TextureRenderTarget* CreateTextureRenderTarget(const int flags, const std::string filePath,
-		const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat, const bool isTextureCube);
+	TextureRenderTarget* CreateTextureRenderTarget(const std::string filePath, const bool isTextureCube,
+		const DXGI_FORMAT srvFormat = DXGI_FORMAT_UNKNOWN, const DXGI_FORMAT uavFormat = DXGI_FORMAT_UNKNOWN, const DXGI_FORMAT rtvFormat = DXGI_FORMAT_UNKNOWN);
 
 	//per frame global resources transition immediate
 	void setGlobalIndexBuffer(const IndexConstantBuffer* const indexBuffer);
@@ -87,13 +87,13 @@ protected:
 
 	void finishGraphicsStageIndexBuffer();
 
-	void setRenderTargets(const std::initializer_list<RenderTargetDesc>& renderTargets,const std::initializer_list<DepthStencilDesc>& depthStencils);
+	void setRenderTargets(const std::initializer_list<RenderTargetDesc>& renderTargets, const std::initializer_list<DepthStencilDesc>& depthStencils);
 
 	void setDefRenderTarget() const;
 
 	void clearDefRenderTarget(const FLOAT clearValue[4]) const;
 
-	void setVertexBuffers(const UINT startSlot,const std::initializer_list<VertexBuffer*>& vertexBuffers);
+	void setVertexBuffers(const UINT startSlot, const std::initializer_list<VertexBuffer*>& vertexBuffers);
 
 	void setIndexBuffers(const std::initializer_list<IndexBuffer*>& indexBuffers);
 
@@ -113,6 +113,8 @@ protected:
 
 	void clearDepthStencil(const DepthStencilDesc desc, const D3D12_CLEAR_FLAGS flags, const FLOAT depth, const UINT8 stencil);
 
+	void uavBarrier(std::initializer_list<Resource*> resources);
+
 	void draw(const UINT vertexCountPerInstance, const UINT instanceCount, const UINT startVertexLocation, const UINT startInstanceLocation);
 
 	void begin();
@@ -131,7 +133,7 @@ private:
 
 	void flushTransitionResources();
 
-	void pushGraphicsStageIndexBuffer(UINT rootParameterIndex, const IndexConstantBuffer* const indexBuffer,const UINT targetSRVState);
+	void pushGraphicsStageIndexBuffer(UINT rootParameterIndex, const IndexConstantBuffer* const indexBuffer, const UINT targetSRVState);
 
 	void pushResourceTrackList(Texture* const texture);
 

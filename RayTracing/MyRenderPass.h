@@ -14,11 +14,10 @@ class MyRenderPass :public RenderPass
 public:
 
 	MyRenderPass() :
-		fullScreenVS(new Shader(Utils::getRootFolder() + "FullScreenVS.cso")),
 		accumulateShader(new Shader(Utils::getRootFolder() + "AccumulateShader.cso")),
 		displayShader(new Shader(Utils::getRootFolder() + "DisplayShader.cso")),
-		accumulatedTexture(new TextureRenderTarget(TEXTURE_VIEW_CREATE_RTV | TEXTURE_VIEW_CREATE_SRV, 1920, 1080, DXGI_FORMAT_R16G16B16A16_UNORM,
-			1, 1, DXGI_FORMAT_R16G16B16A16_UNORM, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_R16G16B16A16_UNORM, false)),
+		accumulatedTexture(CreateTextureRenderTarget(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R16G16B16A16_UNORM, 1, 1, false,
+			DXGI_FORMAT_R16G16B16A16_UNORM, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_R16G16B16A16_UNORM)),
 		cameraParam{ 0.25f,0.0f,12.0f },
 		accumulateParam{ 0,0.f }
 	{
@@ -38,7 +37,7 @@ public:
 			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = {};
 			desc.InputLayout = {};
 			desc.pRootSignature = GlobalRootSignature::getGraphicsRootSignature()->get();
-			desc.VS = fullScreenVS->getByteCode();
+			desc.VS = Shader::fullScreenVS->getByteCode();
 			desc.PS = accumulateShader->getByteCode();
 			desc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
 			desc.BlendState = blendDesc;
@@ -57,7 +56,7 @@ public:
 			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = {};
 			desc.InputLayout = {};
 			desc.pRootSignature = GlobalRootSignature::getGraphicsRootSignature()->get();
-			desc.VS = fullScreenVS->getByteCode();
+			desc.VS = Shader::fullScreenVS->getByteCode();
 			desc.PS = displayShader->getByteCode();
 			desc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
 			desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
@@ -66,7 +65,7 @@ public:
 			desc.SampleMask = UINT_MAX;
 			desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 			desc.NumRenderTargets = 1;
-			desc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
+			desc.RTVFormats[0] = Graphics::getBackBufferFormat();
 			desc.SampleDesc.Count = 1;
 
 			GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&displayState));
@@ -95,7 +94,6 @@ public:
 
 	~MyRenderPass()
 	{
-		delete fullScreenVS;
 		delete accumulateShader;
 		delete displayShader;
 		delete accumulatedTexture;
@@ -111,9 +109,9 @@ protected:
 
 		setTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-		setViewport(1920u, 1080u);
+		setViewport(Graphics::getWidth(), Graphics::getHeight());
 
-		setScissorRect(0.f, 0.f, 1920.f, 1080.f);
+		setScissorRect(0.f, 0.f, static_cast<float>(Graphics::getWidth()), static_cast<float>(Graphics::getHeight()));
 
 		setPipelineState(accumulateState.Get());
 
@@ -135,8 +133,6 @@ protected:
 	}
 
 private:
-
-	Shader* fullScreenVS;
 
 	Shader* accumulateShader;
 

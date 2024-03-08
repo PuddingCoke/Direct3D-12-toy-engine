@@ -6,6 +6,7 @@
 #include<Gear/Core/RenderPass.h>
 #include<Gear/Core/Graphics.h>
 #include<Gear/Core/Camera.h>
+#include<Gear/Core/Shader.h>
 
 #include<iostream>
 #include<dxgi1_6.h>
@@ -70,7 +71,9 @@ private:
 	{
 		Graphics::Time time;
 		Camera::CameraMatrices matrices;
-		DirectX::XMFLOAT4 padding[10];
+		DirectX::XMFLOAT2 screenSize;
+		DirectX::XMFLOAT2 screenTexelSize;
+		DirectX::XMFLOAT4 padding[41];
 	} perFrameResource;
 
 };
