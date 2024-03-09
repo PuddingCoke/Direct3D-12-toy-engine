@@ -22,6 +22,8 @@ IndexBuffer::IndexBuffer(const DXGI_FORMAT format, const UINT size, const bool c
 
 IndexBuffer::IndexBuffer(const IndexBuffer& ib) :
 	indexBufferView(ib.indexBufferView),
+	uploadHeaps(ib.uploadHeaps),
+	uploadHeapIndex(ib.uploadHeapIndex),
 	buffer(new Buffer(*(ib.buffer)))
 {
 }

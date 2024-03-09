@@ -2,7 +2,7 @@
 
 std::future<void> RenderPass::getPassResult()
 {
-	return std::async(std::launch::async, [&]
+	return std::async(std::launch::async, [this]
 		{
 			begin();
 
@@ -30,11 +30,11 @@ RenderPass::~RenderPass()
 		delete transitionCMD;
 	}
 
-	for (std::vector<Resource*>& transientPool : transientResources)
+	for (const std::vector<Resource*>& transientPool : transientResources)
 	{
 		if (transientPool.size())
 		{
-			for (Resource* res : transientPool)
+			for (const Resource* const res : transientPool)
 			{
 				delete res;
 			}
@@ -84,7 +84,7 @@ TextureRenderTarget* RenderPass::CreateTextureRenderTarget(const std::string fil
 
 void RenderPass::begin()
 {
-	for (Resource* res : transientResources[Graphics::getFrameIndex()])
+	for (const Resource* const res : transientResources[Graphics::getFrameIndex()])
 	{
 		delete res;
 	}
@@ -94,7 +94,7 @@ void RenderPass::begin()
 	context->begin();
 }
 
-void RenderPass::end()
+void RenderPass::end() const
 {
 	context->end();
 }

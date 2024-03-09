@@ -35,7 +35,7 @@ private:
 
 	friend class RenderEngine;
 
-	static std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> backBufferHandles;
+	static D3D12_CPU_DESCRIPTOR_HANDLE backBufferHandles[FrameBufferCount];
 
 	static DXGI_FORMAT backBufferFormat;
 

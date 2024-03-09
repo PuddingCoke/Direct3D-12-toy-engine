@@ -49,7 +49,7 @@ protected:
 
 	void begin();
 
-	void end();
+	void end() const;
 
 	virtual void recordCommand() = 0;
 

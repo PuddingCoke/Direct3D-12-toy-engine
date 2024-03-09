@@ -49,7 +49,7 @@ ConstantBuffer::ConstantBuffer(const UINT size, const bool cpuWritable, const vo
 
 		buffer = new Buffer(size, false, data, commandList, transientResourcePool, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
 
-		poolIndex = 0;
+		poolIndex = UINT_MAX;
 
 		D3D12_CONSTANT_BUFFER_VIEW_DESC desc = {};
 		desc.BufferLocation = buffer->getGPUAddress();
@@ -65,7 +65,7 @@ ConstantBuffer::ConstantBuffer(const UINT size, const bool cpuWritable, const vo
 	}
 }
 
-void ConstantBuffer::update(const void* const data, const UINT size)
+void ConstantBuffer::update(const void* const data, const UINT size) const
 {
 	bufferPools[poolIndex]->updateSubRegion(bufferIndex, data, size);
 }

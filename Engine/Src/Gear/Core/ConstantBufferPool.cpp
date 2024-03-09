@@ -70,6 +70,8 @@ ConstantBufferPool::~ConstantBufferPool()
 
 ConstantBufferPool::AvailableDescriptor ConstantBufferPool::requestAvailableDescriptor()
 {
+	std::lock_guard<std::mutex> lockGuard(availableIndicesLock);
+
 	UINT index = availableIndices.back();
 
 	availableIndices.pop_back();
@@ -83,6 +85,8 @@ ConstantBufferPool::AvailableDescriptor ConstantBufferPool::requestAvailableDesc
 
 void ConstantBufferPool::retrieveUsedDescriptor(const UINT descriptorIndex)
 {
+	std::lock_guard<std::mutex> lockGuard(availableIndicesLock);
+
 	availableIndices.push_back(descriptorIndex);
 }
 

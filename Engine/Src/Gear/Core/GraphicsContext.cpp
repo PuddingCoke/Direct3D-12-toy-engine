@@ -653,17 +653,17 @@ void GraphicsContext::setPipelineState(ID3D12PipelineState* const pipelineState)
 	commandList->get()->SetPipelineState(pipelineState);
 }
 
-void GraphicsContext::clearRenderTarget(const RenderTargetDesc desc, const FLOAT clearValue[4])
+void GraphicsContext::clearRenderTarget(const RenderTargetDesc desc, const FLOAT clearValue[4]) const
 {
 	commandList->get()->ClearRenderTargetView(desc.rtvHandle, clearValue, 0, nullptr);
 }
 
-void GraphicsContext::clearDepthStencil(const DepthStencilDesc desc, const D3D12_CLEAR_FLAGS flags, const FLOAT depth, const UINT8 stencil)
+void GraphicsContext::clearDepthStencil(const DepthStencilDesc desc, const D3D12_CLEAR_FLAGS flags, const FLOAT depth, const UINT8 stencil) const
 {
 	commandList->get()->ClearDepthStencilView(desc.dsvHandle, flags, depth, stencil, 0, nullptr);
 }
 
-void GraphicsContext::uavBarrier(const std::initializer_list<Resource*>& resources)
+void GraphicsContext::uavBarrier(const std::initializer_list<Resource*>& resources) const
 {
 	std::vector<D3D12_RESOURCE_BARRIER> barriers;
 
@@ -680,12 +680,12 @@ void GraphicsContext::uavBarrier(const std::initializer_list<Resource*>& resourc
 	commandList->get()->ResourceBarrier(barriers.size(), barriers.data());
 }
 
-void GraphicsContext::draw(const UINT vertexCountPerInstance, const UINT instanceCount, const UINT startVertexLocation, const UINT startInstanceLocation)
+void GraphicsContext::draw(const UINT vertexCountPerInstance, const UINT instanceCount, const UINT startVertexLocation, const UINT startInstanceLocation) const
 {
 	commandList->get()->DrawInstanced(vertexCountPerInstance, instanceCount, startVertexLocation, startInstanceLocation);
 }
 
-void GraphicsContext::begin()
+void GraphicsContext::begin() const
 {
 	commandList->reset();
 
@@ -700,7 +700,7 @@ void GraphicsContext::begin()
 	commandList->get()->SetComputeRootConstantBufferView(0, globalConstantBuffer->getGPUAddress());
 }
 
-void GraphicsContext::end()
+void GraphicsContext::end() const
 {
 	commandList->get()->Close();
 }
