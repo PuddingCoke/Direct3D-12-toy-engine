@@ -7,7 +7,7 @@
 #include<Gear/Core/DX/Resource/Buffer.h>
 #include<Gear/Core/DX/Resource/UploadHeap.h>
 
-#include<list>
+#include<mutex>
 
 class ConstantBufferPool
 {
@@ -33,7 +33,7 @@ private:
 
 	friend class RenderEngine;
 
-	std::list<UINT> availableIndices;
+	std::vector<UINT> availableIndices;
 
 	Buffer* buffer;
 
@@ -48,6 +48,8 @@ private:
 	const UINT subRegionSize;
 
 	const UINT subRegionNum;
+
+	std::mutex availableIndicesLock;
 
 };
 

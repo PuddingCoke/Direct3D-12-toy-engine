@@ -22,13 +22,15 @@ VertexBuffer::VertexBuffer(const UINT perVertexSize, const UINT size, const bool
 
 VertexBuffer::VertexBuffer(const VertexBuffer& vb) :
 	vertexBufferView(vb.vertexBufferView),
+	uploadHeaps(vb.uploadHeaps),
+	uploadHeapIndex(vb.uploadHeapIndex),
 	buffer(new Buffer(*(vb.buffer)))
 {
 }
 
 VertexBuffer::~VertexBuffer()
 {
-	if (buffer) 
+	if (buffer)
 	{
 		delete buffer;
 	}
@@ -49,7 +51,7 @@ D3D12_VERTEX_BUFFER_VIEW VertexBuffer::getVertexBufferView() const
 	return vertexBufferView;
 }
 
-Buffer* VertexBuffer::getBuffer()
+Buffer* VertexBuffer::getBuffer() const
 {
 	return buffer;
 }

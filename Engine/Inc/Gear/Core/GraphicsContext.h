@@ -68,6 +68,7 @@ public:
 	//per draw call transition deferred
 	void setAmplificationIndexBuffer(const IndexConstantBuffer* const indexBuffer);
 
+	//must call this after bind per shader index constant buffer
 	void finishGraphicsStageIndexBuffer();
 
 	void setRenderTargets(const std::initializer_list<RenderTargetDesc>& renderTargets, const std::initializer_list<DepthStencilDesc>& depthStencils);
@@ -92,17 +93,17 @@ public:
 
 	void setPipelineState(ID3D12PipelineState* const pipelineState) const;
 
-	void clearRenderTarget(const RenderTargetDesc desc, const FLOAT clearValue[4]);
+	void clearRenderTarget(const RenderTargetDesc desc, const FLOAT clearValue[4]) const;
 
-	void clearDepthStencil(const DepthStencilDesc desc, const D3D12_CLEAR_FLAGS flags, const FLOAT depth, const UINT8 stencil);
+	void clearDepthStencil(const DepthStencilDesc desc, const D3D12_CLEAR_FLAGS flags, const FLOAT depth, const UINT8 stencil) const;
 
-	void uavBarrier(const std::initializer_list<Resource*>& resources);
+	void uavBarrier(const std::initializer_list<Resource*>& resources) const;
 
-	void draw(const UINT vertexCountPerInstance, const UINT instanceCount, const UINT startVertexLocation, const UINT startInstanceLocation);
+	void draw(const UINT vertexCountPerInstance, const UINT instanceCount, const UINT startVertexLocation, const UINT startInstanceLocation) const;
 
-	void begin();
+	void begin() const;
 
-	void end();
+	void end() const;
 
 	CommandList* getCommandList() const;
 

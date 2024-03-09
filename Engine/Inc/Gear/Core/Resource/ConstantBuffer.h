@@ -18,7 +18,7 @@ public:
 
 	void operator=(const ConstantBuffer&) = delete;
 
-	void update(const void* const data, const UINT size);
+	void update(const void* const data, const UINT size) const;
 
 	~ConstantBuffer();
 
@@ -40,7 +40,7 @@ private:
 
 	Buffer* buffer;
 
-	static ConstantBufferPool* bufferPools[3];
+	static ConstantBufferPool* bufferPools[Graphics::FrameBufferCount];
 
 };
 
