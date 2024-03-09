@@ -155,6 +155,7 @@
     <ClInclude Include="Inc\Gear\Core\DX\Resource\UploadHeap.h" />
     <ClInclude Include="Inc\Gear\Core\GlobalDescriptorHeap.h" />
     <ClInclude Include="Inc\Gear\Core\GlobalRootSignature.h" />
+    <ClInclude Include="Inc\Gear\Core\GraphicsContext.h" />
     <ClInclude Include="Inc\Gear\Core\GraphicsDevice.h" />
     <ClInclude Include="Inc\Gear\Core\Graphics.h" />
     <ClInclude Include="Inc\Gear\Core\RenderEngine.h" />
@@ -186,6 +187,7 @@
     <ClCompile Include="Src\Gear\Core\DescriptorHeap.cpp" />
     <ClCompile Include="Src\Gear\Core\GlobalDescriptorHeap.cpp" />
     <ClCompile Include="Src\Gear\Core\GlobalRootSignature.cpp" />
+    <ClCompile Include="Src\Gear\Core\GraphicsContext.cpp" />
     <ClCompile Include="Src\Gear\Core\RenderEngine.cpp" />
     <ClCompile Include="Src\Gear\Core\RenderPass.cpp" />
     <ClCompile Include="Src\Gear\Core\DX\Resource\Texture.cpp" />

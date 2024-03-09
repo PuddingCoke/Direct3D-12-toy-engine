@@ -45,17 +45,17 @@ protected:
 
 	void recordCommand() override
 	{
-		setDefRenderTarget();
+		context->setDefRenderTarget();
 
-		setPipelineState(pipelineState.Get());
+		context->setPipelineState(pipelineState.Get());
 
-		setViewport(1920u, 1080u);
+		context->setViewport(1920u, 1080u);
 
-		setScissorRect(0.f, 0.f, 1920.f, 1080.f);
+		context->setScissorRect(0.f, 0.f, 1920.f, 1080.f);
 
-		setTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		context->setTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-		draw(3, 1, 0, 0);
+		context->draw(3, 1, 0, 0);
 	}
 
 private:

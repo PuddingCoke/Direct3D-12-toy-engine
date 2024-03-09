@@ -35,7 +35,7 @@ public:
 
 private:
 
-	friend class RenderPass;
+	friend class GraphicsContext;
 
 	ConstantBuffer* constantBuffer;
 

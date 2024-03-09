@@ -21,7 +21,7 @@ public:
 
 private:
 
-	friend class RenderPass;
+	friend class GraphicsContext;
 
 	D3D12_INDEX_BUFFER_VIEW indexBufferView;
 
