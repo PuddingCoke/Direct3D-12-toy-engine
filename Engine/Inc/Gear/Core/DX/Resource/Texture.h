@@ -73,7 +73,7 @@ private:
 
 	friend class RenderEngine;
 
-	friend class RenderPass;
+	friend class GraphicsContext;
 
 	UINT width;
 

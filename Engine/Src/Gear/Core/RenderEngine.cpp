@@ -11,9 +11,9 @@ void RenderEngine::submitRenderPass(RenderPass* const pass)
 {
 	std::vector<D3D12_RESOURCE_BARRIER> barriers;
 
-	for (UINT bufferIdx = 0; bufferIdx < pass->pendingBufferBarrier.size(); bufferIdx++)
+	for (UINT bufferIdx = 0; bufferIdx < pass->context->pendingBufferBarrier.size(); bufferIdx++)
 	{
-		const PendingBufferBarrier pendingBarrier = pass->pendingBufferBarrier[bufferIdx];
+		const PendingBufferBarrier pendingBarrier = pass->context->pendingBufferBarrier[bufferIdx];
 
 		if ((*(pendingBarrier.buffer->globalState)) != pendingBarrier.afterState)
 		{
@@ -29,11 +29,11 @@ void RenderEngine::submitRenderPass(RenderPass* const pass)
 		}
 	}
 
-	pass->pendingBufferBarrier.clear();
+	pass->context->pendingBufferBarrier.clear();
 
-	for (UINT textureIdx = 0; textureIdx < pass->pendingTextureBarrier.size(); textureIdx++)
+	for (UINT textureIdx = 0; textureIdx < pass->context->pendingTextureBarrier.size(); textureIdx++)
 	{
-		const PendingTextureBarrier pendingBarrier = pass->pendingTextureBarrier[textureIdx];
+		const PendingTextureBarrier pendingBarrier = pass->context->pendingTextureBarrier[textureIdx];
 
 		if (pendingBarrier.mipSlice == D3D12_TRANSITION_ALL_MIPLEVELS)
 		{
@@ -138,7 +138,7 @@ void RenderEngine::submitRenderPass(RenderPass* const pass)
 		}
 	}
 
-	pass->pendingTextureBarrier.clear();
+	pass->context->pendingTextureBarrier.clear();
 
 	if (barriers.size() > 0)
 	{
@@ -149,14 +149,14 @@ void RenderEngine::submitRenderPass(RenderPass* const pass)
 		pass->transitionCMD->get()->Close();
 
 		commandLists.push_back(pass->transitionCMD->get());
-		commandLists.push_back(pass->renderCMD->get());
+		commandLists.push_back(pass->context->commandList->get());
 	}
 	else
 	{
-		commandLists.push_back(pass->renderCMD->get());
+		commandLists.push_back(pass->context->commandList->get());
 	}
 
-	pass->updateReferredResStates();
+	pass->context->updateReferredResStates();
 }
 
 void RenderEngine::processCommandLists()
@@ -195,7 +195,7 @@ void RenderEngine::begin()
 
 		perFrameResource.screenTexelSize = DirectX::XMFLOAT2(1.f / Graphics::getWidth(), 1.f / Graphics::getHeight());
 
-		RenderPass::globalConstantBuffer->update(&perFrameResource, sizeof(PerFrameResource));
+		GraphicsContext::globalConstantBuffer->update(&perFrameResource, sizeof(PerFrameResource));
 	}
 }
 
@@ -401,7 +401,7 @@ RenderEngine::RenderEngine(const HWND hwnd) :
 
 		commandLists.push_back(beginCommandlist->get());
 
-		RenderPass::globalConstantBuffer = new ConstantBuffer(sizeof(PerFrameResource), true, nullptr, nullptr, nullptr);
+		GraphicsContext::globalConstantBuffer = new ConstantBuffer(sizeof(PerFrameResource), true, nullptr, nullptr, nullptr);
 	}
 
 	{
@@ -432,9 +432,9 @@ RenderEngine::~RenderEngine()
 		delete GlobalRootSignature::instance;
 	}
 
-	if (RenderPass::globalConstantBuffer)
+	if (GraphicsContext::globalConstantBuffer)
 	{
-		delete RenderPass::globalConstantBuffer;
+		delete GraphicsContext::globalConstantBuffer;
 	}
 
 	Shader::releaseGlobalShaders();

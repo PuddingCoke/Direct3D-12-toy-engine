@@ -107,29 +107,29 @@ protected:
 
 		accumulateParam.floatSeed = Graphics::getTimeElapsed();
 
-		setTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		context->setTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-		setViewport(Graphics::getWidth(), Graphics::getHeight());
+		context->setViewport(Graphics::getWidth(), Graphics::getHeight());
 
-		setScissorRect(0.f, 0.f, static_cast<float>(Graphics::getWidth()), static_cast<float>(Graphics::getHeight()));
+		context->setScissorRect(0.f, 0.f, static_cast<float>(Graphics::getWidth()), static_cast<float>(Graphics::getHeight()));
 
-		setPipelineState(accumulateState.Get());
+		context->setPipelineState(accumulateState.Get());
 
-		setGraphicsConstants(2, &accumulateParam, 0);
+		context->setGraphicsConstants(2, &accumulateParam, 0);
 
-		setGraphicsConstants(3, &cameraParam, 2);
+		context->setGraphicsConstants(3, &cameraParam, 2);
 
-		setRenderTargets({ accumulatedTexture->getRTVMipHandle(0) }, {});
+		context->setRenderTargets({ accumulatedTexture->getRTVMipHandle(0) }, {});
 
-		draw(3, 1, 0, 0);
+		context->draw(3, 1, 0, 0);
 
-		setPipelineState(displayState.Get());
+		context->setPipelineState(displayState.Get());
 
-		setGraphicsConstants({ accumulatedTexture->getAllSRVIndex() }, 0);
+		context->setGraphicsConstants({ accumulatedTexture->getAllSRVIndex() }, 0);
 
-		setDefRenderTarget();
+		context->setDefRenderTarget();
 
-		draw(3, 1, 0, 0);
+		context->draw(3, 1, 0, 0);
 	}
 
 private:

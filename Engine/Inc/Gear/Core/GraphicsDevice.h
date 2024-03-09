@@ -24,8 +24,6 @@ __debugbreak();\
 }\
 }\
 
-#define ALIGN(value) ((value + 255) & ~255)
-
 class GraphicsDevice
 {
 public:

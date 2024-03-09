@@ -7,10 +7,10 @@ struct Indices
 
 ConstantBuffer<Indices> indicesData : register(b1);
 
+static const Texture2D<float4> tex = ResourceDescriptorHeap[indicesData.textureIdx];
+
 float4 main(float2 texCoord : TEXCOORD) : SV_TARGET
 {
-    Texture2D<float4> tex = ResourceDescriptorHeap[indicesData.textureIdx];
-    
     float3 color = tex.Sample(linearClampSampler, texCoord).rgb;
     
     color.rgb = pow(color.rgb, 1.0 / 2.2);

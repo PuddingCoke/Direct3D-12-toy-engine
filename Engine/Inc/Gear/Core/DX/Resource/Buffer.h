@@ -46,7 +46,7 @@ private:
 
 	friend class RenderEngine;
 
-	friend class RenderPass;
+	friend class GraphicsContext;
 
 	std::shared_ptr<UINT> globalState;
 
