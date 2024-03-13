@@ -1,6 +1,6 @@
 #include<Gear/Core/Resource/TextureRenderTarget.h>
 
-TextureRenderTarget::TextureRenderTarget(const UINT width, const UINT height, const DXGI_FORMAT resFormat, const UINT arraySize, const UINT mipLevels, const bool isTextureCube,
+TextureRenderTarget::TextureRenderTarget(const UINT width, const UINT height, const DXGI_FORMAT resFormat, const UINT arraySize, const UINT mipLevels, const bool isTextureCube, const bool persistent,
 	const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat)
 {
 	const bool hasRTV = (rtvFormat != DXGI_FORMAT_UNKNOWN);
@@ -30,10 +30,10 @@ TextureRenderTarget::TextureRenderTarget(const UINT width, const UINT height, co
 	//stateTracking must be true because use this method to create a texture must combine SRV with other flags(UAV or RTV)
 	texture = new Texture(width, height, resFormat, arraySize, mipLevels, true, resFlags);
 
-	createViews(srvFormat, uavFormat, rtvFormat, isTextureCube);
+	createViews(srvFormat, uavFormat, rtvFormat, isTextureCube, persistent);
 }
 
-TextureRenderTarget::TextureRenderTarget(const std::string filePath, ID3D12GraphicsCommandList6* commandList, std::vector<Resource*>* transientResourcePool, const bool isTextureCube,
+TextureRenderTarget::TextureRenderTarget(const std::string filePath, ID3D12GraphicsCommandList6* commandList, std::vector<Resource*>* transientResourcePool, const bool isTextureCube, const bool persistent,
 	const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat)
 {
 	const bool hasRTV = (rtvFormat != DXGI_FORMAT_UNKNOWN);
@@ -63,18 +63,18 @@ TextureRenderTarget::TextureRenderTarget(const std::string filePath, ID3D12Graph
 
 	if (srvFormat == DXGI_FORMAT_UNKNOWN)
 	{
-		createViews(texture->getFormat(), DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, isTextureCube);
+		createViews(texture->getFormat(), DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, isTextureCube, persistent);
 	}
 	else
 	{
-		createViews(srvFormat, uavFormat, rtvFormat, isTextureCube);
+		createViews(srvFormat, uavFormat, rtvFormat, isTextureCube, persistent);
 	}
 }
 
 TextureRenderTarget::TextureRenderTarget(const TextureRenderTarget& trt) :
 	allSRVIndex(trt.allSRVIndex),
-	srvSliceStart(trt.srvSliceStart),
-	uavSliceStart(trt.uavSliceStart),
+	srvMipIndexStart(trt.srvMipIndexStart),
+	uavMipIndexStart(trt.uavMipIndexStart),
 	rtvMipHandles(trt.rtvMipHandles),
 	texture(new Texture(*(trt.texture)))
 {
@@ -107,7 +107,7 @@ ShaderResourceDesc TextureRenderTarget::getSRVMipIndex(const UINT mipSlice) cons
 	desc.state = ShaderResourceDesc::SRV;
 	desc.textureDesc.texture = texture;
 	desc.textureDesc.mipSlice = mipSlice;
-	desc.textureDesc.resourceIndex = srvSliceStart + mipSlice;
+	desc.textureDesc.resourceIndex = srvMipIndexStart + mipSlice;
 
 	return desc;
 }
@@ -119,7 +119,7 @@ ShaderResourceDesc TextureRenderTarget::getUAVMipIndex(const UINT mipSlice) cons
 	desc.state = ShaderResourceDesc::UAV;
 	desc.textureDesc.texture = texture;
 	desc.textureDesc.mipSlice = mipSlice;
-	desc.textureDesc.resourceIndex = uavSliceStart + mipSlice;
+	desc.textureDesc.resourceIndex = uavMipIndexStart + mipSlice;
 
 	return desc;
 }
@@ -139,7 +139,20 @@ Texture* TextureRenderTarget::getTexture() const
 	return texture;
 }
 
-void TextureRenderTarget::createViews(const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat, const bool isTextureCube)
+void TextureRenderTarget::copyDescriptors()
+{
+	const DescriptorHandle handle = GlobalDescriptorHeap::getResourceHeap()->allocDynamicDescriptor(numSRVUAVDescriptors);
+
+	GraphicsDevice::get()->CopyDescriptorsSimple(numSRVUAVDescriptors, handle.getCPUHandle(), srvuavDescriptorHandleStart, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
+	allSRVIndex = handle.getCurrentIndex();
+
+	srvMipIndexStart = allSRVIndex + 1;
+
+	uavMipIndexStart = srvMipIndexStart + texture->getMipLevels();
+}
+
+void TextureRenderTarget::createViews(const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat, const bool isTextureCube, const bool persistent)
 {
 	const bool hasRTV = (rtvFormat != DXGI_FORMAT_UNKNOWN);
 	const bool hasUAV = (uavFormat != DXGI_FORMAT_UNKNOWN);
@@ -147,25 +160,30 @@ void TextureRenderTarget::createViews(const DXGI_FORMAT srvFormat, const DXGI_FO
 	//create srv uav descriptors
 	{
 		//plus 1 because there is a additional srv to acess all mipslices
-		const UINT srvuavDescriptorNum = 1 + texture->getMipLevels() + static_cast<UINT>(hasUAV) * texture->getMipLevels();
+		numSRVUAVDescriptors = 1 + texture->getMipLevels() + static_cast<UINT>(hasUAV) * texture->getMipLevels();
 
-		StaticDescriptorHandle descriptorHandle = GlobalDescriptorHeap::getResourceHeap()->allocStaticDescriptor(srvuavDescriptorNum);
+		DescriptorHandle descriptorHandle = DescriptorHandle();
 
-		allSRVIndex = descriptorHandle.getCurrentIndex();
-
-		srvSliceStart = allSRVIndex + 1;
-
-		if (hasUAV)
+		if (persistent)
 		{
-			uavSliceStart = srvSliceStart + texture->getMipLevels();
+			descriptorHandle = GlobalDescriptorHeap::getResourceHeap()->allocStaticDescriptor(numSRVUAVDescriptors);
 		}
 		else
 		{
-			uavSliceStart = UINT_MAX;
+			descriptorHandle = GlobalDescriptorHeap::getNonShaderVisibleResourceHeap()->allocDynamicDescriptor(numSRVUAVDescriptors);
+
+			srvuavDescriptorHandleStart = descriptorHandle.getCPUHandle();
 		}
+
+		allSRVIndex = descriptorHandle.getCurrentIndex();
+
+		srvMipIndexStart = allSRVIndex + 1;
+
+		uavMipIndexStart = srvMipIndexStart + texture->getMipLevels();
 
 		std::cout << "[class TextureRenderTarget] //////////\n";
 		std::cout << "[class TextureRenderTarget] stateTracking " << texture->getStateTracking() << "\n";
+		std::cout << "[class TextureRenderTarget] persistent " << persistent << "\n";
 
 		if (texture->getStateTracking())
 		{
@@ -177,11 +195,11 @@ void TextureRenderTarget::createViews(const DXGI_FORMAT srvFormat, const DXGI_FO
 		std::cout << "[class TextureRenderTarget] miplevels " << texture->getMipLevels() << "\n";
 		std::cout << "[class TextureRenderTarget] arraysize " << texture->getArraySize() << "\n";
 		std::cout << "[class TextureRenderTarget] all srv index " << allSRVIndex << "\n";
-		std::cout << "[class TextureRenderTarget] srv slice start " << srvSliceStart << "\n";
+		std::cout << "[class TextureRenderTarget] srv slice start " << srvMipIndexStart << "\n";
 
 		if (texture->getStateTracking())
 		{
-			std::cout << "[class TextureRenderTarget] uav slice start " << uavSliceStart << "\n";
+			std::cout << "[class TextureRenderTarget] uav slice start " << uavMipIndexStart << "\n";
 		}
 
 		std::cout << "[class TextureRenderTarget] //////////\n";
@@ -379,7 +397,18 @@ void TextureRenderTarget::createViews(const DXGI_FORMAT srvFormat, const DXGI_FO
 	//create rtv descriptor
 	if (hasRTV)
 	{
-		StaticDescriptorHandle descriptorHandle = GlobalDescriptorHeap::getRenderTargetHeap()->allocStaticDescriptor(texture->getMipLevels());
+		DescriptorHandle descriptorHandle = DescriptorHandle();
+
+		rtvMipHandles = std::vector<D3D12_CPU_DESCRIPTOR_HANDLE>(texture->getMipLevels());
+
+		if (persistent)
+		{
+			descriptorHandle = GlobalDescriptorHeap::getRenderTargetHeap()->allocStaticDescriptor(texture->getMipLevels());
+		}
+		else
+		{
+			descriptorHandle = GlobalDescriptorHeap::getRenderTargetHeap()->allocDynamicDescriptor(texture->getMipLevels());
+		}
 
 		if (texture->getArraySize() > 1)
 		{
@@ -395,7 +424,7 @@ void TextureRenderTarget::createViews(const DXGI_FORMAT srvFormat, const DXGI_FO
 
 				GraphicsDevice::get()->CreateRenderTargetView(texture->getResource(), &desc, descriptorHandle.getCPUHandle());
 
-				rtvMipHandles.push_back(descriptorHandle.getCPUHandle());
+				rtvMipHandles[i] = descriptorHandle.getCPUHandle();
 
 				descriptorHandle.move();
 			}
@@ -412,7 +441,7 @@ void TextureRenderTarget::createViews(const DXGI_FORMAT srvFormat, const DXGI_FO
 
 				GraphicsDevice::get()->CreateRenderTargetView(texture->getResource(), &desc, descriptorHandle.getCPUHandle());
 
-				rtvMipHandles.push_back(descriptorHandle.getCPUHandle());
+				rtvMipHandles[i] = descriptorHandle.getCPUHandle();
 
 				descriptorHandle.move();
 			}

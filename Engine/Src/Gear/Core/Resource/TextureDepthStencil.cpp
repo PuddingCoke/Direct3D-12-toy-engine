@@ -1,6 +1,6 @@
 #include<Gear/Core/Resource/TextureDepthStencil.h>
 
-TextureDepthStencil::TextureDepthStencil(const UINT width, const UINT height, const DXGI_FORMAT resFormat, const UINT arraySize, const UINT mipLevels, const bool isTextureCube)
+TextureDepthStencil::TextureDepthStencil(const UINT width, const UINT height, const DXGI_FORMAT resFormat, const UINT arraySize, const UINT mipLevels, const bool isTextureCube, const bool persistent)
 {
 	texture = new Texture(width, height, resFormat, arraySize, mipLevels, true, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL);
 
@@ -37,7 +37,18 @@ TextureDepthStencil::TextureDepthStencil(const UINT width, const UINT height, co
 
 	//create dsvs
 	{
-		StaticDescriptorHandle descriptorHandle = GlobalDescriptorHeap::getDepthStencilHeap()->allocStaticDescriptor(mipLevels);
+		DescriptorHandle descriptorHandle = DescriptorHandle();
+
+		dsvMipHandles = std::vector<D3D12_CPU_DESCRIPTOR_HANDLE>(mipLevels);
+
+		if (persistent)
+		{
+			descriptorHandle = GlobalDescriptorHeap::getDepthStencilHeap()->allocStaticDescriptor(mipLevels);
+		}
+		else
+		{
+			descriptorHandle = GlobalDescriptorHeap::getDepthStencilHeap()->allocDynamicDescriptor(mipLevels);
+		}
 
 		for (UINT i = 0; i < mipLevels; i++)
 		{
@@ -52,7 +63,7 @@ TextureDepthStencil::TextureDepthStencil(const UINT width, const UINT height, co
 
 				GraphicsDevice::get()->CreateDepthStencilView(texture->getResource(), &desc, descriptorHandle.getCPUHandle());
 
-				dsvMipHandles.push_back(descriptorHandle.getCPUHandle());
+				dsvMipHandles[i]=descriptorHandle.getCPUHandle();
 
 				descriptorHandle.move();
 			}
@@ -65,7 +76,7 @@ TextureDepthStencil::TextureDepthStencil(const UINT width, const UINT height, co
 
 				GraphicsDevice::get()->CreateDepthStencilView(texture->getResource(), &desc, descriptorHandle.getCPUHandle());
 
-				dsvMipHandles.push_back(descriptorHandle.getCPUHandle());
+				dsvMipHandles[i] = descriptorHandle.getCPUHandle();
 
 				descriptorHandle.move();
 			}
@@ -75,24 +86,28 @@ TextureDepthStencil::TextureDepthStencil(const UINT width, const UINT height, co
 	//create depth and stencil srvs
 	{
 		//acquire descriptor size = stencil descriptor size + depth descriptor size
-		const UINT descriptorNum = static_cast<UINT>((stencilSRVFormat != DXGI_FORMAT_UNKNOWN)) * (1 + mipLevels) + (1 + mipLevels);
+		numSRVDescriptors = static_cast<UINT>((stencilSRVFormat != DXGI_FORMAT_UNKNOWN)) * (1 + mipLevels) + (1 + mipLevels);
 
-		StaticDescriptorHandle descriptorHandle = GlobalDescriptorHeap::getResourceHeap()->allocStaticDescriptor(descriptorNum);
+		DescriptorHandle descriptorHandle = DescriptorHandle();
 
-		allDepthIndex = descriptorHandle.getCurrentIndex();
-
-		depthSliceStart = allDepthIndex + 1;
-
-		if (stencilSRVFormat != DXGI_FORMAT_UNKNOWN)
+		if (persistent)
 		{
-			allStencilIndex = depthSliceStart + mipLevels;
-			stencilSliceStart = allStencilIndex + 1;
+			descriptorHandle = GlobalDescriptorHeap::getResourceHeap()->allocStaticDescriptor(numSRVDescriptors);
 		}
 		else
 		{
-			allStencilIndex = UINT_MAX;
-			stencilSliceStart = UINT_MAX;
+			descriptorHandle = GlobalDescriptorHeap::getNonShaderVisibleResourceHeap()->allocDynamicDescriptor(numSRVDescriptors);
+
+			srvDescriptorHandleStart = descriptorHandle.getCPUHandle();
 		}
+
+		allDepthIndex = descriptorHandle.getCurrentIndex();
+
+		depthMipIndexStart = allDepthIndex + 1;
+
+		allStencilIndex = depthMipIndexStart + mipLevels;
+
+		stencilMipIndexStart = allStencilIndex + 1;
 
 		std::cout << "[class TextureDepthStencil] //////////\n";
 		std::cout << "[class TextureDepthStencil] Resource format " << resFormat << "\n";
@@ -101,9 +116,9 @@ TextureDepthStencil::TextureDepthStencil(const UINT width, const UINT height, co
 		std::cout << "[class TextureDepthStencil] DSV format " << dsvFormat << "\n";
 		std::cout << "[class TextureDepthStencil] miplevels " << texture->getMipLevels() << "\n";
 		std::cout << "[class TextureDepthStencil] all depth index " << allDepthIndex << "\n";
-		std::cout << "[class TextureDepthStencil] depth slice start " << depthSliceStart << "\n";
+		std::cout << "[class TextureDepthStencil] depth slice start " << depthMipIndexStart << "\n";
 		std::cout << "[class TextureDepthStencil] all stencil start " << allStencilIndex << "\n";
-		std::cout << "[class TextureDepthStencil] stencil slice start " << stencilSliceStart << "\n";
+		std::cout << "[class TextureDepthStencil] stencil slice start " << stencilMipIndexStart << "\n";
 		std::cout << "[class TextureDepthStencil] //////////\n";
 
 		//create depth srvs
@@ -404,8 +419,8 @@ TextureDepthStencil::TextureDepthStencil(const UINT width, const UINT height, co
 TextureDepthStencil::TextureDepthStencil(const TextureDepthStencil& tds) :
 	allDepthIndex(tds.allDepthIndex),
 	allStencilIndex(tds.allStencilIndex),
-	depthSliceStart(tds.depthSliceStart),
-	stencilSliceStart(tds.stencilSliceStart),
+	depthMipIndexStart(tds.depthMipIndexStart),
+	stencilMipIndexStart(tds.stencilMipIndexStart),
 	dsvMipHandles(tds.dsvMipHandles),
 	texture(new Texture(*(tds.texture)))
 {
@@ -450,7 +465,7 @@ ShaderResourceDesc TextureDepthStencil::getDepthMipIndex(const UINT mipSlice) co
 	desc.state = ShaderResourceDesc::SRV;
 	desc.textureDesc.texture = texture;
 	desc.textureDesc.mipSlice = mipSlice;
-	desc.textureDesc.resourceIndex = depthSliceStart + mipSlice;
+	desc.textureDesc.resourceIndex = depthMipIndexStart + mipSlice;
 
 	return desc;
 }
@@ -462,7 +477,7 @@ ShaderResourceDesc TextureDepthStencil::getStencilMipIndex(const UINT mipSlice) 
 	desc.state = ShaderResourceDesc::SRV;
 	desc.textureDesc.texture = texture;
 	desc.textureDesc.mipSlice = mipSlice;
-	desc.textureDesc.resourceIndex = stencilSliceStart + mipSlice;
+	desc.textureDesc.resourceIndex = stencilMipIndexStart + mipSlice;
 
 	return desc;
 }
@@ -480,4 +495,19 @@ DepthStencilDesc TextureDepthStencil::getDSVMipHandle(const UINT mipSlice) const
 Texture* TextureDepthStencil::getTexture() const
 {
 	return texture;
+}
+
+void TextureDepthStencil::copyDescriptors()
+{
+	const DescriptorHandle handle = GlobalDescriptorHeap::getResourceHeap()->allocDynamicDescriptor(numSRVDescriptors);
+
+	GraphicsDevice::get()->CopyDescriptorsSimple(numSRVDescriptors, handle.getCPUHandle(), srvDescriptorHandleStart, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
+	allDepthIndex = handle.getCurrentIndex();
+
+	depthMipIndexStart = allDepthIndex + 1;
+
+	allStencilIndex = depthMipIndexStart + texture->getMipLevels();
+
+	stencilMipIndexStart = allStencilIndex + 1;
 }

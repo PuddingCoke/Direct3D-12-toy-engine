@@ -61,7 +61,10 @@ void IndexConstantBuffer::setTransitionResources(const std::initializer_list<Sha
 
 IndexConstantBuffer::~IndexConstantBuffer()
 {
-	delete constantBuffer;
+	if (constantBuffer)
+	{
+		delete constantBuffer;
+	}
 }
 
 D3D12_GPU_VIRTUAL_ADDRESS IndexConstantBuffer::getGPUAddress() const

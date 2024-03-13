@@ -8,9 +8,11 @@ GlobalDescriptorHeap::GlobalDescriptorHeap()
 
 	samplerHeap = new DescriptorHeap(2048, 0, D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER, D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE);
 
-	renderTargetHeap = new DescriptorHeap(200000, 500, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, D3D12_DESCRIPTOR_HEAP_FLAG_NONE);
+	renderTargetHeap = new DescriptorHeap(300000, 10000, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, D3D12_DESCRIPTOR_HEAP_FLAG_NONE);
 
-	depthStencilHeap = new DescriptorHeap(200000, 500, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, D3D12_DESCRIPTOR_HEAP_FLAG_NONE);
+	depthStencilHeap = new DescriptorHeap(300000, 10000, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, D3D12_DESCRIPTOR_HEAP_FLAG_NONE);
+
+	nonShaderVisibleResourceHeap = new DescriptorHeap(1000000, 300000, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, D3D12_DESCRIPTOR_HEAP_FLAG_NONE);
 
 	std::cout << "[class GlobalDescriptorHeap] create global descriptor heaps succeeded\n";
 }
@@ -36,6 +38,11 @@ GlobalDescriptorHeap::~GlobalDescriptorHeap()
 	{
 		delete depthStencilHeap;
 	}
+
+	if (nonShaderVisibleResourceHeap)
+	{
+		delete nonShaderVisibleResourceHeap;
+	}
 }
 
 DescriptorHeap* GlobalDescriptorHeap::getResourceHeap()
@@ -56,4 +63,9 @@ DescriptorHeap* GlobalDescriptorHeap::getRenderTargetHeap()
 DescriptorHeap* GlobalDescriptorHeap::getDepthStencilHeap()
 {
 	return instance->depthStencilHeap;
+}
+
+DescriptorHeap* GlobalDescriptorHeap::getNonShaderVisibleResourceHeap()
+{
+	return instance->nonShaderVisibleResourceHeap;
 }

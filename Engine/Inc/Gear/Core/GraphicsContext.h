@@ -24,6 +24,10 @@ public:
 
 	~GraphicsContext();
 
+	void copyResource(Buffer* const dstBuffer, Buffer* const srcBuffer);
+
+	void copyResource(Texture* const dstTexture, Texture* const srcTexture);
+
 	void updateBuffer(VertexBuffer* const vb, const void* const data, const UINT size);
 
 	void updateBuffer(IndexBuffer* const ib, const void* const data, const UINT size);
@@ -33,8 +37,6 @@ public:
 
 	//per draw call transition immediate
 	void setComputeIndexBuffer(const IndexConstantBuffer* const indexBuffer);
-
-	//beware use of these two method provide resourceIndex as long as resource's stateTracking is disabled
 
 	void setGraphicsConstants(const std::initializer_list<ShaderResourceDesc> descs, const UINT offset);
 

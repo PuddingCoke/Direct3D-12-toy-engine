@@ -12,11 +12,13 @@ class DescriptorHeap
 {
 public:
 	
-	class StaticDescriptorHandle
+	class DescriptorHandle
 	{
 	public:
 
-		StaticDescriptorHandle(const CD3DX12_CPU_DESCRIPTOR_HANDLE cpuHandle, const CD3DX12_GPU_DESCRIPTOR_HANDLE gpuHandle, const DescriptorHeap* const descriptorHeap);
+		DescriptorHandle();
+
+		DescriptorHandle(const CD3DX12_CPU_DESCRIPTOR_HANDLE cpuHandle, const CD3DX12_GPU_DESCRIPTOR_HANDLE gpuHandle, const DescriptorHeap* const descriptorHeap);
 
 		UINT getCurrentIndex() const;
 
@@ -24,7 +26,7 @@ public:
 
 		CD3DX12_GPU_DESCRIPTOR_HANDLE getGPUHandle() const;
 
-		virtual void move();
+		void move();
 
 	protected:
 
@@ -32,17 +34,7 @@ public:
 
 		CD3DX12_GPU_DESCRIPTOR_HANDLE gpuHandle;
 
-		const DescriptorHeap* const descriptorHeap;
-
-	};
-
-	class DynamicDescriptorHandle :public StaticDescriptorHandle
-	{
-	public:
-
-		DynamicDescriptorHandle(const CD3DX12_CPU_DESCRIPTOR_HANDLE cpuHandle, const CD3DX12_GPU_DESCRIPTOR_HANDLE gpuHandle, const DescriptorHeap* const descriptorHeap);
-
-		void move() override;
+		const DescriptorHeap* descriptorHeap;
 
 	};
 
@@ -58,9 +50,11 @@ public:
 
 	ID3D12DescriptorHeap* get() const;
 
-	StaticDescriptorHandle allocStaticDescriptor(UINT num);
+	DescriptorHandle allocStaticDescriptor(UINT num);
 
-	DynamicDescriptorHandle allocDynamicDescriptor(UINT num);
+	DescriptorHandle allocDynamicDescriptor(UINT num);
+
+	void resetDynamicDescriptorPointer();
 
 private:
 
