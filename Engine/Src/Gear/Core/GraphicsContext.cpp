@@ -17,6 +17,62 @@ GraphicsContext::~GraphicsContext()
 	}
 }
 
+void GraphicsContext::copyResource(Buffer* const dstBuffer, Buffer* const srcBuffer)
+{
+	pushResourceTrackList(dstBuffer);
+
+	pushResourceTrackList(srcBuffer);
+
+	if (dstBuffer->getStateTracking())
+	{
+		dstBuffer->transitionState = D3D12_RESOURCE_STATE_COPY_DEST;
+	}
+
+	if (srcBuffer->getStateTracking())
+	{
+		srcBuffer->transitionState = D3D12_RESOURCE_STATE_COPY_SOURCE;
+	}
+
+	flushTransitionResources();
+
+	commandList->get()->CopyResource(dstBuffer->getResource(), srcBuffer->getResource());
+}
+
+void GraphicsContext::copyResource(Texture* const dstTexture, Texture* const srcTexture)
+{
+	{
+		pushResourceTrackList(dstTexture);
+
+		if (dstTexture->getStateTracking())
+		{
+			dstTexture->transitionState.allState = D3D12_RESOURCE_STATE_COPY_DEST;
+
+			for (UINT i = 0; i < dstTexture->getMipLevels(); i++)
+			{
+				dstTexture->transitionState.mipLevelStates[i] = D3D12_RESOURCE_STATE_COPY_DEST;
+			}
+		}
+	}
+
+	{
+		pushResourceTrackList(srcTexture);
+
+		if (srcTexture->getStateTracking())
+		{
+			srcTexture->transitionState.allState = D3D12_RESOURCE_STATE_COPY_SOURCE;
+
+			for (UINT i = 0; i < srcTexture->getMipLevels(); i++)
+			{
+				srcTexture->transitionState.mipLevelStates[i] = D3D12_RESOURCE_STATE_COPY_SOURCE;
+			}
+		}
+	}
+
+	flushTransitionResources();
+
+	commandList->get()->CopyResource(dstTexture->getResource(), srcTexture->getResource());
+}
+
 void GraphicsContext::updateBuffer(VertexBuffer* const vb, const void* const data, const UINT size)
 {
 	Buffer* const buffer = vb->getBuffer();
@@ -744,9 +800,9 @@ void GraphicsContext::flushTransitionResources()
 	if (transitionBarriers.size())
 	{
 		commandList->get()->ResourceBarrier(transitionBarriers.size(), transitionBarriers.data());
-	}
 
-	transitionBarriers.clear();
+		transitionBarriers.clear();
+	}
 }
 
 void GraphicsContext::pushGraphicsStageIndexBuffer(UINT rootParameterIndex, const IndexConstantBuffer* const indexBuffer, const UINT targetSRVState)

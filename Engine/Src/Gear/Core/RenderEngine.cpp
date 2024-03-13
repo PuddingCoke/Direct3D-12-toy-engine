@@ -205,6 +205,11 @@ void RenderEngine::begin()
 
 		GraphicsContext::globalConstantBuffer->update(&perFrameResource, sizeof(PerFrameResource));
 	}
+
+	if (Graphics::getFrameIndex() == 0)
+	{
+		GlobalDescriptorHeap::getResourceHeap()->resetDynamicDescriptorPointer();
+	}
 }
 
 void RenderEngine::end()
@@ -410,7 +415,7 @@ RenderEngine::RenderEngine(const HWND hwnd) :
 	}
 
 	{
-		StaticDescriptorHandle descriptorHandle = GlobalDescriptorHeap::getRenderTargetHeap()->allocStaticDescriptor(Graphics::FrameBufferCount);
+		DescriptorHandle descriptorHandle = GlobalDescriptorHeap::getRenderTargetHeap()->allocStaticDescriptor(Graphics::FrameBufferCount);
 
 		for (UINT i = 0; i < Graphics::FrameBufferCount; i++)
 		{

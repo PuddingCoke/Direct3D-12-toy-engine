@@ -26,7 +26,7 @@ ConstantBufferPool::ConstantBufferPool(const UINT subRegionSize, const UINT subR
 	buffer = new Buffer(subRegionSize * subRegionNum, false, nullptr, nullptr, nullptr, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
 
 	{
-		StaticDescriptorHandle descriptorHandle = GlobalDescriptorHeap::getResourceHeap()->allocStaticDescriptor(subRegionNum);
+		DescriptorHandle descriptorHandle = GlobalDescriptorHeap::getResourceHeap()->allocStaticDescriptor(subRegionNum);
 
 		baseDescriptorIndex = descriptorHandle.getCurrentIndex();
 
@@ -72,7 +72,7 @@ ConstantBufferPool::AvailableDescriptor ConstantBufferPool::requestAvailableDesc
 {
 	std::lock_guard<std::mutex> lockGuard(availableIndicesLock);
 
-	UINT index = availableIndices.back();
+	const UINT index = availableIndices.back();
 
 	availableIndices.pop_back();
 

@@ -55,7 +55,7 @@ ConstantBuffer::ConstantBuffer(const UINT size, const bool cpuWritable, const vo
 		desc.BufferLocation = buffer->getGPUAddress();
 		desc.SizeInBytes = size;
 
-		StaticDescriptorHandle descriptorHandle = GlobalDescriptorHeap::getResourceHeap()->allocStaticDescriptor(1);
+		DescriptorHandle descriptorHandle = GlobalDescriptorHeap::getResourceHeap()->allocStaticDescriptor(1);
 
 		GraphicsDevice::get()->CreateConstantBufferView(&desc, descriptorHandle.getCPUHandle());
 

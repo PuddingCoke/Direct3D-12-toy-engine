@@ -5,9 +5,7 @@
 
 #include<Gear/Core/DescriptorHeap.h>
 
-using StaticDescriptorHandle = DescriptorHeap::StaticDescriptorHandle;
-
-using DynamicDescriptorHandle = DescriptorHeap::DynamicDescriptorHandle;
+using DescriptorHandle = DescriptorHeap::DescriptorHandle;
 
 class GlobalDescriptorHeap
 {
@@ -24,6 +22,8 @@ public:
 	static DescriptorHeap* getRenderTargetHeap();
 
 	static DescriptorHeap* getDepthStencilHeap();
+
+	static DescriptorHeap* getNonShaderVisibleResourceHeap();
 
 private:
 
@@ -42,6 +42,8 @@ private:
 	DescriptorHeap* renderTargetHeap;
 
 	DescriptorHeap* depthStencilHeap;
+
+	DescriptorHeap* nonShaderVisibleResourceHeap;
 
 };
 

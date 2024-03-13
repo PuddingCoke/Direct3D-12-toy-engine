@@ -3,7 +3,6 @@
 #ifndef _CONSTANTBUFFER_H_
 #define _CONSTANTBUFFER_H_
 
-#include<Gear/Core/DX/Resource/Buffer.h>
 #include<Gear/Core/ConstantBufferPool.h>
 
 //we use a very effective way to achieve state sync for constant buffer
