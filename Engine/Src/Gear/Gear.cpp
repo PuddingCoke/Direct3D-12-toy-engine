@@ -53,7 +53,7 @@ void Gear::iniGame(Game* const gamePtr)
 
 	RenderEngine::get()->processCommandLists();
 
-	RenderEngine::get()->waitForGPU();
+	RenderEngine::get()->waitForPreviousFrame();
 
 	switch (usage)
 	{
@@ -65,7 +65,7 @@ void Gear::iniGame(Game* const gamePtr)
 		break;
 	}
 
-	RenderEngine::get()->waitForGPU();
+	RenderEngine::get()->waitForPreviousFrame();
 
 	destroy();
 }
@@ -95,6 +95,8 @@ void Gear::runGame()
 		game->render();
 
 		RenderEngine::get()->end();
+
+		RenderEngine::get()->waitForNextFrame();
 
 		const std::chrono::high_resolution_clock::time_point endPoint = clock.now();
 
