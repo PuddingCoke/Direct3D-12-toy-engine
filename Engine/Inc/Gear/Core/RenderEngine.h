@@ -7,6 +7,7 @@
 #include<Gear/Core/Graphics.h>
 #include<Gear/Core/Camera.h>
 #include<Gear/Core/Shader.h>
+#include<Gear/Core/States.h>
 
 #include<iostream>
 #include<dxgi1_6.h>

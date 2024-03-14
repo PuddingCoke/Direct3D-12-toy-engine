@@ -141,7 +141,7 @@ private:
 
 	std::vector<PendingTextureBarrier> pendingTextureBarrier;
 
-	CommandList* commandList;
+	CommandList* const commandList;
 
 };
 
