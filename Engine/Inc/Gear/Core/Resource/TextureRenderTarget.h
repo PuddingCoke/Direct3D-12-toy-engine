@@ -22,6 +22,8 @@ public:
 	TextureRenderTarget(const std::string filePath, ID3D12GraphicsCommandList6* commandList, std::vector<Resource*>* transientResourcePool, const bool isTextureCube, const bool persistent,
 		const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat);
 
+	TextureRenderTarget(const UINT width, const UINT height, const Texture::TextureType type, ID3D12GraphicsCommandList6* commandList, std::vector<Resource*>* transientResourcePool, const bool persistent);
+
 	TextureRenderTarget(const TextureRenderTarget&);
 
 	~TextureRenderTarget();

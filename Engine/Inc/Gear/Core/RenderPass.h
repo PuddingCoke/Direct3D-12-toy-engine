@@ -53,6 +53,8 @@ protected:
 	TextureRenderTarget* CreateTextureRenderTarget(const std::string filePath, const bool isTextureCube, const bool persistent,
 		const DXGI_FORMAT srvFormat = DXGI_FORMAT_UNKNOWN, const DXGI_FORMAT uavFormat = DXGI_FORMAT_UNKNOWN, const DXGI_FORMAT rtvFormat = DXGI_FORMAT_UNKNOWN);
 
+	TextureRenderTarget* CreateTextureRenderTarget(const UINT width, const UINT height, const Texture::TextureType type, const bool persistent);
+
 	void deferredRelease(ConstantBuffer* const cb);
 
 	void deferredRelease(IndexBuffer* const ib);

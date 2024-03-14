@@ -16,7 +16,7 @@ DescriptorHeap::DescriptorHeap(const UINT numDescriptors, const UINT subRegionSi
 
 	dynamicCPUPointerStart = descriptorHeap->GetCPUDescriptorHandleForHeapStart();
 
-	dynamicCPUPointerStart.Offset(numDescriptors - Graphics::FrameBufferCount * subRegionSize, incrementSize);
+	dynamicCPUPointerStart.Offset(numDescriptors - subRegionSize, incrementSize);
 
 	staticCPUPointer = staticCPUPointerStart;
 
@@ -28,7 +28,7 @@ DescriptorHeap::DescriptorHeap(const UINT numDescriptors, const UINT subRegionSi
 
 		dynamicGPUPointerStart = descriptorHeap->GetGPUDescriptorHandleForHeapStart();
 
-		dynamicGPUPointerStart.Offset(numDescriptors - Graphics::FrameBufferCount * subRegionSize, incrementSize);
+		dynamicGPUPointerStart.Offset(numDescriptors - subRegionSize, incrementSize);
 
 		staticGPUPointer = staticGPUPointerStart;
 
