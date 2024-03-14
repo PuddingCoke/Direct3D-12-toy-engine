@@ -22,25 +22,13 @@ public:
 		accumulateParam{ 0,0.f }
 	{
 		{
-			D3D12_BLEND_DESC blendDesc = {};
-			blendDesc.AlphaToCoverageEnable = false;
-			blendDesc.IndependentBlendEnable = false;
-			blendDesc.RenderTarget[0].BlendEnable = true;
-			blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
-			blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
-			blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
-			blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
-			blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_INV_SRC_ALPHA;
-			blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
-			blendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
-
 			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = {};
 			desc.InputLayout = {};
 			desc.pRootSignature = GlobalRootSignature::getGraphicsRootSignature()->get();
 			desc.VS = Shader::fullScreenVS->getByteCode();
 			desc.PS = accumulateShader->getByteCode();
 			desc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
-			desc.BlendState = blendDesc;
+			desc.BlendState = States::defBlendDesc;
 			desc.DepthStencilState.DepthEnable = FALSE;
 			desc.DepthStencilState.StencilEnable = FALSE;
 			desc.SampleMask = UINT_MAX;

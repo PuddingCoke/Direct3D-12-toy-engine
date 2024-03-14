@@ -73,7 +73,7 @@ protected:
 
 	virtual void recordCommand() = 0;
 
-	GraphicsContext* context;
+	GraphicsContext* const context;
 
 private:
 
@@ -93,7 +93,7 @@ private:
 
 	std::vector<VertexBuffer*> deferredReleaseVertexBuffer[Graphics::FrameBufferCount];
 
-	CommandList* transitionCMD;
+	CommandList* const transitionCMD;
 
 	template<typename T>
 	void releaseResources(std::vector<T>& resources);

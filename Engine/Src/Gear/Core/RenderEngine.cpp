@@ -353,6 +353,8 @@ RenderEngine::RenderEngine(const HWND hwnd) :
 		GraphicsDevice::get()->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&commandQueue));
 	}
 
+	States::initialize();
+
 	GlobalDescriptorHeap::instance = new GlobalDescriptorHeap();
 
 	GlobalRootSignature::instance = new GlobalRootSignature();

@@ -129,6 +129,12 @@
     <ClInclude Include="Inc\Gear\Core\GraphicsContext.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Inc\Gear\Core\Gear2D\PrimitiveBatch.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Gear\Core\States.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Gear\Window\Win32Form.cpp">
@@ -242,9 +248,21 @@
     <ClCompile Include="Src\Gear\Core\GraphicsContext.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="Src\Gear\Core\Gear2D\PrimitiveBatch.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gear\Core\States.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\FullScreen\FullScreenVS.hlsl" />
+    <FxCompile Include="Shaders\PrimitiveBatch\PrimitiveBatchCircleVS.hlsl" />
+    <FxCompile Include="Shaders\PrimitiveBatch\PrimitiveBatchLineGS.hlsl" />
+    <FxCompile Include="Shaders\PrimitiveBatch\PrimitiveBatchLineVS.hlsl" />
+    <FxCompile Include="Shaders\PrimitiveBatch\PrimitiveBatchPS.hlsl" />
+    <FxCompile Include="Shaders\PrimitiveBatch\PrimitiveBatchRCLineGS.hlsl" />
+    <FxCompile Include="Shaders\PrimitiveBatch\PrimitiveBatchRCLineVS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\Common.hlsli" />
