@@ -82,6 +82,11 @@ TextureRenderTarget* RenderPass::CreateTextureRenderTarget(const std::string fil
 	return new TextureRenderTarget(filePath, context->getCommandList()->get(), &deferredReleaseResources[Graphics::getFrameIndex()], isTextureCube, persistent, srvFormat, uavFormat, rtvFormat);
 }
 
+TextureRenderTarget* RenderPass::CreateTextureRenderTarget(const UINT width, const UINT height, const Texture::TextureType type, const bool persistent)
+{
+	return new TextureRenderTarget(width, height, type, context->getCommandList()->get(), &deferredReleaseResources[Graphics::getFrameIndex()], persistent);
+}
+
 void RenderPass::deferredRelease(ConstantBuffer* const cb)
 {
 	deferredReleaseConstantBuffer[Graphics::getFrameIndex()].push_back(cb);

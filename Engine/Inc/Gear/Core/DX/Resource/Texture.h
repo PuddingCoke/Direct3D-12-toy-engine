@@ -7,6 +7,8 @@
 #include"UploadHeap.h"
 
 #include<Gear/Utils/Utils.h>
+#include<Gear/Utils/Random.h>
+#include<Gear/Utils/Math.h>
 
 #include<stb_image/stb_image.h>
 #include<DDSTextureLoader/DDSTextureLoader12.h>
@@ -28,9 +30,17 @@ class Texture :public Resource
 {
 public:
 
+	enum class TextureType
+	{
+		NOISE,//4 channel [0,1]
+		GAUSS //mean 0 standard deviation 1
+	};
+
 	Texture(const UINT width, const UINT height, const DXGI_FORMAT format, const UINT arraySize, const UINT mipLevels, const bool stateTracking, const D3D12_RESOURCE_FLAGS resFlags);
 
 	Texture(const std::string filePath, ID3D12GraphicsCommandList6* commandList, std::vector<Resource*>* transientResourcePool, const bool stateTracking, const D3D12_RESOURCE_FLAGS resFlags);
+
+	Texture(const UINT width, const UINT height, const TextureType type, ID3D12GraphicsCommandList6* commandList, std::vector<Resource*>* transientResourcePool);
 
 	Texture(Texture&);
 

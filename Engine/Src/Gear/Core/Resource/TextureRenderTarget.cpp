@@ -71,6 +71,13 @@ TextureRenderTarget::TextureRenderTarget(const std::string filePath, ID3D12Graph
 	}
 }
 
+TextureRenderTarget::TextureRenderTarget(const UINT width, const UINT height, const Texture::TextureType type, ID3D12GraphicsCommandList6* commandList, std::vector<Resource*>* transientResourcePool, const bool persistent)
+{
+	texture = new Texture(width, height, type, commandList, transientResourcePool);
+
+	createViews(texture->getFormat(), DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, false, persistent);
+}
+
 TextureRenderTarget::TextureRenderTarget(const TextureRenderTarget& trt) :
 	allSRVIndex(trt.allSRVIndex),
 	srvMipIndexStart(trt.srvMipIndexStart),
