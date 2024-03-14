@@ -30,7 +30,11 @@ public:
 
 	void processCommandLists();
 
-	void waitForGPU();
+	//no present
+	void waitForPreviousFrame();
+
+	//has present
+	void waitForNextFrame();
 
 	void begin();
 

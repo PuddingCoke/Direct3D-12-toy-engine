@@ -177,7 +177,7 @@ void RenderEngine::processCommandLists()
 	}
 }
 
-void RenderEngine::waitForGPU()
+void RenderEngine::waitForPreviousFrame()
 {
 	commandQueue->Signal(fence.Get(), fenceValues[Graphics::frameIndex]);
 
@@ -186,6 +186,26 @@ void RenderEngine::waitForGPU()
 	WaitForSingleObjectEx(fenceEvent, INFINITE, FALSE);
 
 	fenceValues[Graphics::frameIndex]++;
+}
+
+void RenderEngine::waitForNextFrame()
+{
+	swapChain->Present(1, 0);
+
+	const UINT64 currentFenceValue = fenceValues[Graphics::frameIndex];
+
+	commandQueue->Signal(fence.Get(), currentFenceValue);
+
+	Graphics::frameIndex = swapChain->GetCurrentBackBufferIndex();
+
+	if (fence->GetCompletedValue() < fenceValues[Graphics::frameIndex])
+	{
+		fence->SetEventOnCompletion(fenceValues[Graphics::frameIndex], fenceEvent);
+
+		WaitForSingleObjectEx(fenceEvent, INFINITE, FALSE);
+	}
+
+	fenceValues[Graphics::frameIndex] = currentFenceValue + 1;
 }
 
 void RenderEngine::begin()
@@ -260,23 +280,6 @@ void RenderEngine::end()
 	}
 
 	processCommandLists();
-
-	swapChain->Present(1, 0);
-
-	const UINT64 currentFenceValue = fenceValues[Graphics::frameIndex];
-
-	commandQueue->Signal(fence.Get(), currentFenceValue);
-
-	Graphics::frameIndex = swapChain->GetCurrentBackBufferIndex();
-
-	if (fence->GetCompletedValue() < fenceValues[Graphics::frameIndex])
-	{
-		fence->SetEventOnCompletion(fenceValues[Graphics::frameIndex], fenceEvent);
-
-		WaitForSingleObjectEx(fenceEvent, INFINITE, FALSE);
-	}
-
-	fenceValues[Graphics::frameIndex] = currentFenceValue + 1;
 }
 
 GPUVendor RenderEngine::getVendor() const
