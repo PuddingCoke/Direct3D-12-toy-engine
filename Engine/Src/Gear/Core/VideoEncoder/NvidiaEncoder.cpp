@@ -1,9 +1,10 @@
 #include<Gear/Core/VideoEncoder/NvidiaEncoder.h>
 
 NvidiaEncoder::NvidiaEncoder(const UINT frameToEncode) :
-	frameToEncode(frameToEncode), frameEncoded(0), encoding(true), encodeTime(0.f), encoder(nullptr),
-	readbackHeap(new ReadbackHeap(2 * 4 * Graphics::getWidth() * Graphics::getHeight())), outCtx(nullptr), outStream(nullptr),
-	nvencAPI{ NV_ENCODE_API_FUNCTION_LIST_VER }, outputFenceValue(0), hConsole(nullptr)
+	Encoder(frameToEncode), encoder(nullptr),
+	readbackHeap(new ReadbackHeap(2 * 4 * Graphics::getWidth() * Graphics::getHeight())),
+	outCtx(nullptr), outStream(nullptr), pkt(nullptr),
+	nvencAPI{ NV_ENCODE_API_FUNCTION_LIST_VER }, outputFenceValue(0)
 {
 	moduleNvEncAPI = LoadLibraryA("nvEncodeAPI64.dll");
 
@@ -93,14 +94,6 @@ NvidiaEncoder::NvidiaEncoder(const UINT frameToEncode) :
 	avformat_write_header(outCtx, nullptr);
 
 	pkt = av_packet_alloc();
-
-	hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-
-	CONSOLE_SCREEN_BUFFER_INFO csbi = {};
-
-	GetConsoleScreenBufferInfo(hConsole, &csbi);
-
-	progressBarOutputLocation = csbi.dwCursorPosition;
 }
 
 NvidiaEncoder::~NvidiaEncoder()
@@ -228,19 +221,7 @@ bool NvidiaEncoder::encode(ID3D12Resource* const inputTexture)
 
 		NVENCCALL(nvencAPI.nvEncUnlockBitstream(encoder, lockBitstream.outputBitstream));
 
-		SetConsoleCursorPosition(hConsole, progressBarOutputLocation);
-
-		std::cout << "Encoding... [";
-
-		const UINT totalNum = 30;
-
-		const UINT num = totalNum * (frameEncoded + 1) / frameToEncode;
-
-		std::cout << std::string(num, '*') << std::string(totalNum - num, '/');
-
-		std::cout << "] " << std::fixed << std::setprecision(2) << 100.f * static_cast<float>(frameEncoded + 1) / static_cast<float>(frameToEncode) << "%";
-
-		std::cout.flush();
+		displayProgress();
 	}
 
 	NVENCCALL(nvencAPI.nvEncUnmapInputResource(encoder, mapInputResource.mappedResource));
