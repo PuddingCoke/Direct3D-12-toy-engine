@@ -42,13 +42,15 @@ public:
 
 	GPUVendor getVendor() const;
 
+	ID3D12Resource* getCurrentRenderTexture() const;
+
 private:
 
 	friend class Gear;
 
 	static RenderEngine* instance;
 
-	RenderEngine(const HWND hwnd);
+	RenderEngine(const HWND hwnd, const bool useSwapChainBuffer);
 
 	~RenderEngine();
 

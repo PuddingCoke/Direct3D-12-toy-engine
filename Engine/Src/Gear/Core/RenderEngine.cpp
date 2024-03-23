@@ -287,7 +287,12 @@ GPUVendor RenderEngine::getVendor() const
 	return vendor;
 }
 
-RenderEngine::RenderEngine(const HWND hwnd) :
+ID3D12Resource* RenderEngine::getCurrentRenderTexture() const
+{
+	return backBufferResources[Graphics::getFrameIndex()].Get();
+}
+
+RenderEngine::RenderEngine(const HWND hwnd, const bool useSwapChainBuffer) :
 	fenceValues{}, fenceEvent(nullptr), vendor(GPUVendor::UNKNOWN), perFrameResource{}
 {
 	ComPtr<ID3D12Debug> debugController;
@@ -370,13 +375,11 @@ RenderEngine::RenderEngine(const HWND hwnd) :
 	Shader::createGlobalShaders();
 
 	{
-		Graphics::backBufferFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
-
 		DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
 		swapChainDesc.BufferCount = Graphics::FrameBufferCount;
 		swapChainDesc.Width = Graphics::getWidth();
 		swapChainDesc.Height = Graphics::getHeight();
-		swapChainDesc.Format = Graphics::getBackBufferFormat();
+		swapChainDesc.Format = Graphics::BackBufferFormat;
 		swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 		swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 		swapChainDesc.SampleDesc.Count = 1;
@@ -422,15 +425,41 @@ RenderEngine::RenderEngine(const HWND hwnd) :
 	{
 		DescriptorHandle descriptorHandle = GlobalDescriptorHeap::getRenderTargetHeap()->allocStaticDescriptor(Graphics::FrameBufferCount);
 
-		for (UINT i = 0; i < Graphics::FrameBufferCount; i++)
+		if (useSwapChainBuffer)
 		{
-			swapChain->GetBuffer(i, IID_PPV_ARGS(&backBufferResources[i]));
+			for (UINT i = 0; i < Graphics::FrameBufferCount; i++)
+			{
+				swapChain->GetBuffer(i, IID_PPV_ARGS(&backBufferResources[i]));
 
-			GraphicsDevice::get()->CreateRenderTargetView(backBufferResources[i].Get(), nullptr, descriptorHandle.getCPUHandle());
+				GraphicsDevice::get()->CreateRenderTargetView(backBufferResources[i].Get(), nullptr, descriptorHandle.getCPUHandle());
 
-			Graphics::backBufferHandles[i] = descriptorHandle.getCPUHandle();
+				Graphics::backBufferHandles[i] = descriptorHandle.getCPUHandle();
 
-			descriptorHandle.move();
+				descriptorHandle.move();
+			}
+		}
+		else
+		{
+			D3D12_RENDER_TARGET_VIEW_DESC rtvDesc = {};
+			rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
+			rtvDesc.Format = Graphics::BackBufferFormat;
+			rtvDesc.Texture2D.MipSlice = 0;
+			rtvDesc.Texture2D.PlaneSlice = 0;
+
+			for (UINT i = 0; i < Graphics::FrameBufferCount; i++)
+			{
+				CD3DX12_HEAP_PROPERTIES heapProperties = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
+
+				CD3DX12_RESOURCE_DESC resourceDesc = CD3DX12_RESOURCE_DESC::Tex2D(Graphics::BackBufferFormat, Graphics::width, Graphics::height, 1, 1, 1, 0, D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET);
+
+				GraphicsDevice::get()->CreateCommittedResource(&heapProperties, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_PRESENT, nullptr, IID_PPV_ARGS(&backBufferResources[i]));
+			
+				GraphicsDevice::get()->CreateRenderTargetView(backBufferResources[i].Get(), &rtvDesc, descriptorHandle.getCPUHandle());
+
+				Graphics::backBufferHandles[i] = descriptorHandle.getCPUHandle();
+
+				descriptorHandle.move();
+			}
 		}
 	}
 }

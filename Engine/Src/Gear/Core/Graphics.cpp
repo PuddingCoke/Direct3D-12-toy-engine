@@ -12,8 +12,6 @@ Graphics::Time Graphics::time = { 1.f / 60.f,0.f,0u,0.f };
 
 D3D12_CPU_DESCRIPTOR_HANDLE Graphics::backBufferHandles[Graphics::FrameBufferCount] = {};
 
-DXGI_FORMAT Graphics::backBufferFormat = DXGI_FORMAT_UNKNOWN;
-
 UINT Graphics::getFrameIndex()
 {
 	return frameIndex;
@@ -47,9 +45,4 @@ FLOAT Graphics::getAspectRatio()
 D3D12_CPU_DESCRIPTOR_HANDLE Graphics::getBackBufferHandle()
 {
 	return backBufferHandles[Graphics::frameIndex];
-}
-
-DXGI_FORMAT Graphics::getBackBufferFormat()
-{
-	return backBufferFormat;
 }

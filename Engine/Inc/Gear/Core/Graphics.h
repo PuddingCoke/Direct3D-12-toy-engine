@@ -27,7 +27,7 @@ public:
 
 	static D3D12_CPU_DESCRIPTOR_HANDLE getBackBufferHandle();
 
-	static DXGI_FORMAT getBackBufferFormat();
+	static constexpr DXGI_FORMAT BackBufferFormat = DXGI_FORMAT_B8G8R8A8_UNORM;
 
 private:
 
@@ -36,8 +36,6 @@ private:
 	friend class RenderEngine;
 
 	static D3D12_CPU_DESCRIPTOR_HANDLE backBufferHandles[FrameBufferCount];
-
-	static DXGI_FORMAT backBufferFormat;
 
 	static UINT frameIndex;
 

@@ -28,7 +28,7 @@ public:
 			desc.SampleMask = UINT_MAX;
 			desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 			desc.NumRenderTargets = 1;
-			desc.RTVFormats[0] = Graphics::getBackBufferFormat();
+			desc.RTVFormats[0] = Graphics::BackBufferFormat;
 			desc.SampleDesc.Count = 1;
 
 			GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&pipelineState));

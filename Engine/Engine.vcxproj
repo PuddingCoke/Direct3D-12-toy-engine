@@ -149,6 +149,7 @@
     <ClInclude Include="Inc\Gear\Core\CommandAllocator.h" />
     <ClInclude Include="Inc\Gear\Core\ConstantBufferPool.h" />
     <ClInclude Include="Inc\Gear\Core\DescriptorHeap.h" />
+    <ClInclude Include="Inc\Gear\Core\DX\Resource\ReadbackHeap.h" />
     <ClInclude Include="Inc\Gear\Core\DX\Resource\Texture.h" />
     <ClInclude Include="Inc\Gear\Core\DX\Resource\Buffer.h" />
     <ClInclude Include="Inc\Gear\Core\DX\Resource\Resource.h" />
@@ -170,6 +171,7 @@
     <ClInclude Include="Inc\Gear\Core\RootSignature.h" />
     <ClInclude Include="Inc\Gear\Core\Shader.h" />
     <ClInclude Include="Inc\Gear\Core\States.h" />
+    <ClInclude Include="Inc\Gear\Core\VideoEncoder\NvidiaEncoder.h" />
     <ClInclude Include="Inc\Gear\Game.h" />
     <ClInclude Include="Inc\Gear\Gear.h" />
     <ClInclude Include="Inc\Gear\Input\Event.h" />
@@ -187,6 +189,7 @@
     <ClCompile Include="Src\Gear\Core\Camera.cpp" />
     <ClCompile Include="Src\Gear\Core\ConstantBufferPool.cpp" />
     <ClCompile Include="Src\Gear\Core\DescriptorHeap.cpp" />
+    <ClCompile Include="Src\Gear\Core\DX\Resource\ReadbackHeap.cpp" />
     <ClCompile Include="Src\Gear\Core\Gear2D\PrimitiveBatch.cpp" />
     <ClCompile Include="Src\Gear\Core\GlobalDescriptorHeap.cpp" />
     <ClCompile Include="Src\Gear\Core\GlobalRootSignature.cpp" />
@@ -211,6 +214,7 @@
     <ClCompile Include="Src\Gear\Core\RootSignature.cpp" />
     <ClCompile Include="Src\Gear\Core\Shader.cpp" />
     <ClCompile Include="Src\Gear\Core\States.cpp" />
+    <ClCompile Include="Src\Gear\Core\VideoEncoder\NvidiaEncoder.cpp" />
     <ClCompile Include="Src\Gear\Game.cpp" />
     <ClCompile Include="Src\Gear\Gear.cpp" />
     <ClCompile Include="Src\Gear\Input\Event.cpp" />
@@ -326,6 +330,20 @@
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">6.6</ShaderModel>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">6.6</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="Shaders\VideoEncoder\RGBToNV12CS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">6.6</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4.0</ShaderModel>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">g_%(Filename)Bytes</VariableName>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </ObjectFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Inc/Gear/CompiledShaders/%(Filename).h</HeaderFileOutput>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>

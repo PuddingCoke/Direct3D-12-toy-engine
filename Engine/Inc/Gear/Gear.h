@@ -12,6 +12,7 @@
 #include<Gear/Input/Mouse.h>
 #include<Gear/Configuration.h>
 #include<Gear/Game.h>
+#include<Gear/Core/VideoEncoder/NvidiaEncoder.h>
 
 #include<iostream>
 #include<chrono>
@@ -43,6 +44,8 @@ private:
 
 	void runGame();
 
+	void runEncode();
+
 	void destroy();
 
 	void reportLiveObjects();
@@ -63,6 +66,7 @@ private:
 
 	static LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
+	static LRESULT CALLBACK EncodeProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 };
 
 #endif // !_GEAR_H_
