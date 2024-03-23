@@ -23,11 +23,28 @@ int Gear::iniEngine(const Configuration config, const int argc, const char* argv
 
 	iniWindow(config.title, config.width, config.height);
 
+	if (config.usage == Configuration::EngineUsage::VIDEOPLAYBACK)
+	{
+		ShowWindow(winform->getHandle(), SW_HIDE);
+	}
+
 	Graphics::width = config.width;
 	Graphics::height = config.height;
 	Graphics::aspectRatio = static_cast<float>(Graphics::width) / static_cast<float>(Graphics::height);
 
-	RenderEngine::instance = new RenderEngine(winform->getHandle());
+	switch (config.usage)
+	{
+	case Configuration::EngineUsage::NORMAL:
+		RenderEngine::instance = new RenderEngine(winform->getHandle(), true);
+		break;
+
+	case Configuration::EngineUsage::VIDEOPLAYBACK:
+		RenderEngine::instance = new RenderEngine(winform->getHandle(), false);
+		break;
+
+	default:
+		break;
+	}
 
 	std::cout << "[class Gear] resolution " << Graphics::width << "x" << Graphics::height << "\n";
 	std::cout << "[class Gear] aspect ratio " << Graphics::aspectRatio << "\n";
@@ -62,6 +79,7 @@ void Gear::iniGame(Game* const gamePtr)
 		runGame();
 		break;
 	case Configuration::EngineUsage::VIDEOPLAYBACK:
+		runEncode();
 		break;
 	}
 
@@ -111,6 +129,37 @@ void Gear::runGame()
 
 }
 
+void Gear::runEncode()
+{
+	NvidiaEncoder* encoder = new NvidiaEncoder(3600);
+
+	Graphics::time.deltaTime = 1.f / 60.f;
+
+	do
+	{
+		RenderEngine::get()->begin();
+
+		game->update(Graphics::time.deltaTime);
+
+		game->render();
+
+		RenderEngine::get()->end();
+
+		RenderEngine::get()->waitForPreviousFrame();
+
+		Graphics::time.timeElapsed += Graphics::time.deltaTime;
+
+		Graphics::time.uintSeed = Random::Uint();
+
+		Graphics::time.floatSeed = Random::Float();
+
+	} while (encoder->encode(RenderEngine::get()->getCurrentRenderTexture()));
+
+	delete encoder;
+
+	std::cin.get();
+}
+
 void Gear::destroy()
 {
 	delete game;
@@ -157,6 +206,7 @@ void Gear::iniWindow(const std::wstring& title, const UINT& width, const UINT& h
 		break;
 
 	case Configuration::EngineUsage::VIDEOPLAYBACK:
+		winform = new Win32Form(title, 100, 100, normalWndStyle, Gear::EncodeProc);
 		break;
 
 	default:
@@ -228,6 +278,29 @@ LRESULT Gear::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		Keyboard::keyDownMap[(Keyboard::Key)wParam] = false;
 		Keyboard::keyUpEvents[(Keyboard::Key)wParam]();
 		break;
+
+	case WM_DESTROY:
+		PostQuitMessage(0);
+		break;
+
+	default:
+		return DefWindowProc(hWnd, uMsg, wParam, lParam);
+	}
+
+	return 0;
+}
+
+LRESULT Gear::EncodeProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	switch (uMsg)
+	{
+	case WM_PAINT:
+	{
+		PAINTSTRUCT ps;
+		BeginPaint(hWnd, &ps);
+		EndPaint(hWnd, &ps);
+	}
+	break;
 
 	case WM_DESTROY:
 		PostQuitMessage(0);

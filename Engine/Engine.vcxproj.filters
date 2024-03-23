@@ -135,6 +135,12 @@
     <ClInclude Include="Inc\Gear\Core\States.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Inc\Gear\Core\VideoEncoder\NvidiaEncoder.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Gear\Core\DX\Resource\ReadbackHeap.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Gear\Window\Win32Form.cpp">
@@ -254,6 +260,12 @@
     <ClCompile Include="Src\Gear\Core\States.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="Src\Gear\Core\DX\Resource\ReadbackHeap.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gear\Core\VideoEncoder\NvidiaEncoder.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\FullScreen\FullScreenVS.hlsl" />
@@ -263,6 +275,7 @@
     <FxCompile Include="Shaders\PrimitiveBatch\PrimitiveBatchPS.hlsl" />
     <FxCompile Include="Shaders\PrimitiveBatch\PrimitiveBatchRCLineGS.hlsl" />
     <FxCompile Include="Shaders\PrimitiveBatch\PrimitiveBatchRCLineVS.hlsl" />
+    <FxCompile Include="Shaders\VideoEncoder\RGBToNV12CS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\Common.hlsli" />
