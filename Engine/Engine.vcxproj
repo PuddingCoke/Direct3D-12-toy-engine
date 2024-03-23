@@ -171,6 +171,7 @@
     <ClInclude Include="Inc\Gear\Core\RootSignature.h" />
     <ClInclude Include="Inc\Gear\Core\Shader.h" />
     <ClInclude Include="Inc\Gear\Core\States.h" />
+    <ClInclude Include="Inc\Gear\Core\VideoEncoder\Encoder.h" />
     <ClInclude Include="Inc\Gear\Core\VideoEncoder\NvidiaEncoder.h" />
     <ClInclude Include="Inc\Gear\Game.h" />
     <ClInclude Include="Inc\Gear\Gear.h" />
@@ -214,6 +215,7 @@
     <ClCompile Include="Src\Gear\Core\RootSignature.cpp" />
     <ClCompile Include="Src\Gear\Core\Shader.cpp" />
     <ClCompile Include="Src\Gear\Core\States.cpp" />
+    <ClCompile Include="Src\Gear\Core\VideoEncoder\Encoder.cpp" />
     <ClCompile Include="Src\Gear\Core\VideoEncoder\NvidiaEncoder.cpp" />
     <ClCompile Include="Src\Gear\Game.cpp" />
     <ClCompile Include="Src\Gear\Gear.cpp" />

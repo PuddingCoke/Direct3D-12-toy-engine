@@ -141,6 +141,9 @@
     <ClInclude Include="Inc\Gear\Core\DX\Resource\ReadbackHeap.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Inc\Gear\Core\VideoEncoder\Encoder.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Gear\Window\Win32Form.cpp">
@@ -264,6 +267,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Src\Gear\Core\VideoEncoder\NvidiaEncoder.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gear\Core\VideoEncoder\Encoder.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

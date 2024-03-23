@@ -3,9 +3,7 @@
 #ifndef _NVIDIAENCODER_H_
 #define _NVIDIAENCODER_H_
 
-#include<iomanip>
-
-#include<Gear/Core/Graphics.h>
+#include"Encoder.h"
 
 #include<Gear/Core/DX/Resource/ReadbackHeap.h>
 
@@ -43,7 +41,7 @@ __debugbreak();\
 //4.map output resource
 //5.encode picture
 
-class NvidiaEncoder
+class NvidiaEncoder :public Encoder
 {
 public:
 
@@ -55,23 +53,11 @@ public:
 
 	~NvidiaEncoder();
 
-	bool encode(ID3D12Resource* const inputTexture);
+	bool encode(ID3D12Resource* const inputTexture) override;
 
 private:
 
-	static constexpr UINT frameRate = 60;
-
 	static constexpr NV_ENC_BUFFER_FORMAT bufferFormat = NV_ENC_BUFFER_FORMAT_ARGB;
-
-	HANDLE hConsole;
-
-	COORD progressBarOutputLocation;
-
-	UINT frameEncoded;
-
-	const UINT frameToEncode;
-
-	bool encoding;
 
 	void* encoder;
 
@@ -92,14 +78,6 @@ private:
 	const GUID profile = NV_ENC_HEVC_PROFILE_MAIN_GUID;
 
 	const NV_ENC_TUNING_INFO tuningInfo = NV_ENC_TUNING_INFO_HIGH_QUALITY;
-
-	std::chrono::steady_clock timer;
-
-	std::chrono::steady_clock::time_point timeStart;
-
-	std::chrono::steady_clock::time_point timeEnd;
-
-	float encodeTime;
 
 	AVFormatContext* outCtx;
 

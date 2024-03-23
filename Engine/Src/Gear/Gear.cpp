@@ -131,7 +131,22 @@ void Gear::runGame()
 
 void Gear::runEncode()
 {
-	NvidiaEncoder* encoder = new NvidiaEncoder(3600);
+	GPUVendor vendor = RenderEngine::get()->getVendor();
+
+	Encoder* encoder = nullptr;
+
+	switch (vendor)
+	{
+	case GPUVendor::NVIDIA:
+		encoder = new NvidiaEncoder(3600);
+		break;
+	case GPUVendor::AMD:
+	case GPUVendor::INTEL:
+	case GPUVendor::UNKNOWN:
+		break;
+	default:
+		break;
+	}
 
 	Graphics::time.deltaTime = 1.f / 60.f;
 
