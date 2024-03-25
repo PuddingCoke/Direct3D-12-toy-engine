@@ -49,7 +49,7 @@ public:
 
 	static constexpr int interval = 5;
 
-	PrimitiveBatch* pBatch;
+	PrimitiveBatch* pBatch[2];
 
 	TextureRenderTarget* renderTexture;
 
@@ -67,7 +67,7 @@ public:
 	bool connected;
 
 	MyRenderPass() :
-		pBatch(PrimitiveBatch::create(DXGI_FORMAT_R8G8B8A8_UNORM, context)),
+		pBatch{ new PrimitiveBatch(Graphics::BackBufferFormat,context),new PrimitiveBatch(DXGI_FORMAT_R8G8B8A8_UNORM,context) },
 		renderTexture(CreateTextureRenderTarget(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R8G8B8A8_UNORM, 1, 1, false, true,
 			DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_R8G8B8A8_UNORM)),
 		curFrame(0),
@@ -104,7 +104,9 @@ public:
 			GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&fullScreenPipelineState));
 		}
 
-		pBatch->setLineWidth(1.5f);
+		pBatch[0]->setLineWidth(1.5f);
+
+		pBatch[1]->setLineWidth(1.5f);
 
 		const std::string filePath = "dft_data.json";
 		std::ifstream ifs(filePath);
@@ -172,7 +174,8 @@ public:
 	{
 		delete[] epicycles;
 		delete renderTexture;
-		delete pBatch;
+		delete pBatch[0];
+		delete pBatch[1];
 		delete fullScreenPS;
 	}
 
@@ -188,44 +191,10 @@ protected:
 		x = startX;
 		y = startY;
 
-		pBatch->begin();
-		for (size_t i = 0; i < length; i++)
 		{
-			epicycles[i].set(t);
-			preX = x;
-			preY = y;
-			x += epicycles[i].re;
-			y += epicycles[i].im;
-			pBatch->drawCircle(preX, preY, epicycles[i].length, 0, 0, 0, 0.25f);
-			pBatch->drawLine(preX, preY, x, y, 0, 0, 0, 0.25f);
-		}
-		pBatch->end();
+			PrimitiveBatch* batch = pBatch[0];
 
-		context->setRenderTargets({ renderTexture->getRTVMipHandle(0) }, {});
-
-		pBatch->begin();
-
-		if (curFrame++ == length)
-		{
-			if (connected)
-			{
-				pBatch->drawRoundCapLine(lastX, lastY, x, y, 4.f, color.r, color.g, color.b);
-			}
-		}
-		else
-		{
-			pBatch->drawRoundCapLine(lastX, lastY, x, y, 4.f, color.r, color.g, color.b);
-		}
-
-		lastX = x;
-		lastY = y;
-
-		t += 1.0;
-
-		for (int intervalCount = 0; intervalCount < interval; intervalCount++)
-		{
-			x = startX;
-			y = startY;
+			batch->begin();
 
 			for (size_t i = 0; i < length; i++)
 			{
@@ -234,27 +203,71 @@ protected:
 				preY = y;
 				x += epicycles[i].re;
 				y += epicycles[i].im;
+				batch->drawCircle(preX, preY, epicycles[i].length, 0, 0, 0, 0.25f);
+				batch->drawLine(preX, preY, x, y, 0, 0, 0, 0.25f);
 			}
+
+			batch->end();
+		}
+
+		context->setRenderTargets({ renderTexture->getRTVMipHandle(0) }, {});
+
+		{
+			PrimitiveBatch* batch = pBatch[1];
+
+			batch->begin();
 
 			if (curFrame++ == length)
 			{
 				if (connected)
 				{
-					pBatch->drawRoundCapLine(lastX, lastY, x, y, 4.f, color.r, color.g, color.b);
+					batch->drawRoundCapLine(lastX, lastY, x, y, 4.f, color.r, color.g, color.b);
 				}
 			}
 			else
 			{
-				pBatch->drawRoundCapLine(lastX, lastY, x, y, 4.f, color.r, color.g, color.b);
+				batch->drawRoundCapLine(lastX, lastY, x, y, 4.f, color.r, color.g, color.b);
 			}
 
 			lastX = x;
 			lastY = y;
 
 			t += 1.0;
-		}
 
-		pBatch->end();
+			for (int intervalCount = 0; intervalCount < interval; intervalCount++)
+			{
+				x = startX;
+				y = startY;
+
+				for (size_t i = 0; i < length; i++)
+				{
+					epicycles[i].set(t);
+					preX = x;
+					preY = y;
+					x += epicycles[i].re;
+					y += epicycles[i].im;
+				}
+
+				if (curFrame++ == length)
+				{
+					if (connected)
+					{
+						batch->drawRoundCapLine(lastX, lastY, x, y, 4.f, color.r, color.g, color.b);
+					}
+				}
+				else
+				{
+					batch->drawRoundCapLine(lastX, lastY, x, y, 4.f, color.r, color.g, color.b);
+				}
+
+				lastX = x;
+				lastY = y;
+
+				t += 1.0;
+			}
+
+			batch->end();
+		}
 
 		context->setDefRenderTarget();
 

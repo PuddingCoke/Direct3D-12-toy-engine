@@ -59,17 +59,7 @@ private:
 
 	static constexpr NV_ENC_BUFFER_FORMAT bufferFormat = NV_ENC_BUFFER_FORMAT_ARGB;
 
-	void* encoder;
-
-	NV_ENCODE_API_FUNCTION_LIST nvencAPI;
-
-	ReadbackHeap* readbackHeap;
-
-	HMODULE moduleNvEncAPI;
-
-	ComPtr<ID3D12Fence> outputFence;
-
-	UINT outputFenceValue;
+	static constexpr NV_ENC_TUNING_INFO tuningInfo = NV_ENC_TUNING_INFO_HIGH_QUALITY;
 
 	const GUID codec = NV_ENC_CODEC_HEVC_GUID;
 
@@ -77,7 +67,17 @@ private:
 
 	const GUID profile = NV_ENC_HEVC_PROFILE_MAIN_GUID;
 
-	const NV_ENC_TUNING_INFO tuningInfo = NV_ENC_TUNING_INFO_HIGH_QUALITY;
+	HMODULE moduleNvEncAPI;
+
+	NV_ENCODE_API_FUNCTION_LIST nvencAPI;
+
+	void* encoder;
+
+	ReadbackHeap* readbackHeap;
+
+	ComPtr<ID3D12Fence> outputFence;
+
+	UINT outputFenceValue;
 
 	AVFormatContext* outCtx;
 
