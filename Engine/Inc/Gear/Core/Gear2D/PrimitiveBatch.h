@@ -16,13 +16,13 @@
 
 #include<Gear/CompiledShaders/PrimitiveBatchPS.h>
 
+//due to limitations
+//create multiple instance for multiple render targets
 class PrimitiveBatch
 {
 public:
 
-	static PrimitiveBatch* create(const DXGI_FORMAT format, GraphicsContext* const context);
-
-	static PrimitiveBatch* get();
+	PrimitiveBatch(const DXGI_FORMAT format, GraphicsContext* const context);
 
 	PrimitiveBatch(const PrimitiveBatch&) = delete;
 
@@ -30,8 +30,10 @@ public:
 
 	~PrimitiveBatch();
 
+	//call this once frame
 	void begin();
 
+	//call this once frame
 	void end();
 
 	void drawLine(const float x1, const float y1, const float x2, const float y2, const float r, const float g, const float b, const float a = 1.f);
@@ -43,10 +45,6 @@ public:
 	void setLineWidth(const float width);
 
 private:
-
-	static PrimitiveBatch* instance;
-
-	PrimitiveBatch(const DXGI_FORMAT format, GraphicsContext* const context);
 
 	float lineWidth;
 

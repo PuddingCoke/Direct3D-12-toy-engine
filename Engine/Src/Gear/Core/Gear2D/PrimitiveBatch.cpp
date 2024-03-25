@@ -1,7 +1,5 @@
 #include<Gear/Core/Gear2D/PrimitiveBatch.h>
 
-PrimitiveBatch* PrimitiveBatch::instance = nullptr;
-
 PrimitiveBatch::PrimitiveBatch(const DXGI_FORMAT format, GraphicsContext* const context) :
 	context(context), lineWidth(1.f)
 {
@@ -96,23 +94,6 @@ PrimitiveBatch::PrimitiveBatch(const DXGI_FORMAT format, GraphicsContext* const 
 
 		GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&roundCapLineState));
 	}
-}
-
-PrimitiveBatch* PrimitiveBatch::create(const DXGI_FORMAT format, GraphicsContext* const context)
-{
-	if (instance)
-	{
-		throw "[class PrimitiveBatch] already has an instance";
-	}
-
-	instance = new PrimitiveBatch(format, context);
-
-	return instance;
-}
-
-PrimitiveBatch* PrimitiveBatch::get()
-{
-	return instance;
 }
 
 PrimitiveBatch::~PrimitiveBatch()
