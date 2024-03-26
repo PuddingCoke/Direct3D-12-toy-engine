@@ -171,6 +171,7 @@
     <ClInclude Include="Inc\Gear\Core\RootSignature.h" />
     <ClInclude Include="Inc\Gear\Core\Shader.h" />
     <ClInclude Include="Inc\Gear\Core\States.h" />
+    <ClInclude Include="Inc\Gear\Core\Resource\SwapTexture.h" />
     <ClInclude Include="Inc\Gear\Core\VideoEncoder\Encoder.h" />
     <ClInclude Include="Inc\Gear\Core\VideoEncoder\NvidiaEncoder.h" />
     <ClInclude Include="Inc\Gear\Game.h" />
@@ -178,6 +179,7 @@
     <ClInclude Include="Inc\Gear\Input\Event.h" />
     <ClInclude Include="Inc\Gear\Input\Keyboard.h" />
     <ClInclude Include="Inc\Gear\Input\Mouse.h" />
+    <ClInclude Include="Inc\Gear\Utils\Color.h" />
     <ClInclude Include="Inc\Gear\Utils\Math.h" />
     <ClInclude Include="Inc\Gear\Utils\Random.h" />
     <ClInclude Include="Inc\Gear\Utils\Timer.h" />
@@ -209,6 +211,7 @@
     <ClCompile Include="Src\Gear\Core\Resource\ConstantBuffer.cpp" />
     <ClCompile Include="Src\Gear\Core\Resource\IndexBuffer.cpp" />
     <ClCompile Include="Src\Gear\Core\Resource\IndexConstantBuffer.cpp" />
+    <ClCompile Include="Src\Gear\Core\Resource\SwapTexture.cpp" />
     <ClCompile Include="Src\Gear\Core\Resource\TextureDepthStencil.cpp" />
     <ClCompile Include="Src\Gear\Core\Resource\TextureRenderTarget.cpp" />
     <ClCompile Include="Src\Gear\Core\Resource\VertexBuffer.cpp" />
@@ -222,6 +225,7 @@
     <ClCompile Include="Src\Gear\Input\Event.cpp" />
     <ClCompile Include="Src\Gear\Input\Keyboard.cpp" />
     <ClCompile Include="Src\Gear\Input\Mouse.cpp" />
+    <ClCompile Include="Src\Gear\Utils\Color.cpp" />
     <ClCompile Include="Src\Gear\Utils\Math.cpp" />
     <ClCompile Include="Src\Gear\Utils\Random.cpp" />
     <ClCompile Include="Src\Gear\Utils\Timer.cpp" />

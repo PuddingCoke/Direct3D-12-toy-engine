@@ -35,8 +35,12 @@ public:
 	//per frame global resources transition immediate
 	void setGlobalIndexBuffer(const IndexConstantBuffer* const indexBuffer);
 
+	void setGlobalConstantBuffer(const ConstantBuffer* const constantBuffer);
+
 	//per draw call transition immediate
 	void setComputeIndexBuffer(const IndexConstantBuffer* const indexBuffer);
+
+	void setComputeConstantBuffer(const ConstantBuffer* const constantBuffer);
 
 	void setGraphicsConstants(const std::initializer_list<ShaderResourceDesc> descs, const UINT offset);
 
@@ -52,23 +56,37 @@ public:
 	//per draw call transition deferred
 	void setVertexIndexBuffer(const IndexConstantBuffer* const indexBuffer);
 
+	void setVertexConstantBuffer(const ConstantBuffer* const constantBuffer);
+
 	//per draw call transition deferred
 	void setHullIndexBuffer(const IndexConstantBuffer* const indexBuffer);
+
+	void setHullConstantBuffer(const ConstantBuffer* const constantBuffer);
 
 	//per draw call transition deferred
 	void setGeometryIndexBuffer(const IndexConstantBuffer* const indexBuffer);
 
+	void setGeometryConstantBuffer(const ConstantBuffer* const constantBuffer);
+
 	//per draw call transition deferred
 	void setDomainIndexBuffer(const IndexConstantBuffer* const indexBuffer);
+
+	void setDomainConstantBuffer(const ConstantBuffer* const constantBuffer);
 
 	//per draw call transition deferred
 	void setPixelIndexBuffer(const IndexConstantBuffer* const indexBuffer);
 
+	void setPixelConstantBuffer(const ConstantBuffer* const constantBuffer);
+
 	//per draw call transition deferred
 	void setMeshIndexBuffer(const IndexConstantBuffer* const indexBuffer);
 
+	void setMeshConstantBuffer(const ConstantBuffer* const constantBuffer);
+
 	//per draw call transition deferred
 	void setAmplificationIndexBuffer(const IndexConstantBuffer* const indexBuffer);
+
+	void setAmplificationConstantBuffer(const ConstantBuffer* const constantBuffer);
 
 	//must call this after bind per shader index constant buffer
 	void finishGraphicsStageIndexBuffer();

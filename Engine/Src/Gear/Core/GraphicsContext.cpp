@@ -205,6 +205,12 @@ void GraphicsContext::setGlobalIndexBuffer(const IndexConstantBuffer* const inde
 	commandList->get()->SetComputeRootConstantBufferView(2, indexBuffer->getGPUAddress());
 }
 
+void GraphicsContext::setGlobalConstantBuffer(const ConstantBuffer* const constantBuffer)
+{
+	commandList->get()->SetGraphicsRootConstantBufferView(2, constantBuffer->getGPUAddress());
+	commandList->get()->SetComputeRootConstantBufferView(2, constantBuffer->getGPUAddress());
+}
+
 void GraphicsContext::setComputeIndexBuffer(const IndexConstantBuffer* const indexBuffer)
 {
 	for (const ShaderResourceDesc& desc : indexBuffer->descs)
@@ -296,6 +302,11 @@ void GraphicsContext::setComputeIndexBuffer(const IndexConstantBuffer* const ind
 	flushTransitionResources();
 
 	commandList->get()->SetComputeRootConstantBufferView(3, indexBuffer->getGPUAddress());
+}
+
+void GraphicsContext::setComputeConstantBuffer(const ConstantBuffer* const constantBuffer)
+{
+	commandList->get()->SetComputeRootConstantBufferView(3, constantBuffer->getGPUAddress());
 }
 
 void GraphicsContext::setGraphicsConstants(const std::initializer_list<ShaderResourceDesc> descs, const UINT offset)
@@ -519,9 +530,19 @@ void GraphicsContext::setVertexIndexBuffer(const IndexConstantBuffer* const inde
 	pushGraphicsStageIndexBuffer(9, indexBuffer, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
 }
 
+void GraphicsContext::setVertexConstantBuffer(const ConstantBuffer* const constantBuffer)
+{
+	commandList->get()->SetGraphicsRootConstantBufferView(9, constantBuffer->getGPUAddress());
+}
+
 void GraphicsContext::setHullIndexBuffer(const IndexConstantBuffer* const indexBuffer)
 {
 	pushGraphicsStageIndexBuffer(6, indexBuffer, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
+}
+
+void GraphicsContext::setHullConstantBuffer(const ConstantBuffer* const constantBuffer)
+{
+	commandList->get()->SetGraphicsRootConstantBufferView(6, constantBuffer->getGPUAddress());
 }
 
 void GraphicsContext::setGeometryIndexBuffer(const IndexConstantBuffer* const indexBuffer)
@@ -529,9 +550,19 @@ void GraphicsContext::setGeometryIndexBuffer(const IndexConstantBuffer* const in
 	pushGraphicsStageIndexBuffer(5, indexBuffer, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
 }
 
+void GraphicsContext::setGeometryConstantBuffer(const ConstantBuffer* const constantBuffer)
+{
+	commandList->get()->SetGraphicsRootConstantBufferView(5, constantBuffer->getGPUAddress());
+}
+
 void GraphicsContext::setDomainIndexBuffer(const IndexConstantBuffer* const indexBuffer)
 {
 	pushGraphicsStageIndexBuffer(4, indexBuffer, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
+}
+
+void GraphicsContext::setDomainConstantBuffer(const ConstantBuffer* const constantBuffer)
+{
+	commandList->get()->SetGraphicsRootConstantBufferView(4, constantBuffer->getGPUAddress());
 }
 
 void GraphicsContext::setPixelIndexBuffer(const IndexConstantBuffer* const indexBuffer)
@@ -539,14 +570,29 @@ void GraphicsContext::setPixelIndexBuffer(const IndexConstantBuffer* const index
 	pushGraphicsStageIndexBuffer(8, indexBuffer, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 }
 
+void GraphicsContext::setPixelConstantBuffer(const ConstantBuffer* const constantBuffer)
+{
+	commandList->get()->SetGraphicsRootConstantBufferView(8, constantBuffer->getGPUAddress());
+}
+
 void GraphicsContext::setMeshIndexBuffer(const IndexConstantBuffer* const indexBuffer)
 {
 	pushGraphicsStageIndexBuffer(7, indexBuffer, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
 }
 
+void GraphicsContext::setMeshConstantBuffer(const ConstantBuffer* const constantBuffer)
+{
+	commandList->get()->SetGraphicsRootConstantBufferView(7, constantBuffer->getGPUAddress());
+}
+
 void GraphicsContext::setAmplificationIndexBuffer(const IndexConstantBuffer* const indexBuffer)
 {
 	pushGraphicsStageIndexBuffer(3, indexBuffer, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
+}
+
+void GraphicsContext::setAmplificationConstantBuffer(const ConstantBuffer* const constantBuffer)
+{
+	commandList->get()->SetGraphicsRootConstantBufferView(3, constantBuffer->getGPUAddress());
 }
 
 void GraphicsContext::finishGraphicsStageIndexBuffer()

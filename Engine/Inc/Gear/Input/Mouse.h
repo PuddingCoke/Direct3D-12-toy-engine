@@ -29,6 +29,8 @@ public:
 
 	static const bool& getRightDown();
 
+	static const bool& getMoved();
+
 	static int addMoveEvent(std::function<void(void)> func);
 
 	static int addLeftDownEvent(std::function<void(void)> func);
@@ -57,6 +59,8 @@ private:
 
 	friend class Gear;
 
+	static void resetDeltaInfo();
+
 	static float x;
 	
 	static float y;
@@ -70,6 +74,8 @@ private:
 	static bool leftDown;
 
 	static bool rightDown;
+
+	static bool moved;
 
 	static Event moveEvent;
 

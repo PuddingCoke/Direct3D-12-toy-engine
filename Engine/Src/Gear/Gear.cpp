@@ -100,7 +100,7 @@ void Gear::release()
 
 void Gear::runGame()
 {
-	std::chrono::high_resolution_clock clock;
+	std::chrono::high_resolution_clock clock = std::chrono::high_resolution_clock();
 
 	while (winform->pollEvents())
 	{
@@ -125,6 +125,8 @@ void Gear::runGame()
 		Graphics::time.uintSeed = Random::Uint();
 
 		Graphics::time.floatSeed = Random::Float();
+
+		Mouse::resetDeltaInfo();
 	}
 
 }
@@ -251,8 +253,9 @@ LRESULT Gear::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		Mouse::x = curX;
 		Mouse::y = curY;
 
-		Mouse::moveEvent();
+		Mouse::moved = true;
 
+		Mouse::moveEvent();
 	}
 	break;
 

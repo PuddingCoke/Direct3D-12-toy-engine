@@ -15,13 +15,9 @@ void Encoder::displayProgress()
 
 	GetConsoleScreenBufferInfo(hConsole, &csbi);
 
-	std::cout << "Encoding... [";
-
 	const UINT num = progressBarWidth * (frameEncoded + 1) / frameToEncode;
 
-	std::cout << std::string(num, '*') << std::string(progressBarWidth - num, '/');
-
-	std::cout << "] " << std::fixed << std::setprecision(2) << 100.f * static_cast<float>(frameEncoded + 1) / static_cast<float>(frameToEncode) << "%";
+	std::cout << "Encoding... [" << std::string(num, '*') << std::string(progressBarWidth - num, '/') << "] " << std::fixed << std::setprecision(2) << 100.f * static_cast<float>(frameEncoded + 1) / static_cast<float>(frameToEncode) << "%";
 
 	SetConsoleCursorPosition(hConsole, csbi.dwCursorPosition);
 }

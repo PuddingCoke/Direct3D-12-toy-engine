@@ -9,6 +9,7 @@
 #include<Gear/Core/Resource/ConstantBuffer.h>
 #include<Gear/Core/Resource/VertexBuffer.h>
 #include<Gear/Core/Resource/IndexBuffer.h>
+#include<Gear/Core/Resource/SwapTexture.h>
 
 #include<Gear/Core/GraphicsContext.h>
 

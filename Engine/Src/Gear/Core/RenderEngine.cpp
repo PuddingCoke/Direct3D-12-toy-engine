@@ -354,6 +354,24 @@ RenderEngine::RenderEngine(const HWND hwnd, const bool useSwapChainBuffer) :
 	{
 		GraphicsDevice::instance = new GraphicsDevice(adapter.Get());
 
+		{
+			ComPtr<ID3D12InfoQueue> infoQueue;
+
+			GraphicsDevice::get()->QueryInterface(IID_PPV_ARGS(&infoQueue));
+
+			D3D12_MESSAGE_SEVERITY severity = D3D12_MESSAGE_SEVERITY_INFO;
+
+			D3D12_MESSAGE_ID id = D3D12_MESSAGE_ID_CLEARRENDERTARGETVIEW_MISMATCHINGCLEARVALUE;
+
+			D3D12_INFO_QUEUE_FILTER filter = {};
+			filter.DenyList.NumSeverities = 1;
+			filter.DenyList.pSeverityList = &severity;
+			filter.DenyList.NumIDs = 1;
+			filter.DenyList.pIDList = &id;
+
+			infoQueue->PushStorageFilter(&filter);
+		}
+
 		D3D12_COMMAND_QUEUE_DESC queueDesc = {};
 		queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
 		queueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
@@ -452,8 +470,12 @@ RenderEngine::RenderEngine(const HWND hwnd, const bool useSwapChainBuffer) :
 
 				CD3DX12_RESOURCE_DESC resourceDesc = CD3DX12_RESOURCE_DESC::Tex2D(Graphics::BackBufferFormat, Graphics::width, Graphics::height, 1, 1, 1, 0, D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET);
 
-				GraphicsDevice::get()->CreateCommittedResource(&heapProperties, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_PRESENT, nullptr, IID_PPV_ARGS(&backBufferResources[i]));
-			
+				float color[4] = { 0.f,0.f,0.f,1.f };
+
+				CD3DX12_CLEAR_VALUE clearValue = CD3DX12_CLEAR_VALUE(Graphics::BackBufferFormat, color);
+
+				GraphicsDevice::get()->CreateCommittedResource(&heapProperties, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_PRESENT, &clearValue, IID_PPV_ARGS(&backBufferResources[i]));
+
 				GraphicsDevice::get()->CreateRenderTargetView(backBufferResources[i].Get(), &rtvDesc, descriptorHandle.getCPUHandle());
 
 				Graphics::backBufferHandles[i] = descriptorHandle.getCPUHandle();
