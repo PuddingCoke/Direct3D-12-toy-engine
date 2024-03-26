@@ -8,9 +8,10 @@ class MyGame :public Game
 {
 public:
 
-	MyGame() :
+	MyGame():
 		renderPass(new MyRenderPass())
 	{
+
 	}
 
 	~MyGame()
@@ -23,7 +24,7 @@ public:
 
 	}
 
-	void render()
+	void render() override
 	{
 		auto result = renderPass->getPassResult();
 
@@ -32,7 +33,8 @@ public:
 		RenderEngine::get()->submitRenderPass(renderPass);
 	}
 
-	MyRenderPass* renderPass;
+private:
 
+	MyRenderPass* renderPass;
 
 };

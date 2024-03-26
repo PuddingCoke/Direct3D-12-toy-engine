@@ -17,11 +17,12 @@
 #include<Gear/CompiledShaders/PrimitiveBatchPS.h>
 
 //due to limitations
-//create multiple instance for multiple render targets
+//create multiple instances for multiple render targets
 class PrimitiveBatch
 {
 public:
 
+	//render target format
 	PrimitiveBatch(const DXGI_FORMAT format, GraphicsContext* const context);
 
 	PrimitiveBatch(const PrimitiveBatch&) = delete;

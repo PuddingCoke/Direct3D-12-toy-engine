@@ -27,6 +27,8 @@ public:
 	{
 		auto result = renderPass->getPassResult();
 
+		result.get();
+
 		RenderEngine::get()->submitRenderPass(renderPass);
 	}
 
