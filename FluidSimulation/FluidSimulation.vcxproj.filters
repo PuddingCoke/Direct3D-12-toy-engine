@@ -39,6 +39,5 @@
     <FxCompile Include="VelocityAdvectionDissipation.hlsl" />
     <FxCompile Include="ViscousDiffusionPS.hlsl" />
     <FxCompile Include="VorticityPS.hlsl" />
-    <FxCompile Include="FullScreenPS.hlsl" />
   </ItemGroup>
 </Project>

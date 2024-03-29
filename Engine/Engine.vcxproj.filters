@@ -150,6 +150,12 @@
     <ClInclude Include="Inc\Gear\Utils\Color.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Inc\Gear\Core\Effect\Effect.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Gear\Core\Effect\BloomEffect.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Gear\Window\Win32Form.cpp">
@@ -284,6 +290,12 @@
     <ClCompile Include="Src\Gear\Utils\Color.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="Src\Gear\Core\Effect\Effect.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gear\Core\Effect\BloomEffect.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\FullScreen\FullScreenVS.hlsl" />
@@ -294,6 +306,13 @@
     <FxCompile Include="Shaders\PrimitiveBatch\PrimitiveBatchRCLineGS.hlsl" />
     <FxCompile Include="Shaders\PrimitiveBatch\PrimitiveBatchRCLineVS.hlsl" />
     <FxCompile Include="Shaders\VideoEncoder\RGBToNV12CS.hlsl" />
+    <FxCompile Include="Shaders\Bloom\BloomDownSamplePS.hlsl" />
+    <FxCompile Include="Shaders\Bloom\BloomFilterPS.hlsl" />
+    <FxCompile Include="Shaders\Bloom\BloomFinalPS.hlsl" />
+    <FxCompile Include="Shaders\Bloom\BloomKarisAveragePS.hlsl" />
+    <FxCompile Include="Shaders\Bloom\BloomHBlurCS.hlsl" />
+    <FxCompile Include="Shaders\Bloom\BloomVBlurCS.hlsl" />
+    <FxCompile Include="Shaders\FullScreen\FullScreenPS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\Common.hlsli" />

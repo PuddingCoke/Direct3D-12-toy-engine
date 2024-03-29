@@ -154,6 +154,8 @@
     <ClInclude Include="Inc\Gear\Core\DX\Resource\Buffer.h" />
     <ClInclude Include="Inc\Gear\Core\DX\Resource\Resource.h" />
     <ClInclude Include="Inc\Gear\Core\DX\Resource\UploadHeap.h" />
+    <ClInclude Include="Inc\Gear\Core\Effect\BloomEffect.h" />
+    <ClInclude Include="Inc\Gear\Core\Effect\Effect.h" />
     <ClInclude Include="Inc\Gear\Core\Gear2D\PrimitiveBatch.h" />
     <ClInclude Include="Inc\Gear\Core\GlobalDescriptorHeap.h" />
     <ClInclude Include="Inc\Gear\Core\GlobalRootSignature.h" />
@@ -193,6 +195,8 @@
     <ClCompile Include="Src\Gear\Core\ConstantBufferPool.cpp" />
     <ClCompile Include="Src\Gear\Core\DescriptorHeap.cpp" />
     <ClCompile Include="Src\Gear\Core\DX\Resource\ReadbackHeap.cpp" />
+    <ClCompile Include="Src\Gear\Core\Effect\BloomEffect.cpp" />
+    <ClCompile Include="Src\Gear\Core\Effect\Effect.cpp" />
     <ClCompile Include="Src\Gear\Core\Gear2D\PrimitiveBatch.cpp" />
     <ClCompile Include="Src\Gear\Core\GlobalDescriptorHeap.cpp" />
     <ClCompile Include="Src\Gear\Core\GlobalRootSignature.cpp" />
@@ -233,6 +237,96 @@
     <ClCompile Include="Src\Gear\Window\Win32Form.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="Shaders\Bloom\BloomDownSamplePS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">6.6</ShaderModel>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">g_%(Filename)Bytes</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Inc/Gear/CompiledShaders/%(Filename).h</HeaderFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </ObjectFileOutput>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)Engine\Shaders;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </FxCompile>
+    <FxCompile Include="Shaders\Bloom\BloomFilterPS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">6.6</ShaderModel>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)Engine\Shaders;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">g_%(Filename)Bytes</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Inc/Gear/CompiledShaders/%(Filename).h</HeaderFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </ObjectFileOutput>
+    </FxCompile>
+    <FxCompile Include="Shaders\Bloom\BloomFinalPS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">g_%(Filename)Bytes</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Inc/Gear/CompiledShaders/%(Filename).h</HeaderFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </ObjectFileOutput>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">6.6</ShaderModel>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)Engine\Shaders;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </FxCompile>
+    <FxCompile Include="Shaders\Bloom\BloomHBlurCS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">6.6</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4.0</ShaderModel>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)Engine\Shaders;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">g_%(Filename)Bytes</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Inc/Gear/CompiledShaders/%(Filename).h</HeaderFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </ObjectFileOutput>
+    </FxCompile>
+    <FxCompile Include="Shaders\Bloom\BloomKarisAveragePS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">6.6</ShaderModel>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)Engine\Shaders;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">g_%(Filename)Bytes</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Inc/Gear/CompiledShaders/%(Filename).h</HeaderFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </ObjectFileOutput>
+    </FxCompile>
+    <FxCompile Include="Shaders\Bloom\BloomVBlurCS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">6.6</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4.0</ShaderModel>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)Engine\Shaders;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">g_%(Filename)Bytes</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Inc/Gear/CompiledShaders/%(Filename).h</HeaderFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </ObjectFileOutput>
+    </FxCompile>
+    <FxCompile Include="Shaders\FullScreen\FullScreenPS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">g_%(Filename)Bytes</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Inc/Gear/CompiledShaders/%(Filename).h</HeaderFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </ObjectFileOutput>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">6.6</ShaderModel>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)Engine\Shaders;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </FxCompile>
     <FxCompile Include="Shaders\FullScreen\FullScreenVS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>

@@ -2,6 +2,8 @@
 
 Shader* Shader::fullScreenVS = nullptr;
 
+Shader* Shader::fullScreenPS = nullptr;
+
 Shader::Shader(const BYTE* const bytes, const size_t byteSize)
 {
 	shaderByteCode.pShaderBytecode = bytes;
@@ -43,6 +45,8 @@ D3D12_SHADER_BYTECODE Shader::getByteCode() const
 void Shader::createGlobalShaders()
 {
 	fullScreenVS = new Shader(g_FullScreenVSBytes, sizeof(g_FullScreenVSBytes));
+
+	fullScreenPS = new Shader(g_FullScreenPSBytes, sizeof(g_FullScreenPSBytes));
 }
 
 void Shader::releaseGlobalShaders()
@@ -50,5 +54,10 @@ void Shader::releaseGlobalShaders()
 	if (fullScreenVS)
 	{
 		delete fullScreenVS;
+	}
+
+	if (fullScreenPS)
+	{
+		delete fullScreenPS;
 	}
 }
