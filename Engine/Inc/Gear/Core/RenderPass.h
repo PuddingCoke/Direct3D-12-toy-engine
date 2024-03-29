@@ -28,7 +28,7 @@ class RenderPass
 {
 public:
 
-	std::future<void> getPassResult();
+	void launchTask();
 
 	RenderPass();
 
@@ -95,6 +95,8 @@ private:
 	std::vector<VertexBuffer*> deferredReleaseVertexBuffer[Graphics::FrameBufferCount];
 
 	CommandList* const transitionCMD;
+
+	std::future<void> task;
 
 	template<typename T>
 	void releaseResources(std::vector<T>& resources);
