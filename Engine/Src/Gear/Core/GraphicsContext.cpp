@@ -787,6 +787,11 @@ void GraphicsContext::draw(const UINT vertexCountPerInstance, const UINT instanc
 	commandList->get()->DrawInstanced(vertexCountPerInstance, instanceCount, startVertexLocation, startInstanceLocation);
 }
 
+void GraphicsContext::dispatch(const UINT threadGroupCountX, const UINT threadGroupCountY, const UINT threadGroupCountZ)
+{
+	commandList->get()->Dispatch(threadGroupCountX, threadGroupCountY, threadGroupCountZ);
+}
+
 void GraphicsContext::begin() const
 {
 	commandList->reset();

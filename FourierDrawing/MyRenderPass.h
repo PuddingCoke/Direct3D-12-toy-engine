@@ -55,8 +55,6 @@ public:
 
 	ComPtr<ID3D12PipelineState> fullScreenPipelineState;
 
-	Shader* fullScreenPS;
-
 	const struct Color
 	{
 		float r;
@@ -73,8 +71,6 @@ public:
 		curFrame(0),
 		connected(false)
 	{
-		fullScreenPS = new Shader(Utils::getRootFolder() + "FullScreenPS.cso");
-
 		begin();
 
 		context->setRenderTargets({ renderTexture->getRTVMipHandle(0) }, {});
@@ -90,7 +86,7 @@ public:
 			desc.InputLayout = {};
 			desc.pRootSignature = GlobalRootSignature::getGraphicsRootSignature()->get();
 			desc.VS = Shader::fullScreenVS->getByteCode();
-			desc.PS = fullScreenPS->getByteCode();
+			desc.PS = Shader::fullScreenPS->getByteCode();
 			desc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
 			desc.BlendState = States::defBlendDesc;
 			desc.DepthStencilState.DepthEnable = FALSE;
@@ -176,7 +172,6 @@ public:
 		delete renderTexture;
 		delete pBatch[0];
 		delete pBatch[1];
-		delete fullScreenPS;
 	}
 
 protected:

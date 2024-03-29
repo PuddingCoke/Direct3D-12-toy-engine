@@ -121,6 +121,8 @@ public:
 
 	void draw(const UINT vertexCountPerInstance, const UINT instanceCount, const UINT startVertexLocation, const UINT startInstanceLocation) const;
 
+	void dispatch(const UINT threadGroupCountX, const UINT threadGroupCountY, const UINT threadGroupCountZ);
+
 	void begin() const;
 
 	void end() const;

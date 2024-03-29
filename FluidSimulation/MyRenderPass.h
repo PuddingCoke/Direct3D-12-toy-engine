@@ -2,6 +2,8 @@
 
 #include<Gear/Core/RenderPass.h>
 
+#include<Gear/Core/Effect/BloomEffect.h>
+
 #include<Gear/Utils/Color.h>
 
 #include<DirectXColors.h>
@@ -11,6 +13,7 @@ class MyRenderPass :public RenderPass
 public:
 
 	MyRenderPass() :
+		effect(new BloomEffect(context, Graphics::getWidth(), Graphics::getHeight())),
 		colorUpdateTimer(1.f),
 		fluidFinalPS(new Shader(Utils::getRootFolder() + "FluidFinalPS.cso")),
 		splatColorPS(new Shader(Utils::getRootFolder() + "SplatColorPS.cso")),
@@ -22,9 +25,10 @@ public:
 		divergencePS(new Shader(Utils::getRootFolder() + "DivergencePS.cso")),
 		pressureGradientSubtractPS(new Shader(Utils::getRootFolder() + "PressureGradientSubtractPS.cso")),
 		viscousDiffusionPS(new Shader(Utils::getRootFolder() + "ViscousDiffusionPS.cso")),
-		vorticityPS(new Shader(Utils::getRootFolder() + "VorticityPS.cso")),
-		fullScreenPS(new Shader(Utils::getRootFolder() + "FullScreenPS.cso"))
+		vorticityPS(new Shader(Utils::getRootFolder() + "VorticityPS.cso"))
 	{
+		effect->setThreshold(0.f);
+
 		const DirectX::XMUINT2 simRes =
 		{
 			Graphics::getWidth() / config.resolutionFactor,
@@ -60,132 +64,104 @@ public:
 		simulationParam.splatRadius = config.splatRadius / 100.f * Graphics::getAspectRatio();
 
 		{
-			D3D12_BLEND_DESC blendStateDesc = {};
-			blendStateDesc.IndependentBlendEnable = false;
-			blendStateDesc.RenderTarget[0].BlendEnable = true;
-			blendStateDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
-			blendStateDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_ONE;
-			blendStateDesc.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
-			blendStateDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
-			blendStateDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_INV_SRC_ALPHA;
-			blendStateDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
-			blendStateDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
+			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = getDefaultGraphicsPipelineDesc();
+			desc.PS = fluidFinalPS->getByteCode();
+			desc.RTVFormats[0] = originTexture->getTexture()->getFormat();
 
-			{
-				D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = getDefaultGraphicsPipelineDesc();
-				desc.PS = fluidFinalPS->getByteCode();
-				desc.BlendState = blendStateDesc;
-				desc.RTVFormats[0] = originTexture->getTexture()->getFormat();
-
-				GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&fluidFinalState));
-			}
-
-			{
-				D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = getDefaultGraphicsPipelineDesc();
-				desc.PS = splatColorPS->getByteCode();
-				desc.BlendState = blendStateDesc;
-				desc.RTVFormats[0] = colorTex->read()->getTexture()->getFormat();
-
-				GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&splatColorState));
-			}
-
-			{
-				D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = getDefaultGraphicsPipelineDesc();
-				desc.PS = splatVelocityPS->getByteCode();
-				desc.BlendState = blendStateDesc;
-				desc.RTVFormats[0] = velocityTex->read()->getTexture()->getFormat();
-
-				GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&splatVelocityState));
-			}
+			GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&fluidFinalState));
 		}
 
 		{
-			{
-				D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = getDefaultGraphicsPipelineDesc();
-				desc.PS = colorAdvectionDissipationPS->getByteCode();
-				desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
-				desc.RTVFormats[0] = colorTex->read()->getTexture()->getFormat();
+			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = getDefaultGraphicsPipelineDesc();
+			desc.PS = splatColorPS->getByteCode();
+			desc.RTVFormats[0] = colorTex->read()->getTexture()->getFormat();
 
-				GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&colorAdvectionDissipationState));
-			}
+			GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&splatColorState));
+		}
 
-			{
-				D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = getDefaultGraphicsPipelineDesc();
-				desc.PS = velocityAdvectionDissipationPS->getByteCode();
-				desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
-				desc.RTVFormats[0] = velocityTex->read()->getTexture()->getFormat();
+		{
+			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = getDefaultGraphicsPipelineDesc();
+			desc.PS = splatVelocityPS->getByteCode();
+			desc.RTVFormats[0] = velocityTex->read()->getTexture()->getFormat();
 
-				GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&velocityAdvectionDissipationState));
-			}
+			GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&splatVelocityState));
+		}
 
-			{
-				D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = getDefaultGraphicsPipelineDesc();
-				desc.PS = pressureDissipationPS->getByteCode();
-				desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
-				desc.RTVFormats[0] = pressureTex->read()->getTexture()->getFormat();
+		{
+			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = getDefaultGraphicsPipelineDesc();
+			desc.PS = colorAdvectionDissipationPS->getByteCode();
+			desc.RTVFormats[0] = colorTex->read()->getTexture()->getFormat();
 
-				GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&pressureDissipationState));
-			}
+			GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&colorAdvectionDissipationState));
+		}
 
-			{
-				D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = getDefaultGraphicsPipelineDesc();
-				desc.PS = curlPS->getByteCode();
-				desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
-				desc.RTVFormats[0] = curlTex->getTexture()->getFormat();
+		{
+			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = getDefaultGraphicsPipelineDesc();
+			desc.PS = velocityAdvectionDissipationPS->getByteCode();
+			desc.RTVFormats[0] = velocityTex->read()->getTexture()->getFormat();
 
-				GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&curlState));
-			}
+			GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&velocityAdvectionDissipationState));
+		}
 
-			{
-				D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = getDefaultGraphicsPipelineDesc();
-				desc.PS = divergencePS->getByteCode();
-				desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
-				desc.RTVFormats[0] = divergenceTex->getTexture()->getFormat();
+		{
+			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = getDefaultGraphicsPipelineDesc();
+			desc.PS = pressureDissipationPS->getByteCode();
+			desc.RTVFormats[0] = pressureTex->read()->getTexture()->getFormat();
 
-				GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&divergenceState));
-			}
+			GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&pressureDissipationState));
+		}
 
-			{
-				D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = getDefaultGraphicsPipelineDesc();
-				desc.PS = pressureGradientSubtractPS->getByteCode();
-				desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
-				desc.RTVFormats[0] = velocityTex->read()->getTexture()->getFormat();
+		{
+			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = getDefaultGraphicsPipelineDesc();
+			desc.PS = curlPS->getByteCode();
+			desc.RTVFormats[0] = curlTex->getTexture()->getFormat();
 
-				GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&pressureGradientSubtractState));
-			}
+			GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&curlState));
+		}
 
-			{
-				D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = getDefaultGraphicsPipelineDesc();
-				desc.PS = viscousDiffusionPS->getByteCode();
-				desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
-				desc.RTVFormats[0] = pressureTex->read()->getTexture()->getFormat();
+		{
+			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = getDefaultGraphicsPipelineDesc();
+			desc.PS = divergencePS->getByteCode();
+			desc.RTVFormats[0] = divergenceTex->getTexture()->getFormat();
 
-				GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&viscousDiffusionState));
-			}
+			GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&divergenceState));
+		}
 
-			{
-				D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = getDefaultGraphicsPipelineDesc();
-				desc.PS = vorticityPS->getByteCode();
-				desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
-				desc.RTVFormats[0] = velocityTex->read()->getTexture()->getFormat();
+		{
+			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = getDefaultGraphicsPipelineDesc();
+			desc.PS = pressureGradientSubtractPS->getByteCode();
+			desc.RTVFormats[0] = velocityTex->read()->getTexture()->getFormat();
 
-				GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&vorticityState));
-			}
+			GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&pressureGradientSubtractState));
+		}
 
-			{
-				D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = getDefaultGraphicsPipelineDesc();
-				desc.PS = fullScreenPS->getByteCode();
-				desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
-				desc.RTVFormats[0] = Graphics::BackBufferFormat;
+		{
+			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = getDefaultGraphicsPipelineDesc();
+			desc.PS = viscousDiffusionPS->getByteCode();
+			desc.RTVFormats[0] = pressureTex->read()->getTexture()->getFormat();
 
-				GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&fullScreenState));
-			}
+			GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&viscousDiffusionState));
+		}
+
+		{
+			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = getDefaultGraphicsPipelineDesc();
+			desc.PS = vorticityPS->getByteCode();
+			desc.RTVFormats[0] = velocityTex->read()->getTexture()->getFormat();
+
+			GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&vorticityState));
+		}
+
+		{
+			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = getDefaultGraphicsPipelineDesc();
+			desc.PS = Shader::fullScreenPS->getByteCode();
+			desc.RTVFormats[0] = Graphics::BackBufferFormat;
+
+			GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&fullScreenState));
 		}
 	}
 
 	//just configure
 	//PS
-	//BlendState
 	//RTVFormats[0]
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC getDefaultGraphicsPipelineDesc()
 	{
@@ -194,6 +170,7 @@ public:
 		desc.pRootSignature = GlobalRootSignature::getGraphicsRootSignature()->get();
 		desc.VS = Shader::fullScreenVS->getByteCode();
 		desc.RasterizerState = States::rasterCullBack;
+		desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
 		desc.DepthStencilState.DepthEnable = FALSE;
 		desc.DepthStencilState.StencilEnable = FALSE;
 		desc.SampleMask = UINT_MAX;
@@ -206,6 +183,8 @@ public:
 
 	~MyRenderPass()
 	{
+		delete effect;
+
 		delete colorTex;
 		delete velocityTex;
 		delete curlTex;
@@ -226,7 +205,6 @@ public:
 		delete pressureGradientSubtractPS;
 		delete viscousDiffusionPS;
 		delete vorticityPS;
-		delete fullScreenPS;
 	}
 
 	void recordCommand() override
@@ -266,7 +244,7 @@ public:
 			context->setGraphicsConstants({ velocityTex->read()->getAllSRVIndex() }, 0);
 			context->draw(3, 1, 0, 0);
 			velocityTex->swap();
-			
+
 			context->setViewport(colorTex->width, colorTex->height);
 			context->setScissorRect(0, 0, colorTex->width, colorTex->height);
 			context->setPipelineState(splatColorState.Get());
@@ -333,18 +311,21 @@ public:
 
 		context->setPipelineState(fluidFinalState.Get());
 		context->setRenderTargets({ originTexture->getRTVMipHandle(0) }, {});
-		context->clearRenderTarget({ originTexture->getRTVMipHandle(0) }, DirectX::Colors::Black);
 		context->setGraphicsConstants({ colorTex->read()->getAllSRVIndex() }, 0);
 		context->draw(3, 1, 0, 0);
+
+		TextureRenderTarget* const outputTexture = effect->process(originTexture);
 
 		context->setPipelineState(fullScreenState.Get());
 		context->setDefRenderTarget();
 		context->clearDefRenderTarget(DirectX::Colors::Black);
-		context->setGraphicsConstants({ originTexture->getAllSRVIndex() }, 0);
+		context->setGraphicsConstants({ outputTexture->getAllSRVIndex() }, 0);
 		context->draw(3, 1, 0, 0);
 	}
 
 private:
+
+	BloomEffect* effect;
 
 	SwapTexture* colorTex;
 
@@ -433,8 +414,6 @@ private:
 	Shader* vorticityPS;
 
 	ComPtr<ID3D12PipelineState> vorticityState;
-
-	Shader* fullScreenPS;
 
 	ComPtr<ID3D12PipelineState> fullScreenState;
 };

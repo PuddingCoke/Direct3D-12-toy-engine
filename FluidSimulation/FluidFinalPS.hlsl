@@ -41,7 +41,5 @@ float4 main(float2 texCoord : TEXCOORD) : SV_TARGET
     
     color *= diffuse;
     
-    float a = max(color.r, max(color.g, color.b));
-    
-    return float4(color, a);
+    return float4(color, 1.0);
 }

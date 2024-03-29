@@ -8,6 +8,8 @@
 #include<Gear/Utils/Utils.h>
 
 #include<Gear/CompiledShaders/FullScreenVS.h>
+#include<Gear/CompiledShaders/FullScreenPS.h>
+
 
 class Shader
 {
@@ -20,6 +22,9 @@ public:
 	D3D12_SHADER_BYTECODE getByteCode() const;
 
 	static Shader* fullScreenVS;
+
+	//ctx->setGraphicsConstant({ShaderResourceDesc},0)
+	static Shader* fullScreenPS;
 
 private:
 
