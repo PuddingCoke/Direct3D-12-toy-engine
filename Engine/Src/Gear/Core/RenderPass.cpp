@@ -1,8 +1,8 @@
 #include<Gear/Core/RenderPass.h>
 
-std::future<void> RenderPass::getPassResult()
+void RenderPass::launchTask()
 {
-	return std::async(std::launch::async, [this]
+	task = std::async(std::launch::async, [this]
 		{
 			begin();
 
@@ -14,7 +14,8 @@ std::future<void> RenderPass::getPassResult()
 
 RenderPass::RenderPass() :
 	context(new GraphicsContext()),
-	transitionCMD(new CommandList(D3D12_COMMAND_LIST_TYPE_DIRECT))
+	transitionCMD(new CommandList(D3D12_COMMAND_LIST_TYPE_DIRECT)),
+	task(std::async(std::launch::async, [this] {}))
 {
 }
 

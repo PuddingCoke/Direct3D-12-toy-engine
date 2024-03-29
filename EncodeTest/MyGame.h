@@ -26,9 +26,7 @@ public:
 
 	void render() override
 	{
-		auto result = renderPass->getPassResult();
-
-		result.get();
+		renderPass->launchTask();
 
 		RenderEngine::get()->submitRenderPass(renderPass);
 	}

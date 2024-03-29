@@ -9,6 +9,8 @@ RenderEngine* RenderEngine::get()
 
 void RenderEngine::submitRenderPass(RenderPass* const pass)
 {
+	pass->task.get();
+
 	std::vector<D3D12_RESOURCE_BARRIER> barriers;
 
 	{
