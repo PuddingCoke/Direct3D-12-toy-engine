@@ -266,11 +266,13 @@ protected:
 
 		context->setDefRenderTarget();
 
-		context->setGraphicsConstants({ renderTexture->getAllSRVIndex() }, 0);
+		context->setPSConstants({ renderTexture->getAllSRVIndex() }, 0);
 
 		context->setPipelineState(fullScreenPipelineState.Get());
 
 		context->setTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+		context->transitionResources();
 
 		context->draw(3, 1, 0, 0);
 	}

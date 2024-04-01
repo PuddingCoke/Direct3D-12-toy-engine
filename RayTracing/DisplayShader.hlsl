@@ -5,7 +5,7 @@ struct Indices
     uint textureIdx;
 };
 
-ConstantBuffer<Indices> indicesData : register(b1);
+ConstantBuffer<Indices> indicesData : register(b2);
 
 static const Texture2D<float4> tex = ResourceDescriptorHeap[indicesData.textureIdx];
 

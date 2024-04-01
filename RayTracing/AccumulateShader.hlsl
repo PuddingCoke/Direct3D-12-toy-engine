@@ -15,7 +15,7 @@ struct DrawCallParam
     float radius;
 };
 
-ConstantBuffer<DrawCallParam> drawCallParam : register(b1);
+ConstantBuffer<DrawCallParam> drawCallParam : register(b2);
 
 static float hashSeed = 0.0;
 

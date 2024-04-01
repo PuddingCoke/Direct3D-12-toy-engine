@@ -1,12 +1,12 @@
 #include"Common.hlsli"
 
-cbuffer TextureIndices : register(b1)
+cbuffer TextureIndices : register(b2)
 {
     uint velocityTexIndex;
     uint curlTexIndex;
 }
 
-cbuffer SimulationParam : register(b2)
+cbuffer SimulationParam : register(b1)
 {
     float2 pos;
     float2 posDelta;
