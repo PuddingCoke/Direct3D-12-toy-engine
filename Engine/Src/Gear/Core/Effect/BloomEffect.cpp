@@ -141,27 +141,22 @@ BloomEffect::~BloomEffect()
 
 TextureRenderTarget* BloomEffect::process(TextureRenderTarget* const inputTexture) const
 {
-	for (UINT i = 0; i < blurSteps; i++)
-	{
-		blurParamBuffer[i]->update(&blurParam[i], sizeof(BlurParam));
-	}
-
 	context->setTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	context->setViewport(width, height);
-	context->setScissorRect(0, 0, width, height);
+	context->setViewportSimple(width, height);
 	context->setPipelineState(bloomFilterState.Get());
 	context->setRenderTargets({ filteredTexture->getRTVMipHandle(0) }, {});
-	context->setGraphicsConstants({ inputTexture->getAllSRVIndex() }, 0);
-	context->setGraphicsConstants(5, &bloomParam, 1);
+	context->setPSConstants({ inputTexture->getAllSRVIndex() }, 0);
+	context->setPSConstants(5, &bloomParam, 1);
+	context->transitionResources();
 	context->draw(3, 1, 0, 0);
 
-	context->setViewport(resolutions[0].x, resolutions[0].y);
-	context->setScissorRect(0, 0, resolutions[0].x, resolutions[0].y);
+	context->setViewportSimple(resolutions[0].x, resolutions[0].y);
 	context->setPipelineState(bloomKarisAverageState.Get());
 	context->setRenderTargets({ swapTexture[0]->write()->getRTVMipHandle(0) }, {});
-	context->setGraphicsConstants({ filteredTexture->getAllSRVIndex() }, 0);
-	context->setGraphicsConstants(4, &bloomParam, 1);
+	context->setPSConstants({ filteredTexture->getAllSRVIndex() }, 0);
+	context->setPSConstants(4, &bloomParam, 1);
+	context->transitionResources();
 	context->draw(3, 1, 0, 0);
 	swapTexture[0]->swap();
 
@@ -169,72 +164,76 @@ TextureRenderTarget* BloomEffect::process(TextureRenderTarget* const inputTextur
 
 	for (UINT i = 0; i < blurSteps - 1; i++)
 	{
-		context->setViewport(resolutions[i + 1].x, resolutions[i + 1].y);
-		context->setScissorRect(0, 0, resolutions[i + 1].x, resolutions[i + 1].y);
+		context->setViewportSimple(resolutions[i + 1].x, resolutions[i + 1].y);
 		context->setRenderTargets({ swapTexture[i + 1]->write()->getRTVMipHandle(0) }, {});
-		context->setGraphicsConstants({ swapTexture[i]->read()->getAllSRVIndex() }, 0);
+		context->setPSConstants({ swapTexture[i]->read()->getAllSRVIndex() }, 0);
+		context->transitionResources();
 		context->draw(3, 1, 0, 0);
 		swapTexture[i + 1]->swap();
 	}
 
-	context->setComputeConstants({
+	context->setCSConstants({
 		swapTexture[blurSteps - 1]->read()->getAllSRVIndex(),
 		swapTexture[blurSteps - 1]->write()->getUAVMipIndex(0) }, 0);
 
-	context->setComputeConstantBuffer(blurParamBuffer[blurSteps - 1]);
+	context->setCSConstantBuffer(blurParamBuffer[blurSteps - 1]);
 
 	context->setPipelineState(bloomHBlurState.Get());
+	context->transitionResources();
 	context->dispatch(resolutions[blurSteps - 1].x / workGroupSize.x, resolutions[blurSteps - 1].y / workGroupSize.y + 1, 1);
 	context->uavBarrier({ swapTexture[blurSteps - 1]->write()->getTexture() });
 	swapTexture[blurSteps - 1]->swap();
 
-	context->setComputeConstants({
+	context->setCSConstants({
 		swapTexture[blurSteps - 1]->read()->getAllSRVIndex(),
 		swapTexture[blurSteps - 1]->write()->getUAVMipIndex(0) }, 0);
 
-	context->setComputeConstantBuffer(blurParamBuffer[blurSteps - 1]);
+	context->setCSConstantBuffer(blurParamBuffer[blurSteps - 1]);
 
 	context->setPipelineState(bloomVBlurState.Get());
+	context->transitionResources();
 	context->dispatch(resolutions[blurSteps - 1].x / workGroupSize.x, resolutions[blurSteps - 1].y / workGroupSize.y + 1, 1);
 	context->uavBarrier({ swapTexture[blurSteps - 1]->write()->getTexture() });
 	swapTexture[blurSteps - 1]->swap();
 
 	for (UINT i = 0; i < blurSteps - 1; i++)
 	{
-		context->setComputeConstantBuffer(blurParamBuffer[blurSteps - 2 - i]);
+		context->setCSConstantBuffer(blurParamBuffer[blurSteps - 2 - i]);
 
-		context->setComputeConstants({
+		context->setCSConstants({
 			swapTexture[blurSteps - 2 - i]->read()->getAllSRVIndex(),
 			swapTexture[blurSteps - 2 - i]->write()->getUAVMipIndex(0) }, 0);
 		context->setPipelineState(bloomHBlurState.Get());
+		context->transitionResources();
 		context->dispatch(resolutions[blurSteps - 2 - i].x / workGroupSize.x, resolutions[blurSteps - 2 - i].y / workGroupSize.y + 1, 1);
 		context->uavBarrier({ swapTexture[blurSteps - 2 - i]->write()->getTexture() });
 		swapTexture[blurSteps - 2 - i]->swap();
 
-		context->setComputeConstants({
+		context->setCSConstants({
 			swapTexture[blurSteps - 2 - i]->read()->getAllSRVIndex(),
 			swapTexture[blurSteps - 2 - i]->write()->getUAVMipIndex(0) }, 0);
 		context->setPipelineState(bloomVBlurState.Get());
+		context->transitionResources();
 		context->dispatch(resolutions[blurSteps - 2 - i].x / workGroupSize.x, resolutions[blurSteps - 2 - i].y / workGroupSize.y + 1, 1);
 		context->uavBarrier({ swapTexture[blurSteps - 2 - i]->write()->getTexture() });
 
-		context->setViewport(resolutions[blurSteps - 2 - i].x, resolutions[blurSteps - 2 - i].y);
-		context->setScissorRect(0, 0, resolutions[blurSteps - 2 - i].x, resolutions[blurSteps - 2 - i].y);
+		context->setViewportSimple(resolutions[blurSteps - 2 - i].x, resolutions[blurSteps - 2 - i].y);
 		context->setPipelineState(bloomUpSampleState.Get());
 		context->setRenderTargets({ swapTexture[blurSteps - 2 - i]->write()->getRTVMipHandle(0) }, {});
-		context->setGraphicsConstants({ swapTexture[blurSteps - 1 - i]->read()->getAllSRVIndex() }, 0);
+		context->setPSConstants({ swapTexture[blurSteps - 1 - i]->read()->getAllSRVIndex() }, 0);
+		context->transitionResources();
 		context->draw(3, 1, 0, 0);
 		swapTexture[blurSteps - 2 - i]->swap();
 	}
 
-	context->setViewport(width, height);
-	context->setScissorRect(0, 0, width, height);
+	context->setViewportSimple(width, height);
 	context->setPipelineState(bloomFinalState.Get());
 	context->setRenderTargets({ outputTexture->getRTVMipHandle(0) }, {});
-	context->setGraphicsConstants({
+	context->setPSConstants({
 		inputTexture->getAllSRVIndex(),
 		swapTexture[0]->read()->getAllSRVIndex() }, 0);
-	context->setGraphicsConstants(4, &bloomParam, 3);
+	context->setPSConstants(4, &bloomParam, 3);
+	context->transitionResources();
 	context->draw(3, 1, 0, 0);
 
 	return outputTexture;
@@ -276,4 +275,6 @@ void BloomEffect::updateCurve(const UINT index)
 		blurParam[index].weight[(i + 1) / 2] = g1 + g2;
 		blurParam[index].offset[(i + 1) / 2] = (g1 * i + g2 * (i + 1)) / (g1 + g2);
 	}
+
+	blurParamBuffer[index]->update(&blurParam[index], sizeof(BlurParam));
 }

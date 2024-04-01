@@ -97,22 +97,29 @@ GlobalRootSignature::GlobalRootSignature()
 	}
 
 	{
-		CD3DX12_ROOT_PARAMETER1 rootParameters[10] = {};
+		//2+4*6+16+2+2*7 58 dwords
+		CD3DX12_ROOT_PARAMETER1 rootParameters[16] = {};
 
-		//global constant buffer that can be accessed by any shader stage at any time
+		//reserved global constant buffer used by engine
 		rootParameters[0].InitAsConstantBufferView(0, 0, D3D12_ROOT_DESCRIPTOR_FLAG_NONE, D3D12_SHADER_VISIBILITY_ALL);
-		//global constants
-		rootParameters[1].InitAsConstants(16, 1, 0, D3D12_SHADER_VISIBILITY_ALL);
-		//user defined global constant buffer that can be accessed by any shader stage within one frame
-		rootParameters[2].InitAsConstantBufferView(2, 0, D3D12_ROOT_DESCRIPTOR_FLAG_NONE, D3D12_SHADER_VISIBILITY_ALL);
-		//user defined per stage per draw call constant buffer
-		rootParameters[3].InitAsConstantBufferView(3, 0, D3D12_ROOT_DESCRIPTOR_FLAG_NONE, D3D12_SHADER_VISIBILITY_AMPLIFICATION);
-		rootParameters[4].InitAsConstantBufferView(3, 0, D3D12_ROOT_DESCRIPTOR_FLAG_NONE, D3D12_SHADER_VISIBILITY_DOMAIN);
-		rootParameters[5].InitAsConstantBufferView(3, 0, D3D12_ROOT_DESCRIPTOR_FLAG_NONE, D3D12_SHADER_VISIBILITY_GEOMETRY);
-		rootParameters[6].InitAsConstantBufferView(3, 0, D3D12_ROOT_DESCRIPTOR_FLAG_NONE, D3D12_SHADER_VISIBILITY_HULL);
-		rootParameters[7].InitAsConstantBufferView(3, 0, D3D12_ROOT_DESCRIPTOR_FLAG_NONE, D3D12_SHADER_VISIBILITY_MESH);
-		rootParameters[8].InitAsConstantBufferView(3, 0, D3D12_ROOT_DESCRIPTOR_FLAG_NONE, D3D12_SHADER_VISIBILITY_PIXEL);
+		//user defined global per frame constant buffer
+		rootParameters[1].InitAsConstantBufferView(1, 0, D3D12_ROOT_DESCRIPTOR_FLAG_NONE, D3D12_SHADER_VISIBILITY_ALL);
+		//per draw call constants
+		rootParameters[2].InitAsConstants(4, 2, 0, D3D12_SHADER_VISIBILITY_VERTEX);
+		rootParameters[3].InitAsConstants(4, 2, 0, D3D12_SHADER_VISIBILITY_HULL);
+		rootParameters[4].InitAsConstants(4, 2, 0, D3D12_SHADER_VISIBILITY_DOMAIN);
+		rootParameters[5].InitAsConstants(4, 2, 0, D3D12_SHADER_VISIBILITY_GEOMETRY);
+		rootParameters[6].InitAsConstants(16, 2, 0, D3D12_SHADER_VISIBILITY_PIXEL);
+		rootParameters[7].InitAsConstants(4, 2, 0, D3D12_SHADER_VISIBILITY_AMPLIFICATION);
+		rootParameters[8].InitAsConstants(4, 2, 0, D3D12_SHADER_VISIBILITY_MESH);
+		//per draw call constant buffers
 		rootParameters[9].InitAsConstantBufferView(3, 0, D3D12_ROOT_DESCRIPTOR_FLAG_NONE, D3D12_SHADER_VISIBILITY_VERTEX);
+		rootParameters[10].InitAsConstantBufferView(3, 0, D3D12_ROOT_DESCRIPTOR_FLAG_NONE, D3D12_SHADER_VISIBILITY_HULL);
+		rootParameters[11].InitAsConstantBufferView(3, 0, D3D12_ROOT_DESCRIPTOR_FLAG_NONE, D3D12_SHADER_VISIBILITY_DOMAIN);
+		rootParameters[12].InitAsConstantBufferView(3, 0, D3D12_ROOT_DESCRIPTOR_FLAG_NONE, D3D12_SHADER_VISIBILITY_GEOMETRY);
+		rootParameters[13].InitAsConstantBufferView(3, 0, D3D12_ROOT_DESCRIPTOR_FLAG_NONE, D3D12_SHADER_VISIBILITY_PIXEL);
+		rootParameters[14].InitAsConstantBufferView(3, 0, D3D12_ROOT_DESCRIPTOR_FLAG_NONE, D3D12_SHADER_VISIBILITY_AMPLIFICATION);
+		rootParameters[15].InitAsConstantBufferView(3, 0, D3D12_ROOT_DESCRIPTOR_FLAG_NONE, D3D12_SHADER_VISIBILITY_MESH);
 
 		CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC rootSignatureDesc;
 		rootSignatureDesc.Init_1_1(_countof(rootParameters), rootParameters, _countof(samplerDesc), samplerDesc, 
@@ -122,14 +129,15 @@ GlobalRootSignature::GlobalRootSignature()
 	}
 
 	{
+		//2+2+32+2 38 dwords
 		CD3DX12_ROOT_PARAMETER1 rootParameters[4] = {};
-		//global constant buffer that can be accessed by any shader stage at any time
+		//reserved global constant buffer used by engine
 		rootParameters[0].InitAsConstantBufferView(0, 0, D3D12_ROOT_DESCRIPTOR_FLAG_NONE, D3D12_SHADER_VISIBILITY_ALL);
-		//global constants
-		rootParameters[1].InitAsConstants(16, 1, 0, D3D12_SHADER_VISIBILITY_ALL);
-		//user defined global constant buffer that can be accessed by any shader stage within one frame
-		rootParameters[2].InitAsConstantBufferView(2, 0, D3D12_ROOT_DESCRIPTOR_FLAG_NONE, D3D12_SHADER_VISIBILITY_ALL);
-		//user defined per stage per draw call constant buffer
+		//user defined global per frame constant buffer
+		rootParameters[1].InitAsConstantBufferView(1, 0, D3D12_ROOT_DESCRIPTOR_FLAG_NONE, D3D12_SHADER_VISIBILITY_ALL);
+		//per dispatch call constants
+		rootParameters[2].InitAsConstants(32, 2, 0, D3D12_SHADER_VISIBILITY_ALL);
+		//per dispatch call constant buffers
 		rootParameters[3].InitAsConstantBufferView(3, 0, D3D12_ROOT_DESCRIPTOR_FLAG_NONE, D3D12_SHADER_VISIBILITY_ALL);
 
 		CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC rootSignatureDesc;

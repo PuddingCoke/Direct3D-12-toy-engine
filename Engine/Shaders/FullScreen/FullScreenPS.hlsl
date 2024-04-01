@@ -1,6 +1,6 @@
 #include"Common.hlsli"
 
-cbuffer TextureIndices : register(b1)
+cbuffer TextureIndices : register(b2)
 {
     uint textureIdx;
 }

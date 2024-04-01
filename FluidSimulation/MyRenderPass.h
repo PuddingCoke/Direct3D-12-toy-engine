@@ -241,7 +241,8 @@ public:
 			context->setScissorRect(0, 0, velocityTex->width, velocityTex->height);
 			context->setPipelineState(splatVelocityState.Get());
 			context->setRenderTargets({ velocityTex->write()->getRTVMipHandle(0) }, {});
-			context->setGraphicsConstants({ velocityTex->read()->getAllSRVIndex() }, 0);
+			context->setPSConstants({ velocityTex->read()->getAllSRVIndex() }, 0);
+			context->transitionResources();
 			context->draw(3, 1, 0, 0);
 			velocityTex->swap();
 
@@ -249,7 +250,8 @@ public:
 			context->setScissorRect(0, 0, colorTex->width, colorTex->height);
 			context->setPipelineState(splatColorState.Get());
 			context->setRenderTargets({ colorTex->write()->getRTVMipHandle(0) }, {});
-			context->setGraphicsConstants({ colorTex->read()->getAllSRVIndex() }, 0);
+			context->setPSConstants({ colorTex->read()->getAllSRVIndex() }, 0);
+			context->transitionResources();
 			context->draw(3, 1, 0, 0);
 			colorTex->swap();
 		}
@@ -259,23 +261,27 @@ public:
 
 		context->setPipelineState(curlState.Get());
 		context->setRenderTargets({ curlTex->getRTVMipHandle(0) }, {});
-		context->setGraphicsConstants({ velocityTex->read()->getAllSRVIndex() }, 0);
+		context->setPSConstants({ velocityTex->read()->getAllSRVIndex() }, 0);
+		context->transitionResources();
 		context->draw(3, 1, 0, 0);
 
 		context->setPipelineState(vorticityState.Get());
 		context->setRenderTargets({ velocityTex->write()->getRTVMipHandle(0) }, {});
-		context->setGraphicsConstants({ velocityTex->read()->getAllSRVIndex(),curlTex->getAllSRVIndex() }, 0);
+		context->setPSConstants({ velocityTex->read()->getAllSRVIndex(),curlTex->getAllSRVIndex() }, 0);
+		context->transitionResources();
 		context->draw(3, 1, 0, 0);
 		velocityTex->swap();
 
 		context->setPipelineState(divergenceState.Get());
 		context->setRenderTargets({ divergenceTex->getRTVMipHandle(0) }, {});
-		context->setGraphicsConstants({ velocityTex->read()->getAllSRVIndex() }, 0);
+		context->setPSConstants({ velocityTex->read()->getAllSRVIndex() }, 0);
+		context->transitionResources();
 		context->draw(3, 1, 0, 0);
 
 		context->setPipelineState(pressureDissipationState.Get());
 		context->setRenderTargets({ pressureTex->write()->getRTVMipHandle(0) }, {});
-		context->setGraphicsConstants({ pressureTex->read()->getAllSRVIndex() }, 0);
+		context->setPSConstants({ pressureTex->read()->getAllSRVIndex() }, 0);
+		context->transitionResources();
 		context->draw(3, 1, 0, 0);
 		pressureTex->swap();
 
@@ -283,20 +289,23 @@ public:
 		for (UINT i = 0; i < config.pressureIteraion; i++)
 		{
 			context->setRenderTargets({ pressureTex->write()->getRTVMipHandle(0) }, {});
-			context->setGraphicsConstants({ pressureTex->read()->getAllSRVIndex(),divergenceTex->getAllSRVIndex() }, 0);
+			context->setPSConstants({ pressureTex->read()->getAllSRVIndex(),divergenceTex->getAllSRVIndex() }, 0);
+			context->transitionResources();
 			context->draw(3, 1, 0, 0);
 			pressureTex->swap();
 		}
 
 		context->setPipelineState(pressureGradientSubtractState.Get());
 		context->setRenderTargets({ velocityTex->write()->getRTVMipHandle(0) }, {});
-		context->setGraphicsConstants({ pressureTex->read()->getAllSRVIndex(),velocityTex->read()->getAllSRVIndex() }, 0);
+		context->setPSConstants({ pressureTex->read()->getAllSRVIndex(),velocityTex->read()->getAllSRVIndex() }, 0);
+		context->transitionResources();
 		context->draw(3, 1, 0, 0);
 		velocityTex->swap();
 
 		context->setPipelineState(velocityAdvectionDissipationState.Get());
 		context->setRenderTargets({ velocityTex->write()->getRTVMipHandle(0) }, {});
-		context->setGraphicsConstants({ velocityTex->read()->getAllSRVIndex() }, 0);
+		context->setPSConstants({ velocityTex->read()->getAllSRVIndex() }, 0);
+		context->transitionResources();
 		context->draw(3, 1, 0, 0);
 		velocityTex->swap();
 
@@ -305,13 +314,15 @@ public:
 
 		context->setPipelineState(colorAdvectionDissipationState.Get());
 		context->setRenderTargets({ colorTex->write()->getRTVMipHandle(0) }, {});
-		context->setGraphicsConstants({ velocityTex->read()->getAllSRVIndex(),colorTex->read()->getAllSRVIndex() }, 0);
+		context->setPSConstants({ velocityTex->read()->getAllSRVIndex(),colorTex->read()->getAllSRVIndex() }, 0);
+		context->transitionResources();
 		context->draw(3, 1, 0, 0);
 		colorTex->swap();
 
 		context->setPipelineState(fluidFinalState.Get());
 		context->setRenderTargets({ originTexture->getRTVMipHandle(0) }, {});
-		context->setGraphicsConstants({ colorTex->read()->getAllSRVIndex() }, 0);
+		context->setPSConstants({ colorTex->read()->getAllSRVIndex() }, 0);
+		context->transitionResources();
 		context->draw(3, 1, 0, 0);
 
 		TextureRenderTarget* const outputTexture = effect->process(originTexture);
@@ -319,7 +330,8 @@ public:
 		context->setPipelineState(fullScreenState.Get());
 		context->setDefRenderTarget();
 		context->clearDefRenderTarget(DirectX::Colors::Black);
-		context->setGraphicsConstants({ outputTexture->getAllSRVIndex() }, 0);
+		context->setPSConstants({ outputTexture->getAllSRVIndex() }, 0);
+		context->transitionResources();
 		context->draw(3, 1, 0, 0);
 	}
 

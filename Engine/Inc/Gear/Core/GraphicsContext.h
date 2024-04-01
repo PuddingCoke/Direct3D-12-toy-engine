@@ -15,7 +15,6 @@
 #include<vector>
 #include<unordered_set>
 
-
 class GraphicsContext
 {
 public:
@@ -33,63 +32,92 @@ public:
 	void updateBuffer(IndexBuffer* const ib, const void* const data, const UINT size);
 
 	//per frame global resources transition immediate
-	void setGlobalIndexBuffer(const IndexConstantBuffer* const indexBuffer);
+	void setGlobalConstantBuffer(const IndexConstantBuffer* const indexBuffer);
 
 	void setGlobalConstantBuffer(const ConstantBuffer* const constantBuffer);
 
-	//per draw call transition immediate
-	void setComputeIndexBuffer(const IndexConstantBuffer* const indexBuffer);
+	//4 values availiable
+	void setVSConstants(const std::initializer_list<ShaderResourceDesc>& descs, const UINT offset);
 
-	void setComputeConstantBuffer(const ConstantBuffer* const constantBuffer);
+	//4 values availiable
+	void setVSConstants(const UINT numValues, const void* const data, const UINT offset);
 
-	void setGraphicsConstants(const std::initializer_list<ShaderResourceDesc> descs, const UINT offset);
+	//4 values availiable
+	void setHSConstants(const std::initializer_list<ShaderResourceDesc>& descs, const UINT offset);
 
-	void setGraphicsConstants(const UINT numValues, const void* const data, const UINT offset) const;
+	//4 values availiable
+	void setHSConstants(const UINT numValues, const void* const data, const UINT offset);
 
-	void setComputeConstants(const std::initializer_list<ShaderResourceDesc> descs, const UINT offset);
+	//4 values availiable
+	void setDSConstants(const std::initializer_list<ShaderResourceDesc>& descs, const UINT offset);
 
-	void setComputeConstants(const UINT numValues, const void* const data, const UINT offset) const;
+	//4 values availiable
+	void setDSConstants(const UINT numValues, const void* const data, const UINT offset);
 
-	//deferred because a srv might be read in pixel shader or non pixel shader so the final state is pending
-	//but for compute shader index buffer and global graphics&compute index buffer transition state is deterministic
+	//4 values availiable
+	void setGSConstants(const std::initializer_list<ShaderResourceDesc>& descs, const UINT offset);
 
-	//per draw call transition deferred
-	void setVertexIndexBuffer(const IndexConstantBuffer* const indexBuffer);
+	//4 values availiable
+	void setGSConstants(const UINT numValues, const void* const data, const UINT offset);
 
-	void setVertexConstantBuffer(const ConstantBuffer* const constantBuffer);
+	//16 values availiable
+	void setPSConstants(const std::initializer_list<ShaderResourceDesc>& descs, const UINT offset);
 
-	//per draw call transition deferred
-	void setHullIndexBuffer(const IndexConstantBuffer* const indexBuffer);
+	//16 values availiable
+	void setPSConstants(const UINT numValues, const void* const data, const UINT offset);
 
-	void setHullConstantBuffer(const ConstantBuffer* const constantBuffer);
+	//4 values availiable
+	void setASConstants(const std::initializer_list<ShaderResourceDesc>& descs, const UINT offset);
 
-	//per draw call transition deferred
-	void setGeometryIndexBuffer(const IndexConstantBuffer* const indexBuffer);
+	//4 values availiable
+	void setASConstants(const UINT numValues, const void* const data, const UINT offset);
 
-	void setGeometryConstantBuffer(const ConstantBuffer* const constantBuffer);
+	//4 values availiable
+	void setMSConstants(const std::initializer_list<ShaderResourceDesc>& descs, const UINT offset);
 
-	//per draw call transition deferred
-	void setDomainIndexBuffer(const IndexConstantBuffer* const indexBuffer);
+	//4 values availiable
+	void setMSConstants(const UINT numValues, const void* const data, const UINT offset);
 
-	void setDomainConstantBuffer(const ConstantBuffer* const constantBuffer);
+	//32 values availiable
+	void setCSConstants(const std::initializer_list<ShaderResourceDesc>& descs, const UINT offset);
 
-	//per draw call transition deferred
-	void setPixelIndexBuffer(const IndexConstantBuffer* const indexBuffer);
+	//32 values availiable
+	void setCSConstants(const UINT numValues, const void* const data, const UINT offset);
 
-	void setPixelConstantBuffer(const ConstantBuffer* const constantBuffer);
+	void setVSConstantBuffer(const IndexConstantBuffer* const constantBuffer);
 
-	//per draw call transition deferred
-	void setMeshIndexBuffer(const IndexConstantBuffer* const indexBuffer);
+	void setVSConstantBuffer(const ConstantBuffer* const constantBuffer);
 
-	void setMeshConstantBuffer(const ConstantBuffer* const constantBuffer);
+	void setHSConstantBuffer(const IndexConstantBuffer* const constantBuffer);
 
-	//per draw call transition deferred
-	void setAmplificationIndexBuffer(const IndexConstantBuffer* const indexBuffer);
+	void setHSConstantBuffer(const ConstantBuffer* const constantBuffer);
 
-	void setAmplificationConstantBuffer(const ConstantBuffer* const constantBuffer);
+	void setDSConstantBuffer(const IndexConstantBuffer* const constantBuffer);
 
-	//must call this after bind per shader index constant buffer
-	void finishGraphicsStageIndexBuffer();
+	void setDSConstantBuffer(const ConstantBuffer* const constantBuffer);
+
+	void setGSConstantBuffer(const IndexConstantBuffer* const constantBuffer);
+
+	void setGSConstantBuffer(const ConstantBuffer* const constantBuffer);
+
+	void setPSConstantBuffer(const IndexConstantBuffer* const constantBuffer);
+
+	void setPSConstantBuffer(const ConstantBuffer* const constantBuffer);
+
+	void setASConstantBuffer(const IndexConstantBuffer* const constantBuffer);
+
+	void setASConstantBuffer(const ConstantBuffer* const constantBuffer);
+
+	void setMSConstantBuffer(const IndexConstantBuffer* const constantBuffer);
+
+	void setMSConstantBuffer(const ConstantBuffer* const constantBuffer);
+
+	void setCSConstantBuffer(const IndexConstantBuffer* const constantBuffer);
+
+	void setCSConstantBuffer(const ConstantBuffer* const constantBuffer);
+
+	//must call this method after set*SConstants or set*SConstantBuffer
+	void transitionResources();
 
 	void setRenderTargets(const std::initializer_list<RenderTargetDesc>& renderTargets, const std::initializer_list<DepthStencilDesc>& depthStencils);
 
@@ -110,6 +138,10 @@ public:
 	void setScissorRect(const UINT left, const UINT top, const UINT right, const UINT bottom);
 
 	void setScissorRect(const float left, const float top, const float right, const float bottom);
+
+	void setViewportSimple(const float width, const float height);
+
+	void setViewportSimple(const UINT width, const UINT height);
 
 	void setPipelineState(ID3D12PipelineState* const pipelineState) const;
 
@@ -139,7 +171,15 @@ private:
 
 	void flushTransitionResources();
 
-	void pushGraphicsStageIndexBuffer(UINT rootParameterIndex, const IndexConstantBuffer* const indexBuffer, const UINT targetSRVState);
+	void getIndicesFromResourceDescs(const std::initializer_list<ShaderResourceDesc>& descs, UINT* const dst);
+
+	void setGraphicsPipelineResources(const IndexConstantBuffer* const constantBuffer, const UINT targetSRVState);
+
+	void setGraphicsPipelineResources(const std::initializer_list<ShaderResourceDesc>& descs, const UINT targetSRVState);
+
+	void setComputePipelineResources(const IndexConstantBuffer* const constantBuffer);
+
+	void setComputePipelineResources(const std::initializer_list<ShaderResourceDesc>& descs);
 
 	void pushResourceTrackList(Texture* const texture);
 

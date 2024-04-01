@@ -115,7 +115,7 @@ void PrimitiveBatch::begin()
 
 void PrimitiveBatch::end()
 {
-	context->setGraphicsConstants(1, &lineWidth, 0);
+	context->setGSConstants(1, &lineWidth, 0);
 
 	lineRenderer.end(context, lineState.Get());
 	circleRenderer.end(context, circleState.Get());

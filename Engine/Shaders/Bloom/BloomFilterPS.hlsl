@@ -1,6 +1,6 @@
 #include"Common.hlsli"
 
-cbuffer BloomParam : register(b1)
+cbuffer BloomParam : register(b2)
 {
     uint originTextureIdx;
     float exposure;

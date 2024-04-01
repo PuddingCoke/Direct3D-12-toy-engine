@@ -105,19 +105,23 @@ protected:
 
 		context->setPipelineState(accumulateState.Get());
 
-		context->setGraphicsConstants(2, &accumulateParam, 0);
+		context->setPSConstants(2, &accumulateParam, 0);
 
-		context->setGraphicsConstants(3, &cameraParam, 2);
+		context->setPSConstants(3, &cameraParam, 2);
 
 		context->setRenderTargets({ accumulatedTexture->getRTVMipHandle(0) }, {});
+
+		context->transitionResources();
 
 		context->draw(3, 1, 0, 0);
 
 		context->setPipelineState(displayState.Get());
 
-		context->setGraphicsConstants({ accumulatedTexture->getAllSRVIndex() }, 0);
+		context->setPSConstants({ accumulatedTexture->getAllSRVIndex() }, 0);
 
 		context->setDefRenderTarget();
+
+		context->transitionResources();
 
 		context->draw(3, 1, 0, 0);
 	}
