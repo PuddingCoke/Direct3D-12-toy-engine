@@ -75,6 +75,8 @@ public:
 
 		context->setRenderTargets({ renderTexture->getRTVMipHandle(0) }, {});
 
+		context->transitionResources();
+
 		context->clearRenderTarget(renderTexture->getRTVMipHandle(0), DirectX::Colors::Transparent);
 
 		end();
