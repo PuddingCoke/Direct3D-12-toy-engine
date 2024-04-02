@@ -169,8 +169,6 @@ private:
 
 	void updateReferredResStates();
 
-	void flushTransitionResources();
-
 	void getIndicesFromResourceDescs(const std::initializer_list<ShaderResourceDesc>& descs, UINT* const dst);
 
 	void setGraphicsPipelineResources(const IndexConstantBuffer* const constantBuffer, const UINT targetSRVState);

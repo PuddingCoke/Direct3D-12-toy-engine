@@ -33,7 +33,7 @@ void GraphicsContext::copyResource(Buffer* const dstBuffer, Buffer* const srcBuf
 		srcBuffer->transitionState = D3D12_RESOURCE_STATE_COPY_SOURCE;
 	}
 
-	flushTransitionResources();
+	transitionResources();
 
 	commandList->get()->CopyResource(dstBuffer->getResource(), srcBuffer->getResource());
 }
@@ -68,7 +68,7 @@ void GraphicsContext::copyResource(Texture* const dstTexture, Texture* const src
 		}
 	}
 
-	flushTransitionResources();
+	transitionResources();
 
 	commandList->get()->CopyResource(dstTexture->getResource(), srcTexture->getResource());
 }
@@ -81,7 +81,7 @@ void GraphicsContext::updateBuffer(VertexBuffer* const vb, const void* const dat
 
 	buffer->transitionState = D3D12_RESOURCE_STATE_COPY_DEST;
 
-	flushTransitionResources();
+	transitionResources();
 
 	UploadHeap* const uploadHeap = vb->uploadHeaps[vb->uploadHeapIndex];
 
@@ -100,7 +100,7 @@ void GraphicsContext::updateBuffer(IndexBuffer* const ib, const void* const data
 
 	buffer->transitionState = D3D12_RESOURCE_STATE_COPY_DEST;
 
-	flushTransitionResources();
+	transitionResources();
 
 	UploadHeap* const uploadHeap = ib->uploadHeaps[ib->uploadHeapIndex];
 
@@ -199,7 +199,7 @@ void GraphicsContext::setGlobalConstantBuffer(const IndexConstantBuffer* const i
 		}
 	}
 
-	flushTransitionResources();
+	transitionResources();
 
 	commandList->get()->SetGraphicsRootConstantBufferView(1, indexBuffer->getGPUAddress());
 	commandList->get()->SetComputeRootConstantBufferView(1, indexBuffer->getGPUAddress());
@@ -438,7 +438,26 @@ void GraphicsContext::setCSConstantBuffer(const ConstantBuffer* const constantBu
 
 void GraphicsContext::transitionResources()
 {
-	flushTransitionResources();
+	for (Buffer* const buff : transitionBuffers)
+	{
+		buff->transition(transitionBarriers, pendingBufferBarrier);
+	}
+
+	transitionBuffers.clear();
+
+	for (Texture* const tex : transitionTextures)
+	{
+		tex->transition(transitionBarriers, pendingTextureBarrier);
+	}
+
+	transitionTextures.clear();
+
+	if (transitionBarriers.size())
+	{
+		commandList->get()->ResourceBarrier(transitionBarriers.size(), transitionBarriers.data());
+
+		transitionBarriers.clear();
+	}
 }
 
 void GraphicsContext::setRenderTargets(const std::initializer_list<RenderTargetDesc>& renderTargets, const std::initializer_list<DepthStencilDesc>& depthStencils)
@@ -492,8 +511,6 @@ void GraphicsContext::setRenderTargets(const std::initializer_list<RenderTargetD
 		}
 	}
 
-	flushTransitionResources();
-
 	if (dsvHandles.size() > 0)
 	{
 		commandList->get()->OMSetRenderTargets(rtvHandles.size(), rtvHandles.data(), FALSE, dsvHandles.data());
@@ -533,8 +550,6 @@ void GraphicsContext::setVertexBuffers(const UINT startSlot, const std::initiali
 		vbvs.push_back(vb->getVertexBufferView());
 	}
 
-	flushTransitionResources();
-
 	commandList->get()->IASetVertexBuffers(startSlot, vbvs.size(), vbvs.data());
 }
 
@@ -552,8 +567,6 @@ void GraphicsContext::setIndexBuffers(const std::initializer_list<IndexBuffer*>&
 
 		ibvs.push_back(ib->getIndexBufferView());
 	}
-
-	flushTransitionResources();
 
 	commandList->get()->IASetIndexBuffer(ibvs.data());
 }
@@ -683,30 +696,6 @@ void GraphicsContext::updateReferredResStates()
 	}
 
 	referredResources.clear();
-}
-
-void GraphicsContext::flushTransitionResources()
-{
-	for (Buffer* const buff : transitionBuffers)
-	{
-		buff->transition(transitionBarriers, pendingBufferBarrier);
-	}
-
-	transitionBuffers.clear();
-
-	for (Texture* const tex : transitionTextures)
-	{
-		tex->transition(transitionBarriers, pendingTextureBarrier);
-	}
-
-	transitionTextures.clear();
-
-	if (transitionBarriers.size())
-	{
-		commandList->get()->ResourceBarrier(transitionBarriers.size(), transitionBarriers.data());
-
-		transitionBarriers.clear();
-	}
 }
 
 void GraphicsContext::getIndicesFromResourceDescs(const std::initializer_list<ShaderResourceDesc>& descs, UINT* const dst)
