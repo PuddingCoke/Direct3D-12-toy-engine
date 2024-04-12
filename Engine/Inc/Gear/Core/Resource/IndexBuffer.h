@@ -5,11 +5,13 @@
 
 #include<Gear/Core/DX/Resource/Buffer.h>
 
-class IndexBuffer
+#include"EngineResource.h"
+
+class IndexBuffer :public EngineResource
 {
 public:
 
-	IndexBuffer(const DXGI_FORMAT format, const UINT size, const bool cpuWritable, const void* const data, ID3D12GraphicsCommandList6* commandList, std::vector<Resource*>* transientResourcePool);
+	IndexBuffer(Buffer* const buffer, const DXGI_FORMAT format, const UINT size, const bool cpuWritable);
 
 	IndexBuffer(const IndexBuffer&);
 
@@ -25,11 +27,11 @@ private:
 
 	D3D12_INDEX_BUFFER_VIEW indexBufferView;
 
-	Buffer* buffer;
-
 	UploadHeap** uploadHeaps;
 
 	UINT uploadHeapIndex;
+
+	Buffer* buffer;
 
 };
 

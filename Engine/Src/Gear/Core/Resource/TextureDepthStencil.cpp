@@ -1,8 +1,11 @@
 #include<Gear/Core/Resource/TextureDepthStencil.h>
 
-TextureDepthStencil::TextureDepthStencil(const UINT width, const UINT height, const DXGI_FORMAT resFormat, const UINT arraySize, const UINT mipLevels, const bool isTextureCube, const bool persistent)
+TextureDepthStencil::TextureDepthStencil(Texture* const texture, const bool isTextureCube, const bool persistent):
+	texture(texture)
 {
-	texture = new Texture(width, height, resFormat, arraySize, mipLevels, true, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL);
+	const UINT mipLevels = texture->getMipLevels();
+	const UINT arraySize = texture->getArraySize();
+	const DXGI_FORMAT resFormat = texture->getFormat();
 
 	//R32_TYPELESS R16_TYPELESS R32G8X24_TYPELESS R24G8_TYPELESS
 
@@ -108,18 +111,6 @@ TextureDepthStencil::TextureDepthStencil(const UINT width, const UINT height, co
 		allStencilIndex = depthMipIndexStart + mipLevels;
 
 		stencilMipIndexStart = allStencilIndex + 1;
-
-		std::cout << "[class TextureDepthStencil] //////////\n";
-		std::cout << "[class TextureDepthStencil] Resource format " << resFormat << "\n";
-		std::cout << "[class TextureDepthStencil] Depth SRV format " << depthSRVFormat << "\n";
-		std::cout << "[class TextureDepthStencil] Stencil SRV format " << stencilSRVFormat << "\n";
-		std::cout << "[class TextureDepthStencil] DSV format " << dsvFormat << "\n";
-		std::cout << "[class TextureDepthStencil] miplevels " << texture->getMipLevels() << "\n";
-		std::cout << "[class TextureDepthStencil] all depth index " << allDepthIndex << "\n";
-		std::cout << "[class TextureDepthStencil] depth slice start " << depthMipIndexStart << "\n";
-		std::cout << "[class TextureDepthStencil] all stencil start " << allStencilIndex << "\n";
-		std::cout << "[class TextureDepthStencil] stencil slice start " << stencilMipIndexStart << "\n";
-		std::cout << "[class TextureDepthStencil] //////////\n";
 
 		//create depth srvs
 		if (isTextureCube)

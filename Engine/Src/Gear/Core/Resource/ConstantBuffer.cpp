@@ -2,17 +2,16 @@
 
 ConstantBufferPool* ConstantBuffer::bufferPools[3] = { nullptr,nullptr,nullptr };
 
-ConstantBuffer::ConstantBuffer(const UINT size, const bool cpuWritable, const void* const data, ID3D12GraphicsCommandList6* commandList, std::vector<Resource*>* transientResourcePool)
+ConstantBuffer::ConstantBuffer(Buffer* const buffer, const UINT size) :
+	buffer(buffer)
 {
 	if (size % 256 != 0)
 	{
 		throw "size of constant buffer must be multiply of 256";
 	}
 
-	if (cpuWritable)
+	if (buffer == nullptr)
 	{
-		buffer = nullptr;
-
 		switch (size)
 		{
 		case 256:
@@ -34,21 +33,9 @@ ConstantBuffer::ConstantBuffer(const UINT size, const bool cpuWritable, const vo
 		gpuAddress = availableDescriptor.gpuAddress;
 
 		bufferIndex = availableDescriptor.descriptorIndex;
-
-		if (data)
-		{
-			update(data, size);
-		}
 	}
 	else
 	{
-		if (data == nullptr)
-		{
-			throw "data should not be nullptr if cpuWritable is set to true";
-		}
-
-		buffer = new Buffer(size, false, data, commandList, transientResourcePool, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
-
 		poolIndex = UINT_MAX;
 
 		D3D12_CONSTANT_BUFFER_VIEW_DESC desc = {};

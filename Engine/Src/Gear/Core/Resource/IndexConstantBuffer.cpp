@@ -1,38 +1,17 @@
 #include<Gear/Core/Resource/IndexConstantBuffer.h>
 
-IndexConstantBuffer::IndexConstantBuffer(const std::initializer_list<ShaderResourceDesc>& transitionDescs, const bool cpuWritable, ID3D12GraphicsCommandList6* commandList, std::vector<Resource*>* transientResourcePool)
+IndexConstantBuffer::IndexConstantBuffer(ConstantBuffer* const constantBuffer, const std::initializer_list<ShaderResourceDesc>& transitionDescs) :
+	constantBuffer(constantBuffer)
 {
 	for (const ShaderResourceDesc& desc : transitionDescs)
 	{
 		descs.push_back(desc);
 	}
-
-	const UINT indicesNum = ((descs.size() + 63) & ~63);
-
-	indices = std::vector<UINT>(indicesNum);
-
-	for (UINT i = 0; i < descs.size(); i++)
-	{
-		if (descs[i].type == ShaderResourceDesc::BUFFER)
-		{
-			indices[i] = descs[i].bufferDesc.resourceIndex;
-		}
-		else
-		{
-			indices[i] = descs[i].textureDesc.resourceIndex;
-		}
-	}
-
-	constantBuffer = new ConstantBuffer(sizeof(UINT) * indices.size(), cpuWritable, indices.data(), commandList, transientResourcePool);
 }
 
-IndexConstantBuffer::IndexConstantBuffer(const UINT indicesNum)
+IndexConstantBuffer::IndexConstantBuffer(ConstantBuffer* const constantBuffer):
+	constantBuffer(constantBuffer)
 {
-	const UINT alignedIndicesNum = ((indicesNum + 63) & ~63);
-
-	indices = std::vector<UINT>(alignedIndicesNum);
-
-	constantBuffer = new ConstantBuffer(sizeof(UINT) * alignedIndicesNum, true, nullptr, nullptr, nullptr);
 }
 
 void IndexConstantBuffer::setTransitionResources(const std::initializer_list<ShaderResourceDesc>& transitionDescs)
@@ -44,15 +23,23 @@ void IndexConstantBuffer::setTransitionResources(const std::initializer_list<Sha
 		descs.push_back(desc);
 	}
 
-	for (UINT i = 0; i < descs.size(); i++)
+	std::vector<UINT> indices = std::vector<UINT>(transitionDescs.size());
+
 	{
-		if (descs[i].type == ShaderResourceDesc::BUFFER)
+		UINT index = 0;
+
+		for (const ShaderResourceDesc& desc : descs)
 		{
-			indices[i] = descs[i].bufferDesc.resourceIndex;
-		}
-		else
-		{
-			indices[i] = descs[i].textureDesc.resourceIndex;
+			if (desc.type == ShaderResourceDesc::BUFFER)
+			{
+				indices[index] = desc.bufferDesc.resourceIndex;
+			}
+			else
+			{
+				indices[index] = desc.textureDesc.resourceIndex;
+			}
+
+			index++;
 		}
 	}
 

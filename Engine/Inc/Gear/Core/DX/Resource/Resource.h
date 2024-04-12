@@ -81,7 +81,7 @@ public:
 
 	virtual ~Resource();
 
-	Resource(const bool stateTracking);
+	Resource(const ComPtr<ID3D12Resource>& resource, const bool stateTracking);
 
 	Resource(const D3D12_HEAP_PROPERTIES properties, const D3D12_HEAP_FLAGS flags, const D3D12_RESOURCE_DESC desc,
 		const bool stateTracking, const D3D12_RESOURCE_STATES initialState, const D3D12_CLEAR_VALUE* clearValues);

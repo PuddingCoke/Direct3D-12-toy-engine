@@ -5,11 +5,13 @@
 
 #include<Gear/Core/DX/Resource/Buffer.h>
 
-class VertexBuffer
+#include"EngineResource.h"
+
+class VertexBuffer :public EngineResource
 {
 public:
 
-	VertexBuffer(const UINT perVertexSize,const UINT size, const bool cpuWritable, const void* const data, ID3D12GraphicsCommandList6* commandList, std::vector<Resource*>* transientResourcePool);
+	VertexBuffer(Buffer* const buffer, const UINT perVertexSize, const UINT size, const bool cpuWritable);
 
 	VertexBuffer(const VertexBuffer&);
 
@@ -25,12 +27,11 @@ private:
 
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView;
 
-	Buffer* buffer;
-
 	UploadHeap** uploadHeaps;
 
 	UINT uploadHeapIndex;
 
+	Buffer* buffer;
 };
 
 #endif // !_VERTEXBUFFER_H_

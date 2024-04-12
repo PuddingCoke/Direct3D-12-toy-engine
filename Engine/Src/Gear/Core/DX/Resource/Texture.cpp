@@ -1,289 +1,43 @@
 #include<Gear/Core/DX/Resource/Texture.h>
 
 Texture::Texture(const UINT width, const UINT height, const DXGI_FORMAT format, const UINT arraySize, const UINT mipLevels, const bool stateTracking, const D3D12_RESOURCE_FLAGS resFlags) :
-	Resource(CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE, CD3DX12_RESOURCE_DESC::Tex2D(format, width, height, arraySize, mipLevels, 1, 0, resFlags), stateTracking, D3D12_RESOURCE_STATE_COPY_DEST, nullptr),
+	Resource(CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE, CD3DX12_RESOURCE_DESC::Tex2D(format, width, height, arraySize, mipLevels, 1, 0, resFlags), stateTracking, D3D12_RESOURCE_STATE_COMMON, nullptr),
 	width(width),
 	height(height),
 	arraySize(arraySize),
 	mipLevels(mipLevels),
 	format(format),
-	globalState(std::make_shared<STATES>(STATES{ D3D12_RESOURCE_STATE_COPY_DEST,std::vector<UINT>(mipLevels) })),
-	internalState(STATES{ D3D12_RESOURCE_STATE_COPY_DEST,std::vector<UINT>(mipLevels) }),
+	globalState(std::make_shared<STATES>(STATES{ D3D12_RESOURCE_STATE_COMMON,std::vector<UINT>(mipLevels) })),
+	internalState(STATES{ D3D12_RESOURCE_STATE_COMMON,std::vector<UINT>(mipLevels) }),
 	transitionState(STATES{ D3D12_RESOURCE_STATE_UNKNOWN,std::vector<UINT>(mipLevels) })
 {
 	for (UINT i = 0; i < mipLevels; i++)
 	{
-		(*globalState).mipLevelStates[i] = D3D12_RESOURCE_STATE_COPY_DEST;
-		internalState.mipLevelStates[i] = D3D12_RESOURCE_STATE_COPY_DEST;
+		(*globalState).mipLevelStates[i] = D3D12_RESOURCE_STATE_COMMON;
+		internalState.mipLevelStates[i] = D3D12_RESOURCE_STATE_COMMON;
 		transitionState.mipLevelStates[i] = D3D12_RESOURCE_STATE_UNKNOWN;
 	}
 }
 
-Texture::Texture(const std::string filePath, ID3D12GraphicsCommandList6* commandList, std::vector<Resource*>* transientResourcePool, const bool stateTracking, const D3D12_RESOURCE_FLAGS resFlags) :
-	Resource(stateTracking)
+Texture::Texture(const ComPtr<ID3D12Resource>& texture, const bool stateTracking) :
+	Resource(texture, stateTracking),
+	globalState(std::make_shared<STATES>(STATES{ D3D12_RESOURCE_STATE_COMMON,std::vector<UINT>(mipLevels) })),
+	internalState(STATES{ D3D12_RESOURCE_STATE_COMMON,std::vector<UINT>(mipLevels) }),
+	transitionState(STATES{ D3D12_RESOURCE_STATE_UNKNOWN,std::vector<UINT>(mipLevels) })
 {
-	std::string fileExtension = Utils::File::getExtension(filePath);
-
-	for (char& c : fileExtension)
-	{
-		c = static_cast<char>(std::tolower(c));
-	}
-
-	if (fileExtension == "jpg" || fileExtension == "jpeg" || fileExtension == "png")
-	{
-		int textureWidth, textureHeight, channels;
-
-		unsigned char* pixels = stbi_load(filePath.c_str(), &textureWidth, &textureHeight, &channels, 4);
-
-		width = static_cast<UINT>(textureWidth);
-		height = static_cast<UINT>(textureHeight);
-		format = DXGI_FORMAT_R8G8B8A8_UNORM;
-		mipLevels = 1;
-		arraySize = 1;
-
-		if (pixels)
-		{
-			D3D12_RESOURCE_DESC desc = {};
-			desc.Width = width;
-			desc.Height = height;
-			desc.DepthOrArraySize = arraySize;
-			desc.MipLevels = mipLevels;
-			desc.Flags = D3D12_RESOURCE_FLAG_NONE;
-			desc.Format = format;
-			desc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-			desc.SampleDesc.Count = 1;
-			desc.SampleDesc.Quality = 0;
-			desc.Flags = resFlags;
-
-			createResource(CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE, desc, D3D12_RESOURCE_STATE_COPY_DEST, nullptr);
-
-			const UINT64 uploadHeapSize = GetRequiredIntermediateSize(getResource(), 0, 1);
-
-			UploadHeap* uploadHeap = new UploadHeap(uploadHeapSize);
-
-			transientResourcePool->push_back(uploadHeap);
-
-			D3D12_SUBRESOURCE_DATA subresourceData = {};
-			subresourceData.pData = pixels;
-			subresourceData.RowPitch = width * 4u;
-			subresourceData.SlicePitch = subresourceData.RowPitch * height;
-
-			UpdateSubresources(commandList, getResource(), uploadHeap->getResource(), 0, 0, 1, &subresourceData);
-
-			stbi_image_free(pixels);
-		}
-		else
-		{
-			throw "Cannot open file named " + filePath;
-		}
-	}
-	else if (fileExtension == "hdr")
-	{
-		int textureWidth, textureHeight, channels;
-
-		float* pixels = stbi_loadf(filePath.c_str(), &textureWidth, &textureHeight, &channels, 4);
-
-		width = static_cast<UINT>(textureWidth);
-		height = static_cast<UINT>(textureHeight);
-		format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-		mipLevels = 1;
-		arraySize = 1;
-
-		if (pixels)
-		{
-			D3D12_RESOURCE_DESC desc = {};
-			desc.Width = width;
-			desc.Height = height;
-			desc.DepthOrArraySize = arraySize;
-			desc.MipLevels = mipLevels;
-			desc.Flags = D3D12_RESOURCE_FLAG_NONE;
-			desc.Format = format;
-			desc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-			desc.SampleDesc.Count = 1;
-			desc.SampleDesc.Quality = 0;
-			desc.Flags = resFlags;
-
-			createResource(CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE, desc, D3D12_RESOURCE_STATE_COPY_DEST, nullptr);
-
-			const UINT64 uploadHeapSize = GetRequiredIntermediateSize(getResource(), 0, 1);
-
-			UploadHeap* uploadHeap = new UploadHeap(uploadHeapSize);
-
-			transientResourcePool->push_back(uploadHeap);
-
-			D3D12_SUBRESOURCE_DATA subresourceData = {};
-			subresourceData.pData = pixels;
-			subresourceData.RowPitch = width * 16u;
-			subresourceData.SlicePitch = subresourceData.RowPitch * height;
-
-			UpdateSubresources(commandList, getResource(), uploadHeap->getResource(), 0, 0, 1, &subresourceData);
-
-			stbi_image_free(pixels);
-		}
-		else
-		{
-			throw "Cannot open file named " + filePath;
-		}
-	}
-	else if (fileExtension == "dds")
-	{
-		std::wstring wFilePath = std::wstring(filePath.begin(), filePath.end());
-
-		std::unique_ptr<uint8_t[]> ddsData;
-
-		std::vector<D3D12_SUBRESOURCE_DATA> subresources;
-
-		DirectX::LoadDDSTextureFromFileEx(GraphicsDevice::get(), wFilePath.c_str(), 0, resFlags, DirectX::DDS_LOADER_DEFAULT, releaseAndGet(), ddsData, subresources);
-
-		const UINT64 uploadHeapSize = GetRequiredIntermediateSize(getResource(), 0, static_cast<UINT>(subresources.size()));
-
-		UploadHeap* uploadHeap = new UploadHeap(uploadHeapSize);
-
-		transientResourcePool->push_back(uploadHeap);
-
-		UpdateSubresources(commandList, getResource(), uploadHeap->getResource(), 0, 0, static_cast<UINT>(subresources.size()), subresources.data());
-
-		D3D12_RESOURCE_DESC desc = {};
-
-		desc = getResource()->GetDesc();
-
-		width = desc.Width;
-		height = desc.Height;
-		arraySize = desc.DepthOrArraySize;
-		mipLevels = desc.MipLevels;
-		format = desc.Format;
-	}
-	else
-	{
-		throw "Format not supported";
-	}
-
-	if (stateTracking)
-	{
-		globalState = std::make_shared<STATES>(STATES{ D3D12_RESOURCE_STATE_COPY_DEST,std::vector<UINT>(mipLevels) });
-		internalState = STATES{ D3D12_RESOURCE_STATE_COPY_DEST,std::vector<UINT>(mipLevels) };
-		transitionState = STATES{ D3D12_RESOURCE_STATE_UNKNOWN,std::vector<UINT>(mipLevels) };
-
-		for (UINT i = 0; i < mipLevels; i++)
-		{
-			(*globalState).mipLevelStates[i] = D3D12_RESOURCE_STATE_COPY_DEST;
-			internalState.mipLevelStates[i] = D3D12_RESOURCE_STATE_COPY_DEST;
-			transitionState.mipLevelStates[i] = D3D12_RESOURCE_STATE_UNKNOWN;
-		}
-	}
-	else
-	{
-		globalState = std::make_shared<STATES>(STATES{ D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE,std::vector<UINT>(mipLevels) });
-		internalState = STATES{ D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE,std::vector<UINT>(mipLevels) };
-		transitionState = STATES{ D3D12_RESOURCE_STATE_UNKNOWN,std::vector<UINT>(mipLevels) };
-
-		for (UINT i = 0; i < mipLevels; i++)
-		{
-			(*globalState).mipLevelStates[i] = D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE;
-			internalState.mipLevelStates[i] = D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE;
-			transitionState.mipLevelStates[i] = D3D12_RESOURCE_STATE_UNKNOWN;
-		}
-
-		D3D12_RESOURCE_BARRIER barrier = {};
-		barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-		barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-		barrier.Transition.pResource = getResource();
-		barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-		barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
-		barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE;
-
-		commandList->ResourceBarrier(1, &barrier);
-	}
-
-	std::cout << "[class Texture] create texture at " << filePath << " succeeded\n";
-}
-
-Texture::Texture(const UINT width, const UINT height, const TextureType type, ID3D12GraphicsCommandList6* commandList, std::vector<Resource*>* transientResourcePool) :
-	Resource(false), width(width), height(height), format(type == TextureType::NOISE ? DXGI_FORMAT_R8G8B8A8_UNORM : DXGI_FORMAT_R32G32B32A32_FLOAT), mipLevels(1), arraySize(1)
-{
-	createResource(CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE, CD3DX12_RESOURCE_DESC::Tex2D(format, width, height, arraySize, mipLevels), D3D12_RESOURCE_STATE_COPY_DEST, nullptr);
-
-	std::cout << "[class Texture] generate " << width << "x" << height << " ";
-
-	if (type == TextureType::NOISE)
-	{
-		std::cout << "noise";
-
-		struct Color
-		{
-			unsigned char r;
-			unsigned char g;
-			unsigned char b;
-			unsigned char a;
-		};
-
-		std::vector<Color> colors(width * height);
-
-		for (UINT i = 0; i < width * height; i++)
-		{
-			colors[i] = { static_cast<unsigned char>(Random::Uint() % 256u), static_cast<unsigned char>(Random::Uint() % 256u), static_cast<unsigned char>(Random::Uint() % 256u), static_cast<unsigned char>(Random::Uint() % 256u) };
-		}
-
-		const UINT64 uploadHeapSize = GetRequiredIntermediateSize(getResource(), 0, 1);
-
-		UploadHeap* uploadHeap = new UploadHeap(uploadHeapSize);
-
-		transientResourcePool->push_back(uploadHeap);
-
-		D3D12_SUBRESOURCE_DATA subresourceData = {};
-		subresourceData.pData = colors.data();
-		subresourceData.RowPitch = width * 4u;
-		subresourceData.SlicePitch = subresourceData.RowPitch * height;
-
-		UpdateSubresources(commandList, getResource(), uploadHeap->getResource(), 0, 0, 1, &subresourceData);
-	}
-	else
-	{
-		std::cout << "gauss";
-
-		std::vector<DirectX::XMFLOAT4> colors(width * height);
-
-		for (UINT i = 0; i < width * height; i++)
-		{
-			colors[i] = DirectX::XMFLOAT4(Random::Gauss(), Random::Gauss(), Random::Gauss(), Random::Gauss());
-		}
-
-		const UINT64 uploadHeapSize = GetRequiredIntermediateSize(getResource(), 0, 1);
-
-		UploadHeap* uploadHeap = new UploadHeap(uploadHeapSize);
-
-		transientResourcePool->push_back(uploadHeap);
-
-		D3D12_SUBRESOURCE_DATA subresourceData = {};
-		subresourceData.pData = colors.data();
-		subresourceData.RowPitch = width * 16u;
-		subresourceData.SlicePitch = subresourceData.RowPitch * height;
-
-		UpdateSubresources(commandList, getResource(), uploadHeap->getResource(), 0, 0, 1, &subresourceData);
-	}
-
-	std::cout << " texture\n";
-
-	globalState = std::make_shared<STATES>(STATES{ D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE,std::vector<UINT>(mipLevels) });
-	internalState = STATES{ D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE,std::vector<UINT>(mipLevels) };
-	transitionState = STATES{ D3D12_RESOURCE_STATE_UNKNOWN,std::vector<UINT>(mipLevels) };
+	D3D12_RESOURCE_DESC desc = getResource()->GetDesc();
+	width = desc.Width;
+	height = desc.Height;
+	arraySize = desc.DepthOrArraySize;
+	mipLevels = desc.MipLevels;
+	format = desc.Format;
 
 	for (UINT i = 0; i < mipLevels; i++)
 	{
-		(*globalState).mipLevelStates[i] = D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE;
-		internalState.mipLevelStates[i] = D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE;
+		(*globalState).mipLevelStates[i] = D3D12_RESOURCE_STATE_COMMON;
+		internalState.mipLevelStates[i] = D3D12_RESOURCE_STATE_COMMON;
 		transitionState.mipLevelStates[i] = D3D12_RESOURCE_STATE_UNKNOWN;
 	}
-
-	D3D12_RESOURCE_BARRIER barrier = {};
-	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-	barrier.Transition.pResource = getResource();
-	barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
-	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE;
-
-	commandList->ResourceBarrier(1, &barrier);
 }
 
 Texture::Texture(Texture& tex) :
@@ -640,4 +394,80 @@ UINT Texture::getMipLevels() const
 DXGI_FORMAT Texture::getFormat() const
 {
 	return format;
+}
+
+void Texture::setAllState(const UINT state)
+{
+	if (transitionState.allState == D3D12_RESOURCE_STATE_UNKNOWN)
+	{
+		if (mipLevels > 1)
+		{
+			for (UINT i = 0; i < mipLevels; i++)
+			{
+				if (transitionState.mipLevelStates[i] == D3D12_RESOURCE_STATE_UNKNOWN)
+				{
+					transitionState.mipLevelStates[i] = state;
+				}
+				else
+				{
+					transitionState.mipLevelStates[i] = (transitionState.mipLevelStates[i] | state);
+				}
+			}
+		}
+		else
+		{
+			transitionState.allState = state;
+
+			transitionState.mipLevelStates[0] = state;
+		}
+	}
+	else
+	{
+		if (transitionState.allState != state)
+		{
+			transitionState.allState = (transitionState.allState | state);
+
+			for (UINT i = 0; i < mipLevels; i++)
+			{
+				transitionState.mipLevelStates[i] = (transitionState.mipLevelStates[i] | state);
+			}
+		}
+	}
+}
+
+void Texture::setMipSliceState(const UINT mipSlice, const UINT state)
+{
+	if (mipLevels > 1)
+	{
+		if (transitionState.mipLevelStates[mipSlice] == D3D12_RESOURCE_STATE_UNKNOWN)
+		{
+			transitionState.allState = D3D12_RESOURCE_STATE_UNKNOWN;
+
+			transitionState.mipLevelStates[mipSlice] = state;
+		}
+		else
+		{
+			if (transitionState.mipLevelStates[mipSlice] != state)
+			{
+				transitionState.allState = D3D12_RESOURCE_STATE_UNKNOWN;
+
+				transitionState.mipLevelStates[mipSlice] = (transitionState.mipLevelStates[mipSlice] | state);
+			}
+		}
+	}
+	else
+	{
+		if (transitionState.mipLevelStates[mipSlice] == D3D12_RESOURCE_STATE_UNKNOWN)
+		{
+			transitionState.allState = state;
+
+			transitionState.mipLevelStates[mipSlice] = state;
+		}
+		else
+		{
+			transitionState.allState = (transitionState.allState | state);
+
+			transitionState.mipLevelStates[mipSlice] = (transitionState.mipLevelStates[mipSlice] | state);
+		}
+	}
 }

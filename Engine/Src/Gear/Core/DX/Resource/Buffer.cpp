@@ -1,37 +1,11 @@
 #include<Gear/Core/DX/Resource/Buffer.h>
 
-Buffer::Buffer(const UINT size, const bool stateTracking, const void* const data, ID3D12GraphicsCommandList6* commandList, std::vector<Resource*>* transientResourcePool, const D3D12_RESOURCE_STATES finalState) :
-	Resource(CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE, CD3DX12_RESOURCE_DESC::Buffer(size), stateTracking, D3D12_RESOURCE_STATE_COPY_DEST, nullptr),
+Buffer::Buffer(const UINT size, const bool stateTracking, const D3D12_RESOURCE_FLAGS resFlags) :
+	Resource(CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE, CD3DX12_RESOURCE_DESC::Buffer(size, resFlags), stateTracking, D3D12_RESOURCE_STATE_COPY_DEST, nullptr),
 	globalState(std::make_shared<UINT>(D3D12_RESOURCE_STATE_COPY_DEST)),
 	internalState(D3D12_RESOURCE_STATE_COPY_DEST),
 	transitionState(D3D12_RESOURCE_STATE_UNKNOWN)
 {
-	if (data)
-	{
-		UploadHeap* uploadHeap = new UploadHeap(size);
-
-		transientResourcePool->push_back(uploadHeap);
-
-		uploadHeap->update(data, size);
-
-		commandList->CopyResource(getResource(), uploadHeap->getResource());
-
-		if (!stateTracking)
-		{
-			D3D12_RESOURCE_BARRIER barrier = {};
-			barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-			barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-			barrier.Transition.pResource = getResource();
-			barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-			barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_DEST;
-			barrier.Transition.StateAfter = finalState;
-
-			commandList->ResourceBarrier(1, &barrier);
-
-			*globalState = finalState;
-			internalState = finalState;
-		}
-	}
 }
 
 Buffer::Buffer(Buffer& buff) :
@@ -95,4 +69,16 @@ void Buffer::transition(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers,
 	}
 
 	resetTransitionStates();
+}
+
+void Buffer::setState(const UINT state)
+{
+	if (transitionState == D3D12_RESOURCE_STATE_UNKNOWN)
+	{
+		transitionState = state;
+	}
+	else
+	{
+		transitionState = transitionState | state;
+	}
 }

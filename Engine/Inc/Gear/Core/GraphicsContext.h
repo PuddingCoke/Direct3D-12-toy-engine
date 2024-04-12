@@ -23,10 +23,6 @@ public:
 
 	~GraphicsContext();
 
-	void copyResource(Buffer* const dstBuffer, Buffer* const srcBuffer);
-
-	void copyResource(Texture* const dstTexture, Texture* const srcTexture);
-
 	void updateBuffer(VertexBuffer* const vb, const void* const data, const UINT size);
 
 	void updateBuffer(IndexBuffer* const ib, const void* const data, const UINT size);
@@ -116,7 +112,7 @@ public:
 
 	void setCSConstantBuffer(const ConstantBuffer* const constantBuffer);
 
-	//must call this method after set*SConstants or set*SConstantBuffer
+	//must call this method after all resource binding methods
 	void transitionResources();
 
 	void setRenderTargets(const std::initializer_list<RenderTargetDesc>& renderTargets, const std::initializer_list<DepthStencilDesc>& depthStencils);
@@ -167,37 +163,11 @@ private:
 
 	static ConstantBuffer* globalConstantBuffer;
 
-	void updateReferredResStates();
-
 	void getIndicesFromResourceDescs(const std::initializer_list<ShaderResourceDesc>& descs, UINT* const dst);
-
-	void setGraphicsPipelineResources(const IndexConstantBuffer* const constantBuffer, const UINT targetSRVState);
-
-	void setGraphicsPipelineResources(const std::initializer_list<ShaderResourceDesc>& descs, const UINT targetSRVState);
-
-	void setComputePipelineResources(const IndexConstantBuffer* const constantBuffer);
-
-	void setComputePipelineResources(const std::initializer_list<ShaderResourceDesc>& descs);
-
-	void pushResourceTrackList(Texture* const texture);
-
-	void pushResourceTrackList(Buffer* const buffer);
 
 	D3D12_VIEWPORT vp;
 
 	D3D12_RECT rt;
-
-	std::unordered_set<Resource*> referredResources;
-
-	std::unordered_set<Buffer*> transitionBuffers;
-
-	std::unordered_set<Texture*> transitionTextures;
-
-	std::vector<D3D12_RESOURCE_BARRIER> transitionBarriers;
-
-	std::vector<PendingBufferBarrier> pendingBufferBarrier;
-
-	std::vector<PendingTextureBarrier> pendingTextureBarrier;
 
 	CommandList* const commandList;
 

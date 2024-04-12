@@ -164,7 +164,9 @@
     <ClInclude Include="Inc\Gear\Core\Graphics.h" />
     <ClInclude Include="Inc\Gear\Core\RenderEngine.h" />
     <ClInclude Include="Inc\Gear\Core\RenderPass.h" />
+    <ClInclude Include="Inc\Gear\Core\ResourceManager.h" />
     <ClInclude Include="Inc\Gear\Core\Resource\ConstantBuffer.h" />
+    <ClInclude Include="Inc\Gear\Core\Resource\EngineResource.h" />
     <ClInclude Include="Inc\Gear\Core\Resource\IndexBuffer.h" />
     <ClInclude Include="Inc\Gear\Core\Resource\IndexConstantBuffer.h" />
     <ClInclude Include="Inc\Gear\Core\Resource\TextureDepthStencil.h" />
@@ -212,6 +214,7 @@
     <ClCompile Include="Src\Gear\Core\DX\Resource\Resource.cpp" />
     <ClCompile Include="Src\Gear\Core\DX\Resource\UploadHeap.cpp" />
     <ClCompile Include="Src\Gear\Core\GraphicsDevice.cpp" />
+    <ClCompile Include="Src\Gear\Core\ResourceManager.cpp" />
     <ClCompile Include="Src\Gear\Core\Resource\ConstantBuffer.cpp" />
     <ClCompile Include="Src\Gear\Core\Resource\IndexBuffer.cpp" />
     <ClCompile Include="Src\Gear\Core\Resource\IndexConstantBuffer.cpp" />

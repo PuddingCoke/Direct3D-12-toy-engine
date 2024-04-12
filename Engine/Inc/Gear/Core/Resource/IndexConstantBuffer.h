@@ -5,6 +5,8 @@
 
 #include<Gear/Core/Resource/ConstantBuffer.h>
 
+#include"EngineResource.h"
+
 //Buffer SRV/UAV/CBV
 //Texture SRV/UAV
 
@@ -13,13 +15,13 @@
 //specialized constant buffer for indexing resources in CBV/SRV/UAV heap
 //texture mipSlice srvIndexInHeap
 //buffer cbvIndexInHeap
-class IndexConstantBuffer
+class IndexConstantBuffer :public EngineResource
 {
 public:
 
-	IndexConstantBuffer(const std::initializer_list<ShaderResourceDesc>& transitionDescs, const bool cpuWritable, ID3D12GraphicsCommandList6* commandList, std::vector<Resource*>* transientResourcePool);
+	IndexConstantBuffer(ConstantBuffer* const constantBuffer, const std::initializer_list<ShaderResourceDesc>& transitionDescs);
 
-	IndexConstantBuffer(const UINT indicesNum);
+	IndexConstantBuffer(ConstantBuffer* const constantBuffer);
 
 	IndexConstantBuffer(const IndexConstantBuffer&) = delete;
 
@@ -35,12 +37,9 @@ private:
 
 	friend class GraphicsContext;
 
-	ConstantBuffer* constantBuffer;
-
-	std::vector<UINT> indices;
-
 	std::vector<ShaderResourceDesc> descs;
 
+	ConstantBuffer* constantBuffer;
 };
 
 #endif // !_INDEXCONSTANTBUFFER_H_

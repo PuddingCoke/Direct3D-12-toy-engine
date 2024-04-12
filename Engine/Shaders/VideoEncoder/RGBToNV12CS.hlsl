@@ -1,4 +1,4 @@
-cbuffer TextureIdx : register(b1)
+cbuffer TextureIdx : register(b2)
 {
     uint rgbaTexIdx;
     uint lumaTexIdx;

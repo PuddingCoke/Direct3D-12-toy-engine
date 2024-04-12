@@ -23,7 +23,7 @@ ConstantBufferPool::ConstantBufferPool(const UINT subRegionSize, const UINT subR
 		}
 	}
 
-	buffer = new Buffer(subRegionSize * subRegionNum, false, nullptr, nullptr, nullptr, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
+	buffer = new Buffer(subRegionSize * subRegionNum, true, D3D12_RESOURCE_FLAG_NONE);
 
 	{
 		DescriptorHandle descriptorHandle = GlobalDescriptorHeap::getResourceHeap()->allocStaticDescriptor(subRegionNum);

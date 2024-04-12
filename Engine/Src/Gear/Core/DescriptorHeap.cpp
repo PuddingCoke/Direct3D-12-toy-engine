@@ -110,13 +110,6 @@ DescriptorHeap::DescriptorHandle DescriptorHeap::allocDynamicDescriptor(UINT num
 	return DescriptorHandle(retCPUHandle, retGPUHandle, this);
 }
 
-void DescriptorHeap::resetDynamicDescriptorPointer()
-{
-	dynamicCPUPointer = dynamicCPUPointerStart;
-
-	dynamicGPUPointer = dynamicGPUPointerStart;
-}
-
 DescriptorHeap::DescriptorHandle::DescriptorHandle() :
 	cpuHandle{}, gpuHandle{}, descriptorHeap(nullptr)
 {

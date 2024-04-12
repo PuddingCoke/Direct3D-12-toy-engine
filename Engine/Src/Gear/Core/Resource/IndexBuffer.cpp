@@ -1,10 +1,8 @@
 #include<Gear/Core/Resource/IndexBuffer.h>
 
-IndexBuffer::IndexBuffer(const DXGI_FORMAT format, const UINT size, const bool cpuWritable, const void* const data, ID3D12GraphicsCommandList6* commandList, std::vector<Resource*>* transientResourcePool) :
-	uploadHeaps(nullptr), uploadHeapIndex(0)
+IndexBuffer::IndexBuffer(Buffer* const buffer, const DXGI_FORMAT format, const UINT size, const bool cpuWritable) :
+	buffer(buffer), uploadHeaps(nullptr), uploadHeapIndex(0)
 {
-	buffer = new Buffer(size, cpuWritable, data, commandList, transientResourcePool, D3D12_RESOURCE_STATE_INDEX_BUFFER);
-
 	indexBufferView.BufferLocation = buffer->getGPUAddress();
 	indexBufferView.Format = format;
 	indexBufferView.SizeInBytes = size;

@@ -2,7 +2,7 @@
 
 BloomEffect::BloomEffect(GraphicsContext* const context, const UINT width, const UINT height) :
 	Effect(context, width, height, DXGI_FORMAT_R16G16B16A16_FLOAT),
-	filteredTexture(new TextureRenderTarget(width, height, DXGI_FORMAT_R16G16B16A16_FLOAT, 1, 1, false, true,
+	filteredTexture(ResourceManager::createTextureRenderTarget(width, height, DXGI_FORMAT_R16G16B16A16_FLOAT, 1, 1, false, true,
 		DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_R16G16B16A16_FLOAT))
 {
 	bloomFilter = new Shader(g_BloomFilterPSBytes, sizeof(g_BloomFilterPSBytes));
@@ -21,7 +21,7 @@ BloomEffect::BloomEffect(GraphicsContext* const context, const UINT width, const
 
 			swapTexture[i] = new SwapTexture(
 				[=] {
-					return new TextureRenderTarget(resolutions[i].x, resolutions[i].y, DXGI_FORMAT_R16G16B16A16_FLOAT, 1, 1, false, true,
+					return ResourceManager::createTextureRenderTarget(resolutions[i].x, resolutions[i].y, DXGI_FORMAT_R16G16B16A16_FLOAT, 1, 1, false, true,
 					DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_R16G16B16A16_FLOAT);
 				}
 			);
@@ -30,7 +30,7 @@ BloomEffect::BloomEffect(GraphicsContext* const context, const UINT width, const
 			blurParam[i].iteration = iteration[i];
 			blurParam[i].sigma = sigma[i];
 
-			blurParamBuffer[i] = new ConstantBuffer(sizeof(BlurParam), true, nullptr, nullptr, nullptr);
+			blurParamBuffer[i] = ResourceManager::createConstantBuffer(sizeof(BlurParam));
 
 			updateCurve(i);
 		}

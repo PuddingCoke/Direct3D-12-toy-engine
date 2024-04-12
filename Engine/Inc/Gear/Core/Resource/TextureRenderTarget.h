@@ -5,24 +5,19 @@
 
 #include<Gear/Core/DX/Resource/Texture.h>
 
+#include"EngineResource.h"
+
 //versatile texture
 //texturecubearray
 //texturecube
 //texture2darray
 //texture2d
 //SRV/RTV/UAV
-class TextureRenderTarget
+class TextureRenderTarget :public EngineResource
 {
 public:
 
-	TextureRenderTarget(const UINT width, const UINT height, const DXGI_FORMAT resFormat, const UINT arraySize, const UINT mipLevels, const bool isTextureCube, const bool persistent,
-		const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat);
-
-	//png jpg hdr dds
-	TextureRenderTarget(const std::string filePath, ID3D12GraphicsCommandList6* commandList, std::vector<Resource*>* transientResourcePool, const bool isTextureCube, const bool persistent,
-		const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat);
-
-	TextureRenderTarget(const UINT width, const UINT height, const Texture::TextureType type, ID3D12GraphicsCommandList6* commandList, std::vector<Resource*>* transientResourcePool, const bool persistent);
+	TextureRenderTarget(Texture* const texture, const bool isTextureCube, const bool persistent, const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat);
 
 	TextureRenderTarget(const TextureRenderTarget&);
 
@@ -44,7 +39,7 @@ private:
 
 	void createViews(const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat, const bool isTextureCube, const bool persistent);
 
-	//offset 1 for each mipslice
+	//offset 1 for each mipSlice
 	//since 0th position is all srv
 	UINT allSRVIndex;
 
@@ -54,12 +49,11 @@ private:
 
 	std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> rtvMipHandles;
 
-	Texture* texture;
-
 	CD3DX12_CPU_DESCRIPTOR_HANDLE srvuavDescriptorHandleStart;
 
 	UINT numSRVUAVDescriptors;
 
+	Texture* texture;
 };
 
 #endif // !_TEXTURERENDERTARGET_H_

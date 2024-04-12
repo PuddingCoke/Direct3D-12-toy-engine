@@ -26,7 +26,7 @@ public:
 
 	void render() override
 	{
-		renderPass->launchTask();
+		renderPass->beginRenderPass();
 
 		RenderEngine::get()->submitRenderPass(renderPass);
 	}

@@ -9,12 +9,16 @@ RenderEngine* RenderEngine::get()
 
 void RenderEngine::submitRenderPass(RenderPass* const pass)
 {
-	pass->task.get();
+	const RenderPassResult renderPassResult = pass->getRenderPassResult();
+
+	CommandList* const transitionCMD = renderPassResult.transitionCMD;
+
+	CommandList* const renderCMD = renderPassResult.renderCMD;
 
 	std::vector<D3D12_RESOURCE_BARRIER> barriers;
 
 	{
-		std::vector<PendingBufferBarrier>* pendingBufferBarrier = &(pass->context->commandList->pendingBufferBarrier);
+		std::vector<PendingBufferBarrier>* pendingBufferBarrier = &(renderCMD->pendingBufferBarrier);
 
 		for (UINT bufferIdx = 0; bufferIdx < pendingBufferBarrier->size(); bufferIdx++)
 		{
@@ -38,7 +42,7 @@ void RenderEngine::submitRenderPass(RenderPass* const pass)
 	}
 
 	{
-		std::vector<PendingTextureBarrier>* pendingTextureBarrier = &(pass->context->pendingTextureBarrier);
+		std::vector<PendingTextureBarrier>* pendingTextureBarrier = &(renderCMD->pendingTextureBarrier);
 
 		for (UINT textureIdx = 0; textureIdx < pendingTextureBarrier->size(); textureIdx++)
 		{
@@ -152,21 +156,22 @@ void RenderEngine::submitRenderPass(RenderPass* const pass)
 
 	if (barriers.size() > 0)
 	{
-		pass->transitionCMD->reset();
+		transitionCMD->reset();
 
-		pass->transitionCMD->get()->ResourceBarrier(barriers.size(), barriers.data());
+		transitionCMD->get()->ResourceBarrier(barriers.size(), barriers.data());
 
-		pass->transitionCMD->get()->Close();
+		transitionCMD->get()->Close();
 
-		commandLists.push_back(pass->transitionCMD->get());
-		commandLists.push_back(pass->context->commandList->get());
+		commandLists.push_back(transitionCMD->get());
+
+		commandLists.push_back(renderCMD->get());
 	}
 	else
 	{
-		commandLists.push_back(pass->context->commandList->get());
+		commandLists.push_back(renderCMD->get());
 	}
 
-	pass->context->updateReferredResStates();
+	renderCMD->updateReferredResStates();
 }
 
 void RenderEngine::processCommandLists()
@@ -227,27 +232,24 @@ void RenderEngine::begin()
 
 		GraphicsContext::globalConstantBuffer->update(&perFrameResource, sizeof(PerFrameResource));
 	}
-
-	if (Graphics::getFrameIndex() == 0)
-	{
-		GlobalDescriptorHeap::getResourceHeap()->resetDynamicDescriptorPointer();
-	}
 }
 
 void RenderEngine::end()
 {
 	{
-		CD3DX12_RESOURCE_BARRIER barriers[] =
 		{
-			CD3DX12_RESOURCE_BARRIER::Transition(backBufferResources[Graphics::getFrameIndex()].Get(),D3D12_RESOURCE_STATE_PRESENT,D3D12_RESOURCE_STATE_RENDER_TARGET),
-			CD3DX12_RESOURCE_BARRIER::Transition(ConstantBuffer::bufferPools[0]->buffer->getResource(),D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER,D3D12_RESOURCE_STATE_COPY_DEST),
-			CD3DX12_RESOURCE_BARRIER::Transition(ConstantBuffer::bufferPools[1]->buffer->getResource(),D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER,D3D12_RESOURCE_STATE_COPY_DEST),
-			CD3DX12_RESOURCE_BARRIER::Transition(ConstantBuffer::bufferPools[2]->buffer->getResource(),D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER,D3D12_RESOURCE_STATE_COPY_DEST)
-		};
+			CD3DX12_RESOURCE_BARRIER barriers[] =
+			{
+				CD3DX12_RESOURCE_BARRIER::Transition(backBufferResources[Graphics::getFrameIndex()].Get(),D3D12_RESOURCE_STATE_PRESENT,D3D12_RESOURCE_STATE_RENDER_TARGET),
+				CD3DX12_RESOURCE_BARRIER::Transition(ConstantBuffer::bufferPools[0]->buffer->getResource(),D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER,D3D12_RESOURCE_STATE_COPY_DEST),
+				CD3DX12_RESOURCE_BARRIER::Transition(ConstantBuffer::bufferPools[1]->buffer->getResource(),D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER,D3D12_RESOURCE_STATE_COPY_DEST),
+				CD3DX12_RESOURCE_BARRIER::Transition(ConstantBuffer::bufferPools[2]->buffer->getResource(),D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER,D3D12_RESOURCE_STATE_COPY_DEST)
+			};
 
-		beginCommandlist->get()->ResourceBarrier(_countof(barriers), barriers);
+			beginCommandlist->get()->ResourceBarrier(_countof(barriers), barriers);
+		}
 
-		for (UINT bufferPoolIndex = 0; bufferPoolIndex < Graphics::FrameBufferCount; bufferPoolIndex++)
+		for (UINT bufferPoolIndex = 0; bufferPoolIndex < ConstantBufferPool::numConstantBufferPool; bufferPoolIndex++)
 		{
 			ConstantBuffer::bufferPools[bufferPoolIndex]->recordCommands(beginCommandlist->get());
 		}
@@ -387,7 +389,7 @@ RenderEngine::RenderEngine(const HWND hwnd, const bool useSwapChainBuffer) :
 
 	GlobalRootSignature::instance = new GlobalRootSignature();
 
-	for (UINT i = 0; i < Graphics::FrameBufferCount; i++)
+	for (UINT i = 0; i < ConstantBufferPool::numConstantBufferPool; i++)
 	{
 		ConstantBuffer::bufferPools[i] = new ConstantBufferPool(256 << i, 1024);
 	}
@@ -426,6 +428,11 @@ RenderEngine::RenderEngine(const HWND hwnd, const bool useSwapChainBuffer) :
 	{
 		beginCommandlist->reset();
 
+		for (UINT bufferPoolIndex = 0; bufferPoolIndex < ConstantBufferPool::numConstantBufferPool; bufferPoolIndex++)
+		{
+			ConstantBuffer::bufferPools[bufferPoolIndex]->recordCommands(beginCommandlist->get());
+		}
+
 		CD3DX12_RESOURCE_BARRIER barriers[] =
 		{
 			CD3DX12_RESOURCE_BARRIER::Transition(ConstantBuffer::bufferPools[0]->buffer->getResource(),D3D12_RESOURCE_STATE_COPY_DEST,D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER),
@@ -439,7 +446,7 @@ RenderEngine::RenderEngine(const HWND hwnd, const bool useSwapChainBuffer) :
 
 		commandLists.push_back(beginCommandlist->get());
 
-		GraphicsContext::globalConstantBuffer = new ConstantBuffer(sizeof(PerFrameResource), true, nullptr, nullptr, nullptr);
+		GraphicsContext::globalConstantBuffer = ResourceManager::createConstantBuffer(sizeof(PerFrameResource));
 	}
 
 	{
@@ -472,11 +479,7 @@ RenderEngine::RenderEngine(const HWND hwnd, const bool useSwapChainBuffer) :
 
 				CD3DX12_RESOURCE_DESC resourceDesc = CD3DX12_RESOURCE_DESC::Tex2D(Graphics::BackBufferFormat, Graphics::width, Graphics::height, 1, 1, 1, 0, D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET);
 
-				float color[4] = { 0.f,0.f,0.f,1.f };
-
-				CD3DX12_CLEAR_VALUE clearValue = CD3DX12_CLEAR_VALUE(Graphics::BackBufferFormat, color);
-
-				GraphicsDevice::get()->CreateCommittedResource(&heapProperties, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_PRESENT, &clearValue, IID_PPV_ARGS(&backBufferResources[i]));
+				GraphicsDevice::get()->CreateCommittedResource(&heapProperties, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_PRESENT, nullptr, IID_PPV_ARGS(&backBufferResources[i]));
 
 				GraphicsDevice::get()->CreateRenderTargetView(backBufferResources[i].Get(), &rtvDesc, descriptorHandle.getCPUHandle());
 
@@ -517,7 +520,7 @@ RenderEngine::~RenderEngine()
 		delete endCommandList;
 	}
 
-	for (UINT i = 0; i < Graphics::FrameBufferCount; i++)
+	for (UINT i = 0; i < ConstantBufferPool::numConstantBufferPool; i++)
 	{
 		if (ConstantBuffer::bufferPools[i])
 		{

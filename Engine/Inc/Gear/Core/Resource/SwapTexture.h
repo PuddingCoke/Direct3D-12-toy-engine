@@ -5,9 +5,11 @@
 
 #include"TextureRenderTarget.h"
 
+#include"EngineResource.h"
+
 #include<functional>
 
-class SwapTexture
+class SwapTexture :public EngineResource
 {
 private:
 

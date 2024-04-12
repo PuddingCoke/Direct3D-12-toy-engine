@@ -5,7 +5,9 @@
 
 #include<Gear/Core/DX/Resource/Texture.h>
 
-class TextureDepthStencil
+#include"EngineResource.h"
+
+class TextureDepthStencil :public EngineResource
 {
 public:
 
@@ -14,7 +16,7 @@ public:
 	//R16_TYPELESS 
 	//R32G8X24_TYPELESS 
 	//R24G8_TYPELESS
-	TextureDepthStencil(const UINT width, const UINT height, const DXGI_FORMAT resFormat, const UINT arraySize, const UINT mipLevels, const bool isTextureCube, const bool persistent);
+	TextureDepthStencil(Texture* const texture, const bool isTextureCube, const bool persistent);
 
 	TextureDepthStencil(const TextureDepthStencil&);
 
@@ -46,12 +48,11 @@ private:
 
 	std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> dsvMipHandles;
 
-	Texture* texture;
-
 	CD3DX12_CPU_DESCRIPTOR_HANDLE srvDescriptorHandleStart;
 
 	UINT numSRVDescriptors;
 
+	Texture* texture;
 };
 
 
