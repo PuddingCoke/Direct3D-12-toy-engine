@@ -20,7 +20,7 @@ class Buffer :public Resource
 {
 public:
 
-	Buffer(const UINT size, const bool stateTracking, const void* const data, ID3D12GraphicsCommandList6* commandList, std::vector<Resource*>* transientResourcePool, const D3D12_RESOURCE_STATES finalState);
+	Buffer(const UINT size, const bool stateTracking, const D3D12_RESOURCE_FLAGS resFlags);
 
 	Buffer(Buffer&);
 
@@ -38,6 +38,8 @@ public:
 
 	void transition(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers, std::vector<PendingBufferBarrier>& pendingBarriers);
 
+	void setState(const UINT state);
+
 protected:
 
 	UINT transitionState;
@@ -45,8 +47,6 @@ protected:
 private:
 
 	friend class RenderEngine;
-
-	friend class GraphicsContext;
 
 	std::shared_ptr<UINT> globalState;
 

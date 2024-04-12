@@ -25,7 +25,7 @@ public:
 
 	void render()
 	{
-		renderPass->launchTask();
+		renderPass->beginRenderPass();
 
 		RenderEngine::get()->submitRenderPass(renderPass);
 	}

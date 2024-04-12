@@ -5,6 +5,8 @@
 
 #include<Gear/Core/GraphicsContext.h>
 
+#include<Gear/Core/ResourceManager.h>
+
 #include<Gear/Core/Resource/TextureRenderTarget.h>
 
 class Effect

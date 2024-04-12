@@ -12,6 +12,7 @@
 #include<Gear/Core/Resource/SwapTexture.h>
 
 #include<Gear/Core/GraphicsContext.h>
+#include<Gear/Core/ResourceManager.h>
 
 #include<Gear/Input/Mouse.h>
 #include<Gear/Input/Keyboard.h>
@@ -24,49 +25,26 @@
 #include<vector>
 #include<unordered_set>
 
+//provide needed resources for main render thread to solve pending state problems
+struct RenderPassResult
+{
+	CommandList* transitionCMD;//helps transition pending state
+	CommandList* renderCMD;//contains all pending state
+};
+
 class RenderPass
 {
 public:
 
-	void launchTask();
+	void beginRenderPass();
+
+	RenderPassResult getRenderPassResult();
 
 	RenderPass();
 
 	virtual ~RenderPass();
 
 protected:
-
-	ConstantBuffer* CreateConstantBuffer(const UINT size, const bool cpuWritable, const void* const data);
-
-	IndexBuffer* CreateIndexBuffer(const DXGI_FORMAT format, const UINT size, const bool cpuWritable, const void* const data);
-
-	VertexBuffer* CreateVertexBuffer(const UINT perVertexSize, const UINT size, const bool cpuWritable, const void* const data);
-
-	IndexConstantBuffer* CreateIndexConstantBuffer(const std::initializer_list<ShaderResourceDesc>& descs, const bool cpuWritable);
-
-	IndexConstantBuffer* CreateIndexConstantBuffer(const UINT indicesNum);
-
-	TextureDepthStencil* CreateTextureDepthStencil(const UINT width, const UINT height, const DXGI_FORMAT resFormat, const UINT arraySize, const UINT mipLevels, const bool isTextureCube, const bool persistent);
-
-	TextureRenderTarget* CreateTextureRenderTarget(const UINT width, const UINT height, const DXGI_FORMAT resFormat, const UINT arraySize, const UINT mipLevels, const bool isTextureCube, const bool persistent,
-		const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat);
-
-	TextureRenderTarget* CreateTextureRenderTarget(const std::string filePath, const bool isTextureCube, const bool persistent,
-		const DXGI_FORMAT srvFormat = DXGI_FORMAT_UNKNOWN, const DXGI_FORMAT uavFormat = DXGI_FORMAT_UNKNOWN, const DXGI_FORMAT rtvFormat = DXGI_FORMAT_UNKNOWN);
-
-	TextureRenderTarget* CreateTextureRenderTarget(const UINT width, const UINT height, const Texture::TextureType type, const bool persistent);
-
-	void deferredRelease(ConstantBuffer* const cb);
-
-	void deferredRelease(IndexBuffer* const ib);
-
-	void deferredRelease(IndexConstantBuffer* const icb);
-
-	void deferredRelease(TextureDepthStencil* const tds);
-
-	void deferredRelease(TextureRenderTarget* const trt);
-
-	void deferredRelease(VertexBuffer* const vb);
 
 	void begin();
 
@@ -76,42 +54,14 @@ protected:
 
 	GraphicsContext* const context;
 
+	ResourceManager* const resManager;
+
 private:
-
-	friend class RenderEngine;
-
-	std::vector<Resource*> deferredReleaseResources[Graphics::FrameBufferCount];
-
-	std::vector<ConstantBuffer*> deferredReleaseConstantBuffer[Graphics::FrameBufferCount];
-
-	std::vector<IndexBuffer*> deferredReleaseIndexBuffer[Graphics::FrameBufferCount];
-
-	std::vector<IndexConstantBuffer*> deferredReleaseIndexConstantBuffer[Graphics::FrameBufferCount];
-
-	std::vector<TextureDepthStencil*> deferredReleaseTextureDepthStencil[Graphics::FrameBufferCount];
-
-	std::vector<TextureRenderTarget*> deferredReleaseTextureRenderTarget[Graphics::FrameBufferCount];
-
-	std::vector<VertexBuffer*> deferredReleaseVertexBuffer[Graphics::FrameBufferCount];
 
 	CommandList* const transitionCMD;
 
-	std::future<void> task;
-
-	template<typename T>
-	void releaseResources(std::vector<T>& resources);
+	std::future<RenderPassResult> task;
 
 };
-
-template<typename T>
-inline void RenderPass::releaseResources(std::vector<T>& resources)
-{
-	for (const auto res : resources)
-	{
-		delete res;
-	}
-
-	resources.clear();
-}
 
 #endif // !_RENDERPASS_H_

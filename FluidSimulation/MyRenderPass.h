@@ -35,25 +35,25 @@ public:
 			Graphics::getHeight() / config.resolutionFactor
 		};
 
-		colorTex = new SwapTexture([=] {return new TextureRenderTarget(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R16G16B16A16_FLOAT, 1, 1, false, true,
+		colorTex = new SwapTexture([=] {return ResourceManager::createTextureRenderTarget(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R16G16B16A16_FLOAT, 1, 1, false, true,
 			DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_R16G16B16A16_FLOAT); });
 
-		velocityTex = new SwapTexture([=] {return new TextureRenderTarget(simRes.x, simRes.y, DXGI_FORMAT_R32G32_FLOAT, 1, 1, false, true,
+		velocityTex = new SwapTexture([=] {return ResourceManager::createTextureRenderTarget(simRes.x, simRes.y, DXGI_FORMAT_R32G32_FLOAT, 1, 1, false, true,
 			DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_R32G32_FLOAT); });
 
-		pressureTex = new SwapTexture([=] {return new TextureRenderTarget(simRes.x, simRes.y, DXGI_FORMAT_R32_FLOAT, 1, 1, false, true,
+		pressureTex = new SwapTexture([=] {return ResourceManager::createTextureRenderTarget(simRes.x, simRes.y, DXGI_FORMAT_R32_FLOAT, 1, 1, false, true,
 			DXGI_FORMAT_R32_FLOAT, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_R32_FLOAT); });
 
-		curlTex = new TextureRenderTarget(simRes.x, simRes.y, DXGI_FORMAT_R32_FLOAT, 1, 1, false, true,
+		curlTex = ResourceManager::createTextureRenderTarget(simRes.x, simRes.y, DXGI_FORMAT_R32_FLOAT, 1, 1, false, true,
 			DXGI_FORMAT_R32_FLOAT, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_R32_FLOAT);
 
-		divergenceTex = new TextureRenderTarget(simRes.x, simRes.y, DXGI_FORMAT_R32_FLOAT, 1, 1, false, true,
+		divergenceTex = ResourceManager::createTextureRenderTarget(simRes.x, simRes.y, DXGI_FORMAT_R32_FLOAT, 1, 1, false, true,
 			DXGI_FORMAT_R32_FLOAT, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_R32_FLOAT);
 
-		originTexture = new TextureRenderTarget(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R16G16B16A16_FLOAT, 1, 1, false, true,
+		originTexture = ResourceManager::createTextureRenderTarget(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R16G16B16A16_FLOAT, 1, 1, false, true,
 			DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_R16G16B16A16_FLOAT);
 
-		simulationParamBuffer = new ConstantBuffer(sizeof(SimulationParam), true, nullptr, nullptr, nullptr);
+		simulationParamBuffer = ResourceManager::createConstantBuffer(sizeof(SimulationParam));
 
 		simulationParam.simTexelSize = DirectX::XMFLOAT2(1.f / simRes.x, 1.f / simRes.y);
 		simulationParam.colorDissipationSpeed = config.colorDissipationSpeed;

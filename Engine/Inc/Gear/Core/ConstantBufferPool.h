@@ -29,6 +29,8 @@ public:
 
 	void recordCommands(ID3D12GraphicsCommandList6* const commandList);
 
+	static constexpr UINT numConstantBufferPool = 3;
+
 private:
 
 	friend class RenderEngine;

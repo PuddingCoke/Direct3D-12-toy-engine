@@ -9,8 +9,8 @@ Resource::~Resource()
 {
 }
 
-Resource::Resource(const bool stateTracking) :
-	stateTracking(stateTracking), sharedResource(false)
+Resource::Resource(const ComPtr<ID3D12Resource>& resource, const bool stateTracking) :
+	resource(resource), stateTracking(stateTracking), sharedResource(false)
 {
 }
 

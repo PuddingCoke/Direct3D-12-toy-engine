@@ -4,6 +4,7 @@
 #define _PRIMITIVEBATCH_H_
 
 #include<Gear/Core/GraphicsContext.h>
+#include<Gear/Core/ResourceManager.h>
 #include<Gear/Core/Shader.h>
 #include<Gear/Core/States.h>
 

@@ -1,81 +1,9 @@
 #include<Gear/Core/Resource/TextureRenderTarget.h>
 
-TextureRenderTarget::TextureRenderTarget(const UINT width, const UINT height, const DXGI_FORMAT resFormat, const UINT arraySize, const UINT mipLevels, const bool isTextureCube, const bool persistent,
-	const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat)
+TextureRenderTarget::TextureRenderTarget(Texture* const texture, const bool isTextureCube, const bool persistent, const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat) :
+	texture(texture)
 {
-	const bool hasRTV = (rtvFormat != DXGI_FORMAT_UNKNOWN);
-	const bool hasUAV = (uavFormat != DXGI_FORMAT_UNKNOWN);
-
-	if ((!hasRTV) && (!hasUAV))
-	{
-		throw "With only SRV flag set is not allowed here";
-	}
-	else if (srvFormat == DXGI_FORMAT_UNKNOWN)
-	{
-		throw "SRV format cannot be DXGI_FORMAT_UNKNOWN";
-	}
-
-	D3D12_RESOURCE_FLAGS resFlags = D3D12_RESOURCE_FLAG_NONE;
-
-	if (hasRTV)
-	{
-		resFlags |= D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
-	}
-
-	if (hasUAV)
-	{
-		resFlags |= D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
-	}
-
-	//stateTracking must be true because use this method to create a texture must combine SRV with other flags(UAV or RTV)
-	texture = new Texture(width, height, resFormat, arraySize, mipLevels, true, resFlags);
-
 	createViews(srvFormat, uavFormat, rtvFormat, isTextureCube, persistent);
-}
-
-TextureRenderTarget::TextureRenderTarget(const std::string filePath, ID3D12GraphicsCommandList6* commandList, std::vector<Resource*>* transientResourcePool, const bool isTextureCube, const bool persistent,
-	const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat)
-{
-	const bool hasRTV = (rtvFormat != DXGI_FORMAT_UNKNOWN);
-	const bool hasUAV = (uavFormat != DXGI_FORMAT_UNKNOWN);
-
-	if ((!hasRTV) && (!hasUAV))
-	{
-		//stateTracking is disabled here because flags is set to D3D12_TEXTURE_CREATE_SRV
-		texture = new Texture(filePath, commandList, transientResourcePool, false, D3D12_RESOURCE_FLAG_NONE);
-	}
-	else
-	{
-		D3D12_RESOURCE_FLAGS resFlags = D3D12_RESOURCE_FLAG_NONE;
-
-		if (hasRTV)
-		{
-			resFlags |= D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
-		}
-
-		if (hasUAV)
-		{
-			resFlags |= D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
-		}
-
-		texture = new Texture(filePath, commandList, transientResourcePool, true, resFlags);
-	}
-
-	if (srvFormat == DXGI_FORMAT_UNKNOWN)
-	{
-		createViews(texture->getFormat(), DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, isTextureCube, persistent);
-	}
-	else
-	{
-		createViews(srvFormat, uavFormat, rtvFormat, isTextureCube, persistent);
-	}
-}
-
-TextureRenderTarget::TextureRenderTarget(const UINT width, const UINT height, const Texture::TextureType type, ID3D12GraphicsCommandList6* commandList, std::vector<Resource*>* transientResourcePool, const bool persistent)
-{
-	texture = new Texture(width, height, type, commandList, transientResourcePool);
-
-	createViews(texture->getFormat(), DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN, false, persistent);
 }
 
 TextureRenderTarget::TextureRenderTarget(const TextureRenderTarget& trt) :
@@ -187,29 +115,6 @@ void TextureRenderTarget::createViews(const DXGI_FORMAT srvFormat, const DXGI_FO
 		srvMipIndexStart = allSRVIndex + 1;
 
 		uavMipIndexStart = srvMipIndexStart + texture->getMipLevels();
-
-		std::cout << "[class TextureRenderTarget] //////////\n";
-		std::cout << "[class TextureRenderTarget] stateTracking " << texture->getStateTracking() << "\n";
-		std::cout << "[class TextureRenderTarget] persistent " << persistent << "\n";
-
-		if (texture->getStateTracking())
-		{
-			std::cout << "[class TextureRenderTarget] uav creation flag " << hasUAV << "\n";
-			std::cout << "[class TextureRenderTarget] rtv creation flag " << hasRTV << "\n";
-		}
-
-		std::cout << "[class TextureRenderTarget] isTexturecube " << isTextureCube << "\n";
-		std::cout << "[class TextureRenderTarget] miplevels " << texture->getMipLevels() << "\n";
-		std::cout << "[class TextureRenderTarget] arraysize " << texture->getArraySize() << "\n";
-		std::cout << "[class TextureRenderTarget] all srv index " << allSRVIndex << "\n";
-		std::cout << "[class TextureRenderTarget] srv slice start " << srvMipIndexStart << "\n";
-
-		if (texture->getStateTracking())
-		{
-			std::cout << "[class TextureRenderTarget] uav slice start " << uavMipIndexStart << "\n";
-		}
-
-		std::cout << "[class TextureRenderTarget] //////////\n";
 
 		if (isTextureCube) //TextureCube srv creation
 		{

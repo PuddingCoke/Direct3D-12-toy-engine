@@ -30,17 +30,10 @@ class Texture :public Resource
 {
 public:
 
-	enum class TextureType
-	{
-		NOISE,//4 channel [0,1]
-		GAUSS //mean 0 standard deviation 1
-	};
-
 	Texture(const UINT width, const UINT height, const DXGI_FORMAT format, const UINT arraySize, const UINT mipLevels, const bool stateTracking, const D3D12_RESOURCE_FLAGS resFlags);
 
-	Texture(const std::string filePath, ID3D12GraphicsCommandList6* commandList, std::vector<Resource*>* transientResourcePool, const bool stateTracking, const D3D12_RESOURCE_FLAGS resFlags);
-
-	Texture(const UINT width, const UINT height, const TextureType type, ID3D12GraphicsCommandList6* commandList, std::vector<Resource*>* transientResourcePool);
+	//texture must be in D3D12_RESOURCE_STATE_COMMON
+	Texture(const ComPtr<ID3D12Resource>& texture, const bool stateTracking);
 
 	Texture(Texture&);
 
@@ -68,6 +61,10 @@ public:
 
 	DXGI_FORMAT getFormat() const;
 
+	void setAllState(const UINT state);
+
+	void setMipSliceState(const UINT mipSlice, const UINT state);
+
 protected:
 
 	struct STATES
@@ -82,8 +79,6 @@ protected:
 private:
 
 	friend class RenderEngine;
-
-	friend class GraphicsContext;
 
 	UINT width;
 

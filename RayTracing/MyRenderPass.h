@@ -16,7 +16,7 @@ public:
 	MyRenderPass() :
 		accumulateShader(new Shader(Utils::getRootFolder() + "AccumulateShader.cso")),
 		displayShader(new Shader(Utils::getRootFolder() + "DisplayShader.cso")),
-		accumulatedTexture(CreateTextureRenderTarget(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R16G16B16A16_UNORM, 1, 1, false, false,
+		accumulatedTexture(ResourceManager::createTextureRenderTarget(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R16G16B16A16_UNORM, 1, 1, false, false,
 			DXGI_FORMAT_R16G16B16A16_UNORM, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_R16G16B16A16_UNORM)),
 		cameraParam{ 0.25f,0.0f,12.0f },
 		accumulateParam{ 0,0.f }

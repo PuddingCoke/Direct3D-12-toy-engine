@@ -5,13 +5,16 @@
 
 #include<Gear/Core/ConstantBufferPool.h>
 
-//we use a very effective way to achieve state sync for constant buffer
-//so feel free to just copy constant buffer pointer
-class ConstantBuffer
+#include"EngineResource.h"
+
+//free to just copy pointer
+class ConstantBuffer :public EngineResource
 {
 public:
 
-	ConstantBuffer(const UINT size, const bool cpuWritable, const void* const data, ID3D12GraphicsCommandList6* commandList, std::vector<Resource*>* transientResourcePool);
+	//buffer can be nullptr or not nullptr
+	//buffer is nullptr then it's a dynamic constant buffer
+	ConstantBuffer(Buffer* const buffer, const UINT size);
 
 	ConstantBuffer(const ConstantBuffer&) = delete;
 
@@ -39,7 +42,7 @@ private:
 
 	Buffer* buffer;
 
-	static ConstantBufferPool* bufferPools[Graphics::FrameBufferCount];
+	static ConstantBufferPool* bufferPools[ConstantBufferPool::numConstantBufferPool];
 
 };
 

@@ -66,7 +66,7 @@ public:
 
 	MyRenderPass() :
 		pBatch{ new PrimitiveBatch(Graphics::BackBufferFormat,context),new PrimitiveBatch(DXGI_FORMAT_R8G8B8A8_UNORM,context) },
-		renderTexture(CreateTextureRenderTarget(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R8G8B8A8_UNORM, 1, 1, false, true,
+		renderTexture(ResourceManager::createTextureRenderTarget(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R8G8B8A8_UNORM, 1, 1, false, true,
 			DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_R8G8B8A8_UNORM)),
 		curFrame(0),
 		connected(false)

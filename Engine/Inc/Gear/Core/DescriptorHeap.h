@@ -54,8 +54,6 @@ public:
 
 	DescriptorHandle allocDynamicDescriptor(UINT num);
 
-	void resetDynamicDescriptorPointer();
-
 private:
 
 	const UINT numDescriptors;
