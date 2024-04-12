@@ -14,7 +14,7 @@ void RenderEngine::submitRenderPass(RenderPass* const pass)
 	std::vector<D3D12_RESOURCE_BARRIER> barriers;
 
 	{
-		std::vector<PendingBufferBarrier>* pendingBufferBarrier = &(pass->context->pendingBufferBarrier);
+		std::vector<PendingBufferBarrier>* pendingBufferBarrier = &(pass->context->commandList->pendingBufferBarrier);
 
 		for (UINT bufferIdx = 0; bufferIdx < pendingBufferBarrier->size(); bufferIdx++)
 		{
