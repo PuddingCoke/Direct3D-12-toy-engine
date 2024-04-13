@@ -64,17 +64,6 @@ public:
 
 	void setMipSliceState(const UINT mipSlice, const UINT state);
 
-protected:
-
-	struct STATES
-	{
-		UINT allState;
-
-		std::vector<UINT> mipLevelStates;
-	};
-
-	STATES transitionState;
-
 private:
 
 	friend class RenderEngine;
@@ -89,9 +78,18 @@ private:
 
 	DXGI_FORMAT format;
 
+	struct STATES
+	{
+		UINT allState;
+
+		std::vector<UINT> mipLevelStates;
+	};
+
 	std::shared_ptr<STATES> globalState;
 
 	STATES internalState;
+
+	STATES transitionState;
 
 };
 

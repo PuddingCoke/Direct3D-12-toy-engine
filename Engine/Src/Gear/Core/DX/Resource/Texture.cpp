@@ -65,39 +65,40 @@ Texture::~Texture()
 
 void Texture::updateGlobalStates()
 {
+	for (UINT mipSlice = 0; mipSlice < mipLevels; mipSlice++)
+	{
+		if (internalState.mipLevelStates[mipSlice] != D3D12_RESOURCE_STATE_UNKNOWN)
+		{
+			(*globalState).mipLevelStates[mipSlice] = internalState.mipLevelStates[mipSlice];
+		}
+	}
+
 	if (internalState.allState != D3D12_RESOURCE_STATE_UNKNOWN)
 	{
 		(*globalState).allState = internalState.allState;
 	}
 	else
 	{
-		const UINT tempState = internalState.mipLevelStates[0];
+		bool uniformState = true;
 
-		if (tempState != D3D12_RESOURCE_STATE_UNKNOWN)
+		const UINT tempState = (*globalState).mipLevelStates[0];
+
+		for (UINT i = 0; i < mipLevels; i++)
 		{
-			bool uniformState = true;
-
-			for (UINT mipSlice = 0; mipSlice < mipLevels; mipSlice++)
+			if ((*globalState).mipLevelStates[i] != tempState)
 			{
-				if (internalState.mipLevelStates[mipSlice] != tempState)
-				{
-					uniformState = false;
-					break;
-				}
-			}
-
-			if (uniformState)
-			{
-				(*globalState).allState = tempState;
+				uniformState = false;
+				break;
 			}
 		}
-	}
 
-	for (UINT mipSlice = 0; mipSlice < mipLevels; mipSlice++)
-	{
-		if (internalState.mipLevelStates[mipSlice] != D3D12_RESOURCE_STATE_UNKNOWN)
+		if (uniformState)
 		{
-			(*globalState).mipLevelStates[mipSlice] = internalState.mipLevelStates[mipSlice];
+			(*globalState).allState = tempState;
+		}
+		else
+		{
+			(*globalState).allState = D3D12_RESOURCE_STATE_UNKNOWN;
 		}
 	}
 }
@@ -329,7 +330,6 @@ void Texture::transition(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers
 					internalState.mipLevelStates[mipSlice] = transitionState.mipLevelStates[mipSlice];
 				}
 			}
-
 
 			bool uniformState = true;
 

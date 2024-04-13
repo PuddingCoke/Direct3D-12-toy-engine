@@ -108,13 +108,6 @@ public:
 
 	bool isSharedResource() const;
 
-protected:
-
-	void createResource(const D3D12_HEAP_PROPERTIES properties, const D3D12_HEAP_FLAGS flags, const D3D12_RESOURCE_DESC desc,
-		const D3D12_RESOURCE_STATES initialState, const D3D12_CLEAR_VALUE* clearValues);
-
-	ID3D12Resource** releaseAndGet();
-
 private:
 
 	ComPtr<ID3D12Resource> resource;
