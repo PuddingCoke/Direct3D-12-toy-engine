@@ -40,10 +40,6 @@ public:
 
 	void setState(const UINT state);
 
-protected:
-
-	UINT transitionState;
-
 private:
 
 	friend class RenderEngine;
@@ -51,6 +47,8 @@ private:
 	std::shared_ptr<UINT> globalState;
 
 	UINT internalState;
+
+	UINT transitionState;
 
 };
 

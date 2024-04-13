@@ -48,13 +48,3 @@ bool Resource::isSharedResource() const
 {
 	return sharedResource;
 }
-
-void Resource::createResource(const D3D12_HEAP_PROPERTIES properties, const D3D12_HEAP_FLAGS flags, const D3D12_RESOURCE_DESC desc, const D3D12_RESOURCE_STATES initialState, const D3D12_CLEAR_VALUE* clearValues)
-{
-	GraphicsDevice::get()->CreateCommittedResource(&properties, flags, &desc, initialState, clearValues, IID_PPV_ARGS(&resource));
-}
-
-ID3D12Resource** Resource::releaseAndGet()
-{
-	return resource.ReleaseAndGetAddressOf();
-}
