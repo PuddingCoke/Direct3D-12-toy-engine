@@ -30,6 +30,10 @@ public:
 
 	void reset() const;
 
+	void close() const;
+
+	void resourceBarrier(const UINT numBarriers, const D3D12_RESOURCE_BARRIER* const pBarriers) const;
+
 	void setDescriptorHeap(DescriptorHeap* const resourceHeap, DescriptorHeap* const samplerHeap) const;
 
 	void setGraphicsRootSignature(RootSignature* const rootSignature) const;
@@ -39,8 +43,6 @@ public:
 	ID3D12GraphicsCommandList6* get() const;
 
 	void transitionResources();
-
-	void updateReferredResStates();
 
 	void pushResourceTrackList(Texture* const texture);
 
@@ -66,14 +68,10 @@ private:
 
 	friend class RenderEngine;
 
-	template<typename T>
-	IsCorrectType<T> setAllResources(const T& descs);
+	void updateReferredResStates();
 
 	template<typename T>
-	IsCorrectType<T> setGraphicsResources(const T& descs,const UINT targetSRVState);
-
-	template<typename T>
-	IsCorrectType<T> setComputeResources(const T& descs);
+	IsCorrectType<T> setPipelineResources(const T& descs, const UINT targetSRVState);
 
 	CommandAllocator* allocators[Graphics::FrameBufferCount];
 
@@ -96,65 +94,7 @@ private:
 #endif // !_COMMANDLIST_H_
 
 template<typename T>
-inline IsCorrectType<T> CommandList::setAllResources(const T& descs)
-{
-	for (const ShaderResourceDesc& desc : descs)
-	{
-		if (desc.type == ShaderResourceDesc::BUFFER)
-		{
-			Buffer* const buffer = desc.bufferDesc.buffer;
-
-			if (buffer->getStateTracking() && desc.state != ShaderResourceDesc::CBV)
-			{
-				pushResourceTrackList(buffer);
-
-				if (desc.state == ShaderResourceDesc::SRV)
-				{
-					buffer->setState(D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
-				}
-				else if (desc.state == ShaderResourceDesc::UAV)
-				{
-					buffer->setState(D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
-				}
-			}
-		}
-		else if (desc.type == ShaderResourceDesc::TEXTURE)
-		{
-			Texture* const texture = desc.textureDesc.texture;
-
-			if (texture->getStateTracking())
-			{
-				pushResourceTrackList(texture);
-
-				if (desc.state == ShaderResourceDesc::SRV)
-				{
-					if (desc.textureDesc.mipSlice == D3D12_TRANSITION_ALL_MIPLEVELS)
-					{
-						texture->setAllState(D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
-					}
-					else
-					{
-						texture->setMipSliceState(desc.textureDesc.mipSlice, D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
-					}
-				}
-				else if (desc.state == ShaderResourceDesc::UAV)
-				{
-					if (desc.textureDesc.mipSlice == D3D12_TRANSITION_ALL_MIPLEVELS)
-					{
-						texture->setAllState(D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
-					}
-					else
-					{
-						texture->setMipSliceState(desc.textureDesc.mipSlice, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
-					}
-				}
-			}
-		}
-	}
-}
-
-template<typename T>
-inline IsCorrectType<T> CommandList::setGraphicsResources(const T& descs, const UINT targetSRVState)
+inline IsCorrectType<T> CommandList::setPipelineResources(const T& descs, const UINT targetSRVState)
 {
 	for (const ShaderResourceDesc& desc : descs)
 	{
@@ -193,64 +133,6 @@ inline IsCorrectType<T> CommandList::setGraphicsResources(const T& descs, const 
 					else
 					{
 						texture->setMipSliceState(desc.textureDesc.mipSlice, targetSRVState);
-					}
-				}
-				else if (desc.state == ShaderResourceDesc::UAV)
-				{
-					if (desc.textureDesc.mipSlice == D3D12_TRANSITION_ALL_MIPLEVELS)
-					{
-						texture->setAllState(D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
-					}
-					else
-					{
-						texture->setMipSliceState(desc.textureDesc.mipSlice, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
-					}
-				}
-			}
-		}
-	}
-}
-
-template<typename T>
-inline IsCorrectType<T> CommandList::setComputeResources(const T& descs)
-{
-	for (const ShaderResourceDesc& desc : descs)
-	{
-		if (desc.type == ShaderResourceDesc::BUFFER)
-		{
-			Buffer* const buffer = desc.bufferDesc.buffer;
-
-			if (buffer->getStateTracking() && desc.state != ShaderResourceDesc::CBV)
-			{
-				pushResourceTrackList(buffer);
-
-				if (desc.state == ShaderResourceDesc::SRV)
-				{
-					buffer->setState(D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
-				}
-				else if (desc.state == ShaderResourceDesc::UAV)
-				{
-					buffer->setState(D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
-				}
-			}
-		}
-		else if (desc.type == ShaderResourceDesc::TEXTURE)
-		{
-			Texture* const texture = desc.textureDesc.texture;
-
-			if (texture->getStateTracking())
-			{
-				pushResourceTrackList(texture);
-
-				if (desc.state == ShaderResourceDesc::SRV)
-				{
-					if (desc.textureDesc.mipSlice == D3D12_TRANSITION_ALL_MIPLEVELS)
-					{
-						texture->setAllState(D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
-					}
-					else
-					{
-						texture->setMipSliceState(desc.textureDesc.mipSlice, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
 					}
 				}
 				else if (desc.state == ShaderResourceDesc::UAV)

@@ -220,8 +220,6 @@ bool NvidiaEncoder::encode(ID3D12Resource* const inputTexture)
 		av_write_frame(outCtx, nullptr);
 
 		NVENCCALL(nvencAPI.nvEncUnlockBitstream(encoder, lockBitstream.outputBitstream));
-
-		displayProgress();
 	}
 
 	NVENCCALL(nvencAPI.nvEncUnmapInputResource(encoder, mapInputResource.mappedResource));
@@ -233,6 +231,8 @@ bool NvidiaEncoder::encode(ID3D12Resource* const inputTexture)
 	NVENCCALL(nvencAPI.nvEncUnregisterResource(encoder, registerOutputResource.registeredResource));
 
 	frameEncoded++;
+
+	displayProgress();
 
 	timeEnd = timer.now();
 

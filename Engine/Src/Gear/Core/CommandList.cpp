@@ -30,6 +30,16 @@ void CommandList::reset() const
 	commandList->Reset(allocators[Graphics::getFrameIndex()]->get(), nullptr);
 }
 
+void CommandList::close() const
+{
+	commandList->Close();
+}
+
+void CommandList::resourceBarrier(const UINT numBarriers, const D3D12_RESOURCE_BARRIER* const pBarriers) const
+{
+	commandList->ResourceBarrier(numBarriers, pBarriers);
+}
+
 void CommandList::setDescriptorHeap(DescriptorHeap* const resourceHeap, DescriptorHeap* const samplerHeap) const
 {
 	ID3D12DescriptorHeap* descriptorHeaps[2] = { resourceHeap->get(),samplerHeap->get() };
@@ -125,32 +135,32 @@ void CommandList::pushResourceTrackList(Buffer* const buffer)
 
 void CommandList::setAllPipelineResources(const std::vector<ShaderResourceDesc>& descs)
 {
-	setAllResources(descs);
+	setPipelineResources(descs, D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
 }
 
 void CommandList::setAllPipelineResources(const std::initializer_list<ShaderResourceDesc>& descs)
 {
-	setAllResources(descs);
+	setPipelineResources(descs, D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
 }
 
 void CommandList::setGraphicsPipelineResources(const std::vector<ShaderResourceDesc>& descs, const UINT targetSRVState)
 {
-	setGraphicsResources(descs, targetSRVState);
+	setPipelineResources(descs, targetSRVState);
 }
 
 void CommandList::setGraphicsPipelineResources(const std::initializer_list<ShaderResourceDesc>& descs, const UINT targetSRVState)
 {
-	setGraphicsResources(descs, targetSRVState);
+	setPipelineResources(descs, targetSRVState);
 }
 
 void CommandList::setComputePipelineResources(const std::vector<ShaderResourceDesc>& descs)
 {
-	setComputeResources(descs);
+	setPipelineResources(descs, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
 }
 
 void CommandList::setComputePipelineResources(const std::initializer_list<ShaderResourceDesc>& descs)
 {
-	setComputeResources(descs);
+	setPipelineResources(descs, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
 }
 
 void CommandList::setRenderTargets(const std::initializer_list<RenderTargetDesc>& renderTargets, const std::initializer_list<DepthStencilDesc>& depthStencils)

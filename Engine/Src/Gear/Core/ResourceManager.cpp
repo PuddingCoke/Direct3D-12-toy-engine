@@ -296,7 +296,7 @@ IndexConstantBuffer* ResourceManager::createIndexConstantBuffer(const UINT indic
 {
 	const UINT alignedIndicesNum = ((indicesNum + 63) & ~63);
 
-	ConstantBuffer* constantBuffer = createConstantBuffer(alignedIndicesNum * sizeof(UINT), true, nullptr);
+	ConstantBuffer* constantBuffer = createConstantBuffer(alignedIndicesNum * sizeof(UINT));
 
 	return new IndexConstantBuffer(constantBuffer);
 }
