@@ -32,8 +32,7 @@ public:
 
 	Texture(const UINT width, const UINT height, const DXGI_FORMAT format, const UINT arraySize, const UINT mipLevels, const bool stateTracking, const D3D12_RESOURCE_FLAGS resFlags);
 
-	//texture must be in D3D12_RESOURCE_STATE_COMMON
-	Texture(const ComPtr<ID3D12Resource>& texture, const bool stateTracking);
+	Texture(const ComPtr<ID3D12Resource>& texture, const bool stateTracking, const UINT initialState);
 
 	Texture(Texture&);
 

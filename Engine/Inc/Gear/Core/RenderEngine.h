@@ -40,9 +40,12 @@ public:
 
 	void end();
 
+	//push beginCommandlist in advance
+	void updateConstantBuffer();
+
 	GPUVendor getVendor() const;
 
-	ID3D12Resource* getCurrentRenderTexture() const;
+	Texture* getCurrentRenderTexture() const;
 
 private:
 

@@ -1,25 +1,25 @@
 #include<Gear/Core/DX/Resource/Texture.h>
 
 Texture::Texture(const UINT width, const UINT height, const DXGI_FORMAT format, const UINT arraySize, const UINT mipLevels, const bool stateTracking, const D3D12_RESOURCE_FLAGS resFlags) :
-	Resource(CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE, CD3DX12_RESOURCE_DESC::Tex2D(format, width, height, arraySize, mipLevels, 1, 0, resFlags), stateTracking, D3D12_RESOURCE_STATE_COMMON, nullptr),
+	Resource(CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE, CD3DX12_RESOURCE_DESC::Tex2D(format, width, height, arraySize, mipLevels, 1, 0, resFlags), stateTracking, D3D12_RESOURCE_STATE_COPY_DEST, nullptr),
 	width(width),
 	height(height),
 	arraySize(arraySize),
 	mipLevels(mipLevels),
 	format(format),
-	globalState(std::make_shared<STATES>(STATES{ D3D12_RESOURCE_STATE_COMMON,std::vector<UINT>(mipLevels) })),
-	internalState(STATES{ D3D12_RESOURCE_STATE_COMMON,std::vector<UINT>(mipLevels) }),
+	globalState(std::make_shared<STATES>(STATES{ D3D12_RESOURCE_STATE_COPY_DEST,std::vector<UINT>(mipLevels) })),
+	internalState(STATES{ D3D12_RESOURCE_STATE_COPY_DEST,std::vector<UINT>(mipLevels) }),
 	transitionState(STATES{ D3D12_RESOURCE_STATE_UNKNOWN,std::vector<UINT>(mipLevels) })
 {
 	for (UINT i = 0; i < mipLevels; i++)
 	{
-		(*globalState).mipLevelStates[i] = D3D12_RESOURCE_STATE_COMMON;
-		internalState.mipLevelStates[i] = D3D12_RESOURCE_STATE_COMMON;
+		(*globalState).mipLevelStates[i] = D3D12_RESOURCE_STATE_COPY_DEST;
+		internalState.mipLevelStates[i] = D3D12_RESOURCE_STATE_COPY_DEST;
 		transitionState.mipLevelStates[i] = D3D12_RESOURCE_STATE_UNKNOWN;
 	}
 }
 
-Texture::Texture(const ComPtr<ID3D12Resource>& texture, const bool stateTracking) :
+Texture::Texture(const ComPtr<ID3D12Resource>& texture, const bool stateTracking, const UINT initialState) :
 	Resource(texture, stateTracking)
 {
 	D3D12_RESOURCE_DESC desc = getResource()->GetDesc();
@@ -29,14 +29,14 @@ Texture::Texture(const ComPtr<ID3D12Resource>& texture, const bool stateTracking
 	mipLevels = desc.MipLevels;
 	format = desc.Format;
 
-	globalState = std::make_shared<STATES>(STATES{ D3D12_RESOURCE_STATE_COMMON,std::vector<UINT>(mipLevels) });
-	internalState = STATES{ D3D12_RESOURCE_STATE_COMMON,std::vector<UINT>(mipLevels) };
+	globalState = std::make_shared<STATES>(STATES{ initialState,std::vector<UINT>(mipLevels) });
+	internalState = STATES{ initialState,std::vector<UINT>(mipLevels) };
 	transitionState = STATES{ D3D12_RESOURCE_STATE_UNKNOWN,std::vector<UINT>(mipLevels) };
 
 	for (UINT i = 0; i < mipLevels; i++)
 	{
-		(*globalState).mipLevelStates[i] = D3D12_RESOURCE_STATE_COMMON;
-		internalState.mipLevelStates[i] = D3D12_RESOURCE_STATE_COMMON;
+		(*globalState).mipLevelStates[i] = initialState;
+		internalState.mipLevelStates[i] = initialState;
 		transitionState.mipLevelStates[i] = D3D12_RESOURCE_STATE_UNKNOWN;
 	}
 }

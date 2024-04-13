@@ -159,7 +159,7 @@ Texture* ResourceManager::createTextureFromFile(const std::string filePath, cons
 
 		DirectX::LoadDDSTextureFromFileEx(GraphicsDevice::get(), wFilePath.c_str(), 0, resFlags, DirectX::DDS_LOADER_DEFAULT, &tex, ddsData, subresources);
 
-		texture = new Texture(tex, true);
+		texture = new Texture(tex, true, D3D12_RESOURCE_STATE_COPY_DEST);
 
 		const UINT64 uploadHeapSize = GetRequiredIntermediateSize(texture->getResource(), 0, static_cast<UINT>(subresources.size()));
 

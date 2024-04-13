@@ -13,7 +13,6 @@ class MyRenderPass :public RenderPass
 public:
 
 	MyRenderPass() :
-		effect(new BloomEffect(context, Graphics::getWidth(), Graphics::getHeight())),
 		colorUpdateTimer(1.f),
 		fluidFinalPS(new Shader(Utils::getRootFolder() + "FluidFinalPS.cso")),
 		splatColorPS(new Shader(Utils::getRootFolder() + "SplatColorPS.cso")),
@@ -27,6 +26,14 @@ public:
 		viscousDiffusionPS(new Shader(Utils::getRootFolder() + "ViscousDiffusionPS.cso")),
 		vorticityPS(new Shader(Utils::getRootFolder() + "VorticityPS.cso"))
 	{
+		begin();
+
+		effect = new BloomEffect(context, Graphics::getWidth(), Graphics::getHeight(), resManager);
+
+		end();
+
+		RenderEngine::get()->submitRenderPass(this);
+
 		effect->setThreshold(0.f);
 
 		const DirectX::XMUINT2 simRes =
