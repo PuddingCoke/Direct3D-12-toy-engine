@@ -72,7 +72,7 @@ private:
 
 	CommandList* endCommandList;
 
-	ComPtr<ID3D12Resource> backBufferResources[Graphics::FrameBufferCount];
+	Texture* backBufferResources[Graphics::FrameBufferCount];
 
 	struct PerFrameResource
 	{

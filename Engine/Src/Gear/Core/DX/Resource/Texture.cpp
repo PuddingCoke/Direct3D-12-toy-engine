@@ -20,10 +20,7 @@ Texture::Texture(const UINT width, const UINT height, const DXGI_FORMAT format, 
 }
 
 Texture::Texture(const ComPtr<ID3D12Resource>& texture, const bool stateTracking) :
-	Resource(texture, stateTracking),
-	globalState(std::make_shared<STATES>(STATES{ D3D12_RESOURCE_STATE_COMMON,std::vector<UINT>(mipLevels) })),
-	internalState(STATES{ D3D12_RESOURCE_STATE_COMMON,std::vector<UINT>(mipLevels) }),
-	transitionState(STATES{ D3D12_RESOURCE_STATE_UNKNOWN,std::vector<UINT>(mipLevels) })
+	Resource(texture, stateTracking)
 {
 	D3D12_RESOURCE_DESC desc = getResource()->GetDesc();
 	width = desc.Width;
@@ -31,6 +28,10 @@ Texture::Texture(const ComPtr<ID3D12Resource>& texture, const bool stateTracking
 	arraySize = desc.DepthOrArraySize;
 	mipLevels = desc.MipLevels;
 	format = desc.Format;
+
+	globalState = std::make_shared<STATES>(STATES{ D3D12_RESOURCE_STATE_COMMON,std::vector<UINT>(mipLevels) });
+	internalState = STATES{ D3D12_RESOURCE_STATE_COMMON,std::vector<UINT>(mipLevels) };
+	transitionState = STATES{ D3D12_RESOURCE_STATE_UNKNOWN,std::vector<UINT>(mipLevels) };
 
 	for (UINT i = 0; i < mipLevels; i++)
 	{
