@@ -53,7 +53,7 @@ public:
 
 	~NvidiaEncoder();
 
-	bool encode(ID3D12Resource* const inputTexture) override;
+	bool encode(Texture* const inputTexture) override;
 
 private:
 

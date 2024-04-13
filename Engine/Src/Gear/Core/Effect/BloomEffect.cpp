@@ -1,7 +1,8 @@
 #include<Gear/Core/Effect/BloomEffect.h>
 
-BloomEffect::BloomEffect(GraphicsContext* const context, const UINT width, const UINT height) :
+BloomEffect::BloomEffect(GraphicsContext* const context, const UINT width, const UINT height, ResourceManager* const resManager) :
 	Effect(context, width, height, DXGI_FORMAT_R16G16B16A16_FLOAT),
+	lensDirtTexture(resManager->createTextureRenderTarget(Utils::getRootFolder() + "bloom_dirt_mask.png", false, true)),
 	filteredTexture(ResourceManager::createTextureRenderTarget(width, height, DXGI_FORMAT_R16G16B16A16_FLOAT, 1, 1, false, true,
 		DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_R16G16B16A16_FLOAT))
 {
@@ -131,7 +132,7 @@ BloomEffect::~BloomEffect()
 	delete bloomFilter;
 	delete bloomFinal;
 
-	//delete lensDirtTexture;
+	delete lensDirtTexture;
 
 	delete bloomHBlur;
 	delete bloomVBlur;
@@ -231,7 +232,8 @@ TextureRenderTarget* BloomEffect::process(TextureRenderTarget* const inputTextur
 	context->setRenderTargets({ outputTexture->getRTVMipHandle(0) }, {});
 	context->setPSConstants({
 		inputTexture->getAllSRVIndex(),
-		swapTexture[0]->read()->getAllSRVIndex() }, 0);
+		swapTexture[0]->read()->getAllSRVIndex(),
+		lensDirtTexture->getAllSRVIndex() }, 0);
 	context->setPSConstants(4, &bloomParam, 3);
 	context->transitionResources();
 	context->draw(3, 1, 0, 0);

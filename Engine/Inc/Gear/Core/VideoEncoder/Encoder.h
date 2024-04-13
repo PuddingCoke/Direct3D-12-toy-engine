@@ -8,6 +8,8 @@
 
 #include<Gear/Core/Graphics.h>
 
+#include<Gear/Core/DX/Resource/Texture.h>
+
 class Encoder
 {
 public:
@@ -22,7 +24,7 @@ public:
 
 	virtual ~Encoder();
 
-	virtual bool encode(ID3D12Resource* const inputTexture) = 0;
+	virtual bool encode(Texture* const inputTexture) = 0;
 
 protected:
 

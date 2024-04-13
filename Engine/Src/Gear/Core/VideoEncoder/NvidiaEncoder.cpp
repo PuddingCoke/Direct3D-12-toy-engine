@@ -111,7 +111,7 @@ NvidiaEncoder::~NvidiaEncoder()
 	}
 }
 
-bool NvidiaEncoder::encode(ID3D12Resource* const inputTexture)
+bool NvidiaEncoder::encode(Texture* const inputTexture)
 {
 	timeStart = timer.now();
 
@@ -119,7 +119,7 @@ bool NvidiaEncoder::encode(ID3D12Resource* const inputTexture)
 	registerInputResource.bufferFormat = bufferFormat;
 	registerInputResource.bufferUsage = NV_ENC_INPUT_IMAGE;
 	registerInputResource.resourceType = NV_ENC_INPUT_RESOURCE_TYPE_DIRECTX;
-	registerInputResource.resourceToRegister = inputTexture;
+	registerInputResource.resourceToRegister = inputTexture->getResource();
 	registerInputResource.subResourceIndex = 0;
 	registerInputResource.width = Graphics::getWidth();
 	registerInputResource.height = Graphics::getHeight();

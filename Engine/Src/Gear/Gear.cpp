@@ -68,6 +68,9 @@ void Gear::iniGame(Game* const gamePtr)
 {
 	game = gamePtr;
 
+	//resource creation may need dynamic constant buffer
+	RenderEngine::get()->updateConstantBuffer();
+
 	RenderEngine::get()->processCommandLists();
 
 	RenderEngine::get()->waitForPreviousFrame();

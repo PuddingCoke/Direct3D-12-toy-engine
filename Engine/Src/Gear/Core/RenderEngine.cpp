@@ -240,50 +240,21 @@ void RenderEngine::end()
 	//update constant buffers
 	{
 		{
-			beginCommandlist->pushResourceTrackList(backBufferResources[Graphics::getFrameIndex()]);
+			beginCommandlist->pushResourceTrackList(getCurrentRenderTexture());
 
-			backBufferResources[Graphics::getFrameIndex()]->setAllState(D3D12_RESOURCE_STATE_RENDER_TARGET);
-
-			for (UINT i = 0; i < ConstantBufferPool::numConstantBufferPool; i++)
-			{
-				Buffer* const buffer = ConstantBuffer::bufferPools[i]->buffer;
-
-				beginCommandlist->pushResourceTrackList(buffer);
-
-				buffer->setState(D3D12_RESOURCE_STATE_COPY_DEST);
-			}
-
-			beginCommandlist->transitionResources();
+			getCurrentRenderTexture()->setAllState(D3D12_RESOURCE_STATE_RENDER_TARGET);
 		}
 
-		for (UINT bufferPoolIndex = 0; bufferPoolIndex < ConstantBufferPool::numConstantBufferPool; bufferPoolIndex++)
-		{
-			ConstantBuffer::bufferPools[bufferPoolIndex]->recordCommands(beginCommandlist->get());
-		}
-
-		{
-			for (UINT i = 0; i < ConstantBufferPool::numConstantBufferPool; i++)
-			{
-				Buffer* const buffer = ConstantBuffer::bufferPools[i]->buffer;
-
-				beginCommandlist->pushResourceTrackList(buffer);
-
-				buffer->setState(D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
-			}
-
-			beginCommandlist->transitionResources();
-		}
-
-		beginCommandlist->close();
+		updateConstantBuffer();
 	}
 
 	//transition back buffer to STATE_PRESENT
 	{
 		endCommandList->reset();
 
-		endCommandList->pushResourceTrackList(backBufferResources[Graphics::getFrameIndex()]);
+		endCommandList->pushResourceTrackList(getCurrentRenderTexture());
 
-		backBufferResources[Graphics::getFrameIndex()]->setAllState(D3D12_RESOURCE_STATE_PRESENT);
+		getCurrentRenderTexture()->setAllState(D3D12_RESOURCE_STATE_PRESENT);
 
 		endCommandList->transitionResources();
 
@@ -295,14 +266,50 @@ void RenderEngine::end()
 	processCommandLists();
 }
 
+void RenderEngine::updateConstantBuffer()
+{
+	{
+		for (UINT i = 0; i < ConstantBufferPool::numConstantBufferPool; i++)
+		{
+			Buffer* const buffer = ConstantBuffer::bufferPools[i]->buffer;
+
+			beginCommandlist->pushResourceTrackList(buffer);
+
+			buffer->setState(D3D12_RESOURCE_STATE_COPY_DEST);
+		}
+
+		beginCommandlist->transitionResources();
+	}
+
+	for (UINT bufferPoolIndex = 0; bufferPoolIndex < ConstantBufferPool::numConstantBufferPool; bufferPoolIndex++)
+	{
+		ConstantBuffer::bufferPools[bufferPoolIndex]->recordCommands(beginCommandlist->get());
+	}
+
+	{
+		for (UINT i = 0; i < ConstantBufferPool::numConstantBufferPool; i++)
+		{
+			Buffer* const buffer = ConstantBuffer::bufferPools[i]->buffer;
+
+			beginCommandlist->pushResourceTrackList(buffer);
+
+			buffer->setState(D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
+		}
+
+		beginCommandlist->transitionResources();
+	}
+
+	beginCommandlist->close();
+}
+
 GPUVendor RenderEngine::getVendor() const
 {
 	return vendor;
 }
 
-ID3D12Resource* RenderEngine::getCurrentRenderTexture() const
+Texture* RenderEngine::getCurrentRenderTexture() const
 {
-	return backBufferResources[Graphics::getFrameIndex()]->getResource();
+	return backBufferResources[Graphics::getFrameIndex()];
 }
 
 RenderEngine::RenderEngine(const HWND hwnd, const bool useSwapChainBuffer) :
@@ -437,6 +444,15 @@ RenderEngine::RenderEngine(const HWND hwnd, const bool useSwapChainBuffer) :
 
 	GraphicsContext::globalConstantBuffer = ResourceManager::createConstantBuffer(sizeof(PerFrameResource));
 
+	//push beginCommandList for constant buffer update
+	//resource creation may need dynamic constant buffer
+	//so we need beginCommandlist handle this for us
+	{
+		beginCommandlist->reset();
+
+		commandLists.push_back(beginCommandlist->get());
+	}
+
 	{
 		DescriptorHandle descriptorHandle = GlobalDescriptorHeap::getRenderTargetHeap()->allocStaticDescriptor(Graphics::FrameBufferCount);
 
@@ -454,7 +470,7 @@ RenderEngine::RenderEngine(const HWND hwnd, const bool useSwapChainBuffer) :
 
 				descriptorHandle.move();
 
-				backBufferResources[i] = new Texture(texture, true);
+				backBufferResources[i] = new Texture(texture, true, D3D12_RESOURCE_STATE_PRESENT);
 			}
 		}
 		else
@@ -481,7 +497,7 @@ RenderEngine::RenderEngine(const HWND hwnd, const bool useSwapChainBuffer) :
 
 				descriptorHandle.move();
 
-				backBufferResources[i] = new Texture(texture, true);
+				backBufferResources[i] = new Texture(texture, true, D3D12_RESOURCE_STATE_PRESENT);
 			}
 		}
 	}
