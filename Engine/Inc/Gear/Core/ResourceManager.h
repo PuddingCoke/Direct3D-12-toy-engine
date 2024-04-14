@@ -74,7 +74,11 @@ private:
 
 	std::vector<EngineResource*> engineResources[Graphics::FrameBufferCount];
 
+	//high level task such as create texture cube from equirectangular map
 	GraphicsContext* const context;
+
+	//low level task such as initalize texture with data
+	CommandList* const commandList;
 
 };
 
