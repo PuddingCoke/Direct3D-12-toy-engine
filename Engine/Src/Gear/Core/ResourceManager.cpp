@@ -2,7 +2,7 @@
 
 
 ResourceManager::ResourceManager(GraphicsContext* const context) :
-	context(context)
+	context(context), commandList(context->getCommandList())
 {
 }
 
@@ -63,7 +63,7 @@ Buffer* ResourceManager::createBufferFromData(const void* const data, const UINT
 
 	release(uploadHeap);
 
-	context->getCommandList()->get()->CopyBufferRegion(buffer->getResource(), 0, uploadHeap->getResource(), 0, size);
+	commandList->copyBufferRegion(buffer, 0, uploadHeap, 0, size);
 
 	return buffer;
 }
@@ -109,7 +109,7 @@ Texture* ResourceManager::createTextureFromFile(const std::string filePath, cons
 			subresourceData.RowPitch = width * 4u;
 			subresourceData.SlicePitch = subresourceData.RowPitch * height;
 
-			UpdateSubresources(context->getCommandList()->get(), texture->getResource(), uploadHeap->getResource(), 0, 0, 1, &subresourceData);
+			UpdateSubresources(commandList->get(), texture->getResource(), uploadHeap->getResource(), 0, 0, 1, &subresourceData);
 
 			stbi_image_free(pixels);
 		}
@@ -143,7 +143,7 @@ Texture* ResourceManager::createTextureFromFile(const std::string filePath, cons
 			subresourceData.RowPitch = width * 16u;
 			subresourceData.SlicePitch = subresourceData.RowPitch * height;
 
-			UpdateSubresources(context->getCommandList()->get(), texture->getResource(), uploadHeap->getResource(), 0, 0, 1, &subresourceData);
+			UpdateSubresources(commandList->get(), texture->getResource(), uploadHeap->getResource(), 0, 0, 1, &subresourceData);
 
 			stbi_image_free(pixels);
 		}
@@ -172,7 +172,7 @@ Texture* ResourceManager::createTextureFromFile(const std::string filePath, cons
 
 		release(uploadHeap);
 
-		UpdateSubresources(context->getCommandList()->get(), texture->getResource(), uploadHeap->getResource(), 0, 0, static_cast<UINT>(subresources.size()), subresources.data());
+		UpdateSubresources(commandList->get(), texture->getResource(), uploadHeap->getResource(), 0, 0, static_cast<UINT>(subresources.size()), subresources.data());
 	}
 	else
 	{
@@ -189,12 +189,12 @@ ConstantBuffer* ResourceManager::createConstantBuffer(const UINT size, const boo
 	if (!cpuWritable)
 	{
 		Buffer* buffer = createBufferFromData(data, size, D3D12_RESOURCE_FLAG_NONE);
-		
-		context->getCommandList()->pushResourceTrackList(buffer);
+
+		commandList->pushResourceTrackList(buffer);
 
 		buffer->setState(D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
 
-		context->getCommandList()->transitionResources();
+		commandList->transitionResources();
 
 		buffer->setStateTracking(false);
 
@@ -224,11 +224,11 @@ IndexBuffer* ResourceManager::createIndexBuffer(const DXGI_FORMAT format, const 
 
 	if (!cpuWritable)
 	{
-		context->getCommandList()->pushResourceTrackList(buffer);
+		commandList->pushResourceTrackList(buffer);
 
 		buffer->setState(D3D12_RESOURCE_STATE_INDEX_BUFFER);
 
-		context->getCommandList()->transitionResources();
+		commandList->transitionResources();
 
 		buffer->setStateTracking(false);
 	}
@@ -249,11 +249,11 @@ VertexBuffer* ResourceManager::createVertexBuffer(const UINT perVertexSize, cons
 
 	if (!cpuWritable)
 	{
-		context->getCommandList()->pushResourceTrackList(buffer);
+		commandList->pushResourceTrackList(buffer);
 
 		buffer->setState(D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
 
-		context->getCommandList()->transitionResources();
+		commandList->transitionResources();
 
 		buffer->setStateTracking(false);
 	}
@@ -346,11 +346,11 @@ TextureRenderTarget* ResourceManager::createTextureRenderTarget(const std::strin
 
 	if (!stateTracking)
 	{
-		context->getCommandList()->pushResourceTrackList(texture);
+		commandList->pushResourceTrackList(texture);
 
 		texture->setAllState(D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
 
-		context->getCommandList()->transitionResources();
+		commandList->transitionResources();
 
 		texture->setStateTracking(false);
 	}
