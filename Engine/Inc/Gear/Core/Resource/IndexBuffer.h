@@ -17,7 +17,7 @@ public:
 
 	~IndexBuffer();
 
-	D3D12_INDEX_BUFFER_VIEW getIndexBufferView() const;
+	IndexBufferDesc getIndexBuffer() const;
 
 	Buffer* getBuffer() const;
 

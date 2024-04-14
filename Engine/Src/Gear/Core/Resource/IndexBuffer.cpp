@@ -44,9 +44,13 @@ IndexBuffer::~IndexBuffer()
 	}
 }
 
-D3D12_INDEX_BUFFER_VIEW IndexBuffer::getIndexBufferView() const
+IndexBufferDesc IndexBuffer::getIndexBuffer() const
 {
-	return indexBufferView;
+	IndexBufferDesc desc = {};
+	desc.buffer = buffer;
+	desc.ibv = indexBufferView;
+
+	return desc;
 }
 
 Buffer* IndexBuffer::getBuffer() const

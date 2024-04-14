@@ -121,9 +121,9 @@ public:
 
 	void clearDefRenderTarget(const FLOAT clearValue[4]) const;
 
-	void setVertexBuffers(const UINT startSlot, const std::initializer_list<VertexBuffer*>& vertexBuffers);
+	void setVertexBuffers(const UINT startSlot, const std::initializer_list<VertexBufferDesc>& vertexBuffers);
 
-	void setIndexBuffers(const std::initializer_list<IndexBuffer*>& indexBuffers);
+	void setIndexBuffer(const IndexBufferDesc indexBuffers);
 
 	void setTopology(const D3D12_PRIMITIVE_TOPOLOGY topology) const;
 
@@ -149,7 +149,7 @@ public:
 
 	void draw(const UINT vertexCountPerInstance, const UINT instanceCount, const UINT startVertexLocation, const UINT startInstanceLocation) const;
 
-	void dispatch(const UINT threadGroupCountX, const UINT threadGroupCountY, const UINT threadGroupCountZ);
+	void dispatch(const UINT threadGroupCountX, const UINT threadGroupCountY, const UINT threadGroupCountZ) const;
 
 	void begin() const;
 
@@ -163,7 +163,7 @@ private:
 
 	static ConstantBuffer* globalConstantBuffer;
 
-	void getIndicesFromResourceDescs(const std::initializer_list<ShaderResourceDesc>& descs, UINT* const dst);
+	void getIndicesFromResourceDescs(const std::initializer_list<ShaderResourceDesc>& descs, UINT* const dst) const;
 
 	D3D12_VIEWPORT vp;
 

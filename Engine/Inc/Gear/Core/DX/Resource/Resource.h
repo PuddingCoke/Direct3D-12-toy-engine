@@ -73,6 +73,18 @@ struct DepthStencilDesc
 	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle;
 };
 
+struct VertexBufferDesc
+{
+	Buffer* buffer;
+	D3D12_VERTEX_BUFFER_VIEW vbv;
+};
+
+struct IndexBufferDesc
+{
+	Buffer* buffer;
+	D3D12_INDEX_BUFFER_VIEW ibv;
+};
+
 class Resource
 {
 public:

@@ -35,11 +35,6 @@ void CommandList::close() const
 	commandList->Close();
 }
 
-void CommandList::resourceBarrier(const UINT numBarriers, const D3D12_RESOURCE_BARRIER* const pBarriers) const
-{
-	commandList->ResourceBarrier(numBarriers, pBarriers);
-}
-
 void CommandList::setDescriptorHeap(DescriptorHeap* const resourceHeap, DescriptorHeap* const samplerHeap) const
 {
 	ID3D12DescriptorHeap* descriptorHeaps[2] = { resourceHeap->get(),samplerHeap->get() };
@@ -200,6 +195,87 @@ void CommandList::setRenderTargets(const std::initializer_list<RenderTargetDesc>
 	{
 		commandList->OMSetRenderTargets(rtvHandles.size(), rtvHandles.data(), FALSE, nullptr);
 	}
+}
+
+void CommandList::setVertexBuffers(const UINT startSlot, const std::initializer_list<VertexBufferDesc>& vertexBuffers)
+{
+	std::vector<D3D12_VERTEX_BUFFER_VIEW> vbvs;
+
+	for (const VertexBufferDesc& desc : vertexBuffers)
+	{
+		vbvs.push_back(desc.vbv);
+
+		Buffer* const buffer = desc.buffer;
+
+		pushResourceTrackList(buffer);
+
+		buffer->setState(D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
+	}
+
+	commandList->IASetVertexBuffers(startSlot, vbvs.size(), vbvs.data());
+}
+
+void CommandList::setIndexBuffer(const IndexBufferDesc indexBuffer)
+{
+	Buffer* const buffer = indexBuffer.buffer;
+	
+	pushResourceTrackList(buffer);
+
+	buffer->setState(D3D12_RESOURCE_STATE_INDEX_BUFFER);
+
+	commandList->IASetIndexBuffer(&indexBuffer.ibv);
+}
+
+void CommandList::copyBufferRegion(Buffer* const dstBuffer, const UINT64 dstOffset, UploadHeap* srcBuffer, const UINT64 srcOffset, const UINT64 numBytes)
+{
+	pushResourceTrackList(dstBuffer);
+
+	dstBuffer->setState(D3D12_RESOURCE_STATE_COPY_DEST);
+
+	transitionResources();
+
+	commandList->CopyBufferRegion(dstBuffer->getResource(), dstOffset, srcBuffer->getResource(), srcOffset, numBytes);
+}
+
+void CommandList::copyBufferRegion(Buffer* const dstBuffer, const UINT64 dstOffset, Buffer* srcBuffer, const UINT64 srcOffset, const UINT64 numBytes)
+{
+	pushResourceTrackList(dstBuffer);
+
+	dstBuffer->setState(D3D12_RESOURCE_STATE_COPY_DEST);
+
+	pushResourceTrackList(srcBuffer);
+
+	srcBuffer->setState(D3D12_RESOURCE_STATE_COPY_SOURCE);
+
+	transitionResources();
+
+	commandList->CopyBufferRegion(dstBuffer->getResource(), dstOffset, srcBuffer->getResource(), srcOffset, numBytes);
+}
+
+void CommandList::copyResource(Buffer* const dstBuffer, UploadHeap* const srcBuffer)
+{
+	pushResourceTrackList(dstBuffer);
+
+	dstBuffer->setState(D3D12_RESOURCE_STATE_COPY_DEST);
+
+	transitionResources();
+
+	commandList->CopyResource(dstBuffer->getResource(), srcBuffer->getResource());
+}
+
+void CommandList::copyResource(Buffer* const dstBuffer, Buffer* const srcBuffer)
+{
+	pushResourceTrackList(dstBuffer);
+
+	dstBuffer->setState(D3D12_RESOURCE_STATE_COPY_DEST);
+
+	pushResourceTrackList(srcBuffer);
+
+	srcBuffer->setState(D3D12_RESOURCE_STATE_COPY_SOURCE);
+
+	transitionResources();
+
+	commandList->CopyResource(dstBuffer->getResource(), srcBuffer->getResource());
 }
 
 void CommandList::uavBarrier(const std::initializer_list<Resource*>& resources)

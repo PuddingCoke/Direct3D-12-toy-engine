@@ -3,14 +3,6 @@
 #ifndef _RENDERPASS_H_
 #define _RENDERPASS_H_
 
-#include<Gear/Core/Resource/IndexConstantBuffer.h>
-#include<Gear/Core/Resource/TextureRenderTarget.h>
-#include<Gear/Core/Resource/TextureDepthStencil.h>
-#include<Gear/Core/Resource/ConstantBuffer.h>
-#include<Gear/Core/Resource/VertexBuffer.h>
-#include<Gear/Core/Resource/IndexBuffer.h>
-#include<Gear/Core/Resource/SwapTexture.h>
-
 #include<Gear/Core/GraphicsContext.h>
 #include<Gear/Core/ResourceManager.h>
 

@@ -12,6 +12,8 @@
 
 #include<Gear/Core/DX/Resource/Buffer.h>
 #include<Gear/Core/DX/Resource/Texture.h>
+#include<Gear/Core/DX/Resource/UploadHeap.h>
+#include<Gear/Core/DX/Resource/ReadbackHeap.h>
 
 template<typename T>
 using IsCorrectType = std::enable_if_t<
@@ -31,8 +33,6 @@ public:
 	void reset() const;
 
 	void close() const;
-
-	void resourceBarrier(const UINT numBarriers, const D3D12_RESOURCE_BARRIER* const pBarriers) const;
 
 	void setDescriptorHeap(DescriptorHeap* const resourceHeap, DescriptorHeap* const samplerHeap) const;
 
@@ -61,6 +61,18 @@ public:
 	void setComputePipelineResources(const std::initializer_list<ShaderResourceDesc>& descs);
 
 	void setRenderTargets(const std::initializer_list<RenderTargetDesc>& renderTargets, const std::initializer_list<DepthStencilDesc>& depthStencils);
+
+	void setVertexBuffers(const UINT startSlot, const std::initializer_list<VertexBufferDesc>& vertexBuffers);
+
+	void setIndexBuffer(const IndexBufferDesc indexBuffer);
+	
+	void copyBufferRegion(Buffer* const dstBuffer, const UINT64 dstOffset, UploadHeap* srcBuffer, const UINT64 srcOffset, const UINT64 numBytes);
+
+	void copyBufferRegion(Buffer* const dstBuffer, const UINT64 dstOffset, Buffer* srcBuffer, const UINT64 srcOffset, const UINT64 numBytes);
+
+	void copyResource(Buffer* const dstBuffer, UploadHeap* const srcBuffer);
+
+	void copyResource(Buffer* const dstBuffer, Buffer* const srcBuffer);
 
 	void uavBarrier(const std::initializer_list<Resource*>& resources);
 

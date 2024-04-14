@@ -169,7 +169,7 @@ void PrimitiveBatch::LineRenderer::end(GraphicsContext* const context, ID3D12Pip
 
 		context->setTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
 
-		context->setVertexBuffers(0, { vertexBuffer });
+		context->setVertexBuffers(0, { vertexBuffer->getVertexBuffer() });
 
 		context->transitionResources();
 
@@ -221,7 +221,7 @@ void PrimitiveBatch::CircleRenderer::end(GraphicsContext* const context, ID3D12P
 
 		context->setTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
 
-		context->setVertexBuffers(0, { vertexBuffer });
+		context->setVertexBuffers(0, { vertexBuffer->getVertexBuffer() });
 
 		context->transitionResources();
 
@@ -273,7 +273,7 @@ void PrimitiveBatch::RCLineRenderer::end(GraphicsContext* const context, ID3D12P
 
 		context->setTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
 
-		context->setVertexBuffers(0, { vertexBuffer });
+		context->setVertexBuffers(0, { vertexBuffer->getVertexBuffer() });
 
 		context->transitionResources();
 

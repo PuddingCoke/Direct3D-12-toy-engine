@@ -21,17 +21,11 @@ void GraphicsContext::updateBuffer(VertexBuffer* const vb, const void* const dat
 {
 	Buffer* const buffer = vb->getBuffer();
 
-	commandList->pushResourceTrackList(buffer);
-
-	buffer->setState(D3D12_RESOURCE_STATE_COPY_DEST);
-
-	transitionResources();
-
 	UploadHeap* const uploadHeap = vb->uploadHeaps[vb->uploadHeapIndex];
 
 	uploadHeap->update(data, size);
 
-	commandList->get()->CopyBufferRegion(buffer->getResource(), 0, uploadHeap->getResource(), 0, size);
+	commandList->copyBufferRegion(buffer, 0, uploadHeap, 0, size);
 
 	vb->uploadHeapIndex = (vb->uploadHeapIndex + 1) % Graphics::FrameBufferCount;
 }
@@ -40,17 +34,11 @@ void GraphicsContext::updateBuffer(IndexBuffer* const ib, const void* const data
 {
 	Buffer* const buffer = ib->getBuffer();
 
-	commandList->pushResourceTrackList(buffer);
-
-	buffer->setState(D3D12_RESOURCE_STATE_COPY_DEST);
-
-	transitionResources();
-
 	UploadHeap* const uploadHeap = ib->uploadHeaps[ib->uploadHeapIndex];
 
 	uploadHeap->update(data, size);
 
-	commandList->get()->CopyBufferRegion(buffer->getResource(), 0, uploadHeap->getResource(), 0, size);
+	commandList->copyBufferRegion(buffer, 0, uploadHeap, 0, size);
 
 	ib->uploadHeapIndex = (ib->uploadHeapIndex + 1) % Graphics::FrameBufferCount;
 }
@@ -320,40 +308,14 @@ void GraphicsContext::clearDefRenderTarget(const FLOAT clearValue[4]) const
 	commandList->get()->ClearRenderTargetView(rtvHandle, clearValue, 0, nullptr);
 }
 
-void GraphicsContext::setVertexBuffers(const UINT startSlot, const std::initializer_list<VertexBuffer*>& vertexBuffers)
+void GraphicsContext::setVertexBuffers(const UINT startSlot, const std::initializer_list<VertexBufferDesc>& vertexBuffers)
 {
-	std::vector<D3D12_VERTEX_BUFFER_VIEW> vbvs;
-
-	for (VertexBuffer* const vb : vertexBuffers)
-	{
-		Buffer* buffer = vb->getBuffer();
-
-		commandList->pushResourceTrackList(buffer);
-
-		buffer->setState(D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
-
-		vbvs.push_back(vb->getVertexBufferView());
-	}
-
-	commandList->get()->IASetVertexBuffers(startSlot, vbvs.size(), vbvs.data());
+	commandList->setVertexBuffers(startSlot, vertexBuffers);
 }
 
-void GraphicsContext::setIndexBuffers(const std::initializer_list<IndexBuffer*>& indexBuffers)
+void GraphicsContext::setIndexBuffer(const IndexBufferDesc indexBuffer)
 {
-	std::vector<D3D12_INDEX_BUFFER_VIEW> ibvs;
-
-	for (IndexBuffer* const ib : indexBuffers)
-	{
-		Buffer* buffer = ib->getBuffer();
-
-		commandList->pushResourceTrackList(buffer);
-
-		buffer->setState(D3D12_RESOURCE_STATE_INDEX_BUFFER);
-
-		ibvs.push_back(ib->getIndexBufferView());
-	}
-
-	commandList->get()->IASetIndexBuffer(ibvs.data());
+	commandList->setIndexBuffer(indexBuffer);
 }
 
 void GraphicsContext::setTopology(const D3D12_PRIMITIVE_TOPOLOGY topology) const
@@ -426,7 +388,7 @@ void GraphicsContext::draw(const UINT vertexCountPerInstance, const UINT instanc
 	commandList->get()->DrawInstanced(vertexCountPerInstance, instanceCount, startVertexLocation, startInstanceLocation);
 }
 
-void GraphicsContext::dispatch(const UINT threadGroupCountX, const UINT threadGroupCountY, const UINT threadGroupCountZ)
+void GraphicsContext::dispatch(const UINT threadGroupCountX, const UINT threadGroupCountY, const UINT threadGroupCountZ) const
 {
 	commandList->get()->Dispatch(threadGroupCountX, threadGroupCountY, threadGroupCountZ);
 }
@@ -456,7 +418,7 @@ CommandList* GraphicsContext::getCommandList() const
 	return commandList;
 }
 
-void GraphicsContext::getIndicesFromResourceDescs(const std::initializer_list<ShaderResourceDesc>& descs, UINT* const dst)
+void GraphicsContext::getIndicesFromResourceDescs(const std::initializer_list<ShaderResourceDesc>& descs, UINT* const dst) const
 {
 	UINT index = 0;
 

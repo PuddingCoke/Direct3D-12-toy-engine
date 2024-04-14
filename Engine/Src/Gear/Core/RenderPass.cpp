@@ -21,7 +21,7 @@ RenderPassResult RenderPass::getRenderPassResult()
 
 RenderPass::RenderPass() :
 	context(new GraphicsContext()),
-	resManager(new ResourceManager(context->getCommandList())),
+	resManager(new ResourceManager(context)),
 	transitionCMD(new CommandList(D3D12_COMMAND_LIST_TYPE_DIRECT)),
 	task(std::async(std::launch::async, [this] { return RenderPassResult{ transitionCMD,context->getCommandList() }; }))
 {
