@@ -17,7 +17,7 @@ public:
 
 	~VertexBuffer();
 
-	D3D12_VERTEX_BUFFER_VIEW getVertexBufferView() const;
+	VertexBufferDesc getVertexBuffer() const;
 
 	Buffer* getBuffer() const;
 

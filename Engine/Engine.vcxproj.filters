@@ -322,6 +322,8 @@
     <FxCompile Include="Shaders\Bloom\BloomHBlurCS.hlsl" />
     <FxCompile Include="Shaders\Bloom\BloomVBlurCS.hlsl" />
     <FxCompile Include="Shaders\FullScreen\FullScreenPS.hlsl" />
+    <FxCompile Include="Shaders\TextureCube\EquirectangularVS.hlsl" />
+    <FxCompile Include="Shaders\TextureCube\EquirectangularPS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\Common.hlsli" />

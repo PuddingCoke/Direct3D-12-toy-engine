@@ -1,8 +1,8 @@
 #include<Gear/Core/ResourceManager.h>
 
 
-ResourceManager::ResourceManager(CommandList* const commandList):
-	commandList(commandList)
+ResourceManager::ResourceManager(GraphicsContext* const context) :
+	context(context)
 {
 }
 
@@ -63,12 +63,12 @@ Buffer* ResourceManager::createBufferFromData(const void* const data, const UINT
 
 	release(uploadHeap);
 
-	commandList->get()->CopyBufferRegion(buffer->getResource(), 0, uploadHeap->getResource(), 0, size);
+	context->getCommandList()->get()->CopyBufferRegion(buffer->getResource(), 0, uploadHeap->getResource(), 0, size);
 
 	return buffer;
 }
 
-Texture* ResourceManager::createTextureFromFile(const std::string filePath, const D3D12_RESOURCE_FLAGS resFlags)
+Texture* ResourceManager::createTextureFromFile(const std::string filePath, const D3D12_RESOURCE_FLAGS resFlags, bool* const isTextureCube)
 {
 	Texture* texture = nullptr;
 
@@ -77,6 +77,11 @@ Texture* ResourceManager::createTextureFromFile(const std::string filePath, cons
 	for (char& c : fileExtension)
 	{
 		c = static_cast<char>(std::tolower(c));
+	}
+
+	if (isTextureCube)
+	{
+		*isTextureCube = false;
 	}
 
 	if (fileExtension == "jpg" || fileExtension == "jpeg" || fileExtension == "png")
@@ -104,7 +109,7 @@ Texture* ResourceManager::createTextureFromFile(const std::string filePath, cons
 			subresourceData.RowPitch = width * 4u;
 			subresourceData.SlicePitch = subresourceData.RowPitch * height;
 
-			UpdateSubresources(commandList->get(), texture->getResource(), uploadHeap->getResource(), 0, 0, 1, &subresourceData);
+			UpdateSubresources(context->getCommandList()->get(), texture->getResource(), uploadHeap->getResource(), 0, 0, 1, &subresourceData);
 
 			stbi_image_free(pixels);
 		}
@@ -138,7 +143,7 @@ Texture* ResourceManager::createTextureFromFile(const std::string filePath, cons
 			subresourceData.RowPitch = width * 16u;
 			subresourceData.SlicePitch = subresourceData.RowPitch * height;
 
-			UpdateSubresources(commandList->get(), texture->getResource(), uploadHeap->getResource(), 0, 0, 1, &subresourceData);
+			UpdateSubresources(context->getCommandList()->get(), texture->getResource(), uploadHeap->getResource(), 0, 0, 1, &subresourceData);
 
 			stbi_image_free(pixels);
 		}
@@ -157,7 +162,7 @@ Texture* ResourceManager::createTextureFromFile(const std::string filePath, cons
 
 		ComPtr<ID3D12Resource> tex;
 
-		DirectX::LoadDDSTextureFromFileEx(GraphicsDevice::get(), wFilePath.c_str(), 0, resFlags, DirectX::DDS_LOADER_DEFAULT, &tex, ddsData, subresources);
+		DirectX::LoadDDSTextureFromFileEx(GraphicsDevice::get(), wFilePath.c_str(), 0, resFlags, DirectX::DDS_LOADER_DEFAULT, &tex, ddsData, subresources, nullptr, isTextureCube);
 
 		texture = new Texture(tex, true, D3D12_RESOURCE_STATE_COPY_DEST);
 
@@ -167,7 +172,7 @@ Texture* ResourceManager::createTextureFromFile(const std::string filePath, cons
 
 		release(uploadHeap);
 
-		UpdateSubresources(commandList->get(), texture->getResource(), uploadHeap->getResource(), 0, 0, static_cast<UINT>(subresources.size()), subresources.data());
+		UpdateSubresources(context->getCommandList()->get(), texture->getResource(), uploadHeap->getResource(), 0, 0, static_cast<UINT>(subresources.size()), subresources.data());
 	}
 	else
 	{
@@ -184,12 +189,12 @@ ConstantBuffer* ResourceManager::createConstantBuffer(const UINT size, const boo
 	if (!cpuWritable)
 	{
 		Buffer* buffer = createBufferFromData(data, size, D3D12_RESOURCE_FLAG_NONE);
-
-		commandList->pushResourceTrackList(buffer);
+		
+		context->getCommandList()->pushResourceTrackList(buffer);
 
 		buffer->setState(D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
 
-		commandList->transitionResources();
+		context->getCommandList()->transitionResources();
 
 		buffer->setStateTracking(false);
 
@@ -219,11 +224,11 @@ IndexBuffer* ResourceManager::createIndexBuffer(const DXGI_FORMAT format, const 
 
 	if (!cpuWritable)
 	{
-		commandList->pushResourceTrackList(buffer);
+		context->getCommandList()->pushResourceTrackList(buffer);
 
 		buffer->setState(D3D12_RESOURCE_STATE_INDEX_BUFFER);
 
-		commandList->transitionResources();
+		context->getCommandList()->transitionResources();
 
 		buffer->setStateTracking(false);
 	}
@@ -244,11 +249,11 @@ VertexBuffer* ResourceManager::createVertexBuffer(const UINT perVertexSize, cons
 
 	if (!cpuWritable)
 	{
-		commandList->pushResourceTrackList(buffer);
+		context->getCommandList()->pushResourceTrackList(buffer);
 
 		buffer->setState(D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
 
-		commandList->transitionResources();
+		context->getCommandList()->transitionResources();
 
 		buffer->setStateTracking(false);
 	}
@@ -308,6 +313,58 @@ TextureDepthStencil* ResourceManager::createTextureDepthStencil(const UINT width
 	return new TextureDepthStencil(texture, isTextureCube, persistent);
 }
 
+TextureRenderTarget* ResourceManager::createTextureRenderTarget(const std::string filePath, const bool persistent, const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat)
+{
+	const bool hasRTV = (rtvFormat != DXGI_FORMAT_UNKNOWN);
+
+	const bool hasUAV = (uavFormat != DXGI_FORMAT_UNKNOWN);
+
+	bool stateTracking = true;
+
+	D3D12_RESOURCE_FLAGS resFlags = D3D12_RESOURCE_FLAG_NONE;
+
+	if ((!hasRTV) && (!hasUAV))
+	{
+		stateTracking = false;
+	}
+	else
+	{
+		if (hasRTV)
+		{
+			resFlags |= D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
+		}
+
+		if (hasUAV)
+		{
+			resFlags |= D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
+		}
+	}
+
+	bool isTextureCube = false;
+
+	Texture* texture = createTextureFromFile(filePath, resFlags, &isTextureCube);
+
+	if (!stateTracking)
+	{
+		context->getCommandList()->pushResourceTrackList(texture);
+
+		texture->setAllState(D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
+
+		context->getCommandList()->transitionResources();
+
+		texture->setStateTracking(false);
+	}
+
+	if (srvFormat == DXGI_FORMAT_UNKNOWN)
+	{
+		return new TextureRenderTarget(texture, isTextureCube, persistent, texture->getFormat(), DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN);
+	}
+	else
+	{
+		return new TextureRenderTarget(texture, isTextureCube, persistent, srvFormat, uavFormat, rtvFormat);
+	}
+}
+
 TextureRenderTarget* ResourceManager::createTextureRenderTarget(const UINT width, const UINT height, const DXGI_FORMAT resFormat, const UINT arraySize, const UINT mipLevels, const bool isTextureCube, const bool persistent, const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat)
 {
 	const bool hasRTV = (rtvFormat != DXGI_FORMAT_UNKNOWN);
@@ -338,54 +395,4 @@ TextureRenderTarget* ResourceManager::createTextureRenderTarget(const UINT width
 	Texture* texture = new Texture(width, height, resFormat, arraySize, mipLevels, true, resFlags);
 
 	return new TextureRenderTarget(texture, isTextureCube, persistent, srvFormat, uavFormat, rtvFormat);
-}
-
-TextureRenderTarget* ResourceManager::createTextureRenderTarget(const std::string filePath, const bool isTextureCube, const bool persistent, const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat)
-{
-	const bool hasRTV = (rtvFormat != DXGI_FORMAT_UNKNOWN);
-
-	const bool hasUAV = (uavFormat != DXGI_FORMAT_UNKNOWN);
-
-	bool stateTracking = true;
-
-	D3D12_RESOURCE_FLAGS resFlags = D3D12_RESOURCE_FLAG_NONE;
-
-	if ((!hasRTV) && (!hasUAV))
-	{
-		stateTracking = false;
-	}
-	else
-	{
-		if (hasRTV)
-		{
-			resFlags |= D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
-		}
-
-		if (hasUAV)
-		{
-			resFlags |= D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
-		}
-	}
-
-	Texture* texture = createTextureFromFile(filePath, resFlags);
-
-	if (!stateTracking)
-	{
-		commandList->pushResourceTrackList(texture);
-
-		texture->setAllState(D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
-
-		commandList->transitionResources();
-
-		texture->setStateTracking(false);
-	}
-
-	if (srvFormat == DXGI_FORMAT_UNKNOWN)
-	{
-		return new TextureRenderTarget(texture, isTextureCube, persistent, texture->getFormat(), DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN);
-	}
-	else
-	{
-		return new TextureRenderTarget(texture, isTextureCube, persistent, srvFormat, uavFormat, rtvFormat);
-	}
 }

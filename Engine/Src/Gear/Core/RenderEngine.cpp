@@ -11,19 +11,13 @@ void RenderEngine::submitRenderPass(RenderPass* const pass)
 {
 	const RenderPassResult renderPassResult = pass->getRenderPassResult();
 
-	CommandList* const transitionCMD = renderPassResult.transitionCMD;
-
 	CommandList* const renderCMD = renderPassResult.renderCMD;
 
 	std::vector<D3D12_RESOURCE_BARRIER> barriers;
 
 	{
-		std::vector<PendingBufferBarrier>* pendingBufferBarrier = &(renderCMD->pendingBufferBarrier);
-
-		for (UINT bufferIdx = 0; bufferIdx < pendingBufferBarrier->size(); bufferIdx++)
+		for (const PendingBufferBarrier& pendingBarrier : renderCMD->pendingBufferBarrier)
 		{
-			const PendingBufferBarrier pendingBarrier = (*pendingBufferBarrier)[bufferIdx];
-
 			if ((*(pendingBarrier.buffer->globalState)) != pendingBarrier.afterState)
 			{
 				D3D12_RESOURCE_BARRIER barrier = {};
@@ -38,16 +32,12 @@ void RenderEngine::submitRenderPass(RenderPass* const pass)
 			}
 		}
 
-		pendingBufferBarrier->clear();
+		renderCMD->pendingBufferBarrier.clear();
 	}
 
 	{
-		std::vector<PendingTextureBarrier>* pendingTextureBarrier = &(renderCMD->pendingTextureBarrier);
-
-		for (UINT textureIdx = 0; textureIdx < pendingTextureBarrier->size(); textureIdx++)
+		for (const PendingTextureBarrier& pendingBarrier : renderCMD->pendingTextureBarrier)
 		{
-			const PendingTextureBarrier pendingBarrier = (*pendingTextureBarrier)[textureIdx];
-
 			if (pendingBarrier.mipSlice == D3D12_TRANSITION_ALL_MIPLEVELS)
 			{
 				if (pendingBarrier.texture->mipLevels > 1)
@@ -151,14 +141,16 @@ void RenderEngine::submitRenderPass(RenderPass* const pass)
 			}
 		}
 
-		pendingTextureBarrier->clear();
+		renderCMD->pendingTextureBarrier.clear();
 	}
 
 	if (barriers.size() > 0)
 	{
+		CommandList* const transitionCMD = renderPassResult.transitionCMD;
+
 		transitionCMD->reset();
 
-		transitionCMD->resourceBarrier(barriers.size(), barriers.data());
+		transitionCMD->get()->ResourceBarrier(barriers.size(), barriers.data());
 
 		transitionCMD->close();
 

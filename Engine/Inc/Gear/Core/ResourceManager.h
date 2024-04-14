@@ -3,7 +3,7 @@
 #ifndef _RESOURCEMANAGER_H_
 #define _RESOURCEMANAGER_H_
 
-#include<Gear/Core/CommandList.h>
+#include<Gear/Core/GraphicsContext.h>
 
 #include<Gear/Core/DX/Resource/Resource.h>
 #include<Gear/Core/DX/Resource/Buffer.h>
@@ -25,7 +25,7 @@ class ResourceManager
 {
 public:
 
-	ResourceManager(CommandList* const commandList);
+	ResourceManager(GraphicsContext* const context);
 
 	~ResourceManager();
 
@@ -39,7 +39,7 @@ public:
 	Buffer* createBufferFromData(const void* const data, const UINT size, const D3D12_RESOURCE_FLAGS resFlags);
 
 	//texture's stateTracking is set to true
-	Texture* createTextureFromFile(const std::string filePath, const D3D12_RESOURCE_FLAGS resFlags);
+	Texture* createTextureFromFile(const std::string filePath, const D3D12_RESOURCE_FLAGS resFlags, bool* const isTextureCube);
 
 	ConstantBuffer* createConstantBuffer(const UINT size, const bool cpuWritable, const void* const data);
 
@@ -61,7 +61,8 @@ public:
 
 	static TextureDepthStencil* createTextureDepthStencil(const UINT width, const UINT height, const DXGI_FORMAT resFormat, const UINT arraySize, const UINT mipLevels, const bool isTextureCube, const bool persistent);
 
-	TextureRenderTarget* createTextureRenderTarget(const std::string filePath, const bool isTextureCube, const bool persistent,
+	//load jpg jpeg png hdr dds(auto detect texturecube) textures
+	TextureRenderTarget* createTextureRenderTarget(const std::string filePath, const bool persistent,
 		const DXGI_FORMAT srvFormat = DXGI_FORMAT_UNKNOWN, const DXGI_FORMAT uavFormat = DXGI_FORMAT_UNKNOWN, const DXGI_FORMAT rtvFormat = DXGI_FORMAT_UNKNOWN);
 
 	static TextureRenderTarget* createTextureRenderTarget(const UINT width, const UINT height, const DXGI_FORMAT resFormat, const UINT arraySize, const UINT mipLevels, const bool isTextureCube, const bool persistent,
@@ -73,7 +74,7 @@ private:
 
 	std::vector<EngineResource*> engineResources[Graphics::FrameBufferCount];
 
-	CommandList* const commandList;
+	GraphicsContext* const context;
 
 };
 

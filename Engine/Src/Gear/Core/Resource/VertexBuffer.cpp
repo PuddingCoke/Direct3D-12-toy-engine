@@ -44,9 +44,13 @@ VertexBuffer::~VertexBuffer()
 	}
 }
 
-D3D12_VERTEX_BUFFER_VIEW VertexBuffer::getVertexBufferView() const
+VertexBufferDesc VertexBuffer::getVertexBuffer() const
 {
-	return vertexBufferView;
+	VertexBufferDesc desc = {};
+	desc.buffer = buffer;
+	desc.vbv = vertexBufferView;
+
+	return desc;
 }
 
 Buffer* VertexBuffer::getBuffer() const
