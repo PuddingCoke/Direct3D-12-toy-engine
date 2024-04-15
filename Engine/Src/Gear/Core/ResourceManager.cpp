@@ -398,8 +398,23 @@ TextureRenderTarget* ResourceManager::createTextureCubeFromEquirectangularMap(co
 
 	release(equirectangularMap);
 
-	TextureRenderTarget* const cubemap = createTextureRenderTarget(texturecubeResolution, texturecubeResolution, equirectangularMap->getTexture()->getFormat(), 6, 1, true, false,
-		equirectangularMap->getTexture()->getFormat(), DXGI_FORMAT_UNKNOWN, equirectangularMap->getTexture()->getFormat());
+	DXGI_FORMAT resFormat = DXGI_FORMAT_UNKNOWN;
+
+	switch (equirectangularMap->getTexture()->getFormat())
+	{
+	default:
+		throw "";
+		break;
+	case DXGI_FORMAT_R8G8B8A8_UNORM:
+		resFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
+		break;
+	case DXGI_FORMAT_R32G32B32A32_FLOAT:
+		resFormat = DXGI_FORMAT_R16G16B16A16_FLOAT;
+		break;
+	}
+
+	TextureRenderTarget* const cubemap = createTextureRenderTarget(texturecubeResolution, texturecubeResolution, resFormat, 6, 1, true, false,
+		resFormat, DXGI_FORMAT_UNKNOWN, resFormat);
 
 	release(cubemap);
 
@@ -446,7 +461,7 @@ TextureRenderTarget* ResourceManager::createTextureCubeFromEquirectangularMap(co
 
 	ID3D12PipelineState* pipelineState = nullptr;
 
-	switch (equirectangularMap->getTexture()->getFormat())
+	switch (resFormat)
 	{
 	default:
 		throw "";
@@ -454,7 +469,7 @@ TextureRenderTarget* ResourceManager::createTextureCubeFromEquirectangularMap(co
 	case DXGI_FORMAT_R8G8B8A8_UNORM:
 		pipelineState = PipelineState::get()->equirectangularR8State.Get();
 		break;
-	case DXGI_FORMAT_R16G16B16A16_UNORM:
+	case DXGI_FORMAT_R16G16B16A16_FLOAT:
 		pipelineState = PipelineState::get()->equirectangularR16State.Get();
 		break;
 	}
@@ -496,7 +511,7 @@ TextureRenderTarget* ResourceManager::createTextureCubeFromEquirectangularMap(co
 		}
 	}
 
-	Texture* dstTexture = new Texture(texturecubeResolution, texturecubeResolution, equirectangularMap->getTexture()->getFormat(), 6, 1, true, resFlags);
+	Texture* dstTexture = new Texture(texturecubeResolution, texturecubeResolution, resFormat, 6, 1, true, resFlags);
 
 	Texture* srcTexture = cubemap->getTexture();
 
