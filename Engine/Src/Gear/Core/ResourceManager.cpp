@@ -500,29 +500,13 @@ TextureRenderTarget* ResourceManager::createTextureCubeFromEquirectangularMap(co
 
 	Texture* srcTexture = cubemap->getTexture();
 
-	commandList->pushResourceTrackList(dstTexture);
-
-	dstTexture->setAllState(D3D12_RESOURCE_STATE_COPY_DEST);
-
-	commandList->pushResourceTrackList(srcTexture);
-
-	srcTexture->setAllState(D3D12_RESOURCE_STATE_COPY_SOURCE);
-
-	commandList->transitionResources();
-
 	for (UINT i = 0; i < 6; i++)
 	{
-		D3D12_TEXTURE_COPY_LOCATION dstLocation = {};
-		dstLocation.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
-		dstLocation.pResource = dstTexture->getResource();
-		dstLocation.SubresourceIndex = D3D12CalcSubresource(0, i, 0, dstTexture->getMipLevels(), dstTexture->getArraySize());
+		const UINT dstSubresource= D3D12CalcSubresource(0, i, 0, dstTexture->getMipLevels(), dstTexture->getArraySize());
+		
+		const UINT srcSubresource= D3D12CalcSubresource(0, i, 0, srcTexture->getMipLevels(), srcTexture->getArraySize());
 
-		D3D12_TEXTURE_COPY_LOCATION srcLocation = {};
-		srcLocation.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
-		srcLocation.pResource = srcTexture->getResource();
-		srcLocation.SubresourceIndex = D3D12CalcSubresource(0, i, 0, srcTexture->getMipLevels(), srcTexture->getArraySize());
-
-		commandList->get()->CopyTextureRegion(&dstLocation, 0, 0, 0, &srcLocation, nullptr);
+		commandList->copyTextureRegion(dstTexture, dstSubresource, srcTexture, srcSubresource);
 	}
 
 	if (!stateTracking)

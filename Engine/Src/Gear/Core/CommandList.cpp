@@ -278,6 +278,31 @@ void CommandList::copyResource(Buffer* const dstBuffer, Buffer* const srcBuffer)
 	commandList->CopyResource(dstBuffer->getResource(), srcBuffer->getResource());
 }
 
+void CommandList::copyTextureRegion(Texture* const dstTexture, const UINT dstSubresource, Texture* const srcTexture, const UINT srcSubresource)
+{
+	pushResourceTrackList(dstTexture);
+
+	dstTexture->setAllState(D3D12_RESOURCE_STATE_COPY_DEST);
+
+	pushResourceTrackList(srcTexture);
+
+	srcTexture->setAllState(D3D12_RESOURCE_STATE_COPY_SOURCE);
+
+	transitionResources();
+
+	D3D12_TEXTURE_COPY_LOCATION dstLocation = {};
+	dstLocation.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
+	dstLocation.pResource = dstTexture->getResource();
+	dstLocation.SubresourceIndex = dstSubresource;
+
+	D3D12_TEXTURE_COPY_LOCATION srcLocation = {};
+	srcLocation.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
+	srcLocation.pResource = srcTexture->getResource();
+	srcLocation.SubresourceIndex = srcSubresource;
+
+	commandList->CopyTextureRegion(&dstLocation, 0, 0, 0, &srcLocation, nullptr);
+}
+
 void CommandList::uavBarrier(const std::initializer_list<Resource*>& resources)
 {
 	std::vector<D3D12_RESOURCE_BARRIER> barriers;

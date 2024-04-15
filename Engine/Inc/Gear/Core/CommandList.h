@@ -74,6 +74,8 @@ public:
 
 	void copyResource(Buffer* const dstBuffer, Buffer* const srcBuffer);
 
+	void copyTextureRegion(Texture* const dstTexture, const UINT dstSubresource, Texture* const srcTexture, const UINT srcSubresource);
+
 	void uavBarrier(const std::initializer_list<Resource*>& resources);
 
 private:
