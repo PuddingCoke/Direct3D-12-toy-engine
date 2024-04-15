@@ -162,6 +162,9 @@
     <ClInclude Include="Inc\Gear\Core\Resource\EngineResource.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Inc\Gear\Core\PipelineState.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Gear\Window\Win32Form.cpp">
@@ -306,6 +309,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Src\Gear\Core\Resource\EngineResource.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gear\Core\PipelineState.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

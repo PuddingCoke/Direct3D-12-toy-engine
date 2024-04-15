@@ -402,6 +402,8 @@ RenderEngine::RenderEngine(const HWND hwnd, const bool useSwapChainBuffer) :
 		ConstantBuffer::bufferPools[i] = new ConstantBufferPool(256 << i, 1024);
 	}
 
+	PipelineState::instance = new PipelineState();
+
 	Shader::createGlobalShaders();
 
 	{
@@ -530,6 +532,11 @@ RenderEngine::~RenderEngine()
 		{
 			delete ConstantBuffer::bufferPools[i];
 		}
+	}
+
+	if (PipelineState::instance)
+	{
+		delete PipelineState::instance;
 	}
 
 	for (UINT i = 0; i < Graphics::FrameBufferCount; i++)

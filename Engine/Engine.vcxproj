@@ -162,6 +162,7 @@
     <ClInclude Include="Inc\Gear\Core\GraphicsContext.h" />
     <ClInclude Include="Inc\Gear\Core\GraphicsDevice.h" />
     <ClInclude Include="Inc\Gear\Core\Graphics.h" />
+    <ClInclude Include="Inc\Gear\Core\PipelineState.h" />
     <ClInclude Include="Inc\Gear\Core\RenderEngine.h" />
     <ClInclude Include="Inc\Gear\Core\RenderPass.h" />
     <ClInclude Include="Inc\Gear\Core\ResourceManager.h" />
@@ -203,6 +204,7 @@
     <ClCompile Include="Src\Gear\Core\GlobalDescriptorHeap.cpp" />
     <ClCompile Include="Src\Gear\Core\GlobalRootSignature.cpp" />
     <ClCompile Include="Src\Gear\Core\GraphicsContext.cpp" />
+    <ClCompile Include="Src\Gear\Core\PipelineState.cpp" />
     <ClCompile Include="Src\Gear\Core\RenderEngine.cpp" />
     <ClCompile Include="Src\Gear\Core\RenderPass.cpp" />
     <ClCompile Include="Src\Gear\Core\DX\Resource\Texture.cpp" />

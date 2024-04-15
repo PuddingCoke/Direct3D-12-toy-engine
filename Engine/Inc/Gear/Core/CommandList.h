@@ -112,19 +112,22 @@ inline IsCorrectType<T> CommandList::setPipelineResources(const T& descs, const 
 	{
 		if (desc.type == ShaderResourceDesc::BUFFER)
 		{
-			Buffer* const buffer = desc.bufferDesc.buffer;
-
-			if (buffer->getStateTracking() && desc.state != ShaderResourceDesc::CBV)
+			if (desc.state != ShaderResourceDesc::CBV) 
 			{
-				pushResourceTrackList(buffer);
+				Buffer* const buffer = desc.bufferDesc.buffer;
 
-				if (desc.state == ShaderResourceDesc::SRV)
+				if (buffer->getStateTracking())
 				{
-					buffer->setState(targetSRVState);
-				}
-				else if (desc.state == ShaderResourceDesc::UAV)
-				{
-					buffer->setState(D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+					pushResourceTrackList(buffer);
+
+					if (desc.state == ShaderResourceDesc::SRV)
+					{
+						buffer->setState(targetSRVState);
+					}
+					else if (desc.state == ShaderResourceDesc::UAV)
+					{
+						buffer->setState(D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+					}
 				}
 			}
 		}
