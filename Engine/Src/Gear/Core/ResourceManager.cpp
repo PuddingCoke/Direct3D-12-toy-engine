@@ -279,14 +279,7 @@ IndexConstantBuffer* ResourceManager::createIndexConstantBuffer(const std::initi
 
 		for (const ShaderResourceDesc& desc : descs)
 		{
-			if (desc.type == ShaderResourceDesc::BUFFER)
-			{
-				indices[index] = desc.bufferDesc.resourceIndex;
-			}
-			else
-			{
-				indices[index] = desc.textureDesc.resourceIndex;
-			}
+			indices[index] = desc.resourceIndex;
 
 			index++;
 		}

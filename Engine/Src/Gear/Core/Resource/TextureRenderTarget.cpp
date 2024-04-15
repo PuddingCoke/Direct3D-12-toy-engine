@@ -28,9 +28,9 @@ ShaderResourceDesc TextureRenderTarget::getAllSRVIndex() const
 	ShaderResourceDesc desc = {};
 	desc.type = ShaderResourceDesc::TEXTURE;
 	desc.state = ShaderResourceDesc::SRV;
+	desc.resourceIndex = allSRVIndex;
 	desc.textureDesc.texture = texture;
 	desc.textureDesc.mipSlice = D3D12_TRANSITION_ALL_MIPLEVELS;
-	desc.textureDesc.resourceIndex = allSRVIndex;
 
 	return desc;
 }
@@ -40,9 +40,9 @@ ShaderResourceDesc TextureRenderTarget::getSRVMipIndex(const UINT mipSlice) cons
 	ShaderResourceDesc desc = {};
 	desc.type = ShaderResourceDesc::TEXTURE;
 	desc.state = ShaderResourceDesc::SRV;
+	desc.resourceIndex = srvMipIndexStart + mipSlice;
 	desc.textureDesc.texture = texture;
 	desc.textureDesc.mipSlice = mipSlice;
-	desc.textureDesc.resourceIndex = srvMipIndexStart + mipSlice;
 
 	return desc;
 }
@@ -52,9 +52,9 @@ ShaderResourceDesc TextureRenderTarget::getUAVMipIndex(const UINT mipSlice) cons
 	ShaderResourceDesc desc = {};
 	desc.type = ShaderResourceDesc::TEXTURE;
 	desc.state = ShaderResourceDesc::UAV;
+	desc.resourceIndex = uavMipIndexStart + mipSlice;
 	desc.textureDesc.texture = texture;
 	desc.textureDesc.mipSlice = mipSlice;
-	desc.textureDesc.resourceIndex = uavMipIndexStart + mipSlice;
 
 	return desc;
 }

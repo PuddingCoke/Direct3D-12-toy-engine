@@ -74,8 +74,8 @@ ShaderResourceDesc ConstantBuffer::getBufferIndex() const
 	ShaderResourceDesc desc = {};
 	desc.type = ShaderResourceDesc::BUFFER;
 	desc.state = ShaderResourceDesc::CBV;
+	desc.resourceIndex = bufferIndex;
 	desc.bufferDesc.buffer = buffer;
-	desc.bufferDesc.resourceIndex = bufferIndex;
 
 	return desc;
 }
