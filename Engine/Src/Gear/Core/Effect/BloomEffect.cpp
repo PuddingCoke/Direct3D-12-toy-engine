@@ -31,7 +31,7 @@ BloomEffect::BloomEffect(GraphicsContext* const context, const UINT width, const
 			blurParam[i].iteration = iteration[i];
 			blurParam[i].sigma = sigma[i];
 
-			blurParamBuffer[i] = ResourceManager::createConstantBuffer(sizeof(BlurParam));
+			blurParamBuffer[i] = ResourceManager::createConstantBuffer(sizeof(BlurParam), true);
 
 			updateCurve(i);
 		}

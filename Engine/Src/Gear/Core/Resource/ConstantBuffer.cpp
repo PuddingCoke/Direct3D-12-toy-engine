@@ -2,7 +2,7 @@
 
 ConstantBufferPool* ConstantBuffer::bufferPools[3] = { nullptr,nullptr,nullptr };
 
-ConstantBuffer::ConstantBuffer(Buffer* const buffer, const UINT size) :
+ConstantBuffer::ConstantBuffer(Buffer* const buffer, const UINT size, const bool persistent) :
 	buffer(buffer)
 {
 	if (size % 256 != 0)
@@ -42,7 +42,18 @@ ConstantBuffer::ConstantBuffer(Buffer* const buffer, const UINT size) :
 		desc.BufferLocation = buffer->getGPUAddress();
 		desc.SizeInBytes = size;
 
-		DescriptorHandle descriptorHandle = GlobalDescriptorHeap::getResourceHeap()->allocStaticDescriptor(1);
+		numSRVUAVCBVDescriptors = 1;
+
+		DescriptorHandle descriptorHandle = DescriptorHandle();
+
+		if (persistent)
+		{
+			descriptorHandle = GlobalDescriptorHeap::getResourceHeap()->allocStaticDescriptor(numSRVUAVCBVDescriptors);
+		}
+		else
+		{
+			descriptorHandle = GlobalDescriptorHeap::getNonShaderVisibleResourceHeap()->allocDynamicDescriptor(numSRVUAVCBVDescriptors);
+		}
 
 		GraphicsDevice::get()->CreateConstantBufferView(&desc, descriptorHandle.getCPUHandle());
 
@@ -88,4 +99,13 @@ D3D12_GPU_VIRTUAL_ADDRESS ConstantBuffer::getGPUAddress() const
 Buffer* ConstantBuffer::getBuffer() const
 {
 	return buffer;
+}
+
+void ConstantBuffer::copyDescriptors()
+{
+	const DescriptorHandle handle = GlobalDescriptorHeap::getResourceHeap()->allocDynamicDescriptor(numSRVUAVCBVDescriptors);
+
+	GraphicsDevice::get()->CopyDescriptorsSimple(numSRVUAVCBVDescriptors, handle.getCPUHandle(), srvUAVCBVHandleStart, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
+	bufferIndex = handle.getCurrentIndex();
 }

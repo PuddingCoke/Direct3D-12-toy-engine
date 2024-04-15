@@ -216,6 +216,7 @@
     <ClCompile Include="Src\Gear\Core\GraphicsDevice.cpp" />
     <ClCompile Include="Src\Gear\Core\ResourceManager.cpp" />
     <ClCompile Include="Src\Gear\Core\Resource\ConstantBuffer.cpp" />
+    <ClCompile Include="Src\Gear\Core\Resource\EngineResource.cpp" />
     <ClCompile Include="Src\Gear\Core\Resource\IndexBuffer.cpp" />
     <ClCompile Include="Src\Gear\Core\Resource\IndexConstantBuffer.cpp" />
     <ClCompile Include="Src\Gear\Core\Resource\SwapTexture.cpp" />

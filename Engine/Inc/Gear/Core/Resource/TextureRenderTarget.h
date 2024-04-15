@@ -33,7 +33,7 @@ public:
 
 	Texture* getTexture() const;
 
-	void copyDescriptors();
+	void copyDescriptors() override;
 
 private:
 
@@ -48,10 +48,6 @@ private:
 	UINT uavMipIndexStart;
 
 	std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> rtvMipHandles;
-
-	CD3DX12_CPU_DESCRIPTOR_HANDLE srvuavDescriptorHandleStart;
-
-	UINT numSRVUAVDescriptors;
 
 	Texture* texture;
 };

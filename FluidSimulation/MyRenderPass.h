@@ -60,7 +60,7 @@ public:
 		originTexture = ResourceManager::createTextureRenderTarget(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R16G16B16A16_FLOAT, 1, 1, false, true,
 			DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_R16G16B16A16_FLOAT);
 
-		simulationParamBuffer = ResourceManager::createConstantBuffer(sizeof(SimulationParam));
+		simulationParamBuffer = ResourceManager::createConstantBuffer(sizeof(SimulationParam), true);
 
 		simulationParam.simTexelSize = DirectX::XMFLOAT2(1.f / simRes.x, 1.f / simRes.y);
 		simulationParam.colorDissipationSpeed = config.colorDissipationSpeed;
