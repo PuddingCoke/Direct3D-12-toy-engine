@@ -424,14 +424,7 @@ void GraphicsContext::getIndicesFromResourceDescs(const std::initializer_list<Sh
 
 	for (const ShaderResourceDesc& desc : descs)
 	{
-		if (desc.type == ShaderResourceDesc::BUFFER)
-		{
-			dst[index] = desc.bufferDesc.resourceIndex;
-		}
-		else
-		{
-			dst[index] = desc.textureDesc.resourceIndex;
-		}
+		dst[index] = desc.resourceIndex;
 
 		index++;
 	}

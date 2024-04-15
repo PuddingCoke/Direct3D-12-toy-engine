@@ -430,9 +430,9 @@ ShaderResourceDesc TextureDepthStencil::getAllDepthIndex() const
 	ShaderResourceDesc desc = {};
 	desc.type = ShaderResourceDesc::TEXTURE;
 	desc.state = ShaderResourceDesc::SRV;
+	desc.resourceIndex = allDepthIndex;
 	desc.textureDesc.texture = texture;
 	desc.textureDesc.mipSlice = D3D12_TRANSITION_ALL_MIPLEVELS;
-	desc.textureDesc.resourceIndex = allDepthIndex;
 
 	return desc;
 }
@@ -442,9 +442,9 @@ ShaderResourceDesc TextureDepthStencil::getAllStencilIndex() const
 	ShaderResourceDesc desc = {};
 	desc.type = ShaderResourceDesc::TEXTURE;
 	desc.state = ShaderResourceDesc::SRV;
+	desc.resourceIndex = allStencilIndex;
 	desc.textureDesc.texture = texture;
 	desc.textureDesc.mipSlice = D3D12_TRANSITION_ALL_MIPLEVELS;
-	desc.textureDesc.resourceIndex = allStencilIndex;
 
 	return desc;
 }
@@ -454,9 +454,9 @@ ShaderResourceDesc TextureDepthStencil::getDepthMipIndex(const UINT mipSlice) co
 	ShaderResourceDesc desc = {};
 	desc.type = ShaderResourceDesc::TEXTURE;
 	desc.state = ShaderResourceDesc::SRV;
+	desc.resourceIndex = depthMipIndexStart + mipSlice;
 	desc.textureDesc.texture = texture;
 	desc.textureDesc.mipSlice = mipSlice;
-	desc.textureDesc.resourceIndex = depthMipIndexStart + mipSlice;
 
 	return desc;
 }
@@ -466,9 +466,9 @@ ShaderResourceDesc TextureDepthStencil::getStencilMipIndex(const UINT mipSlice) 
 	ShaderResourceDesc desc = {};
 	desc.type = ShaderResourceDesc::TEXTURE;
 	desc.state = ShaderResourceDesc::SRV;
+	desc.resourceIndex = stencilMipIndexStart + mipSlice;
 	desc.textureDesc.texture = texture;
 	desc.textureDesc.mipSlice = mipSlice;
-	desc.textureDesc.resourceIndex = stencilMipIndexStart + mipSlice;
 
 	return desc;
 }

@@ -39,17 +39,17 @@ struct ShaderResourceDesc
 		CBV
 	} state;
 
+	UINT resourceIndex;
+
 	struct TextureTransitionDesc
 	{
 		Texture* texture;
 		UINT mipSlice;
-		UINT resourceIndex;
 	};
 
 	struct BufferTransitionDesc
 	{
 		Buffer* buffer;
-		UINT resourceIndex;
 	};
 
 	union
