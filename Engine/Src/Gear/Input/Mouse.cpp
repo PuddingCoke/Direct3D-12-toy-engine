@@ -17,7 +17,11 @@ Event Mouse::scrollEvent;
 
 bool Mouse::leftDown = false;
 bool Mouse::rightDown = false;
-bool Mouse::moved = false;
+
+bool Mouse::onMoved = false;
+bool Mouse::onLeftDowned = false;
+bool Mouse::onRightDowned = false;
+bool Mouse::onScrolled = false;
 
 const float& Mouse::getX()
 {
@@ -54,9 +58,24 @@ const bool& Mouse::getRightDown()
 	return rightDown;
 }
 
-const bool& Mouse::getMoved()
+const bool& Mouse::onMove()
 {
-	return moved;
+	return onMoved;
+}
+
+const bool& Mouse::onLeftDown()
+{
+	return onLeftDowned;
+}
+
+const bool& Mouse::onRightDown()
+{
+	return onRightDowned;
+}
+
+const bool& Mouse::onScroll()
+{
+	return onScrolled;
 }
 
 int Mouse::addMoveEvent(std::function<void(void)> func)
@@ -123,5 +142,8 @@ void Mouse::resetDeltaInfo()
 {
 	dx = 0;
 	dy = 0;
-	moved = false;
+	onMoved = false;
+	onLeftDowned = false;
+	onRightDowned = false;
+	onScrolled = false;
 }

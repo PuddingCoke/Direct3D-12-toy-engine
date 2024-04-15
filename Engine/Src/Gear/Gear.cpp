@@ -130,6 +130,8 @@ void Gear::runGame()
 		Graphics::time.floatSeed = Random::Float();
 
 		Mouse::resetDeltaInfo();
+
+		Keyboard::resetOnKeyDownMap();
 	}
 
 }
@@ -256,7 +258,7 @@ LRESULT Gear::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		Mouse::x = curX;
 		Mouse::y = curY;
 
-		Mouse::moved = true;
+		Mouse::onMoved = true;
 
 		Mouse::moveEvent();
 	}
@@ -264,11 +266,13 @@ LRESULT Gear::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 	case WM_LBUTTONDOWN:
 		Mouse::leftDown = true;
+		Mouse::onLeftDowned = true;
 		Mouse::leftDownEvent();
 		break;
 
 	case WM_RBUTTONDOWN:
 		Mouse::rightDown = true;
+		Mouse::onRightDowned = true;
 		Mouse::rightDownEvent();
 		break;
 
@@ -284,6 +288,7 @@ LRESULT Gear::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 	case WM_MOUSEWHEEL:
 		Mouse::wheelDelta = (float)GET_WHEEL_DELTA_WPARAM(wParam) / 120.f;
+		Mouse::onScrolled = true;
 		Mouse::scrollEvent();
 		break;
 
@@ -291,6 +296,7 @@ LRESULT Gear::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		if ((HIWORD(lParam) & KF_REPEAT) == 0)
 		{
 			Keyboard::keyDownMap[(Keyboard::Key)wParam] = true;
+			Keyboard::onKeyDownMap[(Keyboard::Key)wParam] = true;
 			Keyboard::keyDownEvents[(Keyboard::Key)wParam]();
 		}
 		break;
