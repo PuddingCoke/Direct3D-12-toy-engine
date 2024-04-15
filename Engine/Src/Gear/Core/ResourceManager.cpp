@@ -182,7 +182,7 @@ Texture* ResourceManager::createTextureFromFile(const std::string filePath, cons
 	return texture;
 }
 
-ConstantBuffer* ResourceManager::createConstantBuffer(const UINT size, const bool cpuWritable, const void* const data)
+ConstantBuffer* ResourceManager::createConstantBuffer(const UINT size, const bool cpuWritable, const void* const data, const bool persistent)
 {
 	ConstantBuffer* constantBuffer = nullptr;
 
@@ -198,11 +198,11 @@ ConstantBuffer* ResourceManager::createConstantBuffer(const UINT size, const boo
 
 		buffer->setStateTracking(false);
 
-		constantBuffer = new ConstantBuffer(buffer, size);
+		constantBuffer = new ConstantBuffer(buffer, size, persistent);
 	}
 	else
 	{
-		constantBuffer = new ConstantBuffer(nullptr, size);
+		constantBuffer = new ConstantBuffer(nullptr, size, persistent);
 
 		if (data)
 		{
@@ -213,9 +213,9 @@ ConstantBuffer* ResourceManager::createConstantBuffer(const UINT size, const boo
 	return constantBuffer;
 }
 
-ConstantBuffer* ResourceManager::createConstantBuffer(const UINT size)
+ConstantBuffer* ResourceManager::createConstantBuffer(const UINT size, const bool persistent)
 {
-	return new ConstantBuffer(nullptr, size);
+	return new ConstantBuffer(nullptr, size, persistent);
 }
 
 IndexBuffer* ResourceManager::createIndexBuffer(const DXGI_FORMAT format, const UINT size, const bool cpuWritable, const void* const data)
@@ -268,7 +268,7 @@ VertexBuffer* ResourceManager::createVertexBuffer(const UINT perVertexSize, cons
 	return new VertexBuffer(buffer, perVertexSize, size, true);
 }
 
-IndexConstantBuffer* ResourceManager::createIndexConstantBuffer(const std::initializer_list<ShaderResourceDesc>& descs, const bool cpuWritable)
+IndexConstantBuffer* ResourceManager::createIndexConstantBuffer(const std::initializer_list<ShaderResourceDesc>& descs, const bool cpuWritable,const bool persistent)
 {
 	const UINT alignedIndicesNum = ((descs.size() + 63) & ~63);
 
@@ -285,16 +285,16 @@ IndexConstantBuffer* ResourceManager::createIndexConstantBuffer(const std::initi
 		}
 	}
 
-	ConstantBuffer* constantBuffer = createConstantBuffer(sizeof(UINT) * alignedIndicesNum, cpuWritable, indices.data());
+	ConstantBuffer* constantBuffer = createConstantBuffer(sizeof(UINT) * alignedIndicesNum, cpuWritable, indices.data(), persistent);
 
 	return new IndexConstantBuffer(constantBuffer, descs);
 }
 
-IndexConstantBuffer* ResourceManager::createIndexConstantBuffer(const UINT indicesNum)
+IndexConstantBuffer* ResourceManager::createIndexConstantBuffer(const UINT indicesNum,const bool persistent)
 {
 	const UINT alignedIndicesNum = ((indicesNum + 63) & ~63);
 
-	ConstantBuffer* constantBuffer = createConstantBuffer(alignedIndicesNum * sizeof(UINT));
+	ConstantBuffer* constantBuffer = createConstantBuffer(alignedIndicesNum * sizeof(UINT), persistent);
 
 	return new IndexConstantBuffer(constantBuffer);
 }

@@ -434,7 +434,7 @@ RenderEngine::RenderEngine(const HWND hwnd, const bool useSwapChainBuffer) :
 
 	endCommandList = new CommandList(D3D12_COMMAND_LIST_TYPE_DIRECT);
 
-	GraphicsContext::globalConstantBuffer = ResourceManager::createConstantBuffer(sizeof(PerFrameResource));
+	GraphicsContext::globalConstantBuffer = ResourceManager::createConstantBuffer(sizeof(PerFrameResource), true);
 
 	//push beginCommandList for constant buffer update
 	//resource creation may need dynamic constant buffer

@@ -305,6 +305,9 @@
     <ClCompile Include="Src\Gear\Core\ResourceManager.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="Src\Gear\Core\Resource\EngineResource.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\FullScreen\FullScreenVS.hlsl" />

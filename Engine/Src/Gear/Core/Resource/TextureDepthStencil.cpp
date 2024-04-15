@@ -89,20 +89,20 @@ TextureDepthStencil::TextureDepthStencil(Texture* const texture, const bool isTe
 	//create depth and stencil srvs
 	{
 		//acquire descriptor size = stencil descriptor size + depth descriptor size
-		numSRVDescriptors = static_cast<UINT>((stencilSRVFormat != DXGI_FORMAT_UNKNOWN)) * (1 + mipLevels) + (1 + mipLevels);
+		numSRVUAVCBVDescriptors = static_cast<UINT>((stencilSRVFormat != DXGI_FORMAT_UNKNOWN)) * (1 + mipLevels) + (1 + mipLevels);
 
 		DescriptorHandle descriptorHandle = DescriptorHandle();
 
 		if (persistent)
 		{
-			descriptorHandle = GlobalDescriptorHeap::getResourceHeap()->allocStaticDescriptor(numSRVDescriptors);
+			descriptorHandle = GlobalDescriptorHeap::getResourceHeap()->allocStaticDescriptor(numSRVUAVCBVDescriptors);
 		}
 		else
 		{
-			descriptorHandle = GlobalDescriptorHeap::getNonShaderVisibleResourceHeap()->allocDynamicDescriptor(numSRVDescriptors);
-
-			srvDescriptorHandleStart = descriptorHandle.getCPUHandle();
+			descriptorHandle = GlobalDescriptorHeap::getNonShaderVisibleResourceHeap()->allocDynamicDescriptor(numSRVUAVCBVDescriptors);
 		}
+
+		srvUAVCBVHandleStart = descriptorHandle.getCPUHandle();
 
 		allDepthIndex = descriptorHandle.getCurrentIndex();
 
@@ -490,9 +490,9 @@ Texture* TextureDepthStencil::getTexture() const
 
 void TextureDepthStencil::copyDescriptors()
 {
-	const DescriptorHandle handle = GlobalDescriptorHeap::getResourceHeap()->allocDynamicDescriptor(numSRVDescriptors);
+	const DescriptorHandle handle = GlobalDescriptorHeap::getResourceHeap()->allocDynamicDescriptor(numSRVUAVCBVDescriptors);
 
-	GraphicsDevice::get()->CopyDescriptorsSimple(numSRVDescriptors, handle.getCPUHandle(), srvDescriptorHandleStart, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	GraphicsDevice::get()->CopyDescriptorsSimple(numSRVUAVCBVDescriptors, handle.getCPUHandle(), srvUAVCBVHandleStart, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 	allDepthIndex = handle.getCurrentIndex();
 

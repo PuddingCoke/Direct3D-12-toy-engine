@@ -76,9 +76,9 @@ Texture* TextureRenderTarget::getTexture() const
 
 void TextureRenderTarget::copyDescriptors()
 {
-	const DescriptorHandle handle = GlobalDescriptorHeap::getResourceHeap()->allocDynamicDescriptor(numSRVUAVDescriptors);
+	const DescriptorHandle handle = GlobalDescriptorHeap::getResourceHeap()->allocDynamicDescriptor(numSRVUAVCBVDescriptors);
 
-	GraphicsDevice::get()->CopyDescriptorsSimple(numSRVUAVDescriptors, handle.getCPUHandle(), srvuavDescriptorHandleStart, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	GraphicsDevice::get()->CopyDescriptorsSimple(numSRVUAVCBVDescriptors, handle.getCPUHandle(), srvUAVCBVHandleStart, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 	allSRVIndex = handle.getCurrentIndex();
 
@@ -95,20 +95,20 @@ void TextureRenderTarget::createViews(const DXGI_FORMAT srvFormat, const DXGI_FO
 	//create srv uav descriptors
 	{
 		//plus 1 because there is a additional srv to acess all mipslices
-		numSRVUAVDescriptors = 1 + texture->getMipLevels() + static_cast<UINT>(hasUAV) * texture->getMipLevels();
+		numSRVUAVCBVDescriptors = 1 + texture->getMipLevels() + static_cast<UINT>(hasUAV) * texture->getMipLevels();
 
 		DescriptorHandle descriptorHandle = DescriptorHandle();
 
 		if (persistent)
 		{
-			descriptorHandle = GlobalDescriptorHeap::getResourceHeap()->allocStaticDescriptor(numSRVUAVDescriptors);
+			descriptorHandle = GlobalDescriptorHeap::getResourceHeap()->allocStaticDescriptor(numSRVUAVCBVDescriptors);
 		}
 		else
 		{
-			descriptorHandle = GlobalDescriptorHeap::getNonShaderVisibleResourceHeap()->allocDynamicDescriptor(numSRVUAVDescriptors);
-
-			srvuavDescriptorHandleStart = descriptorHandle.getCPUHandle();
+			descriptorHandle = GlobalDescriptorHeap::getNonShaderVisibleResourceHeap()->allocDynamicDescriptor(numSRVUAVCBVDescriptors);
 		}
+
+		srvUAVCBVHandleStart = descriptorHandle.getCPUHandle();
 
 		allSRVIndex = descriptorHandle.getCurrentIndex();
 

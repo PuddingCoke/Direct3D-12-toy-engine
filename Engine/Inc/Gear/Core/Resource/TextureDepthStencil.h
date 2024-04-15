@@ -34,7 +34,7 @@ public:
 
 	Texture* getTexture() const;
 
-	void copyDescriptors();
+	void copyDescriptors() override;
 
 private:
 
@@ -47,10 +47,6 @@ private:
 	UINT stencilMipIndexStart;
 
 	std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> dsvMipHandles;
-
-	CD3DX12_CPU_DESCRIPTOR_HANDLE srvDescriptorHandleStart;
-
-	UINT numSRVDescriptors;
 
 	Texture* texture;
 };

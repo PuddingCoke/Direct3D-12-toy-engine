@@ -41,9 +41,9 @@ public:
 	//texture's stateTracking is set to true
 	Texture* createTextureFromFile(const std::string filePath, const D3D12_RESOURCE_FLAGS resFlags, bool* const isTextureCube);
 
-	ConstantBuffer* createConstantBuffer(const UINT size, const bool cpuWritable, const void* const data);
+	ConstantBuffer* createConstantBuffer(const UINT size, const bool cpuWritable, const void* const data, const bool persistent);
 
-	static ConstantBuffer* createConstantBuffer(const UINT size);
+	static ConstantBuffer* createConstantBuffer(const UINT size, const bool persistent);
 
 	//data must not be nullptr
 	IndexBuffer* createIndexBuffer(const DXGI_FORMAT format, const UINT size, const bool cpuWritable, const void* const data);
@@ -55,9 +55,9 @@ public:
 
 	static VertexBuffer* createVertexBuffer(const UINT perVertexSize, const UINT size);
 
-	IndexConstantBuffer* createIndexConstantBuffer(const std::initializer_list<ShaderResourceDesc>& descs, const bool cpuWritable);
+	IndexConstantBuffer* createIndexConstantBuffer(const std::initializer_list<ShaderResourceDesc>& descs, const bool cpuWritable, const bool persistent);
 
-	static IndexConstantBuffer* createIndexConstantBuffer(const UINT indicesNum);
+	static IndexConstantBuffer* createIndexConstantBuffer(const UINT indicesNum, const bool persistent);
 
 	static TextureDepthStencil* createTextureDepthStencil(const UINT width, const UINT height, const DXGI_FORMAT resFormat, const UINT arraySize, const UINT mipLevels, const bool isTextureCube, const bool persistent);
 
