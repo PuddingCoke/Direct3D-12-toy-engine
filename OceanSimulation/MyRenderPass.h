@@ -15,6 +15,8 @@ public:
 
 		envCube = resManager->createTextureCubeFromEquirectangularMap("ColdSunsetEquirect.png", 1024, true);
 
+		randomNoise = resManager->createTextureRenderTargetFromRandomData(1920, 1080, RandomDataType::GAUSS, true);
+
 		end();
 
 		RenderEngine::get()->submitRenderPass(this);
@@ -48,6 +50,7 @@ public:
 		delete vertexShader;
 		delete pixelShader;
 		delete envCube;
+		delete randomNoise;
 	}
 
 protected:
@@ -72,6 +75,8 @@ private:
 	ComPtr<ID3D12PipelineState> pipelineState;
 
 	TextureRenderTarget* envCube;
+
+	TextureRenderTarget* randomNoise;
 
 	Shader* vertexShader;
 
