@@ -1,5 +1,6 @@
 #include<Gear/Core/ResourceManager.h>
 
+#include<DirectXPackedVector.h>
 
 ResourceManager::ResourceManager(GraphicsContext* const context) :
 	context(context), commandList(context->getCommandList())
@@ -182,6 +183,84 @@ Texture* ResourceManager::createTextureFromFile(const std::string filePath, cons
 	return texture;
 }
 
+Texture* ResourceManager::createTextureFromRandomData(const UINT width, const UINT height, const RandomDataType type, const D3D12_RESOURCE_FLAGS resFlags)
+{
+	Texture* texture = nullptr;
+
+	if (type == RandomDataType::NOISE)
+	{
+		struct Col
+		{
+			UINT8 r, g, b, a;
+		};
+
+		std::vector<Col> colors(width * height);
+
+		for (UINT i = 0; i < width * height; i++)
+		{
+			colors[i] = 
+			{ 
+				static_cast<UINT8>(Random::Uint() % 256u), 
+				static_cast<UINT8>(Random::Uint() % 256u), 
+				static_cast<UINT8>(Random::Uint() % 256u), 
+				static_cast<UINT8>(Random::Uint() % 256u) 
+			};
+		}
+
+		texture = new Texture(width, height, DXGI_FORMAT_R8G8B8A8_UNORM, 1, 1, true, resFlags);
+
+		const UINT64 uploadHeapSize = GetRequiredIntermediateSize(texture->getResource(), 0, 1);
+
+		UploadHeap* uploadHeap = new UploadHeap(uploadHeapSize);
+
+		release(uploadHeap);
+
+		D3D12_SUBRESOURCE_DATA subresourceData = {};
+		subresourceData.pData = colors.data();
+		subresourceData.RowPitch = width * 4u;
+		subresourceData.SlicePitch = subresourceData.RowPitch * height;
+
+		UpdateSubresources(commandList->get(), texture->getResource(), uploadHeap->getResource(), 0, 0, 1, &subresourceData);
+	}
+	else
+	{
+		struct Col
+		{
+			DirectX::PackedVector::HALF r, g, b, a;
+		};
+
+		std::vector<Col> colors(width* height);
+
+		for (UINT i = 0; i < width * height; i++)
+		{
+			colors[i] = 
+			{ 
+				DirectX::PackedVector::XMConvertFloatToHalf(Random::Gauss()),
+				DirectX::PackedVector::XMConvertFloatToHalf(Random::Gauss()),
+				DirectX::PackedVector::XMConvertFloatToHalf(Random::Gauss()),
+				DirectX::PackedVector::XMConvertFloatToHalf(Random::Gauss())
+			};
+		}
+
+		texture = new Texture(width, height, DXGI_FORMAT_R16G16B16A16_FLOAT, 1, 1, true, resFlags);
+
+		const UINT64 uploadHeapSize = GetRequiredIntermediateSize(texture->getResource(), 0, 1);
+
+		UploadHeap* uploadHeap = new UploadHeap(uploadHeapSize);
+
+		release(uploadHeap);
+
+		D3D12_SUBRESOURCE_DATA subresourceData = {};
+		subresourceData.pData = colors.data();
+		subresourceData.RowPitch = width * 8u;
+		subresourceData.SlicePitch = subresourceData.RowPitch * height;
+
+		UpdateSubresources(commandList->get(), texture->getResource(), uploadHeap->getResource(), 0, 0, 1, &subresourceData);
+	}
+
+	return texture;
+}
+
 ConstantBuffer* ResourceManager::createConstantBuffer(const UINT size, const bool cpuWritable, const void* const data, const bool persistent)
 {
 	ConstantBuffer* constantBuffer = nullptr;
@@ -268,7 +347,7 @@ VertexBuffer* ResourceManager::createVertexBuffer(const UINT perVertexSize, cons
 	return new VertexBuffer(buffer, perVertexSize, size, true);
 }
 
-IndexConstantBuffer* ResourceManager::createIndexConstantBuffer(const std::initializer_list<ShaderResourceDesc>& descs, const bool cpuWritable,const bool persistent)
+IndexConstantBuffer* ResourceManager::createIndexConstantBuffer(const std::initializer_list<ShaderResourceDesc>& descs, const bool cpuWritable, const bool persistent)
 {
 	const UINT alignedIndicesNum = ((descs.size() + 63) & ~63);
 
@@ -290,7 +369,7 @@ IndexConstantBuffer* ResourceManager::createIndexConstantBuffer(const std::initi
 	return new IndexConstantBuffer(constantBuffer, descs);
 }
 
-IndexConstantBuffer* ResourceManager::createIndexConstantBuffer(const UINT indicesNum,const bool persistent)
+IndexConstantBuffer* ResourceManager::createIndexConstantBuffer(const UINT indicesNum, const bool persistent)
 {
 	const UINT alignedIndicesNum = ((indicesNum + 63) & ~63);
 
@@ -355,6 +434,56 @@ TextureRenderTarget* ResourceManager::createTextureRenderTarget(const std::strin
 	else
 	{
 		return new TextureRenderTarget(texture, isTextureCube, persistent, srvFormat, uavFormat, rtvFormat);
+	}
+}
+
+TextureRenderTarget* ResourceManager::createTextureRenderTargetFromRandomData(const UINT width, const UINT height, const RandomDataType type, const bool persistent, const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat)
+{
+	const bool hasRTV = (rtvFormat != DXGI_FORMAT_UNKNOWN);
+
+	const bool hasUAV = (uavFormat != DXGI_FORMAT_UNKNOWN);
+
+	bool stateTracking = true;
+
+	D3D12_RESOURCE_FLAGS resFlags = D3D12_RESOURCE_FLAG_NONE;
+
+	if ((!hasRTV) && (!hasUAV))
+	{
+		stateTracking = false;
+	}
+	else
+	{
+		if (hasRTV)
+		{
+			resFlags |= D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
+		}
+
+		if (hasUAV)
+		{
+			resFlags |= D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
+		}
+	}
+
+	Texture* texture = createTextureFromRandomData(width, height, type, resFlags);
+
+	if (!stateTracking)
+	{
+		commandList->pushResourceTrackList(texture);
+
+		texture->setAllState(D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
+
+		commandList->transitionResources();
+
+		texture->setStateTracking(false);
+	}
+
+	if (srvFormat == DXGI_FORMAT_UNKNOWN)
+	{
+		return new TextureRenderTarget(texture, false, persistent, texture->getFormat(), DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN);
+	}
+	else
+	{
+		return new TextureRenderTarget(texture, false, persistent, srvFormat, uavFormat, rtvFormat);
 	}
 }
 
@@ -517,9 +646,9 @@ TextureRenderTarget* ResourceManager::createTextureCubeFromEquirectangularMap(co
 
 	for (UINT i = 0; i < 6; i++)
 	{
-		const UINT dstSubresource= D3D12CalcSubresource(0, i, 0, dstTexture->getMipLevels(), dstTexture->getArraySize());
-		
-		const UINT srcSubresource= D3D12CalcSubresource(0, i, 0, srcTexture->getMipLevels(), srcTexture->getArraySize());
+		const UINT dstSubresource = D3D12CalcSubresource(0, i, 0, dstTexture->getMipLevels(), dstTexture->getArraySize());
+
+		const UINT srcSubresource = D3D12CalcSubresource(0, i, 0, srcTexture->getMipLevels(), srcTexture->getArraySize());
 
 		commandList->copyTextureRegion(dstTexture, dstSubresource, srcTexture, srcSubresource);
 	}

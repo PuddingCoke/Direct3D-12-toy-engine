@@ -5,6 +5,8 @@
 
 #include<Gear/Core/GraphicsContext.h>
 #include<Gear/Core/PipelineState.h>
+#include<Gear/Utils/Math.h>
+#include<directxpackedvector.h>
 
 #include<Gear/Core/DX/Resource/Resource.h>
 #include<Gear/Core/DX/Resource/Buffer.h>
@@ -19,6 +21,12 @@
 #include<Gear/Core/Resource/VertexBuffer.h>
 #include<Gear/Core/Resource/IndexBuffer.h>
 #include<Gear/Core/Resource/SwapTexture.h>
+
+enum class RandomDataType
+{
+	NOISE,
+	GAUSS
+};
 
 //a tool for creating both low level resource and high level resource
 //some method is commandList dependent so you need a ResourceManager instance
@@ -42,6 +50,10 @@ public:
 	//texture's stateTracking is set to true
 	Texture* createTextureFromFile(const std::string filePath, const D3D12_RESOURCE_FLAGS resFlags, bool* const isTextureCube);
 
+	//texture's stateTracking is set to true
+	//generate 4 channel texture
+	Texture* createTextureFromRandomData(const UINT width, const UINT height, const RandomDataType type, const D3D12_RESOURCE_FLAGS resFlags);
+
 	ConstantBuffer* createConstantBuffer(const UINT size, const bool cpuWritable, const void* const data, const bool persistent);
 
 	static ConstantBuffer* createConstantBuffer(const UINT size, const bool persistent);
@@ -64,6 +76,9 @@ public:
 
 	//load jpg jpeg png hdr dds(auto detect texturecube) textures
 	TextureRenderTarget* createTextureRenderTarget(const std::string filePath, const bool persistent,
+		const DXGI_FORMAT srvFormat = DXGI_FORMAT_UNKNOWN, const DXGI_FORMAT uavFormat = DXGI_FORMAT_UNKNOWN, const DXGI_FORMAT rtvFormat = DXGI_FORMAT_UNKNOWN);
+
+	TextureRenderTarget* createTextureRenderTargetFromRandomData(const UINT width, const UINT height, const RandomDataType type, const bool persistent,
 		const DXGI_FORMAT srvFormat = DXGI_FORMAT_UNKNOWN, const DXGI_FORMAT uavFormat = DXGI_FORMAT_UNKNOWN, const DXGI_FORMAT rtvFormat = DXGI_FORMAT_UNKNOWN);
 
 	static TextureRenderTarget* createTextureRenderTarget(const UINT width, const UINT height, const DXGI_FORMAT resFormat, const UINT arraySize, const UINT mipLevels, const bool isTextureCube, const bool persistent,
