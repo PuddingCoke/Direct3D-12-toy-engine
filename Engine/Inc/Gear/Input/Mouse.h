@@ -29,18 +29,30 @@ public:
 
 	static const bool& getRightDown();
 
-	static const bool& getMoved();
+	static const bool& onMove();
 
+	static const bool& onLeftDown();
+
+	static const bool& onRightDown();
+
+	static const bool& onScroll();
+
+	//do not record command here
 	static int addMoveEvent(std::function<void(void)> func);
 
+	//do not record command here
 	static int addLeftDownEvent(std::function<void(void)> func);
 
+	//do not record command here
 	static int addRightDownEvent(std::function<void(void)> func);
 
+	//do not record command here
 	static int addLeftUpEvent(std::function<void(void)> func);
 
+	//do not record command here
 	static int addRightUpEvent(std::function<void(void)> func);
 
+	//do not record command here
 	static int addScrollEvent(std::function<void(void)> func);
 
 	static void removeMoveEvent(const int& id);
@@ -75,7 +87,13 @@ private:
 
 	static bool rightDown;
 
-	static bool moved;
+	static bool onMoved;
+
+	static bool onLeftDowned;
+
+	static bool onRightDowned;
+
+	static bool onScrolled;
 
 	static Event moveEvent;
 

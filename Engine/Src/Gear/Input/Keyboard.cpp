@@ -321,9 +321,121 @@ std::unordered_map<Keyboard::Key, bool> Keyboard::keyDownMap =
 	{Menu, false}
 };
 
+std::unordered_map<Keyboard::Key, bool> Keyboard::onKeyDownMap =
+{
+	{Space, false},
+	{Apostrophe, false},
+	{Comma, false},
+	{Minus, false},
+	{Period, false},
+	{Slash, false},
+	{Num0, false},
+	{Num1, false},
+	{Num2, false},
+	{Num3, false},
+	{Num4, false},
+	{Num5, false},
+	{Num6, false},
+	{Num7, false},
+	{Num8, false},
+	{Num9, false},
+	{Semicolon, false},
+	{Equal, false},
+	{A, false},
+	{B, false},
+	{C, false},
+	{D, false},
+	{E, false},
+	{F, false},
+	{G, false},
+	{H, false},
+	{I, false},
+	{J, false},
+	{K, false},
+	{L, false},
+	{M, false},
+	{N, false},
+	{O, false},
+	{P, false},
+	{Q, false},
+	{R, false},
+	{S, false},
+	{T, false},
+	{U, false},
+	{V, false},
+	{W, false},
+	{X, false},
+	{Y, false},
+	{Z, false},
+	{Left_Bracket, false},
+	{Backslash, false},
+	{Right_Bracket, false},
+	{Grave_Accent, false},
+	{Escape, false},
+	{Enter, false},
+	{Tab, false},
+	{Backspace, false},
+	{Insert, false},
+	{Delete, false},
+	{Right, false},
+	{Left, false},
+	{Down, false},
+	{Up, false},
+	{Page_Up, false},
+	{PAGE_Down, false},
+	{Home, false},
+	{End, false},
+	{Caps_Lock, false},
+	{Scroll_Lock, false},
+	{Num_Lock, false},
+	{Print_Screen, false},
+	{Pause, false},
+	{F1, false},
+	{F2, false},
+	{F3, false},
+	{F4, false},
+	{F5, false},
+	{F6, false},
+	{F7, false},
+	{F8, false},
+	{F9, false},
+	{F10, false},
+	{F11, false},
+	{F12, false},
+	{Numpad0, false},
+	{Numpad1, false},
+	{Numpad2, false},
+	{Numpad3, false},
+	{Numpad4, false},
+	{Numpad5, false},
+	{Numpad6, false},
+	{Numpad7, false},
+	{Numpad8, false},
+	{Numpad9, false},
+	{Numpad_Decimal, false},
+	{Numpad_Divide, false},
+	{Numpad_Multiply, false},
+	{Numpad_Subtract, false},
+	{Numpad_Add, false},
+	{Numpad_Enter, false},
+	{Numpad_Equal, false},
+	{Left_Shift, false},
+	{Left_Control, false},
+	{Left_Alt, false},
+	{Right_Shift, false},
+	{Right_Control, false},
+	{Right_Alt, false},
+	{Menu, false}
+};
+
 bool Keyboard::getKeyDown(const Key& key)
 {
 	return keyDownMap[key];
+}
+
+bool Keyboard::onKeyDown(const Key& key)
+{
+	return onKeyDownMap[key];
 }
 
 int Keyboard::addKeyDownEvent(const Key& key, std::function<void(void)> func)
@@ -344,4 +456,12 @@ void Keyboard::removeKeyDownEvent(const Key& key, const int& id)
 void Keyboard::removeKeyUpEvent(const Key& key, const int& id)
 {
 	keyUpEvents[key] -= id;
+}
+
+void Keyboard::resetOnKeyDownMap()
+{
+	for (std::pair<const Key,bool>& pair: onKeyDownMap)
+	{
+		pair.second = false;
+	}
 }

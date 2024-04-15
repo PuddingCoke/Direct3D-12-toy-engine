@@ -242,7 +242,7 @@ public:
 		context->setGlobalConstantBuffer(simulationParamBuffer);
 		context->setTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-		if (Mouse::getMoved() && Mouse::getLeftDown())
+		if (Mouse::onMove() && Mouse::getLeftDown())
 		{
 			context->setViewport(velocityTex->width, velocityTex->height);
 			context->setScissorRect(0, 0, velocityTex->width, velocityTex->height);
