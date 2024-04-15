@@ -4,6 +4,7 @@
 #define _RESOURCEMANAGER_H_
 
 #include<Gear/Core/GraphicsContext.h>
+#include<Gear/Core/PipelineState.h>
 
 #include<Gear/Core/DX/Resource/Resource.h>
 #include<Gear/Core/DX/Resource/Buffer.h>
@@ -67,6 +68,9 @@ public:
 
 	static TextureRenderTarget* createTextureRenderTarget(const UINT width, const UINT height, const DXGI_FORMAT resFormat, const UINT arraySize, const UINT mipLevels, const bool isTextureCube, const bool persistent,
 		const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat);
+
+	TextureRenderTarget* createTextureCubeFromEquirectangularMap(const std::string filePath, const UINT texturecubeResolution, const bool persistent,
+		const DXGI_FORMAT srvFormat = DXGI_FORMAT_UNKNOWN, const DXGI_FORMAT uavFormat = DXGI_FORMAT_UNKNOWN, const DXGI_FORMAT rtvFormat = DXGI_FORMAT_UNKNOWN);
 
 private:
 

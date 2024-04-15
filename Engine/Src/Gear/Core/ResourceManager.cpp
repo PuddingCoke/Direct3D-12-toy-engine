@@ -389,3 +389,159 @@ TextureRenderTarget* ResourceManager::createTextureRenderTarget(const UINT width
 
 	return new TextureRenderTarget(texture, isTextureCube, persistent, srvFormat, uavFormat, rtvFormat);
 }
+
+TextureRenderTarget* ResourceManager::createTextureCubeFromEquirectangularMap(const std::string filePath, const UINT texturecubeResolution, const bool persistent, const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat)
+{
+	TextureRenderTarget* const equirectangularMap = createTextureRenderTarget(filePath, false);
+
+	equirectangularMap->copyDescriptors();
+
+	release(equirectangularMap);
+
+	TextureRenderTarget* const cubemap = createTextureRenderTarget(texturecubeResolution, texturecubeResolution, equirectangularMap->getTexture()->getFormat(), 6, 1, true, false,
+		equirectangularMap->getTexture()->getFormat(), DXGI_FORMAT_UNKNOWN, equirectangularMap->getTexture()->getFormat());
+
+	release(cubemap);
+
+	struct Matrices
+	{
+		DirectX::XMMATRIX matrices[6];
+		DirectX::XMFLOAT4 padding[8];
+	} matrices{};
+
+	{
+		const DirectX::XMVECTOR focusPoints[6] =
+		{
+			{1.0f,  0.0f,  0.0f},
+			{-1.0f,  0.0f,  0.0f},
+			{0.0f,  1.0f,  0.0f},
+			{0.0f, -1.0f,  0.0f},
+			{0.0f,  0.0f,  1.0f},
+			{0.0f,  0.0f, -1.0f}
+		};
+		const DirectX::XMVECTOR upVectors[6] =
+		{
+			{0.0f, 1.0f,  0.0f},
+			{0.0f, 1.0f,  0.0f},
+			{0.0f,  0.0f,  -1.0f},
+			{0.0f,  0.0f, 1.0f},
+			{0.0f, 1.0f,  0.0f},
+			{0.0f, 1.0f,  0.0f}
+		};
+
+		const DirectX::XMMATRIX projMatrix = DirectX::XMMatrixPerspectiveFovLH(Math::pi / 2.f, 1.f, 0.1f, 10.f);
+
+		for (UINT i = 0; i < 6; i++)
+		{
+			const DirectX::XMMATRIX viewMatrix = DirectX::XMMatrixLookAtLH({ 0.f,0.f,0.f }, focusPoints[i], upVectors[i]);
+			const DirectX::XMMATRIX viewProj = DirectX::XMMatrixTranspose(viewMatrix * projMatrix);
+
+			matrices.matrices[i] = viewProj;
+		}
+	}
+
+	ConstantBuffer* constantBuffer = createConstantBuffer(sizeof(Matrices), false, &matrices, false);
+
+	release(constantBuffer);
+
+	ID3D12PipelineState* pipelineState = nullptr;
+
+	switch (equirectangularMap->getTexture()->getFormat())
+	{
+	default:
+		throw "";
+		break;
+	case DXGI_FORMAT_R8G8B8A8_UNORM:
+		pipelineState = PipelineState::get()->equirectangularR8State.Get();
+		break;
+	case DXGI_FORMAT_R16G16B16A16_UNORM:
+		pipelineState = PipelineState::get()->equirectangularR16State.Get();
+		break;
+	}
+
+	context->setPipelineState(pipelineState);
+	context->setViewport(texturecubeResolution, texturecubeResolution);
+	context->setScissorRect(0, 0, texturecubeResolution, texturecubeResolution);
+	context->setTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	context->setRenderTargets({ cubemap->getRTVMipHandle(0) }, {});
+	context->setVSConstantBuffer(constantBuffer);
+	context->setPSConstants({ equirectangularMap->getAllSRVIndex() }, 0);
+	context->transitionResources();
+
+	context->draw(36, 6, 0, 0);
+
+	const bool hasRTV = (rtvFormat != DXGI_FORMAT_UNKNOWN);
+
+	const bool hasUAV = (uavFormat != DXGI_FORMAT_UNKNOWN);
+
+	bool stateTracking = true;
+
+	D3D12_RESOURCE_FLAGS resFlags = D3D12_RESOURCE_FLAG_NONE;
+
+	if ((!hasRTV) && (!hasUAV))
+	{
+		stateTracking = false;
+	}
+	else
+	{
+		if (hasRTV)
+		{
+			resFlags |= D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
+		}
+
+		if (hasUAV)
+		{
+			resFlags |= D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
+		}
+	}
+
+	Texture* dstTexture = new Texture(texturecubeResolution, texturecubeResolution, equirectangularMap->getTexture()->getFormat(), 6, 1, true, resFlags);
+
+	Texture* srcTexture = cubemap->getTexture();
+
+	commandList->pushResourceTrackList(dstTexture);
+
+	dstTexture->setAllState(D3D12_RESOURCE_STATE_COPY_DEST);
+
+	commandList->pushResourceTrackList(srcTexture);
+
+	srcTexture->setAllState(D3D12_RESOURCE_STATE_COPY_SOURCE);
+
+	commandList->transitionResources();
+
+	for (UINT i = 0; i < 6; i++)
+	{
+		D3D12_TEXTURE_COPY_LOCATION dstLocation = {};
+		dstLocation.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
+		dstLocation.pResource = dstTexture->getResource();
+		dstLocation.SubresourceIndex = D3D12CalcSubresource(0, i, 0, dstTexture->getMipLevels(), dstTexture->getArraySize());
+
+		D3D12_TEXTURE_COPY_LOCATION srcLocation = {};
+		srcLocation.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
+		srcLocation.pResource = srcTexture->getResource();
+		srcLocation.SubresourceIndex = D3D12CalcSubresource(0, i, 0, srcTexture->getMipLevels(), srcTexture->getArraySize());
+
+		commandList->get()->CopyTextureRegion(&dstLocation, 0, 0, 0, &srcLocation, nullptr);
+	}
+
+	if (!stateTracking)
+	{
+		commandList->pushResourceTrackList(dstTexture);
+
+		dstTexture->setAllState(D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
+
+		commandList->transitionResources();
+
+		dstTexture->setStateTracking(false);
+	}
+
+	if (srvFormat == DXGI_FORMAT_UNKNOWN)
+	{
+		return new TextureRenderTarget(dstTexture, true, persistent, dstTexture->getFormat(), DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN);
+	}
+	else
+	{
+		return new TextureRenderTarget(dstTexture, true, persistent, srvFormat, uavFormat, rtvFormat);
+	}
+}
