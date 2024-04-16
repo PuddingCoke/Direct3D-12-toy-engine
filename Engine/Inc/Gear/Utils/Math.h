@@ -5,6 +5,7 @@
 
 #include<cmath>
 #include<DirectXMath.h>
+#include<DirectXPackedVector.h>
 
 namespace Math
 {

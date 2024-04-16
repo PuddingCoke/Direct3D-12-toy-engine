@@ -6,7 +6,6 @@
 #include<Gear/Core/GraphicsContext.h>
 #include<Gear/Core/PipelineState.h>
 #include<Gear/Utils/Math.h>
-#include<directxpackedvector.h>
 
 #include<Gear/Core/DX/Resource/Resource.h>
 #include<Gear/Core/DX/Resource/Buffer.h>
@@ -44,15 +43,19 @@ public:
 
 	void cleanTransientResources();
 
-	//buffer's stateTracking is set to true
-	Buffer* createBufferFromData(const void* const data, const UINT size, const D3D12_RESOURCE_FLAGS resFlags);
+	//following methods create low level resources
+	//stateTracking is true
 
-	//texture's stateTracking is set to true
-	Texture* createTextureFromFile(const std::string filePath, const D3D12_RESOURCE_FLAGS resFlags, bool* const isTextureCube);
+	//create buffer from data
+	Buffer* createBuffer(const void* const data, const UINT size, const D3D12_RESOURCE_FLAGS resFlags);
 
-	//texture's stateTracking is set to true
-	//generate 4 channel texture
-	Texture* createTextureFromRandomData(const UINT width, const UINT height, const RandomDataType type, const D3D12_RESOURCE_FLAGS resFlags);
+	//create texture from file
+	Texture* createTexture(const std::string filePath, const D3D12_RESOURCE_FLAGS resFlags, bool* const isTextureCube);
+
+	//create texture from random data
+	Texture* createTexture(const UINT width, const UINT height, const RandomDataType type, const D3D12_RESOURCE_FLAGS resFlags);
+
+	//following methods create high level resources
 
 	ConstantBuffer* createConstantBuffer(const UINT size, const bool cpuWritable, const void* const data, const bool persistent);
 
@@ -78,13 +81,20 @@ public:
 	TextureRenderTarget* createTextureRenderTarget(const std::string filePath, const bool persistent,
 		const DXGI_FORMAT srvFormat = DXGI_FORMAT_UNKNOWN, const DXGI_FORMAT uavFormat = DXGI_FORMAT_UNKNOWN, const DXGI_FORMAT rtvFormat = DXGI_FORMAT_UNKNOWN);
 
-	TextureRenderTarget* createTextureRenderTargetFromRandomData(const UINT width, const UINT height, const RandomDataType type, const bool persistent,
+	//create texture render target from random data
+	TextureRenderTarget* createTextureRenderTarget(const UINT width, const UINT height, const RandomDataType type, const bool persistent,
 		const DXGI_FORMAT srvFormat = DXGI_FORMAT_UNKNOWN, const DXGI_FORMAT uavFormat = DXGI_FORMAT_UNKNOWN, const DXGI_FORMAT rtvFormat = DXGI_FORMAT_UNKNOWN);
 
+	//create texture render target from custom parameters
 	static TextureRenderTarget* createTextureRenderTarget(const UINT width, const UINT height, const DXGI_FORMAT resFormat, const UINT arraySize, const UINT mipLevels, const bool isTextureCube, const bool persistent,
 		const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat);
 
-	TextureRenderTarget* createTextureCubeFromEquirectangularMap(const std::string filePath, const UINT texturecubeResolution, const bool persistent,
+	//create texture cube from equirectangular map
+	TextureRenderTarget* createTextureCube(const std::string filePath, const UINT texturecubeResolution, const bool persistent,
+		const DXGI_FORMAT srvFormat = DXGI_FORMAT_UNKNOWN, const DXGI_FORMAT uavFormat = DXGI_FORMAT_UNKNOWN, const DXGI_FORMAT rtvFormat = DXGI_FORMAT_UNKNOWN);
+
+	//create texture cube from 6 seperate textures
+	TextureRenderTarget* createTextureCube(const std::initializer_list<std::string> texturesPath,const bool persistent,
 		const DXGI_FORMAT srvFormat = DXGI_FORMAT_UNKNOWN, const DXGI_FORMAT uavFormat = DXGI_FORMAT_UNKNOWN, const DXGI_FORMAT rtvFormat = DXGI_FORMAT_UNKNOWN);
 
 private:

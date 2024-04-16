@@ -13,9 +13,20 @@ public:
 	{
 		begin();
 
-		envCube = resManager->createTextureCubeFromEquirectangularMap("ColdSunsetEquirect.png", 1024, true);
+		envCube = resManager->createTextureCube("ColdSunsetEquirect.png", 1024, true);
 
-		randomNoise = resManager->createTextureRenderTargetFromRandomData(1920, 1080, RandomDataType::GAUSS, true);
+		nightENVCube = resManager->createTextureCube(
+			{
+			"SkyEarlyDusk_Right.png",
+			"SkyEarlyDusk_Left.png",
+			"SkyEarlyDusk_Top.png",
+			"SkyEarlyDusk_Bottom.png",
+			"SkyEarlyDusk_Front.png",
+			"SkyEarlyDusk_Back.png"
+			},
+			true);
+
+		randomNoise = resManager->createTextureRenderTarget(1920, 1080, RandomDataType::GAUSS, true);
 
 		end();
 
@@ -24,7 +35,7 @@ public:
 		vertexShader = new Shader(Utils::getRootFolder() + "VertexShader.cso");
 
 		pixelShader = new Shader(Utils::getRootFolder() + "PixelShader.cso");
-		
+
 		{
 			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = {};
 			desc.InputLayout = {};
@@ -50,6 +61,7 @@ public:
 		delete vertexShader;
 		delete pixelShader;
 		delete envCube;
+		delete nightENVCube;
 		delete randomNoise;
 	}
 
@@ -75,6 +87,8 @@ private:
 	ComPtr<ID3D12PipelineState> pipelineState;
 
 	TextureRenderTarget* envCube;
+
+	TextureRenderTarget* nightENVCube;
 
 	TextureRenderTarget* randomNoise;
 
