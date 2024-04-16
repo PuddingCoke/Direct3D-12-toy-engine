@@ -1,7 +1,5 @@
 #include<Gear/Core/ResourceManager.h>
 
-#include<DirectXPackedVector.h>
-
 ResourceManager::ResourceManager(GraphicsContext* const context) :
 	context(context), commandList(context->getCommandList())
 {
@@ -54,7 +52,7 @@ void ResourceManager::cleanTransientResources()
 	engineResources[Graphics::getFrameIndex()].clear();
 }
 
-Buffer* ResourceManager::createBufferFromData(const void* const data, const UINT size, const D3D12_RESOURCE_FLAGS resFlags)
+Buffer* ResourceManager::createBuffer(const void* const data, const UINT size, const D3D12_RESOURCE_FLAGS resFlags)
 {
 	Buffer* buffer = new Buffer(size, true, resFlags);
 
@@ -69,7 +67,7 @@ Buffer* ResourceManager::createBufferFromData(const void* const data, const UINT
 	return buffer;
 }
 
-Texture* ResourceManager::createTextureFromFile(const std::string filePath, const D3D12_RESOURCE_FLAGS resFlags, bool* const isTextureCube)
+Texture* ResourceManager::createTexture(const std::string filePath, const D3D12_RESOURCE_FLAGS resFlags, bool* const isTextureCube)
 {
 	Texture* texture = nullptr;
 
@@ -183,7 +181,7 @@ Texture* ResourceManager::createTextureFromFile(const std::string filePath, cons
 	return texture;
 }
 
-Texture* ResourceManager::createTextureFromRandomData(const UINT width, const UINT height, const RandomDataType type, const D3D12_RESOURCE_FLAGS resFlags)
+Texture* ResourceManager::createTexture(const UINT width, const UINT height, const RandomDataType type, const D3D12_RESOURCE_FLAGS resFlags)
 {
 	Texture* texture = nullptr;
 
@@ -267,7 +265,7 @@ ConstantBuffer* ResourceManager::createConstantBuffer(const UINT size, const boo
 
 	if (!cpuWritable)
 	{
-		Buffer* buffer = createBufferFromData(data, size, D3D12_RESOURCE_FLAG_NONE);
+		Buffer* buffer = createBuffer(data, size, D3D12_RESOURCE_FLAG_NONE);
 
 		commandList->pushResourceTrackList(buffer);
 
@@ -299,7 +297,7 @@ ConstantBuffer* ResourceManager::createConstantBuffer(const UINT size, const boo
 
 IndexBuffer* ResourceManager::createIndexBuffer(const DXGI_FORMAT format, const UINT size, const bool cpuWritable, const void* const data)
 {
-	Buffer* buffer = createBufferFromData(data, size, D3D12_RESOURCE_FLAG_NONE);
+	Buffer* buffer = createBuffer(data, size, D3D12_RESOURCE_FLAG_NONE);
 
 	if (!cpuWritable)
 	{
@@ -324,7 +322,7 @@ IndexBuffer* ResourceManager::createIndexBuffer(const DXGI_FORMAT format, const 
 
 VertexBuffer* ResourceManager::createVertexBuffer(const UINT perVertexSize, const UINT size, const bool cpuWritable, const void* const data)
 {
-	Buffer* buffer = createBufferFromData(data, size, D3D12_RESOURCE_FLAG_NONE);
+	Buffer* buffer = createBuffer(data, size, D3D12_RESOURCE_FLAG_NONE);
 
 	if (!cpuWritable)
 	{
@@ -414,7 +412,7 @@ TextureRenderTarget* ResourceManager::createTextureRenderTarget(const std::strin
 
 	bool isTextureCube = false;
 
-	Texture* texture = createTextureFromFile(filePath, resFlags, &isTextureCube);
+	Texture* texture = createTexture(filePath, resFlags, &isTextureCube);
 
 	if (!stateTracking)
 	{
@@ -437,7 +435,7 @@ TextureRenderTarget* ResourceManager::createTextureRenderTarget(const std::strin
 	}
 }
 
-TextureRenderTarget* ResourceManager::createTextureRenderTargetFromRandomData(const UINT width, const UINT height, const RandomDataType type, const bool persistent, const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat)
+TextureRenderTarget* ResourceManager::createTextureRenderTarget(const UINT width, const UINT height, const RandomDataType type, const bool persistent, const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat)
 {
 	const bool hasRTV = (rtvFormat != DXGI_FORMAT_UNKNOWN);
 
@@ -464,7 +462,7 @@ TextureRenderTarget* ResourceManager::createTextureRenderTargetFromRandomData(co
 		}
 	}
 
-	Texture* texture = createTextureFromRandomData(width, height, type, resFlags);
+	Texture* texture = createTexture(width, height, type, resFlags);
 
 	if (!stateTracking)
 	{
@@ -519,7 +517,7 @@ TextureRenderTarget* ResourceManager::createTextureRenderTarget(const UINT width
 	return new TextureRenderTarget(texture, isTextureCube, persistent, srvFormat, uavFormat, rtvFormat);
 }
 
-TextureRenderTarget* ResourceManager::createTextureCubeFromEquirectangularMap(const std::string filePath, const UINT texturecubeResolution, const bool persistent, const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat)
+TextureRenderTarget* ResourceManager::createTextureCube(const std::string filePath, const UINT texturecubeResolution, const bool persistent, const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat)
 {
 	TextureRenderTarget* const equirectangularMap = createTextureRenderTarget(filePath, false);
 
@@ -651,6 +649,78 @@ TextureRenderTarget* ResourceManager::createTextureCubeFromEquirectangularMap(co
 		const UINT srcSubresource = D3D12CalcSubresource(0, i, 0, srcTexture->getMipLevels(), srcTexture->getArraySize());
 
 		commandList->copyTextureRegion(dstTexture, dstSubresource, srcTexture, srcSubresource);
+	}
+
+	if (!stateTracking)
+	{
+		commandList->pushResourceTrackList(dstTexture);
+
+		dstTexture->setAllState(D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
+
+		commandList->transitionResources();
+
+		dstTexture->setStateTracking(false);
+	}
+
+	if (srvFormat == DXGI_FORMAT_UNKNOWN)
+	{
+		return new TextureRenderTarget(dstTexture, true, persistent, dstTexture->getFormat(), DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN);
+	}
+	else
+	{
+		return new TextureRenderTarget(dstTexture, true, persistent, srvFormat, uavFormat, rtvFormat);
+	}
+}
+
+TextureRenderTarget* ResourceManager::createTextureCube(const std::initializer_list<std::string> texturesPath, const bool persistent, const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat)
+{
+	Texture* srcTextures[6] = {};
+
+	{
+		UINT index = 0;
+
+		for (const std::string& filePath : texturesPath)
+		{
+			srcTextures[index] = createTexture(filePath, D3D12_RESOURCE_FLAG_NONE, nullptr);
+			release(srcTextures[index]);
+			index++;
+		}
+	}
+
+	const bool hasRTV = (rtvFormat != DXGI_FORMAT_UNKNOWN);
+
+	const bool hasUAV = (uavFormat != DXGI_FORMAT_UNKNOWN);
+
+	bool stateTracking = true;
+
+	D3D12_RESOURCE_FLAGS resFlags = D3D12_RESOURCE_FLAG_NONE;
+
+	if ((!hasRTV) && (!hasUAV))
+	{
+		stateTracking = false;
+	}
+	else
+	{
+		if (hasRTV)
+		{
+			resFlags |= D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
+		}
+
+		if (hasUAV)
+		{
+			resFlags |= D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
+		}
+	}
+
+	Texture* dstTexture = new Texture(srcTextures[0]->getWidth(), srcTextures[0]->getHeight(), srcTextures[0]->getFormat(), 6, 1, true, resFlags);
+
+	for (UINT i = 0; i < 6; i++)
+	{
+		const UINT dstSubresource = D3D12CalcSubresource(0, i, 0, dstTexture->getMipLevels(), dstTexture->getArraySize());
+
+		const UINT srcSubresource = D3D12CalcSubresource(0, 0, 0, srcTextures[i]->getMipLevels(), srcTextures[i]->getArraySize());
+
+		commandList->copyTextureRegion(dstTexture, dstSubresource, srcTextures[i], srcSubresource);
 	}
 
 	if (!stateTracking)
