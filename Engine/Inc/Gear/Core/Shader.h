@@ -9,7 +9,7 @@
 
 #include<Gear/CompiledShaders/FullScreenVS.h>
 #include<Gear/CompiledShaders/FullScreenPS.h>
-
+#include<Gear/CompiledShaders/TextureCubeVS.h>
 
 class Shader
 {
@@ -23,8 +23,9 @@ public:
 
 	static Shader* fullScreenVS;
 
-	//ctx->setGraphicsConstant({ShaderResourceDesc},0)
 	static Shader* fullScreenPS;
+
+	static Shader* textureCubeVS;
 
 private:
 

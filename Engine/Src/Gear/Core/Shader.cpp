@@ -4,6 +4,8 @@ Shader* Shader::fullScreenVS = nullptr;
 
 Shader* Shader::fullScreenPS = nullptr;
 
+Shader* Shader::textureCubeVS = nullptr;
+
 Shader::Shader(const BYTE* const bytes, const size_t byteSize)
 {
 	shaderByteCode.pShaderBytecode = bytes;
@@ -47,6 +49,8 @@ void Shader::createGlobalShaders()
 	fullScreenVS = new Shader(g_FullScreenVSBytes, sizeof(g_FullScreenVSBytes));
 
 	fullScreenPS = new Shader(g_FullScreenPSBytes, sizeof(g_FullScreenPSBytes));
+
+	textureCubeVS = new Shader(g_TextureCubeVSBytes, sizeof(g_TextureCubeVSBytes));
 }
 
 void Shader::releaseGlobalShaders()
@@ -59,5 +63,10 @@ void Shader::releaseGlobalShaders()
 	if (fullScreenPS)
 	{
 		delete fullScreenPS;
+	}
+
+	if (textureCubeVS)
+	{
+		delete textureCubeVS;
 	}
 }

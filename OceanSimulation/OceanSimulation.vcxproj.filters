@@ -28,7 +28,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="PixelShader.hlsl" />
-    <FxCompile Include="VertexShader.hlsl" />
+    <FxCompile Include="TextureCubePS.hlsl" />
   </ItemGroup>
 </Project>
