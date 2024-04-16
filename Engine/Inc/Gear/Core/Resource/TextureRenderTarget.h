@@ -35,6 +35,10 @@ public:
 
 	void copyDescriptors() override;
 
+	const bool hasRTV;
+
+	const bool hasUAV;
+
 private:
 
 	void createViews(const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat, const bool isTextureCube, const bool persistent);

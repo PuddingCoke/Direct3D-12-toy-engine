@@ -373,13 +373,15 @@ RenderEngine::RenderEngine(const HWND hwnd, const bool useSwapChainBuffer) :
 
 			D3D12_MESSAGE_SEVERITY severity = D3D12_MESSAGE_SEVERITY_INFO;
 
-			D3D12_MESSAGE_ID id = D3D12_MESSAGE_ID_CLEARRENDERTARGETVIEW_MISMATCHINGCLEARVALUE;
+			D3D12_MESSAGE_ID id[] = { 
+				D3D12_MESSAGE_ID_CLEARRENDERTARGETVIEW_MISMATCHINGCLEARVALUE,
+			};
 
 			D3D12_INFO_QUEUE_FILTER filter = {};
 			filter.DenyList.NumSeverities = 1;
 			filter.DenyList.pSeverityList = &severity;
-			filter.DenyList.NumIDs = 1;
-			filter.DenyList.pIDList = &id;
+			filter.DenyList.NumIDs = _countof(id);
+			filter.DenyList.pIDList = id;
 
 			infoQueue->PushStorageFilter(&filter);
 		}

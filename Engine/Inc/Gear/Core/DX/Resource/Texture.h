@@ -30,7 +30,7 @@ class Texture :public Resource
 {
 public:
 
-	Texture(const UINT width, const UINT height, const DXGI_FORMAT format, const UINT arraySize, const UINT mipLevels, const bool stateTracking, const D3D12_RESOURCE_FLAGS resFlags);
+	Texture(const UINT width, const UINT height, const DXGI_FORMAT format, const UINT arraySize, const UINT mipLevels, const bool stateTracking, const D3D12_RESOURCE_FLAGS resFlags, D3D12_CLEAR_VALUE* const clearValue = nullptr);
 
 	Texture(const ComPtr<ID3D12Resource>& texture, const bool stateTracking, const UINT initialState);
 
