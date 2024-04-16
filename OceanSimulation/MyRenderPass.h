@@ -1,98 +1,81 @@
 #pragma once
 
 #include<Gear/Core/RenderPass.h>
-#include<Gear/Core/Shader.h>
 
-#include<Gear/Core/Resource/TextureRenderTarget.h>
+#include<Gear/Core/Shader.h>
 
 class MyRenderPass :public RenderPass
 {
 public:
 
-	MyRenderPass()
+	MyRenderPass() :
+		textureCubePS(new Shader(Utils::getRootFolder() + "TextureCubePS.cso"))
 	{
 		begin();
 
 		envCube = resManager->createTextureCube("ColdSunsetEquirect.png", 1024, true);
 
-		nightENVCube = resManager->createTextureCube(
-			{
-			"SkyEarlyDusk_Right.png",
-			"SkyEarlyDusk_Left.png",
-			"SkyEarlyDusk_Top.png",
-			"SkyEarlyDusk_Bottom.png",
-			"SkyEarlyDusk_Front.png",
-			"SkyEarlyDusk_Back.png"
-			},
-			true);
-
-		randomNoise = resManager->createTextureRenderTarget(1920, 1080, RandomDataType::GAUSS, true);
+		randomGauss = resManager->createTextureRenderTarget(1024, 1024, RandomDataType::GAUSS, true);
 
 		end();
 
 		RenderEngine::get()->submitRenderPass(this);
 
-		vertexShader = new Shader(Utils::getRootFolder() + "VertexShader.cso");
-
-		pixelShader = new Shader(Utils::getRootFolder() + "PixelShader.cso");
-
 		{
 			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = {};
 			desc.InputLayout = {};
 			desc.pRootSignature = GlobalRootSignature::getGraphicsRootSignature()->get();
-			desc.VS = vertexShader->getByteCode();
-			desc.PS = pixelShader->getByteCode();
-			desc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
 			desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
-			desc.DepthStencilState.DepthEnable = FALSE;
-			desc.DepthStencilState.StencilEnable = FALSE;
+			desc.RasterizerState = States::rasterCullNone;
+			desc.DepthStencilState.DepthEnable = false;
+			desc.DepthStencilState.StencilEnable = false;
 			desc.SampleMask = UINT_MAX;
 			desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 			desc.NumRenderTargets = 1;
 			desc.RTVFormats[0] = Graphics::BackBufferFormat;
 			desc.SampleDesc.Count = 1;
+			desc.VS = Shader::textureCubeVS->getByteCode();
+			desc.PS = textureCubePS->getByteCode();
 
-			GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&pipelineState));
+			GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&skyboxState));
 		}
 	}
 
 	~MyRenderPass()
 	{
-		delete vertexShader;
-		delete pixelShader;
+		delete textureCubePS;
+
 		delete envCube;
-		delete nightENVCube;
-		delete randomNoise;
+
+		delete randomGauss;
 	}
 
 protected:
 
 	void recordCommand() override
 	{
-		context->setDefRenderTarget();
-
-		context->setPipelineState(pipelineState.Get());
-
-		context->setViewport(1920u, 1080u);
-
-		context->setScissorRect(0.f, 0.f, 1920.f, 1080.f);
-
+		context->setPipelineState(skyboxState.Get());
+		context->setViewport(Graphics::getWidth(), Graphics::getHeight());
+		context->setScissorRect(0, 0, Graphics::getWidth(), Graphics::getHeight());
 		context->setTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-		context->draw(3, 1, 0, 0);
+		context->setDefRenderTarget();
+
+		context->setPSConstants({ envCube->getAllSRVIndex() }, 0);
+
+		context->transitionResources();
+
+		context->draw(36, 1, 0, 0);
 	}
 
 private:
 
-	ComPtr<ID3D12PipelineState> pipelineState;
+	Shader* textureCubePS;
+
+	ComPtr<ID3D12PipelineState> skyboxState;
 
 	TextureRenderTarget* envCube;
 
-	TextureRenderTarget* nightENVCube;
+	TextureRenderTarget* randomGauss;
 
-	TextureRenderTarget* randomNoise;
-
-	Shader* vertexShader;
-
-	Shader* pixelShader;
 };

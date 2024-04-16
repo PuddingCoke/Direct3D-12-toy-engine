@@ -12,6 +12,10 @@ D3D12_RASTERIZER_DESC States::rasterCullFront = {};
 
 D3D12_RASTERIZER_DESC States::rasterCullNone = {};
 
+D3D12_DEPTH_STENCIL_DESC States::depthLessEqual = {};
+
+D3D12_DEPTH_STENCIL_DESC States::depthLess = {};
+
 void States::initialize()
 {
 	{
@@ -70,5 +74,19 @@ void States::initialize()
 		rasterCullNone.FillMode = D3D12_FILL_MODE_SOLID;
 		rasterCullNone.CullMode = D3D12_CULL_MODE_NONE;
 		rasterCullNone.DepthClipEnable = TRUE;
+	}
+
+	{
+		depthLessEqual.DepthEnable = true;
+		depthLessEqual.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+		depthLessEqual.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+		depthLessEqual.StencilEnable = false;
+	}
+
+	{
+		depthLess.DepthEnable = true;
+		depthLess.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+		depthLess.DepthFunc = D3D12_COMPARISON_FUNC_LESS;
+		depthLess.StencilEnable = false;
 	}
 }
