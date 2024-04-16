@@ -378,7 +378,33 @@ IndexConstantBuffer* ResourceManager::createIndexConstantBuffer(const UINT indic
 
 TextureDepthStencil* ResourceManager::createTextureDepthStencil(const UINT width, const UINT height, const DXGI_FORMAT resFormat, const UINT arraySize, const UINT mipLevels, const bool isTextureCube, const bool persistent)
 {
-	Texture* texture = new Texture(width, height, resFormat, arraySize, mipLevels, true, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL);
+	DXGI_FORMAT clearValueFormat = DXGI_FORMAT_UNKNOWN;
+
+	switch (resFormat)
+	{
+	case DXGI_FORMAT_R32_TYPELESS:
+		clearValueFormat = DXGI_FORMAT_D32_FLOAT;
+		break;
+	case DXGI_FORMAT_R16_TYPELESS:
+		clearValueFormat = DXGI_FORMAT_D16_UNORM;
+		break;
+	case DXGI_FORMAT_R32G8X24_TYPELESS:
+		clearValueFormat = DXGI_FORMAT_D32_FLOAT_S8X24_UINT;
+		break;
+	case DXGI_FORMAT_R24G8_TYPELESS:
+		clearValueFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+		break;
+	default:
+		throw "Unknown format";
+		break;
+	}
+
+	D3D12_CLEAR_VALUE clearValue = {};
+	clearValue.Format = clearValueFormat;
+	clearValue.DepthStencil.Depth = 1.f;
+	clearValue.DepthStencil.Stencil = 0;
+
+	Texture* texture = new Texture(width, height, resFormat, arraySize, mipLevels, true, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL, &clearValue);
 
 	return new TextureDepthStencil(texture, isTextureCube, persistent);
 }

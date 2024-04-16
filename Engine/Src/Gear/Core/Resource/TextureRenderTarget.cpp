@@ -1,12 +1,14 @@
 #include<Gear/Core/Resource/TextureRenderTarget.h>
 
 TextureRenderTarget::TextureRenderTarget(Texture* const texture, const bool isTextureCube, const bool persistent, const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat) :
-	texture(texture)
+	texture(texture), hasRTV((rtvFormat != DXGI_FORMAT_UNKNOWN)), hasUAV((uavFormat != DXGI_FORMAT_UNKNOWN))
 {
 	createViews(srvFormat, uavFormat, rtvFormat, isTextureCube, persistent);
 }
 
 TextureRenderTarget::TextureRenderTarget(const TextureRenderTarget& trt) :
+	hasRTV(trt.hasRTV),
+	hasUAV(trt.hasUAV),
 	allSRVIndex(trt.allSRVIndex),
 	srvMipIndexStart(trt.srvMipIndexStart),
 	uavMipIndexStart(trt.uavMipIndexStart),

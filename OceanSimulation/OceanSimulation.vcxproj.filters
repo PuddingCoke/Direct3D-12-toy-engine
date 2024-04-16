@@ -29,5 +29,15 @@
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="TextureCubePS.hlsl" />
+    <FxCompile Include="PhillipsSpectrum.hlsl" />
+    <FxCompile Include="ConjugatedCalcCS.hlsl" />
+    <FxCompile Include="Displacement.hlsl" />
+    <FxCompile Include="IFFT.hlsl" />
+    <FxCompile Include="PermutationCS.hlsl" />
+    <FxCompile Include="WaveMergeCS.hlsl" />
+    <FxCompile Include="OceanDShader.hlsl" />
+    <FxCompile Include="OceanHShader.hlsl" />
+    <FxCompile Include="OceanPShader.hlsl" />
+    <FxCompile Include="OceanVShader.hlsl" />
   </ItemGroup>
 </Project>
