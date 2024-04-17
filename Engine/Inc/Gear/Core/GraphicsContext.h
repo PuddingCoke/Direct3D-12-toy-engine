@@ -115,7 +115,7 @@ public:
 	//must call this method after all resource binding methods
 	void transitionResources();
 
-	void setRenderTargets(const std::initializer_list<RenderTargetDesc>& renderTargets, const std::initializer_list<DepthStencilDesc>& depthStencils);
+	void setRenderTargets(const std::initializer_list<RenderTargetDesc>& renderTargets, const DepthStencilDesc* const depthStencils = nullptr);
 
 	void setDefRenderTarget() const;
 

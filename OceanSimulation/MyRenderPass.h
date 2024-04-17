@@ -408,7 +408,9 @@ protected:
 
 		context->setVertexBuffers(0, { patchVertexBuffer->getVertexBuffer() });
 
-		context->setRenderTargets({ originTexture->getRTVMipHandle(0) }, { depthTexture->getDSVMipHandle(0) });
+		const DepthStencilDesc depthStencilDesc = depthTexture->getDSVMipHandle(0);
+
+		context->setRenderTargets({ originTexture->getRTVMipHandle(0) }, &depthStencilDesc);
 
 		context->setDSConstants({
 			Dxyz->getAllSRVIndex()

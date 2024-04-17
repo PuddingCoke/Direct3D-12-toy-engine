@@ -60,7 +60,7 @@ public:
 
 	void setComputePipelineResources(const std::initializer_list<ShaderResourceDesc>& descs);
 
-	void setRenderTargets(const std::initializer_list<RenderTargetDesc>& renderTargets, const std::initializer_list<DepthStencilDesc>& depthStencils);
+	void setRenderTargets(const std::initializer_list<RenderTargetDesc>& renderTargets, const DepthStencilDesc* const depthStencils);
 
 	void setVertexBuffers(const UINT startSlot, const std::initializer_list<VertexBufferDesc>& vertexBuffers);
 
@@ -102,6 +102,12 @@ private:
 	std::vector<PendingBufferBarrier> pendingBufferBarrier;
 
 	std::vector<PendingTextureBarrier> pendingTextureBarrier;
+
+	std::vector<D3D12_RESOURCE_BARRIER> transientUAVBarriers;
+
+	std::vector<D3D12_VERTEX_BUFFER_VIEW> transientVBViews;
+
+	std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> transientRTVHandles;
 
 };
 

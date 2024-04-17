@@ -75,7 +75,7 @@ void CommandList::transitionResources()
 
 	if (transitionBarriers.size())
 	{
-		commandList->ResourceBarrier(transitionBarriers.size(), transitionBarriers.data());
+		commandList->ResourceBarrier(static_cast<UINT>(transitionBarriers.size()), transitionBarriers.data());
 
 		transitionBarriers.clear();
 	}
@@ -158,15 +158,13 @@ void CommandList::setComputePipelineResources(const std::initializer_list<Shader
 	setPipelineResources(descs, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
 }
 
-void CommandList::setRenderTargets(const std::initializer_list<RenderTargetDesc>& renderTargets, const std::initializer_list<DepthStencilDesc>& depthStencils)
+void CommandList::setRenderTargets(const std::initializer_list<RenderTargetDesc>& renderTargets, const DepthStencilDesc* const depthStencils)
 {
-	std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> rtvHandles;
-
-	std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> dsvHandles;
+	transientRTVHandles.clear();
 
 	for (const RenderTargetDesc& desc : renderTargets)
 	{
-		rtvHandles.push_back(desc.rtvHandle);
+		transientRTVHandles.emplace_back(desc.rtvHandle);
 
 		Texture* const texture = desc.texture;
 
@@ -176,34 +174,32 @@ void CommandList::setRenderTargets(const std::initializer_list<RenderTargetDesc>
 	}
 
 	//not support read only dsv currently
-	for (const DepthStencilDesc& desc : depthStencils)
+	if (depthStencils)
 	{
-		dsvHandles.push_back(desc.dsvHandle);
-
-		Texture* const texture = desc.texture;
+		Texture* const texture = depthStencils->texture;
 
 		pushResourceTrackList(texture);
 
-		texture->setMipSliceState(desc.mipSlice, D3D12_RESOURCE_STATE_DEPTH_WRITE);
+		texture->setMipSliceState(depthStencils->mipSlice, D3D12_RESOURCE_STATE_DEPTH_WRITE);
 	}
 
-	if (dsvHandles.size() > 0)
+	if (depthStencils)
 	{
-		commandList->OMSetRenderTargets(rtvHandles.size(), rtvHandles.data(), FALSE, dsvHandles.data());
+		commandList->OMSetRenderTargets(static_cast<UINT>(transientRTVHandles.size()), transientRTVHandles.data(), FALSE, &(depthStencils->dsvHandle));
 	}
 	else
 	{
-		commandList->OMSetRenderTargets(rtvHandles.size(), rtvHandles.data(), FALSE, nullptr);
+		commandList->OMSetRenderTargets(static_cast<UINT>(transientRTVHandles.size()), transientRTVHandles.data(), FALSE, nullptr);
 	}
 }
 
 void CommandList::setVertexBuffers(const UINT startSlot, const std::initializer_list<VertexBufferDesc>& vertexBuffers)
 {
-	std::vector<D3D12_VERTEX_BUFFER_VIEW> vbvs;
+	transientVBViews.clear();
 
 	for (const VertexBufferDesc& desc : vertexBuffers)
 	{
-		vbvs.push_back(desc.vbv);
+		transientVBViews.emplace_back(desc.vbv);
 
 		Buffer* const buffer = desc.buffer;
 
@@ -212,13 +208,13 @@ void CommandList::setVertexBuffers(const UINT startSlot, const std::initializer_
 		buffer->setState(D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
 	}
 
-	commandList->IASetVertexBuffers(startSlot, vbvs.size(), vbvs.data());
+	commandList->IASetVertexBuffers(startSlot, static_cast<UINT>(transientVBViews.size()), transientVBViews.data());
 }
 
 void CommandList::setIndexBuffer(const IndexBufferDesc indexBuffer)
 {
 	Buffer* const buffer = indexBuffer.buffer;
-	
+
 	pushResourceTrackList(buffer);
 
 	buffer->setState(D3D12_RESOURCE_STATE_INDEX_BUFFER);
@@ -305,7 +301,7 @@ void CommandList::copyTextureRegion(Texture* const dstTexture, const UINT dstSub
 
 void CommandList::uavBarrier(const std::initializer_list<Resource*>& resources)
 {
-	std::vector<D3D12_RESOURCE_BARRIER> barriers;
+	transientUAVBarriers.clear();
 
 	for (const Resource* const resource : resources)
 	{
@@ -314,8 +310,8 @@ void CommandList::uavBarrier(const std::initializer_list<Resource*>& resources)
 		barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_UAV;
 		barrier.UAV.pResource = resource->getResource();
 
-		barriers.push_back(barrier);
+		transientUAVBarriers.emplace_back(barrier);
 	}
 
-	commandList->ResourceBarrier(barriers.size(), barriers.data());
+	commandList->ResourceBarrier(static_cast<UINT>(transientUAVBarriers.size()), transientUAVBarriers.data());
 }

@@ -289,7 +289,7 @@ void GraphicsContext::transitionResources()
 	commandList->transitionResources();
 }
 
-void GraphicsContext::setRenderTargets(const std::initializer_list<RenderTargetDesc>& renderTargets, const std::initializer_list<DepthStencilDesc>& depthStencils)
+void GraphicsContext::setRenderTargets(const std::initializer_list<RenderTargetDesc>& renderTargets, const DepthStencilDesc* const depthStencils)
 {
 	commandList->setRenderTargets(renderTargets, depthStencils);
 }
