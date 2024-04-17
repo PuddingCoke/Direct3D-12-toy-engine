@@ -23,6 +23,20 @@ public:
 
 	static PipelineState* get();
 
+	//configure
+	//InputLayout
+	//BlendState
+	//RasterizerState
+	//DepthStencilState
+	//PrimitiveTopologyType
+	//NumRenderTargets
+	//RTVFormats
+	//DSVFormat
+	static D3D12_GRAPHICS_PIPELINE_STATE_DESC getDefaultGraphicsDesc();
+
+	//configure CS
+	static D3D12_COMPUTE_PIPELINE_STATE_DESC getDefaultComputeDesc();
+
 private:
 
 	friend class RenderEngine;
