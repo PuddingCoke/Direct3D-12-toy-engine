@@ -60,7 +60,7 @@ public:
 			desc.InputLayout = {};
 			desc.pRootSignature = GlobalRootSignature::getGraphicsRootSignature()->get();
 			desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
-			desc.RasterizerState = States::rasterCullNone;
+			desc.RasterizerState = States::rasterCullBack;
 			desc.DepthStencilState.DepthEnable = false;
 			desc.DepthStencilState.StencilEnable = false;
 			desc.SampleMask = UINT_MAX;
@@ -133,8 +133,8 @@ public:
 			desc.InputLayout = { inputLayoutDesc,_countof(inputLayoutDesc) };
 			desc.pRootSignature = GlobalRootSignature::getGraphicsRootSignature()->get();
 			desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
-			desc.RasterizerState = States::rasterCullNone;
-			desc.DepthStencilState = States::depthLessEqual;
+			desc.RasterizerState = States::rasterCullBack;
+			desc.DepthStencilState = States::depthLess;
 			desc.SampleMask = UINT_MAX;
 			desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_PATCH;
 			desc.NumRenderTargets = 1;
@@ -410,8 +410,8 @@ protected:
 
 		context->setRenderTargets({ originTexture->getRTVMipHandle(0) }, { depthTexture->getDSVMipHandle(0) });
 
-		context->setDSConstants({ 
-			Dxyz->getAllSRVIndex() 
+		context->setDSConstants({
+			Dxyz->getAllSRVIndex()
 			}
 		, 0);
 		context->setPSConstants({
@@ -420,10 +420,10 @@ protected:
 			}
 		, 0);
 		context->transitionResources();
-		
+
 		context->clearDepthStencil(depthTexture->getDSVMipHandle(0), D3D12_CLEAR_FLAG_DEPTH, 1.f, 0);
 		context->draw(4 * tildeNum * 32 * tildeNum * 32, 1, 0, 0);
-		
+
 		TextureRenderTarget* bloomTexture = effect->process(originTexture);
 
 		context->setPipelineState(fullScreenState.Get());

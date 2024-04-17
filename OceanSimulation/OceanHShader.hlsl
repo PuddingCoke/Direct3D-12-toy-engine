@@ -1,3 +1,9 @@
+#include"Common.hlsli"
+
+#define BASETESSFACTOR 8.0
+
+#define FINALTESSFACTOR 4.0
+
 struct VS_CONTROL_POINT_OUTPUT
 {
     float3 position : POSITION;
@@ -22,12 +28,18 @@ HS_CONSTANT_DATA_OUTPUT CalcHSPatchConstants(
 {
     HS_CONSTANT_DATA_OUTPUT Output;
     
-    Output.EdgeTessFactor[0] = 16.0;
-    Output.EdgeTessFactor[1] = 16.0;
-    Output.EdgeTessFactor[2] = 16.0;
-    Output.EdgeTessFactor[3] = 16.0;
-    Output.InsideTessFactor[0] = 16.0;
-    Output.InsideTessFactor[1] = 16.0;
+    const float3 centerPos = (ip[0].position + ip[1].position + ip[2].position + ip[3].position) / 4.0;
+    
+    const float dist = distance(perframeResource.eyePos.xyz, centerPos);
+    
+    float tessFactor = lerp(BASETESSFACTOR, FINALTESSFACTOR, saturate(dist / 2048.0));
+    
+    Output.EdgeTessFactor[0] = tessFactor;
+    Output.EdgeTessFactor[1] = tessFactor;
+    Output.EdgeTessFactor[2] = tessFactor;
+    Output.EdgeTessFactor[3] = tessFactor;
+    Output.InsideTessFactor[0] = BASETESSFACTOR;
+    Output.InsideTessFactor[1] = BASETESSFACTOR;
 
     return Output;
 }

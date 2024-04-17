@@ -32,11 +32,6 @@ float4 main(PixelInput input) : SV_TARGET
     
     float3 R = normalize(reflect(-V, N));
     
-    if (R.y < 0.0)
-    {
-        R = -R;
-    }
-    
     float3 H = normalize(V + L);
     
     float3 reflectColor = skyTexture.Sample(linearWrapSampler, R).rgb;

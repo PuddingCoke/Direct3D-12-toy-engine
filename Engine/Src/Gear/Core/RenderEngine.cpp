@@ -366,26 +366,6 @@ RenderEngine::RenderEngine(const HWND hwnd, const bool useSwapChainBuffer) :
 	{
 		GraphicsDevice::instance = new GraphicsDevice(adapter.Get());
 
-		{
-			ComPtr<ID3D12InfoQueue> infoQueue;
-
-			GraphicsDevice::get()->QueryInterface(IID_PPV_ARGS(&infoQueue));
-
-			D3D12_MESSAGE_SEVERITY severity = D3D12_MESSAGE_SEVERITY_INFO;
-
-			D3D12_MESSAGE_ID id[] = { 
-				D3D12_MESSAGE_ID_CLEARRENDERTARGETVIEW_MISMATCHINGCLEARVALUE,
-			};
-
-			D3D12_INFO_QUEUE_FILTER filter = {};
-			filter.DenyList.NumSeverities = 1;
-			filter.DenyList.pSeverityList = &severity;
-			filter.DenyList.NumIDs = _countof(id);
-			filter.DenyList.pIDList = id;
-
-			infoQueue->PushStorageFilter(&filter);
-		}
-
 		D3D12_COMMAND_QUEUE_DESC queueDesc = {};
 		queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
 		queueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
