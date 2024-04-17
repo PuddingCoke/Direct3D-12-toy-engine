@@ -7,6 +7,24 @@ PipelineState* PipelineState::get()
 	return instance;
 }
 
+D3D12_GRAPHICS_PIPELINE_STATE_DESC PipelineState::getDefaultGraphicsDesc()
+{
+	D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = {};
+	desc.pRootSignature = GlobalRootSignature::getGraphicsRootSignature()->get();
+	desc.SampleMask = UINT_MAX;
+	desc.SampleDesc.Count = 1;
+
+	return desc;
+}
+
+D3D12_COMPUTE_PIPELINE_STATE_DESC PipelineState::getDefaultComputeDesc()
+{
+	D3D12_COMPUTE_PIPELINE_STATE_DESC desc = {};
+	desc.pRootSignature = GlobalRootSignature::getComputeRootSignature()->get();
+
+	return desc;
+}
+
 PipelineState::PipelineState()
 {
 	{
