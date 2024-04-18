@@ -36,7 +36,7 @@ void IndexConstantBuffer::setTransitionResources(const std::initializer_list<Sha
 		}
 	}
 
-	constantBuffer->update(indices.data(), sizeof(UINT) * indices.size());
+	constantBuffer->update(indices.data(), static_cast<UINT>(sizeof(UINT) * indices.size()));
 }
 
 IndexConstantBuffer::~IndexConstantBuffer()

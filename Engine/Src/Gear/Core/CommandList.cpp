@@ -23,7 +23,17 @@ CommandList::~CommandList()
 	}
 }
 
-void CommandList::reset() const
+void CommandList::resourceBarrier(const UINT numBarriers, const D3D12_RESOURCE_BARRIER* const pBarriers) const
+{
+	commandList->ResourceBarrier(numBarriers, pBarriers);
+}
+
+ID3D12GraphicsCommandList6* CommandList::get() const
+{
+	return commandList.Get();
+}
+
+void CommandList::open() const
 {
 	allocators[Graphics::getFrameIndex()]->get()->Reset();
 
@@ -50,11 +60,6 @@ void CommandList::setGraphicsRootSignature(RootSignature* const rootSignature) c
 void CommandList::setComputeRootSignature(RootSignature* const rootSignature) const
 {
 	commandList->SetComputeRootSignature(rootSignature->get());
-}
-
-ID3D12GraphicsCommandList6* CommandList::get() const
-{
-	return commandList.Get();
 }
 
 void CommandList::transitionResources()

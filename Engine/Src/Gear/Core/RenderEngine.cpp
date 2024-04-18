@@ -148,9 +148,9 @@ void RenderEngine::submitRenderPass(RenderPass* const pass)
 	{
 		CommandList* const transitionCMD = renderPassResult.transitionCMD;
 
-		transitionCMD->reset();
+		transitionCMD->open();
 
-		transitionCMD->get()->ResourceBarrier(barriers.size(), barriers.data());
+		transitionCMD->resourceBarrier(static_cast<UINT>(barriers.size()), barriers.data());
 
 		transitionCMD->close();
 
@@ -170,7 +170,7 @@ void RenderEngine::processCommandLists()
 {
 	if (commandLists.size())
 	{
-		commandQueue->ExecuteCommandLists(commandLists.size(), commandLists.data());
+		commandQueue->ExecuteCommandLists(static_cast<UINT>(commandLists.size()), commandLists.data());
 
 		commandLists.clear();
 	}
@@ -209,7 +209,7 @@ void RenderEngine::waitForNextFrame()
 
 void RenderEngine::begin()
 {
-	beginCommandlist->reset();
+	beginCommandlist->open();
 
 	commandLists.push_back(beginCommandlist->get());
 
@@ -218,7 +218,7 @@ void RenderEngine::begin()
 
 		perFrameResource.matrices = Camera::matrices;
 
-		perFrameResource.screenSize = DirectX::XMFLOAT2(Graphics::getWidth(), Graphics::getHeight());
+		perFrameResource.screenSize = DirectX::XMFLOAT2(static_cast<float>(Graphics::getWidth()), static_cast<float>(Graphics::getHeight()));
 
 		perFrameResource.screenTexelSize = DirectX::XMFLOAT2(1.f / Graphics::getWidth(), 1.f / Graphics::getHeight());
 
@@ -242,7 +242,7 @@ void RenderEngine::end()
 
 	//transition back buffer to STATE_PRESENT
 	{
-		endCommandList->reset();
+		endCommandList->open();
 
 		endCommandList->pushResourceTrackList(getCurrentRenderTexture());
 
@@ -424,7 +424,7 @@ RenderEngine::RenderEngine(const HWND hwnd, const bool useSwapChainBuffer) :
 	//resource creation may need dynamic constant buffer
 	//so we need beginCommandlist handle this for us
 	{
-		beginCommandlist->reset();
+		beginCommandlist->open();
 
 		commandLists.push_back(beginCommandlist->get());
 	}

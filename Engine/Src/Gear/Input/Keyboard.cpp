@@ -428,32 +428,32 @@ std::unordered_map<Keyboard::Key, bool> Keyboard::onKeyDownMap =
 	{Menu, false}
 };
 
-bool Keyboard::getKeyDown(const Key& key)
+bool Keyboard::getKeyDown(const Key key)
 {
 	return keyDownMap[key];
 }
 
-bool Keyboard::onKeyDown(const Key& key)
+bool Keyboard::onKeyDown(const Key key)
 {
 	return onKeyDownMap[key];
 }
 
-int Keyboard::addKeyDownEvent(const Key& key, std::function<void(void)> func)
+int Keyboard::addKeyDownEvent(const Key key,const std::function<void(void)>& func)
 {
 	return keyDownEvents[key] += func;
 }
 
-int Keyboard::addKeyUpEvent(const Key& key, std::function<void(void)> func)
+int Keyboard::addKeyUpEvent(const Key key,const std::function<void(void)>& func)
 {
 	return keyUpEvents[key] += func;
 }
 
-void Keyboard::removeKeyDownEvent(const Key& key, const int& id)
+void Keyboard::removeKeyDownEvent(const Key key, const int id)
 {
 	keyDownEvents[key] -= id;
 }
 
-void Keyboard::removeKeyUpEvent(const Key& key, const int& id)
+void Keyboard::removeKeyUpEvent(const Key key, const int id)
 {
 	keyUpEvents[key] -= id;
 }

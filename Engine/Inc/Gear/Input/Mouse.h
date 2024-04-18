@@ -15,57 +15,57 @@ public:
 
 	void operator=(const Mouse&) = delete;
 
-	static const float& getX();
+	static float getX();
 
-	static const float& getY();
+	static float getY();
 
-	static const float& getDX();
+	static float getDX();
 
-	static const float& getDY();
+	static float getDY();
 
-	static const float& getWheelDelta();
+	static float getWheelDelta();
 
-	static const bool& getLeftDown();
+	static bool getLeftDown();
 
-	static const bool& getRightDown();
+	static bool getRightDown();
 
-	static const bool& onMove();
+	static bool onMove();
 
-	static const bool& onLeftDown();
+	static bool onLeftDown();
 
-	static const bool& onRightDown();
+	static bool onRightDown();
 
-	static const bool& onScroll();
-
-	//do not record command here
-	static int addMoveEvent(std::function<void(void)> func);
+	static bool onScroll();
 
 	//do not record command here
-	static int addLeftDownEvent(std::function<void(void)> func);
+	static int addMoveEvent(const std::function<void(void)>& func);
 
 	//do not record command here
-	static int addRightDownEvent(std::function<void(void)> func);
+	static int addLeftDownEvent(const std::function<void(void)>& func);
 
 	//do not record command here
-	static int addLeftUpEvent(std::function<void(void)> func);
+	static int addRightDownEvent(const std::function<void(void)>& func);
 
 	//do not record command here
-	static int addRightUpEvent(std::function<void(void)> func);
+	static int addLeftUpEvent(const std::function<void(void)>& func);
 
 	//do not record command here
-	static int addScrollEvent(std::function<void(void)> func);
+	static int addRightUpEvent(const std::function<void(void)>& func);
 
-	static void removeMoveEvent(const int& id);
+	//do not record command here
+	static int addScrollEvent(const std::function<void(void)>& func);
 
-	static void removeLeftDownEvent(const int& id);
+	static void removeMoveEvent(const int id);
 
-	static void removeRightDownEvent(const int& id);
+	static void removeLeftDownEvent(const int id);
 
-	static void removeLeftUpEvent(const int& id);
+	static void removeRightDownEvent(const int id);
 
-	static void removeRightUpEvent(const int& id);
+	static void removeLeftUpEvent(const int id);
 
-	static void removeScrollEvent(const int& id);
+	static void removeRightUpEvent(const int id);
+
+	static void removeScrollEvent(const int id);
 
 private:
 

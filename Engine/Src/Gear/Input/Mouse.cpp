@@ -23,117 +23,117 @@ bool Mouse::onLeftDowned = false;
 bool Mouse::onRightDowned = false;
 bool Mouse::onScrolled = false;
 
-const float& Mouse::getX()
+float Mouse::getX()
 {
 	return x;
 }
 
-const float& Mouse::getY()
+float Mouse::getY()
 {
 	return y;
 }
 
-const float& Mouse::getDX()
+float Mouse::getDX()
 {
 	return dx;
 }
 
-const float& Mouse::getDY()
+float Mouse::getDY()
 {
 	return dy;
 }
 
-const float& Mouse::getWheelDelta()
+float Mouse::getWheelDelta()
 {
 	return wheelDelta;
 }
 
-const bool& Mouse::getLeftDown()
+bool Mouse::getLeftDown()
 {
 	return leftDown;
 }
 
-const bool& Mouse::getRightDown()
+bool Mouse::getRightDown()
 {
 	return rightDown;
 }
 
-const bool& Mouse::onMove()
+bool Mouse::onMove()
 {
 	return onMoved;
 }
 
-const bool& Mouse::onLeftDown()
+bool Mouse::onLeftDown()
 {
 	return onLeftDowned;
 }
 
-const bool& Mouse::onRightDown()
+bool Mouse::onRightDown()
 {
 	return onRightDowned;
 }
 
-const bool& Mouse::onScroll()
+bool Mouse::onScroll()
 {
 	return onScrolled;
 }
 
-int Mouse::addMoveEvent(std::function<void(void)> func)
+int Mouse::addMoveEvent(const std::function<void(void)>& func)
 {
 	return moveEvent += func;
 }
 
-int Mouse::addLeftDownEvent(std::function<void(void)> func)
+int Mouse::addLeftDownEvent(const std::function<void(void)>& func)
 {
 	return leftDownEvent += func;
 }
 
-int Mouse::addRightDownEvent(std::function<void(void)> func)
+int Mouse::addRightDownEvent(const std::function<void(void)>& func)
 {
 	return rightDownEvent += func;
 }
 
-int Mouse::addLeftUpEvent(std::function<void(void)> func)
+int Mouse::addLeftUpEvent(const std::function<void(void)>& func)
 {
 	return leftUpEvent += func;
 }
 
-int Mouse::addRightUpEvent(std::function<void(void)> func)
+int Mouse::addRightUpEvent(const std::function<void(void)>& func)
 {
 	return rightUpEvent += func;
 }
 
-int Mouse::addScrollEvent(std::function<void(void)> func)
+int Mouse::addScrollEvent(const std::function<void(void)>& func)
 {
 	return scrollEvent += func;
 }
 
-void Mouse::removeMoveEvent(const int& id)
+void Mouse::removeMoveEvent(const int id)
 {
 	moveEvent -= id;
 }
 
-void Mouse::removeLeftDownEvent(const int& id)
+void Mouse::removeLeftDownEvent(const int id)
 {
 	leftDownEvent -= id;
 }
 
-void Mouse::removeRightDownEvent(const int& id)
+void Mouse::removeRightDownEvent(const int id)
 {
 	rightDownEvent -= id;
 }
 
-void Mouse::removeLeftUpEvent(const int& id)
+void Mouse::removeLeftUpEvent(const int id)
 {
 	leftUpEvent -= id;
 }
 
-void Mouse::removeRightUpEvent(const int& id)
+void Mouse::removeRightUpEvent(const int id)
 {
 	rightUpEvent -= id;
 }
 
-void Mouse::removeScrollEvent(const int& id)
+void Mouse::removeScrollEvent(const int id)
 {
 	scrollEvent -= id;
 }

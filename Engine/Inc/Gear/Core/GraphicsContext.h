@@ -171,6 +171,8 @@ private:
 
 	CommandList* const commandList;
 
+	UINT tempResourceIndices[32];
+
 };
 
 
