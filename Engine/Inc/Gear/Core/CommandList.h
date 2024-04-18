@@ -30,7 +30,11 @@ public:
 
 	~CommandList();
 
-	void reset() const;
+	void resourceBarrier(const UINT numBarriers, const D3D12_RESOURCE_BARRIER* const pBarriers) const;
+
+	ID3D12GraphicsCommandList6* get() const;
+
+	void open() const;
 
 	void close() const;
 
@@ -39,8 +43,6 @@ public:
 	void setGraphicsRootSignature(RootSignature* const rootSignature) const;
 
 	void setComputeRootSignature(RootSignature* const rootSignature) const;
-
-	ID3D12GraphicsCommandList6* get() const;
 
 	void transitionResources();
 

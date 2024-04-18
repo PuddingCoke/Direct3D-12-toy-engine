@@ -124,19 +124,19 @@ public:
 		Menu = 348
 	};
 
-	static bool getKeyDown(const Key& key);
+	static bool getKeyDown(const Key key);
 
-	static bool onKeyDown(const Key& key);
-
-	//do not record command here
-	static int addKeyDownEvent(const Key& key, std::function<void(void)> func);
+	static bool onKeyDown(const Key key);
 
 	//do not record command here
-	static int addKeyUpEvent(const Key& key, std::function<void(void)> func);
+	static int addKeyDownEvent(const Key key,const std::function<void(void)>& func);
 
-	static void removeKeyDownEvent(const Key& key, const int& id);
+	//do not record command here
+	static int addKeyUpEvent(const Key key,const std::function<void(void)>& func);
 
-	static void removeKeyUpEvent(const Key& key, const int& id);
+	static void removeKeyDownEvent(const Key key, const int id);
+
+	static void removeKeyUpEvent(const Key key, const int id);
 
 private:
 

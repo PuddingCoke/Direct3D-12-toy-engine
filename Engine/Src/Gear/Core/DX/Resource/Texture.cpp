@@ -23,7 +23,7 @@ Texture::Texture(const ComPtr<ID3D12Resource>& texture, const bool stateTracking
 	Resource(texture, stateTracking)
 {
 	D3D12_RESOURCE_DESC desc = getResource()->GetDesc();
-	width = desc.Width;
+	width = static_cast<UINT>(desc.Width);
 	height = desc.Height;
 	arraySize = desc.DepthOrArraySize;
 	mipLevels = desc.MipLevels;

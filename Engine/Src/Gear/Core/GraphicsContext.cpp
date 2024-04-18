@@ -2,10 +2,11 @@
 
 ConstantBuffer* GraphicsContext::globalConstantBuffer = nullptr;
 
-GraphicsContext::GraphicsContext():
+GraphicsContext::GraphicsContext() :
 	commandList(new CommandList(D3D12_COMMAND_LIST_TYPE_DIRECT)),
 	vp{ 0.f,0.f,0.f,0.f,0.f,1.f },
-	rt{ 0,0,0,0 }
+	rt{ 0,0,0,0 },
+	tempResourceIndices{}
 {
 }
 
@@ -61,13 +62,11 @@ void GraphicsContext::setGlobalConstantBuffer(const ConstantBuffer* const consta
 
 void GraphicsContext::setVSConstants(const std::initializer_list<ShaderResourceDesc>& descs, const UINT offset)
 {
-	UINT indices[4] = {};
-
-	getIndicesFromResourceDescs(descs, indices);
+	getIndicesFromResourceDescs(descs, tempResourceIndices);
 
 	commandList->setGraphicsPipelineResources(descs, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
 
-	setVSConstants(descs.size(), indices, offset);
+	setVSConstants(static_cast<UINT>(descs.size()), tempResourceIndices, offset);
 }
 
 void GraphicsContext::setVSConstants(const UINT numValues, const void* const data, const UINT offset)
@@ -77,13 +76,11 @@ void GraphicsContext::setVSConstants(const UINT numValues, const void* const dat
 
 void GraphicsContext::setHSConstants(const std::initializer_list<ShaderResourceDesc>& descs, const UINT offset)
 {
-	UINT indices[4] = {};
-
-	getIndicesFromResourceDescs(descs, indices);
+	getIndicesFromResourceDescs(descs, tempResourceIndices);
 
 	commandList->setGraphicsPipelineResources(descs, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
 
-	setHSConstants(descs.size(), indices, offset);
+	setHSConstants(static_cast<UINT>(descs.size()), tempResourceIndices, offset);
 }
 
 void GraphicsContext::setHSConstants(const UINT numValues, const void* const data, const UINT offset)
@@ -93,13 +90,11 @@ void GraphicsContext::setHSConstants(const UINT numValues, const void* const dat
 
 void GraphicsContext::setDSConstants(const std::initializer_list<ShaderResourceDesc>& descs, const UINT offset)
 {
-	UINT indices[4] = {};
-
-	getIndicesFromResourceDescs(descs, indices);
+	getIndicesFromResourceDescs(descs, tempResourceIndices);
 
 	commandList->setGraphicsPipelineResources(descs, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
 
-	setDSConstants(descs.size(), indices, offset);
+	setDSConstants(static_cast<UINT>(descs.size()), tempResourceIndices, offset);
 }
 
 void GraphicsContext::setDSConstants(const UINT numValues, const void* const data, const UINT offset)
@@ -109,13 +104,11 @@ void GraphicsContext::setDSConstants(const UINT numValues, const void* const dat
 
 void GraphicsContext::setGSConstants(const std::initializer_list<ShaderResourceDesc>& descs, const UINT offset)
 {
-	UINT indices[4] = {};
-
-	getIndicesFromResourceDescs(descs, indices);
+	getIndicesFromResourceDescs(descs, tempResourceIndices);
 
 	commandList->setGraphicsPipelineResources(descs, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
 
-	setGSConstants(descs.size(), indices, offset);
+	setGSConstants(static_cast<UINT>(descs.size()), tempResourceIndices, offset);
 }
 
 void GraphicsContext::setGSConstants(const UINT numValues, const void* const data, const UINT offset)
@@ -125,13 +118,11 @@ void GraphicsContext::setGSConstants(const UINT numValues, const void* const dat
 
 void GraphicsContext::setPSConstants(const std::initializer_list<ShaderResourceDesc>& descs, const UINT offset)
 {
-	UINT indices[16] = {};
-
-	getIndicesFromResourceDescs(descs, indices);
+	getIndicesFromResourceDescs(descs, tempResourceIndices);
 
 	commandList->setGraphicsPipelineResources(descs, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 
-	setPSConstants(descs.size(), indices, offset);
+	setPSConstants(static_cast<UINT>(descs.size()), tempResourceIndices, offset);
 }
 
 void GraphicsContext::setPSConstants(const UINT numValues, const void* const data, const UINT offset)
@@ -141,13 +132,11 @@ void GraphicsContext::setPSConstants(const UINT numValues, const void* const dat
 
 void GraphicsContext::setASConstants(const std::initializer_list<ShaderResourceDesc>& descs, const UINT offset)
 {
-	UINT indices[4] = {};
-
-	getIndicesFromResourceDescs(descs, indices);
+	getIndicesFromResourceDescs(descs, tempResourceIndices);
 
 	commandList->setGraphicsPipelineResources(descs, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
 
-	setASConstants(descs.size(), indices, offset);
+	setASConstants(static_cast<UINT>(descs.size()), tempResourceIndices, offset);
 }
 
 void GraphicsContext::setASConstants(const UINT numValues, const void* const data, const UINT offset)
@@ -157,13 +146,11 @@ void GraphicsContext::setASConstants(const UINT numValues, const void* const dat
 
 void GraphicsContext::setMSConstants(const std::initializer_list<ShaderResourceDesc>& descs, const UINT offset)
 {
-	UINT indices[4] = {};
-
-	getIndicesFromResourceDescs(descs, indices);
+	getIndicesFromResourceDescs(descs, tempResourceIndices);
 
 	commandList->setGraphicsPipelineResources(descs, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
 
-	setMSConstants(descs.size(), indices, offset);
+	setMSConstants(static_cast<UINT>(descs.size()), tempResourceIndices, offset);
 }
 
 void GraphicsContext::setMSConstants(const UINT numValues, const void* const data, const UINT offset)
@@ -173,13 +160,11 @@ void GraphicsContext::setMSConstants(const UINT numValues, const void* const dat
 
 void GraphicsContext::setCSConstants(const std::initializer_list<ShaderResourceDesc>& descs, const UINT offset)
 {
-	UINT indices[32] = {};
-
-	getIndicesFromResourceDescs(descs, indices);
+	getIndicesFromResourceDescs(descs, tempResourceIndices);
 
 	commandList->setComputePipelineResources(descs);
 
-	setCSConstants(descs.size(), indices, offset);
+	setCSConstants(static_cast<UINT>(descs.size()), tempResourceIndices, offset);
 }
 
 void GraphicsContext::setCSConstants(const UINT numValues, const void* const data, const UINT offset)
@@ -395,7 +380,7 @@ void GraphicsContext::dispatch(const UINT threadGroupCountX, const UINT threadGr
 
 void GraphicsContext::begin() const
 {
-	commandList->reset();
+	commandList->open();
 
 	commandList->setDescriptorHeap(GlobalDescriptorHeap::getResourceHeap(), GlobalDescriptorHeap::getSamplerHeap());
 
@@ -410,7 +395,7 @@ void GraphicsContext::begin() const
 
 void GraphicsContext::end() const
 {
-	commandList->get()->Close();
+	commandList->close();
 }
 
 CommandList* GraphicsContext::getCommandList() const
