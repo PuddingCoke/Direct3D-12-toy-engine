@@ -6,17 +6,17 @@ DirectX::XMMATRIX Camera::viewMatrix;
 
 Camera::CameraMatrices Camera::matrices;
 
-const DirectX::XMMATRIX Camera::getProj()
+DirectX::XMMATRIX Camera::getProj()
 {
 	return matrices.proj;
 }
 
-const DirectX::XMMATRIX Camera::getView()
+DirectX::XMMATRIX Camera::getView()
 {
 	return matrices.view;
 }
 
-const DirectX::XMVECTOR Camera::getEyePos()
+DirectX::XMVECTOR Camera::getEyePos()
 {
 	return matrices.eyePos;
 }
@@ -26,7 +26,7 @@ void Camera::setProj(const float fov, const float aspectRatio, const float zNear
 	setProj(DirectX::XMMatrixPerspectiveFovLH(fov, aspectRatio, zNear, zFar));
 }
 
-void Camera::setView(const DirectX::XMVECTOR eyePos, const DirectX::XMVECTOR focus, const DirectX::XMVECTOR up)
+void Camera::setView(const DirectX::XMVECTOR& eyePos, const DirectX::XMVECTOR& focus, const DirectX::XMVECTOR& up)
 {
 	matrices.eyePos = eyePos;
 

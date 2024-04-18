@@ -27,6 +27,8 @@ public:
 
 	static D3D12_RASTERIZER_DESC rasterCullNone;
 
+	static D3D12_RASTERIZER_DESC rasterWireFrame;
+
 	static D3D12_DEPTH_STENCIL_DESC depthLessEqual;
 
 	static D3D12_DEPTH_STENCIL_DESC depthLess;

@@ -8,6 +8,14 @@ Buffer::Buffer(const UINT size, const bool stateTracking, const D3D12_RESOURCE_F
 {
 }
 
+Buffer::Buffer(const ComPtr<ID3D12Resource>& buffer, const bool stateTracking, const UINT initialState) :
+	Resource(buffer, stateTracking),
+	globalState(std::make_shared<UINT>(initialState)),
+	internalState(initialState),
+	transitionState(D3D12_RESOURCE_STATE_UNKNOWN)
+{
+}
+
 Buffer::Buffer(Buffer& buff) :
 	Resource(buff),
 	globalState(buff.globalState),

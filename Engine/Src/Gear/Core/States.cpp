@@ -12,6 +12,8 @@ D3D12_RASTERIZER_DESC States::rasterCullFront = {};
 
 D3D12_RASTERIZER_DESC States::rasterCullNone = {};
 
+D3D12_RASTERIZER_DESC States::rasterWireFrame = {};
+
 D3D12_DEPTH_STENCIL_DESC States::depthLessEqual = {};
 
 D3D12_DEPTH_STENCIL_DESC States::depthLess = {};
@@ -74,6 +76,12 @@ void States::initialize()
 		rasterCullNone.FillMode = D3D12_FILL_MODE_SOLID;
 		rasterCullNone.CullMode = D3D12_CULL_MODE_NONE;
 		rasterCullNone.DepthClipEnable = TRUE;
+	}
+
+	{
+		rasterWireFrame.FillMode = D3D12_FILL_MODE_WIREFRAME;
+		rasterWireFrame.CullMode = D3D12_CULL_MODE_BACK;
+		rasterWireFrame.DepthClipEnable = TRUE;
 	}
 
 	{

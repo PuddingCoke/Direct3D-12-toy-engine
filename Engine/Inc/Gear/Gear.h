@@ -16,7 +16,6 @@
 
 #include<iostream>
 #include<chrono>
-#include<future>
 #include<windowsx.h>
 #include<dxgidebug.h>
 
@@ -60,7 +59,7 @@ private:
 
 	Configuration::EngineUsage usage;
 
-	void iniWindow(const std::wstring& title, const UINT& width, const UINT& height);
+	void iniWindow(const std::wstring title, const UINT width, const UINT height);
 
 	static constexpr DWORD normalWndStyle = WS_CAPTION | WS_SYSMENU;
 

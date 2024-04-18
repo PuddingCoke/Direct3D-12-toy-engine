@@ -15,13 +15,13 @@ public:
 		VIDEOPLAYBACK
 	} usage;
 
-	const int width;
+	const unsigned int width;
 
-	const int height;
+	const unsigned int height;
 
 	const std::wstring title;
 
-	Configuration(const int width, const int height, const std::wstring title, const EngineUsage usage = EngineUsage::NORMAL);
+	Configuration(const unsigned int width, const unsigned int height, const std::wstring title, const EngineUsage usage = EngineUsage::NORMAL);
 
 };
 

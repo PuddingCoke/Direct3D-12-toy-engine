@@ -22,6 +22,8 @@ public:
 
 	Buffer(const UINT size, const bool stateTracking, const D3D12_RESOURCE_FLAGS resFlags);
 
+	Buffer(const ComPtr<ID3D12Resource>& buffer, const bool stateTracking, const UINT initialState);
+
 	Buffer(Buffer&);
 
 	Buffer(const Buffer&) = delete;
