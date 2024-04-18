@@ -32,7 +32,7 @@ HS_CONSTANT_DATA_OUTPUT CalcHSPatchConstants(
     
     const float dist = distance(perframeResource.eyePos.xyz, centerPos);
     
-    float tessFactor = lerp(BASETESSFACTOR, FINALTESSFACTOR, saturate(dist / 2048.0));
+    float tessFactor = lerp(BASETESSFACTOR, FINALTESSFACTOR, saturate(dist / 512.0));
     
     Output.EdgeTessFactor[0] = tessFactor;
     Output.EdgeTessFactor[1] = tessFactor;

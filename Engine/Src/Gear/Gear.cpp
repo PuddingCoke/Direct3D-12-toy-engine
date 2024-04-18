@@ -119,6 +119,10 @@ void Gear::runGame()
 
 		RenderEngine::get()->waitForNextFrame();
 
+		Mouse::resetDeltaInfo();
+
+		Keyboard::resetOnKeyDownMap();
+
 		const std::chrono::high_resolution_clock::time_point endPoint = clock.now();
 
 		Graphics::time.deltaTime = std::chrono::duration_cast<std::chrono::milliseconds>(endPoint - startPoint).count() / 1000.f;
@@ -128,10 +132,6 @@ void Gear::runGame()
 		Graphics::time.uintSeed = Random::Uint();
 
 		Graphics::time.floatSeed = Random::Float();
-
-		Mouse::resetDeltaInfo();
-
-		Keyboard::resetOnKeyDownMap();
 	}
 
 }
@@ -219,7 +219,7 @@ Gear::~Gear()
 
 }
 
-void Gear::iniWindow(const std::wstring& title, const UINT& width, const UINT& height)
+void Gear::iniWindow(const std::wstring title, const UINT width, const UINT height)
 {
 	switch (usage)
 	{

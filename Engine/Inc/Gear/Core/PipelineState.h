@@ -34,8 +34,15 @@ public:
 	//DSVFormat
 	static D3D12_GRAPHICS_PIPELINE_STATE_DESC getDefaultGraphicsDesc();
 
-	//configure CS
+	//configure
+	//CS
 	static D3D12_COMPUTE_PIPELINE_STATE_DESC getDefaultComputeDesc();
+
+	//configure
+	//NumRenderTargets
+	//RTVFormats
+	//PS
+	static D3D12_GRAPHICS_PIPELINE_STATE_DESC getDefaultFullScreenState();
 
 private:
 

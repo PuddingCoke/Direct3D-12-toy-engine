@@ -13,15 +13,15 @@ public:
 
 	void operator=(const Camera&) = delete;
 
-	static const DirectX::XMMATRIX getProj();
+	static DirectX::XMMATRIX getProj();
 
-	static const DirectX::XMMATRIX getView();
+	static DirectX::XMMATRIX getView();
 
-	static const DirectX::XMVECTOR getEyePos();
+	static DirectX::XMVECTOR getEyePos();
 
 	static void setProj(const float fov, const float aspectRatio, const float zNear, const float zFar);
 
-	static void setView(const DirectX::XMVECTOR eyePos, const DirectX::XMVECTOR focus, const DirectX::XMVECTOR up);
+	static void setView(const DirectX::XMVECTOR& eyePos, const DirectX::XMVECTOR& focus, const DirectX::XMVECTOR& up);
 
 	static void setProj(const DirectX::XMMATRIX& proj);
 
