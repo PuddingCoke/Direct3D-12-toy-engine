@@ -87,7 +87,7 @@ public:
 
 	//create texture render target from custom parameters
 	static TextureRenderTarget* createTextureRenderTarget(const UINT width, const UINT height, const DXGI_FORMAT resFormat, const UINT arraySize, const UINT mipLevels, const bool isTextureCube, const bool persistent,
-		const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat);
+		const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat, const float* const color = nullptr);
 
 	//create texture cube from equirectangular map
 	TextureRenderTarget* createTextureCube(const std::string filePath, const UINT texturecubeResolution, const bool persistent,

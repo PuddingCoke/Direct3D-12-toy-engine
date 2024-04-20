@@ -26,9 +26,23 @@
     <ClInclude Include="MyRenderPass.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Scene.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Material.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Model.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="PixelShader.hlsl" />
-    <FxCompile Include="VertexShader.hlsl" />
+    <FxCompile Include="DeferredVShader.hlsl" />
+    <FxCompile Include="DeferredPShader.hlsl" />
+    <FxCompile Include="DeferredFinal.hlsl" />
+    <FxCompile Include="ShadowVS.hlsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Utility.hlsli" />
   </ItemGroup>
 </Project>

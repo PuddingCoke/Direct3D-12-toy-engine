@@ -196,12 +196,12 @@ Texture* ResourceManager::createTexture(const UINT width, const UINT height, con
 
 		for (UINT i = 0; i < width * height; i++)
 		{
-			colors[i] = 
-			{ 
-				static_cast<UINT8>(Random::Uint() % 256u), 
-				static_cast<UINT8>(Random::Uint() % 256u), 
-				static_cast<UINT8>(Random::Uint() % 256u), 
-				static_cast<UINT8>(Random::Uint() % 256u) 
+			colors[i] =
+			{
+				static_cast<UINT8>(Random::Uint() % 256u),
+				static_cast<UINT8>(Random::Uint() % 256u),
+				static_cast<UINT8>(Random::Uint() % 256u),
+				static_cast<UINT8>(Random::Uint() % 256u)
 			};
 		}
 
@@ -227,12 +227,12 @@ Texture* ResourceManager::createTexture(const UINT width, const UINT height, con
 			DirectX::PackedVector::HALF r, g, b, a;
 		};
 
-		std::vector<Col> colors(width* height);
+		std::vector<Col> colors(width * height);
 
 		for (UINT i = 0; i < width * height; i++)
 		{
-			colors[i] = 
-			{ 
+			colors[i] =
+			{
 				DirectX::PackedVector::XMConvertFloatToHalf(Random::Gauss()),
 				DirectX::PackedVector::XMConvertFloatToHalf(Random::Gauss()),
 				DirectX::PackedVector::XMConvertFloatToHalf(Random::Gauss()),
@@ -511,7 +511,7 @@ TextureRenderTarget* ResourceManager::createTextureRenderTarget(const UINT width
 	}
 }
 
-TextureRenderTarget* ResourceManager::createTextureRenderTarget(const UINT width, const UINT height, const DXGI_FORMAT resFormat, const UINT arraySize, const UINT mipLevels, const bool isTextureCube, const bool persistent, const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat)
+TextureRenderTarget* ResourceManager::createTextureRenderTarget(const UINT width, const UINT height, const DXGI_FORMAT resFormat, const UINT arraySize, const UINT mipLevels, const bool isTextureCube, const bool persistent, const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat, const float* const color)
 {
 	const bool hasRTV = (rtvFormat != DXGI_FORMAT_UNKNOWN);
 
@@ -538,7 +538,23 @@ TextureRenderTarget* ResourceManager::createTextureRenderTarget(const UINT width
 		resFlags |= D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
 	}
 
-	Texture* texture = new Texture(width, height, resFormat, arraySize, mipLevels, true, resFlags);
+	Texture* texture = nullptr;
+
+	if (color)
+	{
+		D3D12_CLEAR_VALUE clearValue = {};
+		clearValue.Format = rtvFormat;
+		clearValue.Color[0] = color[0];
+		clearValue.Color[1] = color[1];
+		clearValue.Color[2] = color[2];
+		clearValue.Color[3] = color[3];
+
+		texture = new Texture(width, height, resFormat, arraySize, mipLevels, true, resFlags, &clearValue);
+	}
+	else
+	{
+		texture = new Texture(width, height, resFormat, arraySize, mipLevels, true, resFlags);
+	}
 
 	return new TextureRenderTarget(texture, isTextureCube, persistent, srvFormat, uavFormat, rtvFormat);
 }
