@@ -22,4 +22,4 @@ SamplerState linearClampSampler : register(s2);
 SamplerState linearWrapSampler : register(s3);
 SamplerState anisotrophicClampSampler : register(s4);
 SamplerState anisotrophicWrapSampler : register(s5);
-SamplerState shadowSampler : register(s6);
+SamplerComparisonState shadowSampler : register(s6);
