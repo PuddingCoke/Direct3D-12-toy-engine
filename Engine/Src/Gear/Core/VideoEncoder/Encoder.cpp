@@ -9,7 +9,7 @@ Encoder::~Encoder()
 {
 }
 
-void Encoder::displayProgress()
+void Encoder::displayProgress() const
 {
 	CONSOLE_SCREEN_BUFFER_INFO csbi = {};
 

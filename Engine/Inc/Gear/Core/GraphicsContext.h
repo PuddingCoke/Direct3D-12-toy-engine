@@ -3,17 +3,11 @@
 #ifndef _GRAPHICSCONTEXT_H_
 #define _GRAPHICSCONTEXT_H_
 
-#include<Gear/Core/DX/Resource/Buffer.h>
-#include<Gear/Core/DX/Resource/Texture.h>
-
 #include<Gear/Core/CommandList.h>
 #include<Gear/Core/Resource/ConstantBuffer.h>
 #include<Gear/Core/Resource/VertexBuffer.h>
 #include<Gear/Core/Resource/IndexBuffer.h>
 #include<Gear/Core/Resource/IndexConstantBuffer.h>
-
-#include<vector>
-#include<unordered_set>
 
 class GraphicsContext
 {

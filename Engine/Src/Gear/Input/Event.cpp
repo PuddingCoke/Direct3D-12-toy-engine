@@ -5,12 +5,12 @@ Event::Event() :
 {
 }
 
-void Event::operator-=(const int& id)
+void Event::operator-=(const int id)
 {
 	functions.erase(id);
 }
 
-const int& Event::operator+=(std::function<void(void)> func)
+int Event::operator+=(const std::function<void(void)>& func)
 {
 	functions.emplace(++idx, func);
 	return idx;

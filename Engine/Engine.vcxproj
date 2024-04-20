@@ -127,7 +127,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <AdditionalIncludeDirectories>$(ProjectDir)External\D3D12Headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Inc\D3D12Headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
@@ -138,8 +138,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="External\DDSTextureLoader\DDSTextureLoader12.h" />
-    <ClInclude Include="External\stb_image\stb_image.h" />
+    <ClInclude Include="Inc\DDSTextureLoader\DDSTextureLoader12.h" />
+    <ClInclude Include="Inc\stb_image\stb_image.h" />
     <ClInclude Include="External\stb_image\stb_image_write.h" />
     <ClInclude Include="Inc\Gear\Camera\FPSCamera.h" />
     <ClInclude Include="Inc\Gear\Configuration.h" />
@@ -191,8 +191,8 @@
     <ClInclude Include="Inc\Gear\Window\Win32Form.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="External\DDSTextureLoader\DDSTextureLoader12.cpp" />
-    <ClCompile Include="External\stb_image\stb_image.cpp" />
+    <ClCompile Include="Inc\DDSTextureLoader\DDSTextureLoader12.cpp" />
+    <ClCompile Include="Inc\stb_image\stb_image.cpp" />
     <ClCompile Include="Src\Gear\Camera\FPSCamera.cpp" />
     <ClCompile Include="Src\Gear\Core\Camera.cpp" />
     <ClCompile Include="Src\Gear\Core\ConstantBufferPool.cpp" />
