@@ -304,19 +304,8 @@ Texture* RenderEngine::getCurrentRenderTexture() const
 	return backBufferResources[Graphics::getFrameIndex()];
 }
 
-RenderEngine::RenderEngine(const HWND hwnd, const bool useSwapChainBuffer) :
-	fenceValues{}, fenceEvent(nullptr), vendor(GPUVendor::UNKNOWN), perFrameResource{}
+ComPtr<IDXGIAdapter4> RenderEngine::getBestAdapterAndVendor(IDXGIFactory7* const factory)
 {
-	ComPtr<ID3D12Debug> debugController;
-
-	D3D12GetDebugInterface(IID_PPV_ARGS(&debugController));
-
-	debugController->EnableDebugLayer();
-
-	ComPtr<IDXGIFactory7> factory;
-
-	CreateDXGIFactory2(DXGI_CREATE_FACTORY_DEBUG, IID_PPV_ARGS(&factory));
-
 	ComPtr<IDXGIAdapter4> adapter;
 
 	for (UINT adapterIndex = 0;
@@ -362,6 +351,24 @@ RenderEngine::RenderEngine(const HWND hwnd, const bool useSwapChainBuffer) :
 			break;
 		}
 	}
+
+	return adapter;
+}
+
+RenderEngine::RenderEngine(const HWND hwnd, const bool useSwapChainBuffer) :
+	fenceValues{}, fenceEvent(nullptr), vendor(GPUVendor::UNKNOWN), perFrameResource{}
+{
+	ComPtr<ID3D12Debug> debugController;
+
+	D3D12GetDebugInterface(IID_PPV_ARGS(&debugController));
+
+	debugController->EnableDebugLayer();
+
+	ComPtr<IDXGIFactory7> factory;
+
+	CreateDXGIFactory2(DXGI_CREATE_FACTORY_DEBUG, IID_PPV_ARGS(&factory));
+
+	ComPtr<IDXGIAdapter4> adapter = getBestAdapterAndVendor(factory.Get());
 
 	{
 		GraphicsDevice::instance = new GraphicsDevice(adapter.Get());
@@ -461,11 +468,13 @@ RenderEngine::RenderEngine(const HWND hwnd, const bool useSwapChainBuffer) :
 			{
 				ComPtr<ID3D12Resource> texture;
 
-				CD3DX12_HEAP_PROPERTIES heapProperties = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
+				const CD3DX12_HEAP_PROPERTIES heapProperties = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
 
-				CD3DX12_RESOURCE_DESC resourceDesc = CD3DX12_RESOURCE_DESC::Tex2D(Graphics::BackBufferFormat, Graphics::width, Graphics::height, 1, 1, 1, 0, D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET);
+				const CD3DX12_RESOURCE_DESC resourceDesc = CD3DX12_RESOURCE_DESC::Tex2D(Graphics::BackBufferFormat, Graphics::width, Graphics::height, 1, 1, 1, 0, D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET);
 
-				GraphicsDevice::get()->CreateCommittedResource(&heapProperties, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_PRESENT, nullptr, IID_PPV_ARGS(&texture));
+				const D3D12_CLEAR_VALUE clearValue = { Graphics::BackBufferFormat ,{0.f,0.f,0.f,1.f} };
+
+				GraphicsDevice::get()->CreateCommittedResource(&heapProperties, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_PRESENT, &clearValue, IID_PPV_ARGS(&texture));
 
 				GraphicsDevice::get()->CreateRenderTargetView(texture.Get(), &rtvDesc, descriptorHandle.getCPUHandle());
 

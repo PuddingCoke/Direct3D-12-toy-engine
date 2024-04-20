@@ -71,7 +71,7 @@ ID3D12DescriptorHeap* DescriptorHeap::get() const
 	return descriptorHeap.Get();
 }
 
-DescriptorHeap::DescriptorHandle DescriptorHeap::allocStaticDescriptor(UINT num)
+DescriptorHeap::DescriptorHandle DescriptorHeap::allocStaticDescriptor(const UINT num)
 {
 	std::lock_guard<std::mutex> lockGuard(staticPointerLock);
 
@@ -86,10 +86,12 @@ DescriptorHeap::DescriptorHandle DescriptorHeap::allocStaticDescriptor(UINT num)
 	return DescriptorHandle(retCPUHandle, retGPUHandle, this);
 }
 
-DescriptorHeap::DescriptorHandle DescriptorHeap::allocDynamicDescriptor(UINT num)
+DescriptorHeap::DescriptorHandle DescriptorHeap::allocDynamicDescriptor(const UINT num)
 {
 	std::lock_guard<std::mutex> lockGuard(dynamicPointerLock);
 
+	//if there is no enough room for target descriptor num just reset cpuPointer and gpuPointer
+	
 	const UINT movedLocation = static_cast<UINT>(dynamicCPUPointer.ptr - staticCPUPointerStart.ptr) / incrementSize + num;
 
 	if (movedLocation > numDescriptors)

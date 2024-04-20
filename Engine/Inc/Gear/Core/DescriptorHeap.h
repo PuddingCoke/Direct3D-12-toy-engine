@@ -50,9 +50,9 @@ public:
 
 	ID3D12DescriptorHeap* get() const;
 
-	DescriptorHandle allocStaticDescriptor(UINT num);
+	DescriptorHandle allocStaticDescriptor(const UINT num);
 
-	DescriptorHandle allocDynamicDescriptor(UINT num);
+	DescriptorHandle allocDynamicDescriptor(const UINT num);
 
 private:
 

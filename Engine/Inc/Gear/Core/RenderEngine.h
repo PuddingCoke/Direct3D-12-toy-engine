@@ -54,6 +54,8 @@ private:
 
 	static RenderEngine* instance;
 
+	ComPtr<IDXGIAdapter4> getBestAdapterAndVendor(IDXGIFactory7* const factory);
+
 	RenderEngine(const HWND hwnd, const bool useSwapChainBuffer);
 
 	~RenderEngine();

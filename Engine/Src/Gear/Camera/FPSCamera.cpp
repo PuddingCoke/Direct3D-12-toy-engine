@@ -1,8 +1,45 @@
 #include<Gear/Camera/FPSCamera.h>
 
-FPSCamera::FPSCamera(const DirectX::XMVECTOR& eye, const DirectX::XMVECTOR& lookDir, const DirectX::XMVECTOR& up, const float& moveSpeed):
+FPSCamera::FPSCamera(const DirectX::XMVECTOR& eye, const DirectX::XMVECTOR& lookDir, const DirectX::XMVECTOR& up, const float moveSpeed):
 	eye(eye), lookDir(lookDir), up(up), moveSpeed(moveSpeed)
 {
+	eventID = Mouse::addMoveEvent([this]()
+		{
+			if (Mouse::getLeftDown())
+			{
+				const DirectX::XMMATRIX rotMat = DirectX::XMMatrixRotationAxis(this->up, Mouse::getDX() / 120.f);
+
+				this->lookDir = DirectX::XMVector3Transform(this->lookDir, rotMat);
+
+				const DirectX::XMVECTOR upCrossLookDir = DirectX::XMVector3Normalize(DirectX::XMVector3Cross(this->up, this->lookDir));
+
+				float lookUpAngle;
+
+				DirectX::XMStoreFloat(&lookUpAngle, DirectX::XMVector3AngleBetweenNormals(this->lookDir, this->up));
+
+				const float destAngle = lookUpAngle - Mouse::getDY() / 120.f;
+
+				float rotAngle = -Mouse::getDY() / 120.f;
+
+				if (destAngle > Math::pi - Camera::epsilon)
+				{
+					rotAngle = Math::pi - Camera::epsilon - lookUpAngle;
+				}
+				else if (destAngle < Camera::epsilon)
+				{
+					rotAngle = Camera::epsilon - lookUpAngle;
+				}
+
+				const DirectX::XMMATRIX lookDirRotMat = DirectX::XMMatrixRotationAxis(upCrossLookDir, rotAngle);
+
+				this->lookDir = DirectX::XMVector3Transform(this->lookDir, lookDirRotMat);
+			}
+		});
+}
+
+FPSCamera::~FPSCamera()
+{
+	Mouse::removeMoveEvent(eventID);
 }
 
 void FPSCamera::applyInput(const float& dt)
@@ -30,40 +67,4 @@ void FPSCamera::applyInput(const float& dt)
 	}
 
 	Camera::setView(eye, DirectX::XMVectorAdd(eye, lookDir), up);
-}
-
-void FPSCamera::registerEvent()
-{
-	Mouse::addMoveEvent([this]()
-		{
-			if (Mouse::getLeftDown())
-			{
-				const DirectX::XMMATRIX rotMat = DirectX::XMMatrixRotationAxis(up, Mouse::getDX() / 120.f);
-
-				lookDir = DirectX::XMVector3Transform(lookDir, rotMat);
-
-				const DirectX::XMVECTOR upCrossLookDir = DirectX::XMVector3Normalize(DirectX::XMVector3Cross(up, lookDir));
-
-				float lookUpAngle;
-
-				DirectX::XMStoreFloat(&lookUpAngle, DirectX::XMVector3AngleBetweenNormals(lookDir, up));
-
-				const float destAngle = lookUpAngle - Mouse::getDY() / 120.f;
-
-				float rotAngle = -Mouse::getDY() / 120.f;
-
-				if (destAngle > Math::pi - Camera::epsilon)
-				{
-					rotAngle = Math::pi - Camera::epsilon - lookUpAngle;
-				}
-				else if (destAngle < Camera::epsilon)
-				{
-					rotAngle = Camera::epsilon - lookUpAngle;
-				}
-
-				const DirectX::XMMATRIX lookDirRotMat = DirectX::XMMatrixRotationAxis(upCrossLookDir, rotAngle);
-
-				lookDir = DirectX::XMVector3Transform(lookDir, lookDirRotMat);
-			}
-		});
 }

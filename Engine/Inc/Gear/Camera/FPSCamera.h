@@ -18,11 +18,11 @@ public:
 
 	void operator=(const FPSCamera&) = delete;
 
-	FPSCamera(const DirectX::XMVECTOR& eye, const DirectX::XMVECTOR& lookDir, const DirectX::XMVECTOR& up, const float& moveSpeed);
+	FPSCamera(const DirectX::XMVECTOR& eye, const DirectX::XMVECTOR& lookDir, const DirectX::XMVECTOR& up, const float moveSpeed);
+
+	~FPSCamera();
 
 	void applyInput(const float& dt);
-
-	void registerEvent();
 
 private:
 
@@ -33,6 +33,8 @@ private:
 	DirectX::XMVECTOR lookDir;
 
 	DirectX::XMVECTOR up;
+
+	int eventID;
 
 };
 

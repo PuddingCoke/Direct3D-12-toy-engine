@@ -12,9 +12,9 @@ public:
 
 	Event();
 
-	void operator-=(const int& id);
+	void operator-=(const int id);
 
- 	const int& operator+=(std::function<void(void)> func);
+ 	int operator+=(const std::function<void(void)>& func);
 
 	void operator()();
 
