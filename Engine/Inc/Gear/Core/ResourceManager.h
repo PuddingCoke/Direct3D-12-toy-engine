@@ -20,6 +20,7 @@
 #include<Gear/Core/Resource/VertexBuffer.h>
 #include<Gear/Core/Resource/IndexBuffer.h>
 #include<Gear/Core/Resource/SwapTexture.h>
+#include<Gear/Core/Resource/StructuredBuffer.h>
 
 enum class RandomDataType
 {
@@ -70,6 +71,11 @@ public:
 	VertexBuffer* createVertexBuffer(const UINT perVertexSize, const UINT size, const bool cpuWritable, const void* const data);
 
 	static VertexBuffer* createVertexBuffer(const UINT perVertexSize, const UINT size);
+
+	//data must not be nullptr
+	StructuredBuffer* createStructuredBuffer(const UINT structureByteStride, const UINT size, const bool cpuWritable, const void* const data, const bool persistent);
+
+	static StructuredBuffer* createStructuredBuffer(const UINT structureByteStride, const UINT size, const bool persistent);
 
 	IndexConstantBuffer* createIndexConstantBuffer(const std::initializer_list<ShaderResourceDesc>& descs, const bool cpuWritable, const bool persistent);
 

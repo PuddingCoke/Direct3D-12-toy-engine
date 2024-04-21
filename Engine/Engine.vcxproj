@@ -139,6 +139,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Inc\DDSTextureLoader\DDSTextureLoader12.h" />
+    <ClInclude Include="Inc\Gear\Core\Resource\StructuredBuffer.h" />
     <ClInclude Include="Inc\stb_image\stb_image.h" />
     <ClInclude Include="External\stb_image\stb_image_write.h" />
     <ClInclude Include="Inc\Gear\Camera\FPSCamera.h" />
@@ -228,6 +229,7 @@
     <ClCompile Include="Src\Gear\Core\RootSignature.cpp" />
     <ClCompile Include="Src\Gear\Core\Shader.cpp" />
     <ClCompile Include="Src\Gear\Core\States.cpp" />
+    <ClCompile Include="Src\Gear\Core\Resource\StructuredBuffer.cpp" />
     <ClCompile Include="Src\Gear\Core\VideoEncoder\Encoder.cpp" />
     <ClCompile Include="Src\Gear\Core\VideoEncoder\NvidiaEncoder.cpp" />
     <ClCompile Include="Src\Gear\Game.cpp" />

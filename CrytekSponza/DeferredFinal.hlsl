@@ -8,6 +8,8 @@ cbuffer TextureIndex : register(b2)
     uint gNormalSpecularTexIndex;
     uint gBaseColorTexIndex;
     uint shadowTexIndex;
+    uint irradianceCoeffTexIndex;
+    uint depthOctahedralMapTexIndex;
 }
 
 ConstantBuffer<IrradianceVolume> volume : register(b3);
@@ -19,6 +21,10 @@ static Texture2D gNormalSpecular = ResourceDescriptorHeap[gNormalSpecularTexInde
 static Texture2D gBaseColor = ResourceDescriptorHeap[gBaseColorTexIndex];
 
 static Texture2D<float> shadowTexture = ResourceDescriptorHeap[shadowTexIndex];
+
+static Texture2DArray<float3> irradianceCoeff = ResourceDescriptorHeap[irradianceCoeffTexIndex];
+
+static Texture2DArray<float2> depthOctahedralMap = ResourceDescriptorHeap[depthOctahedralMapTexIndex];
 
 float CalShadow(float3 P)
 {
@@ -72,16 +78,7 @@ float4 main(float2 texCoord : TEXCOORD) : SV_TARGET
     
     outColor += (diffuseColor + specularColor) * shadow;
     
-    if (shadow < 0.2)
-    {
-        outColor += baseColor * 0.10;
-    }
-    
-    //outColor += baseColor * GetIndirectDiffuse(position, N, volume, irradianceCoeff, depthOctahedralMap, clampSampler);
-    
-    //const float ao = ssaoTexture.Sample(clampSampler, texCoord).r;
-        
-    //outColor *= ao;
+    outColor += baseColor * GetIndirectDiffuse(position, N, volume, irradianceCoeff, depthOctahedralMap, linearClampSampler);
     
     return float4(outColor, 1.0);
 }

@@ -168,6 +168,9 @@
     <ClInclude Include="Inc\Gear\Camera\FPSCamera.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Inc\Gear\Core\Resource\StructuredBuffer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Gear\Window\Win32Form.cpp">
@@ -318,6 +321,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Src\Gear\Camera\FPSCamera.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gear\Core\Resource\StructuredBuffer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
