@@ -41,6 +41,12 @@
     <FxCompile Include="DeferredPShader.hlsl" />
     <FxCompile Include="DeferredFinal.hlsl" />
     <FxCompile Include="ShadowVS.hlsl" />
+    <FxCompile Include="CubeRenderVS.hlsl" />
+    <FxCompile Include="CubeRenderPS.hlsl" />
+    <FxCompile Include="IrradianceCompute.hlsl" />
+    <FxCompile Include="OctahedralEncode.hlsl" />
+    <FxCompile Include="CubeRenderBouncePS.hlsl" />
+    <FxCompile Include="SkybosPShader.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Utility.hlsli" />

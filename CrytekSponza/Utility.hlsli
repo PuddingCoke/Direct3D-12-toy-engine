@@ -85,22 +85,22 @@ float3 GetIrradiance(in float3 N, in uint probeIndex, in Texture2DArray<float3> 
     + A2 * C8 * irradianceCoeff[uint3(8, 0, probeIndex)] * (N.x * N.x - N.y * N.y));
 }
 
-uint3 PosToProbeGridPos(in float3 P, in IrradianceVolume volume)
+uint3 PosToProbeGridPos(in float3 P, in ConstantBuffer<IrradianceVolume> volume)
 {
     return uint3((P - volume.fieldStart) / volume.probeSpacing);
 }
 
-uint ProbeGridPosToIndex(in uint3 probeGridPos, in IrradianceVolume volume)
+uint ProbeGridPosToIndex(in uint3 probeGridPos, in ConstantBuffer<IrradianceVolume> volume)
 {
     return probeGridPos.x + probeGridPos.z * volume.probeCount.x + probeGridPos.y * volume.probeCount.x * volume.probeCount.z;
 }
 
-float3 ProbeGridPosToLoc(in uint3 probeGridPos, in IrradianceVolume volume)
+float3 ProbeGridPosToLoc(in uint3 probeGridPos, in ConstantBuffer<IrradianceVolume> volume)
 {
     return volume.fieldStart + float3(probeGridPos) * volume.probeSpacing;
 }
 
-float3 GetIndirectDiffuse(in float3 P, in float3 N, in IrradianceVolume volume, in Texture2DArray<float3> irradianceCoeff, in Texture2DArray<float2> depthOctahedralMap, in SamplerState samplerState)
+float3 GetIndirectDiffuse(in float3 P, in float3 N, in ConstantBuffer<IrradianceVolume> volume, in Texture2DArray<float3> irradianceCoeff, in Texture2DArray<float2> depthOctahedralMap, in SamplerState samplerState)
 {
     float3 sumIrradiance = float3(0.0, 0.0, 0.0);
     

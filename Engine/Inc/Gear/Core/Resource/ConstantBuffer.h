@@ -12,8 +12,6 @@ class ConstantBuffer :public EngineResource
 {
 public:
 
-	//buffer can be nullptr or not nullptr
-	//buffer is nullptr then it's a dynamic constant buffer
 	ConstantBuffer(Buffer* const buffer, const UINT size, const bool persistent);
 
 	ConstantBuffer(const ConstantBuffer&) = delete;

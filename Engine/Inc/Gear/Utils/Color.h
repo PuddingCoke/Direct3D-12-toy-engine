@@ -6,6 +6,8 @@
 #include"Random.h"
 #include"Math.h"
 
+#include<DirectXColors.h>
+
 struct Color
 {
 	float r;

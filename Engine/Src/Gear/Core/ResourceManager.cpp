@@ -345,6 +345,31 @@ VertexBuffer* ResourceManager::createVertexBuffer(const UINT perVertexSize, cons
 	return new VertexBuffer(buffer, perVertexSize, size, true);
 }
 
+StructuredBuffer* ResourceManager::createStructuredBuffer(const UINT structureByteStride, const UINT size, const bool cpuWritable, const void* const data, const bool persistent)
+{
+	Buffer* buffer = createBuffer(data, size, D3D12_RESOURCE_FLAG_NONE);
+
+	if (!cpuWritable)
+	{
+		commandList->pushResourceTrackList(buffer);
+
+		buffer->setState(D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
+
+		commandList->transitionResources();
+
+		buffer->setStateTracking(false);
+	}
+
+	return new StructuredBuffer(buffer, structureByteStride, size, cpuWritable, persistent);
+}
+
+StructuredBuffer* ResourceManager::createStructuredBuffer(const UINT structureByteStride, const UINT size, const bool persistent)
+{
+	Buffer* buffer = new Buffer(size, true, D3D12_RESOURCE_FLAG_NONE);
+
+	return new StructuredBuffer(buffer, structureByteStride, size, true, persistent);
+}
+
 IndexConstantBuffer* ResourceManager::createIndexConstantBuffer(const std::initializer_list<ShaderResourceDesc>& descs, const bool cpuWritable, const bool persistent)
 {
 	const UINT alignedIndicesNum = ((descs.size() + 63) & ~63);

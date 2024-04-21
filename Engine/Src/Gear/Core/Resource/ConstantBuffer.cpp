@@ -55,6 +55,8 @@ ConstantBuffer::ConstantBuffer(Buffer* const buffer, const UINT size, const bool
 			descriptorHandle = GlobalDescriptorHeap::getNonShaderVisibleResourceHeap()->allocDynamicDescriptor(numSRVUAVCBVDescriptors);
 		}
 
+		srvUAVCBVHandleStart = descriptorHandle.getCPUHandle();
+
 		GraphicsDevice::get()->CreateConstantBufferView(&desc, descriptorHandle.getCPUHandle());
 
 		gpuAddress = buffer->getGPUAddress();
