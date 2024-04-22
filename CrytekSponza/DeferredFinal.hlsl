@@ -8,7 +8,7 @@ cbuffer TextureIndex : register(b2)
     uint gNormalSpecularTexIndex;
     uint gBaseColorTexIndex;
     uint shadowTexIndex;
-    uint irradianceCoeffTexIndex;
+    uint irradianceOctahedralMapTexIndex;
     uint depthOctahedralMapTexIndex;
 }
 
@@ -22,7 +22,7 @@ static Texture2D gBaseColor = ResourceDescriptorHeap[gBaseColorTexIndex];
 
 static Texture2D<float> shadowTexture = ResourceDescriptorHeap[shadowTexIndex];
 
-static Texture2DArray<float3> irradianceCoeff = ResourceDescriptorHeap[irradianceCoeffTexIndex];
+static Texture2DArray<float3> irradianceOctahedralMap = ResourceDescriptorHeap[irradianceOctahedralMapTexIndex];
 
 static Texture2DArray<float2> depthOctahedralMap = ResourceDescriptorHeap[depthOctahedralMapTexIndex];
 
@@ -78,7 +78,7 @@ float4 main(float2 texCoord : TEXCOORD) : SV_TARGET
     
     outColor += (diffuseColor + specularColor) * shadow;
     
-    outColor += baseColor * GetIndirectDiffuse(position, N, volume, irradianceCoeff, depthOctahedralMap, linearClampSampler);
+    outColor += baseColor * GetIndirectDiffuse(position, N, volume, irradianceOctahedralMap, depthOctahedralMap, linearClampSampler);
     
     return float4(outColor, 1.0);
 }

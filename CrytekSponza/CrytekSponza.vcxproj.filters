@@ -43,8 +43,8 @@
     <FxCompile Include="ShadowVS.hlsl" />
     <FxCompile Include="CubeRenderVS.hlsl" />
     <FxCompile Include="CubeRenderPS.hlsl" />
-    <FxCompile Include="IrradianceCompute.hlsl" />
-    <FxCompile Include="OctahedralEncode.hlsl" />
+    <FxCompile Include="IrradianceOctahedralEncode.hlsl" />
+    <FxCompile Include="DepthOctahedralEncode.hlsl" />
     <FxCompile Include="CubeRenderBouncePS.hlsl" />
     <FxCompile Include="SkybosPShader.hlsl" />
   </ItemGroup>
