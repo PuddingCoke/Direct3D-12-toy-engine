@@ -18,7 +18,7 @@ cbuffer TextureIndex : register(b2)
     uint normalTexIndex;
     uint shadowTexIndex;
     uint irradianceVolumeBufIndex;
-    uint irradianceCoeffTexIndex;
+    uint irradianceOctahedralMapTexIndex;
     uint depthOctahedralMapTexIndex;
 }
 
@@ -39,7 +39,7 @@ static Texture2D<float> shadowTexture = ResourceDescriptorHeap[shadowTexIndex];
 
 static ConstantBuffer<IrradianceVolume> volume = ResourceDescriptorHeap[irradianceVolumeBufIndex];
 
-static Texture2DArray<float3> irradianceCoeff = ResourceDescriptorHeap[irradianceCoeffTexIndex];
+static Texture2DArray<float3> irradianceOctahedralMap = ResourceDescriptorHeap[irradianceOctahedralMapTexIndex];
 
 static Texture2DArray<float2> depthOctahedralMap = ResourceDescriptorHeap[depthOctahedralMapTexIndex];
 
@@ -76,7 +76,7 @@ float4 main(PixelInput input) : SV_Target
     
     float3 color = (diffuseColor + specularColor) * CalShadow(input.pos);
     
-    color += baseColor.rgb * GetIndirectDiffuse(input.pos, input.normal, volume, irradianceCoeff, depthOctahedralMap, linearClampSampler);
+    color += baseColor.rgb * GetIndirectDiffuse(input.pos, input.normal, volume, irradianceOctahedralMap, depthOctahedralMap, linearClampSampler);
     
     return float4(color, 1.0);
 }

@@ -370,9 +370,9 @@ RenderEngine::RenderEngine(const HWND hwnd, const bool useSwapChainBuffer) :
 
 	ComPtr<IDXGIAdapter4> adapter = getBestAdapterAndVendor(factory.Get());
 
-	{
-		GraphicsDevice::instance = new GraphicsDevice(adapter.Get());
+	GraphicsDevice::instance = new GraphicsDevice(adapter.Get());
 
+	{
 		D3D12_COMMAND_QUEUE_DESC queueDesc = {};
 		queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
 		queueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;

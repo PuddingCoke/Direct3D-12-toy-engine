@@ -37,25 +37,25 @@ public:
 		cubeRenderVS(new Shader(Utils::getRootFolder() + "CubeRenderVS.cso")),
 		cubeRenderPS(new Shader(Utils::getRootFolder() + "CubeRenderPS.cso")),
 		cubeRenderBouncePS(new Shader(Utils::getRootFolder() + "CubeRenderBouncePS.cso")),
-		irradianceCompute(new Shader(Utils::getRootFolder() + "IrradianceCompute.cso")),
-		octahedralEncode(new Shader(Utils::getRootFolder() + "OctahedralEncode.cso")),
+		irradianceOctahedralEncode(new Shader(Utils::getRootFolder() + "IrradianceOctahedralEncode.cso")),
+		depthOctahedralEncode(new Shader(Utils::getRootFolder() + "DepthOctahedralEncode.cso")),
 		skyboxPShader(new Shader(Utils::getRootFolder() + "SkybosPShader.cso")),
 		sunAngle(Math::half_pi - 0.01f)
 	{
 		const UINT probeCount = irradianceVolume.count.x * irradianceVolume.count.y * irradianceVolume.count.z;
 
-		irradianceCoeff = ResourceManager::createTextureRenderTarget(9, 1, DXGI_FORMAT_R11G11B10_FLOAT, probeCount, 1, false, true,
+		irradianceOctahedralMap = ResourceManager::createTextureRenderTarget(6, 6, DXGI_FORMAT_R11G11B10_FLOAT, probeCount, 1, false, true,
 			DXGI_FORMAT_R11G11B10_FLOAT, DXGI_FORMAT_R11G11B10_FLOAT, DXGI_FORMAT_UNKNOWN);
 
-		irradianceBounceCoeff = ResourceManager::createTextureRenderTarget(9, 1, DXGI_FORMAT_R11G11B10_FLOAT, probeCount, 1, false, true,
+		irradianceBounceOctahedralMap = ResourceManager::createTextureRenderTarget(6, 6, DXGI_FORMAT_R11G11B10_FLOAT, probeCount, 1, false, true,
 			DXGI_FORMAT_R11G11B10_FLOAT, DXGI_FORMAT_R11G11B10_FLOAT, DXGI_FORMAT_UNKNOWN);
 
 		depthOctahedralMap = ResourceManager::createTextureRenderTarget(16, 16, DXGI_FORMAT_R16G16_FLOAT, probeCount, 1, false, true,
 			DXGI_FORMAT_R16G16_FLOAT, DXGI_FORMAT_R16G16_FLOAT, DXGI_FORMAT_UNKNOWN);
 
-		irradianceCoeff->getTexture()->getResource()->SetName(L"Irradiance Coeff");
+		irradianceOctahedralMap->getTexture()->getResource()->SetName(L"Irradiance Octahedral Map");
 
-		irradianceBounceCoeff->getTexture()->getResource()->SetName(L"Irradiance Bounce Coeff");
+		irradianceBounceOctahedralMap->getTexture()->getResource()->SetName(L"Irradiance Bounce Octahedral Map");
 
 		depthOctahedralMap->getTexture()->getResource()->SetName(L"Depth Octahedral Map");
 
@@ -166,16 +166,16 @@ public:
 
 		{
 			D3D12_COMPUTE_PIPELINE_STATE_DESC desc = PipelineState::getDefaultComputeDesc();
-			desc.CS = irradianceCompute->getByteCode();
+			desc.CS = irradianceOctahedralEncode->getByteCode();
 
-			GraphicsDevice::get()->CreateComputePipelineState(&desc, IID_PPV_ARGS(&irradianceComputeState));
+			GraphicsDevice::get()->CreateComputePipelineState(&desc, IID_PPV_ARGS(&irradianceOctahedralEncodeState));
 		}
 
 		{
 			D3D12_COMPUTE_PIPELINE_STATE_DESC desc = PipelineState::getDefaultComputeDesc();
-			desc.CS = octahedralEncode->getByteCode();
+			desc.CS = depthOctahedralEncode->getByteCode();
 
-			GraphicsDevice::get()->CreateComputePipelineState(&desc, IID_PPV_ARGS(&octahedralEncodeState));
+			GraphicsDevice::get()->CreateComputePipelineState(&desc, IID_PPV_ARGS(&depthOctahedralEncodeState));
 		}
 
 		begin();
@@ -237,49 +237,6 @@ public:
 			}
 		}
 
-		{
-			struct Sample
-			{
-				DirectX::XMFLOAT4 direction;
-				float Ylm[9];
-			};
-
-			const unsigned int sampleCount = 64;
-			const unsigned int sampleCountSqrt = 8;
-			const double oneoverN = 1.0 / (double)sampleCountSqrt;
-
-			unsigned int i = 0;
-
-			std::vector<Sample> samples(sampleCount);
-
-			for (unsigned int a = 0; a < sampleCountSqrt; a++)
-			{
-				for (unsigned int b = 0; b < sampleCountSqrt; b++)
-				{
-					const double x = (a + Random::Double()) * oneoverN;
-					const double y = (b + Random::Double()) * oneoverN;
-					const double theta = 2.0 * acos(sqrt(1.0 - x));
-					const double phi = 2.0 * 3.141592653589793238 * y;
-
-					samples[i].direction = DirectX::XMFLOAT4((float)sin(theta) * (float)cos(phi), (float)sin(theta) * (float)sin(phi), (float)cos(theta), 1.0);
-
-					for (int l = 0; l < 3; l++)
-					{
-						for (int m = -l; m <= l; m++)
-						{
-							int index = l * (l + 1) + m;
-							samples[i].Ylm[index] = (float)SH(l, m, theta, phi);
-						}
-					}
-					++i;
-				}
-			}
-
-			irradianceSamples = resManager->ResourceManager::createStructuredBuffer(sizeof(Sample), sizeof(Sample) * samples.size(), false, samples.data(), true);
-
-			irradianceSamples->getBuffer()->getResource()->SetName(L"Irradiance Samples");
-		}
-
 		effect = new BloomEffect(context, Graphics::getWidth(), Graphics::getHeight(), resManager);
 
 		effect->setIntensity(0.5f);
@@ -321,13 +278,11 @@ public:
 		delete distanceCube;
 		delete depthCube;
 
-		delete irradianceCoeff;
-		delete irradianceBounceCoeff;
+		delete irradianceOctahedralMap;
+		delete irradianceBounceOctahedralMap;
 		delete depthOctahedralMap;
 
 		delete skybox;
-
-		delete irradianceSamples;
 
 		delete shadowVS;
 		delete deferredVShader;
@@ -447,12 +402,11 @@ protected:
 
 		scene->renderCube(context, probeCapturePipelineState.Get());
 
-		context->setPipelineState(irradianceComputeState.Get());
+		context->setPipelineState(irradianceOctahedralEncodeState.Get());
 
 		context->setCSConstants({
-			irradianceCoeff->getUAVMipIndex(0),
-			radianceCube->getAllSRVIndex(),
-			irradianceSamples->getBufferIndex()
+			irradianceOctahedralMap->getUAVMipIndex(0),
+			radianceCube->getAllSRVIndex()
 			}, 0);
 
 		context->setCSConstantBuffer(cubeRenderParamBuffer[probeIndex]);
@@ -461,9 +415,9 @@ protected:
 
 		context->dispatch(1, 1, 1);
 
-		context->uavBarrier({ irradianceCoeff->getTexture() });
+		context->uavBarrier({ irradianceOctahedralMap->getTexture() });
 
-		context->setPipelineState(octahedralEncodeState.Get());
+		context->setPipelineState(depthOctahedralEncodeState.Get());
 
 		context->setCSConstants({
 			depthOctahedralMap->getUAVMipIndex(0),
@@ -496,7 +450,7 @@ protected:
 		context->setPSConstants({
 			shadowTexture->getAllDepthIndex(),
 			irradianceVolumeBuffer->getBufferIndex(),
-			irradianceCoeff->getAllSRVIndex(),
+			irradianceOctahedralMap->getAllSRVIndex(),
 			depthOctahedralMap->getAllSRVIndex()
 			}, 3);
 
@@ -510,12 +464,11 @@ protected:
 
 		scene->renderCube(context, probeCaptureBouncePipelineState.Get());
 
-		context->setPipelineState(irradianceComputeState.Get());
+		context->setPipelineState(irradianceOctahedralEncodeState.Get());
 
 		context->setCSConstants({
-			irradianceBounceCoeff->getUAVMipIndex(0),
-			radianceCube->getAllSRVIndex(),
-			irradianceSamples->getBufferIndex()
+			irradianceBounceOctahedralMap->getUAVMipIndex(0),
+			radianceCube->getAllSRVIndex()
 			}, 0);
 
 		context->setCSConstantBuffer(cubeRenderParamBuffer[probeIndex]);
@@ -524,7 +477,7 @@ protected:
 
 		context->dispatch(1, 1, 1);
 
-		context->uavBarrier({ irradianceBounceCoeff->getTexture() });
+		context->uavBarrier({ irradianceBounceOctahedralMap->getTexture() });
 	}
 
 	void recordCommand() override
@@ -568,7 +521,7 @@ protected:
 			gNormalSpecular->getAllSRVIndex(),
 			gBaseColor->getAllSRVIndex(),
 			shadowTexture->getAllDepthIndex(),
-			irradianceBounceCoeff->getAllSRVIndex(),
+			irradianceBounceOctahedralMap->getAllSRVIndex(),
 			depthOctahedralMap->getAllSRVIndex()
 			}, 0);
 
@@ -615,56 +568,6 @@ protected:
 		context->clearDefRenderTarget(DirectX::Colors::Black);
 
 		context->draw(3, 1, 0, 0);
-	}
-
-	double Fact(int n)
-	{
-		const double results[13] = { 1.0,1.0,2.0,6.0,24.0,120.0,720.0,5040.0,40320.0,362880.0,3628800.0,39916800.0,479001600.0 };
-		return results[n];
-	}
-
-	double K(int l, int m)
-	{
-		double temp = ((2.0 * l + 1.0) * Fact(l - m)) / (4.0 * 3.141592653589793238 * Fact(l + m));
-		return sqrt(temp);
-	}
-
-	double P(int l, int m, double x)
-	{
-		double pmm = 1.0;
-		if (m > 0)
-		{
-			double somx2 = sqrt((1.0 - x) * (1.0 + x));
-			double fact = 1.0;
-			for (int i = 1; i <= m; i++) {
-				pmm *= (-fact) * somx2;
-				fact += 2.0;
-			}
-		}
-		if (l == m)
-			return pmm;
-
-		double pmmp1 = x * (2.0 * m + 1.0) * pmm;
-		if (l == m + 1)
-			return pmmp1;
-
-		double pll = 0.0;
-		for (int ll = m + 2; ll <= l; ++ll)
-		{
-			pll = ((2.0 * ll - 1.0) * x * pmmp1 - (ll + m - 1.0) * pmm) / (ll - m);
-			pmm = pmmp1;
-			pmmp1 = pll;
-		}
-
-		return pll;
-	}
-
-	double SH(int l, int m, double theta, double phi)
-	{
-		const double sqrt2 = sqrt(2.0);
-		if (m == 0)        return K(l, 0) * P(l, 0, cos(theta));
-		else if (m > 0)    return sqrt2 * K(l, m) * cos(m * phi) * P(l, m, cos(theta));
-		else                return sqrt2 * K(l, -m) * sin(-m * phi) * P(l, -m, cos(theta));
 	}
 
 	UINT ProbeGridPosToIndex(const DirectX::XMUINT3& probeGridPos)
@@ -722,13 +625,11 @@ protected:
 
 	TextureDepthStencil* depthCube;
 
-	TextureRenderTarget* irradianceCoeff;
+	TextureRenderTarget* irradianceOctahedralMap;
 
-	TextureRenderTarget* irradianceBounceCoeff;
+	TextureRenderTarget* irradianceBounceOctahedralMap;
 
 	TextureRenderTarget* depthOctahedralMap;
-
-	StructuredBuffer* irradianceSamples;
 
 	TextureRenderTarget* skybox;
 
@@ -744,9 +645,9 @@ protected:
 
 	ComPtr<ID3D12PipelineState> probeCaptureBouncePipelineState;
 
-	ComPtr<ID3D12PipelineState> irradianceComputeState;
+	ComPtr<ID3D12PipelineState> irradianceOctahedralEncodeState;
 
-	ComPtr<ID3D12PipelineState> octahedralEncodeState;
+	ComPtr<ID3D12PipelineState> depthOctahedralEncodeState;
 
 	ComPtr<ID3D12PipelineState> skyboxState;
 
@@ -764,9 +665,9 @@ protected:
 
 	Shader* cubeRenderBouncePS;
 
-	Shader* irradianceCompute;
+	Shader* irradianceOctahedralEncode;
 
-	Shader* octahedralEncode;
+	Shader* depthOctahedralEncode;
 
 	Shader* skyboxPShader;
 
