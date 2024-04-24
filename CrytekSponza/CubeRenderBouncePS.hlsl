@@ -56,10 +56,7 @@ float4 main(PixelInput input) : SV_Target
 {
     const float4 baseColor = tDiffuse.Sample(linearWrapSampler, input.uv);
     
-    if (baseColor.a < 0.9)
-    {
-        discard;
-    }
+    clip(baseColor.a - 0.9);
     
     const float specular = tSpecular.Sample(linearWrapSampler, input.uv).r;
     

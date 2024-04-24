@@ -2,8 +2,6 @@
 
 #include"Utility.hlsli"
 
-#define PI 3.41592653589793
-
 cbuffer TextureIndex : register(b2)
 {
     uint irradianceOctahedralMapTexIndex;
@@ -90,6 +88,8 @@ static const float3 randomDirection[SAMPLECOUNT] =
     float3(0.211939, -0.435887, -0.874691),
     float3(0.600673, -0.276017, -0.750337)
 };
+
+#define PI 3.41592653589793
 
 [numthreads(6, 6, 1)]
 void main(uint2 DTid : SV_DispatchThreadID)
