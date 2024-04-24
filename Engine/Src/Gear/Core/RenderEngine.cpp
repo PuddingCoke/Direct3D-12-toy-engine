@@ -372,6 +372,8 @@ RenderEngine::RenderEngine(const HWND hwnd, const bool useSwapChainBuffer) :
 
 	GraphicsDevice::instance = new GraphicsDevice(adapter.Get());
 
+	GraphicsDevice::instance->checkFeatureSupport();
+
 	{
 		D3D12_COMMAND_QUEUE_DESC queueDesc = {};
 		queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;

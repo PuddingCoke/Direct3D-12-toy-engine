@@ -42,6 +42,8 @@ private:
 
 	GraphicsDevice(IUnknown* const adapter);
 
+	void checkFeatureSupport();
+
 	static GraphicsDevice* instance;
 
 	ComPtr<ID3D12Device9> device;

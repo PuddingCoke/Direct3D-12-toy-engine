@@ -33,10 +33,7 @@ PixelOutput main(PixelInput input)
 {
     float4 baseColor = tDiffuse.Sample(linearWrapSampler, input.uv);
     
-    if (baseColor.a < 0.9)
-    {
-        discard;
-    }
+    clip(baseColor.a - 0.9);
     
     float3 N = normalize(input.normal);
     float3 B = normalize(input.binormal);
