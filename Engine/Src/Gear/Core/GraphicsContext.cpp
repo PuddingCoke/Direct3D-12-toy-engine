@@ -281,9 +281,7 @@ void GraphicsContext::setRenderTargets(const std::initializer_list<RenderTargetD
 
 void GraphicsContext::setDefRenderTarget() const
 {
-	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = Graphics::getBackBufferHandle();
-
-	commandList->get()->OMSetRenderTargets(1, &rtvHandle, FALSE, nullptr);
+	commandList->setDefRenderTarget();
 }
 
 void GraphicsContext::clearDefRenderTarget(const FLOAT clearValue[4]) const

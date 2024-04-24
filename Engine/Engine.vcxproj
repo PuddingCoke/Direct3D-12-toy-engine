@@ -140,6 +140,14 @@
   <ItemGroup>
     <ClInclude Include="Inc\DDSTextureLoader\DDSTextureLoader12.h" />
     <ClInclude Include="Inc\Gear\Core\Resource\StructuredBuffer.h" />
+    <ClInclude Include="Inc\ImGUI\imconfig.h" />
+    <ClInclude Include="Inc\ImGUI\imgui.h" />
+    <ClInclude Include="Inc\ImGUI\imgui_impl_dx12.h" />
+    <ClInclude Include="Inc\ImGUI\imgui_impl_win32.h" />
+    <ClInclude Include="Inc\ImGUI\imgui_internal.h" />
+    <ClInclude Include="Inc\ImGUI\imstb_rectpack.h" />
+    <ClInclude Include="Inc\ImGUI\imstb_textedit.h" />
+    <ClInclude Include="Inc\ImGUI\imstb_truetype.h" />
     <ClInclude Include="Inc\stb_image\stb_image.h" />
     <ClInclude Include="External\stb_image\stb_image_write.h" />
     <ClInclude Include="Inc\Gear\Camera\FPSCamera.h" />
@@ -193,6 +201,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Inc\DDSTextureLoader\DDSTextureLoader12.cpp" />
+    <ClCompile Include="Inc\ImGUI\imgui.cpp" />
+    <ClCompile Include="Inc\ImGUI\imgui_demo.cpp" />
+    <ClCompile Include="Inc\ImGUI\imgui_draw.cpp" />
+    <ClCompile Include="Inc\ImGUI\imgui_impl_dx12.cpp" />
+    <ClCompile Include="Inc\ImGUI\imgui_impl_win32.cpp" />
+    <ClCompile Include="Inc\ImGUI\imgui_tables.cpp" />
+    <ClCompile Include="Inc\ImGUI\imgui_widgets.cpp" />
     <ClCompile Include="Inc\stb_image\stb_image.cpp" />
     <ClCompile Include="Src\Gear\Camera\FPSCamera.cpp" />
     <ClCompile Include="Src\Gear\Core\Camera.cpp" />

@@ -35,11 +35,11 @@ int Gear::iniEngine(const Configuration config, const int argc, const char* argv
 	switch (config.usage)
 	{
 	case Configuration::EngineUsage::NORMAL:
-		RenderEngine::instance = new RenderEngine(winform->getHandle(), true);
+		RenderEngine::instance = new RenderEngine(winform->getHandle(), true, true);
 		break;
 
 	case Configuration::EngineUsage::VIDEOPLAYBACK:
-		RenderEngine::instance = new RenderEngine(winform->getHandle(), false);
+		RenderEngine::instance = new RenderEngine(winform->getHandle(), false, false);
 		break;
 
 	default:
@@ -238,6 +238,9 @@ void Gear::iniWindow(const std::wstring title, const UINT width, const UINT heig
 
 LRESULT Gear::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
+	if (ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam))
+		return true;
+
 	switch (uMsg)
 	{
 	case WM_PAINT:

@@ -36,6 +36,8 @@ public:
 
 	virtual ~RenderPass();
 
+	virtual void imGuiCommand();
+
 protected:
 
 	void begin();

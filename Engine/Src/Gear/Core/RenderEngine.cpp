@@ -11,6 +11,11 @@ void RenderEngine::submitRenderPass(RenderPass* const pass)
 {
 	const RenderPassResult renderPassResult = pass->getRenderPassResult();
 
+	if (displayImGUISurface)
+	{
+		pass->imGuiCommand();
+	}
+
 	CommandList* const renderCMD = renderPassResult.renderCMD;
 
 	std::vector<D3D12_RESOURCE_BARRIER> barriers;
@@ -209,6 +214,13 @@ void RenderEngine::waitForNextFrame()
 
 void RenderEngine::begin()
 {
+	if (displayImGUISurface)
+	{
+		ImGui_ImplDX12_NewFrame();
+		ImGui_ImplWin32_NewFrame();
+		ImGui::NewFrame();
+	}
+
 	beginCommandlist->open();
 
 	commandLists.push_back(beginCommandlist->get());
@@ -228,6 +240,15 @@ void RenderEngine::begin()
 
 void RenderEngine::end()
 {
+	if(displayImGUISurface)
+	{
+		ImGui::Begin("Frame Profile");
+		ImGui::Text("TimeElapsed %.2f", Graphics::getTimeElapsed());
+		ImGui::Text("FrameTime %.8f", ImGui::GetIO().DeltaTime * 1000.f);
+		ImGui::Text("FrameRate %.1f", ImGui::GetIO().Framerate);
+		ImGui::End();
+	}
+
 	//transition back buffer to STATE_RENDER_TARGET
 	//update constant buffers
 	{
@@ -243,6 +264,36 @@ void RenderEngine::end()
 	//transition back buffer to STATE_PRESENT
 	{
 		endCommandList->open();
+
+		if (displayImGUISurface)
+		{
+			ImGui::Render();
+
+			endCommandList->setDescriptorHeap(GlobalDescriptorHeap::getResourceHeap(), GlobalDescriptorHeap::getSamplerHeap());
+
+			endCommandList->setDefRenderTarget();
+
+			{
+				const D3D12_VIEWPORT vp = {
+					0.f,0.f,
+					static_cast<float>(Graphics::getWidth()),static_cast<float>(Graphics::getHeight()),
+					0.f,1.f
+				};
+
+				endCommandList->get()->RSSetViewports(1, &vp);
+			}
+
+			{
+				const D3D12_RECT rt = {
+					0,0,
+					Graphics::getWidth(),Graphics::getHeight()
+				};
+
+				endCommandList->get()->RSSetScissorRects(1, &rt);
+			}
+
+			ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), endCommandList->get());
+		}
 
 		endCommandList->pushResourceTrackList(getCurrentRenderTexture());
 
@@ -355,8 +406,8 @@ ComPtr<IDXGIAdapter4> RenderEngine::getBestAdapterAndVendor(IDXGIFactory7* const
 	return adapter;
 }
 
-RenderEngine::RenderEngine(const HWND hwnd, const bool useSwapChainBuffer) :
-	fenceValues{}, fenceEvent(nullptr), vendor(GPUVendor::UNKNOWN), perFrameResource{}
+RenderEngine::RenderEngine(const HWND hwnd, const bool useSwapChainBuffer, const bool initializeImGuiSurface) :
+	fenceValues{}, fenceEvent(nullptr), vendor(GPUVendor::UNKNOWN), perFrameResource{}, initializeImGuiSurface(initializeImGuiSurface), displayImGUISurface(initializeImGuiSurface)
 {
 	ComPtr<ID3D12Debug> debugController;
 
@@ -488,10 +539,39 @@ RenderEngine::RenderEngine(const HWND hwnd, const bool useSwapChainBuffer) :
 			}
 		}
 	}
+
+	if (initializeImGuiSurface)
+	{
+		IMGUI_CHECKVERSION();
+		ImGui::CreateContext();
+		ImGuiIO& io = ImGui::GetIO();
+		(void)io;
+		io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
+		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+
+		ImGui::StyleColorsDark();
+
+		const DescriptorHandle handle = GlobalDescriptorHeap::getResourceHeap()->allocStaticDescriptor(1);
+
+		ImGui_ImplWin32_Init(hwnd);
+		ImGui_ImplDX12_Init(GraphicsDevice::get(), Graphics::FrameBufferCount, Graphics::BackBufferFormat,
+			GlobalDescriptorHeap::getResourceHeap()->get(), handle.getCPUHandle(), handle.getGPUHandle());
+
+		ImGui_ImplDX12_NewFrame();
+		ImGui_ImplWin32_NewFrame();
+		ImGui::NewFrame();
+	}
 }
 
 RenderEngine::~RenderEngine()
 {
+	if (initializeImGuiSurface)
+	{
+		ImGui_ImplDX12_Shutdown();
+		ImGui_ImplWin32_Shutdown();
+		ImGui::DestroyContext();
+	}
+
 	if (GlobalDescriptorHeap::instance)
 	{
 		delete GlobalDescriptorHeap::instance;

@@ -3,6 +3,10 @@
 #ifndef _RENDERENGINE_H_
 #define _RENDERENGINE_H_
 
+#include<ImGUI/imgui.h>
+#include<ImGUI/imgui_impl_win32.h>
+#include<ImGUI/imgui_impl_dx12.h>
+
 #include<Gear/Core/RenderPass.h>
 #include<Gear/Core/Graphics.h>
 #include<Gear/Core/Camera.h>
@@ -56,9 +60,13 @@ private:
 
 	ComPtr<IDXGIAdapter4> getBestAdapterAndVendor(IDXGIFactory7* const factory);
 
-	RenderEngine(const HWND hwnd, const bool useSwapChainBuffer);
+	RenderEngine(const HWND hwnd, const bool useSwapChainBuffer, const bool initializeImGuiSurface);
 
 	~RenderEngine();
+
+	const bool initializeImGuiSurface;
+
+	bool displayImGUISurface;
 
 	GPUVendor vendor;
 

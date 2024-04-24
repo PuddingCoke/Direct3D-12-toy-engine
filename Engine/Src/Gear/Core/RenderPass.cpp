@@ -45,6 +45,10 @@ RenderPass::~RenderPass()
 	}
 }
 
+void RenderPass::imGuiCommand()
+{
+}
+
 void RenderPass::begin()
 {
 	resManager->cleanTransientResources();

@@ -62,6 +62,8 @@ public:
 
 	void setComputePipelineResources(const std::initializer_list<ShaderResourceDesc>& descs);
 
+	void setDefRenderTarget();
+
 	void setRenderTargets(const std::initializer_list<RenderTargetDesc>& renderTargets, const DepthStencilDesc* const depthStencils);
 
 	void setVertexBuffers(const UINT startSlot, const std::initializer_list<VertexBufferDesc>& vertexBuffers);
