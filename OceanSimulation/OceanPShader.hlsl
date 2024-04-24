@@ -13,9 +13,11 @@ cbuffer TextureIndex : register(b2)
 }
 
 static Texture2D normalTexture = ResourceDescriptorHeap[normalTextureIndex];
+
 static TextureCube skyTexture = ResourceDescriptorHeap[skyTextureIndex];
 
 static const float3 L = normalize(float3(0.0, 1.0, -1.0));
+
 static const float3 oceanColor = float3(0.0000, 0.3307, 0.3613);
 
 float4 main(PixelInput input) : SV_TARGET
@@ -40,9 +42,11 @@ float4 main(PixelInput input) : SV_TARGET
     
     float highlightMul = 1.0 + 2.0 * smoothstep(1.2, 1.8, turbulence);
     
-    float spec = pow(max(dot(N, H), 0.0), 3072.0);
+    float diff = max(dot(N, L), 0.0);
     
-    float3 color = oceanColor + spec * float3(1.0, 1.0, 1.0);
+    float spec = pow(max(dot(N, H), 0.0), 4096.0);
+    
+    float3 color = diff * oceanColor + spec * float3(1.0, 1.0, 1.0);
     
     color = lerp(color, reflectColor * highlightMul, F);
     

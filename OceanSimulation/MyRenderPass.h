@@ -456,7 +456,7 @@ private:
 		unsigned int mapResolution = 1024;
 		float mapLength = 512.0;
 		DirectX::XMFLOAT2 wind = { 20.f,0.f };
-		float amplitude = 0.0000006f;
+		float amplitude = 0.000001f;
 		float gravity = 9.81f;
 		DirectX::XMFLOAT2 padding0;
 		DirectX::XMFLOAT4 padding1[14];

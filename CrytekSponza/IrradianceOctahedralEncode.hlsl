@@ -109,7 +109,7 @@ void main(uint2 DTid : SV_DispatchThreadID)
         [unroll]
         for (uint i = 0; i < SAMPLECOUNT; i++)
         {
-            const float3 randDir = normalize(dir + randomDirection[i]);
+            const float3 randDir = randomDirection[i] * sign(dot(dir, randomDirection[i]));
             
             const float3 radiance = envCube.SampleLevel(linearClampSampler, randDir, 0.0).rgb;
             
