@@ -202,10 +202,12 @@ void Gear::reportLiveObjects()
 {
 	ComPtr<IDXGIDebug1> dxgiDebug;
 
+#ifdef _DEBUG
 	if (SUCCEEDED(DXGIGetDebugInterface1(0, IID_PPV_ARGS(&dxgiDebug))))
 	{
 		dxgiDebug->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_FLAGS(DXGI_DEBUG_RLO_DETAIL | DXGI_DEBUG_RLO_IGNORE_INTERNAL));
 	}
+#endif
 }
 
 Gear::Gear() :
