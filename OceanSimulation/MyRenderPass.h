@@ -202,7 +202,7 @@ public:
 
 		effect = new BloomEffect(context, Graphics::getWidth(), Graphics::getHeight(), resManager);
 
-		envCube = resManager->createTextureCube("ColdSunsetEquirect.png", 1024, true);
+		envCube = resManager->createTextureCube("E:\\Assets\\Ocean\\ColdSunsetEquirect.png", 1024, true);
 
 		randomGauss = resManager->createTextureRenderTarget(1024, 1024, RandomDataType::GAUSS, true);
 
