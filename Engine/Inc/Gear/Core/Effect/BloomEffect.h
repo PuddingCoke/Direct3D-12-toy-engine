@@ -5,6 +5,8 @@
 
 #include"Effect.h"
 
+#include<ImGUI/imgui.h>
+
 #include<Gear/CompiledShaders/BloomFilterPS.h>
 #include<Gear/CompiledShaders/BloomFinalPS.h>
 #include<Gear/CompiledShaders/BloomVBlurCS.h>
@@ -35,6 +37,8 @@ public:
 	~BloomEffect();
 
 	TextureRenderTarget* process(TextureRenderTarget* const inputTexture) const;
+
+	void imGuiCommand();
 
 	void setExposure(const float exposure);
 

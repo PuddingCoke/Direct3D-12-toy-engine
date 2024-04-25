@@ -213,6 +213,8 @@ public:
 		end();
 
 		RenderEngine::get()->submitRenderPass(this);
+		
+		effect->setExposure(1.5f);
 	}
 
 	~MyRenderPass()
@@ -255,6 +257,11 @@ public:
 		delete depthTexture;
 
 		delete effect;
+	}
+
+	void imGuiCommand() override
+	{
+		effect->imGuiCommand();
 	}
 
 protected:

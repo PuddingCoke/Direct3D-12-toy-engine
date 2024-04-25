@@ -68,6 +68,8 @@ void Gear::iniGame(Game* const gamePtr)
 {
 	game = gamePtr;
 
+	RenderEngine::get()->toggleImGuiSurface();
+
 	//resource creation may need dynamic constant buffer
 	RenderEngine::get()->updateConstantBuffer();
 

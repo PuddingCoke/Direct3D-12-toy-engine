@@ -15,7 +15,6 @@ static const float2 texCoords[] =
 struct VertexOutput
 {
     float2 texCoord : TEXCOORD;
-    uint renderTargetArrayIndex : SV_RenderTargetArrayIndex;
     float4 position : SV_Position;
 };
 
@@ -23,7 +22,6 @@ VertexOutput main(uint vertexID : SV_VertexID, uint instanceID : SV_InstanceID)
 {
     VertexOutput output;
     output.texCoord = texCoords[vertexID];
-    output.renderTargetArrayIndex = instanceID;
     output.position = float4(positions[vertexID], 0.0, 1.0);
     return output;
 }

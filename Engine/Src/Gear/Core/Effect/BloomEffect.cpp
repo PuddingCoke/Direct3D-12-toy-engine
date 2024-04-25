@@ -241,6 +241,17 @@ TextureRenderTarget* BloomEffect::process(TextureRenderTarget* const inputTextur
 	return outputTexture;
 }
 
+void BloomEffect::imGuiCommand()
+{
+	ImGui::Begin("Bloom Effect");
+	ImGui::SliderFloat("Exposure", &bloomParam.exposure, 0.0f, 4.f);
+	ImGui::SliderFloat("Gamma", &bloomParam.gamma, 0.0f, 4.f);
+	ImGui::SliderFloat("Threshold", &bloomParam.threshold, 0.0f, 1.f);
+	ImGui::SliderFloat("SoftThreshold", &bloomParam.softThreshold, 0.0f, 1.f);
+	ImGui::SliderFloat("Intensity", &bloomParam.intensity, 0.0f, 4.f);
+	ImGui::End();
+}
+
 void BloomEffect::setExposure(const float exposure)
 {
 	bloomParam.exposure = exposure;

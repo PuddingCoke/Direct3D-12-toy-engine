@@ -235,7 +235,7 @@ void RenderEngine::begin()
 
 void RenderEngine::end()
 {
-	if(displayImGUISurface)
+	if (displayImGUISurface)
 	{
 		ImGui::Begin("Frame Profile");
 		ImGui::Text("TimeElapsed %.2f", Graphics::getTimeElapsed());
@@ -373,9 +373,17 @@ ComPtr<IDXGIAdapter4> RenderEngine::getBestAdapterAndVendor(IDXGIFactory7* const
 	return adapter;
 }
 
+void RenderEngine::toggleImGuiSurface()
+{
+	if (initializeImGuiSurface)
+	{
+		displayImGUISurface = !displayImGUISurface;
+	}
+}
+
 void RenderEngine::beginImGuiFrame()
 {
-	if (displayImGUISurface) 
+	if (displayImGUISurface)
 	{
 		ImGui_ImplDX12_NewFrame();
 		ImGui_ImplWin32_NewFrame();
@@ -398,7 +406,7 @@ void RenderEngine::endImGuiFrame()
 }
 
 RenderEngine::RenderEngine(const HWND hwnd, const bool useSwapChainBuffer, const bool initializeImGuiSurface) :
-	fenceValues{}, fenceEvent(nullptr), vendor(GPUVendor::UNKNOWN), perFrameResource{}, initializeImGuiSurface(initializeImGuiSurface), displayImGUISurface(initializeImGuiSurface)
+	fenceValues{}, fenceEvent(nullptr), vendor(GPUVendor::UNKNOWN), perFrameResource{}, initializeImGuiSurface(initializeImGuiSurface), displayImGUISurface(false)
 {
 	ComPtr<IDXGIFactory7> factory;
 
