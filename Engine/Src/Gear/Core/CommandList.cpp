@@ -163,9 +163,9 @@ void CommandList::setComputePipelineResources(const std::initializer_list<Shader
 	setPipelineResources(descs, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
 }
 
-void CommandList::setDefRenderTarget()
+void CommandList::setDefRenderTarget() const
 {
-	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = Graphics::getBackBufferHandle();
+	const D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = Graphics::getBackBufferHandle();
 
 	commandList->OMSetRenderTargets(1, &rtvHandle, FALSE, nullptr);
 }

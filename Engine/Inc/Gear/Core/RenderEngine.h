@@ -60,6 +60,10 @@ private:
 
 	ComPtr<IDXGIAdapter4> getBestAdapterAndVendor(IDXGIFactory7* const factory);
 
+	void beginImGuiFrame();
+
+	void endImGuiFrame();
+
 	RenderEngine(const HWND hwnd, const bool useSwapChainBuffer, const bool initializeImGuiSurface);
 
 	~RenderEngine();

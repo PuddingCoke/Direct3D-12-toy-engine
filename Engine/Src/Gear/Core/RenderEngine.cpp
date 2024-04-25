@@ -214,12 +214,7 @@ void RenderEngine::waitForNextFrame()
 
 void RenderEngine::begin()
 {
-	if (displayImGUISurface)
-	{
-		ImGui_ImplDX12_NewFrame();
-		ImGui_ImplWin32_NewFrame();
-		ImGui::NewFrame();
-	}
+	beginImGuiFrame();
 
 	beginCommandlist->open();
 
@@ -265,16 +260,7 @@ void RenderEngine::end()
 	{
 		endCommandList->open();
 
-		if (displayImGUISurface)
-		{
-			ImGui::Render();
-
-			endCommandList->setDescriptorHeap(GlobalDescriptorHeap::getResourceHeap(), GlobalDescriptorHeap::getSamplerHeap());
-
-			endCommandList->setDefRenderTarget();
-
-			ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), endCommandList->get());
-		}
+		endImGuiFrame();
 
 		endCommandList->pushResourceTrackList(getCurrentRenderTexture());
 
@@ -385,6 +371,30 @@ ComPtr<IDXGIAdapter4> RenderEngine::getBestAdapterAndVendor(IDXGIFactory7* const
 	}
 
 	return adapter;
+}
+
+void RenderEngine::beginImGuiFrame()
+{
+	if (displayImGUISurface) 
+	{
+		ImGui_ImplDX12_NewFrame();
+		ImGui_ImplWin32_NewFrame();
+		ImGui::NewFrame();
+	}
+}
+
+void RenderEngine::endImGuiFrame()
+{
+	if (displayImGUISurface)
+	{
+		ImGui::Render();
+
+		endCommandList->setDescriptorHeap(GlobalDescriptorHeap::getResourceHeap(), GlobalDescriptorHeap::getSamplerHeap());
+
+		endCommandList->setDefRenderTarget();
+
+		ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), endCommandList->get());
+	}
 }
 
 RenderEngine::RenderEngine(const HWND hwnd, const bool useSwapChainBuffer, const bool initializeImGuiSurface) :
@@ -531,6 +541,8 @@ RenderEngine::RenderEngine(const HWND hwnd, const bool useSwapChainBuffer, const
 
 	if (initializeImGuiSurface)
 	{
+		std::cout << "[class RenderEngine] enable ImGui\n";
+
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
 		ImGuiIO& io = ImGui::GetIO();
@@ -544,9 +556,11 @@ RenderEngine::RenderEngine(const HWND hwnd, const bool useSwapChainBuffer, const
 		ImGui_ImplDX12_Init(GraphicsDevice::get(), Graphics::FrameBufferCount, Graphics::BackBufferFormat,
 			GlobalDescriptorHeap::getResourceHeap()->get(), handle.getCPUHandle(), handle.getGPUHandle());
 
-		ImGui_ImplDX12_NewFrame();
-		ImGui_ImplWin32_NewFrame();
-		ImGui::NewFrame();
+		beginImGuiFrame();
+	}
+	else
+	{
+		std::cout << "[class RenderEngine] disable ImGui\n";
 	}
 }
 
