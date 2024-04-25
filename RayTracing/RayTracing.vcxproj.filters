@@ -27,8 +27,4 @@
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
-  <ItemGroup>
-    <FxCompile Include="AccumulateShader.hlsl" />
-    <FxCompile Include="DisplayShader.hlsl" />
-  </ItemGroup>
 </Project>

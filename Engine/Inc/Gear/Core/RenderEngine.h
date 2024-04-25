@@ -60,6 +60,8 @@ private:
 
 	ComPtr<IDXGIAdapter4> getBestAdapterAndVendor(IDXGIFactory7* const factory);
 
+	void toggleImGuiSurface();
+
 	void beginImGuiFrame();
 
 	void endImGuiFrame();
