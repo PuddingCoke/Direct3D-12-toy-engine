@@ -273,25 +273,6 @@ void RenderEngine::end()
 
 			endCommandList->setDefRenderTarget();
 
-			{
-				const D3D12_VIEWPORT vp = {
-					0.f,0.f,
-					static_cast<float>(Graphics::getWidth()),static_cast<float>(Graphics::getHeight()),
-					0.f,1.f
-				};
-
-				endCommandList->get()->RSSetViewports(1, &vp);
-			}
-
-			{
-				const D3D12_RECT rt = {
-					0,0,
-					Graphics::getWidth(),Graphics::getHeight()
-				};
-
-				endCommandList->get()->RSSetScissorRects(1, &rt);
-			}
-
 			ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), endCommandList->get());
 		}
 
@@ -409,15 +390,23 @@ ComPtr<IDXGIAdapter4> RenderEngine::getBestAdapterAndVendor(IDXGIFactory7* const
 RenderEngine::RenderEngine(const HWND hwnd, const bool useSwapChainBuffer, const bool initializeImGuiSurface) :
 	fenceValues{}, fenceEvent(nullptr), vendor(GPUVendor::UNKNOWN), perFrameResource{}, initializeImGuiSurface(initializeImGuiSurface), displayImGUISurface(initializeImGuiSurface)
 {
+	ComPtr<IDXGIFactory7> factory;
+
+#ifdef _DEBUG
+	std::cout << "[class RenderEngine] enable debug layer\n";
+
 	ComPtr<ID3D12Debug> debugController;
 
 	D3D12GetDebugInterface(IID_PPV_ARGS(&debugController));
 
 	debugController->EnableDebugLayer();
 
-	ComPtr<IDXGIFactory7> factory;
-
 	CreateDXGIFactory2(DXGI_CREATE_FACTORY_DEBUG, IID_PPV_ARGS(&factory));
+#else
+	std::cout << "[class RenderEngine] disable debug layer\n";
+
+	CreateDXGIFactory2(0, IID_PPV_ARGS(&factory));
+#endif // _DEBUG
 
 	ComPtr<IDXGIAdapter4> adapter = getBestAdapterAndVendor(factory.Get());
 
@@ -546,8 +535,6 @@ RenderEngine::RenderEngine(const HWND hwnd, const bool useSwapChainBuffer, const
 		ImGui::CreateContext();
 		ImGuiIO& io = ImGui::GetIO();
 		(void)io;
-		io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
-		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 
 		ImGui::StyleColorsDark();
 
