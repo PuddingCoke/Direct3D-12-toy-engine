@@ -35,7 +35,7 @@ int Gear::iniEngine(const Configuration config, const int argc, const char* argv
 	switch (config.usage)
 	{
 	case Configuration::EngineUsage::NORMAL:
-		RenderEngine::instance = new RenderEngine(winform->getHandle(), true, true);
+		RenderEngine::instance = new RenderEngine(winform->getHandle(), true, config.enableImGuiSurface);
 		break;
 
 	case Configuration::EngineUsage::VIDEOPLAYBACK:

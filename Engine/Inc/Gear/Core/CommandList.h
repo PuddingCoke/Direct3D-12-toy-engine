@@ -62,7 +62,7 @@ public:
 
 	void setComputePipelineResources(const std::initializer_list<ShaderResourceDesc>& descs);
 
-	void setDefRenderTarget();
+	void setDefRenderTarget() const;
 
 	void setRenderTargets(const std::initializer_list<RenderTargetDesc>& renderTargets, const DepthStencilDesc* const depthStencils);
 
