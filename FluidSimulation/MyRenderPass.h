@@ -42,22 +42,22 @@ public:
 			Graphics::getHeight() / config.resolutionFactor
 		};
 
-		colorTex = new SwapTexture([=] {return ResourceManager::createTextureRenderTarget(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R16G16B16A16_FLOAT, 1, 1, false, true,
+		colorTex = new SwapTexture([=] {return ResourceManager::createTextureRenderView(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R16G16B16A16_FLOAT, 1, 1, false, true,
 			DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_R16G16B16A16_FLOAT); });
 
-		velocityTex = new SwapTexture([=] {return ResourceManager::createTextureRenderTarget(simRes.x, simRes.y, DXGI_FORMAT_R32G32_FLOAT, 1, 1, false, true,
+		velocityTex = new SwapTexture([=] {return ResourceManager::createTextureRenderView(simRes.x, simRes.y, DXGI_FORMAT_R32G32_FLOAT, 1, 1, false, true,
 			DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_R32G32_FLOAT); });
 
-		pressureTex = new SwapTexture([=] {return ResourceManager::createTextureRenderTarget(simRes.x, simRes.y, DXGI_FORMAT_R32_FLOAT, 1, 1, false, true,
+		pressureTex = new SwapTexture([=] {return ResourceManager::createTextureRenderView(simRes.x, simRes.y, DXGI_FORMAT_R32_FLOAT, 1, 1, false, true,
 			DXGI_FORMAT_R32_FLOAT, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_R32_FLOAT); });
 
-		curlTex = ResourceManager::createTextureRenderTarget(simRes.x, simRes.y, DXGI_FORMAT_R32_FLOAT, 1, 1, false, true,
+		curlTex = ResourceManager::createTextureRenderView(simRes.x, simRes.y, DXGI_FORMAT_R32_FLOAT, 1, 1, false, true,
 			DXGI_FORMAT_R32_FLOAT, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_R32_FLOAT);
 
-		divergenceTex = ResourceManager::createTextureRenderTarget(simRes.x, simRes.y, DXGI_FORMAT_R32_FLOAT, 1, 1, false, true,
+		divergenceTex = ResourceManager::createTextureRenderView(simRes.x, simRes.y, DXGI_FORMAT_R32_FLOAT, 1, 1, false, true,
 			DXGI_FORMAT_R32_FLOAT, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_R32_FLOAT);
 
-		originTexture = ResourceManager::createTextureRenderTarget(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R16G16B16A16_FLOAT, 1, 1, false, true,
+		originTexture = ResourceManager::createTextureRenderView(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R16G16B16A16_FLOAT, 1, 1, false, true,
 			DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_R16G16B16A16_FLOAT);
 
 		simulationParamBuffer = ResourceManager::createConstantBuffer(sizeof(SimulationParam), true);
@@ -332,7 +332,7 @@ public:
 		context->transitionResources();
 		context->draw(3, 1, 0, 0);
 
-		TextureRenderTarget* const outputTexture = effect->process(originTexture);
+		TextureRenderView* const outputTexture = effect->process(originTexture);
 
 		context->setPipelineState(fullScreenState.Get());
 		context->setDefRenderTarget();
@@ -350,13 +350,13 @@ private:
 
 	SwapTexture* velocityTex;
 
-	TextureRenderTarget* curlTex;
+	TextureRenderView* curlTex;
 
-	TextureRenderTarget* divergenceTex;
+	TextureRenderView* divergenceTex;
 
 	SwapTexture* pressureTex;
 
-	TextureRenderTarget* originTexture;
+	TextureRenderView* originTexture;
 
 	struct Config
 	{

@@ -14,21 +14,21 @@ class MyRenderPass :public RenderPass
 public:
 
 	MyRenderPass() :
-		gPosition(ResourceManager::createTextureRenderTarget(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 1, false, true,
+		gPosition(ResourceManager::createTextureRenderView(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 1, false, true,
 			DXGI_FORMAT_R32G32B32A32_FLOAT, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_R32G32B32A32_FLOAT, DirectX::Colors::Transparent)),
-		gNormalSpecular(ResourceManager::createTextureRenderTarget(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 1, false, true,
+		gNormalSpecular(ResourceManager::createTextureRenderView(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 1, false, true,
 			DXGI_FORMAT_R32G32B32A32_FLOAT, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_R32G32B32A32_FLOAT, DirectX::Colors::Transparent)),
-		gBaseColor(ResourceManager::createTextureRenderTarget(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R8G8B8A8_UNORM, 1, 1, false, true,
+		gBaseColor(ResourceManager::createTextureRenderView(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R8G8B8A8_UNORM, 1, 1, false, true,
 			DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_R8G8B8A8_UNORM, DirectX::Colors::Transparent)),
-		depthTexture(ResourceManager::createTextureDepthStencil(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R32_TYPELESS, 1, 1, false, true)),
-		shadowTexture(ResourceManager::createTextureDepthStencil(shadowTextureResolution, shadowTextureResolution, DXGI_FORMAT_R32_TYPELESS, 1, 1, false, true)),
-		originTexture(ResourceManager::createTextureRenderTarget(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R16G16B16A16_FLOAT, 1, 1, false, true,
+		depthTexture(ResourceManager::createTextureDepthView(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R32_TYPELESS, 1, 1, false, true)),
+		shadowTexture(ResourceManager::createTextureDepthView(shadowTextureResolution, shadowTextureResolution, DXGI_FORMAT_R32_TYPELESS, 1, 1, false, true)),
+		originTexture(ResourceManager::createTextureRenderView(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R16G16B16A16_FLOAT, 1, 1, false, true,
 			DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_R16G16B16A16_FLOAT, DirectX::Colors::Black)),
-		radianceCube(ResourceManager::createTextureRenderTarget(probeCaptureResolution, probeCaptureResolution, DXGI_FORMAT_R16G16B16A16_FLOAT, 6, 1, true, true,
+		radianceCube(ResourceManager::createTextureRenderView(probeCaptureResolution, probeCaptureResolution, DXGI_FORMAT_R16G16B16A16_FLOAT, 6, 1, true, true,
 			DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_R16G16B16A16_FLOAT, radianceCubeClearColor)),
-		distanceCube(ResourceManager::createTextureRenderTarget(probeCaptureResolution, probeCaptureResolution, DXGI_FORMAT_R32_FLOAT, 6, 1, true, true,
+		distanceCube(ResourceManager::createTextureRenderView(probeCaptureResolution, probeCaptureResolution, DXGI_FORMAT_R32_FLOAT, 6, 1, true, true,
 			DXGI_FORMAT_R32_FLOAT, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_R32_FLOAT, distanceCubeClearColor)),
-		depthCube(ResourceManager::createTextureDepthStencil(probeCaptureResolution, probeCaptureResolution, DXGI_FORMAT_R32_TYPELESS, 6, 1, true, true)),
+		depthCube(ResourceManager::createTextureDepthView(probeCaptureResolution, probeCaptureResolution, DXGI_FORMAT_R32_TYPELESS, 6, 1, true, true)),
 		irradianceVolumeBuffer(ResourceManager::createConstantBuffer(sizeof(IrradianceVolume), true)),
 		shadowVS(new Shader(Utils::getRootFolder() + "ShadowVS.cso")),
 		deferredVShader(new Shader(Utils::getRootFolder() + "DeferredVShader.cso")),
@@ -42,13 +42,13 @@ public:
 		skyboxPShader(new Shader(Utils::getRootFolder() + "SkybosPShader.cso")),
 		sunAngle(Math::half_pi - 0.01f)
 	{
-		irradianceOctahedralMap = ResourceManager::createTextureRenderTarget(6, 6, DXGI_FORMAT_R11G11B10_FLOAT, probeCount, 1, false, true,
+		irradianceOctahedralMap = ResourceManager::createTextureRenderView(6, 6, DXGI_FORMAT_R11G11B10_FLOAT, probeCount, 1, false, true,
 			DXGI_FORMAT_R11G11B10_FLOAT, DXGI_FORMAT_R11G11B10_FLOAT, DXGI_FORMAT_UNKNOWN);
 
-		irradianceBounceOctahedralMap = ResourceManager::createTextureRenderTarget(6, 6, DXGI_FORMAT_R11G11B10_FLOAT, probeCount, 1, false, true,
+		irradianceBounceOctahedralMap = ResourceManager::createTextureRenderView(6, 6, DXGI_FORMAT_R11G11B10_FLOAT, probeCount, 1, false, true,
 			DXGI_FORMAT_R11G11B10_FLOAT, DXGI_FORMAT_R11G11B10_FLOAT, DXGI_FORMAT_UNKNOWN);
 
-		depthOctahedralMap = ResourceManager::createTextureRenderTarget(16, 16, DXGI_FORMAT_R16G16_FLOAT, probeCount, 1, false, true,
+		depthOctahedralMap = ResourceManager::createTextureRenderView(16, 16, DXGI_FORMAT_R16G16_FLOAT, probeCount, 1, false, true,
 			DXGI_FORMAT_R16G16_FLOAT, DXGI_FORMAT_R16G16_FLOAT, DXGI_FORMAT_UNKNOWN);
 
 		irradianceOctahedralMap->getTexture()->setName(L"Irradiance Octahedral Map");
@@ -540,7 +540,7 @@ protected:
 
 		context->draw(36, 1, 0, 0);
 
-		TextureRenderTarget* bloomTexture = effect->process(originTexture);
+		TextureRenderView* bloomTexture = effect->process(originTexture);
 
 		context->setPipelineState(fullScreenBlitState.Get());
 
@@ -606,31 +606,31 @@ protected:
 
 	float sunAngle;
 
-	TextureRenderTarget* gPosition;
+	TextureRenderView* gPosition;
 
-	TextureRenderTarget* gNormalSpecular;
+	TextureRenderView* gNormalSpecular;
 
-	TextureRenderTarget* gBaseColor;
+	TextureRenderView* gBaseColor;
 
-	TextureDepthStencil* depthTexture;
+	TextureDepthView* depthTexture;
 
-	TextureDepthStencil* shadowTexture;
+	TextureDepthView* shadowTexture;
 
-	TextureRenderTarget* originTexture;
+	TextureRenderView* originTexture;
 
-	TextureRenderTarget* radianceCube;
+	TextureRenderView* radianceCube;
 
-	TextureRenderTarget* distanceCube;
+	TextureRenderView* distanceCube;
 
-	TextureDepthStencil* depthCube;
+	TextureDepthView* depthCube;
 
-	TextureRenderTarget* irradianceOctahedralMap;
+	TextureRenderView* irradianceOctahedralMap;
 
-	TextureRenderTarget* irradianceBounceOctahedralMap;
+	TextureRenderView* irradianceBounceOctahedralMap;
 
-	TextureRenderTarget* depthOctahedralMap;
+	TextureRenderView* depthOctahedralMap;
 
-	TextureRenderTarget* skybox;
+	TextureRenderView* skybox;
 
 	ComPtr<ID3D12PipelineState> shadowPipelineState;
 

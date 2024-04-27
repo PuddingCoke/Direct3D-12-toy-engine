@@ -10,6 +10,8 @@
 #include<sstream>
 #include<algorithm>
 #include<Windows.h>
+#include<dxgiformat.h>
+
 
 class Utils
 {
@@ -20,6 +22,8 @@ public:
 	Utils(const Utils&) = delete;
 
 	static const std::string& getRootFolder();
+	
+	static UINT getPixelSize(const DXGI_FORMAT format);
 
 	class File
 	{

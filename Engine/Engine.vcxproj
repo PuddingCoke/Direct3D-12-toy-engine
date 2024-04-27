@@ -140,7 +140,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Inc\DDSTextureLoader\DDSTextureLoader12.h" />
-    <ClInclude Include="Inc\Gear\Core\Resource\StructuredBuffer.h" />
+    <ClInclude Include="Inc\Gear\Core\Resource\BufferView.h" />
     <ClInclude Include="Inc\ImGUI\imconfig.h" />
     <ClInclude Include="Inc\ImGUI\imgui.h" />
     <ClInclude Include="Inc\ImGUI\imgui_impl_dx12.h" />
@@ -177,11 +177,9 @@
     <ClInclude Include="Inc\Gear\Core\ResourceManager.h" />
     <ClInclude Include="Inc\Gear\Core\Resource\ConstantBuffer.h" />
     <ClInclude Include="Inc\Gear\Core\Resource\EngineResource.h" />
-    <ClInclude Include="Inc\Gear\Core\Resource\IndexBuffer.h" />
     <ClInclude Include="Inc\Gear\Core\Resource\IndexConstantBuffer.h" />
-    <ClInclude Include="Inc\Gear\Core\Resource\TextureDepthStencil.h" />
-    <ClInclude Include="Inc\Gear\Core\Resource\TextureRenderTarget.h" />
-    <ClInclude Include="Inc\Gear\Core\Resource\VertexBuffer.h" />
+    <ClInclude Include="Inc\Gear\Core\Resource\TextureDepthView.h" />
+    <ClInclude Include="Inc\Gear\Core\Resource\TextureRenderView.h" />
     <ClInclude Include="Inc\Gear\Core\RootSignature.h" />
     <ClInclude Include="Inc\Gear\Core\Shader.h" />
     <ClInclude Include="Inc\Gear\Core\States.h" />
@@ -234,18 +232,16 @@
     <ClCompile Include="Src\Gear\Core\DX\Resource\UploadHeap.cpp" />
     <ClCompile Include="Src\Gear\Core\GraphicsDevice.cpp" />
     <ClCompile Include="Src\Gear\Core\ResourceManager.cpp" />
+    <ClCompile Include="Src\Gear\Core\Resource\BufferView.cpp" />
     <ClCompile Include="Src\Gear\Core\Resource\ConstantBuffer.cpp" />
     <ClCompile Include="Src\Gear\Core\Resource\EngineResource.cpp" />
-    <ClCompile Include="Src\Gear\Core\Resource\IndexBuffer.cpp" />
     <ClCompile Include="Src\Gear\Core\Resource\IndexConstantBuffer.cpp" />
     <ClCompile Include="Src\Gear\Core\Resource\SwapTexture.cpp" />
-    <ClCompile Include="Src\Gear\Core\Resource\TextureDepthStencil.cpp" />
-    <ClCompile Include="Src\Gear\Core\Resource\TextureRenderTarget.cpp" />
-    <ClCompile Include="Src\Gear\Core\Resource\VertexBuffer.cpp" />
+    <ClCompile Include="Src\Gear\Core\Resource\TextureDepthView.cpp" />
+    <ClCompile Include="Src\Gear\Core\Resource\TextureRenderView.cpp" />
     <ClCompile Include="Src\Gear\Core\RootSignature.cpp" />
     <ClCompile Include="Src\Gear\Core\Shader.cpp" />
     <ClCompile Include="Src\Gear\Core\States.cpp" />
-    <ClCompile Include="Src\Gear\Core\Resource\StructuredBuffer.cpp" />
     <ClCompile Include="Src\Gear\Core\VideoEncoder\Encoder.cpp" />
     <ClCompile Include="Src\Gear\Core\VideoEncoder\NvidiaEncoder.cpp" />
     <ClCompile Include="Src\Gear\Game.cpp" />

@@ -36,7 +36,7 @@ public:
 
 	~BloomEffect();
 
-	TextureRenderTarget* process(TextureRenderTarget* const inputTexture) const;
+	TextureRenderView* process(TextureRenderView* const inputTexture) const;
 
 	void imGuiCommand();
 
@@ -82,11 +82,11 @@ private:
 
 	DirectX::XMUINT2 resolutions[blurSteps];
 
-	TextureRenderTarget* lensDirtTexture;
+	TextureRenderView* lensDirtTexture;
 
 	SwapTexture* swapTexture[blurSteps];
 
-	TextureRenderTarget* filteredTexture;
+	TextureRenderView* filteredTexture;
 
 	ConstantBuffer* blurParamBuffer[blurSteps];
 

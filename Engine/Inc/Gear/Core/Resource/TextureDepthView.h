@@ -1,13 +1,13 @@
 #pragma once
 
-#ifndef _TEXTUREDEPTHSTENCIL_H_
-#define _TEXTUREDEPTHSTENCIL_H_
+#ifndef _TEXTUREDEPTHVIEW_H_
+#define _TEXTUREDEPTHVIEW_H_
 
 #include<Gear/Core/DX/Resource/Texture.h>
 
 #include"EngineResource.h"
 
-class TextureDepthStencil :public EngineResource
+class TextureDepthView :public EngineResource
 {
 public:
 
@@ -16,11 +16,11 @@ public:
 	//R16_TYPELESS 
 	//R32G8X24_TYPELESS 
 	//R24G8_TYPELESS
-	TextureDepthStencil(Texture* const texture, const bool isTextureCube, const bool persistent);
+	TextureDepthView(Texture* const texture, const bool isTextureCube, const bool persistent);
 
-	TextureDepthStencil(const TextureDepthStencil&);
+	TextureDepthView(const TextureDepthView&);
 
-	~TextureDepthStencil();
+	~TextureDepthView();
 
 	ShaderResourceDesc getAllDepthIndex() const;
 
@@ -52,4 +52,4 @@ private:
 };
 
 
-#endif // !_TEXTUREDEPTHSTENCIL_H_
+#endif // !_TEXTUREDEPTHVIEW_H_

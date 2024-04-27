@@ -9,11 +9,11 @@ public:
 
 	Material(ResourceManager* const resManager, const std::string& diffusePath, const std::string& specularPath, std::string& normalPath)
 	{
-		diffuse = resManager->createTextureRenderTarget(diffusePath, true);
+		diffuse = resManager->createTextureRenderView(diffusePath, true);
 
-		specular = resManager->createTextureRenderTarget(specularPath, true);
+		specular = resManager->createTextureRenderView(specularPath, true);
 
-		normal = resManager->createTextureRenderTarget(normalPath, true);
+		normal = resManager->createTextureRenderView(normalPath, true);
 	}
 
 	~Material()
@@ -31,10 +31,10 @@ public:
 
 private:
 
-	TextureRenderTarget* diffuse;
+	TextureRenderView* diffuse;
 
-	TextureRenderTarget* specular;
+	TextureRenderView* specular;
 
-	TextureRenderTarget* normal;
+	TextureRenderView* normal;
 
 };

@@ -3,7 +3,7 @@
 #include<Gear/Core/RenderPass.h>
 #include<Gear/Core/Shader.h>
 
-#include<Gear/Core/Resource/TextureRenderTarget.h>
+#include<Gear/Core/Resource/TextureRenderView.h>
 
 class MyRenderPass :public RenderPass
 {

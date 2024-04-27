@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef _TEXTURERENDERTARGET_H_
-#define _TEXTURERENDERTARGET_H_
+#ifndef _TEXTURERENDERVIEW_H_
+#define _TEXTURERENDERVIEW_H_
 
 #include<Gear/Core/DX/Resource/Texture.h>
 
@@ -13,15 +13,15 @@
 //texture2darray
 //texture2d
 //SRV/RTV/UAV
-class TextureRenderTarget :public EngineResource
+class TextureRenderView :public EngineResource
 {
 public:
 
-	TextureRenderTarget(Texture* const texture, const bool isTextureCube, const bool persistent, const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat);
+	TextureRenderView(Texture* const texture, const bool isTextureCube, const bool persistent, const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat);
 
-	TextureRenderTarget(const TextureRenderTarget&);
+	TextureRenderView(const TextureRenderView&);
 
-	~TextureRenderTarget();
+	~TextureRenderView();
 
 	ShaderResourceDesc getAllSRVIndex() const;
 
@@ -41,8 +41,6 @@ public:
 
 private:
 
-	void createViews(const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat, const bool isTextureCube, const bool persistent);
-
 	//offset 1 for each mipSlice
 	//since 0th position is all srv
 	UINT allSRVIndex;
@@ -56,4 +54,4 @@ private:
 	Texture* texture;
 };
 
-#endif // !_TEXTURERENDERTARGET_H_
+#endif // !_TEXTURERENDERVIEW_H_

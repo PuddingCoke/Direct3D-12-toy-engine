@@ -4,9 +4,8 @@
 #define _GRAPHICSCONTEXT_H_
 
 #include<Gear/Core/CommandList.h>
+#include<Gear/Core/Resource/BufferView.h>
 #include<Gear/Core/Resource/ConstantBuffer.h>
-#include<Gear/Core/Resource/VertexBuffer.h>
-#include<Gear/Core/Resource/IndexBuffer.h>
 #include<Gear/Core/Resource/IndexConstantBuffer.h>
 
 class GraphicsContext
@@ -17,9 +16,7 @@ public:
 
 	~GraphicsContext();
 
-	void updateBuffer(VertexBuffer* const vb, const void* const data, const UINT size);
-
-	void updateBuffer(IndexBuffer* const ib, const void* const data, const UINT size);
+	void updateBuffer(BufferView* const bufferView, const void* const data, const UINT size);
 
 	//per frame global resources transition immediate
 	void setGlobalConstantBuffer(const IndexConstantBuffer* const indexBuffer);

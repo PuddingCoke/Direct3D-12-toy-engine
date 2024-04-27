@@ -1,6 +1,6 @@
-#include<Gear/Core/Resource/TextureDepthStencil.h>
+#include<Gear/Core/Resource/TextureDepthView.h>
 
-TextureDepthStencil::TextureDepthStencil(Texture* const texture, const bool isTextureCube, const bool persistent):
+TextureDepthView::TextureDepthView(Texture* const texture, const bool isTextureCube, const bool persistent):
 	texture(texture)
 {
 	const UINT mipLevels = texture->getMipLevels();
@@ -407,7 +407,7 @@ TextureDepthStencil::TextureDepthStencil(Texture* const texture, const bool isTe
 	}
 }
 
-TextureDepthStencil::TextureDepthStencil(const TextureDepthStencil& tds) :
+TextureDepthView::TextureDepthView(const TextureDepthView& tds) :
 	allDepthIndex(tds.allDepthIndex),
 	allStencilIndex(tds.allStencilIndex),
 	depthMipIndexStart(tds.depthMipIndexStart),
@@ -417,7 +417,7 @@ TextureDepthStencil::TextureDepthStencil(const TextureDepthStencil& tds) :
 {
 }
 
-TextureDepthStencil::~TextureDepthStencil()
+TextureDepthView::~TextureDepthView()
 {
 	if (texture)
 	{
@@ -425,7 +425,7 @@ TextureDepthStencil::~TextureDepthStencil()
 	}
 }
 
-ShaderResourceDesc TextureDepthStencil::getAllDepthIndex() const
+ShaderResourceDesc TextureDepthView::getAllDepthIndex() const
 {
 	ShaderResourceDesc desc = {};
 	desc.type = ShaderResourceDesc::TEXTURE;
@@ -437,7 +437,7 @@ ShaderResourceDesc TextureDepthStencil::getAllDepthIndex() const
 	return desc;
 }
 
-ShaderResourceDesc TextureDepthStencil::getAllStencilIndex() const
+ShaderResourceDesc TextureDepthView::getAllStencilIndex() const
 {
 	ShaderResourceDesc desc = {};
 	desc.type = ShaderResourceDesc::TEXTURE;
@@ -449,7 +449,7 @@ ShaderResourceDesc TextureDepthStencil::getAllStencilIndex() const
 	return desc;
 }
 
-ShaderResourceDesc TextureDepthStencil::getDepthMipIndex(const UINT mipSlice) const
+ShaderResourceDesc TextureDepthView::getDepthMipIndex(const UINT mipSlice) const
 {
 	ShaderResourceDesc desc = {};
 	desc.type = ShaderResourceDesc::TEXTURE;
@@ -461,7 +461,7 @@ ShaderResourceDesc TextureDepthStencil::getDepthMipIndex(const UINT mipSlice) co
 	return desc;
 }
 
-ShaderResourceDesc TextureDepthStencil::getStencilMipIndex(const UINT mipSlice) const
+ShaderResourceDesc TextureDepthView::getStencilMipIndex(const UINT mipSlice) const
 {
 	ShaderResourceDesc desc = {};
 	desc.type = ShaderResourceDesc::TEXTURE;
@@ -473,7 +473,7 @@ ShaderResourceDesc TextureDepthStencil::getStencilMipIndex(const UINT mipSlice) 
 	return desc;
 }
 
-DepthStencilDesc TextureDepthStencil::getDSVMipHandle(const UINT mipSlice) const
+DepthStencilDesc TextureDepthView::getDSVMipHandle(const UINT mipSlice) const
 {
 	DepthStencilDesc desc = {};
 	desc.texture = texture;
@@ -483,12 +483,12 @@ DepthStencilDesc TextureDepthStencil::getDSVMipHandle(const UINT mipSlice) const
 	return desc;
 }
 
-Texture* TextureDepthStencil::getTexture() const
+Texture* TextureDepthView::getTexture() const
 {
 	return texture;
 }
 
-void TextureDepthStencil::copyDescriptors()
+void TextureDepthView::copyDescriptors()
 {
 	const DescriptorHandle handle = GlobalDescriptorHeap::getResourceHeap()->allocDynamicDescriptor(numSRVUAVCBVDescriptors);
 

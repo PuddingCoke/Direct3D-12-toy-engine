@@ -1,99 +1,8 @@
-#include<Gear/Core/Resource/TextureRenderTarget.h>
+#include<Gear/Core/Resource/TextureRenderView.h>
 
-TextureRenderTarget::TextureRenderTarget(Texture* const texture, const bool isTextureCube, const bool persistent, const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat) :
+TextureRenderView::TextureRenderView(Texture* const texture, const bool isTextureCube, const bool persistent, const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat) :
 	texture(texture), hasRTV((rtvFormat != DXGI_FORMAT_UNKNOWN)), hasUAV((uavFormat != DXGI_FORMAT_UNKNOWN))
 {
-	createViews(srvFormat, uavFormat, rtvFormat, isTextureCube, persistent);
-}
-
-TextureRenderTarget::TextureRenderTarget(const TextureRenderTarget& trt) :
-	hasRTV(trt.hasRTV),
-	hasUAV(trt.hasUAV),
-	allSRVIndex(trt.allSRVIndex),
-	srvMipIndexStart(trt.srvMipIndexStart),
-	uavMipIndexStart(trt.uavMipIndexStart),
-	rtvMipHandles(trt.rtvMipHandles),
-	texture(new Texture(*(trt.texture)))
-{
-}
-
-TextureRenderTarget::~TextureRenderTarget()
-{
-	if (texture)
-	{
-		delete texture;
-	}
-}
-
-ShaderResourceDesc TextureRenderTarget::getAllSRVIndex() const
-{
-	ShaderResourceDesc desc = {};
-	desc.type = ShaderResourceDesc::TEXTURE;
-	desc.state = ShaderResourceDesc::SRV;
-	desc.resourceIndex = allSRVIndex;
-	desc.textureDesc.texture = texture;
-	desc.textureDesc.mipSlice = D3D12_TRANSITION_ALL_MIPLEVELS;
-
-	return desc;
-}
-
-ShaderResourceDesc TextureRenderTarget::getSRVMipIndex(const UINT mipSlice) const
-{
-	ShaderResourceDesc desc = {};
-	desc.type = ShaderResourceDesc::TEXTURE;
-	desc.state = ShaderResourceDesc::SRV;
-	desc.resourceIndex = srvMipIndexStart + mipSlice;
-	desc.textureDesc.texture = texture;
-	desc.textureDesc.mipSlice = mipSlice;
-
-	return desc;
-}
-
-ShaderResourceDesc TextureRenderTarget::getUAVMipIndex(const UINT mipSlice) const
-{
-	ShaderResourceDesc desc = {};
-	desc.type = ShaderResourceDesc::TEXTURE;
-	desc.state = ShaderResourceDesc::UAV;
-	desc.resourceIndex = uavMipIndexStart + mipSlice;
-	desc.textureDesc.texture = texture;
-	desc.textureDesc.mipSlice = mipSlice;
-
-	return desc;
-}
-
-RenderTargetDesc TextureRenderTarget::getRTVMipHandle(const UINT mipSlice) const
-{
-	RenderTargetDesc desc = {};
-	desc.texture = texture;
-	desc.mipSlice = mipSlice;
-	desc.rtvHandle = rtvMipHandles[mipSlice];
-
-	return desc;
-}
-
-Texture* TextureRenderTarget::getTexture() const
-{
-	return texture;
-}
-
-void TextureRenderTarget::copyDescriptors()
-{
-	const DescriptorHandle handle = GlobalDescriptorHeap::getResourceHeap()->allocDynamicDescriptor(numSRVUAVCBVDescriptors);
-
-	GraphicsDevice::get()->CopyDescriptorsSimple(numSRVUAVCBVDescriptors, handle.getCPUHandle(), srvUAVCBVHandleStart, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-
-	allSRVIndex = handle.getCurrentIndex();
-
-	srvMipIndexStart = allSRVIndex + 1;
-
-	uavMipIndexStart = srvMipIndexStart + texture->getMipLevels();
-}
-
-void TextureRenderTarget::createViews(const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat, const bool isTextureCube, const bool persistent)
-{
-	const bool hasRTV = (rtvFormat != DXGI_FORMAT_UNKNOWN);
-	const bool hasUAV = (uavFormat != DXGI_FORMAT_UNKNOWN);
-
 	//create srv uav descriptors
 	{
 		//plus 1 because there is a additional srv to acess all mipslices
@@ -361,4 +270,87 @@ void TextureRenderTarget::createViews(const DXGI_FORMAT srvFormat, const DXGI_FO
 			}
 		}
 	}
+}
+
+TextureRenderView::TextureRenderView(const TextureRenderView& trv) :
+	hasRTV(trv.hasRTV),
+	hasUAV(trv.hasUAV),
+	allSRVIndex(trv.allSRVIndex),
+	srvMipIndexStart(trv.srvMipIndexStart),
+	uavMipIndexStart(trv.uavMipIndexStart),
+	rtvMipHandles(trv.rtvMipHandles),
+	texture(new Texture(*(trv.texture)))
+{
+}
+
+TextureRenderView::~TextureRenderView()
+{
+	if (texture)
+	{
+		delete texture;
+	}
+}
+
+ShaderResourceDesc TextureRenderView::getAllSRVIndex() const
+{
+	ShaderResourceDesc desc = {};
+	desc.type = ShaderResourceDesc::TEXTURE;
+	desc.state = ShaderResourceDesc::SRV;
+	desc.resourceIndex = allSRVIndex;
+	desc.textureDesc.texture = texture;
+	desc.textureDesc.mipSlice = D3D12_TRANSITION_ALL_MIPLEVELS;
+
+	return desc;
+}
+
+ShaderResourceDesc TextureRenderView::getSRVMipIndex(const UINT mipSlice) const
+{
+	ShaderResourceDesc desc = {};
+	desc.type = ShaderResourceDesc::TEXTURE;
+	desc.state = ShaderResourceDesc::SRV;
+	desc.resourceIndex = srvMipIndexStart + mipSlice;
+	desc.textureDesc.texture = texture;
+	desc.textureDesc.mipSlice = mipSlice;
+
+	return desc;
+}
+
+ShaderResourceDesc TextureRenderView::getUAVMipIndex(const UINT mipSlice) const
+{
+	ShaderResourceDesc desc = {};
+	desc.type = ShaderResourceDesc::TEXTURE;
+	desc.state = ShaderResourceDesc::UAV;
+	desc.resourceIndex = uavMipIndexStart + mipSlice;
+	desc.textureDesc.texture = texture;
+	desc.textureDesc.mipSlice = mipSlice;
+
+	return desc;
+}
+
+RenderTargetDesc TextureRenderView::getRTVMipHandle(const UINT mipSlice) const
+{
+	RenderTargetDesc desc = {};
+	desc.texture = texture;
+	desc.mipSlice = mipSlice;
+	desc.rtvHandle = rtvMipHandles[mipSlice];
+
+	return desc;
+}
+
+Texture* TextureRenderView::getTexture() const
+{
+	return texture;
+}
+
+void TextureRenderView::copyDescriptors()
+{
+	const DescriptorHandle handle = GlobalDescriptorHeap::getResourceHeap()->allocDynamicDescriptor(numSRVUAVCBVDescriptors);
+
+	GraphicsDevice::get()->CopyDescriptorsSimple(numSRVUAVCBVDescriptors, handle.getCPUHandle(), srvUAVCBVHandleStart, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
+	allSRVIndex = handle.getCurrentIndex();
+
+	srvMipIndexStart = allSRVIndex + 1;
+
+	uavMipIndexStart = srvMipIndexStart + texture->getMipLevels();
 }

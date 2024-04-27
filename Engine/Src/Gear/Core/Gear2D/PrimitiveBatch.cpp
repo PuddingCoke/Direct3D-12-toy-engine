@@ -144,7 +144,7 @@ void PrimitiveBatch::setLineWidth(const float width)
 
 PrimitiveBatch::LineRenderer::LineRenderer() :
 	vertices(new float[2 * 6 * maxLineNum]), idx(0),
-	vertexBuffer(ResourceManager::createVertexBuffer(sizeof(float) * 6, sizeof(float) * 6 * 2 * maxLineNum))
+	vertexBuffer(ResourceManager::createBufferViewByteStride(sizeof(float) * 6, sizeof(float) * 6 * 2 * maxLineNum, false, false, true, true, true))
 {
 }
 
@@ -196,7 +196,7 @@ void PrimitiveBatch::LineRenderer::addLine(const float x1, const float y1, const
 
 PrimitiveBatch::CircleRenderer::CircleRenderer() :
 	vertices(new float[7 * maxCircleNum]), idx(0),
-	vertexBuffer(ResourceManager::createVertexBuffer(sizeof(float) * 7, sizeof(float) * 7 * maxCircleNum))
+	vertexBuffer(ResourceManager::createBufferViewByteStride(sizeof(float) * 7, sizeof(float) * 7 * maxCircleNum, false, false, true, true, true))
 {
 }
 
@@ -248,7 +248,7 @@ void PrimitiveBatch::CircleRenderer::addCircle(const float x, const float y, con
 
 PrimitiveBatch::RCLineRenderer::RCLineRenderer() :
 	vertices(new float[7 * 2 * maxLineNum]), idx(0),
-	vertexBuffer(ResourceManager::createVertexBuffer(sizeof(float) * 7, sizeof(float) * 7 * 2 * maxLineNum))
+	vertexBuffer(ResourceManager::createBufferViewByteStride(sizeof(float) * 7, sizeof(float) * 7 * 2 * maxLineNum, false, false, true, true, true))
 {
 }
 

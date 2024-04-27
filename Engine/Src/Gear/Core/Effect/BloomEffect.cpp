@@ -2,8 +2,8 @@
 
 BloomEffect::BloomEffect(GraphicsContext* const context, const UINT width, const UINT height, ResourceManager* const resManager) :
 	Effect(context, width, height, DXGI_FORMAT_R16G16B16A16_FLOAT),
-	lensDirtTexture(resManager->createTextureRenderTarget(Utils::getRootFolder() + "bloom_dirt_mask.png", true)),
-	filteredTexture(ResourceManager::createTextureRenderTarget(width, height, DXGI_FORMAT_R16G16B16A16_FLOAT, 1, 1, false, true,
+	lensDirtTexture(resManager->createTextureRenderView(Utils::getRootFolder() + "bloom_dirt_mask.png", true)),
+	filteredTexture(ResourceManager::createTextureRenderView(width, height, DXGI_FORMAT_R16G16B16A16_FLOAT, 1, 1, false, true,
 		DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_R16G16B16A16_FLOAT))
 {
 	bloomFilter = new Shader(g_BloomFilterPSBytes, sizeof(g_BloomFilterPSBytes));
@@ -22,7 +22,7 @@ BloomEffect::BloomEffect(GraphicsContext* const context, const UINT width, const
 
 			swapTexture[i] = new SwapTexture(
 				[=] {
-					return ResourceManager::createTextureRenderTarget(resolutions[i].x, resolutions[i].y, DXGI_FORMAT_R16G16B16A16_FLOAT, 1, 1, false, true,
+					return ResourceManager::createTextureRenderView(resolutions[i].x, resolutions[i].y, DXGI_FORMAT_R16G16B16A16_FLOAT, 1, 1, false, true,
 					DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_R16G16B16A16_FLOAT);
 				}
 			);
@@ -140,7 +140,7 @@ BloomEffect::~BloomEffect()
 	delete bloomKarisAverage;
 }
 
-TextureRenderTarget* BloomEffect::process(TextureRenderTarget* const inputTexture) const
+TextureRenderView* BloomEffect::process(TextureRenderView* const inputTexture) const
 {
 	context->setTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 

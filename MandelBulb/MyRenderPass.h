@@ -4,7 +4,7 @@
 
 #include<Gear/Core/Shader.h>
 
-#include<Gear/Core/Resource/TextureRenderTarget.h>
+#include<Gear/Core/Resource/TextureRenderView.h>
 
 #include<Gear/Utils/Math.h>
 #include<Gear/Utils/Random.h>
@@ -16,7 +16,7 @@ public:
 	MyRenderPass() :
 		accumulateShader(new Shader(Utils::getRootFolder() + "AccumulateShader.cso")),
 		displayShader(new Shader(Utils::getRootFolder() + "DisplayShader.cso")),
-		accumulatedTexture(ResourceManager::createTextureRenderTarget(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R16G16B16A16_UNORM, 1, 1, false, false,
+		accumulatedTexture(ResourceManager::createTextureRenderView(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R16G16B16A16_UNORM, 1, 1, false, false,
 			DXGI_FORMAT_R16G16B16A16_UNORM, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_R16G16B16A16_UNORM)),
 		cameraParam{ Math::pi / 4.f + 0.4f,0.f,3.0f,8.f },
 		accumulateParam{ 0,0.f }
@@ -132,7 +132,7 @@ private:
 
 	Shader* displayShader;
 
-	TextureRenderTarget* accumulatedTexture;
+	TextureRenderView* accumulatedTexture;
 
 	ComPtr<ID3D12PipelineState> accumulateState;
 
