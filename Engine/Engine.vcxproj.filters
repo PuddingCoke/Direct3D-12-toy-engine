@@ -81,19 +81,13 @@
     <ClInclude Include="Inc\Gear\Utils\Utils.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Inc\Gear\Core\Resource\TextureRenderTarget.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Inc\Gear\Core\Resource\VertexBuffer.h">
+    <ClInclude Include="Inc\Gear\Core\Resource\TextureRenderView.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="Inc\Gear\Core\Resource\ConstantBuffer.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Inc\Gear\Core\Resource\IndexBuffer.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Inc\Gear\Core\Resource\TextureDepthStencil.h">
+    <ClInclude Include="Inc\Gear\Core\Resource\TextureDepthView.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="Inc\Gear\Core\Resource\IndexConstantBuffer.h">
@@ -168,9 +162,6 @@
     <ClInclude Include="Inc\Gear\Camera\FPSCamera.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Inc\Gear\Core\Resource\StructuredBuffer.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="Inc\ImGUI\imconfig.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -193,6 +184,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="Inc\ImGUI\imstb_truetype.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Gear\Core\Resource\BufferView.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -263,19 +257,13 @@
     <ClCompile Include="Src\Gear\Utils\Utils.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Core\Resource\TextureRenderTarget.cpp">
+    <ClCompile Include="Src\Gear\Core\Resource\TextureRenderView.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Src\Gear\Core\Resource\ConstantBuffer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Core\Resource\VertexBuffer.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Gear\Core\Resource\IndexBuffer.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Gear\Core\Resource\TextureDepthStencil.cpp">
+    <ClCompile Include="Src\Gear\Core\Resource\TextureDepthView.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Src\Gear\Core\Resource\IndexConstantBuffer.cpp">
@@ -347,9 +335,6 @@
     <ClCompile Include="Src\Gear\Camera\FPSCamera.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Core\Resource\StructuredBuffer.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="Inc\ImGUI\imgui.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -369,6 +354,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Inc\ImGUI\imgui_widgets.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gear\Core\Resource\BufferView.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

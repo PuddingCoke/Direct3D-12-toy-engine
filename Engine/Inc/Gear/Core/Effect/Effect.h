@@ -7,8 +7,6 @@
 
 #include<Gear/Core/ResourceManager.h>
 
-#include<Gear/Core/Resource/TextureRenderTarget.h>
-
 class Effect
 {
 public:
@@ -25,7 +23,7 @@ public:
 
 protected:
 
-	TextureRenderTarget* outputTexture;
+	TextureRenderView* outputTexture;
 
 	GraphicsContext* context;
 

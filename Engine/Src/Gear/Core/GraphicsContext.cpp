@@ -18,30 +18,17 @@ GraphicsContext::~GraphicsContext()
 	}
 }
 
-void GraphicsContext::updateBuffer(VertexBuffer* const vb, const void* const data, const UINT size)
+void GraphicsContext::updateBuffer(BufferView* const bufferView, const void* const data, const UINT size)
 {
-	Buffer* const buffer = vb->getBuffer();
+	Buffer* const buffer = bufferView->buffer;
 
-	UploadHeap* const uploadHeap = vb->uploadHeaps[vb->uploadHeapIndex];
+	UploadHeap* const uploadHeap = bufferView->uploadHeaps[bufferView->uploadHeapIndex];
 
 	uploadHeap->update(data, size);
 
 	commandList->copyBufferRegion(buffer, 0, uploadHeap, 0, size);
 
-	vb->uploadHeapIndex = (vb->uploadHeapIndex + 1) % Graphics::FrameBufferCount;
-}
-
-void GraphicsContext::updateBuffer(IndexBuffer* const ib, const void* const data, const UINT size)
-{
-	Buffer* const buffer = ib->getBuffer();
-
-	UploadHeap* const uploadHeap = ib->uploadHeaps[ib->uploadHeapIndex];
-
-	uploadHeap->update(data, size);
-
-	commandList->copyBufferRegion(buffer, 0, uploadHeap, 0, size);
-
-	ib->uploadHeapIndex = (ib->uploadHeapIndex + 1) % Graphics::FrameBufferCount;
+	bufferView->uploadHeapIndex = (bufferView->uploadHeapIndex + 1) % Graphics::FrameBufferCount;
 }
 
 void GraphicsContext::setGlobalConstantBuffer(const IndexConstantBuffer* const indexBuffer)

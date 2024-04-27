@@ -23,37 +23,37 @@ public:
 		oceanHShader(new Shader(Utils::getRootFolder() + "OceanHShader.cso")),
 		oceanDShader(new Shader(Utils::getRootFolder() + "OceanDShader.cso")),
 		oceanPShader(new Shader(Utils::getRootFolder() + "OceanPShader.cso")),
-		tildeh0k(ResourceManager::createTextureRenderTarget(1024, 1024, DXGI_FORMAT_R32G32_FLOAT, 1, 1, false, true,
+		tildeh0k(ResourceManager::createTextureRenderView(1024, 1024, DXGI_FORMAT_R32G32_FLOAT, 1, 1, false, true,
 			DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_UNKNOWN)),
-		tildeh0(ResourceManager::createTextureRenderTarget(1024, 1024, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 1, false, true,
+		tildeh0(ResourceManager::createTextureRenderView(1024, 1024, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 1, false, true,
 			DXGI_FORMAT_R32G32B32A32_FLOAT, DXGI_FORMAT_R32G32B32A32_FLOAT, DXGI_FORMAT_UNKNOWN)),
-		waveData(ResourceManager::createTextureRenderTarget(1024, 1024, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 1, false, true,
+		waveData(ResourceManager::createTextureRenderView(1024, 1024, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 1, false, true,
 			DXGI_FORMAT_R32G32B32A32_FLOAT, DXGI_FORMAT_R32G32B32A32_FLOAT, DXGI_FORMAT_UNKNOWN)),
-		Dy(ResourceManager::createTextureRenderTarget(1024, 1024, DXGI_FORMAT_R32G32_FLOAT, 1, 1, false, true,
+		Dy(ResourceManager::createTextureRenderView(1024, 1024, DXGI_FORMAT_R32G32_FLOAT, 1, 1, false, true,
 			DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_UNKNOWN)),
-		Dx(ResourceManager::createTextureRenderTarget(1024, 1024, DXGI_FORMAT_R32G32_FLOAT, 1, 1, false, true,
+		Dx(ResourceManager::createTextureRenderView(1024, 1024, DXGI_FORMAT_R32G32_FLOAT, 1, 1, false, true,
 			DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_UNKNOWN)),
-		Dz(ResourceManager::createTextureRenderTarget(1024, 1024, DXGI_FORMAT_R32G32_FLOAT, 1, 1, false, true,
+		Dz(ResourceManager::createTextureRenderView(1024, 1024, DXGI_FORMAT_R32G32_FLOAT, 1, 1, false, true,
 			DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_UNKNOWN)),
-		Dyx(ResourceManager::createTextureRenderTarget(1024, 1024, DXGI_FORMAT_R32G32_FLOAT, 1, 1, false, true,
+		Dyx(ResourceManager::createTextureRenderView(1024, 1024, DXGI_FORMAT_R32G32_FLOAT, 1, 1, false, true,
 			DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_UNKNOWN)),
-		Dyz(ResourceManager::createTextureRenderTarget(1024, 1024, DXGI_FORMAT_R32G32_FLOAT, 1, 1, false, true,
+		Dyz(ResourceManager::createTextureRenderView(1024, 1024, DXGI_FORMAT_R32G32_FLOAT, 1, 1, false, true,
 			DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_UNKNOWN)),
-		Dxx(ResourceManager::createTextureRenderTarget(1024, 1024, DXGI_FORMAT_R32G32_FLOAT, 1, 1, false, true,
+		Dxx(ResourceManager::createTextureRenderView(1024, 1024, DXGI_FORMAT_R32G32_FLOAT, 1, 1, false, true,
 			DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_UNKNOWN)),
-		Dzz(ResourceManager::createTextureRenderTarget(1024, 1024, DXGI_FORMAT_R32G32_FLOAT, 1, 1, false, true,
+		Dzz(ResourceManager::createTextureRenderView(1024, 1024, DXGI_FORMAT_R32G32_FLOAT, 1, 1, false, true,
 			DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_UNKNOWN)),
-		Dxz(ResourceManager::createTextureRenderTarget(1024, 1024, DXGI_FORMAT_R32G32_FLOAT, 1, 1, false, true,
+		Dxz(ResourceManager::createTextureRenderView(1024, 1024, DXGI_FORMAT_R32G32_FLOAT, 1, 1, false, true,
 			DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_UNKNOWN)),
-		tempTexture(ResourceManager::createTextureRenderTarget(1024, 1024, DXGI_FORMAT_R32G32_FLOAT, 1, 1, false, true,
+		tempTexture(ResourceManager::createTextureRenderView(1024, 1024, DXGI_FORMAT_R32G32_FLOAT, 1, 1, false, true,
 			DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_UNKNOWN)),
-		Dxyz(ResourceManager::createTextureRenderTarget(1024, 1024, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 1, false, true,
+		Dxyz(ResourceManager::createTextureRenderView(1024, 1024, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 1, false, true,
 			DXGI_FORMAT_R32G32B32A32_FLOAT, DXGI_FORMAT_R32G32B32A32_FLOAT, DXGI_FORMAT_UNKNOWN)),
-		normalJacobian(ResourceManager::createTextureRenderTarget(1024, 1024, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 1, false, true,
+		normalJacobian(ResourceManager::createTextureRenderView(1024, 1024, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 1, false, true,
 			DXGI_FORMAT_R32G32B32A32_FLOAT, DXGI_FORMAT_R32G32B32A32_FLOAT, DXGI_FORMAT_UNKNOWN)),
-		originTexture(ResourceManager::createTextureRenderTarget(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R16G16B16A16_FLOAT, 1, 1, false, true,
+		originTexture(ResourceManager::createTextureRenderView(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R16G16B16A16_FLOAT, 1, 1, false, true,
 			DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_R16G16B16A16_FLOAT)),
-		depthTexture(ResourceManager::createTextureDepthStencil(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R32_TYPELESS, 1, 1, false, true))
+		depthTexture(ResourceManager::createTextureDepthView(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R32_TYPELESS, 1, 1, false, true))
 	{
 		{
 			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = {};
@@ -204,9 +204,9 @@ public:
 
 		envCube = resManager->createTextureCube("E:\\Assets\\Ocean\\ColdSunsetEquirect.png", 1024, true);
 
-		randomGauss = resManager->createTextureRenderTarget(1024, 1024, RandomDataType::GAUSS, true);
+		randomGauss = resManager->createTextureRenderView(1024, 1024, RandomDataType::GAUSS, true);
 
-		patchVertexBuffer = resManager->createVertexBuffer(sizeof(Vertex), sizeof(Vertex) * vertices.size(), false, vertices.data());
+		patchVertexBuffer = resManager->createBufferViewByteStride(sizeof(Vertex), sizeof(Vertex) * vertices.size(), false, false, true, false, true, vertices.data());
 
 		calPhillipsTexture();
 
@@ -297,7 +297,7 @@ protected:
 			});
 	}
 
-	void ifft(TextureRenderTarget* const inputTexture)
+	void ifft(TextureRenderView* const inputTexture)
 	{
 		context->setPipelineState(ifftState.Get());
 
@@ -433,7 +433,7 @@ protected:
 		context->clearDepthStencil(depthTexture->getDSVMipHandle(0), D3D12_CLEAR_FLAG_DEPTH, 1.f, 0);
 		context->draw(4 * tildeNum * 32 * tildeNum * 32, 1, 0, 0);
 
-		TextureRenderTarget* bloomTexture = effect->process(originTexture);
+		TextureRenderView* bloomTexture = effect->process(originTexture);
 
 		context->setPipelineState(fullScreenState.Get());
 		context->setViewport(Graphics::getWidth(), Graphics::getHeight());
@@ -509,45 +509,45 @@ private:
 
 	ComPtr<ID3D12PipelineState> fullScreenState;
 
-	TextureRenderTarget* envCube;
+	TextureRenderView* envCube;
 
-	TextureRenderTarget* randomGauss;
+	TextureRenderView* randomGauss;
 
-	VertexBuffer* patchVertexBuffer;
+	BufferView* patchVertexBuffer;
 
 	ConstantBuffer* oceanParamBuffer;
 
-	TextureRenderTarget* tildeh0k;
+	TextureRenderView* tildeh0k;
 
-	TextureRenderTarget* tildeh0;
+	TextureRenderView* tildeh0;
 
-	TextureRenderTarget* waveData;
+	TextureRenderView* waveData;
 
-	TextureRenderTarget* tempTexture;
+	TextureRenderView* tempTexture;
 
-	TextureRenderTarget* Dy;
+	TextureRenderView* Dy;
 
-	TextureRenderTarget* Dx;
+	TextureRenderView* Dx;
 
-	TextureRenderTarget* Dz;
+	TextureRenderView* Dz;
 
-	TextureRenderTarget* Dyx;
+	TextureRenderView* Dyx;
 
-	TextureRenderTarget* Dyz;
+	TextureRenderView* Dyz;
 
-	TextureRenderTarget* Dxx;
+	TextureRenderView* Dxx;
 
-	TextureRenderTarget* Dzz;
+	TextureRenderView* Dzz;
 
-	TextureRenderTarget* Dxz;
+	TextureRenderView* Dxz;
 
-	TextureRenderTarget* Dxyz;
+	TextureRenderView* Dxyz;
 
-	TextureRenderTarget* normalJacobian;
+	TextureRenderView* normalJacobian;
 
-	TextureRenderTarget* originTexture;
+	TextureRenderView* originTexture;
 
-	TextureDepthStencil* depthTexture;
+	TextureDepthView* depthTexture;
 
 	BloomEffect* effect;
 

@@ -4,7 +4,7 @@
 
 #include<Gear/Core/Shader.h>
 
-#include<Gear/Core/Resource/TextureRenderTarget.h>
+#include<Gear/Core/Resource/TextureRenderView.h>
 
 #include<Gear/Utils/Math.h>
 #include<Gear/Utils/Random.h>

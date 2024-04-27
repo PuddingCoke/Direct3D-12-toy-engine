@@ -3,9 +3,7 @@
 #ifndef _SWAPTEXTURE_H_
 #define _SWAPTEXTURE_H_
 
-#include"TextureRenderTarget.h"
-
-#include"EngineResource.h"
+#include"TextureRenderView.h"
 
 #include<functional>
 
@@ -13,19 +11,19 @@ class SwapTexture :public EngineResource
 {
 private:
 
-	TextureRenderTarget* texture0;
+	TextureRenderView* texture0;
 
-	TextureRenderTarget* texture1;
+	TextureRenderView* texture1;
 
 public:
 
-	SwapTexture(const std::function<TextureRenderTarget* (void)>& factoryFunc);
+	SwapTexture(const std::function<TextureRenderView* (void)>& factoryFunc);
 
 	~SwapTexture();
 
-	TextureRenderTarget* read() const;
+	TextureRenderView* read() const;
 
-	TextureRenderTarget* write() const;
+	TextureRenderView* write() const;
 
 	void swap();
 

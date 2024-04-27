@@ -297,79 +297,128 @@ ConstantBuffer* ResourceManager::createConstantBuffer(const UINT size, const boo
 	return new ConstantBuffer(nullptr, size, persistent);
 }
 
-IndexBuffer* ResourceManager::createIndexBuffer(const DXGI_FORMAT format, const UINT size, const bool cpuWritable, const void* const data)
+BufferView* ResourceManager::createBufferViewByteStride(const UINT structureByteStride, const UINT size, const bool createSRV, const bool createUAV, const bool createVBV, const bool cpuWritable, const bool persistent, const void* const data)
 {
-	Buffer* buffer = createBuffer(data, size, D3D12_RESOURCE_FLAG_NONE);
+	D3D12_RESOURCE_FLAGS resFlags = D3D12_RESOURCE_FLAG_NONE;
+
+	if (createUAV)
+	{
+		resFlags |= D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
+	}
+
+	Buffer* const buffer = createBuffer(data, size, resFlags);
 
 	if (!cpuWritable)
 	{
-		commandList->pushResourceTrackList(buffer);
+		//read-only SRV VBV IBV
+		const bool hasSRVOnly = createSRV && !createVBV;
 
-		buffer->setState(D3D12_RESOURCE_STATE_INDEX_BUFFER);
+		const bool hasVBVOnly = !createSRV && createVBV;
 
-		commandList->transitionResources();
+		if (hasSRVOnly || hasVBVOnly)
+		{
+			commandList->pushResourceTrackList(buffer);
 
-		buffer->setStateTracking(false);
+			if (hasSRVOnly)
+			{
+				buffer->setState(D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
+			}
+			else if (hasVBVOnly)
+			{
+				buffer->setState(D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
+			}
+
+			commandList->transitionResources();
+
+			buffer->setStateTracking(false);
+		}
 	}
 
-	return new IndexBuffer(buffer, format, size, cpuWritable);
+	return new BufferView(buffer, structureByteStride, DXGI_FORMAT_UNKNOWN, size, createSRV, createUAV, createVBV, false, cpuWritable, persistent);
 }
 
-IndexBuffer* ResourceManager::createIndexBuffer(const DXGI_FORMAT format, const UINT size)
+BufferView* ResourceManager::createBufferViewByteStride(const UINT structureByteStride, const UINT size, const bool createSRV, const bool createUAV, const bool createVBV, const bool cpuWritable, const bool persistent)
 {
-	Buffer* buffer = new Buffer(size, true, D3D12_RESOURCE_FLAG_NONE);
+	D3D12_RESOURCE_FLAGS resFlags = D3D12_RESOURCE_FLAG_NONE;
 
-	return new IndexBuffer(buffer, format, size, true);
+	if (createUAV)
+	{
+		resFlags |= D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
+	}
+
+	Buffer* const buffer = new Buffer(size, true, resFlags);
+
+	return new BufferView(buffer, structureByteStride, DXGI_FORMAT_UNKNOWN, size, createSRV, createUAV, createVBV, false, cpuWritable, persistent);
 }
 
-VertexBuffer* ResourceManager::createVertexBuffer(const UINT perVertexSize, const UINT size, const bool cpuWritable, const void* const data)
+BufferView* ResourceManager::createBufferViewFormat(const DXGI_FORMAT format, const UINT size, const bool createSRV, const bool createUAV, const bool createVBV, const bool createIBV, const bool cpuWritable, const bool persistent, const void* const data)
 {
-	Buffer* buffer = createBuffer(data, size, D3D12_RESOURCE_FLAG_NONE);
+	if (createVBV && createIBV)
+	{
+		throw "a buffer cannot be used as VBV and IBV at the same time";
+	}
+
+	D3D12_RESOURCE_FLAGS resFlags = D3D12_RESOURCE_FLAG_NONE;
+
+	if (createUAV)
+	{
+		resFlags |= D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
+	}
+
+	Buffer* const buffer = createBuffer(data, size, resFlags);
 
 	if (!cpuWritable)
 	{
-		commandList->pushResourceTrackList(buffer);
+		//read-only SRV VBV IBV
+		const bool hasSRVOnly = createSRV && !createVBV && !createIBV;
 
-		buffer->setState(D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
+		const bool hasVBVOnly = !createSRV && createVBV && !createIBV;
 
-		commandList->transitionResources();
+		const bool hasIBVOnly = !createSRV && !createVBV && createIBV;
 
-		buffer->setStateTracking(false);
+		if (hasSRVOnly || hasVBVOnly || hasIBVOnly)
+		{
+			commandList->pushResourceTrackList(buffer);
+
+			if (hasSRVOnly)
+			{
+				buffer->setState(D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
+			}
+			else if (hasVBVOnly)
+			{
+				buffer->setState(D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
+			}
+			else if (hasIBVOnly)
+			{
+				buffer->setState(D3D12_RESOURCE_STATE_INDEX_BUFFER);
+			}
+
+			commandList->transitionResources();
+
+			buffer->setStateTracking(false);
+		}
 	}
 
-	return new VertexBuffer(buffer, perVertexSize, size, cpuWritable);
+	return new BufferView(buffer, 0, format, size, createSRV, createUAV, createVBV, createIBV, cpuWritable, persistent);
 }
 
-VertexBuffer* ResourceManager::createVertexBuffer(const UINT perVertexSize, const UINT size)
+BufferView* ResourceManager::createBufferViewFormat(const DXGI_FORMAT format, const UINT size, const bool createSRV, const bool createUAV, const bool createVBV, const bool createIBV, const bool cpuWritable, const bool persistent)
 {
-	Buffer* buffer = new Buffer(size, true, D3D12_RESOURCE_FLAG_NONE);
-
-	return new VertexBuffer(buffer, perVertexSize, size, true);
-}
-
-StructuredBuffer* ResourceManager::createStructuredBuffer(const UINT structureByteStride, const UINT size, const bool cpuWritable, const void* const data, const bool persistent)
-{
-	Buffer* buffer = createBuffer(data, size, D3D12_RESOURCE_FLAG_NONE);
-
-	if (!cpuWritable)
+	if (createVBV && createIBV)
 	{
-		commandList->pushResourceTrackList(buffer);
-
-		buffer->setState(D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
-
-		commandList->transitionResources();
-
-		buffer->setStateTracking(false);
+		throw "a buffer cannot be used as VBV and IBV at the same time";
 	}
 
-	return new StructuredBuffer(buffer, structureByteStride, size, cpuWritable, persistent);
-}
+	D3D12_RESOURCE_FLAGS resFlags = D3D12_RESOURCE_FLAG_NONE;
 
-StructuredBuffer* ResourceManager::createStructuredBuffer(const UINT structureByteStride, const UINT size, const bool persistent)
-{
-	Buffer* buffer = new Buffer(size, true, D3D12_RESOURCE_FLAG_NONE);
+	if (createUAV)
+	{
+		resFlags |= D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
+	}
 
-	return new StructuredBuffer(buffer, structureByteStride, size, true, persistent);
+	Buffer* const buffer = new Buffer(size, true, resFlags);
+
+	return new BufferView(buffer, 0, format, size, createSRV, createUAV, createVBV, createIBV, cpuWritable, persistent);
 }
 
 IndexConstantBuffer* ResourceManager::createIndexConstantBuffer(const std::initializer_list<ShaderResourceDesc>& descs, const bool cpuWritable, const bool persistent)
@@ -403,7 +452,7 @@ IndexConstantBuffer* ResourceManager::createIndexConstantBuffer(const UINT indic
 	return new IndexConstantBuffer(constantBuffer);
 }
 
-TextureDepthStencil* ResourceManager::createTextureDepthStencil(const UINT width, const UINT height, const DXGI_FORMAT resFormat, const UINT arraySize, const UINT mipLevels, const bool isTextureCube, const bool persistent)
+TextureDepthView* ResourceManager::createTextureDepthView(const UINT width, const UINT height, const DXGI_FORMAT resFormat, const UINT arraySize, const UINT mipLevels, const bool isTextureCube, const bool persistent)
 {
 	DXGI_FORMAT clearValueFormat = DXGI_FORMAT_UNKNOWN;
 
@@ -433,10 +482,10 @@ TextureDepthStencil* ResourceManager::createTextureDepthStencil(const UINT width
 
 	Texture* texture = new Texture(width, height, resFormat, arraySize, mipLevels, true, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL, &clearValue);
 
-	return new TextureDepthStencil(texture, isTextureCube, persistent);
+	return new TextureDepthView(texture, isTextureCube, persistent);
 }
 
-TextureRenderTarget* ResourceManager::createTextureRenderTarget(const std::string filePath, const bool persistent, const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat)
+TextureRenderView* ResourceManager::createTextureRenderView(const std::string filePath, const bool persistent, const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat)
 {
 	const bool hasRTV = (rtvFormat != DXGI_FORMAT_UNKNOWN);
 
@@ -480,15 +529,15 @@ TextureRenderTarget* ResourceManager::createTextureRenderTarget(const std::strin
 
 	if (srvFormat == DXGI_FORMAT_UNKNOWN)
 	{
-		return new TextureRenderTarget(texture, isTextureCube, persistent, texture->getFormat(), DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN);
+		return new TextureRenderView(texture, isTextureCube, persistent, texture->getFormat(), DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN);
 	}
 	else
 	{
-		return new TextureRenderTarget(texture, isTextureCube, persistent, srvFormat, uavFormat, rtvFormat);
+		return new TextureRenderView(texture, isTextureCube, persistent, srvFormat, uavFormat, rtvFormat);
 	}
 }
 
-TextureRenderTarget* ResourceManager::createTextureRenderTarget(const UINT width, const UINT height, const RandomDataType type, const bool persistent, const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat)
+TextureRenderView* ResourceManager::createTextureRenderView(const UINT width, const UINT height, const RandomDataType type, const bool persistent, const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat)
 {
 	const bool hasRTV = (rtvFormat != DXGI_FORMAT_UNKNOWN);
 
@@ -530,15 +579,15 @@ TextureRenderTarget* ResourceManager::createTextureRenderTarget(const UINT width
 
 	if (srvFormat == DXGI_FORMAT_UNKNOWN)
 	{
-		return new TextureRenderTarget(texture, false, persistent, texture->getFormat(), DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN);
+		return new TextureRenderView(texture, false, persistent, texture->getFormat(), DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN);
 	}
 	else
 	{
-		return new TextureRenderTarget(texture, false, persistent, srvFormat, uavFormat, rtvFormat);
+		return new TextureRenderView(texture, false, persistent, srvFormat, uavFormat, rtvFormat);
 	}
 }
 
-TextureRenderTarget* ResourceManager::createTextureRenderTarget(const UINT width, const UINT height, const DXGI_FORMAT resFormat, const UINT arraySize, const UINT mipLevels, const bool isTextureCube, const bool persistent, const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat, const float* const color)
+TextureRenderView* ResourceManager::createTextureRenderView(const UINT width, const UINT height, const DXGI_FORMAT resFormat, const UINT arraySize, const UINT mipLevels, const bool isTextureCube, const bool persistent, const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat, const float* const color)
 {
 	const bool hasRTV = (rtvFormat != DXGI_FORMAT_UNKNOWN);
 
@@ -583,12 +632,12 @@ TextureRenderTarget* ResourceManager::createTextureRenderTarget(const UINT width
 		texture = new Texture(width, height, resFormat, arraySize, mipLevels, true, resFlags);
 	}
 
-	return new TextureRenderTarget(texture, isTextureCube, persistent, srvFormat, uavFormat, rtvFormat);
+	return new TextureRenderView(texture, isTextureCube, persistent, srvFormat, uavFormat, rtvFormat);
 }
 
-TextureRenderTarget* ResourceManager::createTextureCube(const std::string filePath, const UINT texturecubeResolution, const bool persistent, const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat)
+TextureRenderView* ResourceManager::createTextureCube(const std::string filePath, const UINT texturecubeResolution, const bool persistent, const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat)
 {
-	TextureRenderTarget* const equirectangularMap = createTextureRenderTarget(filePath, false);
+	TextureRenderView* const equirectangularMap = createTextureRenderView(filePath, false);
 
 	equirectangularMap->copyDescriptors();
 
@@ -609,7 +658,7 @@ TextureRenderTarget* ResourceManager::createTextureCube(const std::string filePa
 		break;
 	}
 
-	TextureRenderTarget* const cubemap = createTextureRenderTarget(texturecubeResolution, texturecubeResolution, resFormat, 6, 1, true, false,
+	TextureRenderView* const cubemap = createTextureRenderView(texturecubeResolution, texturecubeResolution, resFormat, 6, 1, true, false,
 		resFormat, DXGI_FORMAT_UNKNOWN, resFormat);
 
 	release(cubemap);
@@ -733,15 +782,15 @@ TextureRenderTarget* ResourceManager::createTextureCube(const std::string filePa
 
 	if (srvFormat == DXGI_FORMAT_UNKNOWN)
 	{
-		return new TextureRenderTarget(dstTexture, true, persistent, dstTexture->getFormat(), DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN);
+		return new TextureRenderView(dstTexture, true, persistent, dstTexture->getFormat(), DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN);
 	}
 	else
 	{
-		return new TextureRenderTarget(dstTexture, true, persistent, srvFormat, uavFormat, rtvFormat);
+		return new TextureRenderView(dstTexture, true, persistent, srvFormat, uavFormat, rtvFormat);
 	}
 }
 
-TextureRenderTarget* ResourceManager::createTextureCube(const std::initializer_list<std::string> texturesPath, const bool persistent, const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat)
+TextureRenderView* ResourceManager::createTextureCube(const std::initializer_list<std::string> texturesPath, const bool persistent, const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat)
 {
 	Texture* srcTextures[6] = {};
 
@@ -805,10 +854,10 @@ TextureRenderTarget* ResourceManager::createTextureCube(const std::initializer_l
 
 	if (srvFormat == DXGI_FORMAT_UNKNOWN)
 	{
-		return new TextureRenderTarget(dstTexture, true, persistent, dstTexture->getFormat(), DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN);
+		return new TextureRenderView(dstTexture, true, persistent, dstTexture->getFormat(), DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN);
 	}
 	else
 	{
-		return new TextureRenderTarget(dstTexture, true, persistent, srvFormat, uavFormat, rtvFormat);
+		return new TextureRenderView(dstTexture, true, persistent, srvFormat, uavFormat, rtvFormat);
 	}
 }

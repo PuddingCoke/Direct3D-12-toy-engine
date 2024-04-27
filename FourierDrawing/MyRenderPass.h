@@ -4,7 +4,7 @@
 
 #include<Gear/Core/Shader.h>
 
-#include<Gear/Core/Resource/TextureRenderTarget.h>
+#include<Gear/Core/Resource/TextureRenderView.h>
 
 #include<Gear/Utils/Math.h>
 #include<Gear/Utils/Random.h>
@@ -51,7 +51,7 @@ public:
 
 	PrimitiveBatch* pBatch[2];
 
-	TextureRenderTarget* renderTexture;
+	TextureRenderView* renderTexture;
 
 	ComPtr<ID3D12PipelineState> fullScreenPipelineState;
 
@@ -66,7 +66,7 @@ public:
 
 	MyRenderPass() :
 		pBatch{ new PrimitiveBatch(Graphics::BackBufferFormat,context),new PrimitiveBatch(DXGI_FORMAT_R8G8B8A8_UNORM,context) },
-		renderTexture(ResourceManager::createTextureRenderTarget(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R8G8B8A8_UNORM, 1, 1, false, true,
+		renderTexture(ResourceManager::createTextureRenderView(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R8G8B8A8_UNORM, 1, 1, false, true,
 			DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_R8G8B8A8_UNORM)),
 		curFrame(0),
 		connected(false)

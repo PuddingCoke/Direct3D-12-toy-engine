@@ -13,14 +13,12 @@
 #include<Gear/Core/DX/Resource/UploadHeap.h>
 
 #include<Gear/Core/Resource/EngineResource.h>
-#include<Gear/Core/Resource/IndexConstantBuffer.h>
-#include<Gear/Core/Resource/TextureRenderTarget.h>
-#include<Gear/Core/Resource/TextureDepthStencil.h>
 #include<Gear/Core/Resource/ConstantBuffer.h>
-#include<Gear/Core/Resource/VertexBuffer.h>
-#include<Gear/Core/Resource/IndexBuffer.h>
+#include<Gear/Core/Resource/IndexConstantBuffer.h>
+#include<Gear/Core/Resource/BufferView.h>
+#include<Gear/Core/Resource/TextureRenderView.h>
+#include<Gear/Core/Resource/TextureDepthView.h>
 #include<Gear/Core/Resource/SwapTexture.h>
-#include<Gear/Core/Resource/StructuredBuffer.h>
 
 enum class RandomDataType
 {
@@ -33,7 +31,7 @@ enum class RandomDataType
 class ResourceManager
 {
 public:
-
+	
 	ResourceManager(GraphicsContext* const context);
 
 	~ResourceManager();
@@ -62,45 +60,38 @@ public:
 
 	static ConstantBuffer* createConstantBuffer(const UINT size, const bool persistent);
 
-	//data must not be nullptr
-	IndexBuffer* createIndexBuffer(const DXGI_FORMAT format, const UINT size, const bool cpuWritable, const void* const data);
+	BufferView* createBufferViewByteStride(const UINT structureByteStride, const UINT size, const bool createSRV, const bool createUAV, const bool createVBV, const bool cpuWritable, const bool persistent, const void* const data);
 
-	static IndexBuffer* createIndexBuffer(const DXGI_FORMAT format, const UINT size);
+	static BufferView* createBufferViewByteStride(const UINT structureByteStride, const UINT size, const bool createSRV, const bool createUAV, const bool createVBV, const bool cpuWritable, const bool persistent);
 
-	//data must not be nullptr
-	VertexBuffer* createVertexBuffer(const UINT perVertexSize, const UINT size, const bool cpuWritable, const void* const data);
+	BufferView* createBufferViewFormat(const DXGI_FORMAT format, const UINT size, const bool createSRV, const bool createUAV, const bool createVBV, const bool createIBV, const bool cpuWritable, const bool persistent, const void* const data);
 
-	static VertexBuffer* createVertexBuffer(const UINT perVertexSize, const UINT size);
-
-	//data must not be nullptr
-	StructuredBuffer* createStructuredBuffer(const UINT structureByteStride, const UINT size, const bool cpuWritable, const void* const data, const bool persistent);
-
-	static StructuredBuffer* createStructuredBuffer(const UINT structureByteStride, const UINT size, const bool persistent);
+	static BufferView* createBufferViewFormat(const DXGI_FORMAT format, const UINT size, const bool createSRV, const bool createUAV, const bool createVBV, const bool createIBV, const bool cpuWritable, const bool persistent);
 
 	IndexConstantBuffer* createIndexConstantBuffer(const std::initializer_list<ShaderResourceDesc>& descs, const bool cpuWritable, const bool persistent);
 
 	static IndexConstantBuffer* createIndexConstantBuffer(const UINT indicesNum, const bool persistent);
 
-	static TextureDepthStencil* createTextureDepthStencil(const UINT width, const UINT height, const DXGI_FORMAT resFormat, const UINT arraySize, const UINT mipLevels, const bool isTextureCube, const bool persistent);
+	static TextureDepthView* createTextureDepthView(const UINT width, const UINT height, const DXGI_FORMAT resFormat, const UINT arraySize, const UINT mipLevels, const bool isTextureCube, const bool persistent);
 
 	//load jpg jpeg png hdr dds(auto detect texturecube) textures
-	TextureRenderTarget* createTextureRenderTarget(const std::string filePath, const bool persistent,
+	TextureRenderView* createTextureRenderView(const std::string filePath, const bool persistent,
 		const DXGI_FORMAT srvFormat = DXGI_FORMAT_UNKNOWN, const DXGI_FORMAT uavFormat = DXGI_FORMAT_UNKNOWN, const DXGI_FORMAT rtvFormat = DXGI_FORMAT_UNKNOWN);
 
-	//create texture render target from random data
-	TextureRenderTarget* createTextureRenderTarget(const UINT width, const UINT height, const RandomDataType type, const bool persistent,
+	//create texture render view from random data
+	TextureRenderView* createTextureRenderView(const UINT width, const UINT height, const RandomDataType type, const bool persistent,
 		const DXGI_FORMAT srvFormat = DXGI_FORMAT_UNKNOWN, const DXGI_FORMAT uavFormat = DXGI_FORMAT_UNKNOWN, const DXGI_FORMAT rtvFormat = DXGI_FORMAT_UNKNOWN);
 
-	//create texture render target from custom parameters
-	static TextureRenderTarget* createTextureRenderTarget(const UINT width, const UINT height, const DXGI_FORMAT resFormat, const UINT arraySize, const UINT mipLevels, const bool isTextureCube, const bool persistent,
+	//create texture render view from custom parameters
+	static TextureRenderView* createTextureRenderView(const UINT width, const UINT height, const DXGI_FORMAT resFormat, const UINT arraySize, const UINT mipLevels, const bool isTextureCube, const bool persistent,
 		const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat, const float* const color = nullptr);
 
 	//create texture cube from equirectangular map
-	TextureRenderTarget* createTextureCube(const std::string filePath, const UINT texturecubeResolution, const bool persistent,
+	TextureRenderView* createTextureCube(const std::string filePath, const UINT texturecubeResolution, const bool persistent,
 		const DXGI_FORMAT srvFormat = DXGI_FORMAT_UNKNOWN, const DXGI_FORMAT uavFormat = DXGI_FORMAT_UNKNOWN, const DXGI_FORMAT rtvFormat = DXGI_FORMAT_UNKNOWN);
 
 	//create texture cube from 6 seperate textures
-	TextureRenderTarget* createTextureCube(const std::initializer_list<std::string> texturesPath,const bool persistent,
+	TextureRenderView* createTextureCube(const std::initializer_list<std::string> texturesPath,const bool persistent,
 		const DXGI_FORMAT srvFormat = DXGI_FORMAT_UNKNOWN, const DXGI_FORMAT uavFormat = DXGI_FORMAT_UNKNOWN, const DXGI_FORMAT rtvFormat = DXGI_FORMAT_UNKNOWN);
 
 private:

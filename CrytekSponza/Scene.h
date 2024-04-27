@@ -125,7 +125,7 @@ public:
 			startVertexLocation += vertexCount;
 		}
 
-		modelBuffer = resManager->createVertexBuffer(sizeof(Vertex), sizeof(Vertex) * vertices.size(), false, vertices.data());
+		modelBuffer = resManager->createBufferViewByteStride(sizeof(Vertex), sizeof(Vertex) * vertices.size(), false, false, true, false, true, vertices.data());
 	}
 
 	~Scene()
@@ -176,6 +176,6 @@ private:
 
 	std::vector<Model*> models;
 
-	VertexBuffer* modelBuffer;
+	BufferView* modelBuffer;
 
 };
