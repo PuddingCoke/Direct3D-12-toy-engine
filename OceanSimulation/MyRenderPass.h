@@ -168,11 +168,11 @@ public:
 			GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&fullScreenState));
 		}
 
-		normalJacobian->getTexture()->getResource()->SetName(L"Normal Jacobian");
+		normalJacobian->getTexture()->setName(L"Normal Jacobian");
 
-		Dxyz->getTexture()->getResource()->SetName(L"Dxyz");
+		Dxyz->getTexture()->setName(L"Dxyz");
 
-		originTexture->getTexture()->getResource()->SetName(L"Origin Texture");
+		originTexture->getTexture()->setName(L"Origin Texture");
 
 		std::vector<Vertex> vertices;
 

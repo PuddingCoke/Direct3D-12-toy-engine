@@ -75,7 +75,7 @@ float3 GetIrradiance(in float3 N, in uint probeIndex, in Texture2DArray<float3> 
 
 uint3 PosToProbeGridPos(in float3 P, in ConstantBuffer<IrradianceVolume> volume)
 {
-    return uint3((P - volume.fieldStart) / volume.probeSpacing);
+    return uint3(clamp(int3((P - volume.fieldStart) / volume.probeSpacing), int3(0, 0, 0), int3(volume.probeCount - 1)));
 }
 
 uint ProbeGridPosToIndex(in uint3 probeGridPos, in ConstantBuffer<IrradianceVolume> volume)
