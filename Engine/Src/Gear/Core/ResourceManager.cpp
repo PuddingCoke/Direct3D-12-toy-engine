@@ -178,6 +178,8 @@ Texture* ResourceManager::createTexture(const std::string filePath, const D3D12_
 		throw "Format not supported";
 	}
 
+	std::cout << "[class ResourceManager] load texture from " << filePath << " succeeded\n";
+
 	return texture;
 }
 

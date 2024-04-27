@@ -17,18 +17,20 @@ public:
 	{
 		Assimp::Importer importer;
 
-		const aiScene* scene = importer.ReadFile(filePath, aiProcess_FlipUVs | aiProcess_Triangulate | aiProcess_PreTransformVertices | aiProcess_CalcTangentSpace | aiProcess_GenSmoothNormals);
+		const aiScene* const scene = importer.ReadFile(filePath, aiProcess_FlipUVs | aiProcess_Triangulate | aiProcess_PreTransformVertices | aiProcess_CalcTangentSpace | aiProcess_GenSmoothNormals);
 
-		for (UINT i = 0; i < scene->mNumMaterials; i++)
+		for (UINT materialIdx = 0; materialIdx < scene->mNumMaterials; materialIdx++)
 		{
+			const aiMaterial* const material = scene->mMaterials[materialIdx];
+
 			aiString texturePath;
 			std::string diffusePath;
 			std::string specularPath;
 			std::string normalPath;
 
-			if (scene->mMaterials[i]->GetTextureCount(aiTextureType_DIFFUSE) > 0)
+			if (material->GetTextureCount(aiTextureType_DIFFUSE) > 0)
 			{
-				scene->mMaterials[i]->GetTexture(aiTextureType_DIFFUSE, 0, &texturePath);
+				material->GetTexture(aiTextureType_DIFFUSE, 0, &texturePath);
 				diffusePath = assetPath + texturePath.C_Str();
 			}
 			else
@@ -36,9 +38,9 @@ public:
 				diffusePath = assetPath + "/sponza/dummy.dds";
 			}
 
-			if (scene->mMaterials[i]->GetTextureCount(aiTextureType_SPECULAR) > 0)
+			if (material->GetTextureCount(aiTextureType_SPECULAR) > 0)
 			{
-				scene->mMaterials[i]->GetTexture(aiTextureType_SPECULAR, 0, &texturePath);
+				material->GetTexture(aiTextureType_SPECULAR, 0, &texturePath);
 				specularPath = assetPath + texturePath.C_Str();
 			}
 			else
@@ -46,9 +48,9 @@ public:
 				specularPath = assetPath + "/sponza/dummy_specular.dds";
 			}
 
-			if (scene->mMaterials[i]->GetTextureCount(aiTextureType_NORMALS) > 0)
+			if (material->GetTextureCount(aiTextureType_NORMALS) > 0)
 			{
-				scene->mMaterials[i]->GetTexture(aiTextureType_NORMALS, 0, &texturePath);
+				material->GetTexture(aiTextureType_NORMALS, 0, &texturePath);
 				normalPath = assetPath + texturePath.C_Str();
 			}
 			else
@@ -63,45 +65,62 @@ public:
 
 		UINT startVertexLocation = 0;
 
-		UINT vertexCount = 0;
-
-		for (UINT j = 0; j < scene->mNumMeshes; j++)
+		for (UINT meshIdx = 0; meshIdx < scene->mNumMeshes; meshIdx++)
 		{
-			const bool hasUV = scene->mMeshes[j]->HasTextureCoords(0);
+			const aiMesh* const mesh = scene->mMeshes[meshIdx];
 
-			const bool hasTangent = scene->mMeshes[j]->HasTangentsAndBitangents();
+			const bool hasUV = mesh->HasTextureCoords(0);
 
-			vertexCount = scene->mMeshes[j]->mNumVertices;
+			const bool hasTangent = mesh->HasTangentsAndBitangents();
 
-			for (UINT i = 0; i < scene->mMeshes[j]->mNumVertices; i++)
+			const UINT vertexCount = mesh->mNumVertices;
+
+			for (UINT vertIdx = 0; vertIdx < mesh->mNumVertices; vertIdx++)
 			{
 				Vertex vert = {};
 
-				vert.pos = DirectX::XMFLOAT3(scene->mMeshes[j]->mVertices[i].x, scene->mMeshes[j]->mVertices[i].y, scene->mMeshes[j]->mVertices[i].z);
+				{
+					const aiVector3D& position = mesh->mVertices[vertIdx];
+
+					vert.pos = DirectX::XMFLOAT3(position.x, position.y, position.z);
+				}
+
+				{
+					const aiVector3D& normal = mesh->mNormals[vertIdx];
+
+					vert.normal = DirectX::XMFLOAT3(normal.x, normal.y, normal.z);
+				}
+
 				if (hasUV)
 				{
-					vert.uv = DirectX::XMFLOAT2(scene->mMeshes[j]->mTextureCoords[0][i].x, scene->mMeshes[j]->mTextureCoords[0][i].y);
+					const aiVector3D& uv = mesh->mTextureCoords[0][vertIdx];
+
+					vert.uv = DirectX::XMFLOAT2(uv.x, uv.y);
 				}
 				else
 				{
 					vert.uv = DirectX::XMFLOAT2(0.f, 0.f);
 				}
-				vert.normal = DirectX::XMFLOAT3(scene->mMeshes[j]->mNormals[i].x, scene->mMeshes[j]->mNormals[i].y, scene->mMeshes[j]->mNormals[i].z);
+
 				if (hasTangent)
 				{
-					vert.tangent = DirectX::XMFLOAT3(scene->mMeshes[j]->mTangents[i].x, scene->mMeshes[j]->mTangents[i].y, scene->mMeshes[j]->mTangents[i].z);
-					vert.bitangent = DirectX::XMFLOAT3(scene->mMeshes[j]->mBitangents[i].x, scene->mMeshes[j]->mBitangents[i].y, scene->mMeshes[j]->mBitangents[i].z);
+					const aiVector3D& tangent = mesh->mTangents[vertIdx];
+
+					const aiVector3D& binormal = mesh->mBitangents[vertIdx];
+
+					vert.tangent = DirectX::XMFLOAT3(tangent.x, tangent.y, tangent.z);
+					vert.binormal = DirectX::XMFLOAT3(binormal.x, binormal.y, binormal.z);
 				}
 				else
 				{
 					vert.tangent = DirectX::XMFLOAT3(0.f, 1.f, 0.f);
-					vert.bitangent = DirectX::XMFLOAT3(0.f, 1.f, 0.f);
+					vert.binormal = DirectX::XMFLOAT3(0.f, 1.f, 0.f);
 				}
 
 				vertices.push_back(vert);
 			}
 
-			models.push_back(new Model(scene->mMeshes[j]->mMaterialIndex, vertexCount, startVertexLocation));
+			models.push_back(new Model(mesh->mMaterialIndex, vertexCount, startVertexLocation));
 
 			startVertexLocation += vertexCount;
 		}

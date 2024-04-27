@@ -42,8 +42,6 @@ public:
 		skyboxPShader(new Shader(Utils::getRootFolder() + "SkybosPShader.cso")),
 		sunAngle(Math::half_pi - 0.01f)
 	{
-		const UINT probeCount = irradianceVolume.count.x * irradianceVolume.count.y * irradianceVolume.count.z;
-
 		irradianceOctahedralMap = ResourceManager::createTextureRenderTarget(6, 6, DXGI_FORMAT_R11G11B10_FLOAT, probeCount, 1, false, true,
 			DXGI_FORMAT_R11G11B10_FLOAT, DXGI_FORMAT_R11G11B10_FLOAT, DXGI_FORMAT_UNKNOWN);
 
@@ -53,17 +51,17 @@ public:
 		depthOctahedralMap = ResourceManager::createTextureRenderTarget(16, 16, DXGI_FORMAT_R16G16_FLOAT, probeCount, 1, false, true,
 			DXGI_FORMAT_R16G16_FLOAT, DXGI_FORMAT_R16G16_FLOAT, DXGI_FORMAT_UNKNOWN);
 
-		irradianceOctahedralMap->getTexture()->getResource()->SetName(L"Irradiance Octahedral Map");
+		irradianceOctahedralMap->getTexture()->setName(L"Irradiance Octahedral Map");
 
-		irradianceBounceOctahedralMap->getTexture()->getResource()->SetName(L"Irradiance Bounce Octahedral Map");
+		irradianceBounceOctahedralMap->getTexture()->setName(L"Irradiance Bounce Octahedral Map");
 
-		depthOctahedralMap->getTexture()->getResource()->SetName(L"Depth Octahedral Map");
+		depthOctahedralMap->getTexture()->setName(L"Depth Octahedral Map");
 
-		shadowTexture->getTexture()->getResource()->SetName(L"Shadow Texture");
+		shadowTexture->getTexture()->setName(L"Shadow Texture");
 
-		radianceCube->getTexture()->getResource()->SetName(L"Radiance Cube");
+		radianceCube->getTexture()->setName(L"Radiance Cube");
 
-		distanceCube->getTexture()->getResource()->SetName(L"Distance Cube");
+		distanceCube->getTexture()->setName(L"Distance Cube");
 
 		{
 			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = PipelineState::getDefaultGraphicsDesc();
@@ -239,17 +237,15 @@ public:
 
 		effect = new BloomEffect(context, Graphics::getWidth(), Graphics::getHeight(), resManager);
 
+		effect->setThreshold(0.8f);
+
 		effect->setIntensity(0.5f);
+
+		effect->setExposure(1.3f);
 
 		scene = new Scene(assetPath + "/sponza.dae", resManager);
 
-		updateShadow();
-
-		irradianceVolumeBuffer->update(&irradianceVolume, sizeof(IrradianceVolume));
-
-		updateLightProbe();
-
-		updateLightBounceProbe();
+		updateLightField();
 
 		end();
 
@@ -296,6 +292,11 @@ public:
 		delete effect;
 	}
 
+	void imGuiCommand() override
+	{
+		effect->imGuiCommand();
+	}
+
 protected:
 
 	static constexpr UINT shadowTextureResolution = 4096;
@@ -305,6 +306,15 @@ protected:
 	static constexpr float radianceCubeClearColor[4] = { 0.f,0.f,0.f,1.f };
 
 	static constexpr float distanceCubeClearColor[4] = { 512.f,512.f,512.f,512.f };
+
+	void updateLightField()
+	{
+		updateShadow();
+
+		irradianceVolumeBuffer->update(&irradianceVolume, sizeof(IrradianceVolume));
+
+		updateLightProbe();
+	}
 
 	void updateShadow()
 	{
@@ -345,36 +355,19 @@ protected:
 
 	void updateLightProbe()
 	{
-		for (UINT x = 0; x < irradianceVolume.count.x; x++)
+		for (UINT i = 0; i < probeCount; i++)
 		{
-			for (UINT z = 0; z < irradianceVolume.count.z; z++)
-			{
-				for (UINT y = 0; y < irradianceVolume.count.y; y++)
-				{
-					RenderCubeAt({ x,y,z });
-				}
-			}
+			renderCubeAt(cubeRenderParamBuffer[i]);
+		}
+
+		for (UINT i = 0; i < probeCount; i++)
+		{
+			renderCubeBounceAt(cubeRenderParamBuffer[i]);
 		}
 	}
 
-	void updateLightBounceProbe()
+	void renderCubeAt(const ConstantBuffer* const cubeRenderBuffer)
 	{
-		for (UINT x = 0; x < irradianceVolume.count.x; x++)
-		{
-			for (UINT z = 0; z < irradianceVolume.count.z; z++)
-			{
-				for (UINT y = 0; y < irradianceVolume.count.y; y++)
-				{
-					RenderCubeBounceAt({ x,y,z });
-				}
-			}
-		}
-	}
-
-	void RenderCubeAt(const DirectX::XMUINT3& probeGridPos)
-	{
-		const UINT probeIndex = ProbeGridPosToIndex(probeGridPos);
-
 		context->setViewport(probeCaptureResolution, probeCaptureResolution);
 
 		context->setScissorRect(0, 0, probeCaptureResolution, probeCaptureResolution);
@@ -383,14 +376,14 @@ protected:
 
 		context->setRenderTargets({ radianceCube->getRTVMipHandle(0),distanceCube->getRTVMipHandle(0) }, &dsDesc);
 
-		context->setVSConstantBuffer(cubeRenderParamBuffer[probeIndex]);
+		context->setVSConstantBuffer(cubeRenderBuffer);
 
 		context->setPSConstants({
 			shadowTexture->getAllDepthIndex(),
 			irradianceVolumeBuffer->getBufferIndex()
 			}, 3);
 
-		context->setPSConstantBuffer(cubeRenderParamBuffer[probeIndex]);
+		context->setPSConstantBuffer(cubeRenderBuffer);
 
 		context->transitionResources();
 
@@ -409,7 +402,7 @@ protected:
 			radianceCube->getAllSRVIndex()
 			}, 0);
 
-		context->setCSConstantBuffer(cubeRenderParamBuffer[probeIndex]);
+		context->setCSConstantBuffer(cubeRenderBuffer);
 
 		context->transitionResources();
 
@@ -424,7 +417,7 @@ protected:
 			distanceCube->getAllSRVIndex()
 			}, 0);
 
-		context->setCSConstantBuffer(cubeRenderParamBuffer[probeIndex]);
+		context->setCSConstantBuffer(cubeRenderBuffer);
 
 		context->transitionResources();
 
@@ -433,10 +426,8 @@ protected:
 		context->uavBarrier({ depthOctahedralMap->getTexture() });
 	}
 
-	void RenderCubeBounceAt(const DirectX::XMUINT3& probeGridPos)
+	void renderCubeBounceAt(const ConstantBuffer* const cubeRenderBuffer)
 	{
-		const UINT probeIndex = ProbeGridPosToIndex(probeGridPos);
-
 		context->setViewport(probeCaptureResolution, probeCaptureResolution);
 
 		context->setScissorRect(0, 0, probeCaptureResolution, probeCaptureResolution);
@@ -445,7 +436,7 @@ protected:
 
 		context->setRenderTargets({ radianceCube->getRTVMipHandle(0) }, &dsDesc);
 
-		context->setVSConstantBuffer(cubeRenderParamBuffer[probeIndex]);
+		context->setVSConstantBuffer(cubeRenderBuffer);
 
 		context->setPSConstants({
 			shadowTexture->getAllDepthIndex(),
@@ -454,7 +445,7 @@ protected:
 			depthOctahedralMap->getAllSRVIndex()
 			}, 3);
 
-		context->setPSConstantBuffer(cubeRenderParamBuffer[probeIndex]);
+		context->setPSConstantBuffer(cubeRenderBuffer);
 
 		context->transitionResources();
 
@@ -471,7 +462,7 @@ protected:
 			radianceCube->getAllSRVIndex()
 			}, 0);
 
-		context->setCSConstantBuffer(cubeRenderParamBuffer[probeIndex]);
+		context->setCSConstantBuffer(cubeRenderBuffer);
 
 		context->transitionResources();
 
@@ -585,6 +576,14 @@ protected:
 	}
 
 	Scene* scene;
+	
+	static constexpr UINT probeCountX = 17;
+
+	static constexpr UINT probeCountY = 9;
+
+	static constexpr UINT probeCountZ = 12;
+
+	static constexpr UINT probeCount = probeCountX * probeCountY * probeCountZ;
 
 	struct IrradianceVolume
 	{
@@ -593,7 +592,7 @@ protected:
 		DirectX::XMMATRIX lightViewProj;
 		DirectX::XMFLOAT3 start = { -142.f,-16.f,-74.f };
 		float spacing = 18.2f;
-		DirectX::XMUINT3 count = { 17,9,12 };
+		const DirectX::XMUINT3 count = { probeCountX,probeCountY,probeCountZ };
 		float irradianceDistanceBias = 0.f;
 		float irradianceVarianceBias = 0.f;
 		float irradianceChebyshevBias = 0.0f;
@@ -603,7 +602,7 @@ protected:
 
 	ConstantBuffer* irradianceVolumeBuffer;
 
-	ConstantBuffer* cubeRenderParamBuffer[17 * 9 * 12];
+	ConstantBuffer* cubeRenderParamBuffer[probeCount];
 
 	float sunAngle;
 

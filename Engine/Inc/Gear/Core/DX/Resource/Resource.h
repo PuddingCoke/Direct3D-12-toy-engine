@@ -120,6 +120,8 @@ public:
 
 	bool isSharedResource() const;
 
+	void setName(LPCWSTR const name);
+
 private:
 
 	ComPtr<ID3D12Resource> resource;
