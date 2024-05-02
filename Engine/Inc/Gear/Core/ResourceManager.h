@@ -3,22 +3,25 @@
 #ifndef _RESOURCEMANAGER_H_
 #define _RESOURCEMANAGER_H_
 
+#include<stb_image/stb_image.h>
+#include<DDSTextureLoader/DDSTextureLoader12.h>
+
 #include<Gear/Core/GraphicsContext.h>
 #include<Gear/Core/PipelineState.h>
+
 #include<Gear/Utils/Math.h>
+#include<Gear/Utils/Random.h>
 
-#include<Gear/Core/DX/Resource/Resource.h>
-#include<Gear/Core/DX/Resource/Buffer.h>
-#include<Gear/Core/DX/Resource/Texture.h>
-#include<Gear/Core/DX/Resource/UploadHeap.h>
+#include<Gear/Core/DX/Buffer.h>
+#include<Gear/Core/DX/Texture.h>
+#include<Gear/Core/DX/UploadHeap.h>
 
-#include<Gear/Core/Resource/EngineResource.h>
+#include<Gear/Core/Resource/SwapTexture.h>
 #include<Gear/Core/Resource/ConstantBuffer.h>
 #include<Gear/Core/Resource/IndexConstantBuffer.h>
 #include<Gear/Core/Resource/BufferView.h>
 #include<Gear/Core/Resource/TextureRenderView.h>
 #include<Gear/Core/Resource/TextureDepthView.h>
-#include<Gear/Core/Resource/SwapTexture.h>
 
 enum class RandomDataType
 {
@@ -31,7 +34,7 @@ enum class RandomDataType
 class ResourceManager
 {
 public:
-	
+
 	ResourceManager(GraphicsContext* const context);
 
 	~ResourceManager();
@@ -60,13 +63,17 @@ public:
 
 	static ConstantBuffer* createConstantBuffer(const UINT size, const bool persistent);
 
-	BufferView* createBufferViewByteStride(const UINT structureByteStride, const UINT size, const bool createSRV, const bool createUAV, const bool createVBV, const bool cpuWritable, const bool persistent, const void* const data);
+	BufferView* createTypedBufferView(const DXGI_FORMAT format, const UINT size, const bool createSRV, const bool createUAV, const bool createVBV, const bool createIBV, const bool cpuWritable, const bool persistent, const void* const data);
 
-	static BufferView* createBufferViewByteStride(const UINT structureByteStride, const UINT size, const bool createSRV, const bool createUAV, const bool createVBV, const bool cpuWritable, const bool persistent);
+	static BufferView* createTypedBufferView(const DXGI_FORMAT format, const UINT size, const bool createSRV, const bool createUAV, const bool createVBV, const bool createIBV, const bool cpuWritable, const bool persistent);
 
-	BufferView* createBufferViewFormat(const DXGI_FORMAT format, const UINT size, const bool createSRV, const bool createUAV, const bool createVBV, const bool createIBV, const bool cpuWritable, const bool persistent, const void* const data);
+	BufferView* createStructuredBufferView(const UINT structureByteStride, const UINT size, const bool createSRV, const bool createUAV, const bool createVBV, const bool cpuWritable, const bool persistent, const void* const data);
 
-	static BufferView* createBufferViewFormat(const DXGI_FORMAT format, const UINT size, const bool createSRV, const bool createUAV, const bool createVBV, const bool createIBV, const bool cpuWritable, const bool persistent);
+	static BufferView* createStructuredBufferView(const UINT structureByteStride, const UINT size, const bool createSRV, const bool createUAV, const bool createVBV, const bool cpuWritable, const bool persistent);
+
+	BufferView* createByteAddressBufferView(const UINT size, const bool createSRV, const bool createUAV, const bool createVBV, const bool createIBV, const bool cpuWritable, const bool persistent, const void* const data);
+
+	static BufferView* createByteAddressBufferView(const UINT size, const bool createSRV, const bool createUAV, const bool createVBV, const bool createIBV, const bool cpuWritable, const bool persistent);
 
 	IndexConstantBuffer* createIndexConstantBuffer(const std::initializer_list<ShaderResourceDesc>& descs, const bool cpuWritable, const bool persistent);
 
@@ -91,7 +98,7 @@ public:
 		const DXGI_FORMAT srvFormat = DXGI_FORMAT_UNKNOWN, const DXGI_FORMAT uavFormat = DXGI_FORMAT_UNKNOWN, const DXGI_FORMAT rtvFormat = DXGI_FORMAT_UNKNOWN);
 
 	//create texture cube from 6 seperate textures
-	TextureRenderView* createTextureCube(const std::initializer_list<std::string> texturesPath,const bool persistent,
+	TextureRenderView* createTextureCube(const std::initializer_list<std::string> texturesPath, const bool persistent,
 		const DXGI_FORMAT srvFormat = DXGI_FORMAT_UNKNOWN, const DXGI_FORMAT uavFormat = DXGI_FORMAT_UNKNOWN, const DXGI_FORMAT rtvFormat = DXGI_FORMAT_UNKNOWN);
 
 private:

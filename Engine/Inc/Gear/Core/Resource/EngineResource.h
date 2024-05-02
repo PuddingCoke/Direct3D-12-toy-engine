@@ -17,8 +17,12 @@ public:
 
 protected:
 
-	CD3DX12_CPU_DESCRIPTOR_HANDLE srvUAVCBVHandleStart;
+	//use by non persistent resource only
 
+	//descriptor handle in non shader visible resource heap
+	D3D12_CPU_DESCRIPTOR_HANDLE srvUAVCBVHandleStart;
+
+	//number of descriptors allocated from non shader visible resource heap
 	UINT numSRVUAVCBVDescriptors;
 
 };

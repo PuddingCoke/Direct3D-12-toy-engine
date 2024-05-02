@@ -136,6 +136,10 @@ public:
 
 	void clearDepthStencil(const DepthStencilDesc desc, const D3D12_CLEAR_FLAGS flags, const FLOAT depth, const UINT8 stencil) const;
 
+	void clearUnorderedAccess(const ClearUAVDesc desc, const FLOAT values[4]);
+
+	void clearUnorderedAccess(const ClearUAVDesc desc, const UINT values[4]);
+
 	void uavBarrier(const std::initializer_list<Resource*>& resources) const;
 
 	void draw(const UINT vertexCountPerInstance, const UINT instanceCount, const UINT startVertexLocation, const UINT startInstanceLocation) const;

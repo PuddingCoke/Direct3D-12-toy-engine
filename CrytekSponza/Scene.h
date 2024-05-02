@@ -125,7 +125,7 @@ public:
 			startVertexLocation += vertexCount;
 		}
 
-		modelBuffer = resManager->createBufferViewByteStride(sizeof(Vertex), sizeof(Vertex) * vertices.size(), false, false, true, false, true, vertices.data());
+		modelBuffer = resManager->createStructuredBufferView(sizeof(Vertex), sizeof(Vertex) * vertices.size(), false, false, true, false, true, vertices.data());
 	}
 
 	~Scene()

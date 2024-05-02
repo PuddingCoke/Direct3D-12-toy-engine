@@ -1,4 +1,4 @@
-#include<Gear/Core/DX/Resource/ReadbackHeap.h>
+#include<Gear/Core/DX/ReadbackHeap.h>
 
 ReadbackHeap::ReadbackHeap(const UINT size, const D3D12_HEAP_FLAGS flags) :
 	Resource(CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_READBACK), flags, CD3DX12_RESOURCE_DESC::Buffer(size), false, D3D12_RESOURCE_STATE_COPY_DEST, nullptr)
@@ -10,7 +10,7 @@ ReadbackHeap::ReadbackHeap(ReadbackHeap& heap) :
 {
 }
 
-void* ReadbackHeap::map(const D3D12_RANGE readRange)
+void* ReadbackHeap::map(const D3D12_RANGE readRange) const
 {
 	void* dataPtr = nullptr;
 
@@ -19,7 +19,7 @@ void* ReadbackHeap::map(const D3D12_RANGE readRange)
 	return dataPtr;
 }
 
-void ReadbackHeap::unmap()
+void ReadbackHeap::unmap() const
 {
 	getResource()->Unmap(0, nullptr);
 }

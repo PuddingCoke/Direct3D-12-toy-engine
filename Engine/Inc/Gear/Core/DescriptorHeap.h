@@ -28,6 +28,8 @@ public:
 
 		void move();
 
+		void offset(const UINT num);
+
 	protected:
 
 		CD3DX12_CPU_DESCRIPTOR_HANDLE cpuHandle;

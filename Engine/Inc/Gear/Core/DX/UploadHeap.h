@@ -3,9 +3,6 @@
 #ifndef _UPLOADHEAP_H_
 #define _UPLOADHEAP_H_
 
-#include<Gear/Core/GraphicsDevice.h>
-#include<Gear/Core/Graphics.h>
-
 #include"Resource.h"
 
 class UploadHeap :public Resource

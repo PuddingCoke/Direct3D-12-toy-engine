@@ -206,7 +206,11 @@ public:
 
 		randomGauss = resManager->createTextureRenderView(1024, 1024, RandomDataType::GAUSS, true);
 
-		patchVertexBuffer = resManager->createBufferViewByteStride(sizeof(Vertex), sizeof(Vertex) * vertices.size(), false, false, true, false, true, vertices.data());
+		patchVertexBuffer = resManager->createStructuredBufferView(sizeof(Vertex), sizeof(Vertex) * vertices.size(), false, false, true, false, true, vertices.data());
+
+		float clearValue[] = {999.f,999.f, 999.f, 999.f};
+
+		context->clearUnorderedAccess(normalJacobian->getClearUAVDesc(0), clearValue);
 
 		calPhillipsTexture();
 

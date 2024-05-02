@@ -6,7 +6,7 @@ using EngineUsage = Configuration::EngineUsage;
 
 int main(int argc, const char* argv[])
 {
-	Configuration config(1920, 1080, L"RayTracing", EngineUsage::NORMAL);
+	Configuration config(1920, 1080, L"RayTracing", EngineUsage::NORMAL, false);
 
 	Gear::initialize();
 

@@ -27,19 +27,19 @@
     <ClInclude Include="Inc\Gear\Game.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Inc\Gear\Core\DX\Resource\Resource.h">
+    <ClInclude Include="Inc\Gear\Core\DX\Resource.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="Inc\Gear\Core\GraphicsDevice.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Inc\Gear\Core\DX\Resource\Buffer.h">
+    <ClInclude Include="Inc\Gear\Core\DX\Buffer.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="Inc\Gear\Core\Graphics.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Inc\Gear\Core\DX\Resource\UploadHeap.h">
+    <ClInclude Include="Inc\Gear\Core\DX\UploadHeap.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="Inc\Gear\Core\CommandList.h">
@@ -48,7 +48,7 @@
     <ClInclude Include="Inc\Gear\Core\CommandAllocator.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Inc\Gear\Core\DX\Resource\Texture.h">
+    <ClInclude Include="Inc\Gear\Core\DX\Texture.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="Inc\Gear\Core\RenderPass.h">
@@ -132,7 +132,7 @@
     <ClInclude Include="Inc\Gear\Core\VideoEncoder\NvidiaEncoder.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Inc\Gear\Core\DX\Resource\ReadbackHeap.h">
+    <ClInclude Include="Inc\Gear\Core\DX\ReadbackHeap.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="Inc\Gear\Core\VideoEncoder\Encoder.h">
@@ -189,6 +189,9 @@
     <ClInclude Include="Inc\Gear\Core\Resource\BufferView.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Inc\Gear\Core\Resource\CounterBufferView.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Gear\Window\Win32Form.cpp">
@@ -203,13 +206,13 @@
     <ClCompile Include="Src\Gear\Game.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Core\DX\Resource\Resource.cpp">
+    <ClCompile Include="Src\Gear\Core\DX\Resource.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Src\Gear\Core\GraphicsDevice.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Core\DX\Resource\UploadHeap.cpp">
+    <ClCompile Include="Src\Gear\Core\DX\UploadHeap.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Src\Gear\Core\CommandList.cpp">
@@ -218,13 +221,13 @@
     <ClCompile Include="Src\Gear\Core\CommandAllocator.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Core\DX\Resource\Buffer.cpp">
+    <ClCompile Include="Src\Gear\Core\DX\Buffer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Src\Gear\Core\Graphics.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Core\DX\Resource\Texture.cpp">
+    <ClCompile Include="Src\Gear\Core\DX\Texture.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Src\Gear\Core\RenderPass.cpp">
@@ -302,7 +305,7 @@
     <ClCompile Include="Src\Gear\Core\States.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Core\DX\Resource\ReadbackHeap.cpp">
+    <ClCompile Include="Src\Gear\Core\DX\ReadbackHeap.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Src\Gear\Core\VideoEncoder\NvidiaEncoder.cpp">
@@ -357,6 +360,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Src\Gear\Core\Resource\BufferView.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gear\Core\Resource\CounterBufferView.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

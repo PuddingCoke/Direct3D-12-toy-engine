@@ -19,9 +19,9 @@ public:
 
 	ReadbackHeap(const ReadbackHeap&) = delete;
 
-	void* map(const D3D12_RANGE readRange);
+	void* map(const D3D12_RANGE readRange) const;
 
-	void unmap();
+	void unmap() const;
 
 	void updateGlobalStates() override;
 

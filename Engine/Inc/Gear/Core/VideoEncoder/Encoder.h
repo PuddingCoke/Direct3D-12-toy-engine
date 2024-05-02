@@ -8,7 +8,7 @@
 
 #include<Gear/Core/Graphics.h>
 
-#include<Gear/Core/DX/Resource/Texture.h>
+#include<Gear/Core/DX/Texture.h>
 
 class Encoder
 {

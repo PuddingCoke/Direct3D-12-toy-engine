@@ -28,7 +28,7 @@ public:
 			DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_R16G16B16A16_FLOAT, radianceCubeClearColor)),
 		distanceCube(ResourceManager::createTextureRenderView(probeCaptureResolution, probeCaptureResolution, DXGI_FORMAT_R32_FLOAT, 6, 1, true, true,
 			DXGI_FORMAT_R32_FLOAT, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_R32_FLOAT, distanceCubeClearColor)),
-		depthCube(ResourceManager::createTextureDepthView(probeCaptureResolution, probeCaptureResolution, DXGI_FORMAT_R32_TYPELESS, 6, 1, true, true)),
+		depthCube(ResourceManager::createTextureDepthView(probeCaptureResolution, probeCaptureResolution, DXGI_FORMAT_D32_FLOAT, 6, 1, true, true)),
 		irradianceVolumeBuffer(ResourceManager::createConstantBuffer(sizeof(IrradianceVolume), true)),
 		shadowVS(new Shader(Utils::getRootFolder() + "ShadowVS.cso")),
 		deferredVShader(new Shader(Utils::getRootFolder() + "DeferredVShader.cso")),

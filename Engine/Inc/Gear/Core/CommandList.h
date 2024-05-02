@@ -10,10 +10,10 @@
 #include<Gear/Core/GlobalDescriptorHeap.h>
 #include<Gear/Core/GlobalRootSignature.h>
 
-#include<Gear/Core/DX/Resource/Buffer.h>
-#include<Gear/Core/DX/Resource/Texture.h>
-#include<Gear/Core/DX/Resource/UploadHeap.h>
-#include<Gear/Core/DX/Resource/ReadbackHeap.h>
+#include<Gear/Core/DX/Buffer.h>
+#include<Gear/Core/DX/Texture.h>
+#include<Gear/Core/DX/UploadHeap.h>
+#include<Gear/Core/DX/ReadbackHeap.h>
 
 template<typename T>
 using IsCorrectType = std::enable_if_t<
@@ -82,6 +82,10 @@ public:
 
 	void uavBarrier(const std::initializer_list<Resource*>& resources);
 
+	void clearUnorderedAccessView(const ClearUAVDesc desc, const float values[4]);
+
+	void clearUnorderedAccessView(const ClearUAVDesc desc, const UINT values[4]);
+
 private:
 
 	friend class RenderEngine;
@@ -139,6 +143,15 @@ inline IsCorrectType<T> CommandList::setPipelineResources(const T& descs, const 
 					else if (desc.state == ShaderResourceDesc::UAV)
 					{
 						buffer->setState(D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+
+						Buffer* const counterBuffer = desc.bufferDesc.counterBuffer;
+
+						if (counterBuffer)
+						{
+							pushResourceTrackList(counterBuffer);
+
+							counterBuffer->setState(D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+						}
 					}
 				}
 			}

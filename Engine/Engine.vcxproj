@@ -141,6 +141,7 @@
   <ItemGroup>
     <ClInclude Include="Inc\DDSTextureLoader\DDSTextureLoader12.h" />
     <ClInclude Include="Inc\Gear\Core\Resource\BufferView.h" />
+    <ClInclude Include="Inc\Gear\Core\Resource\CounterBufferView.h" />
     <ClInclude Include="Inc\ImGUI\imconfig.h" />
     <ClInclude Include="Inc\ImGUI\imgui.h" />
     <ClInclude Include="Inc\ImGUI\imgui_impl_dx12.h" />
@@ -158,11 +159,11 @@
     <ClInclude Include="Inc\Gear\Core\CommandAllocator.h" />
     <ClInclude Include="Inc\Gear\Core\ConstantBufferPool.h" />
     <ClInclude Include="Inc\Gear\Core\DescriptorHeap.h" />
-    <ClInclude Include="Inc\Gear\Core\DX\Resource\ReadbackHeap.h" />
-    <ClInclude Include="Inc\Gear\Core\DX\Resource\Texture.h" />
-    <ClInclude Include="Inc\Gear\Core\DX\Resource\Buffer.h" />
-    <ClInclude Include="Inc\Gear\Core\DX\Resource\Resource.h" />
-    <ClInclude Include="Inc\Gear\Core\DX\Resource\UploadHeap.h" />
+    <ClInclude Include="Inc\Gear\Core\DX\ReadbackHeap.h" />
+    <ClInclude Include="Inc\Gear\Core\DX\Texture.h" />
+    <ClInclude Include="Inc\Gear\Core\DX\Buffer.h" />
+    <ClInclude Include="Inc\Gear\Core\DX\Resource.h" />
+    <ClInclude Include="Inc\Gear\Core\DX\UploadHeap.h" />
     <ClInclude Include="Inc\Gear\Core\Effect\BloomEffect.h" />
     <ClInclude Include="Inc\Gear\Core\Effect\Effect.h" />
     <ClInclude Include="Inc\Gear\Core\Gear2D\PrimitiveBatch.h" />
@@ -212,7 +213,7 @@
     <ClCompile Include="Src\Gear\Core\Camera.cpp" />
     <ClCompile Include="Src\Gear\Core\ConstantBufferPool.cpp" />
     <ClCompile Include="Src\Gear\Core\DescriptorHeap.cpp" />
-    <ClCompile Include="Src\Gear\Core\DX\Resource\ReadbackHeap.cpp" />
+    <ClCompile Include="Src\Gear\Core\DX\ReadbackHeap.cpp" />
     <ClCompile Include="Src\Gear\Core\Effect\BloomEffect.cpp" />
     <ClCompile Include="Src\Gear\Core\Effect\Effect.cpp" />
     <ClCompile Include="Src\Gear\Core\Gear2D\PrimitiveBatch.cpp" />
@@ -222,18 +223,19 @@
     <ClCompile Include="Src\Gear\Core\PipelineState.cpp" />
     <ClCompile Include="Src\Gear\Core\RenderEngine.cpp" />
     <ClCompile Include="Src\Gear\Core\RenderPass.cpp" />
-    <ClCompile Include="Src\Gear\Core\DX\Resource\Texture.cpp" />
+    <ClCompile Include="Src\Gear\Core\DX\Texture.cpp" />
     <ClCompile Include="Src\Gear\Core\Graphics.cpp" />
-    <ClCompile Include="Src\Gear\Core\DX\Resource\Buffer.cpp" />
+    <ClCompile Include="Src\Gear\Core\DX\Buffer.cpp" />
     <ClCompile Include="Src\Gear\Core\CommandAllocator.cpp" />
     <ClCompile Include="Src\Gear\Configuration.cpp" />
     <ClCompile Include="Src\Gear\Core\CommandList.cpp" />
-    <ClCompile Include="Src\Gear\Core\DX\Resource\Resource.cpp" />
-    <ClCompile Include="Src\Gear\Core\DX\Resource\UploadHeap.cpp" />
+    <ClCompile Include="Src\Gear\Core\DX\Resource.cpp" />
+    <ClCompile Include="Src\Gear\Core\DX\UploadHeap.cpp" />
     <ClCompile Include="Src\Gear\Core\GraphicsDevice.cpp" />
     <ClCompile Include="Src\Gear\Core\ResourceManager.cpp" />
     <ClCompile Include="Src\Gear\Core\Resource\BufferView.cpp" />
     <ClCompile Include="Src\Gear\Core\Resource\ConstantBuffer.cpp" />
+    <ClCompile Include="Src\Gear\Core\Resource\CounterBufferView.cpp" />
     <ClCompile Include="Src\Gear\Core\Resource\EngineResource.cpp" />
     <ClCompile Include="Src\Gear\Core\Resource\IndexConstantBuffer.cpp" />
     <ClCompile Include="Src\Gear\Core\Resource\SwapTexture.cpp" />

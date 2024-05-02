@@ -348,6 +348,16 @@ void GraphicsContext::clearDepthStencil(const DepthStencilDesc desc, const D3D12
 	commandList->get()->ClearDepthStencilView(desc.dsvHandle, flags, depth, stencil, 0, nullptr);
 }
 
+void GraphicsContext::clearUnorderedAccess(const ClearUAVDesc desc, const FLOAT values[4])
+{
+	commandList->clearUnorderedAccessView(desc, values);
+}
+
+void GraphicsContext::clearUnorderedAccess(const ClearUAVDesc desc, const UINT values[4])
+{
+	commandList->clearUnorderedAccessView(desc, values);
+}
+
 void GraphicsContext::uavBarrier(const std::initializer_list<Resource*>& resources) const
 {
 	commandList->uavBarrier(resources);

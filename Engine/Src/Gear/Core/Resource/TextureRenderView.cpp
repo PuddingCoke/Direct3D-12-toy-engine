@@ -1,7 +1,7 @@
 #include<Gear/Core/Resource/TextureRenderView.h>
 
 TextureRenderView::TextureRenderView(Texture* const texture, const bool isTextureCube, const bool persistent, const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat) :
-	texture(texture), hasRTV((rtvFormat != DXGI_FORMAT_UNKNOWN)), hasUAV((uavFormat != DXGI_FORMAT_UNKNOWN))
+	texture(texture), hasRTV((rtvFormat != DXGI_FORMAT_UNKNOWN)), hasUAV((uavFormat != DXGI_FORMAT_UNKNOWN)), rtvMipHandleStart(), viewGPUHandleStart(), viewCPUHandleStart()
 {
 	//create srv uav descriptors
 	{
@@ -182,6 +182,23 @@ TextureRenderView::TextureRenderView(Texture* const texture, const bool isTextur
 
 		if (hasUAV)
 		{
+			DescriptorHandle nonShaderVisibleHandle;
+
+			if (persistent)
+			{
+				viewGPUHandleStart = descriptorHandle.getGPUHandle();
+
+				nonShaderVisibleHandle = GlobalDescriptorHeap::getNonShaderVisibleResourceHeap()->allocStaticDescriptor(texture->getMipLevels());
+
+				viewCPUHandleStart = nonShaderVisibleHandle.getCPUHandle();
+			}
+			else
+			{
+				viewCPUHandleStart = descriptorHandle.getCPUHandle();
+
+				//get viewGPUHandleStart later
+			}
+
 			if (texture->getArraySize() > 1)
 			{
 				for (UINT i = 0; i < texture->getMipLevels(); i++)
@@ -197,6 +214,13 @@ TextureRenderView::TextureRenderView(Texture* const texture, const bool isTextur
 					GraphicsDevice::get()->CreateUnorderedAccessView(texture->getResource(), nullptr, &desc, descriptorHandle.getCPUHandle());
 
 					descriptorHandle.move();
+
+					if (persistent)
+					{
+						GraphicsDevice::get()->CreateUnorderedAccessView(texture->getResource(), nullptr, &desc, nonShaderVisibleHandle.getCPUHandle());
+
+						nonShaderVisibleHandle.move();
+					}
 				}
 			}
 			else
@@ -212,6 +236,13 @@ TextureRenderView::TextureRenderView(Texture* const texture, const bool isTextur
 					GraphicsDevice::get()->CreateUnorderedAccessView(texture->getResource(), nullptr, &desc, descriptorHandle.getCPUHandle());
 
 					descriptorHandle.move();
+
+					if (persistent)
+					{
+						GraphicsDevice::get()->CreateUnorderedAccessView(texture->getResource(), nullptr, &desc, nonShaderVisibleHandle.getCPUHandle());
+
+						nonShaderVisibleHandle.move();
+					}
 				}
 			}
 		}
@@ -222,8 +253,6 @@ TextureRenderView::TextureRenderView(Texture* const texture, const bool isTextur
 	{
 		DescriptorHandle descriptorHandle = DescriptorHandle();
 
-		rtvMipHandles = std::vector<D3D12_CPU_DESCRIPTOR_HANDLE>(texture->getMipLevels());
-
 		if (persistent)
 		{
 			descriptorHandle = GlobalDescriptorHeap::getRenderTargetHeap()->allocStaticDescriptor(texture->getMipLevels());
@@ -232,6 +261,8 @@ TextureRenderView::TextureRenderView(Texture* const texture, const bool isTextur
 		{
 			descriptorHandle = GlobalDescriptorHeap::getRenderTargetHeap()->allocDynamicDescriptor(texture->getMipLevels());
 		}
+
+		rtvMipHandleStart = descriptorHandle.getCPUHandle();
 
 		if (texture->getArraySize() > 1)
 		{
@@ -246,8 +277,6 @@ TextureRenderView::TextureRenderView(Texture* const texture, const bool isTextur
 				desc.Texture2DArray.PlaneSlice = 0;
 
 				GraphicsDevice::get()->CreateRenderTargetView(texture->getResource(), &desc, descriptorHandle.getCPUHandle());
-
-				rtvMipHandles[i] = descriptorHandle.getCPUHandle();
 
 				descriptorHandle.move();
 			}
@@ -264,8 +293,6 @@ TextureRenderView::TextureRenderView(Texture* const texture, const bool isTextur
 
 				GraphicsDevice::get()->CreateRenderTargetView(texture->getResource(), &desc, descriptorHandle.getCPUHandle());
 
-				rtvMipHandles[i] = descriptorHandle.getCPUHandle();
-
 				descriptorHandle.move();
 			}
 		}
@@ -278,7 +305,7 @@ TextureRenderView::TextureRenderView(const TextureRenderView& trv) :
 	allSRVIndex(trv.allSRVIndex),
 	srvMipIndexStart(trv.srvMipIndexStart),
 	uavMipIndexStart(trv.uavMipIndexStart),
-	rtvMipHandles(trv.rtvMipHandles),
+	rtvMipHandleStart(trv.rtvMipHandleStart),
 	texture(new Texture(*(trv.texture)))
 {
 }
@@ -332,7 +359,19 @@ RenderTargetDesc TextureRenderView::getRTVMipHandle(const UINT mipSlice) const
 	RenderTargetDesc desc = {};
 	desc.texture = texture;
 	desc.mipSlice = mipSlice;
-	desc.rtvHandle = rtvMipHandles[mipSlice];
+	desc.rtvHandle = CD3DX12_CPU_DESCRIPTOR_HANDLE(rtvMipHandleStart, mipSlice, GlobalDescriptorHeap::getRenderTargetIncrementSize());
+
+	return desc;
+}
+
+ClearUAVDesc TextureRenderView::getClearUAVDesc(const UINT mipSlice) const
+{
+	ClearUAVDesc desc = {};
+	desc.type = ClearUAVDesc::TEXTURE;
+	desc.textureDesc.texture = texture;
+	desc.textureDesc.mipSlice = mipSlice;
+	desc.viewGPUHandle = CD3DX12_GPU_DESCRIPTOR_HANDLE(viewGPUHandleStart, mipSlice, GlobalDescriptorHeap::getResourceIncrementSize());
+	desc.viewCPUHandle = CD3DX12_CPU_DESCRIPTOR_HANDLE(viewCPUHandleStart, mipSlice, GlobalDescriptorHeap::getResourceIncrementSize());
 
 	return desc;
 }
@@ -344,13 +383,20 @@ Texture* TextureRenderView::getTexture() const
 
 void TextureRenderView::copyDescriptors()
 {
-	const DescriptorHandle handle = GlobalDescriptorHeap::getResourceHeap()->allocDynamicDescriptor(numSRVUAVCBVDescriptors);
+	DescriptorHandle shaderVisibleHandle = GlobalDescriptorHeap::getResourceHeap()->allocDynamicDescriptor(numSRVUAVCBVDescriptors);
 
-	GraphicsDevice::get()->CopyDescriptorsSimple(numSRVUAVCBVDescriptors, handle.getCPUHandle(), srvUAVCBVHandleStart, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	GraphicsDevice::get()->CopyDescriptorsSimple(numSRVUAVCBVDescriptors, shaderVisibleHandle.getCPUHandle(), srvUAVCBVHandleStart, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
-	allSRVIndex = handle.getCurrentIndex();
+	allSRVIndex = shaderVisibleHandle.getCurrentIndex();
 
 	srvMipIndexStart = allSRVIndex + 1;
 
-	uavMipIndexStart = srvMipIndexStart + texture->getMipLevels();
+	if (hasUAV)
+	{
+		uavMipIndexStart = allSRVIndex + 1 + texture->getMipLevels();
+
+		shaderVisibleHandle.offset(1 + texture->getMipLevels());
+
+		viewGPUHandleStart = shaderVisibleHandle.getGPUHandle();
+	}
 }
