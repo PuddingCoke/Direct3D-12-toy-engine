@@ -5,7 +5,7 @@
 
 #include"Encoder.h"
 
-#include<Gear/Core/DX/Resource/ReadbackHeap.h>
+#include<Gear/Core/DX/ReadbackHeap.h>
 
 #include<NvEnc/nvEncodeAPI.h>
 

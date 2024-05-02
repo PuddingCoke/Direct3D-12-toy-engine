@@ -3,12 +3,17 @@
 #ifndef _BUFFERVIEW_H_
 #define _BUFFERVIEW_H_
 
-#include<Gear/Core/DX/Resource/Buffer.h>
+#include<Gear/Core/DX/Buffer.h>
+
+#include<Gear/Core/DX/UploadHeap.h>
 
 #include<Gear/Utils/Utils.h>
 
+#include<Gear/Core/Resource/CounterBufferView.h>
+
 #include"EngineResource.h"
 
+//versatile buffer
 class BufferView :public EngineResource
 {
 public:
@@ -17,13 +22,17 @@ public:
 
 	~BufferView();
 
-	VertexBufferDesc getVertexBuffer();
+	VertexBufferDesc getVertexBuffer() const;
 
-	IndexBufferDesc getIndexBuffer();
+	IndexBufferDesc getIndexBuffer() const;
 
-	ShaderResourceDesc getSRVIndex();
+	ShaderResourceDesc getSRVIndex() const;
 
-	ShaderResourceDesc getUAVIndex();
+	ShaderResourceDesc getUAVIndex() const;
+
+	ClearUAVDesc getClearUAVDesc() const;
+
+	CounterBufferView* getCounterBuffer() const;
 
 	void copyDescriptors() override;
 
@@ -35,9 +44,15 @@ private:
 
 	friend class GraphicsContext;
 
+	CounterBufferView* counterBuffer;
+
 	UINT srvIndex;
 
 	UINT uavIndex;
+
+	D3D12_GPU_DESCRIPTOR_HANDLE viewGPUHandle;
+
+	D3D12_CPU_DESCRIPTOR_HANDLE viewCPUHandle;
 
 	union
 	{
@@ -51,7 +66,6 @@ private:
 	UINT uploadHeapIndex;
 
 	Buffer* buffer;
-
 };
 
 #endif // !_BUFFERVIEW_H_

@@ -4,10 +4,11 @@
 
 #include<Gear/Core/Shader.h>
 
-#include<Gear/Core/Resource/TextureRenderView.h>
-
 #include<Gear/Utils/Math.h>
 #include<Gear/Utils/Random.h>
+#include<Gear/Utils/Color.h>
+
+#include<Gear/Core/Resource/CounterBufferView.h>
 
 class MyRenderPass :public RenderPass
 {
@@ -15,10 +16,12 @@ public:
 
 	MyRenderPass()
 	{
+
 	}
 
 	~MyRenderPass()
 	{
+		delete texture;
 	}
 
 protected:

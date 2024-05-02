@@ -327,3 +327,63 @@ void CommandList::uavBarrier(const std::initializer_list<Resource*>& resources)
 
 	commandList->ResourceBarrier(static_cast<UINT>(transientUAVBarriers.size()), transientUAVBarriers.data());
 }
+
+void CommandList::clearUnorderedAccessView(const ClearUAVDesc desc, const float values[4])
+{
+	ID3D12Resource* resource = nullptr;
+
+	if (desc.type == ShaderResourceDesc::BUFFER)
+	{
+		Buffer* const buffer = desc.bufferDesc.buffer;
+
+		resource = buffer->getResource();
+
+		pushResourceTrackList(buffer);
+
+		buffer->setState(D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+	}
+	else if (desc.type == ShaderResourceDesc::TEXTURE)
+	{
+		Texture* const texture = desc.textureDesc.texture;
+
+		resource = texture->getResource();
+
+		pushResourceTrackList(texture);
+
+		texture->setMipSliceState(desc.textureDesc.mipSlice, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+	}
+
+	transitionResources();
+
+	commandList->ClearUnorderedAccessViewFloat(desc.viewGPUHandle, desc.viewCPUHandle, resource, values, 0, nullptr);
+}
+
+void CommandList::clearUnorderedAccessView(const ClearUAVDesc desc, const UINT values[4])
+{
+	ID3D12Resource* resource = nullptr;
+
+	if (desc.type == ShaderResourceDesc::BUFFER)
+	{
+		Buffer* const buffer = desc.bufferDesc.buffer;
+
+		resource = buffer->getResource();
+
+		pushResourceTrackList(buffer);
+
+		buffer->setState(D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+	}
+	else if (desc.type == ShaderResourceDesc::TEXTURE)
+	{
+		Texture* const texture = desc.textureDesc.texture;
+
+		resource = texture->getResource();
+
+		pushResourceTrackList(texture);
+
+		texture->setMipSliceState(desc.textureDesc.mipSlice, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+	}
+
+	transitionResources();
+
+	commandList->ClearUnorderedAccessViewUint(desc.viewGPUHandle, desc.viewCPUHandle, resource, values, 0, nullptr);
+}

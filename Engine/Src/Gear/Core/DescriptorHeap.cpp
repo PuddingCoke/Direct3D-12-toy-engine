@@ -143,3 +143,10 @@ void DescriptorHeap::DescriptorHandle::move()
 
 	gpuHandle.Offset(1, descriptorHeap->incrementSize);
 }
+
+void DescriptorHeap::DescriptorHandle::offset(const UINT num)
+{
+	cpuHandle.Offset(num, descriptorHeap->incrementSize);
+
+	gpuHandle.Offset(num, descriptorHeap->incrementSize);
+}

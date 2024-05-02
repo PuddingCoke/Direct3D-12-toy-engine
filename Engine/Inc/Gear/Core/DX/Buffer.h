@@ -3,9 +3,7 @@
 #ifndef _BUFFER_H_
 #define _BUFFER_H_
 
-#include<Gear/Core/GraphicsDevice.h>
-
-#include"UploadHeap.h"
+#include"Resource.h"
 
 class Buffer;
 

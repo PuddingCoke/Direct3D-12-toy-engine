@@ -3,7 +3,7 @@
 #ifndef _TEXTUREDEPTHVIEW_H_
 #define _TEXTUREDEPTHVIEW_H_
 
-#include<Gear/Core/DX/Resource/Texture.h>
+#include<Gear/Core/DX/Texture.h>
 
 #include"EngineResource.h"
 
@@ -46,7 +46,7 @@ private:
 
 	UINT stencilMipIndexStart;
 
-	std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> dsvMipHandles;
+	D3D12_CPU_DESCRIPTOR_HANDLE dsvMipHandleStart;
 
 	Texture* texture;
 };

@@ -4,8 +4,8 @@
 #define _CONSTANTBUFFERPOOL_H_
 
 #include<Gear/Core/GlobalDescriptorHeap.h>
-#include<Gear/Core/DX/Resource/Buffer.h>
-#include<Gear/Core/DX/Resource/UploadHeap.h>
+#include<Gear/Core/DX/Buffer.h>
+#include<Gear/Core/DX/UploadHeap.h>
 
 #include<mutex>
 

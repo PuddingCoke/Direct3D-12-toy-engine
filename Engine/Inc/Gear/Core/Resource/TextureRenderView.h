@@ -3,7 +3,7 @@
 #ifndef _TEXTURERENDERVIEW_H_
 #define _TEXTURERENDERVIEW_H_
 
-#include<Gear/Core/DX/Resource/Texture.h>
+#include<Gear/Core/DX/Texture.h>
 
 #include"EngineResource.h"
 
@@ -31,6 +31,8 @@ public:
 
 	RenderTargetDesc getRTVMipHandle(const UINT mipSlice) const;
 
+	ClearUAVDesc getClearUAVDesc(const UINT mipSlice) const;
+
 	Texture* getTexture() const;
 
 	void copyDescriptors() override;
@@ -41,15 +43,17 @@ public:
 
 private:
 
-	//offset 1 for each mipSlice
-	//since 0th position is all srv
 	UINT allSRVIndex;
 
 	UINT srvMipIndexStart;
 
 	UINT uavMipIndexStart;
 
-	std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> rtvMipHandles;
+	D3D12_CPU_DESCRIPTOR_HANDLE rtvMipHandleStart;
+
+	D3D12_GPU_DESCRIPTOR_HANDLE viewGPUHandleStart;
+
+	D3D12_CPU_DESCRIPTOR_HANDLE viewCPUHandleStart;
 
 	Texture* texture;
 };

@@ -297,61 +297,7 @@ ConstantBuffer* ResourceManager::createConstantBuffer(const UINT size, const boo
 	return new ConstantBuffer(nullptr, size, persistent);
 }
 
-BufferView* ResourceManager::createBufferViewByteStride(const UINT structureByteStride, const UINT size, const bool createSRV, const bool createUAV, const bool createVBV, const bool cpuWritable, const bool persistent, const void* const data)
-{
-	D3D12_RESOURCE_FLAGS resFlags = D3D12_RESOURCE_FLAG_NONE;
-
-	if (createUAV)
-	{
-		resFlags |= D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
-	}
-
-	Buffer* const buffer = createBuffer(data, size, resFlags);
-
-	if (!cpuWritable)
-	{
-		//read-only SRV VBV IBV
-		const bool hasSRVOnly = createSRV && !createVBV;
-
-		const bool hasVBVOnly = !createSRV && createVBV;
-
-		if (hasSRVOnly || hasVBVOnly)
-		{
-			commandList->pushResourceTrackList(buffer);
-
-			if (hasSRVOnly)
-			{
-				buffer->setState(D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
-			}
-			else if (hasVBVOnly)
-			{
-				buffer->setState(D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
-			}
-
-			commandList->transitionResources();
-
-			buffer->setStateTracking(false);
-		}
-	}
-
-	return new BufferView(buffer, structureByteStride, DXGI_FORMAT_UNKNOWN, size, createSRV, createUAV, createVBV, false, cpuWritable, persistent);
-}
-
-BufferView* ResourceManager::createBufferViewByteStride(const UINT structureByteStride, const UINT size, const bool createSRV, const bool createUAV, const bool createVBV, const bool cpuWritable, const bool persistent)
-{
-	D3D12_RESOURCE_FLAGS resFlags = D3D12_RESOURCE_FLAG_NONE;
-
-	if (createUAV)
-	{
-		resFlags |= D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
-	}
-
-	Buffer* const buffer = new Buffer(size, true, resFlags);
-
-	return new BufferView(buffer, structureByteStride, DXGI_FORMAT_UNKNOWN, size, createSRV, createUAV, createVBV, false, cpuWritable, persistent);
-}
-
-BufferView* ResourceManager::createBufferViewFormat(const DXGI_FORMAT format, const UINT size, const bool createSRV, const bool createUAV, const bool createVBV, const bool createIBV, const bool cpuWritable, const bool persistent, const void* const data)
+BufferView* ResourceManager::createTypedBufferView(const DXGI_FORMAT format, const UINT size, const bool createSRV, const bool createUAV, const bool createVBV, const bool createIBV, const bool cpuWritable, const bool persistent, const void* const data)
 {
 	if (createVBV && createIBV)
 	{
@@ -402,7 +348,7 @@ BufferView* ResourceManager::createBufferViewFormat(const DXGI_FORMAT format, co
 	return new BufferView(buffer, 0, format, size, createSRV, createUAV, createVBV, createIBV, cpuWritable, persistent);
 }
 
-BufferView* ResourceManager::createBufferViewFormat(const DXGI_FORMAT format, const UINT size, const bool createSRV, const bool createUAV, const bool createVBV, const bool createIBV, const bool cpuWritable, const bool persistent)
+BufferView* ResourceManager::createTypedBufferView(const DXGI_FORMAT format, const UINT size, const bool createSRV, const bool createUAV, const bool createVBV, const bool createIBV, const bool cpuWritable, const bool persistent)
 {
 	if (createVBV && createIBV)
 	{
@@ -419,6 +365,125 @@ BufferView* ResourceManager::createBufferViewFormat(const DXGI_FORMAT format, co
 	Buffer* const buffer = new Buffer(size, true, resFlags);
 
 	return new BufferView(buffer, 0, format, size, createSRV, createUAV, createVBV, createIBV, cpuWritable, persistent);
+}
+
+BufferView* ResourceManager::createStructuredBufferView(const UINT structureByteStride, const UINT size, const bool createSRV, const bool createUAV, const bool createVBV, const bool cpuWritable, const bool persistent, const void* const data)
+{
+	D3D12_RESOURCE_FLAGS resFlags = D3D12_RESOURCE_FLAG_NONE;
+
+	if (createUAV)
+	{
+		resFlags |= D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
+	}
+
+	Buffer* const buffer = createBuffer(data, size, resFlags);
+
+	if (!cpuWritable)
+	{
+		//read-only SRV VBV
+		const bool hasSRVOnly = createSRV && !createVBV;
+
+		const bool hasVBVOnly = !createSRV && createVBV;
+
+		if (hasSRVOnly || hasVBVOnly)
+		{
+			commandList->pushResourceTrackList(buffer);
+
+			if (hasSRVOnly)
+			{
+				buffer->setState(D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
+			}
+			else if (hasVBVOnly)
+			{
+				buffer->setState(D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
+			}
+
+			commandList->transitionResources();
+
+			buffer->setStateTracking(false);
+		}
+	}
+
+	return new BufferView(buffer, structureByteStride, DXGI_FORMAT_UNKNOWN, size, createSRV, createUAV, createVBV, false, cpuWritable, persistent);
+}
+
+BufferView* ResourceManager::createStructuredBufferView(const UINT structureByteStride, const UINT size, const bool createSRV, const bool createUAV, const bool createVBV, const bool cpuWritable, const bool persistent)
+{
+	D3D12_RESOURCE_FLAGS resFlags = D3D12_RESOURCE_FLAG_NONE;
+
+	if (createUAV)
+	{
+		resFlags |= D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
+	}
+
+	Buffer* const buffer = new Buffer(size, true, resFlags);
+
+	return new BufferView(buffer, structureByteStride, DXGI_FORMAT_UNKNOWN, size, createSRV, createUAV, createVBV, false, cpuWritable, persistent);
+}
+
+BufferView* ResourceManager::createByteAddressBufferView(const UINT size, const bool createSRV, const bool createUAV, const bool createVBV, const bool createIBV, const bool cpuWritable, const bool persistent, const void* const data)
+{
+	if (createVBV && createIBV)
+	{
+		throw "a buffer cannot be used as VBV and IBV at the same time";
+	}
+
+	D3D12_RESOURCE_FLAGS resFlags = D3D12_RESOURCE_FLAG_NONE;
+
+	if (createUAV)
+	{
+		resFlags |= D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
+	}
+
+	Buffer* const buffer = createBuffer(data, size, resFlags);
+
+	if (!cpuWritable)
+	{
+		//read-only SRV VBV IBV
+		const bool hasSRVOnly = createSRV && !createVBV && !createIBV;
+
+		const bool hasVBVOnly = !createSRV && createVBV && !createIBV;
+
+		const bool hasIBVOnly = !createSRV && !createVBV && createIBV;
+
+		if (hasSRVOnly || hasVBVOnly || hasIBVOnly)
+		{
+			commandList->pushResourceTrackList(buffer);
+
+			if (hasSRVOnly)
+			{
+				buffer->setState(D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
+			}
+			else if (hasVBVOnly)
+			{
+				buffer->setState(D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
+			}
+			else if (hasIBVOnly)
+			{
+				buffer->setState(D3D12_RESOURCE_STATE_INDEX_BUFFER);
+			}
+
+			commandList->transitionResources();
+
+			buffer->setStateTracking(false);
+		}
+	}
+
+	return new BufferView(buffer, 0, DXGI_FORMAT_UNKNOWN, size, createSRV, createUAV, createVBV, createIBV, cpuWritable, persistent);
+}
+
+BufferView* ResourceManager::createByteAddressBufferView(const UINT size, const bool createSRV, const bool createUAV, const bool createVBV, const bool createIBV, const bool cpuWritable, const bool persistent)
+{
+	D3D12_RESOURCE_FLAGS resFlags = D3D12_RESOURCE_FLAG_NONE;
+
+	if (createUAV)
+	{
+		resFlags |= D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
+	}
+
+	Buffer* const buffer = new Buffer(size, true, resFlags);
+
+	return new BufferView(buffer, 0, DXGI_FORMAT_UNKNOWN, size, createSRV, createUAV, createVBV, createIBV, cpuWritable, persistent);
 }
 
 IndexConstantBuffer* ResourceManager::createIndexConstantBuffer(const std::initializer_list<ShaderResourceDesc>& descs, const bool cpuWritable, const bool persistent)
@@ -458,15 +523,19 @@ TextureDepthView* ResourceManager::createTextureDepthView(const UINT width, cons
 
 	switch (resFormat)
 	{
+	case DXGI_FORMAT_D32_FLOAT:
 	case DXGI_FORMAT_R32_TYPELESS:
 		clearValueFormat = DXGI_FORMAT_D32_FLOAT;
 		break;
+	case DXGI_FORMAT_D16_UNORM:
 	case DXGI_FORMAT_R16_TYPELESS:
 		clearValueFormat = DXGI_FORMAT_D16_UNORM;
 		break;
+	case DXGI_FORMAT_D32_FLOAT_S8X24_UINT:
 	case DXGI_FORMAT_R32G8X24_TYPELESS:
 		clearValueFormat = DXGI_FORMAT_D32_FLOAT_S8X24_UINT;
 		break;
+	case DXGI_FORMAT_D24_UNORM_S8_UINT:
 	case DXGI_FORMAT_R24G8_TYPELESS:
 		clearValueFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 		break;
@@ -620,10 +689,7 @@ TextureRenderView* ResourceManager::createTextureRenderView(const UINT width, co
 	{
 		D3D12_CLEAR_VALUE clearValue = {};
 		clearValue.Format = rtvFormat;
-		clearValue.Color[0] = color[0];
-		clearValue.Color[1] = color[1];
-		clearValue.Color[2] = color[2];
-		clearValue.Color[3] = color[3];
+		memcpy(clearValue.Color, color, sizeof(float) * 4);
 
 		texture = new Texture(width, height, resFormat, arraySize, mipLevels, true, resFlags, &clearValue);
 	}

@@ -22,6 +22,7 @@
 constexpr UINT D3D12_RESOURCE_STATE_UNKNOWN = 0xFFFFFFFF;
 
 class Buffer;
+
 class Texture;
 
 struct ShaderResourceDesc
@@ -50,6 +51,7 @@ struct ShaderResourceDesc
 	struct BufferTransitionDesc
 	{
 		Buffer* buffer;
+		Buffer* counterBuffer;
 	};
 
 	union
@@ -83,6 +85,36 @@ struct IndexBufferDesc
 {
 	Buffer* buffer;
 	D3D12_INDEX_BUFFER_VIEW ibv;
+};
+
+struct ClearUAVDesc
+{
+	enum ResourceType
+	{
+		BUFFER,
+		TEXTURE
+	} type;
+
+	struct TextureClearDesc
+	{
+		Texture* texture;
+		UINT mipSlice;
+	};
+
+	struct BufferClearDesc
+	{
+		Buffer* buffer;
+	};
+
+	union
+	{
+		TextureClearDesc textureDesc;
+		BufferClearDesc bufferDesc;
+	};
+
+	D3D12_GPU_DESCRIPTOR_HANDLE viewGPUHandle;
+
+	D3D12_CPU_DESCRIPTOR_HANDLE viewCPUHandle;
 };
 
 class Resource

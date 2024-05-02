@@ -4,14 +4,6 @@
 #define _TEXTURE_H_
 
 #include"Resource.h"
-#include"UploadHeap.h"
-
-#include<Gear/Utils/Utils.h>
-#include<Gear/Utils/Random.h>
-#include<Gear/Utils/Math.h>
-
-#include<stb_image/stb_image.h>
-#include<DDSTextureLoader/DDSTextureLoader12.h>
 
 class Texture;
 

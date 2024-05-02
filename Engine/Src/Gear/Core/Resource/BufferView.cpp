@@ -1,75 +1,124 @@
 #include<Gear/Core/Resource/BufferView.h>
 
 BufferView::BufferView(Buffer* const buffer, const UINT structureByteStride, const DXGI_FORMAT format, const UINT size, const bool createSRV, const bool createUAV, const bool createVBV, const bool createIBV, const bool cpuWritable, const bool persistent) :
-	buffer(buffer), srvIndex(0), uavIndex(0), vbv{}, ibv{}, uploadHeaps(nullptr), uploadHeapIndex(0), hasSRV(createSRV), hasUAV(createUAV)
+	buffer(buffer), counterBuffer(nullptr), srvIndex(0), uavIndex(0), uploadHeaps(nullptr), uploadHeapIndex(0), hasSRV(createSRV), hasUAV(createUAV), viewCPUHandle(), viewGPUHandle()
 {
-	const UINT elementSize = (structureByteStride != 0 ? structureByteStride : Utils::getPixelSize(format));
+	numSRVUAVCBVDescriptors = static_cast<UINT>(createSRV) + static_cast<UINT>(createUAV);
 
-	if (createSRV || createUAV)
+	const bool isTypedBuffer = (structureByteStride == 0 && format != DXGI_FORMAT_UNKNOWN);
+
+	const bool isStructuredBuffer = (structureByteStride != 0 && format == DXGI_FORMAT_UNKNOWN);
+
+	const bool isByteAddressBuffer = (structureByteStride == 0 && format == DXGI_FORMAT_UNKNOWN);
+
+	if (numSRVUAVCBVDescriptors)
 	{
-		D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
-		srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
-		srvDesc.Buffer.FirstElement = 0;
-		srvDesc.Buffer.NumElements = size / elementSize;
-		srvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
-
-		D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
-		uavDesc.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;
-		uavDesc.Buffer.FirstElement = 0;
-		uavDesc.Buffer.NumElements = size / elementSize;
-		uavDesc.Buffer.Flags = D3D12_BUFFER_UAV_FLAG_NONE;
-
-		if (structureByteStride != 0)
+		//create counter buffer for structured buffer
+		if (isStructuredBuffer && createUAV)
 		{
-			srvDesc.Format = DXGI_FORMAT_UNKNOWN;
-			srvDesc.Buffer.StructureByteStride = structureByteStride;
-
-			uavDesc.Format = DXGI_FORMAT_UNKNOWN;
-			uavDesc.Buffer.StructureByteStride = structureByteStride;
-		}
-		else if (format != DXGI_FORMAT_UNKNOWN)
-		{
-			srvDesc.Format = format;
-			srvDesc.Buffer.StructureByteStride = 0;
-
-			uavDesc.Format = format;
-			uavDesc.Buffer.StructureByteStride = 0;
+			counterBuffer = new CounterBufferView(persistent);
 		}
 
-		numSRVUAVCBVDescriptors = static_cast<UINT>(createSRV) + static_cast<UINT>(createUAV);
+		DescriptorHandle descriptorHandle;
 
-		if (numSRVUAVCBVDescriptors)
+		if (persistent)
 		{
-			DescriptorHandle descriptorHandle;
+			descriptorHandle = GlobalDescriptorHeap::getResourceHeap()->allocStaticDescriptor(numSRVUAVCBVDescriptors);
+		}
+		else
+		{
+			descriptorHandle = GlobalDescriptorHeap::getNonShaderVisibleResourceHeap()->allocDynamicDescriptor(numSRVUAVCBVDescriptors);
+		}
 
-			if (persistent)
+		srvUAVCBVHandleStart = descriptorHandle.getCPUHandle();
+
+		if (createSRV)
+		{
+			D3D12_SHADER_RESOURCE_VIEW_DESC desc = {};
+			desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+			desc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
+
+			if (isTypedBuffer)
 			{
-				descriptorHandle = GlobalDescriptorHeap::getResourceHeap()->allocStaticDescriptor(numSRVUAVCBVDescriptors);
+				desc.Format = format;
+				desc.Buffer.NumElements = size / Utils::getPixelSize(format);
+			}
+			else if (isStructuredBuffer)
+			{
+				desc.Buffer.NumElements = size / structureByteStride;
+				desc.Buffer.StructureByteStride = structureByteStride;
+			}
+			else if (isByteAddressBuffer)
+			{
+				desc.Format = DXGI_FORMAT_R32_TYPELESS;
+				desc.Buffer.NumElements = size / 4;
+				desc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_RAW;
+			}
+
+			GraphicsDevice::get()->CreateShaderResourceView(buffer->getResource(), &desc, descriptorHandle.getCPUHandle());
+
+			srvIndex = descriptorHandle.getCurrentIndex();
+
+			descriptorHandle.move();
+		}
+
+		if (createUAV)
+		{
+			D3D12_UNORDERED_ACCESS_VIEW_DESC desc = {};
+			desc.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;
+
+			if (isTypedBuffer)
+			{
+				desc.Format = format;
+				desc.Buffer.NumElements = size / Utils::getPixelSize(format);
+			}
+			else if (isStructuredBuffer)
+			{
+				desc.Buffer.NumElements = size / structureByteStride;
+				desc.Buffer.StructureByteStride = structureByteStride;
+			}
+			else if (isByteAddressBuffer)
+			{
+				desc.Format = DXGI_FORMAT_R32_TYPELESS;
+				desc.Buffer.NumElements = size / 4;
+				desc.Buffer.Flags = D3D12_BUFFER_UAV_FLAG_RAW;
+			}
+
+			if (isStructuredBuffer)
+			{
+				GraphicsDevice::get()->CreateUnorderedAccessView(buffer->getResource(), counterBuffer->getBuffer()->getResource(), &desc, descriptorHandle.getCPUHandle());
 			}
 			else
 			{
-				descriptorHandle = GlobalDescriptorHeap::getNonShaderVisibleResourceHeap()->allocDynamicDescriptor(numSRVUAVCBVDescriptors);
+				GraphicsDevice::get()->CreateUnorderedAccessView(buffer->getResource(), nullptr, &desc, descriptorHandle.getCPUHandle());
 			}
 
-			srvUAVCBVHandleStart = descriptorHandle.getCPUHandle();
+			uavIndex = descriptorHandle.getCurrentIndex();
 
-			if (createSRV)
+			//for persistent resource we need an extra descriptor in non shader visible heap to get a view cpu handle
+			//for non persistent resource we already have a descriptor in non shader visible heap
+			if (persistent)
 			{
-				GraphicsDevice::get()->CreateShaderResourceView(buffer->getResource(), &srvDesc, descriptorHandle.getCPUHandle());
+				viewGPUHandle = descriptorHandle.getGPUHandle();
 
-				srvIndex = descriptorHandle.getCurrentIndex();
+				const DescriptorHandle nonShaderVisibleHandle = GlobalDescriptorHeap::getNonShaderVisibleResourceHeap()->allocStaticDescriptor(1);
 
-				descriptorHandle.move();
+				if (isStructuredBuffer)
+				{
+					GraphicsDevice::get()->CreateUnorderedAccessView(buffer->getResource(), counterBuffer->getBuffer()->getResource(), &desc, nonShaderVisibleHandle.getCPUHandle());
+				}
+				else
+				{
+					GraphicsDevice::get()->CreateUnorderedAccessView(buffer->getResource(), nullptr, &desc, nonShaderVisibleHandle.getCPUHandle());
+				}
+
+				viewCPUHandle = nonShaderVisibleHandle.getCPUHandle();
 			}
-
-			if (createUAV)
+			else
 			{
-				GraphicsDevice::get()->CreateUnorderedAccessView(buffer->getResource(), nullptr, &uavDesc, descriptorHandle.getCPUHandle());
+				viewCPUHandle = descriptorHandle.getCPUHandle();
 
-				uavIndex = descriptorHandle.getCurrentIndex();
-
-				descriptorHandle.move();
+				//get viewGPUHandle later
 			}
 		}
 	}
@@ -78,7 +127,7 @@ BufferView::BufferView(Buffer* const buffer, const UINT structureByteStride, con
 	{
 		vbv.BufferLocation = buffer->getGPUAddress();
 		vbv.SizeInBytes = size;
-		vbv.StrideInBytes = elementSize;
+		vbv.StrideInBytes = (isStructuredBuffer ? structureByteStride : Utils::getPixelSize(format));
 	}
 
 	if (createIBV)
@@ -101,6 +150,11 @@ BufferView::BufferView(Buffer* const buffer, const UINT structureByteStride, con
 
 BufferView::~BufferView()
 {
+	if (counterBuffer)
+	{
+		delete counterBuffer;
+	}
+
 	if (buffer)
 	{
 		delete buffer;
@@ -117,7 +171,7 @@ BufferView::~BufferView()
 	}
 }
 
-VertexBufferDesc BufferView::getVertexBuffer()
+VertexBufferDesc BufferView::getVertexBuffer() const
 {
 	VertexBufferDesc desc = {};
 	desc.buffer = buffer;
@@ -126,7 +180,7 @@ VertexBufferDesc BufferView::getVertexBuffer()
 	return desc;
 }
 
-IndexBufferDesc BufferView::getIndexBuffer()
+IndexBufferDesc BufferView::getIndexBuffer() const
 {
 	IndexBufferDesc desc = {};
 	desc.buffer = buffer;
@@ -136,7 +190,7 @@ IndexBufferDesc BufferView::getIndexBuffer()
 }
 
 
-ShaderResourceDesc BufferView::getSRVIndex()
+ShaderResourceDesc BufferView::getSRVIndex() const
 {
 	ShaderResourceDesc desc = {};
 	desc.type = ShaderResourceDesc::BUFFER;
@@ -147,7 +201,7 @@ ShaderResourceDesc BufferView::getSRVIndex()
 	return desc;
 }
 
-ShaderResourceDesc BufferView::getUAVIndex()
+ShaderResourceDesc BufferView::getUAVIndex() const
 {
 	ShaderResourceDesc desc = {};
 	desc.type = ShaderResourceDesc::BUFFER;
@@ -155,26 +209,47 @@ ShaderResourceDesc BufferView::getUAVIndex()
 	desc.resourceIndex = uavIndex;
 	desc.bufferDesc.buffer = buffer;
 
+	if (counterBuffer)
+	{
+		desc.bufferDesc.counterBuffer = counterBuffer->getBuffer();
+	}
+
 	return desc;
+}
+
+ClearUAVDesc BufferView::getClearUAVDesc() const
+{
+	ClearUAVDesc desc = {};
+	desc.type = ClearUAVDesc::BUFFER;
+	desc.bufferDesc.buffer = buffer;
+	desc.viewGPUHandle = viewGPUHandle;
+	desc.viewCPUHandle = viewCPUHandle;
+
+	return desc;
+}
+
+CounterBufferView* BufferView::getCounterBuffer() const
+{
+	return counterBuffer;
 }
 
 void BufferView::copyDescriptors()
 {
-	DescriptorHandle descriptorHandle = GlobalDescriptorHeap::getResourceHeap()->allocDynamicDescriptor(numSRVUAVCBVDescriptors);
+	DescriptorHandle shaderVisibleHandle = GlobalDescriptorHeap::getResourceHeap()->allocDynamicDescriptor(numSRVUAVCBVDescriptors);
 
-	GraphicsDevice::get()->CopyDescriptorsSimple(numSRVUAVCBVDescriptors, descriptorHandle.getCPUHandle(), srvUAVCBVHandleStart, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	GraphicsDevice::get()->CopyDescriptorsSimple(numSRVUAVCBVDescriptors, shaderVisibleHandle.getCPUHandle(), srvUAVCBVHandleStart, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 	if (hasSRV)
 	{
-		srvIndex = descriptorHandle.getCurrentIndex();
+		srvIndex = shaderVisibleHandle.getCurrentIndex();
 
-		descriptorHandle.move();
+		shaderVisibleHandle.move();
 	}
 
 	if (hasUAV)
 	{
-		uavIndex = descriptorHandle.getCurrentIndex();
+		uavIndex = shaderVisibleHandle.getCurrentIndex();
 
-		descriptorHandle.move();
+		viewGPUHandle = shaderVisibleHandle.getGPUHandle();
 	}
 }
