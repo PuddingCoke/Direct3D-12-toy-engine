@@ -5,8 +5,6 @@
 
 #include<Gear/Core/DescriptorHeap.h>
 
-using DescriptorHandle = DescriptorHeap::DescriptorHandle;
-
 class GlobalDescriptorHeap
 {
 public:

@@ -21,6 +21,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OceanSimulation", "OceanSim
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CrytekSponza", "CrytekSponza\CrytekSponza.vcxproj", "{1DD61E0C-2055-4C30-B744-9923A093949F}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SimpleParticleEffect", "SimpleParticleEffect\SimpleParticleEffect.vcxproj", "{BEF2256D-25B7-44CB-A6E4-CF6F4B4074E6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -101,6 +103,14 @@ Global
 		{1DD61E0C-2055-4C30-B744-9923A093949F}.Release|x64.Build.0 = Release|x64
 		{1DD61E0C-2055-4C30-B744-9923A093949F}.Release|x86.ActiveCfg = Release|Win32
 		{1DD61E0C-2055-4C30-B744-9923A093949F}.Release|x86.Build.0 = Release|Win32
+		{BEF2256D-25B7-44CB-A6E4-CF6F4B4074E6}.Debug|x64.ActiveCfg = Debug|x64
+		{BEF2256D-25B7-44CB-A6E4-CF6F4B4074E6}.Debug|x64.Build.0 = Debug|x64
+		{BEF2256D-25B7-44CB-A6E4-CF6F4B4074E6}.Debug|x86.ActiveCfg = Debug|Win32
+		{BEF2256D-25B7-44CB-A6E4-CF6F4B4074E6}.Debug|x86.Build.0 = Debug|Win32
+		{BEF2256D-25B7-44CB-A6E4-CF6F4B4074E6}.Release|x64.ActiveCfg = Release|x64
+		{BEF2256D-25B7-44CB-A6E4-CF6F4B4074E6}.Release|x64.Build.0 = Release|x64
+		{BEF2256D-25B7-44CB-A6E4-CF6F4B4074E6}.Release|x86.ActiveCfg = Release|Win32
+		{BEF2256D-25B7-44CB-A6E4-CF6F4B4074E6}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

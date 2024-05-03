@@ -306,6 +306,8 @@ TextureRenderView::TextureRenderView(const TextureRenderView& trv) :
 	srvMipIndexStart(trv.srvMipIndexStart),
 	uavMipIndexStart(trv.uavMipIndexStart),
 	rtvMipHandleStart(trv.rtvMipHandleStart),
+	viewGPUHandleStart(trv.viewGPUHandleStart),
+	viewCPUHandleStart(trv.viewCPUHandleStart),
 	texture(new Texture(*(trv.texture)))
 {
 }

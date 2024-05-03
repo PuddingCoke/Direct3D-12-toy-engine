@@ -14,9 +14,7 @@ DescriptorHeap::DescriptorHeap(const UINT numDescriptors, const UINT subRegionSi
 
 	staticCPUPointerStart = descriptorHeap->GetCPUDescriptorHandleForHeapStart();
 
-	dynamicCPUPointerStart = descriptorHeap->GetCPUDescriptorHandleForHeapStart();
-
-	dynamicCPUPointerStart.Offset(numDescriptors - subRegionSize, incrementSize);
+	dynamicCPUPointerStart = CD3DX12_CPU_DESCRIPTOR_HANDLE(descriptorHeap->GetCPUDescriptorHandleForHeapStart(), numDescriptors - subRegionSize, incrementSize);
 
 	staticCPUPointer = staticCPUPointerStart;
 
@@ -26,9 +24,7 @@ DescriptorHeap::DescriptorHeap(const UINT numDescriptors, const UINT subRegionSi
 	{
 		staticGPUPointerStart = descriptorHeap->GetGPUDescriptorHandleForHeapStart();
 
-		dynamicGPUPointerStart = descriptorHeap->GetGPUDescriptorHandleForHeapStart();
-
-		dynamicGPUPointerStart.Offset(numDescriptors - subRegionSize, incrementSize);
+		dynamicGPUPointerStart = CD3DX12_GPU_DESCRIPTOR_HANDLE(descriptorHeap->GetGPUDescriptorHandleForHeapStart(), numDescriptors - subRegionSize, incrementSize);
 
 		staticGPUPointer = staticGPUPointerStart;
 
@@ -71,7 +67,7 @@ ID3D12DescriptorHeap* DescriptorHeap::get() const
 	return descriptorHeap.Get();
 }
 
-DescriptorHeap::DescriptorHandle DescriptorHeap::allocStaticDescriptor(const UINT num)
+DescriptorHandle DescriptorHeap::allocStaticDescriptor(const UINT num)
 {
 	std::lock_guard<std::mutex> lockGuard(staticPointerLock);
 
@@ -86,7 +82,7 @@ DescriptorHeap::DescriptorHandle DescriptorHeap::allocStaticDescriptor(const UIN
 	return DescriptorHandle(retCPUHandle, retGPUHandle, this);
 }
 
-DescriptorHeap::DescriptorHandle DescriptorHeap::allocDynamicDescriptor(const UINT num)
+DescriptorHandle DescriptorHeap::allocDynamicDescriptor(const UINT num)
 {
 	std::lock_guard<std::mutex> lockGuard(dynamicPointerLock);
 
@@ -112,39 +108,39 @@ DescriptorHeap::DescriptorHandle DescriptorHeap::allocDynamicDescriptor(const UI
 	return DescriptorHandle(retCPUHandle, retGPUHandle, this);
 }
 
-DescriptorHeap::DescriptorHandle::DescriptorHandle() :
+DescriptorHandle::DescriptorHandle() :
 	cpuHandle{}, gpuHandle{}, descriptorHeap(nullptr)
 {
 }
 
-DescriptorHeap::DescriptorHandle::DescriptorHandle(const CD3DX12_CPU_DESCRIPTOR_HANDLE cpuHandle, const CD3DX12_GPU_DESCRIPTOR_HANDLE gpuHandle, const DescriptorHeap* const descriptorHeap) :
+DescriptorHandle::DescriptorHandle(const CD3DX12_CPU_DESCRIPTOR_HANDLE cpuHandle, const CD3DX12_GPU_DESCRIPTOR_HANDLE gpuHandle, const DescriptorHeap* const descriptorHeap) :
 	cpuHandle(cpuHandle), gpuHandle(gpuHandle), descriptorHeap(descriptorHeap)
 {
 }
 
-UINT DescriptorHeap::DescriptorHandle::getCurrentIndex() const
+UINT DescriptorHandle::getCurrentIndex() const
 {
 	return static_cast<UINT>(cpuHandle.ptr - descriptorHeap->staticCPUPointerStart.ptr) / descriptorHeap->incrementSize;
 }
 
-CD3DX12_CPU_DESCRIPTOR_HANDLE DescriptorHeap::DescriptorHandle::getCPUHandle() const
+CD3DX12_CPU_DESCRIPTOR_HANDLE DescriptorHandle::getCPUHandle() const
 {
 	return cpuHandle;
 }
 
-CD3DX12_GPU_DESCRIPTOR_HANDLE DescriptorHeap::DescriptorHandle::getGPUHandle() const
+CD3DX12_GPU_DESCRIPTOR_HANDLE DescriptorHandle::getGPUHandle() const
 {
 	return gpuHandle;
 }
 
-void DescriptorHeap::DescriptorHandle::move()
+void DescriptorHandle::move()
 {
 	cpuHandle.Offset(1, descriptorHeap->incrementSize);
 
 	gpuHandle.Offset(1, descriptorHeap->incrementSize);
 }
 
-void DescriptorHeap::DescriptorHandle::offset(const UINT num)
+void DescriptorHandle::offset(const UINT num)
 {
 	cpuHandle.Offset(num, descriptorHeap->incrementSize);
 
