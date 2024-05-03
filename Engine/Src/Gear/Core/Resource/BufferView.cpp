@@ -233,6 +233,11 @@ CounterBufferView* BufferView::getCounterBuffer() const
 	return counterBuffer;
 }
 
+Buffer* BufferView::getBuffer() const
+{
+	return buffer;
+}
+
 void BufferView::copyDescriptors()
 {
 	DescriptorHandle shaderVisibleHandle = GlobalDescriptorHeap::getResourceHeap()->allocDynamicDescriptor(numSRVUAVCBVDescriptors);

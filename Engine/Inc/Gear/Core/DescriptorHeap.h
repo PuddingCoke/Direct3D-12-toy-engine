@@ -8,37 +8,11 @@
 
 #include<mutex>
 
+class DescriptorHandle;
+
 class DescriptorHeap
 {
 public:
-	
-	class DescriptorHandle
-	{
-	public:
-
-		DescriptorHandle();
-
-		DescriptorHandle(const CD3DX12_CPU_DESCRIPTOR_HANDLE cpuHandle, const CD3DX12_GPU_DESCRIPTOR_HANDLE gpuHandle, const DescriptorHeap* const descriptorHeap);
-
-		UINT getCurrentIndex() const;
-
-		CD3DX12_CPU_DESCRIPTOR_HANDLE getCPUHandle() const;
-
-		CD3DX12_GPU_DESCRIPTOR_HANDLE getGPUHandle() const;
-
-		void move();
-
-		void offset(const UINT num);
-
-	protected:
-
-		CD3DX12_CPU_DESCRIPTOR_HANDLE cpuHandle;
-
-		CD3DX12_GPU_DESCRIPTOR_HANDLE gpuHandle;
-
-		const DescriptorHeap* descriptorHeap;
-
-	};
 
 	DescriptorHeap(const UINT numDescriptors, const UINT subRegionSize, const D3D12_DESCRIPTOR_HEAP_TYPE type, const D3D12_DESCRIPTOR_HEAP_FLAGS flags);
 
@@ -57,6 +31,8 @@ public:
 	DescriptorHandle allocDynamicDescriptor(const UINT num);
 
 private:
+
+	friend class DescriptorHandle;
 
 	const UINT numDescriptors;
 
@@ -87,6 +63,34 @@ private:
 	std::mutex staticPointerLock;
 
 	std::mutex dynamicPointerLock;
+
+};
+
+class DescriptorHandle
+{
+public:
+
+	DescriptorHandle();
+
+	DescriptorHandle(const CD3DX12_CPU_DESCRIPTOR_HANDLE cpuHandle, const CD3DX12_GPU_DESCRIPTOR_HANDLE gpuHandle, const DescriptorHeap* const descriptorHeap);
+
+	UINT getCurrentIndex() const;
+
+	CD3DX12_CPU_DESCRIPTOR_HANDLE getCPUHandle() const;
+
+	CD3DX12_GPU_DESCRIPTOR_HANDLE getGPUHandle() const;
+
+	void move();
+
+	void offset(const UINT num);
+
+protected:
+
+	CD3DX12_CPU_DESCRIPTOR_HANDLE cpuHandle;
+
+	CD3DX12_GPU_DESCRIPTOR_HANDLE gpuHandle;
+
+	const DescriptorHeap* descriptorHeap;
 
 };
 

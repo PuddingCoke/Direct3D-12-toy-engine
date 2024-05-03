@@ -47,13 +47,13 @@ UINT Utils::getPixelSize(const DXGI_FORMAT format)
         case DXGI_FORMAT_R32G32B32A32_FLOAT:
         case DXGI_FORMAT_R32G32B32A32_UINT:
         case DXGI_FORMAT_R32G32B32A32_SINT:
-            return 128;
+            return 16;
 
         case DXGI_FORMAT_R32G32B32_TYPELESS:
         case DXGI_FORMAT_R32G32B32_FLOAT:
         case DXGI_FORMAT_R32G32B32_UINT:
         case DXGI_FORMAT_R32G32B32_SINT:
-            return 96;
+            return 12;
 
         case DXGI_FORMAT_R16G16B16A16_TYPELESS:
         case DXGI_FORMAT_R16G16B16A16_FLOAT:
@@ -72,7 +72,7 @@ UINT Utils::getPixelSize(const DXGI_FORMAT format)
         case DXGI_FORMAT_Y416:
         case DXGI_FORMAT_Y210:
         case DXGI_FORMAT_Y216:
-            return 64;
+            return 8;
 
         case DXGI_FORMAT_R10G10B10A2_TYPELESS:
         case DXGI_FORMAT_R10G10B10A2_UNORM:
@@ -112,12 +112,12 @@ UINT Utils::getPixelSize(const DXGI_FORMAT format)
         case DXGI_FORMAT_AYUV:
         case DXGI_FORMAT_Y410:
         case DXGI_FORMAT_YUY2:
-            return 32;
+            return 4;
 
         case DXGI_FORMAT_P010:
         case DXGI_FORMAT_P016:
         case DXGI_FORMAT_V408:
-            return 24;
+            return 3;
 
         case DXGI_FORMAT_R8G8_TYPELESS:
         case DXGI_FORMAT_R8G8_UNORM:
@@ -137,12 +137,7 @@ UINT Utils::getPixelSize(const DXGI_FORMAT format)
         case DXGI_FORMAT_B4G4R4A4_UNORM:
         case DXGI_FORMAT_P208:
         case DXGI_FORMAT_V208:
-            return 16;
-
-        case DXGI_FORMAT_NV12:
-        case DXGI_FORMAT_420_OPAQUE:
-        case DXGI_FORMAT_NV11:
-            return 12;
+            return 2;
 
         case DXGI_FORMAT_R8_TYPELESS:
         case DXGI_FORMAT_R8_UNORM:
@@ -168,18 +163,7 @@ UINT Utils::getPixelSize(const DXGI_FORMAT format)
         case DXGI_FORMAT_AI44:
         case DXGI_FORMAT_IA44:
         case DXGI_FORMAT_P8:
-            return 8;
-
-        case DXGI_FORMAT_R1_UNORM:
             return 1;
-
-        case DXGI_FORMAT_BC1_TYPELESS:
-        case DXGI_FORMAT_BC1_UNORM:
-        case DXGI_FORMAT_BC1_UNORM_SRGB:
-        case DXGI_FORMAT_BC4_TYPELESS:
-        case DXGI_FORMAT_BC4_UNORM:
-        case DXGI_FORMAT_BC4_SNORM:
-            return 4;
 
         default:
             return 0;

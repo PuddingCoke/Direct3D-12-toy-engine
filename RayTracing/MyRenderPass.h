@@ -16,12 +16,12 @@ public:
 
 	MyRenderPass()
 	{
-
+		bv = ResourceManager::createStructuredBufferView(16, 64, true, true, false, false, false);
 	}
 
 	~MyRenderPass()
 	{
-		delete texture;
+		delete bv;
 	}
 
 protected:
@@ -36,5 +36,7 @@ protected:
 	}
 
 private:
+
+	BufferView* bv;
 
 };

@@ -140,6 +140,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Inc\DDSTextureLoader\DDSTextureLoader12.h" />
+    <ClInclude Include="Inc\Gear\Camera\OrbitCamera.h" />
     <ClInclude Include="Inc\Gear\Core\Resource\BufferView.h" />
     <ClInclude Include="Inc\Gear\Core\Resource\CounterBufferView.h" />
     <ClInclude Include="Inc\ImGUI\imconfig.h" />
@@ -210,6 +211,7 @@
     <ClCompile Include="Inc\ImGUI\imgui_widgets.cpp" />
     <ClCompile Include="Inc\stb_image\stb_image.cpp" />
     <ClCompile Include="Src\Gear\Camera\FPSCamera.cpp" />
+    <ClCompile Include="Src\Gear\Camera\OrbitCamera.cpp" />
     <ClCompile Include="Src\Gear\Core\Camera.cpp" />
     <ClCompile Include="Src\Gear\Core\ConstantBufferPool.cpp" />
     <ClCompile Include="Src\Gear\Core\DescriptorHeap.cpp" />

@@ -34,6 +34,8 @@ public:
 
 	CounterBufferView* getCounterBuffer() const;
 
+	Buffer* getBuffer() const;
+
 	void copyDescriptors() override;
 
 	const bool hasSRV;

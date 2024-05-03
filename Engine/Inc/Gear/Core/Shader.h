@@ -23,6 +23,7 @@ public:
 
 	static Shader* fullScreenVS;
 
+	//context->setPSConstants({ resource }, 0);
 	static Shader* fullScreenPS;
 
 	static Shader* textureCubeVS;

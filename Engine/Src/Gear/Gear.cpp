@@ -10,9 +10,9 @@ Gear* Gear::get()
 int Gear::iniEngine(const Configuration config, const int argc, const char* argv[])
 {
 #ifdef _DEBUG
-	std::cout << "[class Gear] debug build date:" << __DATE__ << " @ " << __TIME__ << "\n";
+	std::cout << "[class Gear] debug build date:" << __TIMESTAMP__ << "\n";
 #else
-	std::cout << "[class Gear] release build date:" << __DATE__ << " @ " << __TIME__ << "\n";
+	std::cout << "[class Gear] release build date:" << __TIMESTAMP__ << "\n";
 #endif // _DEBUG
 
 	std::wcout.imbue(std::locale(""));
