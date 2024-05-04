@@ -49,6 +49,23 @@ void RenderPass::imGuiCommand()
 {
 }
 
+void RenderPass::blit(TextureRenderView* const texture)
+{
+	context->setPipelineState(PipelineState::get()->fullScreenBlitState.Get());
+
+	context->setDefRenderTarget();
+
+	context->setViewportSimple(Graphics::getWidth(), Graphics::getHeight());
+
+	context->setTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	context->setPSConstants({ texture->getAllSRVIndex() }, 0);
+
+	context->transitionResources();
+
+	context->draw(3, 1, 0, 0);
+}
+
 void RenderPass::begin()
 {
 	resManager->cleanTransientResources();

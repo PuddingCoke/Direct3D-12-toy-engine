@@ -9,53 +9,50 @@ struct GeometryInput
 struct GeometryOutput
 {
     float4 color : COLOR;
-    float2 uv : TEXCOORD;
     float4 position : SV_POSITION;
 };
 
-cbuffer ParticleParam : register(b2)
+cbuffer SimulationParam : register(b2)
 {
-    float particleSize;
-};
+    float dissipativeFactor;
+    int simulationSteps;
+}
 
-static float3 billboardPos[4] =
-{
-    float3(-1, 1, 0),
-    float3(1, 1, 0),
-    float3(-1, -1, 0),
-    float3(1, -1, 0),
-};
-    
-static float2 billboardUV[4] =
-{
-    float2(0, 0),
-    float2(1, 0),
-    float2(0, 1),
-    float2(1, 1),
-};
+#define MAXVERTEXCOUNT 16
 
-[maxvertexcount(4)]
+void GetNextPosition(inout float4 pos)
+{
+    [unroll]
+    for (int i = 0; i < 10; i++)
+    {
+        const float dx = (sin(pos.y) - dissipativeFactor * pos.x) * perframeResource.deltaTime;
+        const float dy = (sin(pos.z) - dissipativeFactor * pos.y) * perframeResource.deltaTime;
+        const float dz = (sin(pos.x) - dissipativeFactor * pos.z) * perframeResource.deltaTime;
+
+        pos += float4(dx, dy, dz, 0.0);
+    }
+}
+
+[maxvertexcount(MAXVERTEXCOUNT)]
 void main(
 	point GeometryInput inputs[1],
-	inout TriangleStream<GeometryOutput> outputs
+	inout LineStream<GeometryOutput> outputs
 )
 {
     GeometryOutput output;
     
+    float4 pos = inputs[0].position;
+    
+    output.color = inputs[0].color;
+    
     [unroll]
-    for (uint i = 0; i < 4; i++)
+    for (uint i = 0; i < MAXVERTEXCOUNT; i++)
     {
-        float3 position = billboardPos[i] * particleSize;
+        output.position = mul(pos, perframeResource.viewProj);
         
-        position = mul(position, transpose((float3x3) perframeResource.normalMatrix)) + inputs[0].position.xyz;
-        
-        output.color = inputs[0].color;
-        
-        output.uv = billboardUV[i];
-        
-        output.position = mul(float4(position, 1.0), perframeResource.viewProj);
-
         outputs.Append(output);
+        
+        GetNextPosition(pos);
     }
     
     outputs.RestartStrip();

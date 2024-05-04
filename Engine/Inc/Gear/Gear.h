@@ -8,6 +8,7 @@
 #include<Gear/Window/Win32Form.h>
 #include<Gear/Utils/Utils.h>
 #include<Gear/Utils/Random.h>
+#include<Gear/Utils/DeltaTimeEstimator.h>
 #include<Gear/Input/Keyboard.h>
 #include<Gear/Input/Mouse.h>
 #include<Gear/Configuration.h>
@@ -60,6 +61,8 @@ private:
 	Game* game;
 
 	Configuration::EngineUsage usage;
+
+	DeltaTimeEstimator dtEstimator;
 
 	void iniWindow(const std::wstring title, const UINT width, const UINT height);
 

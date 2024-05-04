@@ -8,7 +8,7 @@ UINT Graphics::height = 0;
 
 FLOAT Graphics::aspectRatio = 0.f;
 
-Graphics::Time Graphics::time = { 1.f / 60.f,0.f,0u,0.f };
+Graphics::Time Graphics::time = { 0.0001f,0.f,0u,0.f };
 
 D3D12_CPU_DESCRIPTOR_HANDLE Graphics::backBufferHandles[Graphics::FrameBufferCount] = {};
 

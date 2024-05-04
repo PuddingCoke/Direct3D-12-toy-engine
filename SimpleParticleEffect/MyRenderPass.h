@@ -4,6 +4,7 @@
 #include<Gear/Core/Shader.h>
 
 #include<Gear/Core/Effect/BloomEffect.h>
+#include<Gear/Core/Effect/FXAAEffect.h>
 
 #include<Gear/Utils/Color.h>
 
@@ -53,19 +54,11 @@ public:
 			GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&particleRenderState));
 		}
 
-		{
-			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = PipelineState::getDefaultFullScreenState();
-			desc.PS = Shader::fullScreenPS->getByteCode();
-			desc.NumRenderTargets = 1;
-			desc.RTVFormats[0] = Graphics::BackBufferFormat;
-
-			GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&fullScreenState));
-		}
-
-
 		context->begin();
 
-		effect = new BloomEffect(context, Graphics::getWidth(), Graphics::getHeight(), resManager);
+		bloomEffect = new BloomEffect(context, Graphics::getWidth(), Graphics::getHeight(), resManager);
+
+		fxaaEffect = new FXAAEffect(context, Graphics::getWidth(), Graphics::getHeight());
 
 		originTexture = ResourceManager::createTextureRenderView(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R16G16B16A16_FLOAT, 1, 1, false, true,
 			DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_R16G16B16A16_FLOAT, DirectX::Colors::Black);
@@ -106,18 +99,17 @@ public:
 
 		RenderEngine::get()->submitRenderPass(this);
 
-		effect->setExposure(0.6f);
+		bloomEffect->setExposure(0.6f);
 
-		effect->setThreshold(1.0f);
+		bloomEffect->setThreshold(1.0f);
 
 		simulationParam = { 0.18f,8 };
-
-		particleParam = { 0.006f };
 	}
 
 	~MyRenderPass()
 	{
-		delete effect;
+		delete bloomEffect;
+		delete fxaaEffect;
 
 		delete particleVS;
 		delete particleGS;
@@ -141,8 +133,6 @@ public:
 
 		ImGui::SliderInt("Simulation Steps", &simulationParam.simulationSteps, 6, 10);
 
-		ImGui::SliderFloat("Particle Size", &sclFactor, 0.f, 100.f);
-
 		ImGui::End();
 	}
 
@@ -150,14 +140,6 @@ protected:
 
 	void recordCommand() override
 	{
-		const DirectX::XMVECTOR lengthVec = DirectX::XMVector3Length(Camera::getEyePos());
-
-		float length;
-			
-		DirectX::XMStoreFloat(&length, lengthVec);
-
-		particleParam.particleSize = Math::lerp(0.0001f, 0.008f, Math::clamp((length) / sclFactor, 0.f, 1.f));
-
 		context->setPipelineState(particleComputeState.Get());
 
 		context->setCSConstants({ positionBuffer->getUAVIndex() }, 0);
@@ -185,7 +167,7 @@ protected:
 			colorBuffer->getVertexBuffer()
 			});
 
-		context->setGSConstants(sizeof(ParticleParam) / 4, &particleParam, 0);
+		context->setGSConstants(sizeof(SimulationParam) / 4, &simulationParam, 0);
 
 		context->transitionResources();
 
@@ -195,26 +177,16 @@ protected:
 
 		context->draw(numParticles, 1, 0, 0);
 
-		TextureRenderView* bloomTexture = effect->process(originTexture);
+		TextureRenderView* bloomTexture = bloomEffect->process(originTexture);
 
-		context->setPipelineState(fullScreenState.Get());
+		TextureRenderView* fxaaTexture = fxaaEffect->process(bloomTexture);
 
-		context->setDefRenderTarget();
-
-		context->setViewport(Graphics::getWidth(), Graphics::getHeight());
-
-		context->setTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-		context->setPSConstants({ bloomTexture->getAllSRVIndex() }, 0);
-
-		context->transitionResources();
-
-		context->draw(3, 1, 0, 0);
+		blit(fxaaTexture);
 	}
 
 private:
 
-	constexpr static UINT numParticles = 3000000;
+	constexpr static UINT numParticles = 100000;
 
 	struct SimulationParam
 	{
@@ -222,14 +194,9 @@ private:
 		int simulationSteps;
 	} simulationParam;
 
-	struct ParticleParam
-	{
-		float particleSize;
-	} particleParam;
+	BloomEffect* bloomEffect;
 
-	float sclFactor = 25.f;
-
-	BloomEffect* effect;
+	FXAAEffect* fxaaEffect;
 
 	ComPtr<ID3D12PipelineState> particleComputeState;
 
@@ -250,7 +217,5 @@ private:
 	BufferView* positionBuffer;
 
 	BufferView* colorBuffer;
-
-	ComPtr<ID3D12PipelineState> fullScreenState;
 
 };
