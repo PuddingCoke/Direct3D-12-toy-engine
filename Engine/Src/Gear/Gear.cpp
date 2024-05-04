@@ -111,11 +111,13 @@ void Gear::release()
 
 void Gear::runGame()
 {
-	std::chrono::high_resolution_clock clock = std::chrono::high_resolution_clock();
+	std::chrono::steady_clock clock;
+
+	float offset = 0.f;
 
 	while (winform->pollEvents())
 	{
-		const std::chrono::high_resolution_clock::time_point startPoint = clock.now();
+		const std::chrono::steady_clock::time_point startPoint = clock.now();
 
 		RenderEngine::get()->begin();
 
@@ -131,11 +133,15 @@ void Gear::runGame()
 
 		Keyboard::resetOnKeyDownMap();
 
-		const std::chrono::high_resolution_clock::time_point endPoint = clock.now();
+		const std::chrono::steady_clock::time_point endPoint = clock.now();
 
-		Graphics::time.deltaTime = std::chrono::duration_cast<std::chrono::milliseconds>(endPoint - startPoint).count() / 1000.f;
+		const float lastDeltaTime = std::chrono::duration_cast<std::chrono::milliseconds>(endPoint - startPoint).count() / 1000.f;
 
-		Graphics::time.timeElapsed += Graphics::time.deltaTime;
+		const float lerpDeltaTime = dtEstimator.getDeltaTime(lastDeltaTime);
+
+		Graphics::time.deltaTime = lerpDeltaTime;
+
+		Graphics::time.timeElapsed += lerpDeltaTime;
 
 		Graphics::time.uintSeed = Random::Uint();
 

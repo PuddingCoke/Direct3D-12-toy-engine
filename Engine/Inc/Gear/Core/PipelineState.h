@@ -5,9 +5,9 @@
 
 #include<Gear/Core/States.h>
 #include<Gear/Core/Shader.h>
+#include<Gear/Core/Graphics.h>
 #include<Gear/Core/GraphicsDevice.h>
 #include<Gear/Core/GlobalRootSignature.h>
-
 
 #include<Gear/CompiledShaders/EquirectangularVS.h>
 #include<Gear/CompiledShaders/EquirectangularPS.h>
@@ -20,6 +20,9 @@ public:
 	ComPtr<ID3D12PipelineState> equirectangularR8State;
 
 	ComPtr<ID3D12PipelineState> equirectangularR16State;
+
+	//simply draw texture to backbuffer
+	ComPtr<ID3D12PipelineState> fullScreenBlitState;
 
 	static PipelineState* get();
 

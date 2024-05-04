@@ -1,0 +1,71 @@
+#include<Gear/Core/Effect/FXAAEffect.h>
+
+FXAAEffect::FXAAEffect(GraphicsContext* const context, const UINT width, const UINT height) :
+	Effect(context, width, height, DXGI_FORMAT_R8G8B8A8_UNORM), fxaaParam{ 1.0f,0.75f,0.166f,0.0633f },
+	colorLumaTexture(ResourceManager::createTextureRenderView(width, height, DXGI_FORMAT_R8G8B8A8_UNORM, 1, 1, false, true,
+		DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_R8G8B8A8_UNORM))
+{
+	colorToColorLumaPS = new Shader(g_ColorToColorLumaBytes, sizeof(g_ColorToColorLumaBytes));
+
+	fxaaPS = new Shader(g_FXAABytes, sizeof(g_FXAABytes));
+
+	{
+		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = PipelineState::getDefaultFullScreenState();
+		desc.PS = colorToColorLumaPS->getByteCode();
+		desc.NumRenderTargets = 1;
+		desc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
+
+		GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&colorToColorLumaState));
+	}
+
+	{
+		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = PipelineState::getDefaultFullScreenState();
+		desc.PS = fxaaPS->getByteCode();
+		desc.NumRenderTargets = 1;
+		desc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
+
+		GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&fxaaState));
+	}
+}
+
+FXAAEffect::~FXAAEffect()
+{
+	delete colorLumaTexture;
+	delete colorToColorLumaPS;
+	delete fxaaPS;
+}
+
+TextureRenderView* FXAAEffect::process(TextureRenderView* const inputTexture) const
+{
+	context->setPipelineState(colorToColorLumaState.Get());
+
+	context->setViewportSimple(Graphics::getWidth(), Graphics::getHeight());
+
+	context->setTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	context->setRenderTargets({ colorLumaTexture->getRTVMipHandle(0) });
+
+	context->setPSConstants({ inputTexture->getAllSRVIndex() }, 0);
+
+	context->transitionResources();
+
+	context->draw(3, 1, 0, 0);
+
+	context->setPipelineState(fxaaState.Get());
+
+	context->setViewportSimple(Graphics::getWidth(), Graphics::getHeight());
+
+	context->setTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	context->setRenderTargets({ outputTexture->getRTVMipHandle(0) });
+
+	context->setPSConstants({ colorLumaTexture->getAllSRVIndex() }, 0);
+
+	context->setPSConstants(4, &fxaaParam, 1);
+
+	context->transitionResources();
+
+	context->draw(3, 1, 0, 0);
+
+	return outputTexture;
+}

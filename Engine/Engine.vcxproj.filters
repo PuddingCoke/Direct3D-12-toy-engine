@@ -195,6 +195,12 @@
     <ClInclude Include="Inc\Gear\Camera\OrbitCamera.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Inc\Gear\Utils\DeltaTimeEstimator.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Gear\Core\Effect\FXAAEffect.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Gear\Window\Win32Form.cpp">
@@ -371,6 +377,12 @@
     <ClCompile Include="Src\Gear\Camera\OrbitCamera.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="Src\Gear\Utils\DeltaTimeEstimator.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gear\Core\Effect\FXAAEffect.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\FullScreen\FullScreenVS.hlsl" />
@@ -391,8 +403,11 @@
     <FxCompile Include="Shaders\TextureCube\EquirectangularVS.hlsl" />
     <FxCompile Include="Shaders\TextureCube\EquirectangularPS.hlsl" />
     <FxCompile Include="Shaders\TextureCube\TextureCubeVS.hlsl" />
+    <FxCompile Include="Shaders\FXAA\FXAA.hlsl" />
+    <FxCompile Include="Shaders\FXAA\ColorToColorLuma.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\Common.hlsli" />
+    <None Include="Shaders\FXAA\FXAAHeader.hlsli" />
   </ItemGroup>
 </Project>

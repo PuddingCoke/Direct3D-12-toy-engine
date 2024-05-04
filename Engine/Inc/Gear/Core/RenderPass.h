@@ -40,6 +40,9 @@ public:
 
 protected:
 
+	//draw texture to backbuffer
+	void blit(TextureRenderView* const texture);
+
 	void begin();
 
 	void end() const;

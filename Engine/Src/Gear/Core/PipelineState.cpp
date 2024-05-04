@@ -74,6 +74,17 @@ PipelineState::PipelineState()
 
 		std::cout << "[class PipelineState] create equirectangularR16State\n";
 	}
+
+	{
+		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = getDefaultFullScreenState();
+		desc.PS = Shader::fullScreenPS->getByteCode();
+		desc.NumRenderTargets = 1;
+		desc.RTVFormats[0] = Graphics::BackBufferFormat;
+
+		GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&fullScreenBlitState));
+
+		std::cout << "[class PipelineState] create fullScreenBlitState\n";
+	}
 }
 
 PipelineState::~PipelineState()

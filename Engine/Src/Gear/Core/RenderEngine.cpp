@@ -440,6 +440,8 @@ RenderEngine::RenderEngine(const HWND hwnd, const bool useSwapChainBuffer, const
 		GraphicsDevice::get()->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&commandQueue));
 	}
 
+	Shader::createGlobalShaders();
+
 	States::initialize();
 
 	GlobalDescriptorHeap::instance = new GlobalDescriptorHeap();
@@ -452,8 +454,6 @@ RenderEngine::RenderEngine(const HWND hwnd, const bool useSwapChainBuffer, const
 	}
 
 	PipelineState::instance = new PipelineState();
-
-	Shader::createGlobalShaders();
 
 	{
 		DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
