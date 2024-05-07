@@ -48,7 +48,7 @@ private:
 
 	//to build a BLAS all input resources need to at least have D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE set.
 	//so we need to transition all buffers to this state
-	//note:addGeometryObject will throw error if input buffer does't need state tracking while does't have mentioned state set
+	//note:addGeometryObject will throw error if input buffer does't need state tracking while without mentioned state set
 	std::vector<Buffer*> transitionBuffers;
 
 	UINT scratchBufferSize;

@@ -9,7 +9,7 @@ const std::string assetPath = "E:/Assets/Sponza";
 #include<assimp/scene.h>
 #include<assimp/postprocess.h>
 
-#include<Gear/Core/Raytracing/BottomLevelAS.h>
+#include<Gear/Core/Raytracing/TopLevelAS.h>
 
 class Scene
 {
@@ -146,6 +146,22 @@ public:
 
 			blas->generateBLAS(resManager->getCommandList());
 		}
+
+		{
+			tlas = new TopLevelAS(false);
+
+			{
+				GeometryInstance instance = {};
+				instance.blas = blas;
+				instance.transform = DirectX::XMMatrixIdentity();
+				instance.instanceID = 0;
+				instance.hitGroupIndex = 0;
+
+				tlas->addGeometryInstance(instance);
+			}
+
+			tlas->generateTLAS(resManager->getCommandList());
+		}
 	}
 
 	~Scene()
@@ -165,6 +181,11 @@ public:
 		if (blas)
 		{
 			delete blas;
+		}
+
+		if (tlas)
+		{
+			delete tlas;
 		}
 	}
 
@@ -203,6 +224,8 @@ private:
 
 	BufferView* modelBuffer;
 
-	BottomLevelAS* blas;
+	BottomLevelAS* blas = nullptr;
+
+	TopLevelAS* tlas = nullptr;
 
 };

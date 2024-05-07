@@ -143,6 +143,7 @@
     <ClInclude Include="Inc\Gear\Camera\OrbitCamera.h" />
     <ClInclude Include="Inc\Gear\Core\Effect\FXAAEffect.h" />
     <ClInclude Include="Inc\Gear\Core\Raytracing\BottomLevelAS.h" />
+    <ClInclude Include="Inc\Gear\Core\Raytracing\TopLevelAS.h" />
     <ClInclude Include="Inc\Gear\Utils\DeltaTimeEstimator.h" />
     <ClInclude Include="Inc\Gear\Core\Resource\BufferView.h" />
     <ClInclude Include="Inc\Gear\Core\Resource\CounterBufferView.h" />
@@ -219,6 +220,7 @@
     <ClCompile Include="Src\Gear\Core\ConstantBufferPool.cpp" />
     <ClCompile Include="Src\Gear\Core\Effect\FXAAEffect.cpp" />
     <ClCompile Include="Src\Gear\Core\Raytracing\BottomLevelAS.cpp" />
+    <ClCompile Include="Src\Gear\Core\Raytracing\TopLevelAS.cpp" />
     <ClCompile Include="Src\Gear\Utils\DeltaTimeEstimator.cpp" />
     <ClCompile Include="Src\Gear\Core\DescriptorHeap.cpp" />
     <ClCompile Include="Src\Gear\Core\DX\ReadbackHeap.cpp" />
