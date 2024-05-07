@@ -53,3 +53,8 @@ void Resource::setName(LPCWSTR const name)
 {
 	resource->SetName(name);
 }
+
+bool bitFlagSubset(const UINT a, const UINT b)
+{
+	return b != 0 ? ((a & b) == b) : false;
+}

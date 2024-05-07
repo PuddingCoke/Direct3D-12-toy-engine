@@ -134,6 +134,10 @@ public:
 		ImGui::SliderInt("Simulation Steps", &simulationParam.simulationSteps, 6, 10);
 
 		ImGui::End();
+
+		bloomEffect->imGuiCommand();
+
+		fxaaEffect->imGuiCommand();
 	}
 
 protected:
@@ -186,7 +190,7 @@ protected:
 
 private:
 
-	constexpr static UINT numParticles = 100000;
+	constexpr static UINT numParticles = 50000;
 
 	struct SimulationParam
 	{

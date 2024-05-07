@@ -21,6 +21,9 @@
 
 constexpr UINT D3D12_RESOURCE_STATE_UNKNOWN = 0xFFFFFFFF;
 
+//a encompass b
+bool bitFlagSubset(const UINT a, const UINT b);
+
 class Buffer;
 
 class Texture;

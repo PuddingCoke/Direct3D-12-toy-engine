@@ -69,3 +69,27 @@ TextureRenderView* FXAAEffect::process(TextureRenderView* const inputTexture) co
 
 	return outputTexture;
 }
+
+void FXAAEffect::imGuiCommand()
+{
+	ImGui::Begin("FXAA Effect");
+	ImGui::SliderFloat("FXAAQualitySubpix", &fxaaParam.fxaaQualitySubpix, 0.0f, 1.f);
+	ImGui::SliderFloat("FXAAQualityEdgeThreshold", &fxaaParam.fxaaQualityEdgeThreshold, 0.0f, 1.f);
+	ImGui::SliderFloat("FXAAQualityEdgeThresholdMin", &fxaaParam.fxaaQualityEdgeThresholdMin, 0.0f, 1.f);
+	ImGui::End();
+}
+
+void FXAAEffect::setFXAAQualitySubpix(const float fxaaQualitySubpix)
+{
+	fxaaParam.fxaaQualitySubpix = fxaaQualitySubpix;
+}
+
+void FXAAEffect::setFXAAQualityEdgeThreshold(const float fxaaQualityEdgeThreshold)
+{
+	fxaaParam.fxaaQualityEdgeThreshold = fxaaQualityEdgeThreshold;
+}
+
+void FXAAEffect::setFXAAQualityEdgeThresholdMin(const float fxaaQualityEdgeThresholdMin)
+{
+	fxaaParam.fxaaQualityEdgeThresholdMin = fxaaQualityEdgeThresholdMin;
+}

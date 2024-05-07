@@ -201,6 +201,9 @@
     <ClInclude Include="Inc\Gear\Core\Effect\FXAAEffect.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Inc\Gear\Core\Raytracing\BottomLevelAS.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Gear\Window\Win32Form.cpp">
@@ -381,6 +384,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Src\Gear\Core\Effect\FXAAEffect.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gear\Core\Raytracing\BottomLevelAS.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

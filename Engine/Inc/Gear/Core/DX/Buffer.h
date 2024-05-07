@@ -5,6 +5,8 @@
 
 #include"Resource.h"
 
+#include<vector>
+
 class Buffer;
 
 struct PendingBufferBarrier
@@ -18,7 +20,7 @@ class Buffer :public Resource
 {
 public:
 
-	Buffer(const UINT size, const bool stateTracking, const D3D12_RESOURCE_FLAGS resFlags);
+	Buffer(const UINT size, const bool stateTracking, const D3D12_RESOURCE_FLAGS resFlags, const D3D12_RESOURCE_STATES initialState = D3D12_RESOURCE_STATE_COPY_DEST);
 
 	Buffer(const ComPtr<ID3D12Resource>& buffer, const bool stateTracking, const UINT initialState);
 
@@ -39,6 +41,8 @@ public:
 	void transition(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers, std::vector<PendingBufferBarrier>& pendingBarriers);
 
 	void setState(const UINT state);
+
+	UINT getState() const;
 
 private:
 
