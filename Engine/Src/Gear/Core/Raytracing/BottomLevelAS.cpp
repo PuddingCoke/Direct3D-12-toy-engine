@@ -107,7 +107,7 @@ void BottomLevelAS::generateBLAS(CommandList* const commandList)
 	desc.Inputs.DescsLayout = D3D12_ELEMENTS_LAYOUT_ARRAY;
 	desc.Inputs.NumDescs = geometryDescs.size();
 	desc.Inputs.pGeometryDescs = geometryDescs.data();
-	desc.Inputs.Flags = buildFlag;
+	desc.Inputs.Flags = D3D12_RAYTRACING_ACCELERATION_STRUCTURE_BUILD_FLAG_NONE;
 	desc.ScratchAccelerationStructureData = scratchBuffer->getGPUAddress();
 	desc.DestAccelerationStructureData = blasBuffer->getGPUAddress();
 	//desc.SourceAccelerationStructureData = ;
