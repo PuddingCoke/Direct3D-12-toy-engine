@@ -7,6 +7,8 @@
 
 #include<Gear/Core/ResourceManager.h>
 
+#include<ImGUI/imgui.h>
+
 class Effect
 {
 public:
@@ -20,6 +22,8 @@ public:
 	Effect(GraphicsContext* const context, const UINT width, const UINT height, const DXGI_FORMAT format);
 
 	virtual ~Effect();
+
+	virtual void imGuiCommand() = 0;
 
 protected:
 

@@ -45,8 +45,9 @@ public:
 
 	void cleanTransientResources();
 
-	//following methods create low level resources
-	//stateTracking is true
+	GraphicsContext* getGraphicsContext() const;
+
+	CommandList* getCommandList() const;
 
 	//create buffer from data
 	Buffer* createBuffer(const void* const data, const UINT size, const D3D12_RESOURCE_FLAGS resFlags);

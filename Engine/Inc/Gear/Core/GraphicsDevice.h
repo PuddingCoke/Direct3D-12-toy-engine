@@ -24,6 +24,9 @@ __debugbreak();\
 }\
 }\
 
+//only works for power of 2
+#define ROUND_UP(x,y) ((x + (y-1)) & ~(y-1))
+
 class GraphicsDevice
 {
 public:

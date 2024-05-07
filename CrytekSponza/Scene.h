@@ -9,6 +9,8 @@ const std::string assetPath = "E:/Assets/Sponza";
 #include<assimp/scene.h>
 #include<assimp/postprocess.h>
 
+#include<Gear/Core/Raytracing/BottomLevelAS.h>
+
 class Scene
 {
 public:
@@ -125,7 +127,25 @@ public:
 			startVertexLocation += vertexCount;
 		}
 
-		modelBuffer = resManager->createStructuredBufferView(sizeof(Vertex), sizeof(Vertex) * vertices.size(), false, false, true, false, true, vertices.data());
+		modelBuffer = resManager->createStructuredBufferView(sizeof(Vertex), sizeof(Vertex) * vertices.size(), true, false, true, false, true, vertices.data());
+
+		{
+			blas = new BottomLevelAS(false);
+
+			for (Model* const model : models)
+			{
+				GeometryObject object = {};
+				object.vertexBuffer = modelBuffer->getBuffer();
+				object.vertexByteOffset = model->startVertexLocation * sizeof(Vertex);
+				object.vertexCount = model->vertexCount;
+				object.vertexSize = sizeof(Vertex);
+				object.opaque = true;
+
+				blas->addGeometryObject(object);
+			}
+
+			blas->generateBLAS(resManager->getCommandList());
+		}
 	}
 
 	~Scene()
@@ -140,6 +160,11 @@ public:
 		for (UINT i = 0; i < models.size(); i++)
 		{
 			delete models[i];
+		}
+
+		if (blas)
+		{
+			delete blas;
 		}
 	}
 
@@ -177,5 +202,7 @@ private:
 	std::vector<Model*> models;
 
 	BufferView* modelBuffer;
+
+	BottomLevelAS* blas;
 
 };

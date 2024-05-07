@@ -1,7 +1,7 @@
 #include<Gear/Utils/DeltaTimeEstimator.h>
 
 DeltaTimeEstimator::DeltaTimeEstimator() :
-	historyDeltatime{}, historyDeltaTimeIndex(0), populated(false)
+	historyDeltatime{}, sortedDeltaTime{}, historyDeltaTimeIndex(0), populated(false)
 {
 }
 
@@ -25,17 +25,15 @@ float DeltaTimeEstimator::getDeltaTime(const float lastDeltaTime)
 		return lastDeltaTime;
 	}
 
-	float sortedArray[11] = {};
+	memcpy(sortedDeltaTime, historyDeltatime, sizeof(float) * 11);
 
-	memcpy(sortedArray, historyDeltatime, sizeof(float) * 11);
-
-	std::sort(sortedArray, sortedArray + 11);
+	std::sort(sortedDeltaTime, sortedDeltaTime + 11);
 
 	float averageDeltaTime = 0.f;
 
 	for (unsigned int i = 2; i < 9; i++)
 	{
-		averageDeltaTime += sortedArray[i];
+		averageDeltaTime += sortedDeltaTime[i];
 	}
 
 	averageDeltaTime /= 7.f;

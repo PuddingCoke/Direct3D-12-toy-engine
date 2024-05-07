@@ -6,6 +6,9 @@
 
 #include"MyRenderPass.h"
 
+//generic 26%
+//all 23.5%
+
 class MyGame :public Game
 {
 public:
@@ -38,5 +41,4 @@ public:
 
 	MyRenderPass* renderPass;
 	
-
 };

@@ -18,6 +18,14 @@ public:
 
 	TextureRenderView* process(TextureRenderView* const inputTexture) const;
 
+	void imGuiCommand() override;
+
+	void setFXAAQualitySubpix(const float fxaaQualitySubpix);
+
+	void setFXAAQualityEdgeThreshold(const float fxaaQualityEdgeThreshold);
+
+	void setFXAAQualityEdgeThresholdMin(const float fxaaQualityEdgeThresholdMin);
+
 private:
 
 	TextureRenderView* colorLumaTexture;

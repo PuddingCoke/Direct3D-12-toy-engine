@@ -17,9 +17,11 @@ public:
 
 private:
 
-	static constexpr float lerpFactor = 0.1f;
+	static constexpr float lerpFactor = 0.065f;
 
 	float historyDeltatime[11];
+
+	float sortedDeltaTime[11];
 
 	unsigned int historyDeltaTimeIndex;
 

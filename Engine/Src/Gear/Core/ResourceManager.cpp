@@ -52,6 +52,16 @@ void ResourceManager::cleanTransientResources()
 	engineResources[Graphics::getFrameIndex()].clear();
 }
 
+GraphicsContext* ResourceManager::getGraphicsContext() const
+{
+	return context;
+}
+
+CommandList* ResourceManager::getCommandList() const
+{
+	return commandList;
+}
+
 Buffer* ResourceManager::createBuffer(const void* const data, const UINT size, const D3D12_RESOURCE_FLAGS resFlags)
 {
 	Buffer* buffer = new Buffer(size, true, resFlags);
@@ -313,36 +323,32 @@ BufferView* ResourceManager::createTypedBufferView(const DXGI_FORMAT format, con
 
 	Buffer* const buffer = createBuffer(data, size, resFlags);
 
-	if (!cpuWritable)
+	if (!cpuWritable && !createUAV)
 	{
-		//read-only SRV VBV IBV
-		const bool hasSRVOnly = createSRV && !createVBV && !createIBV;
+		UINT finalState = 0;
 
-		const bool hasVBVOnly = !createSRV && createVBV && !createIBV;
-
-		const bool hasIBVOnly = !createSRV && !createVBV && createIBV;
-
-		if (hasSRVOnly || hasVBVOnly || hasIBVOnly)
+		if (createSRV)
 		{
-			commandList->pushResourceTrackList(buffer);
-
-			if (hasSRVOnly)
-			{
-				buffer->setState(D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
-			}
-			else if (hasVBVOnly)
-			{
-				buffer->setState(D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
-			}
-			else if (hasIBVOnly)
-			{
-				buffer->setState(D3D12_RESOURCE_STATE_INDEX_BUFFER);
-			}
-
-			commandList->transitionResources();
-
-			buffer->setStateTracking(false);
+			finalState |= D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE;
 		}
+
+		if (createVBV)
+		{
+			finalState |= D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER;
+		}
+
+		if (createIBV)
+		{
+			finalState |= D3D12_RESOURCE_STATE_INDEX_BUFFER;
+		}
+
+		commandList->pushResourceTrackList(buffer);
+
+		buffer->setState(finalState);
+
+		commandList->transitionResources();
+
+		buffer->setStateTracking(false);
 	}
 
 	return new BufferView(buffer, 0, format, size, createSRV, createUAV, createVBV, createIBV, cpuWritable, persistent);
@@ -378,30 +384,27 @@ BufferView* ResourceManager::createStructuredBufferView(const UINT structureByte
 
 	Buffer* const buffer = createBuffer(data, size, resFlags);
 
-	if (!cpuWritable)
+	if (!cpuWritable && !createUAV)
 	{
-		//read-only SRV VBV
-		const bool hasSRVOnly = createSRV && !createVBV;
+		UINT finalState = 0;
 
-		const bool hasVBVOnly = !createSRV && createVBV;
-
-		if (hasSRVOnly || hasVBVOnly)
+		if (createSRV)
 		{
-			commandList->pushResourceTrackList(buffer);
-
-			if (hasSRVOnly)
-			{
-				buffer->setState(D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
-			}
-			else if (hasVBVOnly)
-			{
-				buffer->setState(D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
-			}
-
-			commandList->transitionResources();
-
-			buffer->setStateTracking(false);
+			finalState |= D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE;
 		}
+
+		if (createVBV)
+		{
+			finalState |= D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER;
+		}
+
+		commandList->pushResourceTrackList(buffer);
+
+		buffer->setState(finalState);
+
+		commandList->transitionResources();
+
+		buffer->setStateTracking(false);
 	}
 
 	return new BufferView(buffer, structureByteStride, DXGI_FORMAT_UNKNOWN, size, createSRV, createUAV, createVBV, false, cpuWritable, persistent);
@@ -437,36 +440,32 @@ BufferView* ResourceManager::createByteAddressBufferView(const UINT size, const 
 
 	Buffer* const buffer = createBuffer(data, size, resFlags);
 
-	if (!cpuWritable)
+	if (!cpuWritable && !createUAV)
 	{
-		//read-only SRV VBV IBV
-		const bool hasSRVOnly = createSRV && !createVBV && !createIBV;
+		UINT finalState = 0;
 
-		const bool hasVBVOnly = !createSRV && createVBV && !createIBV;
-
-		const bool hasIBVOnly = !createSRV && !createVBV && createIBV;
-
-		if (hasSRVOnly || hasVBVOnly || hasIBVOnly)
+		if (createSRV)
 		{
-			commandList->pushResourceTrackList(buffer);
-
-			if (hasSRVOnly)
-			{
-				buffer->setState(D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
-			}
-			else if (hasVBVOnly)
-			{
-				buffer->setState(D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
-			}
-			else if (hasIBVOnly)
-			{
-				buffer->setState(D3D12_RESOURCE_STATE_INDEX_BUFFER);
-			}
-
-			commandList->transitionResources();
-
-			buffer->setStateTracking(false);
+			finalState |= D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE;
 		}
+
+		if (createVBV)
+		{
+			finalState |= D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER;
+		}
+
+		if (createIBV)
+		{
+			finalState |= D3D12_RESOURCE_STATE_INDEX_BUFFER;
+		}
+
+		commandList->pushResourceTrackList(buffer);
+
+		buffer->setState(finalState);
+
+		commandList->transitionResources();
+
+		buffer->setStateTracking(false);
 	}
 
 	return new BufferView(buffer, 0, DXGI_FORMAT_UNKNOWN, size, createSRV, createUAV, createVBV, createIBV, cpuWritable, persistent);

@@ -5,6 +5,8 @@
 
 #include"Resource.h"
 
+#include<vector>
+
 class Texture;
 
 constexpr UINT D3D12_TRANSITION_ALL_MIPLEVELS = 0xFFFFFFFF;
@@ -55,6 +57,10 @@ public:
 	void setAllState(const UINT state);
 
 	void setMipSliceState(const UINT mipSlice, const UINT state);
+
+	UINT getAllState() const;
+
+	UINT getMipSliceState(const UINT mipSlice);
 
 private:
 
