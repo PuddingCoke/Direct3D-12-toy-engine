@@ -36,14 +36,14 @@ public:
 
 	virtual ~RenderPass();
 
-	virtual void imGuiCommand();
+	virtual void imGUICall();
 
 protected:
 
 	//draw texture to backbuffer
-	void blit(TextureRenderView* const texture);
+	void blit(TextureRenderView* const texture) const;
 
-	void begin();
+	void begin() const;
 
 	void end() const;
 

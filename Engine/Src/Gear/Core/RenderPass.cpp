@@ -45,11 +45,11 @@ RenderPass::~RenderPass()
 	}
 }
 
-void RenderPass::imGuiCommand()
+void RenderPass::imGUICall()
 {
 }
 
-void RenderPass::blit(TextureRenderView* const texture)
+void RenderPass::blit(TextureRenderView* const texture) const
 {
 	context->setPipelineState(PipelineState::get()->fullScreenBlitState.Get());
 
@@ -66,7 +66,7 @@ void RenderPass::blit(TextureRenderView* const texture)
 	context->draw(3, 1, 0, 0);
 }
 
-void RenderPass::begin()
+void RenderPass::begin() const
 {
 	resManager->cleanTransientResources();
 

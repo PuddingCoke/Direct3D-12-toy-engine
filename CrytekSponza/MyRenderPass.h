@@ -292,9 +292,9 @@ public:
 		delete effect;
 	}
 
-	void imGuiCommand() override
+	void imGUICall() override
 	{
-		effect->imGuiCommand();
+		effect->imGUICall();
 	}
 
 protected:

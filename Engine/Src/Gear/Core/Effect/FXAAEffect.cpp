@@ -70,7 +70,7 @@ TextureRenderView* FXAAEffect::process(TextureRenderView* const inputTexture) co
 	return outputTexture;
 }
 
-void FXAAEffect::imGuiCommand()
+void FXAAEffect::imGUICall()
 {
 	ImGui::Begin("FXAA Effect");
 	ImGui::SliderFloat("FXAAQualitySubpix", &fxaaParam.fxaaQualitySubpix, 0.0f, 1.f);

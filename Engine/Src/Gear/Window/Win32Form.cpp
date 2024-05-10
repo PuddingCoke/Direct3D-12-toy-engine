@@ -46,7 +46,7 @@ bool Win32Form::pollEvents()
 	return msg.message != WM_QUIT;
 }
 
-const HWND& Win32Form::getHandle() const
+HWND Win32Form::getHandle() const
 {
 	return hwnd;
 }

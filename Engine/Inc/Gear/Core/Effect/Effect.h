@@ -23,7 +23,7 @@ public:
 
 	virtual ~Effect();
 
-	virtual void imGuiCommand() = 0;
+	virtual void imGUICall() = 0;
 
 protected:
 

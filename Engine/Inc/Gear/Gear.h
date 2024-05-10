@@ -48,9 +48,9 @@ private:
 
 	void runEncode();
 
-	void destroy();
+	void destroy() const;
 
-	void reportLiveObjects();
+	void reportLiveObjects() const;
 
 	Gear();
 
