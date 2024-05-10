@@ -15,7 +15,7 @@ public:
 
 	bool pollEvents();
 
-	const HWND& getHandle() const;
+	HWND getHandle() const;
 
 private:
 

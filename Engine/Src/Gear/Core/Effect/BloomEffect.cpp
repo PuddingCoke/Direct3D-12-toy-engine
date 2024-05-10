@@ -241,7 +241,7 @@ TextureRenderView* BloomEffect::process(TextureRenderView* const inputTexture) c
 	return outputTexture;
 }
 
-void BloomEffect::imGuiCommand()
+void BloomEffect::imGUICall()
 {
 	ImGui::Begin("Bloom Effect");
 	ImGui::SliderFloat("Exposure", &bloomParam.exposure, 0.0f, 4.f);

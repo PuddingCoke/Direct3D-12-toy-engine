@@ -18,7 +18,7 @@ public:
 
 	TextureRenderView* process(TextureRenderView* const inputTexture) const;
 
-	void imGuiCommand() override;
+	void imGUICall() override;
 
 	void setFXAAQualitySubpix(const float fxaaQualitySubpix);
 

@@ -125,7 +125,7 @@ public:
 		delete colorBuffer;
 	}
 
-	void imGuiCommand() override
+	void imGUICall() override
 	{
 		ImGui::Begin("Simulation Param & Particle Param");
 
@@ -135,9 +135,9 @@ public:
 
 		ImGui::End();
 
-		bloomEffect->imGuiCommand();
+		bloomEffect->imGUICall();
 
-		fxaaEffect->imGuiCommand();
+		fxaaEffect->imGUICall();
 	}
 
 protected:

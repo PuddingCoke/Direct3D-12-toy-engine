@@ -13,7 +13,7 @@ void RenderEngine::submitRenderPass(RenderPass* const pass)
 
 	if (displayImGUISurface)
 	{
-		pass->imGuiCommand();
+		pass->imGUICall();
 	}
 
 	CommandList* const renderCMD = renderPassResult.renderCMD;

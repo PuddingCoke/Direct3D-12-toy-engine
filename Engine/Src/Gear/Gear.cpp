@@ -196,7 +196,7 @@ void Gear::runEncode()
 	std::cin.get();
 }
 
-void Gear::destroy()
+void Gear::destroy() const
 {
 	delete game;
 
@@ -212,7 +212,7 @@ void Gear::destroy()
 	}
 }
 
-void Gear::reportLiveObjects()
+void Gear::reportLiveObjects() const
 {
 	ComPtr<IDXGIDebug1> dxgiDebug;
 

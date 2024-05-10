@@ -119,7 +119,7 @@ DXCCompiler::~DXCCompiler()
 
 }
 
-IDxcBlob* DXCCompiler::compile(const std::string filePath,const ShaderProfile profile)
+IDxcBlob* DXCCompiler::compile(const std::string filePath,const ShaderProfile profile) const
 {
 	const std::string shaderString = Utils::File::readAllText(filePath);
 
