@@ -35,7 +35,7 @@ ID3D12GraphicsCommandList6* CommandList::get() const
 
 void CommandList::open() const
 {
-	allocators[Graphics::getFrameIndex()]->get()->Reset();
+	allocators[Graphics::getFrameIndex()]->reset();
 
 	commandList->Reset(allocators[Graphics::getFrameIndex()]->get(), nullptr);
 }
@@ -223,7 +223,7 @@ void CommandList::setVertexBuffers(const UINT startSlot, const std::initializer_
 	commandList->IASetVertexBuffers(startSlot, static_cast<UINT>(transientVBViews.size()), transientVBViews.data());
 }
 
-void CommandList::setIndexBuffer(const IndexBufferDesc indexBuffer)
+void CommandList::setIndexBuffer(const IndexBufferDesc& indexBuffer)
 {
 	Buffer* const buffer = indexBuffer.buffer;
 
@@ -328,7 +328,7 @@ void CommandList::uavBarrier(const std::initializer_list<Resource*>& resources)
 	commandList->ResourceBarrier(static_cast<UINT>(transientUAVBarriers.size()), transientUAVBarriers.data());
 }
 
-void CommandList::clearUnorderedAccessView(const ClearUAVDesc desc, const float values[4])
+void CommandList::clearUnorderedAccessView(const ClearUAVDesc& desc, const float values[4])
 {
 	ID3D12Resource* resource = nullptr;
 
@@ -358,7 +358,7 @@ void CommandList::clearUnorderedAccessView(const ClearUAVDesc desc, const float 
 	commandList->ClearUnorderedAccessViewFloat(desc.viewGPUHandle, desc.viewCPUHandle, resource, values, 0, nullptr);
 }
 
-void CommandList::clearUnorderedAccessView(const ClearUAVDesc desc, const UINT values[4])
+void CommandList::clearUnorderedAccessView(const ClearUAVDesc& desc, const UINT values[4])
 {
 	ID3D12Resource* resource = nullptr;
 

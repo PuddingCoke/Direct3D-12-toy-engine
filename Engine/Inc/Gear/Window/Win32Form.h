@@ -10,7 +10,7 @@ class Win32Form
 {
 public:
 
-	Win32Form(const std::wstring& title, const UINT& width, const UINT& height, const DWORD& windowStyle,
+	Win32Form(const std::wstring& title, const UINT width, const UINT height, const DWORD windowStyle,
 		LRESULT(*windowCallback)(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam));
 
 	bool pollEvents();

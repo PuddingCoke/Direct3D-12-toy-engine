@@ -53,7 +53,7 @@ public:
 	Buffer* createBuffer(const void* const data, const UINT size, const D3D12_RESOURCE_FLAGS resFlags);
 
 	//create texture from file
-	Texture* createTexture(const std::string filePath, const D3D12_RESOURCE_FLAGS resFlags, bool* const isTextureCube);
+	Texture* createTexture(const std::string& filePath, const D3D12_RESOURCE_FLAGS resFlags, bool* const isTextureCube);
 
 	//create texture from random data
 	Texture* createTexture(const UINT width, const UINT height, const RandomDataType type, const D3D12_RESOURCE_FLAGS resFlags);
@@ -83,7 +83,7 @@ public:
 	static TextureDepthView* createTextureDepthView(const UINT width, const UINT height, const DXGI_FORMAT resFormat, const UINT arraySize, const UINT mipLevels, const bool isTextureCube, const bool persistent);
 
 	//load jpg jpeg png hdr dds(auto detect texturecube) textures
-	TextureRenderView* createTextureRenderView(const std::string filePath, const bool persistent,
+	TextureRenderView* createTextureRenderView(const std::string& filePath, const bool persistent,
 		const DXGI_FORMAT srvFormat = DXGI_FORMAT_UNKNOWN, const DXGI_FORMAT uavFormat = DXGI_FORMAT_UNKNOWN, const DXGI_FORMAT rtvFormat = DXGI_FORMAT_UNKNOWN);
 
 	//create texture render view from random data
@@ -95,11 +95,11 @@ public:
 		const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat, const float* const color = nullptr);
 
 	//create texture cube from equirectangular map
-	TextureRenderView* createTextureCube(const std::string filePath, const UINT texturecubeResolution, const bool persistent,
+	TextureRenderView* createTextureCube(const std::string& filePath, const UINT texturecubeResolution, const bool persistent,
 		const DXGI_FORMAT srvFormat = DXGI_FORMAT_UNKNOWN, const DXGI_FORMAT uavFormat = DXGI_FORMAT_UNKNOWN, const DXGI_FORMAT rtvFormat = DXGI_FORMAT_UNKNOWN);
 
 	//create texture cube from 6 seperate textures
-	TextureRenderView* createTextureCube(const std::initializer_list<std::string> texturesPath, const bool persistent,
+	TextureRenderView* createTextureCube(const std::initializer_list<std::string>& texturesPath, const bool persistent,
 		const DXGI_FORMAT srvFormat = DXGI_FORMAT_UNKNOWN, const DXGI_FORMAT uavFormat = DXGI_FORMAT_UNKNOWN, const DXGI_FORMAT rtvFormat = DXGI_FORMAT_UNKNOWN);
 
 private:

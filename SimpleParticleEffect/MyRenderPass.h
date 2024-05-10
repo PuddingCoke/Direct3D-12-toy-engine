@@ -20,7 +20,7 @@ public:
 
 		particleGS = new Shader(Utils::getRootFolder() + "ParticleGS.cso");
 
-		particlePS = new Shader(Utils::getRootFolder() + "ParticlePS.cso");
+		particlePS = new Shader("ParticlePS.hlsl", ShaderProfile::PIXEL);
 
 		particleCS = new Shader(Utils::getRootFolder() + "ParticleCS.cso");
 

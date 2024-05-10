@@ -32,7 +32,7 @@ public:
 
 	static Gear* get();
 
-	int iniEngine(const Configuration config, const int argc, const char* argv[]);
+	int iniEngine(const Configuration& config, const int argc, const char* argv[]);
 
 	void iniGame(Game* const gamePtr);
 
@@ -64,7 +64,7 @@ private:
 
 	DeltaTimeEstimator dtEstimator;
 
-	void iniWindow(const std::wstring title, const UINT width, const UINT height);
+	void iniWindow(const std::wstring& title, const UINT width, const UINT height);
 
 	static constexpr DWORD normalWndStyle = WS_CAPTION | WS_SYSMENU;
 

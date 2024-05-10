@@ -148,7 +148,7 @@ public:
 		}
 
 		{
-			tlas = new TopLevelAS(false);
+			tlas = new TopLevelAS(false, true);
 
 			{
 				GeometryInstance instance = {};

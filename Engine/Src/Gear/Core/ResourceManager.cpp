@@ -77,7 +77,7 @@ Buffer* ResourceManager::createBuffer(const void* const data, const UINT size, c
 	return buffer;
 }
 
-Texture* ResourceManager::createTexture(const std::string filePath, const D3D12_RESOURCE_FLAGS resFlags, bool* const isTextureCube)
+Texture* ResourceManager::createTexture(const std::string& filePath, const D3D12_RESOURCE_FLAGS resFlags, bool* const isTextureCube)
 {
 	Texture* texture = nullptr;
 
@@ -553,7 +553,7 @@ TextureDepthView* ResourceManager::createTextureDepthView(const UINT width, cons
 	return new TextureDepthView(texture, isTextureCube, persistent);
 }
 
-TextureRenderView* ResourceManager::createTextureRenderView(const std::string filePath, const bool persistent, const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat)
+TextureRenderView* ResourceManager::createTextureRenderView(const std::string& filePath, const bool persistent, const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat)
 {
 	const bool hasRTV = (rtvFormat != DXGI_FORMAT_UNKNOWN);
 
@@ -700,7 +700,7 @@ TextureRenderView* ResourceManager::createTextureRenderView(const UINT width, co
 	return new TextureRenderView(texture, isTextureCube, persistent, srvFormat, uavFormat, rtvFormat);
 }
 
-TextureRenderView* ResourceManager::createTextureCube(const std::string filePath, const UINT texturecubeResolution, const bool persistent, const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat)
+TextureRenderView* ResourceManager::createTextureCube(const std::string& filePath, const UINT texturecubeResolution, const bool persistent, const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat)
 {
 	TextureRenderView* const equirectangularMap = createTextureRenderView(filePath, false);
 
@@ -855,7 +855,7 @@ TextureRenderView* ResourceManager::createTextureCube(const std::string filePath
 	}
 }
 
-TextureRenderView* ResourceManager::createTextureCube(const std::initializer_list<std::string> texturesPath, const bool persistent, const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat)
+TextureRenderView* ResourceManager::createTextureCube(const std::initializer_list<std::string>& texturesPath, const bool persistent, const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat)
 {
 	Texture* srcTextures[6] = {};
 

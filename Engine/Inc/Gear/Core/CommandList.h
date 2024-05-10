@@ -68,7 +68,7 @@ public:
 
 	void setVertexBuffers(const UINT startSlot, const std::initializer_list<VertexBufferDesc>& vertexBuffers);
 
-	void setIndexBuffer(const IndexBufferDesc indexBuffer);
+	void setIndexBuffer(const IndexBufferDesc& indexBuffer);
 	
 	void copyBufferRegion(Buffer* const dstBuffer, const UINT64 dstOffset, UploadHeap* srcBuffer, const UINT64 srcOffset, const UINT64 numBytes);
 
@@ -82,9 +82,9 @@ public:
 
 	void uavBarrier(const std::initializer_list<Resource*>& resources);
 
-	void clearUnorderedAccessView(const ClearUAVDesc desc, const float values[4]);
+	void clearUnorderedAccessView(const ClearUAVDesc& desc, const float values[4]);
 
-	void clearUnorderedAccessView(const ClearUAVDesc desc, const UINT values[4]);
+	void clearUnorderedAccessView(const ClearUAVDesc& desc, const UINT values[4]);
 
 private:
 

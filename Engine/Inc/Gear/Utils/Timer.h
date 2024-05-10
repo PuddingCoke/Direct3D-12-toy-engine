@@ -9,15 +9,15 @@ public:
 
 	Timer();
 
-	Timer(const float& timeLimit);
+	Timer(const float timeLimit);
 
-	bool update(const float& dt);
+	bool update(const float dt);
 
 	void restart();
 
-	void setTimeLimit(const float& timeLimit);
+	void setTimeLimit(const float timeLimit);
 
-	const float& getTimeLimit() const;
+	float getTimeLimit() const;
 
 private:
 

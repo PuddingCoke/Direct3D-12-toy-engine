@@ -42,7 +42,7 @@ FPSCamera::~FPSCamera()
 	Mouse::removeMoveEvent(eventID);
 }
 
-void FPSCamera::applyInput(const float& dt)
+void FPSCamera::applyInput(const float dt)
 {
 	if (Keyboard::getKeyDown(Keyboard::W))
 	{

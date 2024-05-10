@@ -9,6 +9,11 @@ CommandAllocator::~CommandAllocator()
 {
 }
 
+void CommandAllocator::reset() const
+{
+	commandAllocator->Reset();
+}
+
 ID3D12CommandAllocator* CommandAllocator::get() const
 {
 	return commandAllocator.Get();

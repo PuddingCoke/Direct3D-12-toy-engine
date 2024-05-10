@@ -17,6 +17,8 @@ public:
 
 	~CommandAllocator();
 
+	void reset() const;
+
 	ID3D12CommandAllocator* get() const;
 
 private:

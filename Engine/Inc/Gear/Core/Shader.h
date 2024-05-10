@@ -11,13 +11,57 @@
 #include<Gear/CompiledShaders/FullScreenPS.h>
 #include<Gear/CompiledShaders/TextureCubeVS.h>
 
+#include<dxccompiler/dxcapi.h>
+
+#undef DOMAIN
+
+enum ShaderProfile
+{
+	VERTEX,
+	HULL,
+	DOMAIN,
+	GEOMETRY,
+	PIXEL,
+	AMPLIFICATION,
+	MESH,
+	COMPUTE,
+	LIBRARY
+};
+
+class DXCCompiler
+{
+public:
+
+	DXCCompiler();
+
+	~DXCCompiler();
+
+	IDxcBlob* compile(const std::string filePath, const ShaderProfile profile);
+
+private:
+
+	static constexpr UINT codePage = CP_UTF8;
+
+	ComPtr<IDxcCompiler3> dxcCompiler;
+
+	ComPtr<IDxcUtils> dxcUtils;
+
+	ComPtr<IDxcIncludeHandler> dxcIncludeHanlder;
+	
+};
+
 class Shader
 {
 public:
 
+	//byte code
 	Shader(const BYTE* const bytes, const size_t byteSize);
 
-	Shader(const std::string filePath);
+	//cso
+	Shader(const std::string& filePath);
+
+	//hlsl
+	Shader(const std::string& filePath, const ShaderProfile profile);
 
 	D3D12_SHADER_BYTECODE getByteCode() const;
 
@@ -34,12 +78,18 @@ private:
 
 	D3D12_SHADER_BYTECODE shaderByteCode;
 
+	//read byte code from file
 	std::vector<BYTE> codes;
+
+	//compiled code from file
+	ComPtr<IDxcBlob> shaderBlob;
 
 	static void createGlobalShaders();
 
 	static void releaseGlobalShaders();
 
+	static DXCCompiler* dxcCompiler;
+	
 };
 
 
