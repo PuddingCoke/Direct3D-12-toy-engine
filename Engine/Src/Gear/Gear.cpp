@@ -7,7 +7,7 @@ Gear* Gear::get()
 	return instance;
 }
 
-int Gear::iniEngine(const Configuration config, const int argc, const char* argv[])
+int Gear::iniEngine(const Configuration& config, const int argc, const char* argv[])
 {
 #ifdef _DEBUG
 	std::cout << "[class Gear] debug build date:" << __TIMESTAMP__ << "\n";
@@ -235,7 +235,7 @@ Gear::~Gear()
 
 }
 
-void Gear::iniWindow(const std::wstring title, const UINT width, const UINT height)
+void Gear::iniWindow(const std::wstring& title, const UINT width, const UINT height)
 {
 	switch (usage)
 	{

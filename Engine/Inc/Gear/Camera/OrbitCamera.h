@@ -18,7 +18,7 @@ public:
 
 	void operator=(const OrbitCamera&) = delete;
 
-	OrbitCamera(const DirectX::XMVECTOR eye, const DirectX::XMVECTOR up, const float& zoomSpeed);
+	OrbitCamera(const DirectX::XMVECTOR& eye, const DirectX::XMVECTOR& up, const float zoomSpeed);
 
 	~OrbitCamera();
 

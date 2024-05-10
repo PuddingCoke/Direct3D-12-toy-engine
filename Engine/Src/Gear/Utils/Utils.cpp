@@ -30,11 +30,33 @@ std::string Utils::File::getParentFolder(const std::string& filePath)
 
 std::string Utils::File::getExtension(const std::string& filePath)
 {
-	size_t idx = filePath.find_last_of('.');
+	const size_t idx = filePath.find_last_of('.');
+
+    if (idx == std::string::npos)
+    {
+        return "";
+    }
+
 	return filePath.substr(idx + 1, filePath.size() - idx - 1);
 }
 
-const std::string& Utils::getRootFolder()
+std::string Utils::File::readAllText(const std::string& filePath)
+{
+    std::ifstream file(filePath);
+
+    if (!file.is_open())
+    {
+        throw "cannot open file";
+    }
+
+    std::stringstream stringStream;
+
+    stringStream << file.rdbuf();
+
+    return stringStream.str();
+}
+
+std::string Utils::getRootFolder()
 {
 	return exeRootPath;
 }

@@ -114,7 +114,7 @@ public:
 
 	void setVertexBuffers(const UINT startSlot, const std::initializer_list<VertexBufferDesc>& vertexBuffers);
 
-	void setIndexBuffer(const IndexBufferDesc indexBuffers);
+	void setIndexBuffer(const IndexBufferDesc& indexBuffers);
 
 	void setTopology(const D3D12_PRIMITIVE_TOPOLOGY topology) const;
 
@@ -132,13 +132,13 @@ public:
 
 	void setPipelineState(ID3D12PipelineState* const pipelineState) const;
 
-	void clearRenderTarget(const RenderTargetDesc desc, const FLOAT clearValue[4]) const;
+	void clearRenderTarget(const RenderTargetDesc& desc, const FLOAT clearValue[4]) const;
 
-	void clearDepthStencil(const DepthStencilDesc desc, const D3D12_CLEAR_FLAGS flags, const FLOAT depth, const UINT8 stencil) const;
+	void clearDepthStencil(const DepthStencilDesc& desc, const D3D12_CLEAR_FLAGS flags, const FLOAT depth, const UINT8 stencil) const;
 
-	void clearUnorderedAccess(const ClearUAVDesc desc, const FLOAT values[4]);
+	void clearUnorderedAccess(const ClearUAVDesc& desc, const FLOAT values[4]);
 
-	void clearUnorderedAccess(const ClearUAVDesc desc, const UINT values[4]);
+	void clearUnorderedAccess(const ClearUAVDesc& desc, const UINT values[4]);
 
 	void uavBarrier(const std::initializer_list<Resource*>& resources) const;
 

@@ -283,7 +283,7 @@ void GraphicsContext::setVertexBuffers(const UINT startSlot, const std::initiali
 	commandList->setVertexBuffers(startSlot, vertexBuffers);
 }
 
-void GraphicsContext::setIndexBuffer(const IndexBufferDesc indexBuffer)
+void GraphicsContext::setIndexBuffer(const IndexBufferDesc& indexBuffer)
 {
 	commandList->setIndexBuffer(indexBuffer);
 }
@@ -338,22 +338,22 @@ void GraphicsContext::setPipelineState(ID3D12PipelineState* const pipelineState)
 	commandList->get()->SetPipelineState(pipelineState);
 }
 
-void GraphicsContext::clearRenderTarget(const RenderTargetDesc desc, const FLOAT clearValue[4]) const
+void GraphicsContext::clearRenderTarget(const RenderTargetDesc& desc, const FLOAT clearValue[4]) const
 {
 	commandList->get()->ClearRenderTargetView(desc.rtvHandle, clearValue, 0, nullptr);
 }
 
-void GraphicsContext::clearDepthStencil(const DepthStencilDesc desc, const D3D12_CLEAR_FLAGS flags, const FLOAT depth, const UINT8 stencil) const
+void GraphicsContext::clearDepthStencil(const DepthStencilDesc& desc, const D3D12_CLEAR_FLAGS flags, const FLOAT depth, const UINT8 stencil) const
 {
 	commandList->get()->ClearDepthStencilView(desc.dsvHandle, flags, depth, stencil, 0, nullptr);
 }
 
-void GraphicsContext::clearUnorderedAccess(const ClearUAVDesc desc, const FLOAT values[4])
+void GraphicsContext::clearUnorderedAccess(const ClearUAVDesc& desc, const FLOAT values[4])
 {
 	commandList->clearUnorderedAccessView(desc, values);
 }
 
-void GraphicsContext::clearUnorderedAccess(const ClearUAVDesc desc, const UINT values[4])
+void GraphicsContext::clearUnorderedAccess(const ClearUAVDesc& desc, const UINT values[4])
 {
 	commandList->clearUnorderedAccessView(desc, values);
 }

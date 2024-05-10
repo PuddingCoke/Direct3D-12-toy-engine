@@ -1,6 +1,6 @@
 #include<Gear/Window/Win32Form.h>
 
-Win32Form::Win32Form(const std::wstring& title, const UINT& width, const UINT& height, const DWORD& windowStyle, LRESULT(*windowCallback)(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)):
+Win32Form::Win32Form(const std::wstring& title, const UINT width, const UINT height, const DWORD windowStyle, LRESULT(*windowCallback)(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)):
 	hwnd(nullptr), msg{}
 {
 	SetProcessDPIAware();

@@ -5,6 +5,8 @@
 
 #include<DirectXMath.h>
 
+#include<Gear/Core/Resource/EngineResource.h>
+
 #include"BottomLevelAS.h"
 
 struct GeometryInstance
@@ -18,11 +20,11 @@ struct GeometryInstance
 	UINT hitGroupIndex;
 };
 
-class TopLevelAS
+class TopLevelAS :public EngineResource
 {
 public:
 
-	TopLevelAS(const bool allowUpdate);
+	TopLevelAS(const bool allowUpdate, const bool persistent);
 
 	~TopLevelAS();
 
@@ -31,6 +33,8 @@ public:
 	void generateTLAS(CommandList* const commandList);
 
 	Buffer* getTLASBuffer() const;
+
+	ShaderResourceDesc getSRVIndex();
 
 private:
 
@@ -49,6 +53,10 @@ private:
 	Buffer* tlasBuffer;
 
 	UploadHeap* instanceBuffer;
+
+	UINT srvIndex;
+
+	const bool persistent;
 
 };
 

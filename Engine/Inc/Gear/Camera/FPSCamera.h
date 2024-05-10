@@ -22,7 +22,7 @@ public:
 
 	~FPSCamera();
 
-	void applyInput(const float& dt);
+	void applyInput(const float dt);
 
 private:
 

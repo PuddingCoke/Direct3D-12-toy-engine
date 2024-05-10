@@ -12,7 +12,6 @@
 #include<Windows.h>
 #include<dxgiformat.h>
 
-
 class Utils
 {
 public:
@@ -21,7 +20,7 @@ public:
 
 	Utils(const Utils&) = delete;
 
-	static const std::string& getRootFolder();
+	static std::string getRootFolder();
 	
 	static UINT getPixelSize(const DXGI_FORMAT format);
 
@@ -38,6 +37,9 @@ public:
 		static std::string getParentFolder(const std::string& filePath);
 
 		static std::string getExtension(const std::string& filePath);
+
+		static std::string readAllText(const std::string& filePath);
+
 	};
 
 private:
