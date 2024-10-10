@@ -14,48 +14,50 @@ public:
 
 	MyRenderPass() :
 		colorUpdateTimer(1.f),
-		fluidFinalPS(new Shader(Utils::getRootFolder() + "FluidFinalPS.cso")),
-		splatColorPS(new Shader(Utils::getRootFolder() + "SplatColorPS.cso")),
-		splatVelocityPS(new Shader(Utils::getRootFolder() + "SplatVelocityPS.cso")),
-		colorAdvectionDissipationPS(new Shader(Utils::getRootFolder() + "ColorAdvectionDissipation.cso")),
-		velocityAdvectionDissipationPS(new Shader(Utils::getRootFolder() + "VelocityAdvectionDissipation.cso")),
-		pressureDissipationPS(new Shader(Utils::getRootFolder() + "PressureDissipationPS.cso")),
-		curlPS(new Shader(Utils::getRootFolder() + "CurlPS.cso")),
-		divergencePS(new Shader(Utils::getRootFolder() + "DivergencePS.cso")),
-		pressureGradientSubtractPS(new Shader(Utils::getRootFolder() + "PressureGradientSubtractPS.cso")),
-		viscousDiffusionPS(new Shader(Utils::getRootFolder() + "ViscousDiffusionPS.cso")),
-		vorticityPS(new Shader(Utils::getRootFolder() + "VorticityPS.cso"))
+		splatVelocityCS(new Shader(Utils::getRootFolder() + "SplatVelocityCS.cso")),
+		splatColorCS(new Shader(Utils::getRootFolder() + "SplatColorCS.cso")),
+		divergenceCS(new Shader(Utils::getRootFolder() + "DivergenceCS.cso")),
+		pressureResetCS(new Shader(Utils::getRootFolder() + "PressureResetCS.cso")),
+		pressureCS(new Shader(Utils::getRootFolder() + "PressureCS.cso")),
+		gradientSubtractCS(new Shader(Utils::getRootFolder() + "GradientSubtractCS.cso")),
+		velocityAdvectionCS(new Shader(Utils::getRootFolder() + "VelocityAdvectionCS.cso")),
+		colorAdvectionCS(new Shader(Utils::getRootFolder() + "ColorAdvectionCS.cso")),
+		fluidFinalPS(new Shader(Utils::getRootFolder() + "FluidFinalPS.cso"))
 	{
-		begin();
-
-		effect = new BloomEffect(context, Graphics::getWidth(), Graphics::getHeight(), resManager);
-
-		end();
-
-		RenderEngine::get()->submitRenderPass(this);
-
-		effect->setThreshold(0.f);
-
 		const DirectX::XMUINT2 simRes =
 		{
 			Graphics::getWidth() / config.resolutionFactor,
 			Graphics::getHeight() / config.resolutionFactor
 		};
 
-		colorTex = new SwapTexture([=] {return ResourceManager::createTextureRenderView(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R16G16B16A16_FLOAT, 1, 1, false, true,
-			DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_R16G16B16A16_FLOAT); });
-
 		velocityTex = new SwapTexture([=] {return ResourceManager::createTextureRenderView(simRes.x, simRes.y, DXGI_FORMAT_R32G32_FLOAT, 1, 1, false, true,
-			DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_R32G32_FLOAT); });
+			DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_UNKNOWN); });
 
-		pressureTex = new SwapTexture([=] {return ResourceManager::createTextureRenderView(simRes.x, simRes.y, DXGI_FORMAT_R32_FLOAT, 1, 1, false, true,
-			DXGI_FORMAT_R32_FLOAT, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_R32_FLOAT); });
+		velocityTex->read()->getTexture()->getResource()->SetName(L"Velocity Texture (0)");
 
-		curlTex = ResourceManager::createTextureRenderView(simRes.x, simRes.y, DXGI_FORMAT_R32_FLOAT, 1, 1, false, true,
-			DXGI_FORMAT_R32_FLOAT, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_R32_FLOAT);
+		velocityTex->write()->getTexture()->getResource()->SetName(L"Velocity Texture (1)");
+
+		colorTex = new SwapTexture([=] {return ResourceManager::createTextureRenderView(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R16G16B16A16_FLOAT, 1, 1, false, true,
+			DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_UNKNOWN); });
+
+		colorTex->read()->getTexture()->getResource()->SetName(L"Color Texture (0)");
+
+		colorTex->write()->getTexture()->getResource()->SetName(L"Color Texture (1)");
 
 		divergenceTex = ResourceManager::createTextureRenderView(simRes.x, simRes.y, DXGI_FORMAT_R32_FLOAT, 1, 1, false, true,
-			DXGI_FORMAT_R32_FLOAT, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_R32_FLOAT);
+			DXGI_FORMAT_R32_FLOAT, DXGI_FORMAT_R32_FLOAT, DXGI_FORMAT_UNKNOWN);
+
+		divergenceTex->getTexture()->getResource()->SetName(L"Divergence Texture");
+
+		pressureTex = new SwapTexture([=] {return ResourceManager::createTextureRenderView(simRes.x, simRes.y, DXGI_FORMAT_R32_FLOAT, 1, 1, false, true,
+			DXGI_FORMAT_R32_FLOAT, DXGI_FORMAT_R32_FLOAT, DXGI_FORMAT_UNKNOWN); });
+
+		pressureTex->read()->getTexture()->getResource()->SetName(L"Pressure Texture (0)");
+
+		pressureTex->write()->getTexture()->getResource()->SetName(L"Pressure Texture (1)");
+
+		curlTex = ResourceManager::createTextureRenderView(simRes.x, simRes.y, DXGI_FORMAT_R32_FLOAT, 1, 1, false, true,
+			DXGI_FORMAT_R32_FLOAT, DXGI_FORMAT_R32_FLOAT, DXGI_FORMAT_UNKNOWN);
 
 		originTexture = ResourceManager::createTextureRenderView(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R16G16B16A16_FLOAT, 1, 1, false, true,
 			DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_R16G16B16A16_FLOAT);
@@ -71,6 +73,62 @@ public:
 		simulationParam.splatRadius = config.splatRadius / 100.f * Graphics::getAspectRatio();
 
 		{
+			D3D12_COMPUTE_PIPELINE_STATE_DESC desc = PipelineState::getDefaultComputeDesc();
+			desc.CS = splatVelocityCS->getByteCode();
+
+			GraphicsDevice::get()->CreateComputePipelineState(&desc, IID_PPV_ARGS(&splatVelocityState));
+		}
+
+		{
+			D3D12_COMPUTE_PIPELINE_STATE_DESC desc = PipelineState::getDefaultComputeDesc();
+			desc.CS = splatColorCS->getByteCode();
+
+			GraphicsDevice::get()->CreateComputePipelineState(&desc, IID_PPV_ARGS(&splatColorState));
+		}
+
+		{
+			D3D12_COMPUTE_PIPELINE_STATE_DESC desc = PipelineState::getDefaultComputeDesc();
+			desc.CS = divergenceCS->getByteCode();
+
+			GraphicsDevice::get()->CreateComputePipelineState(&desc, IID_PPV_ARGS(&divergenceState));
+		}
+
+		{
+			D3D12_COMPUTE_PIPELINE_STATE_DESC desc = PipelineState::getDefaultComputeDesc();
+			desc.CS = pressureResetCS->getByteCode();
+
+			GraphicsDevice::get()->CreateComputePipelineState(&desc, IID_PPV_ARGS(&pressureResetState));
+		}
+
+		{
+			D3D12_COMPUTE_PIPELINE_STATE_DESC desc = PipelineState::getDefaultComputeDesc();
+			desc.CS = pressureCS->getByteCode();
+
+			GraphicsDevice::get()->CreateComputePipelineState(&desc, IID_PPV_ARGS(&pressureState));
+		}
+
+		{
+			D3D12_COMPUTE_PIPELINE_STATE_DESC desc = PipelineState::getDefaultComputeDesc();
+			desc.CS = gradientSubtractCS->getByteCode();
+
+			GraphicsDevice::get()->CreateComputePipelineState(&desc, IID_PPV_ARGS(&gradientSubtractState));
+		}
+
+		{
+			D3D12_COMPUTE_PIPELINE_STATE_DESC desc = PipelineState::getDefaultComputeDesc();
+			desc.CS = velocityAdvectionCS->getByteCode();
+
+			GraphicsDevice::get()->CreateComputePipelineState(&desc, IID_PPV_ARGS(&velocityAdvectionState));
+		}
+
+		{
+			D3D12_COMPUTE_PIPELINE_STATE_DESC desc = PipelineState::getDefaultComputeDesc();
+			desc.CS = colorAdvectionCS->getByteCode();
+
+			GraphicsDevice::get()->CreateComputePipelineState(&desc, IID_PPV_ARGS(&colorAdvectionState));
+		}
+
+		{
 			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = getDefaultGraphicsPipelineDesc();
 			desc.PS = fluidFinalPS->getByteCode();
 			desc.RTVFormats[0] = originTexture->getTexture()->getFormat();
@@ -80,91 +138,21 @@ public:
 
 		{
 			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = getDefaultGraphicsPipelineDesc();
-			desc.PS = splatColorPS->getByteCode();
-			desc.RTVFormats[0] = colorTex->read()->getTexture()->getFormat();
-
-			GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&splatColorState));
-		}
-
-		{
-			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = getDefaultGraphicsPipelineDesc();
-			desc.PS = splatVelocityPS->getByteCode();
-			desc.RTVFormats[0] = velocityTex->read()->getTexture()->getFormat();
-
-			GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&splatVelocityState));
-		}
-
-		{
-			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = getDefaultGraphicsPipelineDesc();
-			desc.PS = colorAdvectionDissipationPS->getByteCode();
-			desc.RTVFormats[0] = colorTex->read()->getTexture()->getFormat();
-
-			GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&colorAdvectionDissipationState));
-		}
-
-		{
-			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = getDefaultGraphicsPipelineDesc();
-			desc.PS = velocityAdvectionDissipationPS->getByteCode();
-			desc.RTVFormats[0] = velocityTex->read()->getTexture()->getFormat();
-
-			GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&velocityAdvectionDissipationState));
-		}
-
-		{
-			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = getDefaultGraphicsPipelineDesc();
-			desc.PS = pressureDissipationPS->getByteCode();
-			desc.RTVFormats[0] = pressureTex->read()->getTexture()->getFormat();
-
-			GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&pressureDissipationState));
-		}
-
-		{
-			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = getDefaultGraphicsPipelineDesc();
-			desc.PS = curlPS->getByteCode();
-			desc.RTVFormats[0] = curlTex->getTexture()->getFormat();
-
-			GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&curlState));
-		}
-
-		{
-			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = getDefaultGraphicsPipelineDesc();
-			desc.PS = divergencePS->getByteCode();
-			desc.RTVFormats[0] = divergenceTex->getTexture()->getFormat();
-
-			GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&divergenceState));
-		}
-
-		{
-			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = getDefaultGraphicsPipelineDesc();
-			desc.PS = pressureGradientSubtractPS->getByteCode();
-			desc.RTVFormats[0] = velocityTex->read()->getTexture()->getFormat();
-
-			GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&pressureGradientSubtractState));
-		}
-
-		{
-			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = getDefaultGraphicsPipelineDesc();
-			desc.PS = viscousDiffusionPS->getByteCode();
-			desc.RTVFormats[0] = pressureTex->read()->getTexture()->getFormat();
-
-			GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&viscousDiffusionState));
-		}
-
-		{
-			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = getDefaultGraphicsPipelineDesc();
-			desc.PS = vorticityPS->getByteCode();
-			desc.RTVFormats[0] = velocityTex->read()->getTexture()->getFormat();
-
-			GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&vorticityState));
-		}
-
-		{
-			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = getDefaultGraphicsPipelineDesc();
 			desc.PS = Shader::fullScreenPS->getByteCode();
 			desc.RTVFormats[0] = Graphics::BackBufferFormat;
 
 			GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&fullScreenState));
 		}
+
+		begin();
+
+		effect = new BloomEffect(context, Graphics::getWidth(), Graphics::getHeight(), resManager);
+
+		end();
+
+		RenderEngine::get()->submitRenderPass(this);
+
+		effect->setThreshold(0.f);
 	}
 
 	//just configure
@@ -188,6 +176,8 @@ public:
 		return desc;
 	}
 
+	UINT countA = 0;
+
 	~MyRenderPass()
 	{
 		delete effect;
@@ -201,17 +191,15 @@ public:
 
 		delete simulationParamBuffer;
 
+		delete splatVelocityCS;
+		delete splatColorCS;
+		delete divergenceCS;
+		delete pressureResetCS;
+		delete pressureCS;
+		delete gradientSubtractCS;
+		delete velocityAdvectionCS;
+		delete colorAdvectionCS;
 		delete fluidFinalPS;
-		delete splatColorPS;
-		delete splatVelocityPS;
-		delete colorAdvectionDissipationPS;
-		delete velocityAdvectionDissipationPS;
-		delete pressureDissipationPS;
-		delete curlPS;
-		delete divergencePS;
-		delete pressureGradientSubtractPS;
-		delete viscousDiffusionPS;
-		delete vorticityPS;
 	}
 
 	void recordCommand() override
@@ -244,87 +232,67 @@ public:
 
 		if (Mouse::onMove() && Mouse::getLeftDown())
 		{
-			context->setViewport(velocityTex->width, velocityTex->height);
-			context->setScissorRect(0, 0, velocityTex->width, velocityTex->height);
 			context->setPipelineState(splatVelocityState.Get());
-			context->setRenderTargets({ velocityTex->write()->getRTVMipHandle(0) }, {});
-			context->setPSConstants({ velocityTex->read()->getAllSRVIndex() }, 0);
+			context->setCSConstants({ velocityTex->read()->getAllSRVIndex(),velocityTex->write()->getUAVMipIndex(0) }, 0);
 			context->transitionResources();
-			context->draw(3, 1, 0, 0);
+			context->dispatch(velocityTex->width / 16, velocityTex->height / 9, 1);
+			context->uavBarrier({ velocityTex->write()->getTexture() });
 			velocityTex->swap();
 
-			context->setViewport(colorTex->width, colorTex->height);
-			context->setScissorRect(0, 0, colorTex->width, colorTex->height);
 			context->setPipelineState(splatColorState.Get());
-			context->setRenderTargets({ colorTex->write()->getRTVMipHandle(0) }, {});
-			context->setPSConstants({ colorTex->read()->getAllSRVIndex() }, 0);
+			context->setCSConstants({ colorTex->read()->getAllSRVIndex(),colorTex->write()->getUAVMipIndex(0) }, 0);
 			context->transitionResources();
-			context->draw(3, 1, 0, 0);
+			context->dispatch(colorTex->width / 16, colorTex->height / 9, 1);
+			context->uavBarrier({ colorTex->write()->getTexture() });
 			colorTex->swap();
 		}
 
-		context->setViewport(velocityTex->width, velocityTex->height);
-		context->setScissorRect(0, 0, velocityTex->width, velocityTex->height);
-
-		context->setPipelineState(curlState.Get());
-		context->setRenderTargets({ curlTex->getRTVMipHandle(0) }, {});
-		context->setPSConstants({ velocityTex->read()->getAllSRVIndex() }, 0);
-		context->transitionResources();
-		context->draw(3, 1, 0, 0);
-
-		context->setPipelineState(vorticityState.Get());
-		context->setRenderTargets({ velocityTex->write()->getRTVMipHandle(0) }, {});
-		context->setPSConstants({ velocityTex->read()->getAllSRVIndex(),curlTex->getAllSRVIndex() }, 0);
-		context->transitionResources();
-		context->draw(3, 1, 0, 0);
-		velocityTex->swap();
-
 		context->setPipelineState(divergenceState.Get());
-		context->setRenderTargets({ divergenceTex->getRTVMipHandle(0) }, {});
-		context->setPSConstants({ velocityTex->read()->getAllSRVIndex() }, 0);
+		context->setCSConstants({ velocityTex->read()->getAllSRVIndex(),divergenceTex->getUAVMipIndex(0) }, 0);
 		context->transitionResources();
-		context->draw(3, 1, 0, 0);
+		context->dispatch(divergenceTex->getTexture()->getWidth() / 16, divergenceTex->getTexture()->getHeight() / 9, 1);
+		context->uavBarrier({ divergenceTex->getTexture() });
 
-		context->setPipelineState(pressureDissipationState.Get());
-		context->setRenderTargets({ pressureTex->write()->getRTVMipHandle(0) }, {});
-		context->setPSConstants({ pressureTex->read()->getAllSRVIndex() }, 0);
+		context->setPipelineState(pressureResetState.Get());
+		context->setCSConstants({ pressureTex->write()->getUAVMipIndex(0) }, 0);
 		context->transitionResources();
-		context->draw(3, 1, 0, 0);
+		context->dispatch(pressureTex->width / 16, pressureTex->height / 9, 1);
+		context->uavBarrier({ pressureTex->read()->getTexture() });
 		pressureTex->swap();
 
-		context->setPipelineState(viscousDiffusionState.Get());
+		context->setPipelineState(pressureState.Get());
 		for (UINT i = 0; i < config.pressureIteraion; i++)
 		{
-			context->setRenderTargets({ pressureTex->write()->getRTVMipHandle(0) }, {});
-			context->setPSConstants({ pressureTex->read()->getAllSRVIndex(),divergenceTex->getAllSRVIndex() }, 0);
+			context->setCSConstants({ divergenceTex->getAllSRVIndex(),pressureTex->read()->getAllSRVIndex(),pressureTex->write()->getUAVMipIndex(0) }, 0);
 			context->transitionResources();
-			context->draw(3, 1, 0, 0);
+			context->dispatch(pressureTex->width / 16, pressureTex->height / 9, 1);
+			context->uavBarrier({ pressureTex->write()->getTexture() });
 			pressureTex->swap();
 		}
 
-		context->setPipelineState(pressureGradientSubtractState.Get());
-		context->setRenderTargets({ velocityTex->write()->getRTVMipHandle(0) }, {});
-		context->setPSConstants({ pressureTex->read()->getAllSRVIndex(),velocityTex->read()->getAllSRVIndex() }, 0);
+		context->setPipelineState(gradientSubtractState.Get());
+		context->setCSConstants({ pressureTex->read()->getAllSRVIndex(),velocityTex->read()->getAllSRVIndex(),velocityTex->write()->getUAVMipIndex(0) }, 0);
 		context->transitionResources();
-		context->draw(3, 1, 0, 0);
+		context->dispatch(velocityTex->width / 16, velocityTex->height / 9, 1);
+		context->uavBarrier({ velocityTex->write()->getTexture() });
 		velocityTex->swap();
 
-		context->setPipelineState(velocityAdvectionDissipationState.Get());
-		context->setRenderTargets({ velocityTex->write()->getRTVMipHandle(0) }, {});
-		context->setPSConstants({ velocityTex->read()->getAllSRVIndex() }, 0);
+		context->setPipelineState(velocityAdvectionState.Get());
+		context->setCSConstants({ velocityTex->read()->getAllSRVIndex(),velocityTex->write()->getUAVMipIndex(0) }, 0);
 		context->transitionResources();
-		context->draw(3, 1, 0, 0);
+		context->dispatch(velocityTex->width / 16, velocityTex->height / 9, 1);
+		context->uavBarrier({ velocityTex->write()->getTexture() });
 		velocityTex->swap();
+
+		context->setPipelineState(colorAdvectionState.Get());
+		context->setCSConstants({ velocityTex->read()->getAllSRVIndex(),colorTex->read()->getAllSRVIndex(),colorTex->write()->getUAVMipIndex(0) }, 0);
+		context->transitionResources();
+		context->dispatch(colorTex->width / 16, colorTex->height / 9, 1);
+		context->uavBarrier({ colorTex->write()->getTexture() });
+		colorTex->swap();
 
 		context->setViewport(colorTex->width, colorTex->height);
 		context->setScissorRect(0, 0, colorTex->width, colorTex->height);
-
-		context->setPipelineState(colorAdvectionDissipationState.Get());
-		context->setRenderTargets({ colorTex->write()->getRTVMipHandle(0) }, {});
-		context->setPSConstants({ velocityTex->read()->getAllSRVIndex(),colorTex->read()->getAllSRVIndex() }, 0);
-		context->transitionResources();
-		context->draw(3, 1, 0, 0);
-		colorTex->swap();
 
 		context->setPipelineState(fluidFinalState.Get());
 		context->setRenderTargets({ originTexture->getRTVMipHandle(0) }, {});
@@ -361,8 +329,8 @@ private:
 	struct Config
 	{
 		float colorChangeSpeed = 10.f;//颜色改变速度
-		float colorDissipationSpeed = 1.f;//颜色消散速度
-		float velocityDissipationSpeed = 0.2f;//速度消散速度
+		float colorDissipationSpeed = 0.5f;//颜色消散速度
+		float velocityDissipationSpeed = 0.00f;//速度消散速度
 		float pressureDissipationSpeed = 0.25f;//压力消散速度
 		float curlIntensity = 80.f;//涡流强度
 		float splatRadius = 0.25f;//施加颜色的半径
@@ -390,49 +358,42 @@ private:
 
 	Timer colorUpdateTimer;
 
+	Shader* splatVelocityCS;
+
+	ComPtr<ID3D12PipelineState> splatVelocityState;
+
+	Shader* splatColorCS;
+
+	ComPtr<ID3D12PipelineState> splatColorState;
+
+	Shader* divergenceCS;
+
+	ComPtr<ID3D12PipelineState> divergenceState;
+
+	Shader* pressureResetCS;
+
+	ComPtr<ID3D12PipelineState> pressureResetState;
+
+	Shader* pressureCS;
+
+	ComPtr<ID3D12PipelineState> pressureState;
+
+	Shader* gradientSubtractCS;
+
+	ComPtr<ID3D12PipelineState> gradientSubtractState;
+
+	Shader* velocityAdvectionCS;
+
+	ComPtr<ID3D12PipelineState> velocityAdvectionState;
+
+	Shader* colorAdvectionCS;
+
+	ComPtr<ID3D12PipelineState> colorAdvectionState;
+
 	Shader* fluidFinalPS;
 
 	ComPtr<ID3D12PipelineState> fluidFinalState;
 
-	Shader* splatColorPS;
-
-	ComPtr<ID3D12PipelineState> splatColorState;
-
-	Shader* splatVelocityPS;
-
-	ComPtr<ID3D12PipelineState> splatVelocityState;
-
-	Shader* colorAdvectionDissipationPS;
-
-	ComPtr<ID3D12PipelineState> colorAdvectionDissipationState;
-
-	Shader* velocityAdvectionDissipationPS;
-
-	ComPtr<ID3D12PipelineState> velocityAdvectionDissipationState;
-
-	Shader* pressureDissipationPS;
-
-	ComPtr<ID3D12PipelineState> pressureDissipationState;
-
-	Shader* curlPS;
-
-	ComPtr<ID3D12PipelineState> curlState;
-
-	Shader* divergencePS;
-
-	ComPtr<ID3D12PipelineState> divergenceState;
-
-	Shader* pressureGradientSubtractPS;
-
-	ComPtr<ID3D12PipelineState> pressureGradientSubtractState;
-
-	Shader* viscousDiffusionPS;
-
-	ComPtr<ID3D12PipelineState> viscousDiffusionState;
-
-	Shader* vorticityPS;
-
-	ComPtr<ID3D12PipelineState> vorticityState;
-
 	ComPtr<ID3D12PipelineState> fullScreenState;
+
 };

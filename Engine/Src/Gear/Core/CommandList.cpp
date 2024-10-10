@@ -355,7 +355,16 @@ void CommandList::clearUnorderedAccessView(const ClearUAVDesc& desc, const float
 
 	transitionResources();
 
+	D3D12_RESOURCE_BARRIER barrier = {};
+	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_UAV;
+	barrier.UAV.pResource = resource;
+
+	commandList->ResourceBarrier(1, &barrier);
+
 	commandList->ClearUnorderedAccessViewFloat(desc.viewGPUHandle, desc.viewCPUHandle, resource, values, 0, nullptr);
+
+	commandList->ResourceBarrier(1, &barrier);
 }
 
 void CommandList::clearUnorderedAccessView(const ClearUAVDesc& desc, const UINT values[4])

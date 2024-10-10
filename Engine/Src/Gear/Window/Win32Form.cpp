@@ -40,6 +40,7 @@ bool Win32Form::pollEvents()
 	if (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
 	{
 		TranslateMessage(&msg);
+
 		DispatchMessage(&msg);
 	}
 	

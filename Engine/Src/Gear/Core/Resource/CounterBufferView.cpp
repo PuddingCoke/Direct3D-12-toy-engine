@@ -1,7 +1,7 @@
 #include<Gear/Core/Resource/CounterBufferView.h>
 
 CounterBufferView::CounterBufferView(const bool persistent) :
-	buffer(new Buffer(4, true, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS)), srvIndex(0), uavIndex(0), viewGPUHandle(), viewCPUHandle()
+	EngineResource(persistent), buffer(new Buffer(4, true, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS)), srvIndex(0), uavIndex(0), viewGPUHandle(), viewCPUHandle()
 {
 	numSRVUAVCBVDescriptors = 2;
 
@@ -9,11 +9,11 @@ CounterBufferView::CounterBufferView(const bool persistent) :
 
 	if (persistent)
 	{
-		descriptorHandle = GlobalDescriptorHeap::getResourceHeap()->allocStaticDescriptor(2);
+		descriptorHandle = GlobalDescriptorHeap::getResourceHeap()->allocStaticDescriptor(numSRVUAVCBVDescriptors);
 	}
 	else
 	{
-		descriptorHandle = GlobalDescriptorHeap::getNonShaderVisibleResourceHeap()->allocDynamicDescriptor(2);
+		descriptorHandle = GlobalDescriptorHeap::getNonShaderVisibleResourceHeap()->allocDynamicDescriptor(numSRVUAVCBVDescriptors);
 	}
 
 	srvUAVCBVHandleStart = descriptorHandle.getCPUHandle();
@@ -108,9 +108,7 @@ ClearUAVDesc CounterBufferView::getClearUAVDesc() const
 
 void CounterBufferView::copyDescriptors()
 {
-	DescriptorHandle shaderVisibleHandle = GlobalDescriptorHeap::getResourceHeap()->allocDynamicDescriptor(numSRVUAVCBVDescriptors);
-
-	GraphicsDevice::get()->CopyDescriptorsSimple(numSRVUAVCBVDescriptors, shaderVisibleHandle.getCPUHandle(), srvUAVCBVHandleStart, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	DescriptorHandle shaderVisibleHandle = getTransientDescriptorHandle();
 
 	srvIndex = shaderVisibleHandle.getCurrentIndex();
 

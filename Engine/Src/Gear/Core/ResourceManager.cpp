@@ -424,13 +424,8 @@ BufferView* ResourceManager::createStructuredBufferView(const UINT structureByte
 	return new BufferView(buffer, structureByteStride, DXGI_FORMAT_UNKNOWN, size, createSRV, createUAV, createVBV, false, cpuWritable, persistent);
 }
 
-BufferView* ResourceManager::createByteAddressBufferView(const UINT size, const bool createSRV, const bool createUAV, const bool createVBV, const bool createIBV, const bool cpuWritable, const bool persistent, const void* const data)
+BufferView* ResourceManager::createByteAddressBufferView(const UINT size, const bool createSRV, const bool createUAV, const bool cpuWritable, const bool persistent, const void* const data)
 {
-	if (createVBV && createIBV)
-	{
-		throw "a buffer cannot be used as VBV and IBV at the same time";
-	}
-
 	D3D12_RESOURCE_FLAGS resFlags = D3D12_RESOURCE_FLAG_NONE;
 
 	if (createUAV)
@@ -449,16 +444,6 @@ BufferView* ResourceManager::createByteAddressBufferView(const UINT size, const 
 			finalState |= D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE;
 		}
 
-		if (createVBV)
-		{
-			finalState |= D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER;
-		}
-
-		if (createIBV)
-		{
-			finalState |= D3D12_RESOURCE_STATE_INDEX_BUFFER;
-		}
-
 		commandList->pushResourceTrackList(buffer);
 
 		buffer->setState(finalState);
@@ -468,10 +453,10 @@ BufferView* ResourceManager::createByteAddressBufferView(const UINT size, const 
 		buffer->setStateTracking(false);
 	}
 
-	return new BufferView(buffer, 0, DXGI_FORMAT_UNKNOWN, size, createSRV, createUAV, createVBV, createIBV, cpuWritable, persistent);
+	return new BufferView(buffer, 0, DXGI_FORMAT_UNKNOWN, size, createSRV, createUAV, false, false, cpuWritable, persistent);
 }
 
-BufferView* ResourceManager::createByteAddressBufferView(const UINT size, const bool createSRV, const bool createUAV, const bool createVBV, const bool createIBV, const bool cpuWritable, const bool persistent)
+BufferView* ResourceManager::createByteAddressBufferView(const UINT size, const bool createSRV, const bool createUAV, const bool cpuWritable, const bool persistent)
 {
 	D3D12_RESOURCE_FLAGS resFlags = D3D12_RESOURCE_FLAG_NONE;
 
@@ -482,7 +467,7 @@ BufferView* ResourceManager::createByteAddressBufferView(const UINT size, const 
 
 	Buffer* const buffer = new Buffer(size, true, resFlags);
 
-	return new BufferView(buffer, 0, DXGI_FORMAT_UNKNOWN, size, createSRV, createUAV, createVBV, createIBV, cpuWritable, persistent);
+	return new BufferView(buffer, 0, DXGI_FORMAT_UNKNOWN, size, createSRV, createUAV, false, false, cpuWritable, persistent);
 }
 
 IndexConstantBuffer* ResourceManager::createIndexConstantBuffer(const std::initializer_list<ShaderResourceDesc>& descs, const bool cpuWritable, const bool persistent)

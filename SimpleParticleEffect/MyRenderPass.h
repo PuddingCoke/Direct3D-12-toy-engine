@@ -16,13 +16,13 @@ public:
 
 	MyRenderPass()
 	{
-		particleVS = new Shader(Utils::getRootFolder() + "ParticleVS.cso");
+		particleVS = new Shader("ParticleVS.hlsl", ShaderProfile::VERTEX);
 
-		particleGS = new Shader(Utils::getRootFolder() + "ParticleGS.cso");
+		particleGS = new Shader("ParticleGS.hlsl", ShaderProfile::GEOMETRY);
 
 		particlePS = new Shader("ParticlePS.hlsl", ShaderProfile::PIXEL);
 
-		particleCS = new Shader(Utils::getRootFolder() + "ParticleCS.cso");
+		particleCS = new Shader("ParticleCS.hlsl", ShaderProfile::COMPUTE);
 
 		{
 			D3D12_COMPUTE_PIPELINE_STATE_DESC desc = PipelineState::getDefaultComputeDesc();
@@ -103,7 +103,7 @@ public:
 
 		bloomEffect->setThreshold(1.0f);
 
-		simulationParam = { 0.18f,8 };
+		simulationParam = { 0.18f,4 };
 	}
 
 	~MyRenderPass()
@@ -131,7 +131,7 @@ public:
 
 		ImGui::SliderFloat("Dissipative Factor", &simulationParam.dissipativeFactor, 0.f, 0.2f);
 
-		ImGui::SliderInt("Simulation Steps", &simulationParam.simulationSteps, 6, 10);
+		ImGui::SliderInt("Simulation Steps", &simulationParam.simulationSteps, 1, 8);
 
 		ImGui::End();
 

@@ -3,7 +3,7 @@
 ConstantBufferPool* ConstantBuffer::bufferPools[3] = { nullptr,nullptr,nullptr };
 
 ConstantBuffer::ConstantBuffer(Buffer* const buffer, const UINT size, const bool persistent) :
-	buffer(buffer)
+	EngineResource(persistent), buffer(buffer)
 {
 	if (size % 256 != 0)
 	{

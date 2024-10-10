@@ -1,7 +1,7 @@
 #include<Gear/Core/Resource/TextureDepthView.h>
 
 TextureDepthView::TextureDepthView(Texture* const texture, const bool isTextureCube, const bool persistent) :
-	texture(texture), dsvMipHandleStart()
+	EngineResource(persistent), texture(texture), dsvMipHandleStart(), allDepthIndex(0), allStencilIndex(0), depthMipIndexStart(0), stencilMipIndexStart(0)
 {
 	const UINT mipLevels = texture->getMipLevels();
 	const UINT arraySize = texture->getArraySize();
@@ -94,7 +94,7 @@ TextureDepthView::TextureDepthView(Texture* const texture, const bool isTextureC
 
 	numSRVUAVCBVDescriptors = (static_cast<UINT>((stencilSRVFormat != DXGI_FORMAT_UNKNOWN)) + static_cast<UINT>((depthSRVFormat != DXGI_FORMAT_UNKNOWN))) * (1 + mipLevels);
 
-	if(numSRVUAVCBVDescriptors)
+	if (numSRVUAVCBVDescriptors)
 	{
 		DescriptorHandle descriptorHandle = DescriptorHandle();
 
@@ -416,6 +416,7 @@ TextureDepthView::TextureDepthView(Texture* const texture, const bool isTextureC
 }
 
 TextureDepthView::TextureDepthView(const TextureDepthView& tdv) :
+	EngineResource(tdv.persistent),
 	allDepthIndex(tdv.allDepthIndex),
 	allStencilIndex(tdv.allStencilIndex),
 	depthMipIndexStart(tdv.depthMipIndexStart),
@@ -498,9 +499,7 @@ Texture* TextureDepthView::getTexture() const
 
 void TextureDepthView::copyDescriptors()
 {
-	const DescriptorHandle handle = GlobalDescriptorHeap::getResourceHeap()->allocDynamicDescriptor(numSRVUAVCBVDescriptors);
-
-	GraphicsDevice::get()->CopyDescriptorsSimple(numSRVUAVCBVDescriptors, handle.getCPUHandle(), srvUAVCBVHandleStart, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	const DescriptorHandle handle = getTransientDescriptorHandle();
 
 	allDepthIndex = handle.getCurrentIndex();
 

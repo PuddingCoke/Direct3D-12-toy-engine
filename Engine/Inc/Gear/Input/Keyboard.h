@@ -126,6 +126,7 @@ public:
 
 	static bool getKeyDown(const Key key);
 
+	//trigger once
 	static bool onKeyDown(const Key key);
 
 	//do not record command here
@@ -150,7 +151,6 @@ private:
 
 	static std::unordered_map<Key, bool> keyDownMap;
 
-	//trigger once
 	static std::unordered_map<Key, bool> onKeyDownMap;
 
 };
