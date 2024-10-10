@@ -9,20 +9,23 @@ class EngineResource
 {
 public:
 
-	EngineResource();
+	EngineResource(const bool persistent);
 
 	virtual ~EngineResource();
 
 	virtual void copyDescriptors();
 
+	bool getPersistent();
+
 protected:
 
-	//use by non persistent resource only
+	//copy non shader visible resource heap to shader visible resource heap
+	DescriptorHandle getTransientDescriptorHandle() const;
 
-	//descriptor handle in non shader visible resource heap
+	const bool persistent;
+
 	D3D12_CPU_DESCRIPTOR_HANDLE srvUAVCBVHandleStart;
 
-	//number of descriptors allocated from non shader visible resource heap
 	UINT numSRVUAVCBVDescriptors;
 
 };

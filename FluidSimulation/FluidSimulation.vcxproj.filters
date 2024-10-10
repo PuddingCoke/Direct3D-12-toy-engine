@@ -28,16 +28,17 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="ColorAdvectionDissipation.hlsl" />
-    <FxCompile Include="CurlPS.hlsl" />
-    <FxCompile Include="DivergencePS.hlsl" />
     <FxCompile Include="FluidFinalPS.hlsl" />
-    <FxCompile Include="PressureDissipationPS.hlsl" />
-    <FxCompile Include="PressureGradientSubtractPS.hlsl" />
-    <FxCompile Include="SplatColorPS.hlsl" />
-    <FxCompile Include="SplatVelocityPS.hlsl" />
-    <FxCompile Include="VelocityAdvectionDissipation.hlsl" />
-    <FxCompile Include="ViscousDiffusionPS.hlsl" />
-    <FxCompile Include="VorticityPS.hlsl" />
+    <FxCompile Include="DivergenceCS.hlsl" />
+    <FxCompile Include="PressureCS.hlsl" />
+    <FxCompile Include="PressureResetCS.hlsl" />
+    <FxCompile Include="SplatColorCS.hlsl" />
+    <FxCompile Include="SplatVelocityCS.hlsl" />
+    <FxCompile Include="GradientSubtractCS.hlsl" />
+    <FxCompile Include="VelocityAdvectionCS.hlsl" />
+    <FxCompile Include="ColorAdvectionCS.hlsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Utility.hlsli" />
   </ItemGroup>
 </Project>

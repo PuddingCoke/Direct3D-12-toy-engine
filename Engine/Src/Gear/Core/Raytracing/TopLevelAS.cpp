@@ -1,11 +1,11 @@
 #include<Gear/Core/Raytracing/TopLevelAS.h>
 
 TopLevelAS::TopLevelAS(const bool allowUpdate, const bool persistent) :
+	EngineResource(persistent),
 	scratchBufferSize(0), tlasBufferSize(0), instanceBufferSize(0), scratchBuffer(nullptr), tlasBuffer(nullptr), instanceBuffer(nullptr),
 	buildFlag(allowUpdate ? D3D12_RAYTRACING_ACCELERATION_STRUCTURE_BUILD_FLAG_ALLOW_UPDATE
 		: D3D12_RAYTRACING_ACCELERATION_STRUCTURE_BUILD_FLAG_NONE),
 	persistent(persistent)
-
 {
 }
 

@@ -28,9 +28,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="ParticleVS.hlsl" />
-    <FxCompile Include="ParticlePS.hlsl" />
-    <FxCompile Include="ParticleCS.hlsl" />
-    <FxCompile Include="ParticleGS.hlsl" />
+    <None Include="Common.hlsli" />
   </ItemGroup>
 </Project>

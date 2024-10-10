@@ -33,7 +33,11 @@ PixelOutput main(PixelInput input)
 {
     float4 baseColor = tDiffuse.Sample(linearWrapSampler, input.uv);
     
-    clip(baseColor.a - 0.9);
+    float dist = distance(perframeResource.eyePos.xyz, input.pos.xyz);
+    
+    float alphaBlendFactor = 1.0 - pow(dist / 512.0, 0.4);
+    
+    clip(baseColor.a - alphaBlendFactor);
     
     float3 N = normalize(input.normal);
     float3 B = normalize(input.binormal);

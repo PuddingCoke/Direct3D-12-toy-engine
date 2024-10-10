@@ -1,7 +1,7 @@
 #include<Gear/Core/Resource/BufferView.h>
 
 BufferView::BufferView(Buffer* const buffer, const UINT structureByteStride, const DXGI_FORMAT format, const UINT size, const bool createSRV, const bool createUAV, const bool createVBV, const bool createIBV, const bool cpuWritable, const bool persistent) :
-	buffer(buffer), counterBuffer(nullptr), srvIndex(0), uavIndex(0), uploadHeaps(nullptr), uploadHeapIndex(0), hasSRV(createSRV), hasUAV(createUAV), viewCPUHandle(), viewGPUHandle()
+	EngineResource(persistent), buffer(buffer), counterBuffer(nullptr), vbv{}, srvIndex(0), uavIndex(0), uploadHeaps(nullptr), uploadHeapIndex(0), hasSRV(createSRV), hasUAV(createUAV), viewCPUHandle(), viewGPUHandle()
 {
 	numSRVUAVCBVDescriptors = static_cast<UINT>(createSRV) + static_cast<UINT>(createUAV);
 
@@ -240,9 +240,7 @@ Buffer* BufferView::getBuffer() const
 
 void BufferView::copyDescriptors()
 {
-	DescriptorHandle shaderVisibleHandle = GlobalDescriptorHeap::getResourceHeap()->allocDynamicDescriptor(numSRVUAVCBVDescriptors);
-
-	GraphicsDevice::get()->CopyDescriptorsSimple(numSRVUAVCBVDescriptors, shaderVisibleHandle.getCPUHandle(), srvUAVCBVHandleStart, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	DescriptorHandle shaderVisibleHandle = getTransientDescriptorHandle();
 
 	if (hasSRV)
 	{

@@ -7,7 +7,7 @@
 
 #include<functional>
 
-class SwapTexture :public EngineResource
+class SwapTexture
 {
 private:
 

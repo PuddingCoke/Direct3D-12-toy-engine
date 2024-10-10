@@ -1,7 +1,7 @@
 #include<Gear/Core/Resource/TextureRenderView.h>
 
 TextureRenderView::TextureRenderView(Texture* const texture, const bool isTextureCube, const bool persistent, const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat) :
-	texture(texture), hasRTV((rtvFormat != DXGI_FORMAT_UNKNOWN)), hasUAV((uavFormat != DXGI_FORMAT_UNKNOWN)), rtvMipHandleStart(), viewGPUHandleStart(), viewCPUHandleStart()
+	EngineResource(persistent), texture(texture), hasRTV((rtvFormat != DXGI_FORMAT_UNKNOWN)), hasUAV((uavFormat != DXGI_FORMAT_UNKNOWN)), rtvMipHandleStart(), viewGPUHandleStart(), viewCPUHandleStart()
 {
 	//create srv uav descriptors
 	{
@@ -217,6 +217,7 @@ TextureRenderView::TextureRenderView(Texture* const texture, const bool isTextur
 
 					if (persistent)
 					{
+						//create uav to non shader visible heap at the same time
 						GraphicsDevice::get()->CreateUnorderedAccessView(texture->getResource(), nullptr, &desc, nonShaderVisibleHandle.getCPUHandle());
 
 						nonShaderVisibleHandle.move();
@@ -239,6 +240,7 @@ TextureRenderView::TextureRenderView(Texture* const texture, const bool isTextur
 
 					if (persistent)
 					{
+						//create uav to non shader visible heap at the same time
 						GraphicsDevice::get()->CreateUnorderedAccessView(texture->getResource(), nullptr, &desc, nonShaderVisibleHandle.getCPUHandle());
 
 						nonShaderVisibleHandle.move();
@@ -300,6 +302,7 @@ TextureRenderView::TextureRenderView(Texture* const texture, const bool isTextur
 }
 
 TextureRenderView::TextureRenderView(const TextureRenderView& trv) :
+	EngineResource(trv.persistent),
 	hasRTV(trv.hasRTV),
 	hasUAV(trv.hasUAV),
 	allSRVIndex(trv.allSRVIndex),
@@ -385,9 +388,7 @@ Texture* TextureRenderView::getTexture() const
 
 void TextureRenderView::copyDescriptors()
 {
-	DescriptorHandle shaderVisibleHandle = GlobalDescriptorHeap::getResourceHeap()->allocDynamicDescriptor(numSRVUAVCBVDescriptors);
-
-	GraphicsDevice::get()->CopyDescriptorsSimple(numSRVUAVCBVDescriptors, shaderVisibleHandle.getCPUHandle(), srvUAVCBVHandleStart, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	DescriptorHandle shaderVisibleHandle = getTransientDescriptorHandle();
 
 	allSRVIndex = shaderVisibleHandle.getCurrentIndex();
 

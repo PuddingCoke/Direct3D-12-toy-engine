@@ -72,9 +72,9 @@ public:
 
 	static BufferView* createStructuredBufferView(const UINT structureByteStride, const UINT size, const bool createSRV, const bool createUAV, const bool createVBV, const bool cpuWritable, const bool persistent);
 
-	BufferView* createByteAddressBufferView(const UINT size, const bool createSRV, const bool createUAV, const bool createVBV, const bool createIBV, const bool cpuWritable, const bool persistent, const void* const data);
+	BufferView* createByteAddressBufferView(const UINT size, const bool createSRV, const bool createUAV, const bool cpuWritable, const bool persistent, const void* const data);
 
-	static BufferView* createByteAddressBufferView(const UINT size, const bool createSRV, const bool createUAV, const bool createVBV, const bool createIBV, const bool cpuWritable, const bool persistent);
+	static BufferView* createByteAddressBufferView(const UINT size, const bool createSRV, const bool createUAV, const bool cpuWritable, const bool persistent);
 
 	IndexConstantBuffer* createIndexConstantBuffer(const std::initializer_list<ShaderResourceDesc>& descs, const bool cpuWritable, const bool persistent);
 

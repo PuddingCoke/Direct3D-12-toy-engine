@@ -1,7 +1,7 @@
 #include<Gear/Core/Resource/IndexConstantBuffer.h>
 
 IndexConstantBuffer::IndexConstantBuffer(ConstantBuffer* const constantBuffer, const std::initializer_list<ShaderResourceDesc>& transitionDescs) :
-	constantBuffer(constantBuffer)
+	EngineResource(constantBuffer->getPersistent()), constantBuffer(constantBuffer)
 {
 	for (const ShaderResourceDesc& desc : transitionDescs)
 	{
@@ -9,8 +9,8 @@ IndexConstantBuffer::IndexConstantBuffer(ConstantBuffer* const constantBuffer, c
 	}
 }
 
-IndexConstantBuffer::IndexConstantBuffer(ConstantBuffer* const constantBuffer):
-	constantBuffer(constantBuffer)
+IndexConstantBuffer::IndexConstantBuffer(ConstantBuffer* const constantBuffer) :
+	EngineResource(constantBuffer->getPersistent()), constantBuffer(constantBuffer)
 {
 }
 
