@@ -3,12 +3,13 @@ cbuffer SimulationParam : register(b1)
     float2 pos;
     float2 posDelta;
     float4 splatColor;
+    float2 colorTexelSize;
     float2 simTexelSize;
+    uint2 colorTextureSize;
+    uint2 simTextureSize;
     float colorDissipationSpeed;
     float velocityDissipationSpeed;
-    float pressureDissipationSpeed;
     float curlIntensity;
-    float aspectRatio;
     float splatRadius;
 }
 
@@ -22,77 +23,74 @@ static Texture2D<float2> velocityReadTex = ResourceDescriptorHeap[velocityReadTe
 
 static RWTexture2D<float2> velocityWriteTex = ResourceDescriptorHeap[velocityWriteTexIndex];
 
+float2 VelocityAt(const uint2 loc)
+{
+    const float2 texCoord = (float2(loc) + float2(0.5, 0.5)) * simTexelSize;
+    
+    float2 p = texCoord - pos;
+    
+    const float aspectRatio = simTexelSize.y / simTexelSize.x;
+    
+    p.x *= aspectRatio;
+    
+    const float2 velocity = exp(-dot(p, p) / splatRadius) * posDelta;
+    
+    const float2 curVelocity = velocityReadTex[loc];
+    
+    return curVelocity + velocity;
+}
+
 [numthreads(16, 9, 1)]
 void main(const uint2 DTid : SV_DispatchThreadID)
 {
-    uint width, height;
-    
-    velocityWriteTex.GetDimensions(width, height);
-    
-    bool isInteriorTexel = false;
-    
-    if (DTid.x > 0 && DTid.x < width - 1 && DTid.y > 0 && DTid.y < height - 1)
+    //interior texel
+    if (DTid.x > 0 && DTid.x < simTextureSize.x - 1 && DTid.y > 0 && DTid.y < simTextureSize.y - 1)
     {
-        isInteriorTexel = true;
-        
-        float2 texCoord = (float2(DTid) + float2(0.5, 0.5)) / float2(width, height);
-        float2 p = texCoord - pos;
-        p.x *= aspectRatio;
-        float2 velocity = exp(-dot(p, p) / splatRadius) * posDelta;
-        float2 curVelocity = velocityReadTex[DTid];
-        velocityWriteTex[DTid] = curVelocity + velocity;
+        velocityWriteTex[DTid] = VelocityAt(DTid);
     }
-    
-    AllMemoryBarrierWithGroupSync();
-    
-    //solve obstacle condition later because pressure gradient subtraction and velocity advection also need this
-    //so we just write another shader solve this problem at once
-    if (!isInteriorTexel)
+    //row texel
+    else if (DTid.x > 0 && DTid.x < simTextureSize.x - 1)
     {
-        //row texel
-        if (DTid.x > 0 && DTid.x < width - 1)
+        if (DTid.y == 0)
         {
-            if (DTid.y == 0)
-            {
-                float2 velocity = velocityWriteTex[uint2(DTid.x, 1)];
+            float2 velocity = VelocityAt(uint2(DTid.x, 1));
                 
-                velocity.y = -velocity.y;
+            velocity.y = -velocity.y;
                 
-                velocityWriteTex[DTid] = velocity;
-            }
-            else if (DTid.y == height - 1)
-            {
-                float2 velocity = velocityWriteTex[uint2(DTid.x, height - 2)];
-                
-                velocity.y = -velocity.y;
-                
-                velocityWriteTex[DTid] = velocity;
-            }
+            velocityWriteTex[DTid] = velocity;
         }
-        //column texel
-        else if (DTid.y > 0 && DTid.y < height - 1)
+        else if (DTid.y == simTextureSize.y - 1)
         {
-            if (DTid.x == 0)
-            {
-                float2 velocity = velocityWriteTex[uint2(1, DTid.y)];
+            float2 velocity = VelocityAt(uint2(DTid.x, simTextureSize.y - 2));
                 
-                velocity.x = -velocity.x;
+            velocity.y = -velocity.y;
                 
-                velocityWriteTex[DTid] = velocity;
-            }
-            else if (DTid.x == width - 1)
-            {
-                float2 velocity = velocityWriteTex[uint2(width - 2, DTid.y)];
-                
-                velocity.x = -velocity.x;
-                
-                velocityWriteTex[DTid] = velocity;
-            }
+            velocityWriteTex[DTid] = velocity;
         }
-        //corner texel
-        else if ((DTid.x == 0 || DTid.x == width - 1) && (DTid.y == 0 || DTid.y == height - 1))
+    }
+    //column texel
+    else if (DTid.y > 0 && DTid.y < simTextureSize.y - 1)
+    {
+        if (DTid.x == 0)
         {
-            velocityWriteTex[DTid] = float2(0.0, 0.0);
+            float2 velocity = VelocityAt(uint2(1, DTid.y));
+                
+            velocity.x = -velocity.x;
+                
+            velocityWriteTex[DTid] = velocity;
         }
+        else if (DTid.x == simTextureSize.x - 1)
+        {
+            float2 velocity = VelocityAt(uint2(simTextureSize.x - 2, DTid.y));
+                
+            velocity.x = -velocity.x;
+                
+            velocityWriteTex[DTid] = velocity;
+        }
+    }
+    //corner texel
+    else if ((DTid.x == 0 || DTid.x == simTextureSize.x - 1) && (DTid.y == 0 || DTid.y == simTextureSize.y - 1))
+    {
+        velocityWriteTex[DTid] = float2(0.0, 0.0);
     }
 }

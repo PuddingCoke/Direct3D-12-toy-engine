@@ -24,11 +24,7 @@ public:
 		colorAdvectionCS(new Shader(Utils::getRootFolder() + "ColorAdvectionCS.cso")),
 		fluidFinalPS(new Shader(Utils::getRootFolder() + "FluidFinalPS.cso"))
 	{
-		const DirectX::XMUINT2 simRes =
-		{
-			Graphics::getWidth() / config.resolutionFactor,
-			Graphics::getHeight() / config.resolutionFactor
-		};
+		const DirectX::XMUINT2 simRes = { Graphics::getWidth() / config.resolutionFactor,Graphics::getHeight() / config.resolutionFactor };
 
 		velocityTex = new SwapTexture([=] {return ResourceManager::createTextureRenderView(simRes.x, simRes.y, DXGI_FORMAT_R32G32_FLOAT, 1, 1, false, true,
 			DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_UNKNOWN); });
@@ -64,12 +60,20 @@ public:
 
 		simulationParamBuffer = ResourceManager::createConstantBuffer(sizeof(SimulationParam), true);
 
+		simulationParam.colorTexelSize = DirectX::XMFLOAT2(1.f / Graphics::getWidth(), 1.f / Graphics::getHeight());
+
 		simulationParam.simTexelSize = DirectX::XMFLOAT2(1.f / simRes.x, 1.f / simRes.y);
+
+		simulationParam.colorTextureSize = DirectX::XMUINT2(Graphics::getWidth(), Graphics::getHeight());
+
+		simulationParam.simTextureSize = DirectX::XMUINT2(simRes.x, simRes.y);
+
 		simulationParam.colorDissipationSpeed = config.colorDissipationSpeed;
+
 		simulationParam.velocityDissipationSpeed = config.velocityDissipationSpeed;
-		simulationParam.pressureDissipationSpeed = config.pressureDissipationSpeed;
+
 		simulationParam.curlIntensity = config.curlIntensity;
-		simulationParam.aspectRatio = Graphics::getAspectRatio();
+
 		simulationParam.splatRadius = config.splatRadius / 100.f * Graphics::getAspectRatio();
 
 		{
@@ -257,7 +261,7 @@ public:
 		context->setCSConstants({ pressureTex->write()->getUAVMipIndex(0) }, 0);
 		context->transitionResources();
 		context->dispatch(pressureTex->width / 16, pressureTex->height / 9, 1);
-		context->uavBarrier({ pressureTex->read()->getTexture() });
+		context->uavBarrier({ pressureTex->write()->getTexture() });
 		pressureTex->swap();
 
 		context->setPipelineState(pressureState.Get());
@@ -331,7 +335,6 @@ private:
 		float colorChangeSpeed = 10.f;//颜色改变速度
 		float colorDissipationSpeed = 0.5f;//颜色消散速度
 		float velocityDissipationSpeed = 0.00f;//速度消散速度
-		float pressureDissipationSpeed = 0.25f;//压力消散速度
 		float curlIntensity = 80.f;//涡流强度
 		float splatRadius = 0.25f;//施加颜色的半径
 		float splatForce = 6000.f;//施加速度的强度
@@ -344,14 +347,15 @@ private:
 		DirectX::XMFLOAT2 pos = { 0,0 };
 		DirectX::XMFLOAT2 posDelta = { 0,0 };
 		DirectX::XMFLOAT4 splatColor = { 0,0,0,1 };
+		DirectX::XMFLOAT2 colorTexelSize;
 		DirectX::XMFLOAT2 simTexelSize;
+		DirectX::XMUINT2 colorTextureSize;
+		DirectX::XMUINT2 simTextureSize;
 		float colorDissipationSpeed;
 		float velocityDissipationSpeed;
-		float pressureDissipationSpeed;
 		float curlIntensity;
-		float aspectRatio;
 		float splatRadius;
-		DirectX::XMFLOAT4 padding[12];
+		DirectX::XMFLOAT4 padding[11];
 	} simulationParam;
 
 	ConstantBuffer* simulationParamBuffer;
