@@ -17,9 +17,12 @@ cbuffer SimulationParam : register(b1)
 
 cbuffer TextureIndices : register(b2)
 {
+    uint vorticityTexIndex;
     uint velocityReadTexIndex;
     uint velocityWriteTexIndex;
 }
+
+static Texture2D<float> vorticityTex = ResourceDescriptorHeap[vorticityTexIndex];
 
 static Texture2D<float2> velocityReadTex = ResourceDescriptorHeap[velocityReadTexIndex];
 
@@ -27,15 +30,23 @@ static RWTexture2D<float2> velocityWriteTex = ResourceDescriptorHeap[velocityWri
 
 float2 VelocityAt(const uint2 loc)
 {
-    float2 texCoord = (float2(loc) + float2(0.5, 0.5)) * simTexelSize;
+    const float L = vorticityTex[loc - uint2(1, 0)];
     
-    texCoord -= perframeResource.deltaTime * velocityReadTex[loc] * simTexelSize;
-
-    const float2 velocity = velocityReadTex.SampleLevel(linearClampSampler, texCoord, 0.0);
+    const float R = vorticityTex[loc + uint2(1, 0)];
     
-    const float decay = 1.0 + velocityDissipationSpeed * perframeResource.deltaTime;
+    const float T = vorticityTex[loc + uint2(0, 1)];
     
-    return velocity / decay;
+    const float B = vorticityTex[loc - uint2(0, 1)];
+    
+    const float C = vorticityTex[loc];
+    
+    float2 force = 0.5 * float2(abs(B) - abs(T), abs(R) - abs(L));
+    
+    force = force / (length(force) + 1e-5) * vorticityIntensity * C;
+    
+    const float2 curVelocity = velocityReadTex[loc];
+    
+    return curVelocity + force * perframeResource.deltaTime;
 }
 
 [numthreads(16, 9, 1)]

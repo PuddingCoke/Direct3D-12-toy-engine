@@ -11,7 +11,6 @@ public:
 	MyGame():
 		renderPass(new MyRenderPass())
 	{
-
 	}
 
 	~MyGame()
