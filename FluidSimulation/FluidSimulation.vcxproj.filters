@@ -13,6 +13,15 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="HLSL">
+      <UniqueIdentifier>{ed9e0de0-ac9e-44b2-8511-2dd4c89baf09}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HLSL\ColorTexture">
+      <UniqueIdentifier>{857047d5-7b2c-46a3-8cd8-68fc114865d8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HLSL\SimTexture">
+      <UniqueIdentifier>{a1c6ad48-11c5-4462-bbe2-161ff3ca22f8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -28,17 +37,37 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="FluidFinalPS.hlsl" />
-    <FxCompile Include="DivergenceCS.hlsl" />
-    <FxCompile Include="PressureCS.hlsl" />
-    <FxCompile Include="PressureResetCS.hlsl" />
-    <FxCompile Include="SplatColorCS.hlsl" />
-    <FxCompile Include="SplatVelocityCS.hlsl" />
-    <FxCompile Include="GradientSubtractCS.hlsl" />
-    <FxCompile Include="VelocityAdvectionCS.hlsl" />
-    <FxCompile Include="ColorAdvectionCS.hlsl" />
+    <FxCompile Include="ColorAdvectionCS.hlsl">
+      <Filter>HLSL\ColorTexture</Filter>
+    </FxCompile>
+    <FxCompile Include="FluidFinalPS.hlsl">
+      <Filter>HLSL\ColorTexture</Filter>
+    </FxCompile>
+    <FxCompile Include="SplatColorCS.hlsl">
+      <Filter>HLSL\ColorTexture</Filter>
+    </FxCompile>
+    <FxCompile Include="DivergenceCS.hlsl">
+      <Filter>HLSL\SimTexture</Filter>
+    </FxCompile>
+    <FxCompile Include="GradientSubtractCS.hlsl">
+      <Filter>HLSL\SimTexture</Filter>
+    </FxCompile>
+    <FxCompile Include="PressureCS.hlsl">
+      <Filter>HLSL\SimTexture</Filter>
+    </FxCompile>
+    <FxCompile Include="PressureResetCS.hlsl">
+      <Filter>HLSL\SimTexture</Filter>
+    </FxCompile>
+    <FxCompile Include="SplatVelocityCS.hlsl">
+      <Filter>HLSL\SimTexture</Filter>
+    </FxCompile>
+    <FxCompile Include="VelocityAdvectionCS.hlsl">
+      <Filter>HLSL\SimTexture</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Utility.hlsli" />
+    <None Include="Utility.hlsli">
+      <Filter>HLSL</Filter>
+    </None>
   </ItemGroup>
 </Project>
