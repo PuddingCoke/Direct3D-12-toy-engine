@@ -35,8 +35,8 @@ float3 ColorAt(const uint2 loc)
     const float aspectRatio = colorTexelSize.y / colorTexelSize.x;
     
     p.x *= aspectRatio;
-        
-    const float3 color = exp(-dot(p, p) / splatRadius) * splatColor.rgb * 0.15;
+    
+    const float3 color = exp(-dot(p, p) / splatRadius) * splatColor.rgb * 0.05;
         
     const float3 curColor = colorReadTex[loc].rgb;
     
@@ -46,16 +46,15 @@ float3 ColorAt(const uint2 loc)
 [numthreads(16, 9, 1)]
 void main(const uint2 DTid : SV_DispatchThreadID)
 {
-    const float ratio = simTexelSize.x / colorTexelSize.x;
+    const float scale = simTexelSize.x / colorTexelSize.x;
     
-    const float newObstacleRadius = obstacleRadius * ratio;
+    const float newObstacleRadius = obstacleRadius * scale;
     
-    const float2 newObstaclePosition = obstaclePosition * ratio;
+    const float2 newObstaclePosition = obstaclePosition * scale;
     
     const float2 dir = (float2(DTid) + float2(0.5, 0.5)) - newObstaclePosition;
     
-    //boundary and obstacle condition
-    if (DTid.x == 0 || DTid.x == colorTextureSize.x - 1 || DTid.y == 0 || DTid.y == colorTextureSize.y - 1 /*|| length(dir) < newObstacleRadius*/)
+    if (DTid.x == 0 || DTid.x == colorTextureSize.x - 1 || DTid.y == 0 || DTid.y == colorTextureSize.y - 1 || length(dir) < newObstacleRadius)
     {
         colorWriteTex[DTid] = float4(0.0, 0.0, 0.0, 1.0);
     }
