@@ -16,46 +16,46 @@ cbuffer SimulationParam : register(b1)
 cbuffer TextureIndices : register(b2)
 {
     uint velocityTexIndex;
-    uint divergenceTexIndex;
-};
+    uint vorticityTexIndex;
+}
 
 static Texture2D<float2> velocityTex = ResourceDescriptorHeap[velocityTexIndex];
 
-static RWTexture2D<float> divergenceTex = ResourceDescriptorHeap[divergenceTexIndex];
+static RWTexture2D<float> vorticityTex = ResourceDescriptorHeap[vorticityTexIndex];
 
-float DivergenceAt(const uint2 loc)
+float VorticityAt(const uint2 loc)
 {
-    const float uR = velocityTex[loc + uint2(1, 0)].x;
-        
-    const float uL = velocityTex[loc - uint2(1, 0)].x;
-        
-    const float vT = velocityTex[loc + uint2(0, 1)].y;
-        
-    const float vB = velocityTex[loc - uint2(0, 1)].y;
-        
-    const float divergence = 0.5 * (uR - uL + vT - vB);
+    const float vR = velocityTex[loc + uint2(1, 0)].y;
     
-    return divergence;
+    const float vL = velocityTex[loc - uint2(1, 0)].y;
+    
+    const float uT = velocityTex[loc + uint2(0, 1)].x;
+    
+    const float uB = velocityTex[loc - uint2(0, 1)].x;
+    
+    const float vorticity = 0.5 * (uT - uB + vL - vR);
+    
+    return vorticity;
 }
 
 [numthreads(16, 9, 1)]
-void main(const uint2 DTid : SV_DispatchThreadID)
+void main(const uint2 DTid : SV_DispatchThreadID )
 {
     //interior texel
     if (DTid.x > 0 && DTid.x < simTextureSize.x - 1 && DTid.y > 0 && DTid.y < simTextureSize.y - 1)
     {
-        divergenceTex[DTid] = DivergenceAt(DTid);
+        vorticityTex[DTid] = VorticityAt(DTid);
     }
     //row texel
     else if (DTid.x > 0 && DTid.x < simTextureSize.x - 1)
     {
         if (DTid.y == 0)
         {
-            divergenceTex[DTid] = DivergenceAt(uint2(DTid.x, 1));
+            vorticityTex[DTid] = VorticityAt(uint2(DTid.x, 1));
         }
         else if (DTid.y == simTextureSize.y - 1)
         {
-            divergenceTex[DTid] = DivergenceAt(uint2(DTid.x, simTextureSize.y - 2));
+            vorticityTex[DTid] = VorticityAt(uint2(DTid.x, simTextureSize.y - 2));
         }
     }
     //column texel
@@ -63,11 +63,11 @@ void main(const uint2 DTid : SV_DispatchThreadID)
     {
         if (DTid.x == 0)
         {
-            divergenceTex[DTid] = DivergenceAt(uint2(1, DTid.y));
+            vorticityTex[DTid] = VorticityAt(uint2(1, DTid.y));
         }
         else if (DTid.x == simTextureSize.x - 1)
         {
-            divergenceTex[DTid] = DivergenceAt(uint2(simTextureSize.x - 2, DTid.y));
+            vorticityTex[DTid] = VorticityAt(uint2(simTextureSize.x - 2, DTid.y));
         }
     }
     //corner texel
@@ -75,22 +75,22 @@ void main(const uint2 DTid : SV_DispatchThreadID)
     {
         if (DTid.x == 0)
         {
-            divergenceTex[DTid] = DivergenceAt(uint2(1, 1));
+            vorticityTex[DTid] = VorticityAt(uint2(1, 1));
         }
         else if (DTid.x == simTextureSize.x - 1)
         {
-            divergenceTex[DTid] = DivergenceAt(uint2(simTextureSize.x - 2, 1));
+            vorticityTex[DTid] = VorticityAt(uint2(simTextureSize.x - 2, 1));
         }
     }
     else if (DTid.y == simTextureSize.y - 1)
     {
         if (DTid.x == 0)
         {
-            divergenceTex[DTid] = DivergenceAt(uint2(1, simTextureSize.y - 2));
+            vorticityTex[DTid] = VorticityAt(uint2(1, simTextureSize.y - 2));
         }
         else if (DTid.x == simTextureSize.x - 1)
         {
-            divergenceTex[DTid] = DivergenceAt(uint2(simTextureSize.x - 2, simTextureSize.y - 2));
+            vorticityTex[DTid] = VorticityAt(uint2(simTextureSize.x - 2, simTextureSize.y - 2));
         }
     }
 }

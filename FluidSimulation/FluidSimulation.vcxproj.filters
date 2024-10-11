@@ -70,6 +70,12 @@
     <FxCompile Include="FluidFinalCS.hlsl">
       <Filter>HLSL\ColorTexture</Filter>
     </FxCompile>
+    <FxCompile Include="VorticityCS.hlsl">
+      <Filter>HLSL\SimTexture</Filter>
+    </FxCompile>
+    <FxCompile Include="VorticityConfinementCS.hlsl">
+      <Filter>HLSL\SimTexture</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Utility.hlsli">

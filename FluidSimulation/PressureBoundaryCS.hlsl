@@ -12,7 +12,7 @@ cbuffer SimulationParam : register(b1)
     uint2 simTextureSize;
     float colorDissipationSpeed;
     float velocityDissipationSpeed;
-    float curlIntensity;
+    float vorticityIntensity;
     float splatRadius;
 }
 

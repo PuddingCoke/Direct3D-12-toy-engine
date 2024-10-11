@@ -16,6 +16,8 @@ public:
 		colorUpdateTimer(1.f),
 		splatVelocityCS(new Shader(Utils::getRootFolder() + "SplatVelocityCS.cso")),
 		splatColorCS(new Shader(Utils::getRootFolder() + "SplatColorCS.cso")),
+		vorticityCS(new Shader(Utils::getRootFolder() + "VorticityCS.cso")),
+		vorticityConfinementCS(new Shader(Utils::getRootFolder() + "VorticityConfinementCS.cso")),
 		divergenceCS(new Shader(Utils::getRootFolder() + "DivergenceCS.cso")),
 		pressureResetCS(new Shader(Utils::getRootFolder() + "PressureResetCS.cso")),
 		pressureCS(new Shader(Utils::getRootFolder() + "PressureCS.cso")),
@@ -54,8 +56,10 @@ public:
 
 		pressureTex->write()->getTexture()->getResource()->SetName(L"Pressure Texture (1)");
 
-		curlTex = ResourceManager::createTextureRenderView(simRes.x, simRes.y, DXGI_FORMAT_R32_FLOAT, 1, 1, false, true,
+		vorticityTex = ResourceManager::createTextureRenderView(simRes.x, simRes.y, DXGI_FORMAT_R32_FLOAT, 1, 1, false, true,
 			DXGI_FORMAT_R32_FLOAT, DXGI_FORMAT_R32_FLOAT, DXGI_FORMAT_UNKNOWN);
+
+		vorticityTex->getTexture()->getResource()->SetName(L"Vorticity Texture");
 
 		originTexture = ResourceManager::createTextureRenderView(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R16G16B16A16_FLOAT, 1, 1, false, true,
 			DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_UNKNOWN);
@@ -74,7 +78,7 @@ public:
 
 		simulationParam.velocityDissipationSpeed = config.velocityDissipationSpeed;
 
-		simulationParam.curlIntensity = config.curlIntensity;
+		simulationParam.vorticityIntensity = config.vorticityIntensity;
 
 		simulationParam.splatRadius = config.splatRadius / 100.f * Graphics::getAspectRatio();
 
@@ -90,6 +94,20 @@ public:
 			desc.CS = splatColorCS->getByteCode();
 
 			GraphicsDevice::get()->CreateComputePipelineState(&desc, IID_PPV_ARGS(&splatColorState));
+		}
+
+		{
+			D3D12_COMPUTE_PIPELINE_STATE_DESC desc = PipelineState::getDefaultComputeDesc();
+			desc.CS = vorticityCS->getByteCode();
+
+			GraphicsDevice::get()->CreateComputePipelineState(&desc, IID_PPV_ARGS(&vorticityState));
+		}
+
+		{
+			D3D12_COMPUTE_PIPELINE_STATE_DESC desc = PipelineState::getDefaultComputeDesc();
+			desc.CS = vorticityConfinementCS->getByteCode();
+
+			GraphicsDevice::get()->CreateComputePipelineState(&desc, IID_PPV_ARGS(&vorticityConfinementState));
 		}
 
 		{
@@ -172,7 +190,7 @@ public:
 
 		delete colorTex;
 		delete velocityTex;
-		delete curlTex;
+		delete vorticityTex;
 		delete divergenceTex;
 		delete pressureTex;
 		delete originTexture;
@@ -181,6 +199,8 @@ public:
 
 		delete splatVelocityCS;
 		delete splatColorCS;
+		delete vorticityCS;
+		delete vorticityConfinementCS;
 		delete divergenceCS;
 		delete pressureResetCS;
 		delete pressureCS;
@@ -192,39 +212,18 @@ public:
 		delete fluidFinalCS;
 	}
 
-	void recordCommand() override
+	void vorticityConfinement()
 	{
-		/*const DirectX::XMFLOAT2 pos =
-		{
-			(float)Mouse::getX() / Graphics::getWidth(),
-			(float)(Graphics::getHeight() - Mouse::getY()) / Graphics::getHeight()
-		};*/
+		//calculate vorticity
+		context->setPipelineState(vorticityState.Get());
+		context->setCSConstants({ velocityTex->read()->getAllSRVIndex(),vorticityTex->getUAVMipIndex(0) }, 0);
+		context->transitionResources();
+		context->dispatch(vorticityTex->getTexture()->getWidth() / 16, vorticityTex->getTexture()->getHeight() / 9, 1);
+		context->uavBarrier({ vorticityTex->getTexture() });
 
-		/*const DirectX::XMFLOAT2 posDelta =
-		{
-			(pos.x - simulationParam.pos.x) * config.splatForce,
-			((pos.y - simulationParam.pos.y) / Graphics::getAspectRatio()) * config.splatForce
-		};*/
-
-		simulationParam.pos = DirectX::XMFLOAT2(0.10, 0.5);
-		simulationParam.posDelta = DirectX::XMFLOAT2(30.0, 0.0);
-
-		if (colorUpdateTimer.update(Graphics::getDeltaTime() * config.colorChangeSpeed))
-		{
-			Color c = Color::HSVtoRGB({ Random::Float(),1.f,1.f });
-			simulationParam.splatColor = { c.r,c.g,c.b,1.f };
-		}
-
-		simulationParamBuffer->update(&simulationParam, sizeof(SimulationParam));
-
-		context->setGlobalConstantBuffer(simulationParamBuffer);
-		context->setTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-		/*if (Mouse::onMove() && Mouse::getLeftDown())
-		{*/
-
-		context->setPipelineState(splatVelocityState.Get());
-		context->setCSConstants({ velocityTex->read()->getAllSRVIndex(),velocityTex->write()->getUAVMipIndex(0) }, 0);
+		//apply vorticity confinement
+		context->setPipelineState(vorticityConfinementState.Get());
+		context->setCSConstants({ vorticityTex->getAllSRVIndex(),velocityTex->read()->getAllSRVIndex(),velocityTex->write()->getUAVMipIndex(0) }, 0);
 		context->transitionResources();
 		context->dispatch(velocityTex->width / 16, velocityTex->height / 9, 1);
 		context->uavBarrier({ velocityTex->write()->getTexture() });
@@ -237,21 +236,18 @@ public:
 		context->dispatch(velocityTex->width / 16, velocityTex->height / 9, 1);
 		context->uavBarrier({ velocityTex->write()->getTexture() });
 		velocityTex->swap();
+	}
 
-		context->setPipelineState(splatColorState.Get());
-		context->setCSConstants({ colorTex->read()->getAllSRVIndex(),colorTex->write()->getUAVMipIndex(0) }, 0);
-		context->transitionResources();
-		context->dispatch(colorTex->width / 16, colorTex->height / 9, 1);
-		context->uavBarrier({ colorTex->write()->getTexture() });
-		colorTex->swap();
-		/*}*/
-
+	void project()
+	{
+		//calculate divergence
 		context->setPipelineState(divergenceState.Get());
 		context->setCSConstants({ velocityTex->read()->getAllSRVIndex(),divergenceTex->getUAVMipIndex(0) }, 0);
 		context->transitionResources();
 		context->dispatch(divergenceTex->getTexture()->getWidth() / 16, divergenceTex->getTexture()->getHeight() / 9, 1);
 		context->uavBarrier({ divergenceTex->getTexture() });
 
+		//reset pressure
 		context->setPipelineState(pressureResetState.Get());
 		context->setCSConstants({ pressureTex->write()->getUAVMipIndex(0) }, 0);
 		context->transitionResources();
@@ -259,6 +255,7 @@ public:
 		context->uavBarrier({ pressureTex->write()->getTexture() });
 		pressureTex->swap();
 
+		//calculate pressure
 		for (UINT i = 0; i < config.pressureIteraion; i++)
 		{
 			context->setPipelineState(pressureState.Get());
@@ -277,6 +274,7 @@ public:
 			pressureTex->swap();
 		}
 
+		//velocity subtract gradient of pressure
 		context->setPipelineState(gradientSubtractState.Get());
 		context->setCSConstants({ pressureTex->read()->getAllSRVIndex(),velocityTex->read()->getAllSRVIndex(),velocityTex->write()->getUAVMipIndex(0) }, 0);
 		context->transitionResources();
@@ -291,7 +289,11 @@ public:
 		context->dispatch(velocityTex->width / 16, velocityTex->height / 9, 1);
 		context->uavBarrier({ velocityTex->write()->getTexture() });
 		velocityTex->swap();
+	}
 
+	void advect()
+	{
+		//velocity advection
 		context->setPipelineState(velocityAdvectionState.Get());
 		context->setCSConstants({ velocityTex->read()->getAllSRVIndex(),velocityTex->write()->getUAVMipIndex(0) }, 0);
 		context->transitionResources();
@@ -307,12 +309,69 @@ public:
 		context->uavBarrier({ velocityTex->write()->getTexture() });
 		velocityTex->swap();
 
+		//color advection
 		context->setPipelineState(colorAdvectionState.Get());
 		context->setCSConstants({ velocityTex->read()->getAllSRVIndex(),colorTex->read()->getAllSRVIndex(),colorTex->write()->getUAVMipIndex(0) }, 0);
 		context->transitionResources();
 		context->dispatch(colorTex->width / 16, colorTex->height / 9, 1);
 		context->uavBarrier({ colorTex->write()->getTexture() });
 		colorTex->swap();
+	}
+
+	void recordCommand() override
+	{
+
+		const DirectX::XMFLOAT2 pos =
+		{
+			(float)Mouse::getX() / Graphics::getWidth(),
+			(float)(Graphics::getHeight() - Mouse::getY()) / Graphics::getHeight()
+		};
+
+		const DirectX::XMFLOAT2 posDelta =
+		{
+			(pos.x - simulationParam.pos.x) * config.splatForce,
+			((pos.y - simulationParam.pos.y) / Graphics::getAspectRatio()) * config.splatForce
+		};
+
+		simulationParam.pos = pos;
+		simulationParam.posDelta = posDelta;
+
+		//simulationParam.pos = DirectX::XMFLOAT2(0.10, 0.5);
+		//simulationParam.posDelta = DirectX::XMFLOAT2(15.0, 0.0);
+
+		if (colorUpdateTimer.update(Graphics::getDeltaTime() * config.colorChangeSpeed))
+		{
+			Color c = Color::HSVtoRGB({ Random::Float(),1.f,1.f });
+			simulationParam.splatColor = { c.r,c.g,c.b,1.f };
+		}
+
+		simulationParamBuffer->update(&simulationParam, sizeof(SimulationParam));
+
+		context->setGlobalConstantBuffer(simulationParamBuffer);
+		context->setTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+		if (Mouse::onMove() && Mouse::getLeftDown())
+		{
+			context->setPipelineState(splatVelocityState.Get());
+			context->setCSConstants({ velocityTex->read()->getAllSRVIndex(),velocityTex->write()->getUAVMipIndex(0) }, 0);
+			context->transitionResources();
+			context->dispatch(velocityTex->width / 16, velocityTex->height / 9, 1);
+			context->uavBarrier({ velocityTex->write()->getTexture() });
+			velocityTex->swap();
+
+			context->setPipelineState(splatColorState.Get());
+			context->setCSConstants({ colorTex->read()->getAllSRVIndex(),colorTex->write()->getUAVMipIndex(0) }, 0);
+			context->transitionResources();
+			context->dispatch(colorTex->width / 16, colorTex->height / 9, 1);
+			context->uavBarrier({ colorTex->write()->getTexture() });
+			colorTex->swap();
+		}
+
+		vorticityConfinement();
+
+		project();
+
+		advect();
 
 		context->setPipelineState(fluidFinalState.Get());
 		context->setCSConstants({ colorTex->read()->getAllSRVIndex(),originTexture->getUAVMipIndex(0) }, 0);
@@ -333,7 +392,7 @@ private:
 
 	SwapTexture* velocityTex;
 
-	TextureRenderView* curlTex;
+	TextureRenderView* vorticityTex;
 
 	TextureRenderView* divergenceTex;
 
@@ -344,10 +403,10 @@ private:
 	struct Configuration
 	{
 		float colorChangeSpeed = 10.f;//颜色改变速度
-		float colorDissipationSpeed = 0.1f;//颜色消散速度
+		float colorDissipationSpeed = 1.f;//颜色消散速度
 		float velocityDissipationSpeed = 0.00f;//速度消散速度
-		float curlIntensity = 80.f;//涡流强度
-		float splatRadius = 0.40f;//施加颜色的半径
+		float vorticityIntensity = 80.f;//涡流强度
+		float splatRadius = 0.25f;//施加颜色的半径
 		float splatForce = 6000.f;//施加速度的强度
 		const unsigned int pressureIteraion = 50;//雅可比迭代次数 这个值越高物理模拟越不容易出错 NVIDIA的文章有提到通常20-50次就够了
 		const unsigned int resolutionFactor = 2;//物理模拟分辨率
@@ -364,7 +423,7 @@ private:
 		DirectX::XMUINT2 simTextureSize;
 		float colorDissipationSpeed;
 		float velocityDissipationSpeed;
-		float curlIntensity;
+		float vorticityIntensity;
 		float splatRadius;
 		DirectX::XMFLOAT4 padding[11];
 	} simulationParam;
@@ -380,6 +439,14 @@ private:
 	Shader* splatColorCS;
 
 	ComPtr<ID3D12PipelineState> splatColorState;
+
+	Shader* vorticityCS;
+
+	ComPtr<ID3D12PipelineState> vorticityState;
+
+	Shader* vorticityConfinementCS;
+
+	ComPtr<ID3D12PipelineState> vorticityConfinementState;
 
 	Shader* divergenceCS;
 

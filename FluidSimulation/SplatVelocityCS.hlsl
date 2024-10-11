@@ -9,7 +9,7 @@ cbuffer SimulationParam : register(b1)
     uint2 simTextureSize;
     float colorDissipationSpeed;
     float velocityDissipationSpeed;
-    float curlIntensity;
+    float vorticityIntensity;
     float splatRadius;
 }
 
@@ -25,15 +25,15 @@ static RWTexture2D<float2> velocityWriteTex = ResourceDescriptorHeap[velocityWri
 
 float2 VelocityAt(const uint2 loc)
 {
-    const float2 texCoord = (float2(loc) + float2(0.5, 0.5)) * simTexelSize;
+    float2 texCoord = (float2(loc) + float2(0.5, 0.5)) * simTexelSize;
     
-    float2 p = texCoord - pos;
+    texCoord -= pos;
     
     const float aspectRatio = simTexelSize.y / simTexelSize.x;
     
-    p.x *= aspectRatio;
+    texCoord.x *= aspectRatio;
     
-    const float2 velocity = exp(-dot(p, p) / splatRadius) * posDelta;
+    const float2 velocity = exp(-dot(texCoord, texCoord) / splatRadius) * posDelta;
     
     const float2 curVelocity = velocityReadTex[loc];
     
