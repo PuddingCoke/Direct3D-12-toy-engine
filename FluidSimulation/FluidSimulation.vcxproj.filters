@@ -40,9 +40,6 @@
     <FxCompile Include="ColorAdvectionCS.hlsl">
       <Filter>HLSL\ColorTexture</Filter>
     </FxCompile>
-    <FxCompile Include="FluidFinalPS.hlsl">
-      <Filter>HLSL\ColorTexture</Filter>
-    </FxCompile>
     <FxCompile Include="SplatColorCS.hlsl">
       <Filter>HLSL\ColorTexture</Filter>
     </FxCompile>
@@ -63,6 +60,15 @@
     </FxCompile>
     <FxCompile Include="VelocityAdvectionCS.hlsl">
       <Filter>HLSL\SimTexture</Filter>
+    </FxCompile>
+    <FxCompile Include="PressureBoundaryCS.hlsl">
+      <Filter>HLSL\SimTexture</Filter>
+    </FxCompile>
+    <FxCompile Include="VelocityBoundaryCS.hlsl">
+      <Filter>HLSL\SimTexture</Filter>
+    </FxCompile>
+    <FxCompile Include="FluidFinalCS.hlsl">
+      <Filter>HLSL\ColorTexture</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
