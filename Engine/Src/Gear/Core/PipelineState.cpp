@@ -17,14 +17,6 @@ D3D12_GRAPHICS_PIPELINE_STATE_DESC PipelineState::getDefaultGraphicsDesc()
 	return desc;
 }
 
-D3D12_COMPUTE_PIPELINE_STATE_DESC PipelineState::getDefaultComputeDesc()
-{
-	D3D12_COMPUTE_PIPELINE_STATE_DESC desc = {};
-	desc.pRootSignature = GlobalRootSignature::getComputeRootSignature()->get();
-
-	return desc;
-}
-
 D3D12_GRAPHICS_PIPELINE_STATE_DESC PipelineState::getDefaultFullScreenState()
 {
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = {};
@@ -40,6 +32,19 @@ D3D12_GRAPHICS_PIPELINE_STATE_DESC PipelineState::getDefaultFullScreenState()
 	desc.VS = Shader::fullScreenVS->getByteCode();
 
 	return desc;
+}
+
+ID3D12PipelineState* PipelineState::createComputeState(const Shader* const shader)
+{
+	D3D12_COMPUTE_PIPELINE_STATE_DESC desc = {};
+	desc.pRootSignature = GlobalRootSignature::getComputeRootSignature()->get();
+	desc.CS = shader->getByteCode();
+
+	ID3D12PipelineState* state = nullptr;
+
+	GraphicsDevice::get()->CreateComputePipelineState(&desc, IID_PPV_ARGS(&state));
+
+	return state;
 }
 
 PipelineState::PipelineState()

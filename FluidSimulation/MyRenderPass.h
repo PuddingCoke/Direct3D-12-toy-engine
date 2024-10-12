@@ -82,96 +82,31 @@ public:
 
 		simulationParam.splatRadius = config.splatRadius / 100.f * Graphics::getAspectRatio();
 
-		{
-			D3D12_COMPUTE_PIPELINE_STATE_DESC desc = PipelineState::getDefaultComputeDesc();
-			desc.CS = splatVelocityCS->getByteCode();
+		splatVelocityState = PipelineState::createComputeState(splatVelocityCS);
 
-			GraphicsDevice::get()->CreateComputePipelineState(&desc, IID_PPV_ARGS(&splatVelocityState));
-		}
+		splatColorState = PipelineState::createComputeState(splatColorCS);
 
-		{
-			D3D12_COMPUTE_PIPELINE_STATE_DESC desc = PipelineState::getDefaultComputeDesc();
-			desc.CS = splatColorCS->getByteCode();
+		vorticityState = PipelineState::createComputeState(vorticityCS);
 
-			GraphicsDevice::get()->CreateComputePipelineState(&desc, IID_PPV_ARGS(&splatColorState));
-		}
+		vorticityConfinementState = PipelineState::createComputeState(vorticityConfinementCS);
 
-		{
-			D3D12_COMPUTE_PIPELINE_STATE_DESC desc = PipelineState::getDefaultComputeDesc();
-			desc.CS = vorticityCS->getByteCode();
+		divergenceState = PipelineState::createComputeState(divergenceCS);
 
-			GraphicsDevice::get()->CreateComputePipelineState(&desc, IID_PPV_ARGS(&vorticityState));
-		}
+		pressureResetState = PipelineState::createComputeState(pressureResetCS);
 
-		{
-			D3D12_COMPUTE_PIPELINE_STATE_DESC desc = PipelineState::getDefaultComputeDesc();
-			desc.CS = vorticityConfinementCS->getByteCode();
+		pressureState = PipelineState::createComputeState(pressureCS);
 
-			GraphicsDevice::get()->CreateComputePipelineState(&desc, IID_PPV_ARGS(&vorticityConfinementState));
-		}
+		gradientSubtractState = PipelineState::createComputeState(gradientSubtractCS);
 
-		{
-			D3D12_COMPUTE_PIPELINE_STATE_DESC desc = PipelineState::getDefaultComputeDesc();
-			desc.CS = divergenceCS->getByteCode();
+		velocityAdvectionState = PipelineState::createComputeState(velocityAdvectionCS);
 
-			GraphicsDevice::get()->CreateComputePipelineState(&desc, IID_PPV_ARGS(&divergenceState));
-		}
+		colorAdvectionState = PipelineState::createComputeState(colorAdvectionCS);
 
-		{
-			D3D12_COMPUTE_PIPELINE_STATE_DESC desc = PipelineState::getDefaultComputeDesc();
-			desc.CS = pressureResetCS->getByteCode();
+		velocityBoundaryState = PipelineState::createComputeState(velocityBoundaryCS);
 
-			GraphicsDevice::get()->CreateComputePipelineState(&desc, IID_PPV_ARGS(&pressureResetState));
-		}
+		pressureBoundaryState = PipelineState::createComputeState(pressureBoundaryCS);
 
-		{
-			D3D12_COMPUTE_PIPELINE_STATE_DESC desc = PipelineState::getDefaultComputeDesc();
-			desc.CS = pressureCS->getByteCode();
-
-			GraphicsDevice::get()->CreateComputePipelineState(&desc, IID_PPV_ARGS(&pressureState));
-		}
-
-		{
-			D3D12_COMPUTE_PIPELINE_STATE_DESC desc = PipelineState::getDefaultComputeDesc();
-			desc.CS = gradientSubtractCS->getByteCode();
-
-			GraphicsDevice::get()->CreateComputePipelineState(&desc, IID_PPV_ARGS(&gradientSubtractState));
-		}
-
-		{
-			D3D12_COMPUTE_PIPELINE_STATE_DESC desc = PipelineState::getDefaultComputeDesc();
-			desc.CS = velocityAdvectionCS->getByteCode();
-
-			GraphicsDevice::get()->CreateComputePipelineState(&desc, IID_PPV_ARGS(&velocityAdvectionState));
-		}
-
-		{
-			D3D12_COMPUTE_PIPELINE_STATE_DESC desc = PipelineState::getDefaultComputeDesc();
-			desc.CS = colorAdvectionCS->getByteCode();
-
-			GraphicsDevice::get()->CreateComputePipelineState(&desc, IID_PPV_ARGS(&colorAdvectionState));
-		}
-
-		{
-			D3D12_COMPUTE_PIPELINE_STATE_DESC desc = PipelineState::getDefaultComputeDesc();
-			desc.CS = velocityBoundaryCS->getByteCode();
-
-			GraphicsDevice::get()->CreateComputePipelineState(&desc, IID_PPV_ARGS(&velocityBoundaryState));
-		}
-
-		{
-			D3D12_COMPUTE_PIPELINE_STATE_DESC desc = PipelineState::getDefaultComputeDesc();
-			desc.CS = pressureBoundaryCS->getByteCode();
-
-			GraphicsDevice::get()->CreateComputePipelineState(&desc, IID_PPV_ARGS(&pressureBoundaryState));
-		}
-
-		{
-			D3D12_COMPUTE_PIPELINE_STATE_DESC desc = PipelineState::getDefaultComputeDesc();
-			desc.CS = fluidFinalCS->getByteCode();
-
-			GraphicsDevice::get()->CreateComputePipelineState(&desc, IID_PPV_ARGS(&fluidFinalState));
-		}
+		fluidFinalState = PipelineState::createComputeState(fluidFinalCS);
 
 		begin();
 

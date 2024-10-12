@@ -162,19 +162,9 @@ public:
 			GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&skyboxState));
 		}
 
-		{
-			D3D12_COMPUTE_PIPELINE_STATE_DESC desc = PipelineState::getDefaultComputeDesc();
-			desc.CS = irradianceOctahedralEncode->getByteCode();
+		irradianceOctahedralEncodeState = PipelineState::createComputeState(irradianceOctahedralEncode);
 
-			GraphicsDevice::get()->CreateComputePipelineState(&desc, IID_PPV_ARGS(&irradianceOctahedralEncodeState));
-		}
-
-		{
-			D3D12_COMPUTE_PIPELINE_STATE_DESC desc = PipelineState::getDefaultComputeDesc();
-			desc.CS = depthOctahedralEncode->getByteCode();
-
-			GraphicsDevice::get()->CreateComputePipelineState(&desc, IID_PPV_ARGS(&depthOctahedralEncodeState));
-		}
+		depthOctahedralEncodeState = PipelineState::createComputeState(depthOctahedralEncode);
 
 		begin();
 

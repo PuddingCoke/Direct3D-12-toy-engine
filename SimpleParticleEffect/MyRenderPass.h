@@ -24,12 +24,7 @@ public:
 
 		particleCS = new Shader("ParticleCS.hlsl", ShaderProfile::COMPUTE);
 
-		{
-			D3D12_COMPUTE_PIPELINE_STATE_DESC desc = PipelineState::getDefaultComputeDesc();
-			desc.CS = particleCS->getByteCode();
-
-			GraphicsDevice::get()->CreateComputePipelineState(&desc, IID_PPV_ARGS(&particleComputeState));
-		}
+		particleComputeState = PipelineState::createComputeState(particleCS);
 
 		{
 			D3D12_INPUT_ELEMENT_DESC inputDesc[2] =
