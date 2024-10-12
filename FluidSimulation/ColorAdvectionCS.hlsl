@@ -43,7 +43,7 @@ float3 ColorAt(const uint2 loc)
 
 [numthreads(16, 9, 1)]
 void main(const uint2 DTid : SV_DispatchThreadID)
-{   
+{
     if (DTid.x == 0 || DTid.x == colorTextureSize.x - 1 || DTid.y == 0 || DTid.y == colorTextureSize.y - 1)
     {
         colorWriteTex[DTid] = float4(0.0, 0.0, 0.0, 1.0);

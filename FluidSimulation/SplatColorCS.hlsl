@@ -48,13 +48,13 @@ void main(const uint2 DTid : SV_DispatchThreadID)
 {
     const float scale = simTexelSize.x / colorTexelSize.x;
     
-    const float newObstacleRadius = obstacleRadius * scale;
+    const float scaledRadius = obstacleRadius * scale;
     
-    const float2 newObstaclePosition = obstaclePosition * scale;
+    const float2 scaledPosition = obstaclePosition * scale;
     
-    const float2 dir = (float2(DTid) + float2(0.5, 0.5)) - newObstaclePosition;
+    const float2 dir = (float2(DTid) + float2(0.5, 0.5)) - scaledPosition;
     
-    if (DTid.x == 0 || DTid.x == colorTextureSize.x - 1 || DTid.y == 0 || DTid.y == colorTextureSize.y - 1 || length(dir) < newObstacleRadius)
+    if (DTid.x == 0 || DTid.x == colorTextureSize.x - 1 || DTid.y == 0 || DTid.y == colorTextureSize.y - 1 || length(dir) < scaledRadius)
     {
         colorWriteTex[DTid] = float4(0.0, 0.0, 0.0, 1.0);
     }
