@@ -38,14 +38,12 @@ public:
 	static D3D12_GRAPHICS_PIPELINE_STATE_DESC getDefaultGraphicsDesc();
 
 	//configure
-	//CS
-	static D3D12_COMPUTE_PIPELINE_STATE_DESC getDefaultComputeDesc();
-
-	//configure
 	//NumRenderTargets
 	//RTVFormats
 	//PS
 	static D3D12_GRAPHICS_PIPELINE_STATE_DESC getDefaultFullScreenState();
+
+	static ID3D12PipelineState* createComputeState(const Shader* const shader);
 
 private:
 
