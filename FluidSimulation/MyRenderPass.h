@@ -147,6 +147,26 @@ public:
 		delete fluidFinalCS;
 	}
 
+	void splatVelocityAndColor()
+	{
+		if (Mouse::onMove() && Mouse::getLeftDown())
+		{
+			context->setPipelineState(splatVelocityState.Get());
+			context->setCSConstants({ velocityTex->read()->getAllSRVIndex(),velocityTex->write()->getUAVMipIndex(0) }, 0);
+			context->transitionResources();
+			context->dispatch(velocityTex->width / 16, velocityTex->height / 9, 1);
+			context->uavBarrier({ velocityTex->write()->getTexture() });
+			velocityTex->swap();
+
+			context->setPipelineState(splatColorState.Get());
+			context->setCSConstants({ colorTex->read()->getAllSRVIndex(),colorTex->write()->getUAVMipIndex(0) }, 0);
+			context->transitionResources();
+			context->dispatch(colorTex->width / 16, colorTex->height / 9, 1);
+			context->uavBarrier({ colorTex->write()->getTexture() });
+			colorTex->swap();
+		}
+	}
+
 	void vorticityConfinement()
 	{
 		//calculate vorticity
@@ -283,24 +303,8 @@ public:
 		simulationParamBuffer->update(&simulationParam, sizeof(SimulationParam));
 
 		context->setGlobalConstantBuffer(simulationParamBuffer);
-		context->setTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-		if (Mouse::onMove() && Mouse::getLeftDown())
-		{
-			context->setPipelineState(splatVelocityState.Get());
-			context->setCSConstants({ velocityTex->read()->getAllSRVIndex(),velocityTex->write()->getUAVMipIndex(0) }, 0);
-			context->transitionResources();
-			context->dispatch(velocityTex->width / 16, velocityTex->height / 9, 1);
-			context->uavBarrier({ velocityTex->write()->getTexture() });
-			velocityTex->swap();
-
-			context->setPipelineState(splatColorState.Get());
-			context->setCSConstants({ colorTex->read()->getAllSRVIndex(),colorTex->write()->getUAVMipIndex(0) }, 0);
-			context->transitionResources();
-			context->dispatch(colorTex->width / 16, colorTex->height / 9, 1);
-			context->uavBarrier({ colorTex->write()->getTexture() });
-			colorTex->swap();
-		}
+		splatVelocityAndColor();
 
 		vorticityConfinement();
 
@@ -308,6 +312,7 @@ public:
 
 		advect();
 
+		context->setTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		context->setPipelineState(fluidFinalState.Get());
 		context->setCSConstants({ colorTex->read()->getAllSRVIndex(),originTexture->getUAVMipIndex(0) }, 0);
 		context->transitionResources();
