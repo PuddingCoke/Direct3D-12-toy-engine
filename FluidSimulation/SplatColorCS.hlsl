@@ -32,7 +32,7 @@ float3 ColorAt(const uint2 loc)
         
     texCoord -= pos;
     
-    const float aspectRatio = colorTexelSize.y / colorTexelSize.x;
+    const float aspectRatio = 16.0 / 9.0;
     
     texCoord.x *= aspectRatio;
     

@@ -29,7 +29,7 @@ float2 VelocityAt(const uint2 loc)
     
     texCoord -= pos;
     
-    const float aspectRatio = simTexelSize.y / simTexelSize.x;
+    const float aspectRatio = 16.0 / 9.0;
     
     texCoord.x *= aspectRatio;
     
