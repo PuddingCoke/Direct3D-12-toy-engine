@@ -8,11 +8,14 @@ struct PixelInput
 
 cbuffer TextureIndex : register(b2)
 {
-    uint normalTextureIndex;
+    uint DxyzJacobianIndex;
+    uint DerivativeIndex;
     uint skyTextureIndex;
 }
 
-static Texture2D normalTexture = ResourceDescriptorHeap[normalTextureIndex];
+static Texture2D DxyzJacobian = ResourceDescriptorHeap[DxyzJacobianIndex];
+
+static Texture2D Derivative = ResourceDescriptorHeap[DerivativeIndex];
 
 static TextureCube skyTexture = ResourceDescriptorHeap[skyTextureIndex];
 
@@ -22,9 +25,11 @@ static const float3 oceanColor = float3(0.0000, 0.3307, 0.3613);
 
 float4 main(PixelInput input) : SV_TARGET
 {
-    float4 NJ = normalTexture.Sample(linearWrapSampler, input.texCoord);
+    float4 derivative = Derivative.Sample(linearWrapSampler, input.texCoord);
     
-    float3 N = normalize(NJ.xyz);
+    float2 slope = float2(derivative.x / (1.0 + derivative.z), derivative.y / (1.0 + derivative.w));
+    
+    float3 N = normalize(float3(-slope.x, 1.0, -slope.y));
     
     float3 V = normalize(perframeResource.eyePos.xyz - input.position.xyz);
     
@@ -38,7 +43,9 @@ float4 main(PixelInput input) : SV_TARGET
     
     float3 reflectColor = skyTexture.Sample(linearWrapSampler, R).rgb;
     
-    float turbulence = max(1.6 - NJ.w, 0.0);
+    float J = DxyzJacobian.Sample(linearWrapSampler, input.texCoord).w;
+    
+    float turbulence = max(1.6 - J, 0.0);
     
     float highlightMul = 1.0 + 2.0 * smoothstep(1.2, 1.8, turbulence);
     
@@ -50,13 +57,13 @@ float4 main(PixelInput input) : SV_TARGET
     
     color = lerp(color, reflectColor * highlightMul, F);
     
-    float fogFactor = distance(perframeResource.eyePos.xz, input.position.xz);
+    //float fogFactor = distance(perframeResource.eyePos.xz, input.position.xz);
     
-    float2 fogTexcoord = normalize(input.position.xz - perframeResource.eyePos.xz);
+    //float2 fogTexcoord = normalize(input.position.xz - perframeResource.eyePos.xz);
     
-    float3 fogColor = skyTexture.Sample(linearWrapSampler, float3(fogTexcoord.x, 0.0, fogTexcoord.y)).rgb;
+    //float3 fogColor = skyTexture.Sample(linearWrapSampler, float3(fogTexcoord.x, 0.0, fogTexcoord.y)).rgb;
     
-    fogFactor = pow(smoothstep(0.0, 1536.0, fogFactor), 0.5);
+    //fogFactor = pow(smoothstep(0.0, 1536.0, fogFactor), 0.5);
     
-    return float4(lerp(color, fogColor, fogFactor), 1.0);
+    return float4(reflectColor*F, 1.0);
 }

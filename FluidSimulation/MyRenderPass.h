@@ -275,7 +275,6 @@ public:
 
 	void recordCommand() override
 	{
-
 		const DirectX::XMFLOAT2 pos =
 		{
 			(float)Mouse::getX() / Graphics::getWidth(),
@@ -348,7 +347,7 @@ private:
 		float vorticityIntensity = 80.f;//涡流强度
 		float splatRadius = 0.25f;//施加颜色的半径
 		float splatForce = 6000.f;//施加速度的强度
-		const unsigned int pressureIteraion = 50;//雅可比迭代次数 这个值越高物理模拟越不容易出错 NVIDIA的文章有提到通常20-50次就够了
+		const unsigned int pressureIteraion = 35;//雅可比迭代次数 这个值越高物理模拟越不容易出错 NVIDIA的文章有提到通常20-50次就够了
 		const unsigned int resolutionFactor = 2;//物理模拟分辨率
 	}config;
 

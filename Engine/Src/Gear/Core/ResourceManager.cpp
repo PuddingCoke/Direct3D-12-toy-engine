@@ -850,10 +850,18 @@ TextureRenderView* ResourceManager::createTextureCube(const std::initializer_lis
 		for (const std::string& filePath : texturesPath)
 		{
 			srcTextures[index] = createTexture(filePath, D3D12_RESOURCE_FLAG_NONE, nullptr);
+
+			commandList->pushResourceTrackList(srcTextures[index]);
+
+			srcTextures[index]->setAllState(D3D12_RESOURCE_STATE_COPY_SOURCE);
+
 			release(srcTextures[index]);
+
 			index++;
 		}
 	}
+
+	commandList->transitionResources();
 
 	const bool hasRTV = (rtvFormat != DXGI_FORMAT_UNKNOWN);
 
