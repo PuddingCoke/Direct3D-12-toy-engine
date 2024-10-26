@@ -33,6 +33,7 @@ float getPhillip(float2 k)
     float len = length(k);
         
     float len2 = len * len;
+    
     float len4 = len2 * len2;
         
     float kDotw = dot(normalize(k), normalize(wind));
@@ -56,20 +57,22 @@ float getPhillip(float2 k)
 }
 
 [numthreads(32, 32, 1)]
-void main( uint3 DTid : SV_DispatchThreadID )
+void main(uint3 DTid : SV_DispatchThreadID)
 {
-    float2 k = float2(M_PI * (2.0 * float(DTid.x) - float(mapResolution)) / float(mapLength), M_PI * (2.0 * float(DTid.y) - float(mapResolution)) / float(mapLength));
+    const float2 k = float2(M_PI * (2.0 * float(DTid.x) - float(mapResolution)) / float(mapLength), M_PI * (2.0 * float(DTid.y) - float(mapResolution)) / float(mapLength));
     
-    float len = length(k);
+    const float len = length(k);
     
-    if (len >= 0.0001 && len <= 5.0)
+    if (len >= 0.0001)
     {
         tildeh0k[DTid.xy] = gaussTexture[DTid.xy].xy * sqrt(getPhillip(k) / 2.0);
+        
         waveData[DTid.xy] = float4(k.x, 1.0 / len, k.y, Dispersion(k));
     }
     else
     {
         tildeh0k[DTid.xy] = float2(0.0, 0.0);
+        
         waveData[DTid.xy] = float4(k.x, 1.0, k.y, 0.0);
     }
 }

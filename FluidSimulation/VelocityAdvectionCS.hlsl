@@ -41,6 +41,7 @@ float2 VelocityAt(const uint2 loc)
 [numthreads(16, 9, 1)]
 void main(const uint2 DTid : SV_DispatchThreadID)
 {
+    //interior texel
     if (DTid.x > 0 && DTid.x < simTextureSize.x - 1 && DTid.y > 0 && DTid.y < simTextureSize.y - 1)
     {
         velocityWriteTex[DTid] = VelocityAt(DTid);

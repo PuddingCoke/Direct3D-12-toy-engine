@@ -13,7 +13,7 @@ public:
 	MyRenderPass() :
 		oceanParamBuffer(ResourceManager::createConstantBuffer(sizeof(Param), true)),
 		textureCubePS(new Shader(Utils::getRootFolder() + "TextureCubePS.cso")),
-		phillipSpectrumShader(new Shader(Utils::getRootFolder() + "PhillipsSpectrum.cso")),
+		phillipsSpectrumShader(new Shader(Utils::getRootFolder() + "PhillipsSpectrum.cso")),
 		conjugatedCalcCS(new Shader(Utils::getRootFolder() + "ConjugatedCalcCS.cso")),
 		displacementShader(new Shader(Utils::getRootFolder() + "Displacement.cso")),
 		ifftShader(new Shader(Utils::getRootFolder() + "IFFT.cso")),
@@ -23,34 +23,6 @@ public:
 		oceanHShader(new Shader(Utils::getRootFolder() + "OceanHShader.cso")),
 		oceanDShader(new Shader(Utils::getRootFolder() + "OceanDShader.cso")),
 		oceanPShader(new Shader(Utils::getRootFolder() + "OceanPShader.cso")),
-		tildeh0k(ResourceManager::createTextureRenderView(1024, 1024, DXGI_FORMAT_R32G32_FLOAT, 1, 1, false, true,
-			DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_UNKNOWN)),
-		tildeh0(ResourceManager::createTextureRenderView(1024, 1024, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 1, false, true,
-			DXGI_FORMAT_R32G32B32A32_FLOAT, DXGI_FORMAT_R32G32B32A32_FLOAT, DXGI_FORMAT_UNKNOWN)),
-		waveData(ResourceManager::createTextureRenderView(1024, 1024, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 1, false, true,
-			DXGI_FORMAT_R32G32B32A32_FLOAT, DXGI_FORMAT_R32G32B32A32_FLOAT, DXGI_FORMAT_UNKNOWN)),
-		Dy(ResourceManager::createTextureRenderView(1024, 1024, DXGI_FORMAT_R32G32_FLOAT, 1, 1, false, true,
-			DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_UNKNOWN)),
-		Dx(ResourceManager::createTextureRenderView(1024, 1024, DXGI_FORMAT_R32G32_FLOAT, 1, 1, false, true,
-			DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_UNKNOWN)),
-		Dz(ResourceManager::createTextureRenderView(1024, 1024, DXGI_FORMAT_R32G32_FLOAT, 1, 1, false, true,
-			DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_UNKNOWN)),
-		Dyx(ResourceManager::createTextureRenderView(1024, 1024, DXGI_FORMAT_R32G32_FLOAT, 1, 1, false, true,
-			DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_UNKNOWN)),
-		Dyz(ResourceManager::createTextureRenderView(1024, 1024, DXGI_FORMAT_R32G32_FLOAT, 1, 1, false, true,
-			DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_UNKNOWN)),
-		Dxx(ResourceManager::createTextureRenderView(1024, 1024, DXGI_FORMAT_R32G32_FLOAT, 1, 1, false, true,
-			DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_UNKNOWN)),
-		Dzz(ResourceManager::createTextureRenderView(1024, 1024, DXGI_FORMAT_R32G32_FLOAT, 1, 1, false, true,
-			DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_UNKNOWN)),
-		Dxz(ResourceManager::createTextureRenderView(1024, 1024, DXGI_FORMAT_R32G32_FLOAT, 1, 1, false, true,
-			DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_UNKNOWN)),
-		tempTexture(ResourceManager::createTextureRenderView(1024, 1024, DXGI_FORMAT_R32G32_FLOAT, 1, 1, false, true,
-			DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_UNKNOWN)),
-		Dxyz(ResourceManager::createTextureRenderView(1024, 1024, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 1, false, true,
-			DXGI_FORMAT_R32G32B32A32_FLOAT, DXGI_FORMAT_R32G32B32A32_FLOAT, DXGI_FORMAT_UNKNOWN)),
-		normalJacobian(ResourceManager::createTextureRenderView(1024, 1024, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 1, false, true,
-			DXGI_FORMAT_R32G32B32A32_FLOAT, DXGI_FORMAT_R32G32B32A32_FLOAT, DXGI_FORMAT_UNKNOWN)),
 		originTexture(ResourceManager::createTextureRenderView(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R16G16B16A16_FLOAT, 1, 1, false, true,
 			DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_R16G16B16A16_FLOAT)),
 		depthTexture(ResourceManager::createTextureDepthView(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R32_TYPELESS, 1, 1, false, true))
@@ -74,53 +46,17 @@ public:
 			GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&skyboxState));
 		}
 
-		{
-			D3D12_COMPUTE_PIPELINE_STATE_DESC desc = {};
-			desc.pRootSignature = GlobalRootSignature::getComputeRootSignature()->get();
-			desc.CS = phillipSpectrumShader->getByteCode();
+		phillipsSpectrumState = PipelineState::createComputeState(phillipsSpectrumShader);
 
-			GraphicsDevice::get()->CreateComputePipelineState(&desc, IID_PPV_ARGS(&phillipSpectrumState));
-		}
+		conjugatedCalcState = PipelineState::createComputeState(conjugatedCalcCS);
 
-		{
-			D3D12_COMPUTE_PIPELINE_STATE_DESC desc = {};
-			desc.pRootSignature = GlobalRootSignature::getComputeRootSignature()->get();
-			desc.CS = conjugatedCalcCS->getByteCode();
+		displacementState = PipelineState::createComputeState(displacementShader);
 
-			GraphicsDevice::get()->CreateComputePipelineState(&desc, IID_PPV_ARGS(&conjugatedCalcState));
-		}
+		ifftState = PipelineState::createComputeState(ifftShader);
 
-		{
-			D3D12_COMPUTE_PIPELINE_STATE_DESC desc = {};
-			desc.pRootSignature = GlobalRootSignature::getComputeRootSignature()->get();
-			desc.CS = displacementShader->getByteCode();
+		permutationState = PipelineState::createComputeState(permutationCS);
 
-			GraphicsDevice::get()->CreateComputePipelineState(&desc, IID_PPV_ARGS(&displacementState));
-		}
-
-		{
-			D3D12_COMPUTE_PIPELINE_STATE_DESC desc = {};
-			desc.pRootSignature = GlobalRootSignature::getComputeRootSignature()->get();
-			desc.CS = ifftShader->getByteCode();
-
-			GraphicsDevice::get()->CreateComputePipelineState(&desc, IID_PPV_ARGS(&ifftState));
-		}
-
-		{
-			D3D12_COMPUTE_PIPELINE_STATE_DESC desc = {};
-			desc.pRootSignature = GlobalRootSignature::getComputeRootSignature()->get();
-			desc.CS = permutationCS->getByteCode();
-
-			GraphicsDevice::get()->CreateComputePipelineState(&desc, IID_PPV_ARGS(&permutationState));
-		}
-
-		{
-			D3D12_COMPUTE_PIPELINE_STATE_DESC desc = {};
-			desc.pRootSignature = GlobalRootSignature::getComputeRootSignature()->get();
-			desc.CS = waveMergeCS->getByteCode();
-
-			GraphicsDevice::get()->CreateComputePipelineState(&desc, IID_PPV_ARGS(&waveMergeState));
-		}
+		waveMergeState = PipelineState::createComputeState(waveMergeCS);
 
 		{
 			D3D12_INPUT_ELEMENT_DESC inputLayoutDesc[2] =
@@ -168,9 +104,63 @@ public:
 			GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&fullScreenState));
 		}
 
-		normalJacobian->getTexture()->setName(L"Normal Jacobian");
+		tildeh0k = ResourceManager::createTextureRenderView(textureResolution + 1, textureResolution + 1, DXGI_FORMAT_R32G32_FLOAT, 1, 1, false, true,
+			DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_UNKNOWN);
 
-		Dxyz->getTexture()->setName(L"Dxyz");
+		tildeh0 = ResourceManager::createTextureRenderView(textureResolution, textureResolution, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 1, false, true,
+			DXGI_FORMAT_R32G32B32A32_FLOAT, DXGI_FORMAT_R32G32B32A32_FLOAT, DXGI_FORMAT_UNKNOWN);
+
+		waveData = ResourceManager::createTextureRenderView(textureResolution + 1, textureResolution + 1, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 1, false, true,
+			DXGI_FORMAT_R32G32B32A32_FLOAT, DXGI_FORMAT_R32G32B32A32_FLOAT, DXGI_FORMAT_UNKNOWN);
+
+		Dy = ResourceManager::createTextureRenderView(textureResolution, textureResolution, DXGI_FORMAT_R32G32_FLOAT, 1, 1, false, true,
+			DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_UNKNOWN);
+
+		Dx = ResourceManager::createTextureRenderView(textureResolution, textureResolution, DXGI_FORMAT_R32G32_FLOAT, 1, 1, false, true,
+			DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_UNKNOWN);
+
+		Dz = ResourceManager::createTextureRenderView(textureResolution, textureResolution, DXGI_FORMAT_R32G32_FLOAT, 1, 1, false, true,
+			DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_UNKNOWN);
+
+		Dyx = ResourceManager::createTextureRenderView(textureResolution, textureResolution, DXGI_FORMAT_R32G32_FLOAT, 1, 1, false, true,
+			DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_UNKNOWN);
+
+		Dyz = ResourceManager::createTextureRenderView(textureResolution, textureResolution, DXGI_FORMAT_R32G32_FLOAT, 1, 1, false, true,
+			DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_UNKNOWN);
+
+		Dxx = ResourceManager::createTextureRenderView(textureResolution, textureResolution, DXGI_FORMAT_R32G32_FLOAT, 1, 1, false, true,
+			DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_UNKNOWN);
+
+		Dzz = ResourceManager::createTextureRenderView(textureResolution, textureResolution, DXGI_FORMAT_R32G32_FLOAT, 1, 1, false, true,
+			DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_UNKNOWN);
+
+		Dxz = ResourceManager::createTextureRenderView(textureResolution, textureResolution, DXGI_FORMAT_R32G32_FLOAT, 1, 1, false, true,
+			DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_UNKNOWN);
+
+		tempTexture = ResourceManager::createTextureRenderView(textureResolution, textureResolution, DXGI_FORMAT_R32G32_FLOAT, 1, 1, false, true,
+			DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_UNKNOWN);
+
+		DxyzJacobian = ResourceManager::createTextureRenderView(textureResolution, textureResolution, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 1, false, true,
+			DXGI_FORMAT_R32G32B32A32_FLOAT, DXGI_FORMAT_R32G32B32A32_FLOAT, DXGI_FORMAT_UNKNOWN);
+
+		Derivative = ResourceManager::createTextureRenderView(textureResolution, textureResolution, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 1, false, true,
+			DXGI_FORMAT_R32G32B32A32_FLOAT, DXGI_FORMAT_R32G32B32A32_FLOAT, DXGI_FORMAT_UNKNOWN);
+
+		tildeh0k->getTexture()->setName(L"tildeh0k");
+
+		tildeh0->getTexture()->setName(L"tildeh0");
+
+		waveData->getTexture()->setName(L"WaveData");
+
+		Dx->getTexture()->setName(L"Dx");
+
+		Dy->getTexture()->setName(L"Dy");
+
+		Dz->getTexture()->setName(L"Dz");
+
+		Derivative->getTexture()->setName(L"Derivative");
+
+		DxyzJacobian->getTexture()->setName(L"Dxyz");
 
 		originTexture->getTexture()->setName(L"Origin Texture");
 
@@ -179,16 +169,16 @@ public:
 		{
 			auto getVertexAt = [this](const int& x, const int& z)
 				{
-					const float xPos = ((float)x - (float)patchSize / 2.f) * (float)param.mapLength / (float)patchSize - (float)param.mapLength / 2.f;
-					const float zPos = ((float)z - (float)patchSize / 2.f) * (float)param.mapLength / (float)patchSize - (float)param.mapLength / 2.f;
-					const float u = (float)x / (float)patchSize;
-					const float v = (float)z / (float)patchSize;
+					const float xPos = (float)x * (float)param.mapLength;
+					const float zPos = (float)z * (float)param.mapLength;
+					const float u = (float)x;
+					const float v = (float)z;
 					return Vertex{ {xPos,0.f,zPos},{u,v} };
 				};
 
-			for (int z = 0; z < tildeNum * 32; z++)
+			for (int z = 0; z < patchSize; z++)
 			{
-				for (int x = 0; x < tildeNum * 32; x++)
+				for (int x = 0; x < patchSize; x++)
 				{
 					vertices.push_back(getVertexAt(x, z));
 					vertices.push_back(getVertexAt(x, z + 1));
@@ -202,22 +192,22 @@ public:
 
 		effect = new BloomEffect(context, Graphics::getWidth(), Graphics::getHeight(), resManager);
 
-		envCube = resManager->createTextureCube("E:\\Assets\\Ocean\\ColdSunsetEquirect.png", 1024, true);
+		envCube = resManager->createTextureCube("E:\\Assets\\Ocean\\ColdSunsetEquirect.png", textureResolution, true);
 
-		randomGauss = resManager->createTextureRenderView(1024, 1024, RandomDataType::GAUSS, true);
+		randomGauss = resManager->createTextureRenderView(textureResolution + 1, textureResolution + 1, RandomDataType::GAUSS, true);
 
 		patchVertexBuffer = resManager->createStructuredBufferView(sizeof(Vertex), sizeof(Vertex) * vertices.size(), false, false, true, false, true, vertices.data());
 
-		float clearValue[] = {999.f,999.f, 999.f, 999.f};
+		float clearValue[] = { 999.f, 999.f, 999.f, 999.f };
 
-		context->clearUnorderedAccess(normalJacobian->getClearUAVDesc(0), clearValue);
+		context->clearUnorderedAccess(DxyzJacobian->getClearUAVDesc(0), clearValue);
 
 		calPhillipsTexture();
 
 		end();
 
 		RenderEngine::get()->submitRenderPass(this);
-		
+
 		effect->setExposure(1.5f);
 	}
 
@@ -226,7 +216,7 @@ public:
 		delete oceanParamBuffer;
 
 		delete textureCubePS;
-		delete phillipSpectrumShader;
+		delete phillipsSpectrumShader;
 		delete conjugatedCalcCS;
 		delete displacementShader;
 		delete ifftShader;
@@ -254,8 +244,8 @@ public:
 		delete Dzz;
 		delete Dxz;
 		delete tempTexture;
-		delete Dxyz;
-		delete normalJacobian;
+		delete DxyzJacobian;
+		delete Derivative;
 
 		delete originTexture;
 		delete depthTexture;
@@ -274,7 +264,7 @@ protected:
 	{
 		oceanParamBuffer->update(&param, sizeof(Param));
 
-		context->setPipelineState(phillipSpectrumState.Get());
+		context->setPipelineState(phillipsSpectrumState.Get());
 		context->setCSConstants({
 			tildeh0k->getUAVMipIndex(0),
 			waveData->getUAVMipIndex(0),
@@ -282,7 +272,7 @@ protected:
 		, 0);
 		context->setCSConstantBuffer(oceanParamBuffer);
 		context->transitionResources();
-		context->dispatch(1024 / 32, 1024 / 32, 1);
+		context->dispatch(textureResolution / 32 + 1, textureResolution / 32 + 1, 1);
 		context->uavBarrier({
 			tildeh0k->getTexture(),
 			waveData->getTexture()
@@ -295,7 +285,7 @@ protected:
 			}
 		, 0);
 		context->transitionResources();
-		context->dispatch(1024 / 32, 1024 / 32, 1);
+		context->dispatch(textureResolution / 32, textureResolution / 32, 1);
 		context->uavBarrier({
 			tildeh0->getTexture()
 			});
@@ -311,7 +301,7 @@ protected:
 			}
 		, 0);
 		context->transitionResources();
-		context->dispatch(1024, 1, 1);
+		context->dispatch(textureResolution, 1, 1);
 		context->uavBarrier({
 			tempTexture->getTexture()
 			});
@@ -322,7 +312,7 @@ protected:
 			}
 		, 0);
 		context->transitionResources();
-		context->dispatch(1024, 1, 1);
+		context->dispatch(textureResolution, 1, 1);
 		context->uavBarrier({
 			inputTexture->getTexture()
 			});
@@ -333,7 +323,7 @@ protected:
 			}
 		, 0);
 		context->transitionResources();
-		context->dispatch(1024 / 32, 1024 / 32, 1);
+		context->dispatch(textureResolution / 32, textureResolution / 32, 1);
 		context->uavBarrier({
 			inputTexture->getTexture()
 			});
@@ -356,7 +346,7 @@ protected:
 			}
 		, 0);
 		context->transitionResources();
-		context->dispatch(1024 / 32, 1024 / 32, 1);
+		context->dispatch(textureResolution / 32, textureResolution / 32, 1);
 		context->uavBarrier({
 			Dy->getTexture(),
 			Dx->getTexture(),
@@ -380,8 +370,8 @@ protected:
 
 		context->setPipelineState(waveMergeState.Get());
 		context->setCSConstants({
-			Dxyz->getUAVMipIndex(0),
-			normalJacobian->getUAVMipIndex(0),
+			DxyzJacobian->getUAVMipIndex(0),
+			Derivative->getUAVMipIndex(0),
 			Dy->getAllSRVIndex(),
 			Dx->getAllSRVIndex(),
 			Dz->getAllSRVIndex(),
@@ -393,10 +383,10 @@ protected:
 			}
 		, 0);
 		context->transitionResources();
-		context->dispatch(1024 / 32, 1024 / 32, 1);
+		context->dispatch(textureResolution / 32, textureResolution / 32, 1);
 		context->uavBarrier({
-			Dxyz->getTexture(),
-			normalJacobian->getTexture()
+			DxyzJacobian->getTexture(),
+			Derivative->getTexture()
 			});
 
 		context->setPipelineState(skyboxState.Get());
@@ -424,18 +414,19 @@ protected:
 		context->setRenderTargets({ originTexture->getRTVMipHandle(0) }, &depthStencilDesc);
 
 		context->setDSConstants({
-			Dxyz->getAllSRVIndex()
+			DxyzJacobian->getAllSRVIndex()
 			}
 		, 0);
 		context->setPSConstants({
-			normalJacobian->getAllSRVIndex(),
+			DxyzJacobian->getAllSRVIndex(),
+			Derivative->getAllSRVIndex(),
 			envCube->getAllSRVIndex()
 			}
 		, 0);
 		context->transitionResources();
 
 		context->clearDepthStencil(depthTexture->getDSVMipHandle(0), D3D12_CLEAR_FLAG_DEPTH, 1.f, 0);
-		context->draw(4 * tildeNum * 32 * tildeNum * 32, 1, 0, 0);
+		context->draw(4 * patchSize * patchSize, 1, 0, 0);
 
 		TextureRenderView* bloomTexture = effect->process(originTexture);
 
@@ -452,7 +443,7 @@ protected:
 
 private:
 
-	static constexpr UINT tildeNum = 6;
+	static constexpr UINT textureResolution = 1024;
 
 	static constexpr UINT patchSize = 32;
 
@@ -464,9 +455,9 @@ private:
 
 	const struct Param
 	{
-		unsigned int mapResolution = 1024;
-		float mapLength = 512.0;
-		DirectX::XMFLOAT2 wind = { 20.f,0.f };
+		unsigned int mapResolution = textureResolution;
+		float mapLength = 128.0;
+		DirectX::XMFLOAT2 wind = { 10.f,10.f };
 		float amplitude = 0.000001f;
 		float gravity = 9.81f;
 		DirectX::XMFLOAT2 padding0;
@@ -475,7 +466,7 @@ private:
 
 	Shader* textureCubePS;
 
-	Shader* phillipSpectrumShader;
+	Shader* phillipsSpectrumShader;
 
 	Shader* conjugatedCalcCS;
 
@@ -497,7 +488,7 @@ private:
 
 	ComPtr<ID3D12PipelineState> skyboxState;
 
-	ComPtr<ID3D12PipelineState> phillipSpectrumState;
+	ComPtr<ID3D12PipelineState> phillipsSpectrumState;
 
 	ComPtr<ID3D12PipelineState> conjugatedCalcState;
 
@@ -545,9 +536,9 @@ private:
 
 	TextureRenderView* Dxz;
 
-	TextureRenderView* Dxyz;
+	TextureRenderView* DxyzJacobian;
 
-	TextureRenderView* normalJacobian;
+	TextureRenderView* Derivative;
 
 	TextureRenderView* originTexture;
 

@@ -45,9 +45,11 @@ void main(uint2 DTid : SV_DispatchThreadID)
     float omegat = wave.w * perframeResource.timeElapsed;
     
     float cos_ = cos(omegat);
+    
     float sin_ = sin(omegat);
     
     float2 c0 = float2(cos_, sin_);
+    
     float2 c1 = float2(cos_, -sin_);
     
     float2 h = ComplexMul(htilde0, c0) + ComplexMul(htilde0mkconj, c1);
@@ -55,11 +57,18 @@ void main(uint2 DTid : SV_DispatchThreadID)
     float2 ih = float2(-h.y, h.x);
     
     Dy[DTid] = h;
+    
     Dyx[DTid] = ih * wave.x;
+    
     Dyz[DTid] = ih * wave.z;
+    
     Dx[DTid] = ih * wave.x * wave.y;
+    
     Dz[DTid] = ih * wave.z * wave.y;
+    
     Dxx[DTid] = -h * wave.x * wave.x * wave.y;
+    
     Dzz[DTid] = -h * wave.z * wave.z * wave.y;
+    
     Dxz[DTid] = -h * wave.x * wave.z * wave.y;
 }
