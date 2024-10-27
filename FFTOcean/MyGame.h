@@ -11,7 +11,7 @@ class MyGame :public Game
 public:
 
 	MyGame() :
-		camera({ 0.f,100.f,0.f }, { 1.f,0.f,0.f }, { 0.f,1.f,0.f }, 512.f),
+		camera({ 0.f,100.f,0.f }, { 0.f,-0.3f,-1.f }, { 0.f,1.f,0.f }, 100.f),
 		renderPass(new MyRenderPass())
 	{
 		Camera::setProj(Math::pi / 4.f, Graphics::getAspectRatio(), 1.f, 2048.f);
