@@ -2,7 +2,8 @@
 
 struct DS_OUTPUT
 {
-    float3 position : POSITION;
+    float3 displacedPosition : POSITION0;
+    float3 unDisplacedPosition : POSITION1;
     float2 uv : TEXCOORD;
     float4 svPosition : SV_POSITION;
 };
@@ -37,7 +38,7 @@ float3 interpolatePosition(const float3 v0, const float3 v1, const float3 v2, co
     return p;
 }
 
-float2 interpolateUV(const float2 v0,const float2 v1,const float2 v2,const float2 v3,const float2 uv)
+float2 interpolateUV(const float2 v0, const float2 v1, const float2 v2, const float2 v3, const float2 uv)
 {
     const float2 bottom = lerp(v0, v1, uv.x);
     
@@ -60,9 +61,11 @@ DS_OUTPUT main(
     
     const float2 uv = interpolateUV(patch[0].uv, patch[1].uv, patch[2].uv, patch[3].uv, domain);
     
+    Output.unDisplacedPosition = position;
+    
     position += displacementTexture.SampleLevel(linearWrapSampler, uv, 0.0).xyz;
     
-    Output.position = position;
+    Output.displacedPosition = position;
     
     Output.uv = uv;
     

@@ -67,5 +67,8 @@
     <FxCompile Include="OceanPS.hlsl">
       <Filter>HLSL\Rendering</Filter>
     </FxCompile>
+    <FxCompile Include="TextureCubePS.hlsl">
+      <Filter>HLSL\Rendering</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

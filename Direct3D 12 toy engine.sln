@@ -17,8 +17,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FluidSimulation", "FluidSim
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MandelBulb", "MandelBulb\MandelBulb.vcxproj", "{018B5D19-926B-45C3-BD59-30040FB50409}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OceanSimulation", "OceanSimulation\OceanSimulation.vcxproj", "{3DC0E79E-7D9B-4D66-A93A-7C5ADF8A4F29}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CrytekSponza", "CrytekSponza\CrytekSponza.vcxproj", "{1DD61E0C-2055-4C30-B744-9923A093949F}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SimpleParticleEffect", "SimpleParticleEffect\SimpleParticleEffect.vcxproj", "{BEF2256D-25B7-44CB-A6E4-CF6F4B4074E6}"
@@ -89,14 +87,6 @@ Global
 		{018B5D19-926B-45C3-BD59-30040FB50409}.Release|x64.Build.0 = Release|x64
 		{018B5D19-926B-45C3-BD59-30040FB50409}.Release|x86.ActiveCfg = Release|Win32
 		{018B5D19-926B-45C3-BD59-30040FB50409}.Release|x86.Build.0 = Release|Win32
-		{3DC0E79E-7D9B-4D66-A93A-7C5ADF8A4F29}.Debug|x64.ActiveCfg = Debug|x64
-		{3DC0E79E-7D9B-4D66-A93A-7C5ADF8A4F29}.Debug|x64.Build.0 = Debug|x64
-		{3DC0E79E-7D9B-4D66-A93A-7C5ADF8A4F29}.Debug|x86.ActiveCfg = Debug|Win32
-		{3DC0E79E-7D9B-4D66-A93A-7C5ADF8A4F29}.Debug|x86.Build.0 = Debug|Win32
-		{3DC0E79E-7D9B-4D66-A93A-7C5ADF8A4F29}.Release|x64.ActiveCfg = Release|x64
-		{3DC0E79E-7D9B-4D66-A93A-7C5ADF8A4F29}.Release|x64.Build.0 = Release|x64
-		{3DC0E79E-7D9B-4D66-A93A-7C5ADF8A4F29}.Release|x86.ActiveCfg = Release|Win32
-		{3DC0E79E-7D9B-4D66-A93A-7C5ADF8A4F29}.Release|x86.Build.0 = Release|Win32
 		{1DD61E0C-2055-4C30-B744-9923A093949F}.Debug|x64.ActiveCfg = Debug|x64
 		{1DD61E0C-2055-4C30-B744-9923A093949F}.Debug|x64.Build.0 = Debug|x64
 		{1DD61E0C-2055-4C30-B744-9923A093949F}.Debug|x86.ActiveCfg = Debug|Win32

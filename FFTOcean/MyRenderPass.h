@@ -6,6 +6,8 @@
 
 #include<Gear/Core/Resource/TextureRenderView.h>
 
+#include<Gear/Core/Effect/BloomEffect.h>
+
 #include<DirectXColors.h>
 
 class MyRenderPass :public RenderPass
@@ -14,6 +16,7 @@ public:
 
 	MyRenderPass() :
 		spectrumParamBuffer(ResourceManager::createConstantBuffer(sizeof(SpectrumParam), true)),
+		textureCubePS(new Shader(Utils::getRootFolder() + "TextureCubePS.cso")),
 		oceanVS(new Shader(Utils::getRootFolder() + "OceanVS.cso")),
 		oceanHS(new Shader(Utils::getRootFolder() + "OceanHS.cso")),
 		oceanDS(new Shader(Utils::getRootFolder() + "OceanDS.cso")),
@@ -25,6 +28,25 @@ public:
 		permutationCS(new Shader(Utils::getRootFolder() + "PermutationCS.cso")),
 		waveMergeCS(new Shader(Utils::getRootFolder() + "WaveMergeCS.cso"))
 	{
+		{
+			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = PipelineState::getDefaultGraphicsDesc();
+			desc.InputLayout = {};
+			desc.pRootSignature = GlobalRootSignature::getGraphicsRootSignature()->get();
+			desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
+			desc.RasterizerState = States::rasterCullBack;
+			desc.DepthStencilState.DepthEnable = false;
+			desc.DepthStencilState.StencilEnable = false;
+			desc.SampleMask = UINT_MAX;
+			desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+			desc.NumRenderTargets = 1;
+			desc.RTVFormats[0] = DXGI_FORMAT_R16G16B16A16_FLOAT;
+			desc.SampleDesc.Count = 1;
+			desc.VS = Shader::textureCubeVS->getByteCode();
+			desc.PS = textureCubePS->getByteCode();
+
+			GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&textureCubeState));
+		}
+
 		{
 			D3D12_INPUT_ELEMENT_DESC inputLayoutDesc[] =
 			{
@@ -110,13 +132,13 @@ public:
 		{
 			auto getVertexAt = [this](const UINT& x, const UINT& z)
 				{
-					const float xPos = (float)x * (float)spectrumParam.mapLength / (float)tileNum;
+					const float xPos = (float)x * (float)spectrumParam.mapLength / (float)tilePerPatch - (float)patchNum * spectrumParam.mapLength / 2.f;
 
-					const float zPos = (float)z * (float)spectrumParam.mapLength / (float)tileNum;
+					const float zPos = (float)z * (float)spectrumParam.mapLength / (float)tilePerPatch - (float)patchNum * spectrumParam.mapLength / 2.f;
 
-					const float u = (float)x / (float)tileNum;
+					const float u = (float)x / (float)tilePerPatch;
 
-					const float v = (float)z / (float)tileNum;
+					const float v = (float)z / (float)tilePerPatch;
 
 					return Vertex{ {xPos,0.f,zPos},{u,v} };
 				};
@@ -125,13 +147,13 @@ public:
 			{
 				for (UINT patchX = 0; patchX < patchNum; patchX++)
 				{
-					for (UINT tileZ = 0; tileZ < tileNum; tileZ++)
+					for (UINT tileZ = 0; tileZ < tilePerPatch; tileZ++)
 					{
-						for (UINT tileX = 0; tileX < tileNum; tileX++)
+						for (UINT tileX = 0; tileX < tilePerPatch; tileX++)
 						{
-							const UINT z = patchZ * tileNum + tileZ;
+							const UINT z = patchZ * tilePerPatch + tileZ;
 
-							const UINT x = patchX * tileNum + tileX;
+							const UINT x = patchX * tilePerPatch + tileX;
 
 							vertices.push_back(getVertexAt(x, z));
 
@@ -148,9 +170,13 @@ public:
 
 		begin();
 
+		effect = new BloomEffect(context, Graphics::getWidth(), Graphics::getHeight(), resManager);
+
 		vertexBuffer = resManager->createStructuredBufferView(sizeof(Vertex), static_cast<UINT>(sizeof(Vertex) * vertices.size()), false, false, true, false, true, vertices.data());
 
 		randomGaussTexture = resManager->createTextureRenderView(textureResolution + 1, textureResolution + 1, RandomDataType::GAUSS, true);
+
+		enviromentCube = resManager->createTextureCube("E:\\Assets\\Ocean\\ColdSunsetEquirect.png", textureResolution, true);
 
 		calculateInitialSpectrum();
 
@@ -197,6 +223,10 @@ public:
 		originTexture->getTexture()->setName(L"originTexture");
 
 		depthTexture->getTexture()->setName(L"depthTexture");
+
+		effect->setExposure(1.5f);
+
+		effect->setGamma(0.6f);
 	}
 
 	~MyRenderPass()
@@ -204,6 +234,8 @@ public:
 		delete vertexBuffer;
 
 		delete spectrumParamBuffer;
+
+		delete textureCubePS;
 
 		delete oceanVS;
 
@@ -224,6 +256,8 @@ public:
 		delete permutationCS;
 
 		delete waveMergeCS;
+
+		delete enviromentCube;
 
 		delete randomGaussTexture;
 
@@ -260,6 +294,13 @@ public:
 		delete originTexture;
 
 		delete depthTexture;
+
+		delete effect;
+	}
+
+	void imGUICall() override
+	{
+		effect->imGUICall();
 	}
 
 protected:
@@ -280,7 +321,7 @@ private:
 
 	static constexpr UINT patchNum = 4;
 
-	static constexpr UINT tileNum = 8;
+	static constexpr UINT tilePerPatch = 8;
 
 	static TextureRenderView* createTexture(const UINT& resolution, const DXGI_FORMAT& format)
 	{
@@ -437,6 +478,21 @@ private:
 
 	void renderSkyDomeAndOceanSurface()
 	{
+		context->setPipelineState(textureCubeState.Get());
+
+		context->setViewportSimple(Graphics::getWidth(), Graphics::getHeight());
+
+		context->setTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+		context->setRenderTargets({ originTexture->getRTVMipHandle(0) }, {});
+
+		context->setPSConstants({
+			enviromentCube->getAllSRVIndex() }, 0);
+
+		context->transitionResources();
+
+		context->draw(36, 1, 0, 0);
+
 		context->setPipelineState(oceanState.Get());
 
 		context->setViewportSimple(Graphics::getWidth(), Graphics::getHeight());
@@ -457,26 +513,26 @@ private:
 		context->setPSConstants({
 			displacementTexture->getAllSRVIndex(),
 			derivativeTexture->getAllSRVIndex(),
-			jacobianTexture->getAllSRVIndex() }, 0);
+			jacobianTexture->getAllSRVIndex(),
+			enviromentCube->getAllSRVIndex() }, 0);
 
 		context->transitionResources();
 
-		//clear
-		context->clearRenderTarget(originTexture->getRTVMipHandle(0), DirectX::Colors::Black);
-
 		context->clearDepthStencil(depthTexture->getDSVMipHandle(0), D3D12_CLEAR_FLAG_DEPTH, 1.f, 0);
 
-		context->draw(4 * (patchNum * patchNum) * (tileNum * tileNum), 1, 0, 0);
+		context->draw(4 * (patchNum * patchNum) * (tilePerPatch * tilePerPatch), 1, 0, 0);
 
-		blit(originTexture);
+		TextureRenderView* bloomTexture = effect->process(originTexture);
+
+		blit(bloomTexture);
 	}
 
 	struct SpectrumParam
 	{
 		UINT mapResolution = textureResolution;
 		float mapLength = 512.f;
-		DirectX::XMFLOAT2 wind = { 20.f,0.f };
-		float amplitude = 0.000001f;
+		DirectX::XMFLOAT2 wind = { 10.f,0.f };
+		float amplitude = 0.0000005f;
 		float gravity = 9.81f;
 		DirectX::XMFLOAT2 padding0;
 		DirectX::XMFLOAT4 padding1[14];
@@ -485,6 +541,10 @@ private:
 	BufferView* vertexBuffer;
 
 	ConstantBuffer* spectrumParamBuffer;
+
+	Shader* textureCubePS;
+
+	ComPtr<ID3D12PipelineState> textureCubeState;
 
 	Shader* oceanVS;
 
@@ -581,5 +641,7 @@ private:
 	TextureRenderView* originTexture;
 
 	TextureDepthView* depthTexture;
+
+	BloomEffect* effect;
 
 };
