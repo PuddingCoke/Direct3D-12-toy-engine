@@ -16,6 +16,12 @@
     <Filter Include="HLSL">
       <UniqueIdentifier>{749338ae-9bef-47f2-94a9-aeebf65ad8ca}</UniqueIdentifier>
     </Filter>
+    <Filter Include="HLSL\Simulation">
+      <UniqueIdentifier>{6113d3a1-aaf3-40e3-ba9b-6d8ab829c44e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HLSL\Rendering">
+      <UniqueIdentifier>{e4cba8e8-4d3a-4c2b-9c63-11b5a6a78cc5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -31,23 +37,35 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="SpectrumCS.hlsl">
-      <Filter>HLSL</Filter>
-    </FxCompile>
     <FxCompile Include="ConjugateCS.hlsl">
-      <Filter>HLSL</Filter>
+      <Filter>HLSL\Simulation</Filter>
     </FxCompile>
     <FxCompile Include="DisplacementSpectrumCS.hlsl">
-      <Filter>HLSL</Filter>
+      <Filter>HLSL\Simulation</Filter>
     </FxCompile>
     <FxCompile Include="IFFTCS.hlsl">
-      <Filter>HLSL</Filter>
+      <Filter>HLSL\Simulation</Filter>
     </FxCompile>
     <FxCompile Include="PermutationCS.hlsl">
-      <Filter>HLSL</Filter>
+      <Filter>HLSL\Simulation</Filter>
+    </FxCompile>
+    <FxCompile Include="SpectrumCS.hlsl">
+      <Filter>HLSL\Simulation</Filter>
     </FxCompile>
     <FxCompile Include="WaveMergeCS.hlsl">
-      <Filter>HLSL</Filter>
+      <Filter>HLSL\Simulation</Filter>
+    </FxCompile>
+    <FxCompile Include="OceanVS.hlsl">
+      <Filter>HLSL\Rendering</Filter>
+    </FxCompile>
+    <FxCompile Include="OceanHS.hlsl">
+      <Filter>HLSL\Rendering</Filter>
+    </FxCompile>
+    <FxCompile Include="OceanDS.hlsl">
+      <Filter>HLSL\Rendering</Filter>
+    </FxCompile>
+    <FxCompile Include="OceanPS.hlsl">
+      <Filter>HLSL\Rendering</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

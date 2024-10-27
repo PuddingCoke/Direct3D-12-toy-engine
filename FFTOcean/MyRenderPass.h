@@ -6,12 +6,18 @@
 
 #include<Gear/Core/Resource/TextureRenderView.h>
 
+#include<DirectXColors.h>
+
 class MyRenderPass :public RenderPass
 {
 public:
 
 	MyRenderPass() :
 		spectrumParamBuffer(ResourceManager::createConstantBuffer(sizeof(SpectrumParam), true)),
+		oceanVS(new Shader(Utils::getRootFolder() + "OceanVS.cso")),
+		oceanHS(new Shader(Utils::getRootFolder() + "OceanHS.cso")),
+		oceanDS(new Shader(Utils::getRootFolder() + "OceanDS.cso")),
+		oceanPS(new Shader(Utils::getRootFolder() + "OceanPS.cso")),
 		spectrumCS(new Shader(Utils::getRootFolder() + "SpectrumCS.cso")),
 		conjugateCS(new Shader(Utils::getRootFolder() + "ConjugateCS.cso")),
 		displacementSpectrumCS(new Shader(Utils::getRootFolder() + "DisplacementSpectrumCS.cso")),
@@ -19,6 +25,33 @@ public:
 		permutationCS(new Shader(Utils::getRootFolder() + "PermutationCS.cso")),
 		waveMergeCS(new Shader(Utils::getRootFolder() + "WaveMergeCS.cso"))
 	{
+		{
+			D3D12_INPUT_ELEMENT_DESC inputLayoutDesc[] =
+			{
+				{"POSITION",0,DXGI_FORMAT_R32G32B32_FLOAT,0,D3D12_APPEND_ALIGNED_ELEMENT,D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0},
+				{"TEXCOORD",0,DXGI_FORMAT_R32G32_FLOAT,0,D3D12_APPEND_ALIGNED_ELEMENT,D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0}
+			};
+
+			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = PipelineState::getDefaultGraphicsDesc();
+			desc.InputLayout = { inputLayoutDesc,_countof(inputLayoutDesc) };
+			desc.pRootSignature = GlobalRootSignature::getGraphicsRootSignature()->get();
+			desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
+			desc.RasterizerState = States::rasterCullBack;
+			desc.DepthStencilState = States::depthLess;
+			desc.SampleMask = UINT_MAX;
+			desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_PATCH;
+			desc.NumRenderTargets = 1;
+			desc.RTVFormats[0] = DXGI_FORMAT_R16G16B16A16_FLOAT;
+			desc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
+			desc.SampleDesc.Count = 1;
+			desc.VS = oceanVS->getByteCode();
+			desc.HS = oceanHS->getByteCode();
+			desc.DS = oceanDS->getByteCode();
+			desc.PS = oceanPS->getByteCode();
+
+			GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&oceanState));
+		}
+
 		spectrumState = PipelineState::createComputeState(spectrumCS);
 
 		conjugateState = PipelineState::createComputeState(conjugateCS);
@@ -61,7 +94,61 @@ public:
 
 		jacobianTexture = createTexture(textureResolution, DXGI_FORMAT_R32_FLOAT);
 
+		originTexture = ResourceManager::createTextureRenderView(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R16G16B16A16_FLOAT, 1, 1, false, true,
+			DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_R16G16B16A16_FLOAT, DirectX::Colors::Black);
+
+		depthTexture = ResourceManager::createTextureDepthView(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R32_TYPELESS, 1, 1, false, true);
+
+		struct Vertex
+		{
+			DirectX::XMFLOAT3 position;
+			DirectX::XMFLOAT2 uv;
+		};
+
+		std::vector<Vertex> vertices;
+
+		{
+			auto getVertexAt = [this](const UINT& x, const UINT& z)
+				{
+					const float xPos = (float)x * (float)spectrumParam.mapLength / (float)tileNum;
+
+					const float zPos = (float)z * (float)spectrumParam.mapLength / (float)tileNum;
+
+					const float u = (float)x / (float)tileNum;
+
+					const float v = (float)z / (float)tileNum;
+
+					return Vertex{ {xPos,0.f,zPos},{u,v} };
+				};
+
+			for (UINT patchZ = 0; patchZ < patchNum; patchZ++)
+			{
+				for (UINT patchX = 0; patchX < patchNum; patchX++)
+				{
+					for (UINT tileZ = 0; tileZ < tileNum; tileZ++)
+					{
+						for (UINT tileX = 0; tileX < tileNum; tileX++)
+						{
+							const UINT z = patchZ * tileNum + tileZ;
+
+							const UINT x = patchX * tileNum + tileX;
+
+							vertices.push_back(getVertexAt(x, z));
+
+							vertices.push_back(getVertexAt(x, z + 1));
+
+							vertices.push_back(getVertexAt(x + 1, z + 1));
+
+							vertices.push_back(getVertexAt(x + 1, z));
+						}
+					}
+				}
+			}
+		}
+
 		begin();
+
+		vertexBuffer = resManager->createStructuredBufferView(sizeof(Vertex), static_cast<UINT>(sizeof(Vertex) * vertices.size()), false, false, true, false, true, vertices.data());
 
 		randomGaussTexture = resManager->createTextureRenderView(textureResolution + 1, textureResolution + 1, RandomDataType::GAUSS, true);
 
@@ -106,11 +193,25 @@ public:
 		derivativeTexture->getTexture()->setName(L"derivativeTexture");
 
 		jacobianTexture->getTexture()->setName(L"jacobianTexture");
+
+		originTexture->getTexture()->setName(L"originTexture");
+
+		depthTexture->getTexture()->setName(L"depthTexture");
 	}
 
 	~MyRenderPass()
 	{
+		delete vertexBuffer;
+
 		delete spectrumParamBuffer;
+
+		delete oceanVS;
+
+		delete oceanHS;
+
+		delete oceanDS;
+
+		delete oceanPS;
 
 		delete spectrumCS;
 
@@ -155,6 +256,10 @@ public:
 		delete derivativeTexture;
 
 		delete jacobianTexture;
+
+		delete originTexture;
+
+		delete depthTexture;
 	}
 
 protected:
@@ -165,16 +270,60 @@ protected:
 
 		calculateDisplacementAndDerivative();
 
-		float color[4] = { cosf(Graphics::getTimeElapsed()) * 0.5f + 0.5f,sinf(Graphics::getTimeElapsed()) * 0.5f + 0.5f,1.0f,1.0f };
-
-		context->clearDefRenderTarget(color);
+		renderSkyDomeAndOceanSurface();
 	}
 
 private:
 
+	//do not change this!
+	static constexpr UINT textureResolution = 1024;
+
+	static constexpr UINT patchNum = 4;
+
+	static constexpr UINT tileNum = 8;
+
 	static TextureRenderView* createTexture(const UINT& resolution, const DXGI_FORMAT& format)
 	{
 		return ResourceManager::createTextureRenderView(resolution, resolution, format, 1, 1, false, true, format, format, DXGI_FORMAT_UNKNOWN);
+	}
+
+	void ifftPermutation(TextureRenderView* const inputTexture)
+	{
+		context->setPipelineState(ifftState.Get());
+
+		context->setCSConstants({
+			tempTexture->getUAVMipIndex(0),
+			inputTexture->getAllSRVIndex() }, 0);
+
+		context->transitionResources();
+
+		context->dispatch(textureResolution, 1, 1);
+
+		context->uavBarrier({
+			tempTexture->getTexture() });
+
+		context->setCSConstants({
+			inputTexture->getUAVMipIndex(0),
+			tempTexture->getAllSRVIndex() }, 0);
+
+		context->transitionResources();
+
+		context->dispatch(textureResolution, 1, 1);
+
+		context->uavBarrier({
+			inputTexture->getTexture() });
+
+		context->setPipelineState(permutationState.Get());
+
+		context->setCSConstants({
+			inputTexture->getUAVMipIndex(0) }, 0);
+
+		context->transitionResources();
+
+		context->dispatch(textureResolution / 8, textureResolution / 8, 1);
+
+		context->uavBarrier({
+			inputTexture->getTexture() });
 	}
 
 	void calculateInitialSpectrum()
@@ -286,47 +435,41 @@ private:
 			jacobianTexture->getTexture() });
 	}
 
-	void ifftPermutation(TextureRenderView* const inputTexture)
+	void renderSkyDomeAndOceanSurface()
 	{
-		context->setPipelineState(ifftState.Get());
+		context->setPipelineState(oceanState.Get());
 
-		context->setCSConstants({
-			tempTexture->getUAVMipIndex(0),
-			inputTexture->getAllSRVIndex() }, 0);
+		context->setViewportSimple(Graphics::getWidth(), Graphics::getHeight());
 
-		context->transitionResources();
+		context->setTopology(D3D_PRIMITIVE_TOPOLOGY_4_CONTROL_POINT_PATCHLIST);
 
-		context->dispatch(textureResolution, 1, 1);
+		context->setVertexBuffers(0, { vertexBuffer->getVertexBuffer() });
 
-		context->uavBarrier({
-			tempTexture->getTexture() });
+		const DepthStencilDesc depthStencilDesc = depthTexture->getDSVMipHandle(0);
 
-		context->setCSConstants({
-			inputTexture->getUAVMipIndex(0),
-			tempTexture->getAllSRVIndex() }, 0);
+		context->setRenderTargets({ originTexture->getRTVMipHandle(0) }, &depthStencilDesc);
 
-		context->transitionResources();
+		context->setDSConstants({
+			displacementTexture->getAllSRVIndex(),
+			derivativeTexture->getAllSRVIndex(),
+			jacobianTexture->getAllSRVIndex() }, 0);
 
-		context->dispatch(textureResolution, 1, 1);
-
-		context->uavBarrier({
-			inputTexture->getTexture() });
-
-		context->setPipelineState(permutationState.Get());
-
-		context->setCSConstants({
-			inputTexture->getUAVMipIndex(0) }, 0);
+		context->setPSConstants({
+			displacementTexture->getAllSRVIndex(),
+			derivativeTexture->getAllSRVIndex(),
+			jacobianTexture->getAllSRVIndex() }, 0);
 
 		context->transitionResources();
 
-		context->dispatch(textureResolution / 8, textureResolution / 8, 1);
+		//clear
+		context->clearRenderTarget(originTexture->getRTVMipHandle(0), DirectX::Colors::Black);
 
-		context->uavBarrier({
-			inputTexture->getTexture() });
+		context->clearDepthStencil(depthTexture->getDSVMipHandle(0), D3D12_CLEAR_FLAG_DEPTH, 1.f, 0);
+
+		context->draw(4 * (patchNum * patchNum) * (tileNum * tileNum), 1, 0, 0);
+
+		blit(originTexture);
 	}
-
-	//do not change this!
-	static constexpr UINT textureResolution = 1024;
 
 	struct SpectrumParam
 	{
@@ -339,7 +482,19 @@ private:
 		DirectX::XMFLOAT4 padding1[14];
 	} spectrumParam;
 
+	BufferView* vertexBuffer;
+
 	ConstantBuffer* spectrumParamBuffer;
+
+	Shader* oceanVS;
+
+	Shader* oceanHS;
+
+	Shader* oceanDS;
+
+	Shader* oceanPS;
+
+	ComPtr<ID3D12PipelineState> oceanState;
 
 	Shader* spectrumCS;
 
@@ -422,4 +577,9 @@ private:
 
 	//J
 	TextureRenderView* jacobianTexture;
+
+	TextureRenderView* originTexture;
+
+	TextureDepthView* depthTexture;
+
 };
