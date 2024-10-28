@@ -82,31 +82,31 @@ public:
 
 		simulationParam.splatRadius = config.splatRadius / 100.f * Graphics::getAspectRatio();
 
-		splatVelocityState = PipelineState::createComputeState(splatVelocityCS);
+		PipelineState::createComputeState(&splatVelocityState, splatVelocityCS);
 
-		splatColorState = PipelineState::createComputeState(splatColorCS);
+		PipelineState::createComputeState(&splatColorState, splatColorCS);
 
-		vorticityState = PipelineState::createComputeState(vorticityCS);
+		PipelineState::createComputeState(&vorticityState, vorticityCS);
 
-		vorticityConfinementState = PipelineState::createComputeState(vorticityConfinementCS);
+		PipelineState::createComputeState(&vorticityConfinementState, vorticityConfinementCS);
 
-		divergenceState = PipelineState::createComputeState(divergenceCS);
+		PipelineState::createComputeState(&divergenceState, divergenceCS);
 
-		pressureResetState = PipelineState::createComputeState(pressureResetCS);
+		PipelineState::createComputeState(&pressureResetState, pressureResetCS);
 
-		pressureState = PipelineState::createComputeState(pressureCS);
+		PipelineState::createComputeState(&pressureState, pressureCS);
 
-		gradientSubtractState = PipelineState::createComputeState(gradientSubtractCS);
+		PipelineState::createComputeState(&gradientSubtractState, gradientSubtractCS);
 
-		velocityAdvectionState = PipelineState::createComputeState(velocityAdvectionCS);
+		PipelineState::createComputeState(&velocityAdvectionState, velocityAdvectionCS);
 
-		colorAdvectionState = PipelineState::createComputeState(colorAdvectionCS);
+		PipelineState::createComputeState(&colorAdvectionState, colorAdvectionCS);
 
-		velocityBoundaryState = PipelineState::createComputeState(velocityBoundaryCS);
+		PipelineState::createComputeState(&velocityBoundaryState, velocityBoundaryCS);
 
-		pressureBoundaryState = PipelineState::createComputeState(pressureBoundaryCS);
+		PipelineState::createComputeState(&pressureBoundaryState, pressureBoundaryCS);
 
-		fluidFinalState = PipelineState::createComputeState(fluidFinalCS);
+		PipelineState::createComputeState(&fluidFinalState, fluidFinalCS);
 
 		begin();
 

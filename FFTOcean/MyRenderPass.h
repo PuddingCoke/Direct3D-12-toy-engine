@@ -74,17 +74,17 @@ public:
 			GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&oceanState));
 		}
 
-		spectrumState = PipelineState::createComputeState(spectrumCS);
+		PipelineState::createComputeState(&spectrumState, spectrumCS);
 
-		conjugateState = PipelineState::createComputeState(conjugateCS);
+		PipelineState::createComputeState(&conjugateState, conjugateCS);
 
-		displacementSpectrumState = PipelineState::createComputeState(displacementSpectrumCS);
+		PipelineState::createComputeState(&displacementSpectrumState, displacementSpectrumCS);
 
-		ifftState = PipelineState::createComputeState(ifftCS);
+		PipelineState::createComputeState(&ifftState, ifftCS);
 
-		permutationState = PipelineState::createComputeState(permutationCS);
+		PipelineState::createComputeState(&permutationState, permutationCS);
 
-		waveMergeState = PipelineState::createComputeState(waveMergeCS);
+		PipelineState::createComputeState(&waveMergeState, waveMergeCS);
 
 		tildeh0Texture = createTexture(textureResolution + 1, DXGI_FORMAT_R32G32_FLOAT);
 
