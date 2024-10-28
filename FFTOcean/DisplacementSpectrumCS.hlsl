@@ -1,36 +1,22 @@
 #include"Common.hlsli"
 
-#define M_PI 3.1415926535897932384626433832795
-
 cbuffer TextureIndices : register(b2)
 {
-    uint DyIndex;
-    uint DxIndex;
-    uint DzIndex;
-    uint DyxIndex;
-    uint DyzIndex;
-    uint DxxIndex;
-    uint DzzIndex;
-    uint DxzIndex;
+    uint DxDzIndex;
+    uint DyDxzIndex;
+    uint DyxDyzIndex;
+    uint DxxDzzIndex;
     uint waveDataTextureIndex;
     uint waveSpectrumTextureIndex;
 }
 
-static RWTexture2D<float2> Dy = ResourceDescriptorHeap[DyIndex];
+static RWTexture2D<float2> DxDz = ResourceDescriptorHeap[DxDzIndex];
 
-static RWTexture2D<float2> Dx = ResourceDescriptorHeap[DxIndex];
+static RWTexture2D<float2> DyDxz = ResourceDescriptorHeap[DyDxzIndex];
 
-static RWTexture2D<float2> Dz = ResourceDescriptorHeap[DzIndex];
+static RWTexture2D<float2> DyxDyz = ResourceDescriptorHeap[DyxDyzIndex];
 
-static RWTexture2D<float2> Dyx = ResourceDescriptorHeap[DyxIndex];
-
-static RWTexture2D<float2> Dyz = ResourceDescriptorHeap[DyzIndex];
-
-static RWTexture2D<float2> Dxx = ResourceDescriptorHeap[DxxIndex];
-
-static RWTexture2D<float2> Dzz = ResourceDescriptorHeap[DzzIndex];
-
-static RWTexture2D<float2> Dxz = ResourceDescriptorHeap[DxzIndex];
+static RWTexture2D<float2> DxxDzz = ResourceDescriptorHeap[DxxDzzIndex];
 
 static Texture2D<float4> waveDataTexture = ResourceDescriptorHeap[waveDataTextureIndex];
 
@@ -66,19 +52,27 @@ void main(const uint2 DTid : SV_DispatchThreadID)
     
     const float2 ih = float2(-h.y, h.x);
     
-    Dy[DTid] = h;
+    const float2 displacementY = h;
     
-    Dyx[DTid] = ih * waveData.x;
+    const float2 displacementY_dx = ih * waveData.x;
     
-    Dyz[DTid] = ih * waveData.z;
+    const float2 displacementY_dz = ih * waveData.z;
     
-    Dx[DTid] = ih * waveData.x * waveData.y;
+    const float2 displacementX = ih * waveData.x * waveData.y;
     
-    Dz[DTid] = ih * waveData.z * waveData.y;
+    const float2 displacementZ = ih * waveData.z * waveData.y;
     
-    Dxx[DTid] = -h * waveData.x * waveData.x * waveData.y;
+    const float2 displacementX_dx = -h * waveData.x * waveData.x * waveData.y;
     
-    Dzz[DTid] = -h * waveData.z * waveData.z * waveData.y;
+    const float2 displacementZ_dz = -h * waveData.z * waveData.z * waveData.y;
     
-    Dxz[DTid] = -h * waveData.x * waveData.z * waveData.y;
+    const float2 displacementX_dz = -h * waveData.x * waveData.z * waveData.y;
+    
+    DxDz[DTid] = float2(displacementX.x - displacementZ.y, displacementX.y + displacementZ.x);
+    
+    DyDxz[DTid] = float2(displacementY.x - displacementX_dz.y, displacementY.y + displacementX_dz.x);
+    
+    DyxDyz[DTid] = float2(displacementY_dx.x - displacementY_dz.y, displacementY_dx.y + displacementY_dz.x);
+    
+    DxxDzz[DTid] = float2(displacementX_dx.x - displacementZ_dz.y, displacementX_dx.y + displacementZ_dz.x);
 }
