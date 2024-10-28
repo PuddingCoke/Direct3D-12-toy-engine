@@ -43,7 +43,7 @@ public:
 	//PS
 	static D3D12_GRAPHICS_PIPELINE_STATE_DESC getDefaultFullScreenState();
 
-	static ID3D12PipelineState* createComputeState(const Shader* const shader);
+	static void createComputeState(ID3D12PipelineState** pipelineState, const Shader* const shader);
 
 private:
 

@@ -162,9 +162,9 @@ public:
 			GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&skyboxState));
 		}
 
-		irradianceOctahedralEncodeState = PipelineState::createComputeState(irradianceOctahedralEncode);
+		PipelineState::createComputeState(&irradianceOctahedralEncodeState, irradianceOctahedralEncode);
 
-		depthOctahedralEncodeState = PipelineState::createComputeState(depthOctahedralEncode);
+		PipelineState::createComputeState(&depthOctahedralEncodeState, depthOctahedralEncode);
 
 		begin();
 
@@ -566,7 +566,7 @@ protected:
 	}
 
 	Scene* scene;
-	
+
 	static constexpr UINT probeCountX = 17;
 
 	static constexpr UINT probeCountY = 9;

@@ -71,7 +71,7 @@ float4 main(PixelInput input) : SV_TARGET
     
     float3 fogColor = enviromentCube.Sample(linearWrapSampler, float3(fogTexcoord.x, 0.0, fogTexcoord.y)).rgb;
     
-    fogFactor = pow(smoothstep(0.0, 2000.0, fogFactor), 0.5);
+    fogFactor = pow(smoothstep(0.0, 1600.0, fogFactor), 0.5);
     
     color = lerp(color, fogColor, fogFactor);
     
