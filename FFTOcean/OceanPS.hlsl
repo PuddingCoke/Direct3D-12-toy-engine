@@ -4,6 +4,7 @@ struct PixelInput
 {
     float3 displacedPosition : POSITION0;
     float3 unDisplacedPosition : POSITION1;
+    float3 viewDir : VIEWDIR;
     float2 uv : TEXCOORD;
 };
 
@@ -27,18 +28,17 @@ static const float3 L = normalize(float3(0.0, 1.0, -10.0));
 
 static const float3 oceanColor = float3(0.0000, 0.2307, 0.3613);
 
+static const float3 sunColor = float3(1.0, 1.0, 1.0);
+
 float4 main(PixelInput input) : SV_TARGET
 {
     float4 derivative = derivativeTexture.Sample(linearWrapSampler, input.uv);
     
     float2 slope = float2(derivative.x / (1.0 + derivative.z), derivative.y / (1.0 + derivative.w));
     
-    //might be wrong
-    float3 P = input.unDisplacedPosition + displacementTexture.Sample(linearWrapSampler, input.uv).xyz;
-    
     float3 N = normalize(float3(-slope.x, 1.0, -slope.y));
     
-    float3 V = normalize(perframeResource.eyePos.xyz - P);
+    float3 V = normalize(input.viewDir);
     
     if (dot(N, V) < 0.0)
     {
@@ -61,9 +61,7 @@ float4 main(PixelInput input) : SV_TARGET
     
     float highlightMul = 1.0 + 3.0 * smoothstep(1.2, 1.8, turbulence);
     
-    float3 color = lerp(oceanColor, reflectColor * highlightMul, F);
-    
-    color += pow(max(dot(N, H), 0.0), 128.0) * float3(1.0, 1.0, 1.0);
+    float3 color = lerp(oceanColor, reflectColor * highlightMul, F) + pow(max(dot(L, R), 0.0), 256.0) * sunColor;
     
     float fogFactor = distance(perframeResource.eyePos.xz, input.displacedPosition.xz);
     

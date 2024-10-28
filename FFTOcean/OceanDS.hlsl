@@ -4,6 +4,7 @@ struct DS_OUTPUT
 {
     float3 displacedPosition : POSITION0;
     float3 unDisplacedPosition : POSITION1;
+    float3 viewDir : VIEWDIR;
     float2 uv : TEXCOORD;
     float4 svPosition : SV_POSITION;
 };
@@ -62,6 +63,8 @@ DS_OUTPUT main(
     const float2 uv = interpolateUV(patch[0].uv, patch[1].uv, patch[2].uv, patch[3].uv, domain);
     
     Output.unDisplacedPosition = position;
+    
+    Output.viewDir = perframeResource.eyePos.xyz - Output.unDisplacedPosition;
     
     position += displacementTexture.SampleLevel(linearWrapSampler, uv, 0.0).xyz;
     
