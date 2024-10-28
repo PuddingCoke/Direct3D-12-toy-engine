@@ -208,6 +208,8 @@ public:
 
 		depthTexture->getTexture()->setName(L"depthTexture");
 
+		oceanState->SetName(L"oceanState");
+
 		effect->setExposure(1.5f);
 
 		effect->setGamma(0.6f);
@@ -548,13 +550,14 @@ private:
 	TextureRenderView* tildeh0Texture;
 
 	//k.x 1.0/length(K) k.z angularSpeed
+	//x y z w
 	TextureRenderView* waveDataTexture;
 
 	//(tildeh0(k), conj(tildeh0(-k)))
 	//x y z w
 	TextureRenderView* waveSpectrumTexture;
 
-	//for ifft compute
+	//intermediate texture for ifft compute
 	TextureRenderView* tempTexture;
 
 	//following 4 textures store displacement and derivative(can be further calculated to normal and jacobian)
