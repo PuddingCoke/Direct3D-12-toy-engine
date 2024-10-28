@@ -94,21 +94,13 @@ public:
 
 		tempTexture = createTexture(textureResolution, DXGI_FORMAT_R32G32_FLOAT);
 
-		Dy = createTexture(textureResolution, DXGI_FORMAT_R32G32_FLOAT);
+		DxDz = createTexture(textureResolution, DXGI_FORMAT_R32G32_FLOAT);
 
-		Dx = createTexture(textureResolution, DXGI_FORMAT_R32G32_FLOAT);
+		DyDxz = createTexture(textureResolution, DXGI_FORMAT_R32G32_FLOAT);
 
-		Dz = createTexture(textureResolution, DXGI_FORMAT_R32G32_FLOAT);
+		DyxDyz = createTexture(textureResolution, DXGI_FORMAT_R32G32_FLOAT);
 
-		Dyx = createTexture(textureResolution, DXGI_FORMAT_R32G32_FLOAT);
-
-		Dyz = createTexture(textureResolution, DXGI_FORMAT_R32G32_FLOAT);
-
-		Dxx = createTexture(textureResolution, DXGI_FORMAT_R32G32_FLOAT);
-
-		Dzz = createTexture(textureResolution, DXGI_FORMAT_R32G32_FLOAT);
-
-		Dxz = createTexture(textureResolution, DXGI_FORMAT_R32G32_FLOAT);
+		DxxDzz = createTexture(textureResolution, DXGI_FORMAT_R32G32_FLOAT);
 
 		displacementTexture = createTexture(textureResolution, DXGI_FORMAT_R32G32B32A32_FLOAT);
 
@@ -134,7 +126,7 @@ public:
 				{
 					const float xPos = (float)x * (float)spectrumParam.mapLength / (float)tilePerPatch - (float)patchNum * spectrumParam.mapLength / 2.f;
 
-					const float zPos = (float)z * (float)spectrumParam.mapLength / (float)tilePerPatch - (float)patchNum * spectrumParam.mapLength / 2.f;
+					const float zPos = (float)z * (float)spectrumParam.mapLength / (float)tilePerPatch - (float)patchNum * spectrumParam.mapLength;
 
 					const float u = (float)x / (float)tilePerPatch;
 
@@ -198,21 +190,13 @@ public:
 
 		waveSpectrumTexture->getTexture()->setName(L"waveSpectrumTexture");
 
-		Dy->getTexture()->setName(L"Dy");
+		DxDz->getTexture()->setName(L"DxDz");
 
-		Dx->getTexture()->setName(L"Dx");
+		DyDxz->getTexture()->setName(L"DyDxz");
 
-		Dz->getTexture()->setName(L"Dz");
+		DyxDyz->getTexture()->setName(L"DyxDyz");
 
-		Dyx->getTexture()->setName(L"Dyx");
-
-		Dyz->getTexture()->setName(L"Dyz");
-
-		Dxx->getTexture()->setName(L"Dxx");
-
-		Dzz->getTexture()->setName(L"Dzz");
-
-		Dxz->getTexture()->setName(L"Dxz");
+		DxxDzz->getTexture()->setName(L"DxxDzz");
 
 		displacementTexture->getTexture()->setName(L"displacementTexture");
 
@@ -269,21 +253,13 @@ public:
 
 		delete tempTexture;
 
-		delete Dy;
+		delete DxDz;
 
-		delete Dx;
+		delete DyDxz;
 
-		delete Dz;
+		delete DyxDyz;
 
-		delete Dyx;
-
-		delete Dyz;
-
-		delete Dxx;
-
-		delete Dzz;
-
-		delete Dxz;
+		delete DxxDzz;
 
 		delete displacementTexture;
 
@@ -319,7 +295,7 @@ private:
 	//do not change this!
 	static constexpr UINT textureResolution = 1024;
 
-	static constexpr UINT patchNum = 4;
+	static constexpr UINT patchNum = 5;
 
 	static constexpr UINT tilePerPatch = 8;
 
@@ -407,14 +383,10 @@ private:
 		context->setPipelineState(displacementSpectrumState.Get());
 
 		context->setCSConstants({
-			Dy->getUAVMipIndex(0),
-			Dx->getUAVMipIndex(0),
-			Dz->getUAVMipIndex(0),
-			Dyx->getUAVMipIndex(0),
-			Dyz->getUAVMipIndex(0),
-			Dxx->getUAVMipIndex(0),
-			Dzz->getUAVMipIndex(0),
-			Dxz->getUAVMipIndex(0),
+			DxDz->getUAVMipIndex(0),
+			DyDxz->getUAVMipIndex(0),
+			DyxDyz->getUAVMipIndex(0),
+			DxxDzz->getUAVMipIndex(0),
 			waveDataTexture->getAllSRVIndex(),
 			waveSpectrumTexture->getAllSRVIndex() }, 0);
 
@@ -423,33 +395,21 @@ private:
 		context->dispatch(textureResolution / 8, textureResolution / 8, 1);
 
 		context->uavBarrier({
-			Dy->getTexture(),
-			Dx->getTexture(),
-			Dz->getTexture(),
-			Dyx->getTexture(),
-			Dyz->getTexture(),
-			Dxx->getTexture(),
-			Dzz->getTexture(),
-			Dxz->getTexture() });
+			DxDz->getTexture(),
+			DyDxz->getTexture(),
+			DyxDyz->getTexture(),
+			DxxDzz->getTexture() });
 	}
 
 	void calculateDisplacementAndDerivative()
 	{
-		ifftPermutation(Dy);
+		ifftPermutation(DxDz);
 
-		ifftPermutation(Dx);
+		ifftPermutation(DyDxz);
 
-		ifftPermutation(Dz);
+		ifftPermutation(DyxDyz);
 
-		ifftPermutation(Dyx);
-
-		ifftPermutation(Dyz);
-
-		ifftPermutation(Dxx);
-
-		ifftPermutation(Dzz);
-
-		ifftPermutation(Dxz);
+		ifftPermutation(DxxDzz);
 
 		context->setPipelineState(waveMergeState.Get());
 
@@ -457,14 +417,10 @@ private:
 			displacementTexture->getUAVMipIndex(0),
 			derivativeTexture->getUAVMipIndex(0),
 			jacobianTexture->getUAVMipIndex(0),
-			Dy->getAllSRVIndex(),
-			Dx->getAllSRVIndex(),
-			Dz->getAllSRVIndex(),
-			Dyx->getAllSRVIndex(),
-			Dyz->getAllSRVIndex(),
-			Dxx->getAllSRVIndex(),
-			Dzz->getAllSRVIndex(),
-			Dxz->getAllSRVIndex() }, 0);
+			DxDz->getAllSRVIndex(),
+			DyDxz->getAllSRVIndex(),
+			DyxDyz->getAllSRVIndex(),
+			DxxDzz->getAllSRVIndex() }, 0);
 
 		context->transitionResources();
 
@@ -601,33 +557,19 @@ private:
 	//for ifft compute
 	TextureRenderView* tempTexture;
 
-	//Dy
-	TextureRenderView* Dy;
+	//following 4 textures store displacement and derivative(can be further calculated to normal and jacobian)
 
-	//following 2 textures are used for simulating choppy wave
+	//Dx Dz
+	TextureRenderView* DxDz;
 
-	//Dx
-	TextureRenderView* Dx;
+	//Dy dDx/dz
+	TextureRenderView* DyDxz;
 
-	//Dz
-	TextureRenderView* Dz;
+	//dDy/dx dDy/dz
+	TextureRenderView* DyxDyz;
 
-	//following 5 textures are used for computing normals and jacobians
-
-	//derivative dDy/dx
-	TextureRenderView* Dyx;
-
-	//derivative dDy/dz
-	TextureRenderView* Dyz;
-
-	//derivative dDx/dx
-	TextureRenderView* Dxx;
-
-	//derivative dDz/dz
-	TextureRenderView* Dzz;
-
-	//derivative dDx/dz
-	TextureRenderView* Dxz;
+	//dDx/dx dDz/dz
+	TextureRenderView* DxxDzz;
 
 	//Dx Dy Dz
 	TextureRenderView* displacementTexture;

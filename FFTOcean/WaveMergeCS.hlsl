@@ -5,14 +5,10 @@ cbuffer TextureIndices : register(b2)
     uint displacementTextureIndex;
     uint derivativeTextureIndex;
     uint jacobianTextureIndex;
-    uint DyIndex;
-    uint DxIndex;
-    uint DzIndex;
-    uint DyxIndex;
-    uint DyzIndex;
-    uint DxxIndex;
-    uint DzzIndex;
-    uint DxzIndex;
+    uint DxDzIndex;
+    uint DyDxzIndex;
+    uint DyxDyzIndex;
+    uint DxxDzzIndex;
 }
 
 static RWTexture2D<float4> displacementTexture = ResourceDescriptorHeap[displacementTextureIndex];
@@ -21,32 +17,32 @@ static RWTexture2D<float4> derivativeTexture = ResourceDescriptorHeap[derivative
 
 static RWTexture2D<float> jacobianTexture = ResourceDescriptorHeap[jacobianTextureIndex];
 
-static Texture2D<float2> Dy = ResourceDescriptorHeap[DyIndex];
+static Texture2D<float2> DxDz = ResourceDescriptorHeap[DxDzIndex];
 
-static Texture2D<float2> Dx = ResourceDescriptorHeap[DxIndex];
+static Texture2D<float2> DyDxz = ResourceDescriptorHeap[DyDxzIndex];
 
-static Texture2D<float2> Dz = ResourceDescriptorHeap[DzIndex];
+static Texture2D<float2> DyxDyz = ResourceDescriptorHeap[DyxDyzIndex];
 
-static Texture2D<float2> Dyx = ResourceDescriptorHeap[DyxIndex];
-
-static Texture2D<float2> Dyz = ResourceDescriptorHeap[DyzIndex];
-
-static Texture2D<float2> Dxx = ResourceDescriptorHeap[DxxIndex];
-
-static Texture2D<float2> Dzz = ResourceDescriptorHeap[DzzIndex];
-
-static Texture2D<float2> Dxz = ResourceDescriptorHeap[DxzIndex];
+static Texture2D<float2> DxxDzz = ResourceDescriptorHeap[DxxDzzIndex];
 
 static const float lambda = 1.0;
 
 [numthreads(8, 8, 1)]
-void main(const uint2 DTid : SV_DispatchThreadID )
+void main(const uint2 DTid : SV_DispatchThreadID)
 {
-    displacementTexture[DTid] = float4(lambda * Dx[DTid].x, Dy[DTid].x, lambda * Dz[DTid].x, 1.0);
+    const float2 Dx_Dz = DxDz[DTid];
     
-    derivativeTexture[DTid] = float4(Dyx[DTid].x, Dyz[DTid].x, lambda * Dxx[DTid].x, lambda * Dzz[DTid].x);
+    const float2 Dy_Dxz = DyDxz[DTid];
     
-    float jacobian = (1.0 + lambda * Dxx[DTid].x) * (1.0 + lambda * Dzz[DTid].x) - lambda * lambda * Dxz[DTid].x * Dxz[DTid].x;
+    const float2 Dyx_Dyz = DyxDyz[DTid];
+    
+    const float2 Dxx_Dzz = DxxDzz[DTid];
+    
+    displacementTexture[DTid] = float4(lambda * Dx_Dz.x, Dy_Dxz.x, lambda * Dx_Dz.y, 1.0);
+    
+    derivativeTexture[DTid] = float4(Dyx_Dyz, lambda * Dxx_Dzz);
+    
+    float jacobian = (1.0 + lambda * Dxx_Dzz.x) * (1.0 + lambda * Dxx_Dzz.y) - lambda * lambda * Dy_Dxz.y * Dy_Dxz.y;
     
     const float temp = jacobianTexture[DTid] + perframeResource.deltaTime * 0.5 / max(jacobian, 0.5);
     

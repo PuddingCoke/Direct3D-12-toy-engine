@@ -23,7 +23,7 @@ static Texture2D<float> jacobianTexture = ResourceDescriptorHeap[jacobianTexture
 
 static TextureCube<float4> enviromentCube = ResourceDescriptorHeap[enviromentCubeIndex];
 
-static const float3 L = normalize(float3(0.0, 0.0, -10.0));
+static const float3 L = normalize(float3(0.0, 1.0, -10.0));
 
 static const float3 oceanColor = float3(0.0000, 0.2307, 0.3613);
 
@@ -71,7 +71,7 @@ float4 main(PixelInput input) : SV_TARGET
     
     float3 fogColor = enviromentCube.Sample(linearWrapSampler, float3(fogTexcoord.x, 0.0, fogTexcoord.y)).rgb;
     
-    fogFactor = pow(smoothstep(0.0, 1400.0, fogFactor), 0.5);
+    fogFactor = pow(smoothstep(0.0, 2000.0, fogFactor), 0.5);
     
     color = lerp(color, fogColor, fogFactor);
     
