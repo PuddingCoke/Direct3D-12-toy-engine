@@ -44,7 +44,8 @@ float phillips(const float2 k)
     return P_h * exp(-kSquare * l * l);
 }
 
-float angularSpeed(const float2 k)
+//deep water
+float waveFrequency(const float2 k)
 {
     return sqrt(gravity * length(k));
 }
@@ -61,7 +62,7 @@ void main(const uint2 DTid : SV_DispatchThreadID)
     {
         tildeh0Texture[DTid] = randomGaussTexture[DTid].xy * sqrt(phillips(k) / 2.0);
 
-        waveDataTexture[DTid] = float4(k.x, 1.0 / len, k.y, angularSpeed(k));
+        waveDataTexture[DTid] = float4(k.x, 1.0 / len, k.y, waveFrequency(k));
     }
     else
     {

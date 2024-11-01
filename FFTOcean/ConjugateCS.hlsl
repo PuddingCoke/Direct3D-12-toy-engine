@@ -13,7 +13,7 @@ void main(const uint2 DTid : SV_DispatchThreadID)
 {
     const float2 tildeh0k = tildeh0Texture[DTid];
     
-    const float2 tildeh0Minusk = tildeh0Texture[uint2(1024 - DTid.x, 1024 - DTid.y)];
+    const float2 tildeh0Minusk = tildeh0Texture[uint2((1024 - DTid.x) % 1024, (1024 - DTid.y) % 1024)];
     
     waveSpectrumTexture[DTid] = float4(tildeh0k.x, tildeh0k.y, tildeh0Minusk.x, -tildeh0Minusk.y);
 }

@@ -2,7 +2,6 @@
 
 struct PixelInput
 {
-    float3 displacedPosition : POSITION0;
     float3 unDisplacedPosition : POSITION1;
     float3 viewDir : VIEWDIR;
     float2 uv : TEXCOORD;
@@ -63,9 +62,9 @@ float4 main(PixelInput input) : SV_TARGET
     
     float3 color = lerp(oceanColor, reflectColor * highlightMul, F) + pow(max(dot(L, R), 0.0), 256.0) * sunColor;
     
-    float fogFactor = distance(perframeResource.eyePos.xz, input.displacedPosition.xz);
+    float fogFactor = distance(perframeResource.eyePos.xz, input.unDisplacedPosition.xz);
     
-    float2 fogTexcoord = normalize(input.displacedPosition.xz - perframeResource.eyePos.xz);
+    float2 fogTexcoord = normalize(input.unDisplacedPosition.xz - perframeResource.eyePos.xz);
     
     float3 fogColor = enviromentCube.Sample(linearWrapSampler, float3(fogTexcoord.x, 0.0, fogTexcoord.y)).rgb;
     

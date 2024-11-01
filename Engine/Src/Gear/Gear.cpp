@@ -10,15 +10,15 @@ Gear* Gear::get()
 int Gear::iniEngine(const Configuration& config, const int argc, const char* argv[])
 {
 #ifdef _DEBUG
-	std::cout << "[class Gear] debug build date:" << __TIMESTAMP__ << "\n";
+	std::cout << "[class Gear] debug lib build date:" << __TIMESTAMP__ << "\n";
 #else
-	std::cout << "[class Gear] release build date:" << __TIMESTAMP__ << "\n";
+	std::cout << "[class Gear] release lib build date:" << __TIMESTAMP__ << "\n";
 #endif // _DEBUG
 
 	std::wcout.imbue(std::locale(""));
 
 	{
-		std::string exeRootPath = argv[0];
+		const std::string exeRootPath = argv[0];
 
 		Utils::exeRootPath = Utils::File::backslashToSlash(Utils::File::getParentFolder(exeRootPath));
 
@@ -53,7 +53,9 @@ int Gear::iniEngine(const Configuration& config, const int argc, const char* arg
 	}
 
 	std::cout << "[class Gear] resolution " << Graphics::width << "x" << Graphics::height << "\n";
+
 	std::cout << "[class Gear] aspect ratio " << Graphics::aspectRatio << "\n";
+
 	std::cout << "[class Gear] back buffer count " << Graphics::FrameBufferCount << "\n";
 
 	switch (usage)
@@ -113,8 +115,6 @@ void Gear::runGame()
 {
 	std::chrono::steady_clock clock;
 
-	float offset = 0.f;
-
 	while (winform->pollEvents())
 	{
 		const std::chrono::steady_clock::time_point startPoint = clock.now();
@@ -147,7 +147,6 @@ void Gear::runGame()
 
 		Graphics::time.floatSeed = Random::Float();
 	}
-
 }
 
 void Gear::runEncode()
