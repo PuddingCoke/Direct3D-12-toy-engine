@@ -168,7 +168,7 @@ public:
 
 		randomGaussTexture = resManager->createTextureRenderView(textureResolution + 1, textureResolution + 1, RandomDataType::GAUSS, true);
 
-		enviromentCube = resManager->createTextureCube("E:\\Assets\\Ocean\\ColdSunsetEquirect.png", textureResolution, true);
+		enviromentCube = resManager->createTextureCube("E:\\Assets\\Ocean\\ColdSunsetEquirect.png", 1024, true);
 
 		calculateInitialSpectrum();
 
@@ -489,7 +489,7 @@ private:
 	{
 		UINT mapResolution = textureResolution;
 		float mapLength = 512.f;
-		DirectX::XMFLOAT2 wind = { 10.f,0.f };
+		DirectX::XMFLOAT2 wind = { 12.5f,0.f };
 		float amplitude = 0.0000005f;
 		float gravity = 9.81f;
 		DirectX::XMFLOAT2 padding0;

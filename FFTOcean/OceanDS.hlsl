@@ -2,7 +2,6 @@
 
 struct DS_OUTPUT
 {
-    float3 displacedPosition : POSITION0;
     float3 unDisplacedPosition : POSITION1;
     float3 viewDir : VIEWDIR;
     float2 uv : TEXCOORD;
@@ -67,8 +66,6 @@ DS_OUTPUT main(
     Output.viewDir = perframeResource.eyePos.xyz - Output.unDisplacedPosition;
     
     position += displacementTexture.SampleLevel(linearWrapSampler, uv, 0.0).xyz;
-    
-    Output.displacedPosition = position;
     
     Output.uv = uv;
     
