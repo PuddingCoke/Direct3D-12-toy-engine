@@ -203,7 +203,11 @@ void Gear::destroy() const
 
 	delete RenderEngine::instance;
 
+#ifdef _DEBUG
+
 	reportLiveObjects();
+
+#endif // _DEBUG
 
 	if (GraphicsDevice::instance)
 	{
@@ -215,8 +219,6 @@ void Gear::reportLiveObjects() const
 {
 	ComPtr<IDXGIDebug1> dxgiDebug;
 
-#ifdef _DEBUG
-
 	OutputDebugStringA("Live Object Report\n");
 
 	if (SUCCEEDED(DXGIGetDebugInterface1(0, IID_PPV_ARGS(&dxgiDebug))))
@@ -225,8 +227,6 @@ void Gear::reportLiveObjects() const
 	}
 
 	OutputDebugStringA("Live Object Report\n");
-
-#endif
 }
 
 Gear::Gear() :
