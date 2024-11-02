@@ -52,7 +52,7 @@ float4 main(PixelInput input) : SV_TARGET
     
     float3 H = normalize(V + L);
     
-    float3 reflectColor = 1.5 * enviromentCube.Sample(linearWrapSampler, R).rgb;
+    float3 reflectColor = enviromentCube.Sample(linearWrapSampler, R).rgb;
     
     float J = jacobianTexture.Sample(linearWrapSampler, input.uv);
     

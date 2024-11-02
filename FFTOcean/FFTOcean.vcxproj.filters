@@ -71,4 +71,9 @@
       <Filter>HLSL\Rendering</Filter>
     </FxCompile>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Predefine.hlsli">
+      <Filter>HLSL\Simulation</Filter>
+    </None>
+  </ItemGroup>
 </Project>
