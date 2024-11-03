@@ -10,12 +10,15 @@
 
 #include<DirectXColors.h>
 
+#include"WaveCascade.h"
+
 class MyRenderPass :public RenderPass
 {
 public:
 
 	MyRenderPass() :
-		spectrumParamBuffer(ResourceManager::createConstantBuffer(sizeof(SpectrumParam), true)),
+		spectrumParamBuffer{ ResourceManager::createConstantBuffer(sizeof(SpectrumParam), true),ResourceManager::createConstantBuffer(sizeof(SpectrumParam), true),ResourceManager::createConstantBuffer(sizeof(SpectrumParam), true) },
+		cascade{ new WaveCascade(textureResolution,context),new WaveCascade(textureResolution,context),new WaveCascade(textureResolution,context) },
 		textureCubePS(new Shader(Utils::getRootFolder() + "TextureCubePS.cso")),
 		oceanVS(new Shader(Utils::getRootFolder() + "OceanVS.cso")),
 		oceanHS(new Shader(Utils::getRootFolder() + "OceanHS.cso")),
@@ -28,6 +31,12 @@ public:
 		permutationCS(new Shader(Utils::getRootFolder() + "PermutationCS.cso")),
 		waveMergeCS(new Shader(Utils::getRootFolder() + "WaveMergeCS.cso"))
 	{
+		spectrumParam[0].mapLength = lengthScale0;
+
+		spectrumParam[1].mapLength = lengthScale1;
+
+		spectrumParam[2].mapLength = lengthScale2;
+
 		{
 			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = PipelineState::getDefaultGraphicsDesc();
 			desc.InputLayout = {};
@@ -86,27 +95,25 @@ public:
 
 		PipelineState::createComputeState(&waveMergeState, waveMergeCS);
 
-		tildeh0Texture = createTexture(textureResolution + 1, DXGI_FORMAT_R32G32_FLOAT);
-
-		waveDataTexture = createTexture(textureResolution + 1, DXGI_FORMAT_R32G32B32A32_FLOAT);
-
-		waveSpectrumTexture = createTexture(textureResolution, DXGI_FORMAT_R32G32B32A32_FLOAT);
+		tildeh0Texture = createTexture(textureResolution, DXGI_FORMAT_R32G32_FLOAT);
 
 		tempTexture = createTexture(textureResolution, DXGI_FORMAT_R32G32_FLOAT);
 
-		DxDz = createTexture(textureResolution, DXGI_FORMAT_R32G32_FLOAT);
+		WaveCascade::spectrumState = spectrumState.Get();
 
-		DyDxz = createTexture(textureResolution, DXGI_FORMAT_R32G32_FLOAT);
+		WaveCascade::conjugateState = conjugateState.Get();
 
-		DyxDyz = createTexture(textureResolution, DXGI_FORMAT_R32G32_FLOAT);
+		WaveCascade::displacementSpectrumState = displacementSpectrumState.Get();
 
-		DxxDzz = createTexture(textureResolution, DXGI_FORMAT_R32G32_FLOAT);
+		WaveCascade::ifftState = ifftState.Get();
 
-		displacementTexture = createTexture(textureResolution, DXGI_FORMAT_R32G32B32A32_FLOAT);
+		WaveCascade::permutationState = permutationState.Get();
 
-		derivativeTexture = createTexture(textureResolution, DXGI_FORMAT_R32G32B32A32_FLOAT);
+		WaveCascade::waveMergeState = waveMergeState.Get();
 
-		jacobianTexture = createTexture(textureResolution, DXGI_FORMAT_R32_FLOAT);
+		WaveCascade::tildeh0Texture = tildeh0Texture;
+
+		WaveCascade::tempTexture = tempTexture;
 
 		originTexture = ResourceManager::createTextureRenderView(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R16G16B16A16_FLOAT, 1, 1, false, true,
 			DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_R16G16B16A16_FLOAT, DirectX::Colors::Black);
@@ -124,9 +131,9 @@ public:
 		{
 			auto getVertexAt = [this](const UINT& x, const UINT& z)
 				{
-					const float xPos = (float)x * (float)spectrumParam.mapLength / (float)tilePerPatch - (float)patchNum * spectrumParam.mapLength / 2.f;
+					const float xPos = (float)x * (float)spectrumParam[0].mapLength / (float)tilePerPatch - (float)patchNum * spectrumParam[0].mapLength / 2.f;
 
-					const float zPos = (float)z * (float)spectrumParam.mapLength / (float)tilePerPatch - (float)patchNum * spectrumParam.mapLength;
+					const float zPos = (float)z * (float)spectrumParam[0].mapLength / (float)tilePerPatch - (float)patchNum * spectrumParam[0].mapLength;
 
 					const float u = (float)x / (float)tilePerPatch;
 
@@ -166,43 +173,23 @@ public:
 
 		vertexBuffer = resManager->createStructuredBufferView(sizeof(Vertex), static_cast<UINT>(sizeof(Vertex) * vertices.size()), false, false, true, false, true, vertices.data());
 
-		randomGaussTexture = resManager->createTextureRenderView(textureResolution + 1, textureResolution + 1, RandomDataType::GAUSS, true);
+		randomGaussTexture = resManager->createTextureRenderView(textureResolution, textureResolution, RandomDataType::GAUSS, true);
+
+		WaveCascade::randomGaussTexture = randomGaussTexture;
 
 		enviromentCube = resManager->createTextureCube("E:\\Assets\\Ocean\\ColdSunsetEquirect.png", 2048, true);
 
 		calculateInitialSpectrum();
 
-		{
-			const float clearValue[] = { 999.f,999.f,999.f,999.f };
-
-			context->clearUnorderedAccess(jacobianTexture->getClearUAVDesc(0), clearValue);
-		}
-
 		end();
 
 		RenderEngine::get()->submitRenderPass(this);
 
+		tempTexture->getTexture()->setName(L"tempTexture");
+
 		randomGaussTexture->getTexture()->setName(L"randomGaussTexture");
 
 		tildeh0Texture->getTexture()->setName(L"tildeh0Texture");
-
-		waveDataTexture->getTexture()->setName(L"waveDataTexture");
-
-		waveSpectrumTexture->getTexture()->setName(L"waveSpectrumTexture");
-
-		DxDz->getTexture()->setName(L"DxDz");
-
-		DyDxz->getTexture()->setName(L"DyDxz");
-
-		DyxDyz->getTexture()->setName(L"DyxDyz");
-
-		DxxDzz->getTexture()->setName(L"DxxDzz");
-
-		displacementTexture->getTexture()->setName(L"displacementTexture");
-
-		derivativeTexture->getTexture()->setName(L"derivativeTexture");
-
-		jacobianTexture->getTexture()->setName(L"jacobianTexture");
 
 		originTexture->getTexture()->setName(L"originTexture");
 
@@ -218,8 +205,6 @@ public:
 	~MyRenderPass()
 	{
 		delete vertexBuffer;
-
-		delete spectrumParamBuffer;
 
 		delete textureCubePS;
 
@@ -249,31 +234,20 @@ public:
 
 		delete tildeh0Texture;
 
-		delete waveDataTexture;
-
-		delete waveSpectrumTexture;
-
 		delete tempTexture;
-
-		delete DxDz;
-
-		delete DyDxz;
-
-		delete DyxDyz;
-
-		delete DxxDzz;
-
-		delete displacementTexture;
-
-		delete derivativeTexture;
-
-		delete jacobianTexture;
 
 		delete originTexture;
 
 		delete depthTexture;
 
 		delete effect;
+
+		for (UINT i = 0; i < cascadeNum; i++)
+		{
+			delete spectrumParamBuffer[i];
+
+			delete cascade[i];
+		}
 	}
 
 	void imGUICall() override
@@ -285,14 +259,21 @@ protected:
 
 	void recordCommand() override
 	{
-		calculateTimeDependentSpectrum();
-
 		calculateDisplacementAndDerivative();
 
 		renderSkyDomeAndOceanSurface();
 	}
 
 private:
+
+	//do not change this!
+	static constexpr UINT cascadeNum = 3;
+
+	static constexpr float lengthScale0 = 500.f;
+
+	static constexpr float lengthScale1 = 27.f;
+
+	static constexpr float lengthScale2 = 5.f;
 
 	//do not change this!
 	static constexpr UINT textureResolution = 512;
@@ -306,132 +287,50 @@ private:
 		return ResourceManager::createTextureRenderView(resolution, resolution, format, 1, 1, false, true, format, format, DXGI_FORMAT_UNKNOWN);
 	}
 
-	void ifftPermutation(TextureRenderView* const inputTexture)
-	{
-		context->setPipelineState(ifftState.Get());
-
-		context->setCSConstants({
-			tempTexture->getUAVMipIndex(0),
-			inputTexture->getAllSRVIndex() }, 0);
-
-		context->transitionResources();
-
-		context->dispatch(textureResolution, 1, 1);
-
-		context->uavBarrier({
-			tempTexture->getTexture() });
-
-		context->setCSConstants({
-			inputTexture->getUAVMipIndex(0),
-			tempTexture->getAllSRVIndex() }, 0);
-
-		context->transitionResources();
-
-		context->dispatch(textureResolution, 1, 1);
-
-		context->uavBarrier({
-			inputTexture->getTexture() });
-
-		context->setPipelineState(permutationState.Get());
-
-		context->setCSConstants({
-			inputTexture->getUAVMipIndex(0) }, 0);
-
-		context->transitionResources();
-
-		context->dispatch(textureResolution / 8, textureResolution / 8, 1);
-
-		context->uavBarrier({
-			inputTexture->getTexture() });
-	}
-
 	void calculateInitialSpectrum()
 	{
-		spectrumParamBuffer->update(&spectrumParam, sizeof(SpectrumParam));
+		const float boundary1 = 2.f * Math::pi / lengthScale1 * 7.f;
 
-		context->setPipelineState(spectrumState.Get());
+		const float boundary2 = 2.f * Math::pi / lengthScale2 * 7.f;
 
-		context->setCSConstants({
-			tildeh0Texture->getUAVMipIndex(0),
-			waveDataTexture->getUAVMipIndex(0),
-			randomGaussTexture->getAllSRVIndex() }, 0);
+		std::cout << "boundary 1 " << boundary1 << "\n";
 
-		context->setCSConstantBuffer(spectrumParamBuffer);
+		std::cout << "boundary 2 " << boundary2 << "\n";
 
-		context->transitionResources();
+		{
+			spectrumParam[0].cutoffLow = 0.0001f;
 
-		context->dispatch(textureResolution / 8 + 1, textureResolution / 8 + 1, 1);
+			spectrumParam[0].cutoffHigh = boundary1;
+		}
 
-		context->uavBarrier({
-			tildeh0Texture->getTexture(),
-			waveDataTexture->getTexture() });
+		{
+			spectrumParam[1].cutoffLow = boundary1;
 
-		context->setPipelineState(conjugateState.Get());
+			spectrumParam[1].cutoffHigh = boundary2;
+		}
 
-		context->setCSConstants({
-			waveSpectrumTexture->getUAVMipIndex(0),
-			tildeh0Texture->getAllSRVIndex() }, 0);
+		{
+			spectrumParam[2].cutoffLow = boundary2;
 
-		context->transitionResources();
+			spectrumParam[2].cutoffHigh = 9999.f;
+		}
 
-		context->dispatch(textureResolution / 8, textureResolution / 8, 1);
+		for (UINT i = 0; i < cascadeNum; i++)
+		{
+			spectrumParamBuffer[i]->update(&spectrumParam[i], sizeof(SpectrumParam));
 
-		context->uavBarrier({
-			waveSpectrumTexture->getTexture() });
-	}
-
-	void calculateTimeDependentSpectrum()
-	{
-		context->setPipelineState(displacementSpectrumState.Get());
-
-		context->setCSConstants({
-			DxDz->getUAVMipIndex(0),
-			DyDxz->getUAVMipIndex(0),
-			DyxDyz->getUAVMipIndex(0),
-			DxxDzz->getUAVMipIndex(0),
-			waveDataTexture->getAllSRVIndex(),
-			waveSpectrumTexture->getAllSRVIndex() }, 0);
-
-		context->transitionResources();
-
-		context->dispatch(textureResolution / 8, textureResolution / 8, 1);
-
-		context->uavBarrier({
-			DxDz->getTexture(),
-			DyDxz->getTexture(),
-			DyxDyz->getTexture(),
-			DxxDzz->getTexture() });
+			cascade[i]->calculateInitialSpectrum(spectrumParamBuffer[i]);
+		}
 	}
 
 	void calculateDisplacementAndDerivative()
 	{
-		ifftPermutation(DxDz);
+		for (UINT i = 0; i < cascadeNum; i++)
+		{
+			cascade[i]->calculateTimeDependentSpectrum();
 
-		ifftPermutation(DyDxz);
-
-		ifftPermutation(DyxDyz);
-
-		ifftPermutation(DxxDzz);
-
-		context->setPipelineState(waveMergeState.Get());
-
-		context->setCSConstants({
-			displacementTexture->getUAVMipIndex(0),
-			derivativeTexture->getUAVMipIndex(0),
-			jacobianTexture->getUAVMipIndex(0),
-			DxDz->getAllSRVIndex(),
-			DyDxz->getAllSRVIndex(),
-			DyxDyz->getAllSRVIndex(),
-			DxxDzz->getAllSRVIndex() }, 0);
-
-		context->transitionResources();
-
-		context->dispatch(textureResolution / 8, textureResolution / 8, 1);
-
-		context->uavBarrier({
-			displacementTexture->getTexture(),
-			derivativeTexture->getTexture(),
-			jacobianTexture->getTexture() });
+			cascade[i]->calculateDisplacementAndDerivative();
+		}
 	}
 
 	void renderSkyDomeAndOceanSurface()
@@ -464,14 +363,14 @@ private:
 		context->setRenderTargets({ originTexture->getRTVMipHandle(0) }, &depthStencilDesc);
 
 		context->setDSConstants({
-			displacementTexture->getAllSRVIndex(),
-			derivativeTexture->getAllSRVIndex(),
-			jacobianTexture->getAllSRVIndex() }, 0);
+			cascade[0]->displacementTexture->getAllSRVIndex(),
+			cascade[0]->derivativeTexture->getAllSRVIndex(),
+			cascade[0]->jacobianTexture->getAllSRVIndex() }, 0);
 
 		context->setPSConstants({
-			displacementTexture->getAllSRVIndex(),
-			derivativeTexture->getAllSRVIndex(),
-			jacobianTexture->getAllSRVIndex(),
+			cascade[0]->displacementTexture->getAllSRVIndex(),
+			cascade[0]->derivativeTexture->getAllSRVIndex(),
+			cascade[0]->jacobianTexture->getAllSRVIndex(),
 			enviromentCube->getAllSRVIndex() }, 0);
 
 		context->transitionResources();
@@ -487,18 +386,17 @@ private:
 
 	struct SpectrumParam
 	{
-		UINT mapResolution = textureResolution;
-		float mapLength = 256.f;
-		DirectX::XMFLOAT2 wind = { 12.5f,0.f };
-		float amplitude = 0.0000005f;
-		float gravity = 9.81f;
-		DirectX::XMFLOAT2 padding0;
-		DirectX::XMFLOAT4 padding1[14];
-	} spectrumParam;
+		const UINT mapResolution = textureResolution;
+		float mapLength;
+		const DirectX::XMFLOAT2 wind = { 12.f,0.f };
+		const float amplitude = 0.0000015f;
+		const float gravity = 9.81f;
+		float cutoffLow;
+		float cutoffHigh;
+		const DirectX::XMFLOAT4 padding1[14] = {};
+	} spectrumParam[cascadeNum];
 
 	BufferView* vertexBuffer;
-
-	ConstantBuffer* spectrumParamBuffer;
 
 	Shader* textureCubePS;
 
@@ -549,44 +447,17 @@ private:
 	//x y
 	TextureRenderView* tildeh0Texture;
 
-	//k.x 1.0/length(K) k.z angularSpeed
-	//x y z w
-	TextureRenderView* waveDataTexture;
-
-	//(tildeh0(k), conj(tildeh0(-k)))
-	//x y z w
-	TextureRenderView* waveSpectrumTexture;
-
 	//intermediate texture for ifft compute
 	TextureRenderView* tempTexture;
-
-	//following 4 textures store displacement and derivative(can be further calculated to normal and jacobian)
-
-	//Dx Dz
-	TextureRenderView* DxDz;
-
-	//Dy dDx/dz
-	TextureRenderView* DyDxz;
-
-	//dDy/dx dDy/dz
-	TextureRenderView* DyxDyz;
-
-	//dDx/dx dDz/dz
-	TextureRenderView* DxxDzz;
-
-	//Dx Dy Dz
-	TextureRenderView* displacementTexture;
-
-	//dDy/dx dDy/dz dDx/dx dDz/dz
-	TextureRenderView* derivativeTexture;
-
-	//J
-	TextureRenderView* jacobianTexture;
 
 	TextureRenderView* originTexture;
 
 	TextureDepthView* depthTexture;
 
 	BloomEffect* effect;
+
+	ConstantBuffer* spectrumParamBuffer[cascadeNum];
+
+	WaveCascade* cascade[cascadeNum];
 
 };

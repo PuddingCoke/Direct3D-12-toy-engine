@@ -142,6 +142,7 @@
   <ItemGroup>
     <ClInclude Include="MyGame.h" />
     <ClInclude Include="MyRenderPass.h" />
+    <ClInclude Include="WaveCascade.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="ConjugateCS.hlsl">
