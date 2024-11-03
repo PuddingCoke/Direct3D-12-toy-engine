@@ -14,6 +14,8 @@ cbuffer SpectrumParam : register(b3)
     float2 wind;
     float amplitude;
     float gravity;
+    float cutoffLow;
+    float cutoffHigh;
 }
 
 static RWTexture2D<float2> tildeh0Texture = ResourceDescriptorHeap[tildeh0TextureIndex];
@@ -58,7 +60,7 @@ void main(const uint2 DTid : SV_DispatchThreadID)
     
     const float len = length(k);
     
-    if (len >= 0.0001)
+    if (len >= cutoffLow && len <= cutoffHigh)
     {
         tildeh0Texture[DTid] = randomGaussTexture[DTid].xy * sqrt(phillips(k) / 2.0);
 
