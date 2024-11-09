@@ -24,6 +24,12 @@ public:
 
 	void applyInput(const float dt);
 
+	DirectX::XMVECTOR getEyePos() const;
+
+	DirectX::XMVECTOR getLookDir() const;
+
+	DirectX::XMVECTOR getUpVector() const;
+
 private:
 
 	const float moveSpeed;

@@ -2,16 +2,15 @@
 
 struct DS_OUTPUT
 {
-    float3 unDisplacedPosition : POSITION1;
+    float2 texCoord : TEXCOORD;
+    float4 lodScales : LODSCALES;
     float3 viewDir : VIEWDIR;
-    float2 uv : TEXCOORD;
     float4 svPosition : SV_POSITION;
 };
 
 struct HS_CONTROL_POINT_OUTPUT
 {
     float3 position : POSITION;
-    float2 uv : TEXCOORD;
 };
 
 struct HS_CONSTANT_DATA_OUTPUT
@@ -22,10 +21,24 @@ struct HS_CONSTANT_DATA_OUTPUT
 
 cbuffer TextureIndices : register(b2)
 {
-    uint displacementTextureIndex;
+    uint displacement0TextureIndex;
+    uint displacement1TextureIndex;
+    uint displacement2TextureIndex;
 }
 
-static Texture2D<float4> displacementTexture = ResourceDescriptorHeap[displacementTextureIndex];
+cbuffer RenderParam : register(b3)
+{
+    float lodScale;
+    float lengthScale0;
+    float lengthScale1;
+    float lengthScale2;
+}
+
+static Texture2D<float4> displacement0Texture = ResourceDescriptorHeap[displacement0TextureIndex];
+
+static Texture2D<float4> displacement1Texture = ResourceDescriptorHeap[displacement1TextureIndex];
+
+static Texture2D<float4> displacement2Texture = ResourceDescriptorHeap[displacement2TextureIndex];
 
 float3 interpolatePosition(const float3 v0, const float3 v1, const float3 v2, const float3 v3, const float2 uv)
 {
@@ -34,17 +47,6 @@ float3 interpolatePosition(const float3 v0, const float3 v1, const float3 v2, co
     const float3 top = lerp(v3, v2, uv.x);
     
     const float3 p = lerp(bottom, top, uv.y);
-    
-    return p;
-}
-
-float2 interpolateUV(const float2 v0, const float2 v1, const float2 v2, const float2 v3, const float2 uv)
-{
-    const float2 bottom = lerp(v0, v1, uv.x);
-    
-    const float2 top = lerp(v3, v2, uv.x);
-    
-    const float2 p = lerp(bottom, top, uv.y);
     
     return p;
 }
@@ -59,17 +61,27 @@ DS_OUTPUT main(
 
     float3 position = interpolatePosition(patch[0].position, patch[1].position, patch[2].position, patch[3].position, domain);
     
-    const float2 uv = interpolateUV(patch[0].uv, patch[1].uv, patch[2].uv, patch[3].uv, domain);
+    Output.texCoord = position.xz;
     
-    Output.unDisplacedPosition = position;
+    Output.viewDir = perframeResource.eyePos.xyz - position;
     
-    Output.viewDir = perframeResource.eyePos.xyz - Output.unDisplacedPosition;
+    const float viewDist = length(Output.viewDir);
     
-    position += displacementTexture.SampleLevel(linearWrapSampler, uv, 0.0).xyz;
+    const float lod_c0 = min(lodScale * lengthScale0 / viewDist, 1.0);
     
-    Output.uv = uv;
+    const float lod_c1 = min(lodScale * lengthScale1 / viewDist, 1.0);
+    
+    const float lod_c2 = min(lodScale * lengthScale2 / viewDist, 1.0);
+    
+    position += displacement0Texture.SampleLevel(anisotrophicWrapSampler, position.xz / lengthScale0, 0.0).xyz * lod_c0;
+    
+    position += displacement1Texture.SampleLevel(anisotrophicWrapSampler, position.xz / lengthScale1, 0.0).xyz * lod_c1;
+    
+    position += displacement2Texture.SampleLevel(anisotrophicWrapSampler, position.xz / lengthScale2, 0.0).xyz * lod_c2;
+    
+    Output.lodScales = float4(lod_c0, lod_c1, lod_c2, 0.0);
     
     Output.svPosition = mul(float4(position, 1.0), perframeResource.viewProj);
-
+    
     return Output;
 }

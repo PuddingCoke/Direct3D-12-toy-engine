@@ -1,13 +1,11 @@
 struct VS_CONTROL_POINT_OUTPUT
 {
     float3 position : POSITION;
-    float2 uv : TEXCOORD;
 };
 
 struct HS_CONTROL_POINT_OUTPUT
 {
     float3 position : POSITION;
-    float2 uv : TEXCOORD;
 };
 
 struct HS_CONSTANT_DATA_OUTPUT
@@ -45,6 +43,5 @@ HS_CONTROL_POINT_OUTPUT main(
 {
     HS_CONTROL_POINT_OUTPUT Output;
     Output.position = ip[i].position;
-    Output.uv = ip[i].uv;
     return Output;
 }
