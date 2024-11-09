@@ -8,12 +8,12 @@ Camera::CameraMatrices Camera::matrices;
 
 DirectX::XMMATRIX Camera::getProj()
 {
-	return matrices.proj;
+	return projMatrix;
 }
 
 DirectX::XMMATRIX Camera::getView()
 {
-	return matrices.view;
+	return viewMatrix;
 }
 
 DirectX::XMVECTOR Camera::getEyePos()

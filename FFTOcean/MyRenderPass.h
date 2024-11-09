@@ -16,7 +16,9 @@ class MyRenderPass :public RenderPass
 {
 public:
 
-	MyRenderPass() :
+	MyRenderPass(FPSCamera* const camera) :
+		camera(camera),
+		renderParamBuffer(ResourceManager::createConstantBuffer(sizeof(RenderParam), true)),
 		spectrumParamBuffer{ ResourceManager::createConstantBuffer(sizeof(SpectrumParam), true),ResourceManager::createConstantBuffer(sizeof(SpectrumParam), true),ResourceManager::createConstantBuffer(sizeof(SpectrumParam), true) },
 		cascade{ new WaveCascade(textureResolution,context),new WaveCascade(textureResolution,context),new WaveCascade(textureResolution,context) },
 		textureCubePS(new Shader(Utils::getRootFolder() + "TextureCubePS.cso")),
@@ -60,7 +62,6 @@ public:
 			D3D12_INPUT_ELEMENT_DESC inputLayoutDesc[] =
 			{
 				{"POSITION",0,DXGI_FORMAT_R32G32B32_FLOAT,0,D3D12_APPEND_ALIGNED_ELEMENT,D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0},
-				{"TEXCOORD",0,DXGI_FORMAT_R32G32_FLOAT,0,D3D12_APPEND_ALIGNED_ELEMENT,D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0}
 			};
 
 			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = PipelineState::getDefaultGraphicsDesc();
@@ -123,36 +124,31 @@ public:
 		struct Vertex
 		{
 			DirectX::XMFLOAT3 position;
-			DirectX::XMFLOAT2 uv;
 		};
 
 		std::vector<Vertex> vertices;
 
 		{
-			auto getVertexAt = [this](const UINT& x, const UINT& z)
+			auto getVertexAt = [this](const int x, const int z)
 				{
-					const float xPos = (float)x * (float)spectrumParam[0].mapLength / (float)tilePerPatch - (float)patchNum * spectrumParam[0].mapLength / 2.f;
+					const float xPos = (float)x * 512.f / (float)tilePerPatch - 512.f / 2.f;
 
-					const float zPos = (float)z * (float)spectrumParam[0].mapLength / (float)tilePerPatch - (float)patchNum * spectrumParam[0].mapLength;
+					const float zPos = (float)z * 512.f / (float)tilePerPatch - 512.f / 2.f;
 
-					const float u = (float)x / (float)tilePerPatch;
-
-					const float v = (float)z / (float)tilePerPatch;
-
-					return Vertex{ {xPos,0.f,zPos},{u,v} };
+					return Vertex{ {xPos,0.f,zPos} };
 				};
 
-			for (UINT patchZ = 0; patchZ < patchNum; patchZ++)
+			for (int row = 0; row < rowNum; row++)
 			{
-				for (UINT patchX = 0; patchX < patchNum; patchX++)
+				for (int column = -row; column <= row; column++)
 				{
-					for (UINT tileZ = 0; tileZ < tilePerPatch; tileZ++)
+					for (int tileZ = 0; tileZ < tilePerPatch; tileZ++)
 					{
-						for (UINT tileX = 0; tileX < tilePerPatch; tileX++)
+						for (int tileX = 0; tileX < tilePerPatch; tileX++)
 						{
-							const UINT z = patchZ * tilePerPatch + tileZ;
+							const int z = row * tilePerPatch + tileZ;
 
-							const UINT x = patchX * tilePerPatch + tileX;
+							const int x = column * tilePerPatch + tileX;
 
 							vertices.push_back(getVertexAt(x, z));
 
@@ -242,6 +238,8 @@ public:
 
 		delete effect;
 
+		delete renderParamBuffer;
+
 		for (UINT i = 0; i < cascadeNum; i++)
 		{
 			delete spectrumParamBuffer[i];
@@ -253,12 +251,21 @@ public:
 	void imGUICall() override
 	{
 		effect->imGUICall();
+
+		ImGui::Begin("RenderParam");
+		ImGui::SliderFloat("Lod Scale", &renderParam.lodScale, 1.0f, 10.f);
+		ImGui::SliderFloat("Fog Pow", &renderParam.fogPower, 0.f, 4.f);
+		ImGui::SliderFloat("Sun Theta", &renderParam.sunTheta, 0.f, Math::pi / 2.f);
+		ImGui::SliderFloat("Specular Pow", &renderParam.specularPower, 0.f, 4096.f);
+		ImGui::End();
 	}
 
 protected:
 
 	void recordCommand() override
 	{
+		updateVertices();
+
 		calculateDisplacementAndDerivative();
 
 		renderSkyDomeAndOceanSurface();
@@ -269,18 +276,20 @@ private:
 	//do not change this!
 	static constexpr UINT cascadeNum = 3;
 
-	static constexpr float lengthScale0 = 500.f;
+	static constexpr float lengthScale0 = 250.f;
 
-	static constexpr float lengthScale1 = 27.f;
+	static constexpr float lengthScale1 = 17.f;
 
 	static constexpr float lengthScale2 = 5.f;
 
 	//do not change this!
 	static constexpr UINT textureResolution = 512;
 
-	static constexpr UINT patchNum = 5;
+	static constexpr int rowNum = 6;
 
-	static constexpr UINT tilePerPatch = 8;
+	static constexpr int tilePerPatch = 8;
+
+	static constexpr UINT gridSize = 128;
 
 	static TextureRenderView* createTexture(const UINT& resolution, const DXGI_FORMAT& format)
 	{
@@ -289,13 +298,9 @@ private:
 
 	void calculateInitialSpectrum()
 	{
-		const float boundary1 = 2.f * Math::pi / lengthScale1 * 7.f;
+		const float boundary1 = 2.f * Math::pi / lengthScale1 * 12.f;
 
-		const float boundary2 = 2.f * Math::pi / lengthScale2 * 7.f;
-
-		std::cout << "boundary 1 " << boundary1 << "\n";
-
-		std::cout << "boundary 2 " << boundary2 << "\n";
+		const float boundary2 = 2.f * Math::pi / lengthScale2 * 12.f;
 
 		{
 			spectrumParam[0].cutoffLow = 0.0001f;
@@ -335,6 +340,8 @@ private:
 
 	void renderSkyDomeAndOceanSurface()
 	{
+		renderParamBuffer->update(&renderParam, sizeof(RenderParam));
+
 		context->setPipelineState(textureCubeState.Get());
 
 		context->setViewportSimple(Graphics::getWidth(), Graphics::getHeight());
@@ -364,24 +371,258 @@ private:
 
 		context->setDSConstants({
 			cascade[0]->displacementTexture->getAllSRVIndex(),
-			cascade[0]->derivativeTexture->getAllSRVIndex(),
-			cascade[0]->jacobianTexture->getAllSRVIndex() }, 0);
+			cascade[1]->displacementTexture->getAllSRVIndex(),
+			cascade[2]->displacementTexture->getAllSRVIndex() }, 0);
+
+		context->setDSConstantBuffer(renderParamBuffer);
 
 		context->setPSConstants({
 			cascade[0]->displacementTexture->getAllSRVIndex(),
 			cascade[0]->derivativeTexture->getAllSRVIndex(),
 			cascade[0]->jacobianTexture->getAllSRVIndex(),
+			cascade[1]->displacementTexture->getAllSRVIndex(),
+			cascade[1]->derivativeTexture->getAllSRVIndex(),
+			cascade[1]->jacobianTexture->getAllSRVIndex(),
+			cascade[2]->displacementTexture->getAllSRVIndex(),
+			cascade[2]->derivativeTexture->getAllSRVIndex(),
+			cascade[2]->jacobianTexture->getAllSRVIndex(),
 			enviromentCube->getAllSRVIndex() }, 0);
+
+		context->setPSConstantBuffer(renderParamBuffer);
 
 		context->transitionResources();
 
 		context->clearDepthStencil(depthTexture->getDSVMipHandle(0), D3D12_CLEAR_FLAG_DEPTH, 1.f, 0);
 
-		context->draw(4 * (patchNum * patchNum) * (tilePerPatch * tilePerPatch), 1, 0, 0);
+		context->draw(4 * (rowNum * rowNum) * (tilePerPatch * tilePerPatch), 1, 0, 0);
 
 		TextureRenderView* bloomTexture = effect->process(originTexture);
 
 		blit(bloomTexture);
+	}
+
+	bool getMinMaxMatrix(DirectX::XMMATRIX* minMaxMatrix)
+	{
+		DirectX::XMVECTOR corners[8] = {
+			{-1.f,-1.f,0.f,1.f},
+			{-1.f,1.f,0.f,1.f},
+			{1.f,1.f,0.f,1.f},
+			{1.f,-1.f,0.f,1.f},
+			{-1.f,-1.f,1.f,1.f},
+			{-1.f,1.f,1.f,1.f},
+			{1.f,1.f,1.f,1.f},
+			{1.f,-1.f,1.f,1.f},
+		};
+
+		const UINT edges[12][2] = {
+			{0,1},{1,2},{2,3},{3,0},
+			{2,6},{3,7},{1,5},{0,4},
+			{4,5},{5,6},{6,7},{7,4}
+		};
+
+		{
+			const DirectX::XMMATRIX invViewProj = DirectX::XMMatrixInverse(nullptr, Camera::getView() * Camera::getProj());
+
+			//transform corner point to world space
+			for (UINT i = 0; i < 8; i++)
+			{
+				corners[i] = DirectX::XMVector3TransformCoord(corners[i], invViewProj);
+			}
+		}
+
+		std::vector<DirectX::XMVECTOR> intersections;
+
+		//get all intersections
+
+		const float bound = 25.f;
+
+		{
+			const float a0 = bound;
+
+			for (UINT i = 0; i < 12; i++)
+			{
+				const DirectX::XMVECTOR p0 = corners[edges[i][0]];
+
+				const DirectX::XMVECTOR p1 = corners[edges[i][1]];
+
+				const float y0 = DirectX::XMVectorGetY(p0);
+
+				const float y1 = DirectX::XMVectorGetY(p1);
+
+				if ((y0 - a0) * (y1 - a0) < 0.f)
+				{
+					const float t = (a0 - y0) / (y1 - y0);
+
+					const DirectX::XMVECTOR intersection = DirectX::XMVectorLerp(p0, p1, t);
+
+					intersections.push_back(intersection);
+				}
+			}
+		}
+
+		{
+			const float a0 = -bound;
+
+			for (UINT i = 0; i < 12; i++)
+			{
+				const DirectX::XMVECTOR p0 = corners[edges[i][0]];
+
+				const DirectX::XMVECTOR p1 = corners[edges[i][1]];
+
+				const float y0 = DirectX::XMVectorGetY(p0);
+
+				const float y1 = DirectX::XMVectorGetY(p1);
+
+				if ((y0 - a0) * (y1 - a0) < 0.f)
+				{
+					const float t = (a0 - y0) / (y1 - y0);
+
+					const DirectX::XMVECTOR intersection = DirectX::XMVectorLerp(p0, p1, t);
+
+					intersections.push_back(intersection);
+				}
+			}
+		}
+
+		//add interior point to intersections too
+		for (UINT i = 0; i < 8; i++)
+		{
+			const DirectX::XMVECTOR p0 = corners[i];
+
+			const float y0 = DirectX::XMVectorGetY(p0);
+
+			if (y0<bound && y0>-bound)
+			{
+				intersections.push_back(p0);
+			}
+		}
+
+		//project all points to y=0 plane
+		for (UINT i = 0; i < intersections.size(); i++)
+		{
+			intersections[i] = DirectX::XMVectorSetY(intersections[i], 0.f);
+		}
+
+		DirectX::XMVECTOR aimPoint0;
+
+		DirectX::XMVECTOR aimPoint1;
+
+		{
+			DirectX::XMVECTOR forward = camera->getLookDir();
+
+			if (DirectX::XMVectorGetY(forward) > 0.f)
+			{
+				forward = DirectX::XMVectorSetY(forward, -DirectX::XMVectorGetY(forward));
+			}
+
+			{
+				const DirectX::XMVECTOR p0 = camera->getEyePos();
+
+				const DirectX::XMVECTOR p1 = DirectX::XMVectorAdd(p0, forward);
+
+				const float y0 = DirectX::XMVectorGetY(p0);
+
+				const float y1 = DirectX::XMVectorGetY(p1);
+
+				const float t = -y0 / (y1 - y0);
+
+				aimPoint0 = DirectX::XMVectorLerp(p0, p1, t);
+			}
+		}
+
+		const float af = fabsf(DirectX::XMVectorGetY(camera->getLookDir()));
+
+		aimPoint1 = DirectX::XMVectorAdd(camera->getEyePos(), DirectX::XMVectorScale(camera->getLookDir(), 10.f));
+
+		aimPoint1 = DirectX::XMVectorSetY(aimPoint1, 0.f);
+
+		aimPoint0 = DirectX::XMVectorLerp(aimPoint1, aimPoint0, af);
+
+		const DirectX::XMMATRIX viewMatrix = DirectX::XMMatrixLookAtLH(camera->getEyePos(), aimPoint0, camera->getUpVector());
+
+		{
+			const DirectX::XMMATRIX viewProj = viewMatrix * Camera::getProj();
+
+			for (UINT i = 0; i < intersections.size(); i++)
+			{
+				intersections[i] = DirectX::XMVector3TransformCoord(intersections[i], viewProj);
+			}
+		}
+
+		float x_min = DirectX::XMVectorGetX(intersections[0]);
+
+		float x_max = DirectX::XMVectorGetX(intersections[0]);
+
+		float y_min = DirectX::XMVectorGetY(intersections[0]);
+
+		float y_max = DirectX::XMVectorGetY(intersections[0]);
+
+		for (UINT i = 1; i < intersections.size(); i++)
+		{
+			const float x = DirectX::XMVectorGetX(intersections[i]);
+
+			const float y = DirectX::XMVectorGetY(intersections[i]);
+
+			if (x > x_max) x_max = x;
+			if (x < x_min) x_min = x;
+			if (y > y_max) y_max = y;
+			if (y < y_min) y_min = y;
+		}
+
+		DirectX::XMMATRIX pack(x_max - x_min, 0, 0, x_min,
+			0, y_max - y_min, 0, y_min,
+			0, 0, 1, 0,
+			0, 0, 0, 1);
+
+		pack = DirectX::XMMatrixTranspose(pack);
+
+		*minMaxMatrix = pack * DirectX::XMMatrixInverse(nullptr, viewMatrix * Camera::getProj());
+
+		return true;
+	}
+
+	DirectX::XMFLOAT4 getWorldPos(const float u, const float v, const DirectX::XMMATRIX& m)
+	{
+		DirectX::XMVECTOR origin = { u,v,0.f,1.f };
+
+		DirectX::XMVECTOR direction = { u,v,1.f,1.f };
+
+		origin = DirectX::XMVector4Transform(origin, m);
+
+		direction = DirectX::XMVector4Transform(direction, m);
+
+		direction = DirectX::XMVectorSubtract(direction, origin);
+
+		const float l = -DirectX::XMVectorGetY(origin) / DirectX::XMVectorGetY(direction);
+
+		const DirectX::XMVECTOR worldPos = DirectX::XMVectorAdd(origin, DirectX::XMVectorScale(direction, l));
+
+		DirectX::XMFLOAT4 flt;
+
+		DirectX::XMStoreFloat4(&flt, worldPos);
+
+		return flt;
+	}
+
+	void updateVertices()
+	{
+		DirectX::XMMATRIX range;
+		
+		getMinMaxMatrix(&range);
+
+		//left bottom
+		DirectX::XMFLOAT4 corners0 = getWorldPos(0.f, 0.f, range);
+
+		//right bottom
+		DirectX::XMFLOAT4 corners1 = getWorldPos(1.f, 0.f, range);
+
+		//left top
+		DirectX::XMFLOAT4 corners2 = getWorldPos(0.f, 1.f, range);
+
+		//right top
+		DirectX::XMFLOAT4 corners3 = getWorldPos(1.f, 1.f, range);
+
+		
 	}
 
 	struct SpectrumParam
@@ -389,12 +630,25 @@ private:
 		const UINT mapResolution = textureResolution;
 		float mapLength;
 		const DirectX::XMFLOAT2 wind = { 12.f,0.f };
-		const float amplitude = 0.0000015f;
+		const float amplitude = 0.000002f;
 		const float gravity = 9.81f;
 		float cutoffLow;
 		float cutoffHigh;
 		const DirectX::XMFLOAT4 padding1[14] = {};
 	} spectrumParam[cascadeNum];
+
+	struct RenderParam
+	{
+		float lodScale = 3.f;
+		float lengthScale0 = MyRenderPass::lengthScale0;
+		float lengthScale1 = MyRenderPass::lengthScale1;
+		float lengthScale2 = MyRenderPass::lengthScale2;
+		float fogPower = 3.4f;
+		float sunTheta = 0.01f;
+		float specularPower = 256.f;
+		float padding0;
+		DirectX::XMFLOAT4 padding1[14];
+	} renderParam;
 
 	BufferView* vertexBuffer;
 
@@ -456,8 +710,12 @@ private:
 
 	BloomEffect* effect;
 
+	ConstantBuffer* renderParamBuffer;
+
 	ConstantBuffer* spectrumParamBuffer[cascadeNum];
 
 	WaveCascade* cascade[cascadeNum];
+
+	FPSCamera* camera;
 
 };

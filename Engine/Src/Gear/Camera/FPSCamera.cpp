@@ -68,3 +68,18 @@ void FPSCamera::applyInput(const float dt)
 
 	Camera::setView(eye, DirectX::XMVectorAdd(eye, lookDir), up);
 }
+
+DirectX::XMVECTOR FPSCamera::getEyePos() const
+{
+	return eye;
+}
+
+DirectX::XMVECTOR FPSCamera::getLookDir() const
+{
+	return lookDir;
+}
+
+DirectX::XMVECTOR FPSCamera::getUpVector() const
+{
+	return up;
+}
