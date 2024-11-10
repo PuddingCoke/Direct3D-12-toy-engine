@@ -17,11 +17,14 @@ class MyRenderPass :public RenderPass
 public:
 
 	MyRenderPass(FPSCamera* const camera) :
+		vertices((gridSize + 1)* (gridSize + 1)),
 		camera(camera),
 		renderParamBuffer(ResourceManager::createConstantBuffer(sizeof(RenderParam), true)),
 		spectrumParamBuffer{ ResourceManager::createConstantBuffer(sizeof(SpectrumParam), true),ResourceManager::createConstantBuffer(sizeof(SpectrumParam), true),ResourceManager::createConstantBuffer(sizeof(SpectrumParam), true) },
 		cascade{ new WaveCascade(textureResolution,context),new WaveCascade(textureResolution,context),new WaveCascade(textureResolution,context) },
 		textureCubePS(new Shader(Utils::getRootFolder() + "TextureCubePS.cso")),
+		gridDebugVS(new Shader(Utils::getRootFolder() + "GridDebugVS.cso")),
+		gridDebugPS(new Shader(Utils::getRootFolder() + "GridDebugPS.cso")),
 		oceanVS(new Shader(Utils::getRootFolder() + "OceanVS.cso")),
 		oceanHS(new Shader(Utils::getRootFolder() + "OceanHS.cso")),
 		oceanDS(new Shader(Utils::getRootFolder() + "OceanDS.cso")),
@@ -56,6 +59,30 @@ public:
 			desc.PS = textureCubePS->getByteCode();
 
 			GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&textureCubeState));
+		}
+
+		{
+			D3D12_INPUT_ELEMENT_DESC inputLayoutDesc[] =
+			{
+				{"POSITION",0,DXGI_FORMAT_R32G32B32_FLOAT,0,D3D12_APPEND_ALIGNED_ELEMENT,D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0},
+			};
+
+			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = PipelineState::getDefaultGraphicsDesc();
+			desc.InputLayout = { inputLayoutDesc,_countof(inputLayoutDesc) };
+			desc.pRootSignature = GlobalRootSignature::getGraphicsRootSignature()->get();
+			desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
+			desc.RasterizerState = States::rasterCullBack;
+			desc.DepthStencilState.DepthEnable = FALSE;
+			desc.DepthStencilState.StencilEnable = FALSE;
+			desc.SampleMask = UINT_MAX;
+			desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+			desc.NumRenderTargets = 1;
+			desc.RTVFormats[0] = Graphics::BackBufferFormat;
+			desc.SampleDesc.Count = 1;
+			desc.VS = gridDebugVS->getByteCode();
+			desc.PS = gridDebugPS->getByteCode();
+
+			GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&gridDebugState));
 		}
 
 		{
@@ -121,53 +148,41 @@ public:
 
 		depthTexture = ResourceManager::createTextureDepthView(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R32_TYPELESS, 1, 1, false, true);
 
-		struct Vertex
-		{
-			DirectX::XMFLOAT3 position;
-		};
-
-		std::vector<Vertex> vertices;
-
-		{
-			auto getVertexAt = [this](const int x, const int z)
-				{
-					const float xPos = (float)x * 512.f / (float)tilePerPatch - 512.f / 2.f;
-
-					const float zPos = (float)z * 512.f / (float)tilePerPatch - 512.f / 2.f;
-
-					return Vertex{ {xPos,0.f,zPos} };
-				};
-
-			for (int row = 0; row < rowNum; row++)
-			{
-				for (int column = -row; column <= row; column++)
-				{
-					for (int tileZ = 0; tileZ < tilePerPatch; tileZ++)
-					{
-						for (int tileX = 0; tileX < tilePerPatch; tileX++)
-						{
-							const int z = row * tilePerPatch + tileZ;
-
-							const int x = column * tilePerPatch + tileX;
-
-							vertices.push_back(getVertexAt(x, z));
-
-							vertices.push_back(getVertexAt(x, z + 1));
-
-							vertices.push_back(getVertexAt(x + 1, z + 1));
-
-							vertices.push_back(getVertexAt(x + 1, z));
-						}
-					}
-				}
-			}
-		}
-
 		begin();
 
 		effect = new BloomEffect(context, Graphics::getWidth(), Graphics::getHeight(), resManager);
 
-		vertexBuffer = resManager->createStructuredBufferView(sizeof(Vertex), static_cast<UINT>(sizeof(Vertex) * vertices.size()), false, false, true, false, true, vertices.data());
+		vertexBuffer = resManager->createStructuredBufferView(sizeof(DirectX::XMFLOAT3), static_cast<UINT>(sizeof(DirectX::XMFLOAT3) * vertices.size()), false, false, true, true, true, vertices.data());
+
+		{
+			for (UINT y = 0; y < gridSize; y++)
+			{
+				for (UINT x = 0; x < gridSize; x++)
+				{
+					const UINT bottomLeft = y * (gridSize + 1) + x;
+
+					const UINT bottomRight = bottomLeft + 1;
+
+					const UINT topLeft = (y + 1) * (gridSize + 1) + x;
+
+					const UINT topRight = topLeft + 1;
+
+					indices.push_back(bottomRight);
+
+					indices.push_back(bottomLeft);
+
+					indices.push_back(topLeft);
+
+					indices.push_back(topLeft);
+
+					indices.push_back(topRight);
+
+					indices.push_back(bottomRight);
+				}
+			}
+
+			indexBuffer = resManager->createTypedBufferView(DXGI_FORMAT_R32_UINT, sizeof(UINT) * indices.size(), false, false, false, true, false, true, indices.data());
+		}
 
 		randomGaussTexture = resManager->createTextureRenderView(textureResolution, textureResolution, RandomDataType::GAUSS, true);
 
@@ -202,7 +217,13 @@ public:
 	{
 		delete vertexBuffer;
 
+		delete indexBuffer;
+
 		delete textureCubePS;
+
+		delete gridDebugVS;
+
+		delete gridDebugPS;
 
 		delete oceanVS;
 
@@ -340,6 +361,26 @@ private:
 
 	void renderSkyDomeAndOceanSurface()
 	{
+		/*context->setPipelineState(gridDebugState.Get());
+
+		context->setViewportSimple(Graphics::getWidth(), Graphics::getHeight());
+
+		context->setDefRenderTarget();
+
+		context->setVertexBuffers(0, { vertexBuffer->getVertexBuffer() });
+
+		context->setIndexBuffer(indexBuffer->getIndexBuffer());
+
+		context->setTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+		context->transitionResources();
+
+		context->clearDefRenderTarget(DirectX::Colors::Black);
+
+		context->draw(vertices.size(), 1, 0, 0);
+
+		context->drawIndexed(indices.size(), 1, 0, 0, 0);*/
+
 		renderParamBuffer->update(&renderParam, sizeof(RenderParam));
 
 		context->setPipelineState(textureCubeState.Get());
@@ -361,9 +402,11 @@ private:
 
 		context->setViewportSimple(Graphics::getWidth(), Graphics::getHeight());
 
-		context->setTopology(D3D_PRIMITIVE_TOPOLOGY_4_CONTROL_POINT_PATCHLIST);
+		context->setTopology(D3D_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST);
 
 		context->setVertexBuffers(0, { vertexBuffer->getVertexBuffer() });
+
+		context->setIndexBuffer(indexBuffer->getIndexBuffer());
 
 		const DepthStencilDesc depthStencilDesc = depthTexture->getDSVMipHandle(0);
 
@@ -394,7 +437,7 @@ private:
 
 		context->clearDepthStencil(depthTexture->getDSVMipHandle(0), D3D12_CLEAR_FLAG_DEPTH, 1.f, 0);
 
-		context->draw(4 * (rowNum * rowNum) * (tilePerPatch * tilePerPatch), 1, 0, 0);
+		context->drawIndexed(indices.size(), 1, 0, 0, 0);
 
 		TextureRenderView* bloomTexture = effect->process(originTexture);
 
@@ -607,22 +650,48 @@ private:
 	void updateVertices()
 	{
 		DirectX::XMMATRIX range;
-		
+
 		getMinMaxMatrix(&range);
 
 		//left bottom
-		DirectX::XMFLOAT4 corners0 = getWorldPos(0.f, 0.f, range);
+		const DirectX::XMFLOAT4 corners0 = getWorldPos(0.f, 0.f, range);
 
 		//right bottom
-		DirectX::XMFLOAT4 corners1 = getWorldPos(1.f, 0.f, range);
+		const DirectX::XMFLOAT4 corners1 = getWorldPos(1.f, 0.f, range);
 
 		//left top
-		DirectX::XMFLOAT4 corners2 = getWorldPos(0.f, 1.f, range);
+		const DirectX::XMFLOAT4 corners2 = getWorldPos(0.f, 1.f, range);
 
 		//right top
-		DirectX::XMFLOAT4 corners3 = getWorldPos(1.f, 1.f, range);
+		const DirectX::XMFLOAT4 corners3 = getWorldPos(1.f, 1.f, range);
 
-		
+		for (UINT y = 0; y < gridSize + 1; y++)
+		{
+			for (UINT x = 0; x < gridSize + 1; x++)
+			{
+				const float u = (float)x / (float)gridSize;
+
+				const float v = (float)y / (float)gridSize;
+
+				DirectX::XMFLOAT4 result;
+
+				result.x = (1.f - v) * ((1.f - u) * corners0.x + u * corners1.x) + v * ((1.f - u) * corners2.x + u * corners3.x);
+				result.z = (1.f - v) * ((1.f - u) * corners0.z + u * corners1.z) + v * ((1.f - u) * corners2.z + u * corners3.z);
+				result.w = (1.f - v) * ((1.f - u) * corners0.w + u * corners1.w) + v * ((1.f - u) * corners2.w + u * corners3.w);
+
+				const float divide = 1.f / result.w;
+
+				result.x *= divide;
+
+				result.z *= divide;
+
+				const UINT writeCoord = y * (gridSize + 1) + x;
+
+				vertices[writeCoord] = { result.x,0.f,result.z };
+			}
+		}
+
+		context->updateBuffer(vertexBuffer, vertices.data(), static_cast<UINT>(sizeof(DirectX::XMFLOAT3) * vertices.size()));
 	}
 
 	struct SpectrumParam
@@ -652,9 +721,17 @@ private:
 
 	BufferView* vertexBuffer;
 
+	BufferView* indexBuffer;
+
 	Shader* textureCubePS;
 
 	ComPtr<ID3D12PipelineState> textureCubeState;
+
+	Shader* gridDebugVS;
+
+	Shader* gridDebugPS;
+
+	ComPtr<ID3D12PipelineState> gridDebugState;
 
 	Shader* oceanVS;
 
@@ -718,4 +795,7 @@ private:
 
 	FPSCamera* camera;
 
+	std::vector<DirectX::XMFLOAT3> vertices;
+
+	std::vector<UINT> indices;
 };

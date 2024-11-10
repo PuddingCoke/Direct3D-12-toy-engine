@@ -10,34 +10,32 @@ struct HS_CONTROL_POINT_OUTPUT
 
 struct HS_CONSTANT_DATA_OUTPUT
 {
-    float EdgeTessFactor[4] : SV_TessFactor;
-    float InsideTessFactor[2] : SV_InsideTessFactor;
+    float EdgeTessFactor[3] : SV_TessFactor;
+    float InsideTessFactor : SV_InsideTessFactor;
 };
 
 HS_CONSTANT_DATA_OUTPUT CalcHSPatchConstants(
-	InputPatch<VS_CONTROL_POINT_OUTPUT, 4> ip,
+	InputPatch<VS_CONTROL_POINT_OUTPUT, 3> ip,
 	uint PatchID : SV_PrimitiveID)
 {
     HS_CONSTANT_DATA_OUTPUT Output;
 
-    Output.EdgeTessFactor[0] = 32.0;
-    Output.EdgeTessFactor[1] = 32.0;
-    Output.EdgeTessFactor[2] = 32.0;
-    Output.EdgeTessFactor[3] = 32.0;
+    Output.EdgeTessFactor[0] = 8.0;
+    Output.EdgeTessFactor[1] = 8.0;
+    Output.EdgeTessFactor[2] = 8.0;
 
-    Output.InsideTessFactor[0] = 32.0;
-    Output.InsideTessFactor[1] = 32.0;
+    Output.InsideTessFactor = 8.0;
 
     return Output;
 }
 
-[domain("quad")]
-[partitioning("integer")]
+[domain("tri")]
+[partitioning("fractional_even")]
 [outputtopology("triangle_cw")]
-[outputcontrolpoints(4)]
+[outputcontrolpoints(3)]
 [patchconstantfunc("CalcHSPatchConstants")]
 HS_CONTROL_POINT_OUTPUT main(
-	InputPatch<VS_CONTROL_POINT_OUTPUT, 4> ip,
+	InputPatch<VS_CONTROL_POINT_OUTPUT, 3> ip,
 	uint i : SV_OutputControlPointID,
 	uint PatchID : SV_PrimitiveID)
 {
