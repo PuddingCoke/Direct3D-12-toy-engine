@@ -48,6 +48,10 @@ public:
 
 	void setSoftThreshold(const float softThreshold);
 
+	float getExposure() const;
+
+	float getGamma() const;
+
 private:
 
 	void updateCurve(const UINT index);

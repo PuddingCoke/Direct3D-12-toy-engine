@@ -27,9 +27,14 @@ cbuffer RenderParam : register(b3)
     float lengthScale0;
     float lengthScale1;
     float lengthScale2;
-    float fogPower;
+    float sunStrength;
     float sunTheta;
     float specularPower;
+    float foamBias;
+    float foamScale;
+    float sunDirection;
+    float exposure;
+    float gamma;
 }
 
 static Texture2D<float4> displacement0Texture = ResourceDescriptorHeap[displacement0TextureIndex];
@@ -46,7 +51,7 @@ static Texture2D<float> jacobian2Texture = ResourceDescriptorHeap[jacobian2Textu
 
 static TextureCube<float4> enviromentCube = ResourceDescriptorHeap[enviromentCubeIndex];
 
-static const float3 L = normalize(float3(0.0, sin(sunTheta), cos(sunTheta)));
+static const float3 L = normalize(float3(cos(sunTheta) * cos(sunDirection), sin(sunTheta), cos(sunTheta) * sin(sunDirection)));
 
 static const float3 oceanColor = float3(0.0000, 0.2507, 0.3613);
 
@@ -85,23 +90,19 @@ float4 main(PixelInput input) : SV_TARGET
     
     float3 H = normalize(V + L);
     
-    float3 reflectColor = enviromentCube.Sample(linearWrapSampler, R).rgb;
+    //0.3 0.47
     
-    float turbulence = max(1.6 - J, 0.0);
+    float3 skyLight = enviromentCube.Sample(linearWrapSampler, R).rgb;
     
-    float highlightMul = 1.0 + 3.0 * smoothstep(1.2, 1.8, turbulence);
+    skyLight = 1.0 - exp(-skyLight * exposure);
     
-    float3 color = lerp(oceanColor, reflectColor * highlightMul, F) + pow(max(dot(L, R), 0.0), specularPower) * sunColor;
+    skyLight = pow(skyLight, gamma);
     
-    float fogFactor = distance(perframeResource.eyePos.xz, input.texCoord);
+    float3 sunLight = sunStrength * pow(saturate(dot(L, R)), specularPower) * sunColor;
     
-    float2 fogTexcoord = normalize(input.texCoord - perframeResource.eyePos.xz);
+    float turbulence = min(1.0, max(0.0, (-J + foamBias) * foamScale));
     
-    float3 fogColor = enviromentCube.Sample(linearWrapSampler, float3(fogTexcoord.x, 0.0, fogTexcoord.y)).rgb;
-    
-    fogFactor = pow(smoothstep(0.0, 4096.0, fogFactor), fogPower);
-    
-    color = lerp(color, fogColor, fogFactor);
+    float3 color = (1.0 - turbulence) * ((1.0 - F) * oceanColor + F * (skyLight + sunLight)) + turbulence * float3(0.9, 0.9, 0.9);
     
     return float4(color, 1.0);
 }

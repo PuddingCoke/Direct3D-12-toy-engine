@@ -188,7 +188,7 @@ public:
 
 		WaveCascade::randomGaussTexture = randomGaussTexture;
 
-		enviromentCube = resManager->createTextureCube("E:\\Assets\\Ocean\\ColdSunsetEquirect.png", 2048, true);
+		enviromentCube = resManager->createTextureCube("E:\\Assets\\Ocean\\clear_sky_field_sky_dome_8k.hdr", 1024, true);
 
 		calculateInitialSpectrum();
 
@@ -275,9 +275,12 @@ public:
 
 		ImGui::Begin("RenderParam");
 		ImGui::SliderFloat("Lod Scale", &renderParam.lodScale, 1.0f, 10.f);
-		ImGui::SliderFloat("Fog Pow", &renderParam.fogPower, 0.f, 4.f);
+		ImGui::SliderFloat("Sun Strength", &renderParam.sunStrength, 0.f, 4.f);
 		ImGui::SliderFloat("Sun Theta", &renderParam.sunTheta, 0.f, Math::pi / 2.f);
 		ImGui::SliderFloat("Specular Pow", &renderParam.specularPower, 0.f, 4096.f);
+		ImGui::SliderFloat("Foam Bias", &renderParam.foamBias, 0.f, 5.f);
+		ImGui::SliderFloat("Foam Scale", &renderParam.foamScale, 0.f, 1.f);
+		ImGui::SliderFloat("Sun Direction", &renderParam.sunDirection, 0.f, Math::two_pi);
 		ImGui::End();
 	}
 
@@ -285,6 +288,10 @@ protected:
 
 	void recordCommand() override
 	{
+		renderParam.exposure = effect->getExposure();
+
+		renderParam.gamma = effect->getGamma();
+
 		updateVertices();
 
 		calculateDisplacementAndDerivative();
@@ -698,7 +705,7 @@ private:
 	{
 		const UINT mapResolution = textureResolution;
 		float mapLength;
-		const DirectX::XMFLOAT2 wind = { 12.f,0.f };
+		const DirectX::XMFLOAT2 wind = { 12.f * cosf(0.93 + Math::half_pi),12.f * sinf(0.93 + Math::half_pi) };
 		const float amplitude = 0.000002f;
 		const float gravity = 9.81f;
 		float cutoffLow;
@@ -712,11 +719,15 @@ private:
 		float lengthScale0 = MyRenderPass::lengthScale0;
 		float lengthScale1 = MyRenderPass::lengthScale1;
 		float lengthScale2 = MyRenderPass::lengthScale2;
-		float fogPower = 3.4f;
+		float sunStrength = 2.f;
 		float sunTheta = 0.01f;
 		float specularPower = 256.f;
-		float padding0;
-		DirectX::XMFLOAT4 padding1[14];
+		float foamBias = 1.6f;
+		float foamScale = 1.f / 1.6f;
+		float sunDirection = 0.93f;
+		float exposure;
+		float gamma;
+		DirectX::XMFLOAT4 padding1[13] = {};
 	} renderParam;
 
 	BufferView* vertexBuffer;
