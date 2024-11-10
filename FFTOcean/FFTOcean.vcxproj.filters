@@ -22,6 +22,9 @@
     <Filter Include="HLSL\Rendering">
       <UniqueIdentifier>{e4cba8e8-4d3a-4c2b-9c63-11b5a6a78cc5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="HLSL\Debug">
+      <UniqueIdentifier>{aad171c5-bae9-4059-936f-50a5c40c7bda}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -72,6 +75,12 @@
     </FxCompile>
     <FxCompile Include="TextureCubePS.hlsl">
       <Filter>HLSL\Rendering</Filter>
+    </FxCompile>
+    <FxCompile Include="GridDebugVS.hlsl">
+      <Filter>HLSL\Debug</Filter>
+    </FxCompile>
+    <FxCompile Include="GridDebugPS.hlsl">
+      <Filter>HLSL\Debug</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>

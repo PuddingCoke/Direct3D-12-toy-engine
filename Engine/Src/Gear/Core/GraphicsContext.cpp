@@ -368,6 +368,11 @@ void GraphicsContext::draw(const UINT vertexCountPerInstance, const UINT instanc
 	commandList->get()->DrawInstanced(vertexCountPerInstance, instanceCount, startVertexLocation, startInstanceLocation);
 }
 
+void GraphicsContext::drawIndexed(const UINT indexCountPerInstance, const UINT instanceCount, const UINT startIndexLocation, const INT baseVertexLocation, const UINT startInstanceLocation) const
+{
+	commandList->get()->DrawIndexedInstanced(indexCountPerInstance, instanceCount, startIndexLocation, baseVertexLocation, startInstanceLocation);
+}
+
 void GraphicsContext::dispatch(const UINT threadGroupCountX, const UINT threadGroupCountY, const UINT threadGroupCountZ) const
 {
 	commandList->get()->Dispatch(threadGroupCountX, threadGroupCountY, threadGroupCountZ);
