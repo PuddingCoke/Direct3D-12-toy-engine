@@ -277,6 +277,16 @@ void BloomEffect::setSoftThreshold(const float softThreshold)
 	bloomParam.softThreshold = softThreshold;
 }
 
+float BloomEffect::getExposure() const
+{
+	return bloomParam.exposure;
+}
+
+float BloomEffect::getGamma() const
+{
+	return bloomParam.gamma;
+}
+
 void BloomEffect::updateCurve(const UINT index)
 {
 	blurParam[index].weight[0] = Math::gauss(blurParam[index].sigma, 0.f);
