@@ -14,7 +14,7 @@ public:
 		camera({ 0.f,100.f,0.f }, { 0.f,-0.1f,1.f }, { 0.f,1.f,0.f }, 100.f),
 		renderPass(new MyRenderPass(&camera))
 	{
-		Camera::setProj(Math::pi / 4.f, Graphics::getAspectRatio(), 1.f, 5000.f);
+		Camera::setProj(Math::pi / 3.f, Graphics::getAspectRatio(), 1.f, 5000.f);
 	}
 
 	~MyGame()

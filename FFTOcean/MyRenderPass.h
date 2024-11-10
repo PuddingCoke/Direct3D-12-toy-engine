@@ -275,7 +275,7 @@ public:
 
 		ImGui::Begin("RenderParam");
 		ImGui::SliderFloat("Lod Scale", &renderParam.lodScale, 1.0f, 10.f);
-		ImGui::SliderFloat("Sun Strength", &renderParam.sunStrength, 0.f, 4.f);
+		ImGui::SliderFloat("Sun Strength", &renderParam.sunStrength, 0.f, 1.f);
 		ImGui::SliderFloat("Sun Theta", &renderParam.sunTheta, 0.f, Math::pi / 2.f);
 		ImGui::SliderFloat("Specular Pow", &renderParam.specularPower, 0.f, 4096.f);
 		ImGui::SliderFloat("Foam Bias", &renderParam.foamBias, 0.f, 5.f);
@@ -719,8 +719,8 @@ private:
 		float lengthScale0 = MyRenderPass::lengthScale0;
 		float lengthScale1 = MyRenderPass::lengthScale1;
 		float lengthScale2 = MyRenderPass::lengthScale2;
-		float sunStrength = 2.f;
-		float sunTheta = 0.01f;
+		float sunStrength = 0.548f;
+		float sunTheta = 0.143f;
 		float specularPower = 256.f;
 		float foamBias = 1.6f;
 		float foamScale = 1.f / 1.6f;

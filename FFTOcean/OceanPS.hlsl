@@ -90,15 +90,28 @@ float4 main(PixelInput input) : SV_TARGET
     
     float3 H = normalize(V + L);
     
-    //0.3 0.47
-    
     float3 skyLight = enviromentCube.Sample(linearWrapSampler, R).rgb;
     
     skyLight = 1.0 - exp(-skyLight * exposure);
     
-    skyLight = pow(skyLight, gamma);
+    skyLight = pow(skyLight, 1.0 / gamma);
     
-    float3 sunLight = sunStrength * pow(saturate(dot(L, R)), specularPower) * sunColor;
+    const float rho = 0.3;
+    const float ax = 0.2;
+    const float ay = 0.1;
+
+    float3 h = L + V;
+    float3 x = cross(L, N);
+    float3 y = cross(x, N);
+
+    float mult = (1.0 / (4.0 * 3.1415926535) * rho / (ax * ay * sqrt(max(1e-5, dot(L, N) * dot(V, N)))));
+    float hdotx = dot(h, x) / ax;
+    float hdoty = dot(h, y) / ay;
+    float hdotn = dot(h, N);
+
+    float spec = mult * exp(-((hdotx * hdotx) + (hdoty * hdoty)) / (hdotn * hdotn));
+    
+    float3 sunLight = spec * sunColor * sunStrength;
     
     float turbulence = min(1.0, max(0.0, (-J + foamBias) * foamScale));
     
