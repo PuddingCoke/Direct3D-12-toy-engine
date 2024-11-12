@@ -80,6 +80,13 @@ public:
 
 	}
 
+	void imGUICall() override
+	{
+		ImGui::Begin("Parameters");
+		ImGui::SliderFloat("POWER", &cameraParam.POWER, 0.f, 12.f);
+		ImGui::End();
+	}
+
 	~MyRenderPass()
 	{
 		delete accumulateShader;

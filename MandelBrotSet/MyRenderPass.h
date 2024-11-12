@@ -46,6 +46,8 @@ protected:
 			{
 				param.scale /= 0.85f;
 			}
+
+			accParam.frameIndex = 0;
 		}
 
 		if (Mouse::getLeftDown() && Mouse::onMove())
@@ -53,13 +55,21 @@ protected:
 			param.location.x -= Graphics::getDeltaTime() * Mouse::getDX() * param.scale;
 
 			param.location.y += Graphics::getDeltaTime() * Mouse::getDY() * param.scale;
+
+			accParam.frameIndex = 0;
 		}
+
+		accParam.frameIndex++;
+
+		accParam.floatSeed = Graphics::getTimeElapsed();
 
 		context->setPipelineState(computeState.Get());
 
 		context->setCSConstants({ originTexture->getUAVMipIndex(0) }, 0);
 
-		context->setCSConstants(sizeof(SimulationParam) / 4, &param, 1);
+		context->setCSConstants(6, &param, 1);
+
+		context->setCSConstants(2, &accParam, 7);
 
 		context->transitionResources();
 
@@ -85,4 +95,11 @@ private:
 		const DirectX::XMFLOAT2 texelSize = { 1.f / static_cast<float>(Graphics::getWidth()),1.f / static_cast<float>(Graphics::getHeight()) };
 		float dividen = 16.f;
 	} param;
+
+	struct AccumulateParam
+	{
+		UINT frameIndex;
+		float floatSeed;
+	} accParam;
+
 };
