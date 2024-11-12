@@ -5,6 +5,8 @@ cbuffer TextureIndices : register(b2)
     float scale;
     float2 texelSize;
     float dividen;
+    uint frameIndex;
+    float floatSeed;
 }
 
 static RWTexture2D<float4> outputTexture = ResourceDescriptorHeap[outputTextureIndex];
@@ -63,10 +65,28 @@ float2 complexMul(const float2 a, const float2 b)
     return float2(a.x * b.x - a.y * b.y, a.y * b.x + a.x * b.y);
 }
 
+static float hashSeed = 0.0;
+
+uint BaseHash(uint2 p)
+{
+    p = 1103515245U * ((p >> 1U) ^ (p.yx));
+    uint h32 = 1103515245U * ((p.x) ^ (p.y >> 3U));
+    return h32 ^ (h32 >> 16);
+}
+
+float2 Hash2(inout float seed)
+{
+    uint n = BaseHash(asuint(float2(seed += 0.1, seed += 0.1)));
+    uint2 rz = uint2(n, n * 48271U);
+    return float2(rz.xy & uint2(0x7fffffffU, 0x7fffffffU)) / float(0x7fffffff);
+}
+
 [numthreads(16, 9, 1)]
 void main(const uint2 DTid : SV_DispatchThreadID)
 {
-    const float2 originPosition = ((float2(DTid) + float2(0.5, 0.5)) * texelSize - 0.5) * float2(2.2 * 16.0 / 9.0, 2.2) * scale + location;
+    hashSeed = float(BaseHash(asuint(float2(DTid) + float2(0.5, 0.5)))) / float(0xffffffffU) + floatSeed;
+    
+    const float2 originPosition = ((float2(DTid) + float2(0.5, 0.5) + Hash2(hashSeed)) * texelSize - 0.5) * float2(2.2 * 16.0 / 9.0, 2.2) * scale + location;
     
     float2 position = originPosition;
     
@@ -95,15 +115,15 @@ void main(const uint2 DTid : SV_DispatchThreadID)
         //dz_sum += dz;
     }
     
-    //const float smoothed_i = float(i) - log2(max(1.0, log2(length(position))));
+    const float smoothed_i = float(i) - log2(max(1.0, log2(length(position))));
     
-    //float iter_ratio = saturate(smoothed_i / float(MAXITERATION)) * 0.8575;
+    float iter_ratio = saturate(smoothed_i / float(MAXITERATION)) * 0.8575;
     
-    const float smoothed_i = log2(log2(dot(position, position)) / 2.0);
+    //const float smoothed_i = log2(log2(dot(position, position)) / 2.0);
     
-    float colorI = sqrt(i + 10.0 - smoothed_i) / dividen*0.8575;
+    //float colorI = sqrt(i + 10.0 - smoothed_i) / dividen*0.8575;
     
-    const float3 color = interpolateColor(colorI) / 255.0;
+    const float3 color = interpolateColor(iter_ratio) / 255.0;
     
-    outputTexture[DTid] = float4(color, 1.0);
+    outputTexture[DTid] = lerp(outputTexture[DTid], float4(color, 1.0), 1.0 / float(frameIndex));
 }
