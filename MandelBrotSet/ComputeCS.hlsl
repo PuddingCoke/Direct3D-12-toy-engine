@@ -94,10 +94,6 @@ void main(const uint2 DTid : SV_DispatchThreadID)
     
     //const float2 c = originPosition;
     
-    float2 dz = float2(1.0, 0.0);
-    
-    float2 dz_sum = float2(0.0, 0.0);
-    
     uint i = 0;
     
     [unroll]
@@ -109,21 +105,15 @@ void main(const uint2 DTid : SV_DispatchThreadID)
         }
         
         position = ComplexSqr(position) + c;
-        
-        //dz = 2.0 * complexMul(dz, position) + float2(1.0, 0.0);
-        
-        //dz_sum += dz;
     }
     
     const float smoothed_i = float(i) - log2(max(1.0, log2(length(position))));
     
     float iter_ratio = saturate(smoothed_i / float(MAXITERATION)) * 0.8575;
     
-    //const float smoothed_i = log2(log2(dot(position, position)) / 2.0);
+    float3 outsideColor = float3(0.5 * sin(position.xy) + 0.5, 1.0);
     
-    //float colorI = sqrt(i + 10.0 - smoothed_i) / dividen*0.8575;
-    
-    const float3 color = interpolateColor(iter_ratio) / 255.0;
+    const float3 color = lerp(interpolateColor(iter_ratio) / 255.0, outsideColor, iter_ratio / 0.8575);
     
     outputTexture[DTid] = lerp(outputTexture[DTid], float4(color, 1.0), 1.0 / float(frameIndex));
 }
