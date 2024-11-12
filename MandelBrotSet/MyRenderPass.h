@@ -28,6 +28,7 @@ public:
 	{
 		ImGui::Begin("Simulation Parameters");
 		ImGui::SliderFloat("scale", &param.scale, 0.f, 1.f);
+		ImGui::SliderFloat("dividen", &param.dividen, 1.f, 64.f);
 		ImGui::End();
 	}
 
@@ -39,11 +40,11 @@ protected:
 		{
 			if (Mouse::getWheelDelta() > 0.f)
 			{
-				param.scale *= 0.85;
+				param.scale *= 0.85f;
 			}
 			else
 			{
-				param.scale /= 0.85;
+				param.scale /= 0.85f;
 			}
 		}
 
@@ -82,5 +83,6 @@ private:
 		DirectX::XMFLOAT2 location = { 0.f,0.f };
 		float scale = { 1.f };
 		const DirectX::XMFLOAT2 texelSize = { 1.f / static_cast<float>(Graphics::getWidth()),1.f / static_cast<float>(Graphics::getHeight()) };
+		float dividen = 16.f;
 	} param;
 };
