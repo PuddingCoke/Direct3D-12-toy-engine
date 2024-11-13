@@ -28,7 +28,7 @@ public:
 	{
 		ImGui::Begin("Simulation Parameters");
 		ImGui::SliderFloat("scale", &param.scale, 0.f, 1.f);
-		ImGui::SliderFloat("dividen", &param.dividen, 1.f, 64.f);
+		ImGui::SliderFloat("dividen", &param.dividen, 0.f, 32.f);
 		ImGui::End();
 	}
 
@@ -67,9 +67,9 @@ protected:
 
 		context->setCSConstants({ originTexture->getUAVMipIndex(0) }, 0);
 
-		context->setCSConstants(6, &param, 1);
+		context->setCSConstants(sizeof(SimulationParam) / 4, &param, 1);
 
-		context->setCSConstants(2, &accParam, 7);
+		context->setCSConstants(2, &accParam, sizeof(SimulationParam) / 4 + 1);
 
 		context->transitionResources();
 

@@ -4,7 +4,7 @@ cbuffer TextureIndices : register(b2)
     float2 location;
     float scale;
     float2 texelSize;
-    float dividen;
+    float loop;
     uint frameIndex;
     float floatSeed;
 }
@@ -60,7 +60,7 @@ float3 interpolateColor(float t)
     return float3(0.0, 0.0, 0.0);
 }
 
-float2 complexMul(const float2 a, const float2 b)
+float2 ComplexMul(const float2 a, const float2 b)
 {
     return float2(a.x * b.x - a.y * b.y, a.y * b.x + a.x * b.y);
 }
@@ -88,7 +88,9 @@ void main(const uint2 DTid : SV_DispatchThreadID)
     
     const float2 originPosition = ((float2(DTid) + float2(0.5, 0.5) + Hash2(hashSeed)) * texelSize - 0.5) * float2(2.2 * 16.0 / 9.0, 2.2) * scale + location;
     
-    float2 position = originPosition;
+    float2 z = originPosition;
+    
+    float2 dz = float2(1.0, 0.0);
     
     const float2 c = float2(-0.5251993, -0.5251993);
     
@@ -96,24 +98,64 @@ void main(const uint2 DTid : SV_DispatchThreadID)
     
     uint i = 0;
     
+    uint reason = 0;
+    
+    const float pixelSize = 1e-8;
+    
+    float power = 1.0;
+    
     [unroll]
     for (; i < MAXITERATION; i++)
     {
-        if (dot(position, position) > ESCAPEBOUNDARY)
+        z = ComplexSqr(z) + c;
+        
+        dz = 2.0 * ComplexMul(z, dz);
+        
+        power = power * 2.0;
+        
+        if (dot(z, z) < dot(dz * pixelSize, dz * pixelSize))
         {
+            reason = 1;
+            
             break;
         }
         
-        position = ComplexSqr(position) + c;
+        if (dot(z, z) > ESCAPEBOUNDARY)
+        {
+            reason = 2;
+            
+            break;
+        }
     }
     
-    const float smoothed_i = float(i) - log2(max(1.0, log2(length(position))));
+    const float smoothed_i = float(i) - log2(max(1.0, log2(length(z))));
     
-    float iter_ratio = saturate(smoothed_i / float(MAXITERATION)) * 0.8575;
+    const float iter_ratio = saturate(smoothed_i / float(MAXITERATION)) * 0.8575;
     
-    float3 outsideColor = float3(0.5 * sin(position.xy) + 0.5, 1.0);
+    const float dist = 2.0 * log(length(z)) * length(z) / length(dz);
     
-    const float3 color = lerp(interpolateColor(iter_ratio) / 255.0, outsideColor, iter_ratio / 0.8575);
+    const float t = saturate(tanh(dist * 1080.0));
+    
+    const float3 insideColor = 1.2 * interpolateColor(iter_ratio) / 255.0;
+    
+    const float3 outsideColor = 1.2 * interpolateColor(t) / 255.0;
+    
+    float3 color = float3(0.0, 0.0, 0.0);
+    
+    if (reason == 2)
+    {
+        color = outsideColor;
+    }
+    else if (reason == 1)
+    {
+        color = insideColor;
+    }
+    
+    const float fadeFactor = 1.0 - log(dot(z, z)) / power;
+    
+    color *= fadeFactor;
+    
+    //const float3 color = 1.2 * lerp(insideColor, outsideColor, iter_ratio / 0.8575);
     
     outputTexture[DTid] = lerp(outputTexture[DTid], float4(color, 1.0), 1.0 / float(frameIndex));
 }
