@@ -208,9 +208,9 @@ public:
 
 		oceanState->SetName(L"oceanState");
 
-		effect->setExposure(1.5f);
+		effect->setExposure(0.59f);
 
-		effect->setGamma(0.6f);
+		effect->setGamma(0.972f);
 	}
 
 	~MyRenderPass()

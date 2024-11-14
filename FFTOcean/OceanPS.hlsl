@@ -57,6 +57,23 @@ static const float3 oceanColor = float3(0.0000, 0.2507, 0.3613);
 
 static const float3 sunColor = float3(1.0, 1.0, 1.0);
 
+float3 ACESToneMapping(float3 color)
+{
+    const float A = 2.51;
+    
+    const float B = 0.03;
+    
+    const float C = 2.43;
+    
+    const float D = 0.59;
+    
+    const float E = 0.14;
+
+    color *= exposure;
+    
+    return (color * (A * color + B)) / (color * (C * color + D) + E);
+}
+
 float4 main(PixelInput input) : SV_TARGET
 {
     float4 derivative = derivative0Texture.Sample(anisotrophicWrapSampler, input.texCoord / lengthScale0);
@@ -92,7 +109,7 @@ float4 main(PixelInput input) : SV_TARGET
     
     float3 skyLight = enviromentCube.Sample(linearWrapSampler, R).rgb;
     
-    skyLight = 1.0 - exp(-skyLight * exposure);
+    skyLight = ACESToneMapping(skyLight);
     
     skyLight = pow(skyLight, 1.0 / gamma);
     
