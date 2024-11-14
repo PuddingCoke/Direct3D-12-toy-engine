@@ -313,10 +313,6 @@ private:
 	//do not change this!
 	static constexpr UINT textureResolution = 512;
 
-	static constexpr int rowNum = 6;
-
-	static constexpr int tilePerPatch = 8;
-
 	static constexpr UINT gridSize = 128;
 
 	static TextureRenderView* createTexture(const UINT& resolution, const DXGI_FORMAT& format)
