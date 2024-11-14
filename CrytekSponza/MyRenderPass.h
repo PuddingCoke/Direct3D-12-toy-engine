@@ -227,11 +227,11 @@ public:
 
 		effect = new BloomEffect(context, Graphics::getWidth(), Graphics::getHeight(), resManager);
 
-		effect->setThreshold(0.8f);
-
 		effect->setIntensity(0.5f);
 
-		effect->setExposure(1.3f);
+		effect->setExposure(0.574f);
+
+		effect->setGamma(1.578f);
 
 		scene = new Scene(assetPath + "/sponza.dae", resManager);
 
