@@ -28,7 +28,7 @@ public:
 	{
 		ImGui::Begin("Simulation Parameters");
 		ImGui::SliderFloat("scale", &param.scale, 0.f, 1.f);
-		ImGui::SliderFloat("dividen", &param.dividen, 0.f, 32.f);
+		ImGui::SliderFloat("lerpFactor", &param.lerpFactor, 0.f, 1.f);
 		ImGui::End();
 	}
 
@@ -93,7 +93,7 @@ private:
 		DirectX::XMFLOAT2 location = { 0.f,0.f };
 		float scale = { 1.f };
 		const DirectX::XMFLOAT2 texelSize = { 1.f / static_cast<float>(Graphics::getWidth()),1.f / static_cast<float>(Graphics::getHeight()) };
-		float dividen = 16.f;
+		float lerpFactor = 0.f;
 	} param;
 
 	struct AccumulateParam

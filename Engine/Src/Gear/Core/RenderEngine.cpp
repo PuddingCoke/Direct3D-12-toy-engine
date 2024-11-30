@@ -219,18 +219,6 @@ void RenderEngine::begin()
 	beginCommandlist->open();
 
 	commandLists.push_back(beginCommandlist->get());
-
-	{
-		perFrameResource.time = Graphics::time;
-
-		perFrameResource.matrices = Camera::matrices;
-
-		perFrameResource.screenSize = DirectX::XMFLOAT2(static_cast<float>(Graphics::getWidth()), static_cast<float>(Graphics::getHeight()));
-
-		perFrameResource.screenTexelSize = DirectX::XMFLOAT2(1.f / Graphics::getWidth(), 1.f / Graphics::getHeight());
-
-		GraphicsContext::globalConstantBuffer->update(&perFrameResource, sizeof(PerFrameResource));
-	}
 }
 
 void RenderEngine::end()
@@ -252,6 +240,16 @@ void RenderEngine::end()
 
 			getCurrentRenderTexture()->setAllState(D3D12_RESOURCE_STATE_RENDER_TARGET);
 		}
+
+		perFrameResource.time = Graphics::time;
+
+		perFrameResource.matrices = Camera::matrices;
+
+		perFrameResource.screenSize = DirectX::XMFLOAT2(static_cast<float>(Graphics::getWidth()), static_cast<float>(Graphics::getHeight()));
+
+		perFrameResource.screenTexelSize = DirectX::XMFLOAT2(1.f / Graphics::getWidth(), 1.f / Graphics::getHeight());
+
+		GraphicsContext::globalConstantBuffer->update(&perFrameResource, sizeof(PerFrameResource));
 
 		updateConstantBuffer();
 	}
@@ -279,32 +277,23 @@ void RenderEngine::end()
 void RenderEngine::updateConstantBuffer()
 {
 	{
-		for (UINT i = 0; i < ConstantBufferPool::numConstantBufferPool; i++)
-		{
-			Buffer* const buffer = ConstantBuffer::bufferPools[i]->buffer;
+		Buffer* const buffer = ConstantBufferManager::get()->buffer;
 
-			beginCommandlist->pushResourceTrackList(buffer);
+		beginCommandlist->pushResourceTrackList(buffer);
 
-			buffer->setState(D3D12_RESOURCE_STATE_COPY_DEST);
-		}
+		buffer->setState(D3D12_RESOURCE_STATE_COPY_DEST);
 
 		beginCommandlist->transitionResources();
 	}
 
-	for (UINT bufferPoolIndex = 0; bufferPoolIndex < ConstantBufferPool::numConstantBufferPool; bufferPoolIndex++)
-	{
-		ConstantBuffer::bufferPools[bufferPoolIndex]->recordCommands(beginCommandlist->get());
-	}
+	ConstantBufferManager::get()->recordCommands(beginCommandlist->get());
 
 	{
-		for (UINT i = 0; i < ConstantBufferPool::numConstantBufferPool; i++)
-		{
-			Buffer* const buffer = ConstantBuffer::bufferPools[i]->buffer;
+		Buffer* const buffer = ConstantBufferManager::get()->buffer;
 
-			beginCommandlist->pushResourceTrackList(buffer);
+		beginCommandlist->pushResourceTrackList(buffer);
 
-			buffer->setState(D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
-		}
+		buffer->setState(D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
 
 		beginCommandlist->transitionResources();
 	}
@@ -448,10 +437,7 @@ RenderEngine::RenderEngine(const HWND hwnd, const bool useSwapChainBuffer, const
 
 	GlobalRootSignature::instance = new GlobalRootSignature();
 
-	for (UINT i = 0; i < ConstantBufferPool::numConstantBufferPool; i++)
-	{
-		ConstantBuffer::bufferPools[i] = new ConstantBufferPool(256 << i, 1024);
-	}
+	ConstantBufferManager::instance = new ConstantBufferManager();
 
 	PipelineState::instance = new PipelineState();
 
@@ -608,12 +594,9 @@ RenderEngine::~RenderEngine()
 		delete endCommandList;
 	}
 
-	for (UINT i = 0; i < ConstantBufferPool::numConstantBufferPool; i++)
+	if (ConstantBufferManager::instance)
 	{
-		if (ConstantBuffer::bufferPools[i])
-		{
-			delete ConstantBuffer::bufferPools[i];
-		}
+		delete ConstantBufferManager::instance;
 	}
 
 	if (PipelineState::instance)

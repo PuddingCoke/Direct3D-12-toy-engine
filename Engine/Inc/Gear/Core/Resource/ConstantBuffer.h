@@ -3,11 +3,13 @@
 #ifndef _CONSTANTBUFFER_H_
 #define _CONSTANTBUFFER_H_
 
-#include<Gear/Core/ConstantBufferPool.h>
+#include<Gear/Core/ConstantBufferManager.h>
 
 #include"EngineResource.h"
 
-//free to just copy pointer
+//feel free to copy pointer because an effecient management strategy we use here
+//but be cautious here you should release transient constantbuffer by using resource manager(resManager)
+//otherwise there will be data overwritten
 class ConstantBuffer :public EngineResource
 {
 public:
@@ -26,7 +28,7 @@ public:
 
 	D3D12_GPU_VIRTUAL_ADDRESS getGPUAddress() const;
 
-	Buffer* getBuffer() const; 
+	Buffer* getBuffer() const;
 
 	void copyDescriptors() override;
 
@@ -38,11 +40,9 @@ private:
 
 	UINT bufferIndex;
 
-	UINT poolIndex;
+	UINT regionIndex;
 
 	Buffer* buffer;
-
-	static ConstantBufferPool* bufferPools[ConstantBufferPool::numConstantBufferPool];
 
 };
 

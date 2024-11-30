@@ -141,6 +141,7 @@
   <ItemGroup>
     <ClInclude Include="Inc\DDSTextureLoader\DDSTextureLoader12.h" />
     <ClInclude Include="Inc\Gear\Camera\OrbitCamera.h" />
+    <ClInclude Include="Inc\Gear\Core\ConstantBufferManager.h" />
     <ClInclude Include="Inc\Gear\Core\Effect\FXAAEffect.h" />
     <ClInclude Include="Inc\Gear\Core\Raytracing\BottomLevelAS.h" />
     <ClInclude Include="Inc\Gear\Core\Raytracing\TopLevelAS.h" />
@@ -162,7 +163,6 @@
     <ClInclude Include="Inc\Gear\Core\Camera.h" />
     <ClInclude Include="Inc\Gear\Core\CommandList.h" />
     <ClInclude Include="Inc\Gear\Core\CommandAllocator.h" />
-    <ClInclude Include="Inc\Gear\Core\ConstantBufferPool.h" />
     <ClInclude Include="Inc\Gear\Core\DescriptorHeap.h" />
     <ClInclude Include="Inc\Gear\Core\DX\ReadbackHeap.h" />
     <ClInclude Include="Inc\Gear\Core\DX\Texture.h" />
@@ -217,7 +217,7 @@
     <ClCompile Include="Src\Gear\Camera\FPSCamera.cpp" />
     <ClCompile Include="Src\Gear\Camera\OrbitCamera.cpp" />
     <ClCompile Include="Src\Gear\Core\Camera.cpp" />
-    <ClCompile Include="Src\Gear\Core\ConstantBufferPool.cpp" />
+    <ClCompile Include="Src\Gear\Core\ConstantBufferManager.cpp" />
     <ClCompile Include="Src\Gear\Core\Effect\FXAAEffect.cpp" />
     <ClCompile Include="Src\Gear\Core\Raytracing\BottomLevelAS.cpp" />
     <ClCompile Include="Src\Gear\Core\Raytracing\TopLevelAS.cpp" />

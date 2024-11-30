@@ -282,9 +282,6 @@
     <ClInclude Include="Inc\Gear\Core\DescriptorHeap.h">
       <Filter>Header\Core</Filter>
     </ClInclude>
-    <ClInclude Include="Inc\Gear\Core\ConstantBufferPool.h">
-      <Filter>Header\Core</Filter>
-    </ClInclude>
     <ClInclude Include="Inc\DDSTextureLoader\DDSTextureLoader12.h">
       <Filter>Header\ExternalHeader\DDSTextureLoader</Filter>
     </ClInclude>
@@ -317,6 +314,9 @@
     </ClInclude>
     <ClInclude Include="External\stb_image\stb_image_write.h">
       <Filter>Header\ExternalHeader\stbi</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Gear\Core\ConstantBufferManager.h">
+      <Filter>Header</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -437,9 +437,6 @@
     <ClCompile Include="Src\Gear\Core\CommandList.cpp">
       <Filter>Source\Core</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Core\ConstantBufferPool.cpp">
-      <Filter>Source\Core</Filter>
-    </ClCompile>
     <ClCompile Include="Src\Gear\Core\DescriptorHeap.cpp">
       <Filter>Source\Core</Filter>
     </ClCompile>
@@ -505,6 +502,9 @@
     </ClCompile>
     <ClCompile Include="Inc\stb_image\stb_image.cpp">
       <Filter>Source\ExternalSource\stbi</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gear\Core\ConstantBufferManager.cpp">
+      <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
