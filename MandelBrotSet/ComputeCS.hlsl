@@ -4,7 +4,7 @@ cbuffer TextureIndices : register(b2)
     float2 location;
     float scale;
     float2 texelSize;
-    float loop;
+    float lerpFactor;
     uint frameIndex;
     float floatSeed;
 }
@@ -92,9 +92,7 @@ void main(const uint2 DTid : SV_DispatchThreadID)
     
     float2 dz = float2(1.0, 0.0);
     
-    const float2 c = float2(-0.5251993, -0.5251993);
-    
-    //const float2 c = originPosition;
+    const float2 c = lerp(float2(-0.5251993, -0.5251993), originPosition, pow(lerpFactor, 2.0));
     
     uint i = 0;
     
@@ -136,26 +134,24 @@ void main(const uint2 DTid : SV_DispatchThreadID)
     
     const float t = saturate(tanh(dist * 1080.0));
     
-    const float3 insideColor = 1.2 * interpolateColor(iter_ratio) / 255.0;
+    const float3 insideColor = interpolateColor(iter_ratio) / 255.0;
     
-    const float3 outsideColor = 1.2 * interpolateColor(t) / 255.0;
+    const float3 outsideColor = interpolateColor(t) / 255.0;
     
     float3 color = float3(0.0, 0.0, 0.0);
     
-    if (reason == 2)
-    {
-        color = outsideColor;
-    }
-    else if (reason == 1)
+    if (reason == 1)
     {
         color = insideColor;
+    }
+    else if (reason == 2)
+    {
+        color = outsideColor;
     }
     
     const float fadeFactor = 1.0 - log(dot(z, z)) / power;
     
     color *= fadeFactor;
-    
-    //const float3 color = 1.2 * lerp(insideColor, outsideColor, iter_ratio / 0.8575);
     
     outputTexture[DTid] = lerp(outputTexture[DTid], float4(color, 1.0), 1.0 / float(frameIndex));
 }

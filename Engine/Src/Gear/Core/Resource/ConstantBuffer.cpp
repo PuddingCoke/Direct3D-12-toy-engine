@@ -1,7 +1,5 @@
 #include<Gear/Core/Resource/ConstantBuffer.h>
 
-ConstantBufferPool* ConstantBuffer::bufferPools[3] = { nullptr,nullptr,nullptr };
-
 ConstantBuffer::ConstantBuffer(Buffer* const buffer, const UINT size, const bool persistent) :
 	EngineResource(persistent), buffer(buffer)
 {
@@ -15,20 +13,20 @@ ConstantBuffer::ConstantBuffer(Buffer* const buffer, const UINT size, const bool
 		switch (size)
 		{
 		case 256:
-			poolIndex = 0;
+			regionIndex = 0;
 			break;
 		case 512:
-			poolIndex = 1;
+			regionIndex = 1;
 			break;
 		case 1024:
-			poolIndex = 2;
+			regionIndex = 2;
 			break;
 		default:
 			throw "size should be one of 256 512 1024";
 			break;
 		}
 
-		ConstantBufferPool::AvailableDescriptor availableDescriptor = bufferPools[poolIndex]->requestAvailableDescriptor();
+		ConstantBufferManager::AvailableDescriptor availableDescriptor = ConstantBufferManager::get()->requestDescriptor(regionIndex);
 
 		gpuAddress = availableDescriptor.gpuAddress;
 
@@ -36,7 +34,7 @@ ConstantBuffer::ConstantBuffer(Buffer* const buffer, const UINT size, const bool
 	}
 	else
 	{
-		poolIndex = UINT_MAX;
+		regionIndex = UINT_MAX;
 
 		D3D12_CONSTANT_BUFFER_VIEW_DESC desc = {};
 		desc.BufferLocation = buffer->getGPUAddress();
@@ -67,7 +65,7 @@ ConstantBuffer::ConstantBuffer(Buffer* const buffer, const UINT size, const bool
 
 void ConstantBuffer::update(const void* const data, const UINT size) const
 {
-	bufferPools[poolIndex]->updateSubRegion(bufferIndex, data, size);
+	ConstantBufferManager::get()->updateSubregion(regionIndex, bufferIndex, data, size);
 }
 
 ConstantBuffer::~ConstantBuffer()
@@ -78,7 +76,7 @@ ConstantBuffer::~ConstantBuffer()
 	}
 	else
 	{
-		bufferPools[poolIndex]->retrieveUsedDescriptor(bufferIndex);
+		ConstantBufferManager::get()->retrieveDescriptor(regionIndex, bufferIndex);
 	}
 }
 
