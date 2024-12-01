@@ -276,27 +276,21 @@ void RenderEngine::end()
 
 void RenderEngine::updateConstantBuffer()
 {
-	{
-		Buffer* const buffer = ConstantBufferManager::get()->buffer;
+	Buffer* const buffer = ConstantBufferManager::get()->buffer;
 
-		beginCommandlist->pushResourceTrackList(buffer);
+	beginCommandlist->pushResourceTrackList(buffer);
 
-		buffer->setState(D3D12_RESOURCE_STATE_COPY_DEST);
+	buffer->setState(D3D12_RESOURCE_STATE_COPY_DEST);
 
-		beginCommandlist->transitionResources();
-	}
+	beginCommandlist->transitionResources();
 
 	ConstantBufferManager::get()->recordCommands(beginCommandlist->get());
 
-	{
-		Buffer* const buffer = ConstantBufferManager::get()->buffer;
+	beginCommandlist->pushResourceTrackList(buffer);
 
-		beginCommandlist->pushResourceTrackList(buffer);
+	buffer->setState(D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
 
-		buffer->setState(D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
-
-		beginCommandlist->transitionResources();
-	}
+	beginCommandlist->transitionResources();
 
 	beginCommandlist->close();
 }

@@ -57,18 +57,21 @@ private:
 	//for each frame and each subregion we need [FrameBufferCount] uploadheaps
 	std::vector<std::vector<UploadHeap*>> uploadHeaps[numRegion];
 
-	//store available indices
+	//indicate which subregion need update
+	std::vector<bool> updateIndicators[numRegion];
+
+	//store available descriptor indices
 	//we use mutex to protect this container
-	std::vector<UINT> availableIndices[numRegion];
+	std::vector<UINT> availableDescriptorIndices[numRegion];
 
 	//prevent race condition
 	std::mutex mutexes[numRegion];
 
-	//record subregion(subregionIndex) of each region that need update
-	std::vector<UINT> updateIndices[numRegion];
+	//record subregionIndex of each region that need update
+	std::vector<UINT> updateSubregionIndices[numRegion];
 
-	//this index indicate which uploadheap of a subregion that upload data to large buffer
-	std::vector<UINT> updateUploadHeapIndices[numRegion];
+	//indicate which uploadheap of subregion need update
+	UINT updateUploadHeapIndex;
 
 };
 
