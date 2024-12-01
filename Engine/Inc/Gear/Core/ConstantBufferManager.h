@@ -3,6 +3,7 @@
 #ifndef _CONSTANTBUFFERMANAGER_H_
 #define _CONSTANTBUFFERMANAGER_H_
 
+#include<Gear/Core/CommandList.h>
 #include<Gear/Core/GlobalDescriptorHeap.h>
 #include<Gear/Core/DX/Buffer.h>
 #include<Gear/Core/DX/UploadHeap.h>
@@ -44,7 +45,7 @@ private:
 
 	friend class RenderEngine;
 
-	void recordCommands(ID3D12GraphicsCommandList6* const commandList);
+	void recordCommands(CommandList* const commandList);
 
 	Buffer* buffer;
 
