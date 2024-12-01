@@ -2,7 +2,8 @@
 
 ConstantBufferManager* ConstantBufferManager::instance = nullptr;
 
-ConstantBufferManager::ConstantBufferManager()
+ConstantBufferManager::ConstantBufferManager() :
+	updateUploadHeapIndex(0)
 {
 	//create a large buffer that used as constant buffer
 	{
@@ -17,13 +18,15 @@ ConstantBufferManager::ConstantBufferManager()
 
 		buffer->setName(L"Large Constant Buffer");
 
-		std::cout << "[class ConstantBufferManager] create " << requiredSize << "bytes constant buffer\n";
+		std::cout << "[class ConstantBufferManager] create " << requiredSize / 1024.f << "kbytes constant buffer\n";
 	}
 
 	//create all neccessary containers
 	for (UINT regionIndex = 0; regionIndex < numRegion; regionIndex++)
 	{
 		uploadHeaps[regionIndex] = std::vector<std::vector<UploadHeap*>>(numSubRegion[regionIndex]);
+
+		updateIndicators[regionIndex] = std::vector<bool>(numSubRegion[regionIndex], false);
 
 		for (UINT subregionIndex = 0; subregionIndex < numSubRegion[regionIndex]; subregionIndex++)
 		{
@@ -38,9 +41,7 @@ ConstantBufferManager::ConstantBufferManager()
 			}
 		}
 
-		availableIndices[regionIndex] = std::vector<UINT>(numSubRegion[regionIndex]);
-
-		updateUploadHeapIndices[regionIndex] = std::vector<UINT>(numSubRegion[regionIndex], 0);
+		availableDescriptorIndices[regionIndex] = std::vector<UINT>(numSubRegion[regionIndex]);
 	}
 
 	//create descriptors
@@ -74,7 +75,7 @@ ConstantBufferManager::ConstantBufferManager()
 
 				GraphicsDevice::get()->CreateConstantBufferView(&desc, descriptorHandle.getCPUHandle());
 
-				availableIndices[regionIndex][subregionIndex] = descriptorHandle.getCurrentIndex();
+				availableDescriptorIndices[regionIndex][subregionIndex] = descriptorHandle.getCurrentIndex();
 
 				descriptorHandle.move();
 			}
@@ -100,19 +101,19 @@ ConstantBufferManager::~ConstantBufferManager()
 
 ConstantBufferManager::AvailableDescriptor ConstantBufferManager::requestDescriptor(const UINT regionIndex)
 {
-	UINT index;
+	UINT descriptorIndex;
 
 	{
 		std::lock_guard<std::mutex> lockGuard(mutexes[regionIndex]);
 
-		index = availableIndices[regionIndex].back();
+		descriptorIndex = availableDescriptorIndices[regionIndex].back();
 
-		availableIndices[regionIndex].pop_back();
+		availableDescriptorIndices[regionIndex].pop_back();
 	}
 
 	const ConstantBufferManager::AvailableDescriptor descriptor = {
-		buffer->getGPUAddress() + baseAddressOffsets[regionIndex] + (256 << regionIndex) * (index - baseDescriptorIndices[regionIndex]),
-		index
+		buffer->getGPUAddress() + baseAddressOffsets[regionIndex] + (256 << regionIndex) * (descriptorIndex - baseDescriptorIndices[regionIndex]),
+		descriptorIndex
 	};
 
 	return descriptor;
@@ -122,18 +123,23 @@ void ConstantBufferManager::retrieveDescriptor(const UINT regionIndex, const UIN
 {
 	std::lock_guard<std::mutex> lockGuard(mutexes[regionIndex]);
 
-	availableIndices[regionIndex].push_back(descriptorIndex);
+	availableDescriptorIndices[regionIndex].push_back(descriptorIndex);
 }
 
 void ConstantBufferManager::updateSubregion(const UINT regionIndex, const UINT descriptorIndex, const void* const data, const UINT size)
 {
 	const UINT subregionIndex = descriptorIndex - baseDescriptorIndices[regionIndex];
 
-	const UINT uploadHeapIndex = updateUploadHeapIndices[regionIndex][subregionIndex];
+	if (updateIndicators[regionIndex][subregionIndex])
+	{
+		throw "you cannot update a constant buffer in a frame multiple time";
+	}
 
-	uploadHeaps[regionIndex][subregionIndex][uploadHeapIndex]->update(data, size);
+	updateIndicators[regionIndex][subregionIndex] = true;
 
-	updateIndices[regionIndex].push_back(subregionIndex);
+	uploadHeaps[regionIndex][subregionIndex][updateUploadHeapIndex]->update(data, size);
+
+	updateSubregionIndices[regionIndex].push_back(subregionIndex);
 }
 
 ConstantBufferManager* ConstantBufferManager::get()
@@ -145,17 +151,17 @@ void ConstantBufferManager::recordCommands(ID3D12GraphicsCommandList6* const com
 {
 	for (UINT regionIndex = 0; regionIndex < numRegion; regionIndex++)
 	{
-		for (const UINT subregionIndex : updateIndices[regionIndex])
+		for (const UINT subregionIndex : updateSubregionIndices[regionIndex])
 		{
 			const UINT64 dstOffset = baseAddressOffsets[regionIndex] + (256 << regionIndex) * subregionIndex;
 
-			const UINT uploadHeapIndex = updateUploadHeapIndices[regionIndex][subregionIndex];
+			updateIndicators[regionIndex][subregionIndex] = false;
 
-			commandList->CopyBufferRegion(buffer->getResource(), dstOffset, uploadHeaps[regionIndex][subregionIndex][uploadHeapIndex]->getResource(), 0, (256 << regionIndex));
-
-			updateUploadHeapIndices[regionIndex][subregionIndex] = (updateUploadHeapIndices[regionIndex][subregionIndex] + 1) % Graphics::FrameBufferCount;
+			commandList->CopyBufferRegion(buffer->getResource(), dstOffset, uploadHeaps[regionIndex][subregionIndex][updateUploadHeapIndex]->getResource(), 0, (256 << regionIndex));
 		}
 
-		updateIndices[regionIndex].clear();
+		updateSubregionIndices[regionIndex].clear();
 	}
+
+	updateUploadHeapIndex = (updateUploadHeapIndex + 1) % Graphics::FrameBufferCount;
 }
