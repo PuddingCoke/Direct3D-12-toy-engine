@@ -45,7 +45,9 @@ public:
 
 	void end();
 
-	//push beginCommandlist in advance
+	//open&push beginCommandlist in advance
+	//this method will update update all constant buffer by using copybufferregion
+	//and it will close begin commandlist for us too
 	void updateConstantBuffer();
 
 	GPUVendor getVendor() const;

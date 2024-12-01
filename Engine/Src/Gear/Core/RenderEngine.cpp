@@ -276,21 +276,7 @@ void RenderEngine::end()
 
 void RenderEngine::updateConstantBuffer()
 {
-	Buffer* const buffer = ConstantBufferManager::get()->buffer;
-
-	beginCommandlist->pushResourceTrackList(buffer);
-
-	buffer->setState(D3D12_RESOURCE_STATE_COPY_DEST);
-
-	beginCommandlist->transitionResources();
-
-	ConstantBufferManager::get()->recordCommands(beginCommandlist->get());
-
-	beginCommandlist->pushResourceTrackList(buffer);
-
-	buffer->setState(D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
-
-	beginCommandlist->transitionResources();
+	ConstantBufferManager::get()->recordCommands(beginCommandlist);
 
 	beginCommandlist->close();
 }
@@ -561,6 +547,11 @@ RenderEngine::~RenderEngine()
 		ImGui::DestroyContext();
 	}
 
+	if (GraphicsContext::globalConstantBuffer)
+	{
+		delete GraphicsContext::globalConstantBuffer;
+	}
+
 	if (GlobalDescriptorHeap::instance)
 	{
 		delete GlobalDescriptorHeap::instance;
@@ -571,9 +562,14 @@ RenderEngine::~RenderEngine()
 		delete GlobalRootSignature::instance;
 	}
 
-	if (GraphicsContext::globalConstantBuffer)
+	if (ConstantBufferManager::instance)
 	{
-		delete GraphicsContext::globalConstantBuffer;
+		delete ConstantBufferManager::instance;
+	}
+
+	if (PipelineState::instance)
+	{
+		delete PipelineState::instance;
 	}
 
 	Shader::releaseGlobalShaders();
@@ -586,16 +582,6 @@ RenderEngine::~RenderEngine()
 	if (endCommandList)
 	{
 		delete endCommandList;
-	}
-
-	if (ConstantBufferManager::instance)
-	{
-		delete ConstantBufferManager::instance;
-	}
-
-	if (PipelineState::instance)
-	{
-		delete PipelineState::instance;
 	}
 
 	for (UINT i = 0; i < Graphics::FrameBufferCount; i++)

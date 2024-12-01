@@ -147,8 +147,14 @@ ConstantBufferManager* ConstantBufferManager::get()
 	return instance;
 }
 
-void ConstantBufferManager::recordCommands(ID3D12GraphicsCommandList6* const commandList)
+void ConstantBufferManager::recordCommands(CommandList* const commandList)
 {
+	commandList->pushResourceTrackList(buffer);
+
+	buffer->setState(D3D12_RESOURCE_STATE_COPY_DEST);
+
+	commandList->transitionResources();
+
 	for (UINT regionIndex = 0; regionIndex < numRegion; regionIndex++)
 	{
 		for (const UINT subregionIndex : updateSubregionIndices[regionIndex])
@@ -157,11 +163,17 @@ void ConstantBufferManager::recordCommands(ID3D12GraphicsCommandList6* const com
 
 			updateIndicators[regionIndex][subregionIndex] = false;
 
-			commandList->CopyBufferRegion(buffer->getResource(), dstOffset, uploadHeaps[regionIndex][subregionIndex][updateUploadHeapIndex]->getResource(), 0, (256 << regionIndex));
+			commandList->get()->CopyBufferRegion(buffer->getResource(), dstOffset, uploadHeaps[regionIndex][subregionIndex][updateUploadHeapIndex]->getResource(), 0, (256 << regionIndex));
 		}
 
 		updateSubregionIndices[regionIndex].clear();
 	}
 
 	updateUploadHeapIndex = (updateUploadHeapIndex + 1) % Graphics::FrameBufferCount;
+
+	commandList->pushResourceTrackList(buffer);
+
+	buffer->setState(D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
+
+	commandList->transitionResources();
 }
