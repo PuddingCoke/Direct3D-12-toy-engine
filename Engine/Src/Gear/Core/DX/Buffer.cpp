@@ -60,9 +60,6 @@ void Buffer::transition(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers,
 	}
 	else if (!bitFlagSubset(internalState, transitionState))
 	{
-		//might combine internal state with transition state
-		//need further investigation
-
 		D3D12_RESOURCE_BARRIER barrier = {};
 		barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 		barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
