@@ -97,8 +97,8 @@ GlobalRootSignature::GlobalRootSignature()
 	}
 
 	{
-		//2+4*6+16+2+2*7 58 dwords
-		CD3DX12_ROOT_PARAMETER1 rootParameters[16] = {};
+		//2+2+4+4+8+4+24+2*5 = 58 dwords
+		CD3DX12_ROOT_PARAMETER1 rootParameters[12] = {};
 
 		//reserved global constant buffer used by engine
 		rootParameters[0].InitAsConstantBufferView(0, 0, D3D12_ROOT_DESCRIPTOR_FLAG_NONE, D3D12_SHADER_VISIBILITY_ALL);
@@ -107,23 +107,21 @@ GlobalRootSignature::GlobalRootSignature()
 		//per draw call constants
 		rootParameters[2].InitAsConstants(4, 2, 0, D3D12_SHADER_VISIBILITY_VERTEX);
 		rootParameters[3].InitAsConstants(4, 2, 0, D3D12_SHADER_VISIBILITY_HULL);
-		rootParameters[4].InitAsConstants(4, 2, 0, D3D12_SHADER_VISIBILITY_DOMAIN);
+		rootParameters[4].InitAsConstants(8, 2, 0, D3D12_SHADER_VISIBILITY_DOMAIN);
 		rootParameters[5].InitAsConstants(4, 2, 0, D3D12_SHADER_VISIBILITY_GEOMETRY);
-		rootParameters[6].InitAsConstants(16, 2, 0, D3D12_SHADER_VISIBILITY_PIXEL);
-		rootParameters[7].InitAsConstants(4, 2, 0, D3D12_SHADER_VISIBILITY_AMPLIFICATION);
-		rootParameters[8].InitAsConstants(4, 2, 0, D3D12_SHADER_VISIBILITY_MESH);
+		rootParameters[6].InitAsConstants(24, 2, 0, D3D12_SHADER_VISIBILITY_PIXEL);
 		//per draw call constant buffers
-		rootParameters[9].InitAsConstantBufferView(3, 0, D3D12_ROOT_DESCRIPTOR_FLAG_NONE, D3D12_SHADER_VISIBILITY_VERTEX);
-		rootParameters[10].InitAsConstantBufferView(3, 0, D3D12_ROOT_DESCRIPTOR_FLAG_NONE, D3D12_SHADER_VISIBILITY_HULL);
-		rootParameters[11].InitAsConstantBufferView(3, 0, D3D12_ROOT_DESCRIPTOR_FLAG_NONE, D3D12_SHADER_VISIBILITY_DOMAIN);
-		rootParameters[12].InitAsConstantBufferView(3, 0, D3D12_ROOT_DESCRIPTOR_FLAG_NONE, D3D12_SHADER_VISIBILITY_GEOMETRY);
-		rootParameters[13].InitAsConstantBufferView(3, 0, D3D12_ROOT_DESCRIPTOR_FLAG_NONE, D3D12_SHADER_VISIBILITY_PIXEL);
-		rootParameters[14].InitAsConstantBufferView(3, 0, D3D12_ROOT_DESCRIPTOR_FLAG_NONE, D3D12_SHADER_VISIBILITY_AMPLIFICATION);
-		rootParameters[15].InitAsConstantBufferView(3, 0, D3D12_ROOT_DESCRIPTOR_FLAG_NONE, D3D12_SHADER_VISIBILITY_MESH);
+		rootParameters[7].InitAsConstantBufferView(3, 0, D3D12_ROOT_DESCRIPTOR_FLAG_NONE, D3D12_SHADER_VISIBILITY_VERTEX);
+		rootParameters[8].InitAsConstantBufferView(3, 0, D3D12_ROOT_DESCRIPTOR_FLAG_NONE, D3D12_SHADER_VISIBILITY_HULL);
+		rootParameters[9].InitAsConstantBufferView(3, 0, D3D12_ROOT_DESCRIPTOR_FLAG_NONE, D3D12_SHADER_VISIBILITY_DOMAIN);
+		rootParameters[10].InitAsConstantBufferView(3, 0, D3D12_ROOT_DESCRIPTOR_FLAG_NONE, D3D12_SHADER_VISIBILITY_GEOMETRY);
+		rootParameters[11].InitAsConstantBufferView(3, 0, D3D12_ROOT_DESCRIPTOR_FLAG_NONE, D3D12_SHADER_VISIBILITY_PIXEL);
 
 		CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC rootSignatureDesc;
-		rootSignatureDesc.Init_1_1(_countof(rootParameters), rootParameters, _countof(samplerDesc), samplerDesc, 
-			D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT | D3D12_ROOT_SIGNATURE_FLAG_CBV_SRV_UAV_HEAP_DIRECTLY_INDEXED | D3D12_ROOT_SIGNATURE_FLAG_SAMPLER_HEAP_DIRECTLY_INDEXED);
+		rootSignatureDesc.Init_1_1(_countof(rootParameters), rootParameters, _countof(samplerDesc), samplerDesc,
+			D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT |
+			D3D12_ROOT_SIGNATURE_FLAG_DENY_AMPLIFICATION_SHADER_ROOT_ACCESS | D3D12_ROOT_SIGNATURE_FLAG_DENY_MESH_SHADER_ROOT_ACCESS |
+			D3D12_ROOT_SIGNATURE_FLAG_CBV_SRV_UAV_HEAP_DIRECTLY_INDEXED | D3D12_ROOT_SIGNATURE_FLAG_SAMPLER_HEAP_DIRECTLY_INDEXED);
 
 		graphicsRootSignature = new RootSignature(rootSignatureDesc);
 	}
@@ -141,7 +139,7 @@ GlobalRootSignature::GlobalRootSignature()
 		rootParameters[3].InitAsConstantBufferView(3, 0, D3D12_ROOT_DESCRIPTOR_FLAG_NONE, D3D12_SHADER_VISIBILITY_ALL);
 
 		CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC rootSignatureDesc;
-		rootSignatureDesc.Init_1_1(_countof(rootParameters), rootParameters, _countof(samplerDesc), samplerDesc, 
+		rootSignatureDesc.Init_1_1(_countof(rootParameters), rootParameters, _countof(samplerDesc), samplerDesc,
 			D3D12_ROOT_SIGNATURE_FLAG_CBV_SRV_UAV_HEAP_DIRECTLY_INDEXED | D3D12_ROOT_SIGNATURE_FLAG_SAMPLER_HEAP_DIRECTLY_INDEXED);
 
 		computeRootSignature = new RootSignature(rootSignatureDesc);
