@@ -166,8 +166,6 @@ public:
 
 		PipelineState::createComputeState(&depthOctahedralEncodeState, depthOctahedralEncode);
 
-		begin();
-
 		skybox = resManager->createTextureCube(assetPath + "/sky/kloppenheim_05_4k.hdr", 1024, true);
 
 		{
@@ -236,10 +234,6 @@ public:
 		scene = new Scene(assetPath + "/sponza.dae", resManager);
 
 		updateLightField();
-
-		end();
-
-		RenderEngine::get()->submitRenderPass(this);
 	}
 
 	~MyRenderPass()

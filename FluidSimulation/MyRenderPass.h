@@ -108,13 +108,7 @@ public:
 
 		PipelineState::createComputeState(&fluidFinalState, fluidFinalCS);
 
-		begin();
-
 		effect = new BloomEffect(context, Graphics::getWidth(), Graphics::getHeight(), resManager);
-
-		end();
-
-		RenderEngine::get()->submitRenderPass(this);
 
 		effect->setThreshold(0.f);
 	}

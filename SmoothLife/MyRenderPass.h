@@ -26,13 +26,7 @@ public:
 		swapTexture = new SwapTexture([] {return ResourceManager::createTextureRenderView(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R32_FLOAT, 1, 1, false, true,
 			DXGI_FORMAT_R32_FLOAT, DXGI_FORMAT_R32_FLOAT, DXGI_FORMAT_UNKNOWN); });
 
-		begin();
-
 		initialize();
-
-		end();
-
-		RenderEngine::get()->submitRenderPass(this);
 	}
 
 	~MyRenderPass()

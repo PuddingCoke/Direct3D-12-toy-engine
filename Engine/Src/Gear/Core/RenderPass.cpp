@@ -1,30 +1,13 @@
 #include<Gear/Core/RenderPass.h>
 
-void RenderPass::beginRenderPass()
-{
-	task = std::async(std::launch::async, [this]
-		{
-			begin();
-
-			recordCommand();
-
-			end();
-
-			return RenderPassResult{ transitionCMD,context->getCommandList() };
-		});
-}
-
-RenderPassResult RenderPass::getRenderPassResult()
-{
-	return task.get();
-}
-
 RenderPass::RenderPass() :
 	context(new GraphicsContext()),
 	resManager(new ResourceManager(context)),
-	transitionCMD(new CommandList(D3D12_COMMAND_LIST_TYPE_DIRECT)),
-	task(std::async(std::launch::async, [this] { return RenderPassResult{ transitionCMD,context->getCommandList() }; }))
+	task(std::async(std::launch::async, [this] { return context->getCommandList(); }))
 {
+	context->begin();
+
+	RenderEngine::get()->submitCreateCommandList(context->getCommandList());
 }
 
 RenderPass::~RenderPass()
@@ -38,11 +21,26 @@ RenderPass::~RenderPass()
 	{
 		delete resManager;
 	}
+}
 
-	if (transitionCMD)
-	{
-		delete transitionCMD;
-	}
+void RenderPass::beginRenderPass()
+{
+	task = std::async(std::launch::async, [this]
+		{
+			resManager->cleanTransientResources();
+
+			context->begin();
+
+			recordCommand();
+			
+			//main render thread will solve pending barriers and close commandlist for us
+			return context->getCommandList();
+		});
+}
+
+CommandList* RenderPass::getRenderPassResult()
+{
+	return task.get();
 }
 
 void RenderPass::imGUICall()
@@ -64,16 +62,4 @@ void RenderPass::blit(TextureRenderView* const texture) const
 	context->transitionResources();
 
 	context->draw(3, 1, 0, 0);
-}
-
-void RenderPass::begin() const
-{
-	resManager->cleanTransientResources();
-
-	context->begin();
-}
-
-void RenderPass::end() const
-{
-	context->end();
 }

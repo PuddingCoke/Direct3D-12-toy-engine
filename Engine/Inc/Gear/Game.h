@@ -3,6 +3,8 @@
 #ifndef _GAME_H_
 #define _GAME_H_
 
+#include<Gear/Core/RenderPass.h>
+
 class Game
 {
 public:
@@ -18,6 +20,8 @@ public:
 	virtual void update(const float dt) = 0;
 
 	virtual void render() = 0;
+
+	void submitRenderPass(RenderPass* const pass);
 
 };
 
