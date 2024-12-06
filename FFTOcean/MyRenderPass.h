@@ -148,8 +148,6 @@ public:
 
 		depthTexture = ResourceManager::createTextureDepthView(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R32_TYPELESS, 1, 1, false, true);
 
-		begin();
-
 		effect = new BloomEffect(context, Graphics::getWidth(), Graphics::getHeight(), resManager);
 
 		vertexBuffer = resManager->createStructuredBufferView(sizeof(DirectX::XMFLOAT3), static_cast<UINT>(sizeof(DirectX::XMFLOAT3) * vertices.size()), false, false, true, true, true, vertices.data());
@@ -191,10 +189,6 @@ public:
 		enviromentCube = resManager->createTextureCube("E:\\Assets\\Ocean\\clear_sky_field_sky_dome_8k.hdr", 1024, true);
 
 		calculateInitialSpectrum();
-
-		end();
-
-		RenderEngine::get()->submitRenderPass(this);
 
 		tempTexture->getTexture()->setName(L"tempTexture");
 

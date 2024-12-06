@@ -7,21 +7,12 @@ RenderEngine* RenderEngine::get()
 	return instance;
 }
 
-void RenderEngine::submitRenderPass(RenderPass* const pass)
+void RenderEngine::submitRecordCommandList(CommandList* const commandList)
 {
-	const RenderPassResult renderPassResult = pass->getRenderPassResult();
-
-	if (displayImGUISurface)
-	{
-		pass->imGUICall();
-	}
-
-	CommandList* const renderCMD = renderPassResult.renderCMD;
-
 	std::vector<D3D12_RESOURCE_BARRIER> barriers;
 
 	{
-		for (const PendingBufferBarrier& pendingBarrier : renderCMD->pendingBufferBarrier)
+		for (const PendingBufferBarrier& pendingBarrier : commandList->pendingBufferBarrier)
 		{
 			if ((*(pendingBarrier.buffer->globalState)) != pendingBarrier.afterState)
 			{
@@ -37,11 +28,11 @@ void RenderEngine::submitRenderPass(RenderPass* const pass)
 			}
 		}
 
-		renderCMD->pendingBufferBarrier.clear();
+		commandList->pendingBufferBarrier.clear();
 	}
 
 	{
-		for (const PendingTextureBarrier& pendingBarrier : renderCMD->pendingTextureBarrier)
+		for (const PendingTextureBarrier& pendingBarrier : commandList->pendingTextureBarrier)
 		{
 			if (pendingBarrier.mipSlice == D3D12_TRANSITION_ALL_MIPLEVELS)
 			{
@@ -140,44 +131,67 @@ void RenderEngine::submitRenderPass(RenderPass* const pass)
 				{
 					throw "Transition texture with only 1 miplevel however its pending mipslice is not D3D12_TRANSITION_ALL_MIPLEVELS is not allowed!\n";
 					//in this case target mipslice is not D3D12_TRANSITION_ALL_MIPLEVELS for texture has only 1 miplevel
-					//but for transition texture only has 1 miplevel target mipslice should be D3D12_TRANSITION_ALL_MIPLEVELS
-					//so not handling this case
 				}
 			}
 		}
 
-		renderCMD->pendingTextureBarrier.clear();
+		commandList->pendingTextureBarrier.clear();
 	}
+
+	CommandList* const helperCommandList = recordCommandLists.back();
 
 	if (barriers.size() > 0)
 	{
-		CommandList* const transitionCMD = renderPassResult.transitionCMD;
-
-		transitionCMD->open();
-
-		transitionCMD->resourceBarrier(static_cast<UINT>(barriers.size()), barriers.data());
-
-		transitionCMD->close();
-
-		commandLists.push_back(transitionCMD->get());
-
-		commandLists.push_back(renderCMD->get());
+		helperCommandList->resourceBarrier(static_cast<UINT>(barriers.size()), barriers.data());
 	}
-	else
+
+	//we should not close beginCommandList 
+	if (helperCommandList != beginCommandList)
 	{
-		commandLists.push_back(renderCMD->get());
+		helperCommandList->close();
 	}
 
-	renderCMD->updateReferredResStates();
+	recordCommandLists.push_back(commandList);
+
+	commandList->updateReferredResStates();
+}
+
+void RenderEngine::submitCreateCommandList(CommandList* const commandList)
+{
+	std::lock_guard<std::mutex> lockGuard(createCommandListsMutex);
+
+	createCommandLists.push_back(commandList);
 }
 
 void RenderEngine::processCommandLists()
 {
+	//here is how we handle the execution of all commandLists
+	//at this point commandLists in createCommandLists are ready for submission
+	//we just use submitCommandList to submit each commandList
+
+	for (CommandList* const commandList : createCommandLists)
+	{
+		submitRecordCommandList(commandList);
+	}
+
+	createCommandLists.clear();
+
+	recordCommandLists.front()->close();
+
+	recordCommandLists.back()->close();
+
+	std::vector<ID3D12CommandList*> commandLists;
+
+	for (CommandList* const commandList : recordCommandLists)
+	{
+		commandLists.push_back(commandList->get());
+	}
+
+	recordCommandLists.clear();
+
 	if (commandLists.size())
 	{
 		commandQueue->ExecuteCommandLists(static_cast<UINT>(commandLists.size()), commandLists.data());
-
-		commandLists.clear();
 	}
 }
 
@@ -216,9 +230,9 @@ void RenderEngine::begin()
 {
 	beginImGuiFrame();
 
-	beginCommandlist->open();
+	beginCommandList->open();
 
-	commandLists.push_back(beginCommandlist->get());
+	recordCommandLists.push_back(beginCommandList);
 }
 
 void RenderEngine::end()
@@ -233,10 +247,10 @@ void RenderEngine::end()
 	}
 
 	//transition back buffer to STATE_RENDER_TARGET
-	//update constant buffers
+	//update all constant buffers
 	{
 		{
-			beginCommandlist->pushResourceTrackList(getCurrentRenderTexture());
+			beginCommandList->pushResourceTrackList(getCurrentRenderTexture());
 
 			getCurrentRenderTexture()->setAllState(D3D12_RESOURCE_STATE_RENDER_TARGET);
 		}
@@ -254,21 +268,28 @@ void RenderEngine::end()
 		updateConstantBuffer();
 	}
 
+	//we rely on the last commandList to do some finishing works
+	//draw ImGui frame 
 	//transition back buffer to STATE_PRESENT
 	{
-		endCommandList->open();
+		CommandList* endCommandList = nullptr;
 
-		endImGuiFrame();
+		if (createCommandLists.size())
+		{
+			endCommandList = createCommandLists.back();
+		}
+		else
+		{
+			endCommandList = recordCommandLists.back();
+		}
+
+		drawImGuiFrame(endCommandList);
 
 		endCommandList->pushResourceTrackList(getCurrentRenderTexture());
 
 		getCurrentRenderTexture()->setAllState(D3D12_RESOURCE_STATE_PRESENT);
 
 		endCommandList->transitionResources();
-
-		endCommandList->close();
-
-		commandLists.push_back(endCommandList->get());
 	}
 
 	processCommandLists();
@@ -276,9 +297,7 @@ void RenderEngine::end()
 
 void RenderEngine::updateConstantBuffer()
 {
-	ConstantBufferManager::get()->recordCommands(beginCommandlist);
-
-	beginCommandlist->close();
+	ConstantBufferManager::get()->recordCommands(beginCommandList);
 }
 
 GPUVendor RenderEngine::getVendor() const
@@ -289,6 +308,11 @@ GPUVendor RenderEngine::getVendor() const
 Texture* RenderEngine::getCurrentRenderTexture() const
 {
 	return backBufferResources[Graphics::getFrameIndex()];
+}
+
+bool RenderEngine::getDisplayImGuiSurface() const
+{
+	return displayImGUISurface;
 }
 
 ComPtr<IDXGIAdapter4> RenderEngine::getBestAdapterAndVendor(IDXGIFactory7* const factory)
@@ -342,6 +366,20 @@ ComPtr<IDXGIAdapter4> RenderEngine::getBestAdapterAndVendor(IDXGIFactory7* const
 	return adapter;
 }
 
+void RenderEngine::initializeResources()
+{
+	//turn on ImGui surface if it is needed
+	toggleImGuiSurface();
+
+	//update all constant buffers since resource creation might need these buffers
+	updateConstantBuffer();
+
+	processCommandLists();
+
+	//wait little seconds here
+	waitForPreviousFrame();
+}
+
 void RenderEngine::toggleImGuiSurface()
 {
 	if (initializeImGuiSurface)
@@ -350,7 +388,7 @@ void RenderEngine::toggleImGuiSurface()
 	}
 }
 
-void RenderEngine::beginImGuiFrame()
+void RenderEngine::beginImGuiFrame() const
 {
 	if (displayImGUISurface)
 	{
@@ -360,17 +398,18 @@ void RenderEngine::beginImGuiFrame()
 	}
 }
 
-void RenderEngine::endImGuiFrame()
+void RenderEngine::drawImGuiFrame(CommandList* const targetCommandList)
 {
 	if (displayImGUISurface)
 	{
 		ImGui::Render();
 
-		endCommandList->setDescriptorHeap(GlobalDescriptorHeap::getResourceHeap(), GlobalDescriptorHeap::getSamplerHeap());
+		//we take assumption here that global descriptor heap and global sampler heap are bound on target command list defautly
+		//targetCommandList->setDescriptorHeap(GlobalDescriptorHeap::getResourceHeap(), GlobalDescriptorHeap::getSamplerHeap());
 
-		endCommandList->setDefRenderTarget();
+		targetCommandList->setDefRenderTarget();
 
-		ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), endCommandList->get());
+		ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), targetCommandList->get());
 	}
 }
 
@@ -447,20 +486,13 @@ RenderEngine::RenderEngine(const HWND hwnd, const bool useSwapChainBuffer, const
 
 	fenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
 
-	beginCommandlist = new CommandList(D3D12_COMMAND_LIST_TYPE_DIRECT);
-
-	endCommandList = new CommandList(D3D12_COMMAND_LIST_TYPE_DIRECT);
+	beginCommandList = new CommandList(D3D12_COMMAND_LIST_TYPE_DIRECT);
 
 	GraphicsContext::globalConstantBuffer = ResourceManager::createConstantBuffer(sizeof(PerFrameResource), true);
 
-	//push beginCommandList for constant buffer update
-	//resource creation may need dynamic constant buffer
-	//so we need beginCommandlist handle this for us
-	{
-		beginCommandlist->open();
-
-		commandLists.push_back(beginCommandlist->get());
-	}
+	//make sure beginCommandList is always the first element of recordCommandLists
+	//and we may need constant buffer for resource creation 
+	begin();
 
 	{
 		DescriptorHandle descriptorHandle = GlobalDescriptorHeap::getRenderTargetHeap()->allocStaticDescriptor(Graphics::FrameBufferCount);
@@ -529,8 +561,6 @@ RenderEngine::RenderEngine(const HWND hwnd, const bool useSwapChainBuffer, const
 		ImGui_ImplWin32_Init(hwnd);
 		ImGui_ImplDX12_Init(GraphicsDevice::get(), Graphics::FrameBufferCount, Graphics::BackBufferFormat,
 			GlobalDescriptorHeap::getResourceHeap()->get(), handle.getCPUHandle(), handle.getGPUHandle());
-
-		beginImGuiFrame();
 	}
 	else
 	{
@@ -574,14 +604,9 @@ RenderEngine::~RenderEngine()
 
 	Shader::releaseGlobalShaders();
 
-	if (beginCommandlist)
+	if (beginCommandList)
 	{
-		delete beginCommandlist;
-	}
-
-	if (endCommandList)
-	{
-		delete endCommandList;
+		delete beginCommandList;
 	}
 
 	for (UINT i = 0; i < Graphics::FrameBufferCount; i++)

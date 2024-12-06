@@ -49,8 +49,6 @@ public:
 			GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&particleRenderState));
 		}
 
-		context->begin();
-
 		bloomEffect = new BloomEffect(context, Graphics::getWidth(), Graphics::getHeight(), resManager);
 
 		fxaaEffect = new FXAAEffect(context, Graphics::getWidth(), Graphics::getHeight());
@@ -89,10 +87,6 @@ public:
 
 			colorBuffer = resManager->createTypedBufferView(DXGI_FORMAT_R32G32B32A32_FLOAT, sizeof(DirectX::XMFLOAT4) * numParticles, false, false, true, false, false, true, colors);
 		}
-
-		context->end();
-
-		RenderEngine::get()->submitRenderPass(this);
 
 		bloomEffect->setExposure(0.6f);
 

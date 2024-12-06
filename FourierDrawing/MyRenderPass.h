@@ -71,17 +71,11 @@ public:
 		curFrame(0),
 		connected(false)
 	{
-		begin();
-
 		context->setRenderTargets({ renderTexture->getRTVMipHandle(0) }, {});
 
 		context->transitionResources();
 
 		context->clearRenderTarget(renderTexture->getRTVMipHandle(0), DirectX::Colors::Transparent);
-
-		end();
-
-		RenderEngine::get()->submitRenderPass(this);
 
 		{
 			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = {};

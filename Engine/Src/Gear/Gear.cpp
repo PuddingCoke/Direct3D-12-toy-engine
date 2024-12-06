@@ -9,12 +9,6 @@ Gear* Gear::get()
 
 int Gear::iniEngine(const Configuration& config, const int argc, const char* argv[])
 {
-#ifdef _DEBUG
-	std::cout << "[class Gear] debug lib build date:" << __TIMESTAMP__ << "\n";
-#else
-	std::cout << "[class Gear] release lib build date:" << __TIMESTAMP__ << "\n";
-#endif // _DEBUG
-
 	std::wcout.imbue(std::locale(""));
 
 	{
@@ -76,14 +70,7 @@ void Gear::iniGame(Game* const gamePtr)
 {
 	game = gamePtr;
 
-	RenderEngine::get()->toggleImGuiSurface();
-
-	//resource creation may need dynamic constant buffer
-	RenderEngine::get()->updateConstantBuffer();
-
-	RenderEngine::get()->processCommandLists();
-
-	RenderEngine::get()->waitForPreviousFrame();
+	RenderEngine::get()->initializeResources();
 
 	switch (usage)
 	{

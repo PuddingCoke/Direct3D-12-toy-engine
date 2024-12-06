@@ -27,7 +27,7 @@ class CommandList
 public:
 
 	CommandList(const D3D12_COMMAND_LIST_TYPE type);
-
+	
 	~CommandList();
 
 	void resourceBarrier(const UINT numBarriers, const D3D12_RESOURCE_BARRIER* const pBarriers) const;

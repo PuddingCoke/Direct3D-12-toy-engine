@@ -28,7 +28,7 @@ public:
 	{
 		renderPass->beginRenderPass();
 
-		RenderEngine::get()->submitRenderPass(renderPass);
+		submitRenderPass(renderPass);
 	}
 
 private:

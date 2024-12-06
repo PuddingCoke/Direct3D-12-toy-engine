@@ -2,6 +2,7 @@
 
 #include<Gear/Core/RenderPass.h>
 #include<Gear/Core/Shader.h>
+#include<Gear/Core/Effect/BloomEffect.h>
 
 #include<Gear/Core/Resource/TextureRenderView.h>
 
@@ -9,60 +10,93 @@ class MyRenderPass :public RenderPass
 {
 public:
 
-	MyRenderPass()
+	MyRenderPass() :
+		blackHoleAccumulateCS(new Shader(Utils::getRootFolder() + "BlackHoleAccumulateCS.cso"))
 	{
-		vertexShader = new Shader(Utils::getRootFolder() + "VertexShader.cso");
+		accumulateTexture = ResourceManager::createTextureRenderView(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R16G16B16A16_FLOAT, 1, 1, false, true,
+			DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_UNKNOWN);
 
-		pixelShader = new Shader(Utils::getRootFolder() + "PixelShader.cso");
-		
-		{
-			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = {};
-			desc.InputLayout = {};
-			desc.pRootSignature = GlobalRootSignature::getGraphicsRootSignature()->get();
-			desc.VS = vertexShader->getByteCode();
-			desc.PS = pixelShader->getByteCode();
-			desc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
-			desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
-			desc.DepthStencilState.DepthEnable = FALSE;
-			desc.DepthStencilState.StencilEnable = FALSE;
-			desc.SampleMask = UINT_MAX;
-			desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-			desc.NumRenderTargets = 1;
-			desc.RTVFormats[0] = Graphics::BackBufferFormat;
-			desc.SampleDesc.Count = 1;
+		PipelineState::createComputeState(&blackHoleAccumulateState, blackHoleAccumulateCS);
 
-			GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&pipelineState));
-		}
+		Mouse::addMoveEvent([this]()
+			{
+				if (Mouse::getLeftDown())
+				{
+					renderParam.phi -= Mouse::getDY() * Graphics::getDeltaTime();
+					renderParam.theta -= Mouse::getDX() * Graphics::getDeltaTime();
+					renderParam.phi = Math::clamp(renderParam.phi, -Math::half_pi + 0.01f, Math::half_pi - 0.01f);
+
+					renderParam.frameIndex = 0;
+				}
+			});
+
+		envCube = resManager->createTextureCube("E:\\Assets\\SpaceShip\\360-Space-Panorama-III.hdr", 2048, true);
+
+		effect = new BloomEffect(context, Graphics::getWidth(), Graphics::getHeight(), resManager);
+
+		effect->setExposure(1.6f);
+
+		effect->setGamma(2.2f);
+
 	}
 
 	~MyRenderPass()
 	{
-		delete vertexShader;
-		delete pixelShader;
+		delete accumulateTexture;
+
+		delete envCube;
+
+		delete effect;
+
+		delete blackHoleAccumulateCS;
+	}
+
+	void imGUICall() override
+	{
+		effect->imGUICall();
 	}
 
 protected:
 
 	void recordCommand() override
 	{
-		context->setDefRenderTarget();
+		renderParam.frameIndex++;
 
-		context->setPipelineState(pipelineState.Get());
+		context->setPipelineState(blackHoleAccumulateState.Get());;
 
-		context->setViewport(1920u, 1080u);
+		context->setCSConstants({ accumulateTexture->getUAVMipIndex(0),envCube->getAllSRVIndex() }, 0);
 
-		context->setScissorRect(0.f, 0.f, 1920.f, 1080.f);
+		context->setCSConstants(sizeof(RenderParam) / 4, &renderParam, 2);
 
-		context->setTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		context->transitionResources();
 
-		context->draw(3, 1, 0, 0);
+		context->dispatch(Graphics::getWidth() / 16, Graphics::getHeight() / 9, 1);
+
+		context->uavBarrier({ accumulateTexture->getTexture() });
+
+		auto tex = effect->process(accumulateTexture);
+
+		blit(tex);
 	}
 
 private:
 
-	ComPtr<ID3D12PipelineState> pipelineState;
+	TextureRenderView* accumulateTexture;
 
-	Shader* vertexShader;
+	TextureRenderView* envCube;
 
-	Shader* pixelShader;
+	BloomEffect* effect;
+
+	ComPtr<ID3D12PipelineState> blackHoleAccumulateState;
+
+	Shader* blackHoleAccumulateCS;
+
+	struct RenderParam
+	{
+		UINT frameIndex = 0;
+		float phi = 0.f;
+		float theta = 0.f;
+		float radius = 8.f;
+	} renderParam;
+
 };
