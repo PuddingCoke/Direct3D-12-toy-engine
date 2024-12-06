@@ -117,34 +117,6 @@ void GraphicsContext::setPSConstants(const UINT numValues, const void* const dat
 	commandList->get()->SetGraphicsRoot32BitConstants(6, numValues, data, offset);
 }
 
-void GraphicsContext::setASConstants(const std::initializer_list<ShaderResourceDesc>& descs, const UINT offset)
-{
-	getIndicesFromResourceDescs(descs, tempResourceIndices);
-
-	commandList->setGraphicsPipelineResources(descs, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
-
-	setASConstants(static_cast<UINT>(descs.size()), tempResourceIndices, offset);
-}
-
-void GraphicsContext::setASConstants(const UINT numValues, const void* const data, const UINT offset)
-{
-	commandList->get()->SetGraphicsRoot32BitConstants(7, numValues, data, offset);
-}
-
-void GraphicsContext::setMSConstants(const std::initializer_list<ShaderResourceDesc>& descs, const UINT offset)
-{
-	getIndicesFromResourceDescs(descs, tempResourceIndices);
-
-	commandList->setGraphicsPipelineResources(descs, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
-
-	setMSConstants(static_cast<UINT>(descs.size()), tempResourceIndices, offset);
-}
-
-void GraphicsContext::setMSConstants(const UINT numValues, const void* const data, const UINT offset)
-{
-	commandList->get()->SetGraphicsRoot32BitConstants(8, numValues, data, offset);
-}
-
 void GraphicsContext::setCSConstants(const std::initializer_list<ShaderResourceDesc>& descs, const UINT offset)
 {
 	getIndicesFromResourceDescs(descs, tempResourceIndices);
@@ -168,7 +140,7 @@ void GraphicsContext::setVSConstantBuffer(const IndexConstantBuffer* const const
 
 void GraphicsContext::setVSConstantBuffer(const ConstantBuffer* const constantBuffer)
 {
-	commandList->get()->SetGraphicsRootConstantBufferView(9, constantBuffer->getGPUAddress());
+	commandList->get()->SetGraphicsRootConstantBufferView(7, constantBuffer->getGPUAddress());
 }
 
 void GraphicsContext::setHSConstantBuffer(const IndexConstantBuffer* const constantBuffer)
@@ -180,7 +152,7 @@ void GraphicsContext::setHSConstantBuffer(const IndexConstantBuffer* const const
 
 void GraphicsContext::setHSConstantBuffer(const ConstantBuffer* const constantBuffer)
 {
-	commandList->get()->SetGraphicsRootConstantBufferView(10, constantBuffer->getGPUAddress());
+	commandList->get()->SetGraphicsRootConstantBufferView(8, constantBuffer->getGPUAddress());
 }
 
 void GraphicsContext::setDSConstantBuffer(const IndexConstantBuffer* const constantBuffer)
@@ -192,7 +164,7 @@ void GraphicsContext::setDSConstantBuffer(const IndexConstantBuffer* const const
 
 void GraphicsContext::setDSConstantBuffer(const ConstantBuffer* const constantBuffer)
 {
-	commandList->get()->SetGraphicsRootConstantBufferView(11, constantBuffer->getGPUAddress());
+	commandList->get()->SetGraphicsRootConstantBufferView(9, constantBuffer->getGPUAddress());
 }
 
 void GraphicsContext::setGSConstantBuffer(const IndexConstantBuffer* const constantBuffer)
@@ -204,7 +176,7 @@ void GraphicsContext::setGSConstantBuffer(const IndexConstantBuffer* const const
 
 void GraphicsContext::setGSConstantBuffer(const ConstantBuffer* const constantBuffer)
 {
-	commandList->get()->SetGraphicsRootConstantBufferView(12, constantBuffer->getGPUAddress());
+	commandList->get()->SetGraphicsRootConstantBufferView(10, constantBuffer->getGPUAddress());
 }
 
 void GraphicsContext::setPSConstantBuffer(const IndexConstantBuffer* const constantBuffer)
@@ -216,31 +188,7 @@ void GraphicsContext::setPSConstantBuffer(const IndexConstantBuffer* const const
 
 void GraphicsContext::setPSConstantBuffer(const ConstantBuffer* const constantBuffer)
 {
-	commandList->get()->SetGraphicsRootConstantBufferView(13, constantBuffer->getGPUAddress());
-}
-
-void GraphicsContext::setASConstantBuffer(const IndexConstantBuffer* const constantBuffer)
-{
-	commandList->setGraphicsPipelineResources(constantBuffer->descs, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
-
-	setASConstantBuffer(constantBuffer->constantBuffer);
-}
-
-void GraphicsContext::setASConstantBuffer(const ConstantBuffer* const constantBuffer)
-{
-	commandList->get()->SetGraphicsRootConstantBufferView(14, constantBuffer->getGPUAddress());
-}
-
-void GraphicsContext::setMSConstantBuffer(const IndexConstantBuffer* const constantBuffer)
-{
-	commandList->setGraphicsPipelineResources(constantBuffer->descs, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
-
-	setMSConstantBuffer(constantBuffer->constantBuffer);
-}
-
-void GraphicsContext::setMSConstantBuffer(const ConstantBuffer* const constantBuffer)
-{
-	commandList->get()->SetGraphicsRootConstantBufferView(15, constantBuffer->getGPUAddress());
+	commandList->get()->SetGraphicsRootConstantBufferView(11, constantBuffer->getGPUAddress());
 }
 
 void GraphicsContext::setCSConstantBuffer(const IndexConstantBuffer* const constantBuffer)

@@ -35,10 +35,10 @@ public:
 	//4 values availiable
 	void setHSConstants(const UINT numValues, const void* const data, const UINT offset);
 
-	//4 values availiable
+	//8 values availiable
 	void setDSConstants(const std::initializer_list<ShaderResourceDesc>& descs, const UINT offset);
 
-	//4 values availiable
+	//8 values availiable
 	void setDSConstants(const UINT numValues, const void* const data, const UINT offset);
 
 	//4 values availiable
@@ -47,23 +47,11 @@ public:
 	//4 values availiable
 	void setGSConstants(const UINT numValues, const void* const data, const UINT offset);
 
-	//16 values availiable
+	//24 values availiable
 	void setPSConstants(const std::initializer_list<ShaderResourceDesc>& descs, const UINT offset);
 
-	//16 values availiable
+	//24 values availiable
 	void setPSConstants(const UINT numValues, const void* const data, const UINT offset);
-
-	//4 values availiable
-	void setASConstants(const std::initializer_list<ShaderResourceDesc>& descs, const UINT offset);
-
-	//4 values availiable
-	void setASConstants(const UINT numValues, const void* const data, const UINT offset);
-
-	//4 values availiable
-	void setMSConstants(const std::initializer_list<ShaderResourceDesc>& descs, const UINT offset);
-
-	//4 values availiable
-	void setMSConstants(const UINT numValues, const void* const data, const UINT offset);
 
 	//32 values availiable
 	void setCSConstants(const std::initializer_list<ShaderResourceDesc>& descs, const UINT offset);
@@ -90,14 +78,6 @@ public:
 	void setPSConstantBuffer(const IndexConstantBuffer* const constantBuffer);
 
 	void setPSConstantBuffer(const ConstantBuffer* const constantBuffer);
-
-	void setASConstantBuffer(const IndexConstantBuffer* const constantBuffer);
-
-	void setASConstantBuffer(const ConstantBuffer* const constantBuffer);
-
-	void setMSConstantBuffer(const IndexConstantBuffer* const constantBuffer);
-
-	void setMSConstantBuffer(const ConstantBuffer* const constantBuffer);
 
 	void setCSConstantBuffer(const IndexConstantBuffer* const constantBuffer);
 
