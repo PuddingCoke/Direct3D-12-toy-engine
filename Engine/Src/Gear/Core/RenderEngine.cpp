@@ -145,8 +145,8 @@ void RenderEngine::submitRecordCommandList(CommandList* const commandList)
 		helperCommandList->resourceBarrier(static_cast<UINT>(barriers.size()), barriers.data());
 	}
 
-	//we should not close beginCommandList 
-	if (helperCommandList != beginCommandList)
+	//we should not close prepareCommandList 
+	if (helperCommandList != prepareCommandList)
 	{
 		helperCommandList->close();
 	}
@@ -165,10 +165,6 @@ void RenderEngine::submitCreateCommandList(CommandList* const commandList)
 
 void RenderEngine::processCommandLists()
 {
-	//here is how we handle the execution of all commandLists
-	//at this point commandLists in createCommandLists are ready for submission
-	//we just use submitCommandList to submit each commandList
-
 	for (CommandList* const commandList : createCommandLists)
 	{
 		submitRecordCommandList(commandList);
@@ -230,9 +226,9 @@ void RenderEngine::begin()
 {
 	beginImGuiFrame();
 
-	beginCommandList->open();
+	prepareCommandList->open();
 
-	recordCommandLists.push_back(beginCommandList);
+	recordCommandLists.push_back(prepareCommandList);
 }
 
 void RenderEngine::end()
@@ -250,7 +246,7 @@ void RenderEngine::end()
 	//update all constant buffers
 	{
 		{
-			beginCommandList->pushResourceTrackList(getCurrentRenderTexture());
+			prepareCommandList->pushResourceTrackList(getCurrentRenderTexture());
 
 			getCurrentRenderTexture()->setAllState(D3D12_RESOURCE_STATE_RENDER_TARGET);
 		}
@@ -272,24 +268,24 @@ void RenderEngine::end()
 	//draw ImGui frame 
 	//transition back buffer to STATE_PRESENT
 	{
-		CommandList* endCommandList = nullptr;
+		CommandList* finishCommandList = nullptr;
 
 		if (createCommandLists.size())
 		{
-			endCommandList = createCommandLists.back();
+			finishCommandList = createCommandLists.back();
 		}
 		else
 		{
-			endCommandList = recordCommandLists.back();
+			finishCommandList = recordCommandLists.back();
 		}
 
-		drawImGuiFrame(endCommandList);
+		drawImGuiFrame(finishCommandList);
 
-		endCommandList->pushResourceTrackList(getCurrentRenderTexture());
+		finishCommandList->pushResourceTrackList(getCurrentRenderTexture());
 
 		getCurrentRenderTexture()->setAllState(D3D12_RESOURCE_STATE_PRESENT);
 
-		endCommandList->transitionResources();
+		finishCommandList->transitionResources();
 	}
 
 	processCommandLists();
@@ -297,7 +293,7 @@ void RenderEngine::end()
 
 void RenderEngine::updateConstantBuffer()
 {
-	ConstantBufferManager::get()->recordCommands(beginCommandList);
+	ConstantBufferManager::get()->recordCommands(prepareCommandList);
 }
 
 GPUVendor RenderEngine::getVendor() const
@@ -486,7 +482,7 @@ RenderEngine::RenderEngine(const HWND hwnd, const bool useSwapChainBuffer, const
 
 	fenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
 
-	beginCommandList = new CommandList(D3D12_COMMAND_LIST_TYPE_DIRECT);
+	prepareCommandList = new CommandList(D3D12_COMMAND_LIST_TYPE_DIRECT);
 
 	GraphicsContext::globalConstantBuffer = ResourceManager::createConstantBuffer(sizeof(PerFrameResource), true);
 
@@ -604,9 +600,9 @@ RenderEngine::~RenderEngine()
 
 	Shader::releaseGlobalShaders();
 
-	if (beginCommandList)
+	if (prepareCommandList)
 	{
-		delete beginCommandList;
+		delete prepareCommandList;
 	}
 
 	for (UINT i = 0; i < Graphics::FrameBufferCount; i++)
