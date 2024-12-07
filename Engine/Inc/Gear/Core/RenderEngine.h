@@ -62,18 +62,17 @@ private:
 	//wait for next frame complete and present frame buffer
 	void waitForNextFrame();
 
-	//we use this method to make sure beginCommandList is always the 1th element in recordCommandLists
-	//and this is also the start of imGui frame
+	//we use this method to make sure prepareCommandList is always the 1th element in recordCommandLists
+	//and we begin imGui frame here
 	void begin();
 
-	//using beginCommandList transition back buffer to STATE_RENDER_TARGET
+	//using prepareCommandList transition back buffer to STATE_RENDER_TARGET
 	//update all constant buffers
-	//using endCommandList transition back buffer to STATE_PRESENT
+	//using finishCommandList transition back buffer to STATE_PRESENT
 	//draw imGui frame
 	//finally execute all commandLists
 	void end();
 
-	//make sure begin command list is the 1th element in recordCommandLists
 	//this method will update all constant buffers by using copybufferregion
 	void updateConstantBuffer();
 
@@ -108,7 +107,7 @@ private:
 	//main render thread will loop through this container and solve pending barriers one by one
 	std::vector<CommandList*> createCommandLists;
 
-	//we need a mutex protect createCommandLists container
+	//we need a mutex to protect createCommandLists container
 	std::mutex createCommandListsMutex;
 
 	ComPtr<ID3D12Fence> fence;
@@ -118,7 +117,7 @@ private:
 	HANDLE fenceEvent;
 
 	//do some preperation works and solve pending barriers
-	CommandList* beginCommandList;
+	CommandList* prepareCommandList;
 
 	Texture* backBufferResources[Graphics::FrameBufferCount];
 
