@@ -46,4 +46,15 @@ private:
 
 };
 
+template <typename RenderPassType, typename First, typename... Rest>
+std::future<void> createRenderPassAsync(const First& first, const Rest&... args)
+{
+	return std::async(std::launch::async, [=]()
+		{
+			*first = new RenderPassType(args...);
+
+			RenderEngine::get()->submitCommandList((*first)->getRenderPassResult());
+		});
+}
+
 #endif // !_RENDERPASS_H_

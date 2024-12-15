@@ -11,10 +11,13 @@ class MyGame :public Game
 public:
 
 	MyGame():
-		renderPass(new MyRenderPass()),
 		camera({ 4,4,-11 }, { -1,-1,-2 }, 2.f)
 	{
 		Camera::setProj(Math::pi / 4.f, Graphics::getAspectRatio(), 0.01f, 512.f);
+
+		pushCreateFuture(createRenderPassAsync<MyRenderPass>(&renderPass));
+
+		scheduleAllTasks();
 	}
 
 	~MyGame()
@@ -31,12 +34,13 @@ public:
 
 	void render()
 	{
-		renderPass->beginRenderPass();
+		beginRenderPass(renderPass);
 
-		submitRenderPass(renderPass);
+		scheduleAllTasks();
 	}
 
 	MyRenderPass* renderPass;
 	
 	OrbitCamera camera;
+
 };

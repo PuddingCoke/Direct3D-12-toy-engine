@@ -8,9 +8,11 @@ class MyGame :public Game
 {
 public:
 
-	MyGame() :
-		renderPass(new MyRenderPass())
+	MyGame()
 	{
+		pushCreateFuture(createRenderPassAsync<MyRenderPass>(&renderPass));
+
+		scheduleAllTasks();
 	}
 
 	~MyGame()
@@ -25,12 +27,11 @@ public:
 
 	void render()
 	{
-		renderPass->beginRenderPass();
+		beginRenderPass(renderPass);
 
-		submitRenderPass(renderPass);
+		scheduleAllTasks();
 	}
 
 	MyRenderPass* renderPass;
-
 
 };
