@@ -139,7 +139,7 @@
     <ClInclude Include="Epicycle.h" />
     <ClInclude Include="json.hpp" />
     <ClInclude Include="MyGame.h" />
-    <ClInclude Include="MyRenderPass.h" />
+    <ClInclude Include="MyRenderTask.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

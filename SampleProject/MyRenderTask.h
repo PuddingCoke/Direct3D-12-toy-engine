@@ -1,15 +1,15 @@
 #pragma once
 
-#include<Gear/Core/RenderPass.h>
+#include<Gear/Core/RenderTask.h>
 #include<Gear/Core/Shader.h>
 
 #include<Gear/Core/Resource/TextureRenderView.h>
 
-class MyRenderPass :public RenderPass
+class MyRenderTask :public RenderTask
 {
 public:
 
-	MyRenderPass()
+	MyRenderTask()
 	{
 		vertexShader = new Shader(Utils::getRootFolder() + "VertexShader.cso");
 
@@ -35,7 +35,7 @@ public:
 		}
 	}
 
-	~MyRenderPass()
+	~MyRenderTask()
 	{
 		delete vertexShader;
 		delete pixelShader;

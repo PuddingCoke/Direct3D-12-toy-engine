@@ -23,13 +23,13 @@
     <ClInclude Include="MyGame.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="MyRenderPass.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="Epicycle.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="json.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="MyRenderTask.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

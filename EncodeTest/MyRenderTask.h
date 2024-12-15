@@ -1,8 +1,8 @@
 #pragma once
 
-#include<Gear/Core/RenderPass.h>
+#include<Gear/Core/RenderTask.h>
 
-class MyRenderPass :public RenderPass
+class MyRenderTask :public RenderTask
 {
 public:
 

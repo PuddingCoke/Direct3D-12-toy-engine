@@ -3,7 +3,7 @@
 #ifndef _GAME_H_
 #define _GAME_H_
 
-#include<Gear/Core/RenderPass.h>
+#include<Gear/Core/RenderTask.h>
 
 #include<queue>
 
@@ -23,13 +23,13 @@ public:
 
 	virtual void render() = 0;
 
-	void beginRenderPass(RenderPass* const renderPass);
+	void beginRenderTask(RenderTask* const renderTask);
 
 	void pushCreateFuture(std::future<void>&& createFuture);
 
 	void scheduleAllTasks();
 
-	std::queue<RenderPass*> recordQueue;
+	std::queue<RenderTask*> recordQueue;
 
 	std::queue<std::future<void>> createQueue;
 

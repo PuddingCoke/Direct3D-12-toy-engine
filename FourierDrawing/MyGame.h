@@ -2,7 +2,7 @@
 
 #include<Gear/Game.h>
 
-#include"MyRenderPass.h"
+#include"MyRenderTask.h"
 
 class MyGame :public Game
 {
@@ -10,14 +10,14 @@ public:
 
 	MyGame()
 	{
-		pushCreateFuture(createRenderPassAsync<MyRenderPass>(&renderPass));
+		pushCreateFuture(createRenderTaskAsync<MyRenderTask>(&renderTask));
 
 		scheduleAllTasks();
 	}
 
 	~MyGame()
 	{
-		delete renderPass;
+		delete renderTask;
 	}
 
 	void update(const float dt) override
@@ -27,11 +27,11 @@ public:
 
 	void render()
 	{
-		beginRenderPass(renderPass);
+		beginRenderTask(renderTask);
 
 		scheduleAllTasks();
 	}
 
-	MyRenderPass* renderPass;
+	MyRenderTask* renderTask;
 
 };

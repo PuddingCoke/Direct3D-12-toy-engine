@@ -1,6 +1,6 @@
 #pragma once
 
-#include<Gear/Core/RenderPass.h>
+#include<Gear/Core/RenderTask.h>
 
 #include<Gear/Core/Shader.h>
 
@@ -9,11 +9,11 @@
 #include<Gear/Utils/Math.h>
 #include<Gear/Utils/Random.h>
 
-class MyRenderPass :public RenderPass
+class MyRenderTask :public RenderTask
 {
 public:
 
-	MyRenderPass() :
+	MyRenderTask() :
 		accumulateShader(new Shader(Utils::getRootFolder() + "AccumulateShader.cso")),
 		displayShader(new Shader(Utils::getRootFolder() + "DisplayShader.cso")),
 		accumulatedTexture(ResourceManager::createTextureRenderView(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R16G16B16A16_UNORM, 1, 1, false, false,
@@ -87,7 +87,7 @@ public:
 		ImGui::End();
 	}
 
-	~MyRenderPass()
+	~MyRenderTask()
 	{
 		delete accumulateShader;
 		delete displayShader;

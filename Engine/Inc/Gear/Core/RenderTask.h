@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef _RENDERPASS_H_
-#define _RENDERPASS_H_
+#ifndef _RENDERTASK_H_
+#define _RENDERTASK_H_
 
 #include<Gear/Core/RenderEngine.h>
 
@@ -15,17 +15,17 @@
 
 #include<future>
 
-class RenderPass
+class RenderTask
 {
 public:
 
-	RenderPass();
+	RenderTask();
 
-	virtual ~RenderPass();
+	virtual ~RenderTask();
 
-	void beginRenderPass();
+	void beginRenderTask();
 
-	CommandList* getRenderPassResult();
+	CommandList* getRenderTaskResult();
 
 	virtual void imGUICall();
 
@@ -46,15 +46,15 @@ private:
 
 };
 
-template <typename RenderPassType, typename First, typename... Rest>
-std::future<void> createRenderPassAsync(const First& first, const Rest&... args)
+template <typename RenderTaskType, typename First, typename... Rest>
+std::future<void> createRenderTaskAsync(const First& first, const Rest&... args)
 {
 	return std::async(std::launch::async, [=]()
 		{
-			*first = new RenderPassType(args...);
+			*first = new RenderTaskType(args...);
 
-			RenderEngine::get()->submitCommandList((*first)->getRenderPassResult());
+			RenderEngine::get()->submitCommandList((*first)->getRenderTaskResult());
 		});
 }
 
-#endif // !_RENDERPASS_H_
+#endif // !_RENDERTASK_H_

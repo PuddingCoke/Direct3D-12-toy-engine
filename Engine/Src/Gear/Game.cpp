@@ -12,15 +12,15 @@ void Game::imGUICall()
 {
 }
 
-void Game::beginRenderPass(RenderPass* const renderPass)
+void Game::beginRenderTask(RenderTask* const renderTask)
 {
-	renderPass->beginRenderPass();
+	renderTask->beginRenderTask();
 
-	recordQueue.push(renderPass);
+	recordQueue.push(renderTask);
 
 	if (RenderEngine::get()->getDisplayImGuiSurface())
 	{
-		renderPass->imGUICall();
+		renderTask->imGUICall();
 	}
 }
 
@@ -33,7 +33,7 @@ void Game::scheduleAllTasks()
 {
 	while (recordQueue.size())
 	{
-		RenderEngine::get()->submitCommandList(recordQueue.front()->getRenderPassResult());
+		RenderEngine::get()->submitCommandList(recordQueue.front()->getRenderTaskResult());
 
 		recordQueue.pop();
 	}

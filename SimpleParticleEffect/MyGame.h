@@ -4,7 +4,7 @@
 
 #include<Gear/Camera/OrbitCamera.h>
 
-#include"MyRenderPass.h"
+#include"MyRenderTask.h"
 
 class MyGame :public Game
 {
@@ -15,14 +15,14 @@ public:
 	{
 		Camera::setProj(Math::pi / 4.f, Graphics::getAspectRatio(), 0.01f, 512.f);
 
-		pushCreateFuture(createRenderPassAsync<MyRenderPass>(&renderPass));
+		pushCreateFuture(createRenderTaskAsync<MyRenderTask>(&renderTask));
 
 		scheduleAllTasks();
 	}
 
 	~MyGame()
 	{
-		delete renderPass;
+		delete renderTask;
 	}
 
 	void update(const float dt) override
@@ -34,12 +34,12 @@ public:
 
 	void render()
 	{
-		beginRenderPass(renderPass);
+		beginRenderTask(renderTask);
 
 		scheduleAllTasks();
 	}
 
-	MyRenderPass* renderPass;
+	MyRenderTask* renderTask;
 	
 	OrbitCamera camera;
 

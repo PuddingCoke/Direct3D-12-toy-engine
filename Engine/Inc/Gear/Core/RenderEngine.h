@@ -49,29 +49,16 @@ private:
 
 	ComPtr<IDXGIAdapter4> getBestAdapterAndVendor(IDXGIFactory7* const factory);
 
-	//merge recordCommandLists and createCommandLists
-	//and execute all commandLists by using one ExecuteCommandLists call
 	void processCommandLists();
 
-	//just wait for previous frame complete and this does not present frame buffer
-	//becuase this method is created for spceial purpose such as wait for resource creation
 	void waitForPreviousFrame();
 
-	//wait for next frame complete and present frame buffer
 	void waitForNextFrame();
 
-	//we use this method to make sure prepareCommandList is always the 1th element in recordCommandLists
-	//and we begin imGui frame here
 	void begin();
 
-	//using prepareCommandList transition back buffer to STATE_RENDER_TARGET
-	//update all constant buffers
-	//using finishCommandList transition back buffer to STATE_PRESENT
-	//draw imGui frame
-	//finally execute all commandLists
 	void end();
 
-	//this method will update all constant buffers by using copybufferregion
 	void updateConstantBuffer();
 
 	void initializeResources();
@@ -96,7 +83,6 @@ private:
 
 	ComPtr<ID3D12CommandQueue> commandQueue;
 
-	//we need to use this container to solve pending barriers
 	std::vector<CommandList*> recordCommandLists;
 
 	ComPtr<ID3D12Fence> fence;
@@ -105,7 +91,6 @@ private:
 
 	HANDLE fenceEvent;
 
-	//do some preperation works and solve pending barriers
 	CommandList* prepareCommandList;
 
 	Texture* backBufferResources[Graphics::FrameBufferCount];

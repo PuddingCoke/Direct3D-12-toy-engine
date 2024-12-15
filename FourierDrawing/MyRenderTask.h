@@ -1,6 +1,6 @@
 #pragma once
 
-#include<Gear/Core/RenderPass.h>
+#include<Gear/Core/RenderTask.h>
 
 #include<Gear/Core/Shader.h>
 
@@ -19,7 +19,7 @@
 
 using nlohmann::json;
 
-class MyRenderPass :public RenderPass
+class MyRenderTask :public RenderTask
 {
 public:
 
@@ -64,7 +64,7 @@ public:
 
 	bool connected;
 
-	MyRenderPass() :
+	MyRenderTask() :
 		pBatch{ new PrimitiveBatch(Graphics::BackBufferFormat,context),new PrimitiveBatch(DXGI_FORMAT_R8G8B8A8_UNORM,context) },
 		renderTexture(ResourceManager::createTextureRenderView(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R8G8B8A8_UNORM, 1, 1, false, true,
 			DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_R8G8B8A8_UNORM)),
@@ -162,7 +162,7 @@ public:
 		Camera::setProj(DirectX::XMMatrixOrthographicOffCenterLH(0.f, (float)Graphics::getWidth(), 0, (float)Graphics::getHeight(), -1.f, 1.f));
 	}
 
-	~MyRenderPass()
+	~MyRenderTask()
 	{
 		delete[] epicycles;
 		delete renderTexture;

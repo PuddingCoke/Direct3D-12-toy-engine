@@ -141,7 +141,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MyGame.h" />
-    <ClInclude Include="MyRenderPass.h" />
+    <ClInclude Include="MyRenderTask.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Common.hlsli" />

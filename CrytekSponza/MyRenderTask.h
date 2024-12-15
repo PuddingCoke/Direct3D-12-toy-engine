@@ -1,6 +1,6 @@
 #pragma once
 
-#include<Gear/Core/RenderPass.h>
+#include<Gear/Core/RenderTask.h>
 #include<Gear/Core/Shader.h>
 
 #include<Gear/Core/Effect/BloomEffect.h>
@@ -9,11 +9,11 @@
 
 #include"Scene.h"
 
-class MyRenderPass :public RenderPass
+class MyRenderTask :public RenderTask
 {
 public:
 
-	MyRenderPass() :
+	MyRenderTask() :
 		gPosition(ResourceManager::createTextureRenderView(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 1, false, true,
 			DXGI_FORMAT_R32G32B32A32_FLOAT, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_R32G32B32A32_FLOAT, DirectX::Colors::Transparent)),
 		gNormalSpecular(ResourceManager::createTextureRenderView(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 1, false, true,
@@ -236,7 +236,7 @@ public:
 		updateLightField();
 	}
 
-	~MyRenderPass()
+	~MyRenderTask()
 	{
 		delete scene;
 
