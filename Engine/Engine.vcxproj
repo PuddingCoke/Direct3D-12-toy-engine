@@ -145,6 +145,7 @@
     <ClInclude Include="Inc\Gear\Core\Effect\FXAAEffect.h" />
     <ClInclude Include="Inc\Gear\Core\Raytracing\BottomLevelAS.h" />
     <ClInclude Include="Inc\Gear\Core\Raytracing\TopLevelAS.h" />
+    <ClInclude Include="Inc\Gear\Core\RenderTask.h" />
     <ClInclude Include="Inc\Gear\Utils\DeltaTimeEstimator.h" />
     <ClInclude Include="Inc\Gear\Core\Resource\BufferView.h" />
     <ClInclude Include="Inc\Gear\Core\Resource\CounterBufferView.h" />
@@ -179,7 +180,6 @@
     <ClInclude Include="Inc\Gear\Core\Graphics.h" />
     <ClInclude Include="Inc\Gear\Core\PipelineState.h" />
     <ClInclude Include="Inc\Gear\Core\RenderEngine.h" />
-    <ClInclude Include="Inc\Gear\Core\RenderPass.h" />
     <ClInclude Include="Inc\Gear\Core\ResourceManager.h" />
     <ClInclude Include="Inc\Gear\Core\Resource\ConstantBuffer.h" />
     <ClInclude Include="Inc\Gear\Core\Resource\EngineResource.h" />
@@ -221,6 +221,7 @@
     <ClCompile Include="Src\Gear\Core\Effect\FXAAEffect.cpp" />
     <ClCompile Include="Src\Gear\Core\Raytracing\BottomLevelAS.cpp" />
     <ClCompile Include="Src\Gear\Core\Raytracing\TopLevelAS.cpp" />
+    <ClCompile Include="Src\Gear\Core\RenderTask.cpp" />
     <ClCompile Include="Src\Gear\Utils\DeltaTimeEstimator.cpp" />
     <ClCompile Include="Src\Gear\Core\DescriptorHeap.cpp" />
     <ClCompile Include="Src\Gear\Core\DX\ReadbackHeap.cpp" />
@@ -232,7 +233,6 @@
     <ClCompile Include="Src\Gear\Core\GraphicsContext.cpp" />
     <ClCompile Include="Src\Gear\Core\PipelineState.cpp" />
     <ClCompile Include="Src\Gear\Core\RenderEngine.cpp" />
-    <ClCompile Include="Src\Gear\Core\RenderPass.cpp" />
     <ClCompile Include="Src\Gear\Core\DX\Texture.cpp" />
     <ClCompile Include="Src\Gear\Core\Graphics.cpp" />
     <ClCompile Include="Src\Gear\Core\DX\Buffer.cpp" />

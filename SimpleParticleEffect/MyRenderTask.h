@@ -1,6 +1,6 @@
 #pragma once
 
-#include<Gear/Core/RenderPass.h>
+#include<Gear/Core/RenderTask.h>
 #include<Gear/Core/Shader.h>
 
 #include<Gear/Core/Effect/BloomEffect.h>
@@ -10,11 +10,11 @@
 
 #include<Gear/Core/Resource/TextureRenderView.h>
 
-class MyRenderPass :public RenderPass
+class MyRenderTask :public RenderTask
 {
 public:
 
-	MyRenderPass()
+	MyRenderTask()
 	{
 		particleVS = new Shader("ParticleVS.hlsl", ShaderProfile::VERTEX);
 
@@ -95,7 +95,7 @@ public:
 		simulationParam = { 0.18f,4 };
 	}
 
-	~MyRenderPass()
+	~MyRenderTask()
 	{
 		delete bloomEffect;
 		delete fxaaEffect;

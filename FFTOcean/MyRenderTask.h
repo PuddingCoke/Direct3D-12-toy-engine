@@ -1,6 +1,6 @@
 #pragma once
 
-#include<Gear/Core/RenderPass.h>
+#include<Gear/Core/RenderTask.h>
 
 #include<Gear/Core/Shader.h>
 
@@ -12,11 +12,11 @@
 
 #include"WaveCascade.h"
 
-class MyRenderPass :public RenderPass
+class MyRenderTask :public RenderTask
 {
 public:
 
-	MyRenderPass(FPSCamera* const camera) :
+	MyRenderTask(FPSCamera* const camera) :
 		vertices((gridSize + 1)* (gridSize + 1)),
 		camera(camera),
 		renderParamBuffer(ResourceManager::createConstantBuffer(sizeof(RenderParam), true)),
@@ -207,7 +207,7 @@ public:
 		effect->setGamma(0.972f);
 	}
 
-	~MyRenderPass()
+	~MyRenderTask()
 	{
 		delete vertexBuffer;
 
@@ -706,9 +706,9 @@ private:
 	struct RenderParam
 	{
 		float lodScale = 3.f;
-		float lengthScale0 = MyRenderPass::lengthScale0;
-		float lengthScale1 = MyRenderPass::lengthScale1;
-		float lengthScale2 = MyRenderPass::lengthScale2;
+		float lengthScale0 = MyRenderTask::lengthScale0;
+		float lengthScale1 = MyRenderTask::lengthScale1;
+		float lengthScale2 = MyRenderTask::lengthScale2;
 		float sunStrength = 0.548f;
 		float sunTheta = 0.143f;
 		float specularPower = 256.f;

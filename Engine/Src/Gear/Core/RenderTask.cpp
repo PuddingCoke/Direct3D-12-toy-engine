@@ -1,6 +1,6 @@
-#include<Gear/Core/RenderPass.h>
+#include<Gear/Core/RenderTask.h>
 
-RenderPass::RenderPass() :
+RenderTask::RenderTask() :
 	context(new GraphicsContext()),
 	resManager(new ResourceManager(context)),
 	task(std::async(std::launch::async, [this]() {return context->getCommandList(); }))
@@ -8,7 +8,7 @@ RenderPass::RenderPass() :
 	context->begin();
 }
 
-RenderPass::~RenderPass()
+RenderTask::~RenderTask()
 {
 	if (context)
 	{
@@ -21,7 +21,7 @@ RenderPass::~RenderPass()
 	}
 }
 
-void RenderPass::beginRenderPass()
+void RenderTask::beginRenderTask()
 {
 	task = std::async(std::launch::async, [this]
 		{
@@ -36,17 +36,17 @@ void RenderPass::beginRenderPass()
 		});
 }
 
-CommandList* RenderPass::getRenderPassResult()
+CommandList* RenderTask::getRenderTaskResult()
 {
 	return task.get();
 }
 
-void RenderPass::imGUICall()
+void RenderTask::imGUICall()
 {
 
 }
 
-void RenderPass::blit(TextureRenderView* const texture) const
+void RenderTask::blit(TextureRenderView* const texture) const
 {
 	context->setPipelineState(PipelineState::get()->fullScreenBlitState.Get());
 

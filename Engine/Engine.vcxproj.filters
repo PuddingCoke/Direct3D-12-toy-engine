@@ -270,9 +270,6 @@
     <ClInclude Include="Inc\Gear\Core\ResourceManager.h">
       <Filter>Header\Core</Filter>
     </ClInclude>
-    <ClInclude Include="Inc\Gear\Core\RenderPass.h">
-      <Filter>Header\Core</Filter>
-    </ClInclude>
     <ClInclude Include="Inc\Gear\Core\RenderEngine.h">
       <Filter>Header\Core</Filter>
     </ClInclude>
@@ -316,6 +313,9 @@
       <Filter>Header\ExternalHeader\stbi</Filter>
     </ClInclude>
     <ClInclude Include="Inc\Gear\Core\ConstantBufferManager.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Gear\Core\RenderTask.h">
       <Filter>Header</Filter>
     </ClInclude>
   </ItemGroup>
@@ -461,9 +461,6 @@
     <ClCompile Include="Src\Gear\Core\RenderEngine.cpp">
       <Filter>Source\Core</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Core\RenderPass.cpp">
-      <Filter>Source\Core</Filter>
-    </ClCompile>
     <ClCompile Include="Src\Gear\Core\ResourceManager.cpp">
       <Filter>Source\Core</Filter>
     </ClCompile>
@@ -504,6 +501,9 @@
       <Filter>Source\ExternalSource\stbi</Filter>
     </ClCompile>
     <ClCompile Include="Src\Gear\Core\ConstantBufferManager.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gear\Core\RenderTask.cpp">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>

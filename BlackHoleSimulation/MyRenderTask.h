@@ -1,16 +1,16 @@
 #pragma once
 
-#include<Gear/Core/RenderPass.h>
+#include<Gear/Core/RenderTask.h>
 #include<Gear/Core/Shader.h>
 #include<Gear/Core/Effect/BloomEffect.h>
 
 #include<Gear/Core/Resource/TextureRenderView.h>
 
-class MyRenderPass :public RenderPass
+class MyRenderTask :public RenderTask
 {
 public:
 
-	MyRenderPass() :
+	MyRenderTask() :
 		blackHoleAccumulateCS(new Shader(Utils::getRootFolder() + "BlackHoleAccumulateCS.cso"))
 	{
 		accumulateTexture = ResourceManager::createTextureRenderView(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R16G16B16A16_FLOAT, 1, 1, false, true,
@@ -44,7 +44,7 @@ public:
 
 	}
 
-	~MyRenderPass()
+	~MyRenderTask()
 	{
 		delete accumulateTexture;
 

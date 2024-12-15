@@ -1,15 +1,15 @@
 #pragma once
 
-#include<Gear/Core/RenderPass.h>
+#include<Gear/Core/RenderTask.h>
 #include<Gear/Core/Shader.h>
 
 #include<Gear/Core/Resource/TextureRenderView.h>
 
-class MyRenderPass :public RenderPass
+class MyRenderTask :public RenderTask
 {
 public:
 
-	MyRenderPass() :
+	MyRenderTask() :
 		timer(1.f / 60.f),
 		whiteNoiseCS(new Shader(Utils::getRootFolder() + "WhiteNoiseCS.cso")),
 		evolveCS(new Shader(Utils::getRootFolder() + "EvolveCS.cso")),
@@ -29,7 +29,7 @@ public:
 		initialize();
 	}
 
-	~MyRenderPass()
+	~MyRenderTask()
 	{
 		delete whiteNoiseCS;
 		delete evolveCS;

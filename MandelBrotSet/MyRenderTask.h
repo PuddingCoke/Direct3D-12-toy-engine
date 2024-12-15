@@ -1,15 +1,15 @@
 #pragma once
 
-#include<Gear/Core/RenderPass.h>
+#include<Gear/Core/RenderTask.h>
 #include<Gear/Core/Shader.h>
 
 #include<Gear/Core/Resource/TextureRenderView.h>
 
-class MyRenderPass :public RenderPass
+class MyRenderTask :public RenderTask
 {
 public:
 
-	MyRenderPass() :
+	MyRenderTask() :
 		computeCS(new Shader(Utils::getRootFolder() + "ComputeCS.cso")),
 		originTexture(ResourceManager::createTextureRenderView(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R16G16B16A16_UNORM, 1, 1, false, true,
 			DXGI_FORMAT_R16G16B16A16_UNORM, DXGI_FORMAT_R16G16B16A16_UNORM, DXGI_FORMAT_UNKNOWN))
@@ -17,7 +17,7 @@ public:
 		PipelineState::createComputeState(&computeState, computeCS);
 	}
 
-	~MyRenderPass()
+	~MyRenderTask()
 	{
 		delete computeCS;
 

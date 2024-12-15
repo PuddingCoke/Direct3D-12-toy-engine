@@ -27,7 +27,7 @@
     <ClInclude Include="MyGame.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="MyRenderPass.h">
+    <ClInclude Include="MyRenderTask.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

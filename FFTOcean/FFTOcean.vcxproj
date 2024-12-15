@@ -142,7 +142,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MyGame.h" />
-    <ClInclude Include="MyRenderPass.h" />
+    <ClInclude Include="MyRenderTask.h" />
     <ClInclude Include="WaveCascade.h" />
   </ItemGroup>
   <ItemGroup>

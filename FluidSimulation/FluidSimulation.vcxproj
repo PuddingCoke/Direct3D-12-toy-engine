@@ -141,7 +141,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MyGame.h" />
-    <ClInclude Include="MyRenderPass.h" />
+    <ClInclude Include="MyRenderTask.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="ColorAdvectionCS.hlsl">

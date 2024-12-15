@@ -4,7 +4,7 @@
 
 #include<Gear/Camera/FPSCamera.h>
 
-#include"MyRenderPass.h"
+#include"MyRenderTask.h"
 
 class MyGame :public Game
 {
@@ -15,14 +15,14 @@ public:
 	{
 		Camera::setProj(Math::pi / 3.f, Graphics::getAspectRatio(), 1.f, 5000.f);
 
-		pushCreateFuture(createRenderPassAsync<MyRenderPass>(&renderPass, &camera));
+		pushCreateFuture(createRenderTaskAsync<MyRenderTask>(&renderTask, &camera));
 
 		scheduleAllTasks();
 	}
 
 	~MyGame()
 	{
-		delete renderPass;
+		delete renderTask;
 	}
 
 	void update(const float dt) override
@@ -32,12 +32,12 @@ public:
 
 	void render()
 	{
-		beginRenderPass(renderPass);
+		beginRenderTask(renderTask);
 
 		scheduleAllTasks();
 	}
 
-	MyRenderPass* renderPass;
+	MyRenderTask* renderTask;
 
 	FPSCamera camera;
 

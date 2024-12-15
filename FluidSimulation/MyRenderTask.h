@@ -1,6 +1,6 @@
 #pragma once
 
-#include<Gear/Core/RenderPass.h>
+#include<Gear/Core/RenderTask.h>
 
 #include<Gear/Core/Effect/BloomEffect.h>
 
@@ -8,11 +8,11 @@
 
 #include<DirectXColors.h>
 
-class MyRenderPass :public RenderPass
+class MyRenderTask :public RenderTask
 {
 public:
 
-	MyRenderPass() :
+	MyRenderTask() :
 		colorUpdateTimer(1.f),
 		splatVelocityCS(new Shader(Utils::getRootFolder() + "SplatVelocityCS.cso")),
 		splatColorCS(new Shader(Utils::getRootFolder() + "SplatColorCS.cso")),
@@ -113,7 +113,7 @@ public:
 		effect->setThreshold(0.f);
 	}
 
-	~MyRenderPass()
+	~MyRenderTask()
 	{
 		delete effect;
 

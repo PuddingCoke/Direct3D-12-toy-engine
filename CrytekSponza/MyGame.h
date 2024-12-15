@@ -4,7 +4,7 @@
 
 #include<Gear/Game.h>
 
-#include"MyRenderPass.h"
+#include"MyRenderTask.h"
 
 //generic 26%
 //all 23.5%
@@ -20,14 +20,14 @@ public:
 	{
 		Camera::setProj(Math::pi / 4.f, Graphics::getAspectRatio(), 1.f, 512.f);
 
-		pushCreateFuture(createRenderPassAsync<MyRenderPass>(&renderPass));
+		pushCreateFuture(createRenderTaskAsync<MyRenderTask>(&renderTask));
 
 		scheduleAllTasks();
 	}
 
 	~MyGame()
 	{
-		delete renderPass;
+		delete renderTask;
 	}
 
 	void update(const float dt) override
@@ -37,11 +37,11 @@ public:
 
 	void render()
 	{
-		beginRenderPass(renderPass);
+		beginRenderTask(renderTask);
 
 		scheduleAllTasks();
 	}
 
-	MyRenderPass* renderPass;
+	MyRenderTask* renderTask;
 	
 };
