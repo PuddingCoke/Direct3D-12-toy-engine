@@ -3,11 +3,9 @@
 RenderPass::RenderPass() :
 	context(new GraphicsContext()),
 	resManager(new ResourceManager(context)),
-	task(std::async(std::launch::async, [this] { return context->getCommandList(); }))
+	task(std::async(std::launch::async, [this]() {return context->getCommandList(); }))
 {
 	context->begin();
-
-	RenderEngine::get()->submitCreateCommandList(context->getCommandList());
 }
 
 RenderPass::~RenderPass()
@@ -32,8 +30,8 @@ void RenderPass::beginRenderPass()
 			context->begin();
 
 			recordCommand();
-			
-			//main render thread will solve pending barriers and close commandlist for us
+
+			//main render thread will solve pending barriers and close commandList
 			return context->getCommandList();
 		});
 }
@@ -45,6 +43,7 @@ CommandList* RenderPass::getRenderPassResult()
 
 void RenderPass::imGUICall()
 {
+
 }
 
 void RenderPass::blit(TextureRenderView* const texture) const

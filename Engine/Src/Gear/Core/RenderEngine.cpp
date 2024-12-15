@@ -7,8 +7,10 @@ RenderEngine* RenderEngine::get()
 	return instance;
 }
 
-void RenderEngine::submitRecordCommandList(CommandList* const commandList)
+void RenderEngine::submitCommandList(CommandList* const commandList)
 {
+	std::lock_guard<std::mutex> lockGuard(submitCommandListLock);
+
 	std::vector<D3D12_RESOURCE_BARRIER> barriers;
 
 	{
@@ -156,22 +158,8 @@ void RenderEngine::submitRecordCommandList(CommandList* const commandList)
 	commandList->updateReferredResStates();
 }
 
-void RenderEngine::submitCreateCommandList(CommandList* const commandList)
-{
-	std::lock_guard<std::mutex> lockGuard(createCommandListsMutex);
-
-	createCommandLists.push_back(commandList);
-}
-
 void RenderEngine::processCommandLists()
 {
-	for (CommandList* const commandList : createCommandLists)
-	{
-		submitRecordCommandList(commandList);
-	}
-
-	createCommandLists.clear();
-
 	recordCommandLists.front()->close();
 
 	recordCommandLists.back()->close();
@@ -185,10 +173,7 @@ void RenderEngine::processCommandLists()
 
 	recordCommandLists.clear();
 
-	if (commandLists.size())
-	{
-		commandQueue->ExecuteCommandLists(static_cast<UINT>(commandLists.size()), commandLists.data());
-	}
+	commandQueue->ExecuteCommandLists(static_cast<UINT>(commandLists.size()), commandLists.data());
 }
 
 void RenderEngine::waitForPreviousFrame()
@@ -268,16 +253,7 @@ void RenderEngine::end()
 	//draw ImGui frame 
 	//transition back buffer to STATE_PRESENT
 	{
-		CommandList* finishCommandList = nullptr;
-
-		if (createCommandLists.size())
-		{
-			finishCommandList = createCommandLists.back();
-		}
-		else
-		{
-			finishCommandList = recordCommandLists.back();
-		}
+		CommandList* const finishCommandList = recordCommandLists.back();
 
 		drawImGuiFrame(finishCommandList);
 
@@ -400,7 +376,7 @@ void RenderEngine::drawImGuiFrame(CommandList* const targetCommandList)
 	{
 		ImGui::Render();
 
-		//we take assumption here that global descriptor heap and global sampler heap are bound on target command list defautly
+		//we take an assumption here that global descriptor heap and global sampler heap are bound on target command list by default
 		//targetCommandList->setDescriptorHeap(GlobalDescriptorHeap::getResourceHeap(), GlobalDescriptorHeap::getSamplerHeap());
 
 		targetCommandList->setDefRenderTarget();

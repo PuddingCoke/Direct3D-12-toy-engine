@@ -5,6 +5,8 @@
 
 #include<Gear/Core/RenderPass.h>
 
+#include<queue>
+
 class Game
 {
 public:
@@ -21,7 +23,15 @@ public:
 
 	virtual void render() = 0;
 
-	void submitRenderPass(RenderPass* const pass);
+	void beginRenderPass(RenderPass* const renderPass);
+
+	void pushCreateFuture(std::future<void>&& createFuture);
+
+	void scheduleAllTasks();
+
+	std::queue<RenderPass*> recordQueue;
+
+	std::queue<std::future<void>> createQueue;
 
 };
 

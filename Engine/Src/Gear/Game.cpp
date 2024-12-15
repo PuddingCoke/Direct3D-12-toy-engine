@@ -12,12 +12,36 @@ void Game::imGUICall()
 {
 }
 
-void Game::submitRenderPass(RenderPass* const pass)
+void Game::beginRenderPass(RenderPass* const renderPass)
 {
+	renderPass->beginRenderPass();
+
+	recordQueue.push(renderPass);
+
 	if (RenderEngine::get()->getDisplayImGuiSurface())
 	{
-		pass->imGUICall();
+		renderPass->imGUICall();
+	}
+}
+
+void Game::pushCreateFuture(std::future<void>&& future)
+{
+	createQueue.push(std::move(future));
+}
+
+void Game::scheduleAllTasks()
+{
+	while (recordQueue.size())
+	{
+		RenderEngine::get()->submitCommandList(recordQueue.front()->getRenderPassResult());
+
+		recordQueue.pop();
 	}
 
-	RenderEngine::get()->submitRecordCommandList(pass->getRenderPassResult());
+	while (createQueue.size())
+	{
+		createQueue.front().get();
+
+		createQueue.pop();
+	}
 }

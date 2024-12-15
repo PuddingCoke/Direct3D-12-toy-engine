@@ -33,9 +33,7 @@ public:
 
 	static RenderEngine* get();
 
-	void submitRecordCommandList(CommandList* const commandList);
-
-	void submitCreateCommandList(CommandList* const commandList);
+	void submitCommandList(CommandList* const commandList);
 
 	GPUVendor getVendor() const;
 
@@ -98,17 +96,8 @@ private:
 
 	ComPtr<ID3D12CommandQueue> commandQueue;
 
-	//after the completion of render pass's recordCommand method
-	//render pass's commandList will be pushed to this container
+	//we need to use this container to solve pending barriers
 	std::vector<CommandList*> recordCommandLists;
-
-	//it is potential to create render pass on the fly
-	//i want to make this asynchronously
-	//main render thread will loop through this container and solve pending barriers one by one
-	std::vector<CommandList*> createCommandLists;
-
-	//we need a mutex to protect createCommandLists container
-	std::mutex createCommandListsMutex;
 
 	ComPtr<ID3D12Fence> fence;
 
@@ -120,6 +109,8 @@ private:
 	CommandList* prepareCommandList;
 
 	Texture* backBufferResources[Graphics::FrameBufferCount];
+
+	std::mutex submitCommandListLock;
 
 	struct PerFrameResource
 	{

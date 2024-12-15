@@ -32,6 +32,10 @@ public:
 
 		envCube = resManager->createTextureCube("E:\\Assets\\SpaceShip\\360-Space-Panorama-III.hdr", 2048, true);
 
+		noiseTexture = resManager->createTextureRenderView(512, 512, RandomDataType::NOISE, true);
+
+		diskTexture = resManager->createTextureRenderView("DiskTexture.jpg", true);
+
 		effect = new BloomEffect(context, Graphics::getWidth(), Graphics::getHeight(), resManager);
 
 		effect->setExposure(1.6f);
@@ -46,6 +50,10 @@ public:
 
 		delete envCube;
 
+		delete noiseTexture;
+
+		delete diskTexture;
+
 		delete effect;
 
 		delete blackHoleAccumulateCS;
@@ -54,6 +62,10 @@ public:
 	void imGUICall() override
 	{
 		effect->imGUICall();
+
+		ImGui::Begin("Render Parameters");
+		ImGui::SliderFloat("radius", &renderParam.radius, 8.f, 12.f);
+		ImGui::End();
 	}
 
 protected:
@@ -64,9 +76,9 @@ protected:
 
 		context->setPipelineState(blackHoleAccumulateState.Get());;
 
-		context->setCSConstants({ accumulateTexture->getUAVMipIndex(0),envCube->getAllSRVIndex() }, 0);
+		context->setCSConstants({ accumulateTexture->getUAVMipIndex(0),envCube->getAllSRVIndex(),noiseTexture->getAllSRVIndex(),diskTexture->getAllSRVIndex() }, 0);
 
-		context->setCSConstants(sizeof(RenderParam) / 4, &renderParam, 2);
+		context->setCSConstants(sizeof(RenderParam) / 4, &renderParam, 4);
 
 		context->transitionResources();
 
@@ -85,6 +97,10 @@ private:
 
 	TextureRenderView* envCube;
 
+	TextureRenderView* noiseTexture;
+
+	TextureRenderView* diskTexture;
+
 	BloomEffect* effect;
 
 	ComPtr<ID3D12PipelineState> blackHoleAccumulateState;
@@ -96,7 +112,7 @@ private:
 		UINT frameIndex = 0;
 		float phi = 0.f;
 		float theta = 0.f;
-		float radius = 8.f;
+		float radius = 10.f;
 	} renderParam;
 
 };

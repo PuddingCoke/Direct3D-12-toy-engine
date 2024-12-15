@@ -695,7 +695,7 @@ private:
 	{
 		const UINT mapResolution = textureResolution;
 		float mapLength;
-		const DirectX::XMFLOAT2 wind = { 12.f * cosf(0.93 + Math::half_pi),12.f * sinf(0.93 + Math::half_pi) };
+		const DirectX::XMFLOAT2 wind = { 12.f * cosf(0.93f + Math::half_pi),12.f * sinf(0.93f + Math::half_pi) };
 		const float amplitude = 0.000002f;
 		const float gravity = 9.81f;
 		float cutoffLow;

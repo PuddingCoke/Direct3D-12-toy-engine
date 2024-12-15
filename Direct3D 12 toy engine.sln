@@ -7,8 +7,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Engine", "Engine\Engine.vcx
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SampleProject", "SampleProject\SampleProject.vcxproj", "{A13675B6-58B4-444D-877F-46BD07D9FC93}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RayTracing", "RayTracing\RayTracing.vcxproj", "{68713D02-023B-4416-9E0D-BC71BE533EC6}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FourierDrawing", "FourierDrawing\FourierDrawing.vcxproj", "{B18A355B-F353-4C89-AC23-2EFEC0C104CC}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EncodeTest", "EncodeTest\EncodeTest.vcxproj", "{B3A539E2-A69A-41B3-9D3D-BF7DF8428561}"
@@ -53,14 +51,6 @@ Global
 		{A13675B6-58B4-444D-877F-46BD07D9FC93}.Release|x64.Build.0 = Release|x64
 		{A13675B6-58B4-444D-877F-46BD07D9FC93}.Release|x86.ActiveCfg = Release|Win32
 		{A13675B6-58B4-444D-877F-46BD07D9FC93}.Release|x86.Build.0 = Release|Win32
-		{68713D02-023B-4416-9E0D-BC71BE533EC6}.Debug|x64.ActiveCfg = Debug|x64
-		{68713D02-023B-4416-9E0D-BC71BE533EC6}.Debug|x64.Build.0 = Debug|x64
-		{68713D02-023B-4416-9E0D-BC71BE533EC6}.Debug|x86.ActiveCfg = Debug|Win32
-		{68713D02-023B-4416-9E0D-BC71BE533EC6}.Debug|x86.Build.0 = Debug|Win32
-		{68713D02-023B-4416-9E0D-BC71BE533EC6}.Release|x64.ActiveCfg = Release|x64
-		{68713D02-023B-4416-9E0D-BC71BE533EC6}.Release|x64.Build.0 = Release|x64
-		{68713D02-023B-4416-9E0D-BC71BE533EC6}.Release|x86.ActiveCfg = Release|Win32
-		{68713D02-023B-4416-9E0D-BC71BE533EC6}.Release|x86.Build.0 = Release|Win32
 		{B18A355B-F353-4C89-AC23-2EFEC0C104CC}.Debug|x64.ActiveCfg = Debug|x64
 		{B18A355B-F353-4C89-AC23-2EFEC0C104CC}.Debug|x64.Build.0 = Debug|x64
 		{B18A355B-F353-4C89-AC23-2EFEC0C104CC}.Debug|x86.ActiveCfg = Debug|Win32
