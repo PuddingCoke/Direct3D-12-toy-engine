@@ -3,13 +3,24 @@
 RenderTask::RenderTask() :
 	context(new GraphicsContext()),
 	resManager(new ResourceManager(context)),
-	task(std::async(std::launch::async, [this]() {return context->getCommandList(); }))
+	taskCompleted(true),
+	isRunning(true),
+	workerThread(std::thread(&RenderTask::workerLoop, this))
 {
 	context->begin();
 }
 
 RenderTask::~RenderTask()
 {
+	isRunning = false;
+
+	beginTask();
+
+	if (workerThread.joinable())
+	{
+		workerThread.join();
+	}
+
 	if (context)
 	{
 		delete context;
@@ -21,24 +32,25 @@ RenderTask::~RenderTask()
 	}
 }
 
-void RenderTask::beginRenderTask()
+void RenderTask::beginTask()
 {
-	task = std::async(std::launch::async, [this]
-		{
-			resManager->cleanTransientResources();
+	std::lock_guard<std::mutex> lockGuard(taskMutex);
 
-			context->begin();
+	taskCompleted = false;
 
-			recordCommand();
-
-			//main render thread will solve pending barriers and close commandList
-			return context->getCommandList();
-		});
+	taskCondition.notify_one();
 }
 
-CommandList* RenderTask::getRenderTaskResult()
+void RenderTask::waitTask()
 {
-	return task.get();
+	std::unique_lock<std::mutex> lock(taskMutex);
+
+	taskCondition.wait(lock, [=]() {return taskCompleted; });
+}
+
+CommandList* RenderTask::getCommandList()
+{
+	return context->getCommandList();
 }
 
 void RenderTask::imGUICall()
@@ -61,4 +73,29 @@ void RenderTask::blit(TextureRenderView* const texture) const
 	context->transitionResources();
 
 	context->draw(3, 1, 0, 0);
+}
+
+void RenderTask::workerLoop()
+{
+	while (true)
+	{
+		std::unique_lock<std::mutex> lock(taskMutex);
+
+		taskCondition.wait(lock, [this]() {return !taskCompleted; });
+
+		if (!isRunning)
+		{
+			break;
+		}
+
+		resManager->cleanTransientResources();
+
+		context->begin();
+
+		recordCommand();
+
+		taskCompleted = true;
+
+		taskCondition.notify_one();
+	}
 }

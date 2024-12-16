@@ -14,6 +14,9 @@
 #include<Gear/Utils/Timer.h>
 
 #include<future>
+#include<thread>
+#include<condition_variable>
+#include<mutex>
 
 class RenderTask
 {
@@ -23,9 +26,11 @@ public:
 
 	virtual ~RenderTask();
 
-	void beginRenderTask();
+	void beginTask();
 
-	CommandList* getRenderTaskResult();
+	void waitTask();
+
+	CommandList* getCommandList();
 
 	virtual void imGUICall();
 
@@ -42,7 +47,17 @@ protected:
 
 private:
 
-	std::future<CommandList*> task;
+	void workerLoop();
+
+	std::thread workerThread;
+
+	bool taskCompleted;
+
+	bool isRunning;
+
+	std::mutex taskMutex;
+
+	std::condition_variable taskCondition;
 
 };
 
@@ -53,7 +68,7 @@ std::future<void> createRenderTaskAsync(const First& first, const Rest&... args)
 		{
 			*first = new RenderTaskType(args...);
 
-			RenderEngine::get()->submitCommandList((*first)->getRenderTaskResult());
+			RenderEngine::get()->submitCommandList((*first)->getCommandList());
 		});
 }
 

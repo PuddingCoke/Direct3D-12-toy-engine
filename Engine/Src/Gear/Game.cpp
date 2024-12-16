@@ -14,7 +14,7 @@ void Game::imGUICall()
 
 void Game::beginRenderTask(RenderTask* const renderTask)
 {
-	renderTask->beginRenderTask();
+	renderTask->beginTask();
 
 	recordQueue.push(renderTask);
 
@@ -33,7 +33,9 @@ void Game::scheduleAllTasks()
 {
 	while (recordQueue.size())
 	{
-		RenderEngine::get()->submitCommandList(recordQueue.front()->getRenderTaskResult());
+		recordQueue.front()->waitTask();
+
+		RenderEngine::get()->submitCommandList(recordQueue.front()->getCommandList());
 
 		recordQueue.pop();
 	}
