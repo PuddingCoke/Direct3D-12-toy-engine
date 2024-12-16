@@ -22,7 +22,10 @@
 constexpr UINT D3D12_RESOURCE_STATE_UNKNOWN = 0xFFFFFFFF;
 
 //a encompass b
-bool bitFlagSubset(const UINT a, const UINT b);
+constexpr bool bitFlagSubset(const UINT a, const UINT b)
+{
+	return b != 0 ? ((a & b) == b) : false;
+}
 
 class Buffer;
 
@@ -163,7 +166,8 @@ private:
 
 	bool stateTracking;
 
-	bool sharedResource;
+	std::shared_ptr<bool> sharedResource;
+
 };
 
 #endif // !_RESOURCE_H_
