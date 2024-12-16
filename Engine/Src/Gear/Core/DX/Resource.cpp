@@ -10,13 +10,13 @@ Resource::~Resource()
 }
 
 Resource::Resource(const ComPtr<ID3D12Resource>& resource, const bool stateTracking) :
-	resource(resource), stateTracking(stateTracking), sharedResource(false)
+	resource(resource), stateTracking(stateTracking), sharedResource(std::make_shared<bool>(false))
 {
 }
 
 Resource::Resource(const D3D12_HEAP_PROPERTIES properties, const D3D12_HEAP_FLAGS flags, const D3D12_RESOURCE_DESC desc,
 	const bool stateTracking, const D3D12_RESOURCE_STATES initialState, const D3D12_CLEAR_VALUE* clearValues) :
-	stateTracking(stateTracking), sharedResource(false)
+	stateTracking(stateTracking), sharedResource(std::make_shared<bool>(false))
 {
 	GraphicsDevice::get()->CreateCommittedResource(&properties, flags, &desc, initialState, clearValues, IID_PPV_ARGS(&resource));
 }
@@ -24,9 +24,9 @@ Resource::Resource(const D3D12_HEAP_PROPERTIES properties, const D3D12_HEAP_FLAG
 Resource::Resource(Resource& res) :
 	resource(res.resource),
 	stateTracking(res.stateTracking),
-	sharedResource(true)
+	sharedResource(res.sharedResource)
 {
-	res.sharedResource = true;
+	*(res.sharedResource) = true;
 }
 
 D3D12_GPU_VIRTUAL_ADDRESS Resource::getGPUAddress() const
@@ -46,15 +46,10 @@ bool Resource::getStateTracking() const
 
 bool Resource::isSharedResource() const
 {
-	return sharedResource;
+	return *sharedResource;
 }
 
 void Resource::setName(LPCWSTR const name)
 {
 	resource->SetName(name);
-}
-
-bool bitFlagSubset(const UINT a, const UINT b)
-{
-	return b != 0 ? ((a & b) == b) : false;
 }

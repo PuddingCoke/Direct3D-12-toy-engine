@@ -45,7 +45,7 @@ void RenderTask::waitTask()
 {
 	std::unique_lock<std::mutex> lock(taskMutex);
 
-	taskCondition.wait(lock, [=]() {return taskCompleted; });
+	taskCondition.wait(lock, [this]() {return taskCompleted; });
 }
 
 CommandList* RenderTask::getCommandList()
