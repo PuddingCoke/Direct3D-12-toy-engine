@@ -113,7 +113,7 @@ NvidiaEncoder::~NvidiaEncoder()
 
 bool NvidiaEncoder::encode(Texture* const inputTexture)
 {
-	timeStart = timer.now();
+	timeStart = std::chrono::steady_clock::now();
 
 	NV_ENC_REGISTER_RESOURCE registerInputResource = { NV_ENC_REGISTER_RESOURCE_VER };
 	registerInputResource.bufferFormat = bufferFormat;
@@ -234,9 +234,9 @@ bool NvidiaEncoder::encode(Texture* const inputTexture)
 
 	displayProgress();
 
-	timeEnd = timer.now();
+	timeEnd = std::chrono::steady_clock::now();
 
-	const float frameTime = std::chrono::duration_cast<std::chrono::milliseconds>(timeEnd - timeStart).count() / 1000.f;
+	const float frameTime = std::chrono::duration<float>(timeEnd - timeStart).count();
 
 	encodeTime += frameTime;
 
