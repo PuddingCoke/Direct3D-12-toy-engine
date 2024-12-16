@@ -40,6 +40,13 @@ __debugbreak();\
 //3.register output resource
 //4.map output resource
 //5.encode picture
+//6.lock bitstream
+//7.get bitstream ptr
+//8.unlock bitstream
+//9.unmap input resource
+//10.unregister input resource
+//11.unmap output resource
+//12.unregister output resource
 
 class NvidiaEncoder :public Encoder
 {

@@ -40,8 +40,6 @@ protected:
 
 	bool encoding;
 
-	std::chrono::steady_clock timer;
-
 	std::chrono::steady_clock::time_point timeStart;
 
 	std::chrono::steady_clock::time_point timeEnd;
