@@ -116,7 +116,7 @@ void main(uint2 DTid : SV_DispatchThreadID)
             result += radiance * saturate(dot(dir, randDir));
         }
         
-        result = 1.0989 * PI * result / (1.0 + float(SAMPLECOUNT));
+        result = 1.0989 * 2.0 * PI * result / (1.0 + float(SAMPLECOUNT));
         
         irradianceOctahedralMap[uint3(DTid, probeIndex)] = result;
     }

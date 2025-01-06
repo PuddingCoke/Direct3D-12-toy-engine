@@ -40,13 +40,13 @@ float2 VelocityAt(const uint2 loc)
     
     const float C = vorticityTex[loc];
     
-    float2 force = 0.5 * float2(abs(B) - abs(T), abs(R) - abs(L));
+    float2 acc = 0.5 * float2(abs(B) - abs(T), abs(R) - abs(L));
     
-    force = force / (length(force) + 1e-5) * vorticityIntensity * C;
+    acc = acc / (length(acc) + 1e-5) * vorticityIntensity * C;
     
     const float2 curVelocity = velocityReadTex[loc];
     
-    return curVelocity + force * perframeResource.deltaTime;
+    return curVelocity + acc * perframeResource.deltaTime;
 }
 
 [numthreads(16, 9, 1)]

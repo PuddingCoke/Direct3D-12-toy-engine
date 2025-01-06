@@ -18,11 +18,12 @@ extern "C"
 
 #define NVENCCALL(func) \
 {\
-NVENCSTATUS status=func;\
-if(status!=NV_ENC_SUCCESS)\
+const NVENCSTATUS status = func;\
+if(status != NV_ENC_SUCCESS)\
 {\
 std::cout<<"error occured at function "<<#func<<"\n";\
 const char* error = nvencAPI.nvEncGetLastErrorString(encoder);\
+std::cout << "status " << status << "\n";\
 std::cout << error << "\n";\
 __debugbreak();\
 }\
@@ -68,11 +69,11 @@ private:
 
 	static constexpr NV_ENC_TUNING_INFO tuningInfo = NV_ENC_TUNING_INFO_HIGH_QUALITY;
 
-	const GUID codec = NV_ENC_CODEC_HEVC_GUID;
+	const GUID codec = NV_ENC_CODEC_H264_GUID;
 
 	const GUID preset = NV_ENC_PRESET_P7_GUID;
 
-	const GUID profile = NV_ENC_HEVC_PROFILE_MAIN_GUID;
+	const GUID profile = NV_ENC_H264_PROFILE_HIGH_GUID;
 
 	HMODULE moduleNvEncAPI;
 

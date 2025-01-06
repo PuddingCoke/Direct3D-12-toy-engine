@@ -23,7 +23,7 @@ public:
 	static constexpr UINT numRegion = 3;
 
 	//define number of each region's subregion
-	static constexpr UINT numSubRegion[numRegion] = { 1024,1024,1024 };
+	static constexpr UINT numSubRegion[numRegion] = { 1024,512,512 };
 
 	struct AvailableDescriptor
 	{
