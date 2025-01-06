@@ -113,6 +113,8 @@ float4 main(PixelInput input) : SV_TARGET
     
     skyLight = pow(skyLight, 1.0 / gamma);
     
+    //author:https://github.com/asylum2010
+    //
     const float rho = 0.3;
     const float ax = 0.2;
     const float ay = 0.1;
@@ -127,6 +129,7 @@ float4 main(PixelInput input) : SV_TARGET
     float hdotn = dot(h, N);
 
     float spec = mult * exp(-((hdotx * hdotx) + (hdoty * hdoty)) / (hdotn * hdotn));
+    //
     
     float3 sunLight = spec * sunColor * sunStrength;
     

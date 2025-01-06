@@ -1,3 +1,5 @@
+//author:https://github.com/asylum2010
+
 #include"Predefine.hlsli"
 
 #define TWO_PI 6.283185307179586476925286766559
