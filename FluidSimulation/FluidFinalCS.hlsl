@@ -28,6 +28,8 @@ void main(const uint2 DTid : SV_DispatchThreadID)
 {
     if (DTid.x > 0 && DTid.x < colorTextureSize.x - 1 && DTid.y > 0 && DTid.y < colorTextureSize.y - 1)
     {
+        //author:https://github.com/PavelDoGreat
+        //
         float3 color = colorTex[DTid].rgb;
     
         const float3 R = colorTex[DTid + uint2(1, 0)].rgb;
@@ -49,7 +51,8 @@ void main(const uint2 DTid : SV_DispatchThreadID)
         const float diffuse = clamp(dot(normal, light) + 0.7, 0.7, 1.0);
     
         color *= diffuse;
-    
+        //
+        
         originTex[DTid] = float4(color, 1.0);
     }
     else
