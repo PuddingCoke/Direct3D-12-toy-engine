@@ -138,5 +138,5 @@ float3 GetIndirectDiffuse(in float3 P, in float3 N, in ConstantBuffer<Irradiance
         sumIrradiance += weight * GetIrradiance(N, probeIndex, irradianceOctahedralMap, samplerState);
     }
     
-    return 0.5 * 3.1415926535 * 1.0989 * sumIrradiance / sumWeight;
+    return sumIrradiance / sumWeight;
 }

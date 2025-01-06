@@ -38,12 +38,10 @@ NvidiaEncoder::NvidiaEncoder(const UINT frameToEncode) :
 	//high quality encode
 	config.gopLength = 120;
 	config.frameIntervalP = 1;
-	config.encodeCodecConfig.hevcConfig.idrPeriod = config.gopLength;
-
+	config.rcParams.enableLookahead = 0;
 	config.rcParams.rateControlMode = NV_ENC_PARAMS_RC_VBR;
 	config.rcParams.averageBitRate = 12000000U;
 	config.rcParams.maxBitRate = 14000000U;
-	config.rcParams.multiPass = NV_ENC_TWO_PASS_FULL_RESOLUTION;
 	config.rcParams.vbvBufferSize = config.rcParams.maxBitRate * 4;
 	config.rcParams.vbvInitialDelay = 0;
 	config.rcParams.enableAQ = 1;
@@ -84,7 +82,7 @@ NvidiaEncoder::NvidiaEncoder(const UINT frameToEncode) :
 	outStream->id = 0;
 
 	AVCodecParameters* vpar = outStream->codecpar;
-	vpar->codec_id = AV_CODEC_ID_HEVC;
+	vpar->codec_id = AV_CODEC_ID_H264;
 	vpar->codec_type = AVMEDIA_TYPE_VIDEO;
 	vpar->width = Graphics::getWidth();
 	vpar->height = Graphics::getHeight();
@@ -204,15 +202,23 @@ bool NvidiaEncoder::encode(Texture* const inputTexture)
 
 		NVENCCALL(nvencAPI.nvEncLockBitstream(encoder, &lockBitstream));
 
+		uint8_t* const bitstreamPtr = (uint8_t*)lockBitstream.bitstreamBufferPtr;
+
+		const int bitstreamSize = lockBitstream.bitstreamSizeInBytes;
+
 		pkt->pts = av_rescale_q(frameEncoded, AVRational{ 1,(int)frameRate }, outStream->time_base);
 		pkt->dts = pkt->pts;
 		pkt->stream_index = outStream->index;
-		pkt->data = (uint8_t*)lockBitstream.bitstreamBufferPtr;
-		pkt->size = lockBitstream.bitstreamSizeInBytes;
+		pkt->data = bitstreamPtr;
+		pkt->size = bitstreamSize;
 
-		if (!memcmp(lockBitstream.bitstreamBufferPtr, "\x00\x00\x00\x01\x67", 5))
+		if (!memcmp(bitstreamPtr, "\x00\x00\x00\x01", 4) && ((bitstreamPtr[4] & 31) == 5))
 		{
-			pkt->flags |= AV_PKT_FLAG_KEY;
+			pkt->flags = AV_PKT_FLAG_KEY;
+		}
+		else
+		{
+			pkt->flags = 0;
 		}
 
 		av_write_frame(outCtx, pkt);
