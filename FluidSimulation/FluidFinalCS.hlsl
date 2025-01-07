@@ -41,17 +41,17 @@ void main(const uint2 DTid : SV_DispatchThreadID)
 
         const float3 bottom = colorTex[DTid - uint2(0, 1)].rgb;
 
-        float leftHeight = dot(left.rgb, float3(0.299, 0.587, 0.114));
+        const float leftHeight = dot(left, float3(0.299, 0.587, 0.114));
 
-        float rightHeight = dot(right.rgb, float3(0.299, 0.587, 0.114));
+        const float rightHeight = dot(right, float3(0.299, 0.587, 0.114));
 
-        float topHeight = dot(top.rgb, float3(0.299, 0.587, 0.114));
+        const float topHeight = dot(top, float3(0.299, 0.587, 0.114));
 
-        float bottomHeight = dot(bottom.rgb, float3(0.299, 0.587, 0.114));
+        const float bottomHeight = dot(bottom, float3(0.299, 0.587, 0.114));
    
-        float dx = (rightHeight - leftHeight) * 0.5;
+        const float dx = (rightHeight - leftHeight) * 0.5;
 
-        float dy = (topHeight - bottomHeight) * 0.5;
+        const float dy = (topHeight - bottomHeight) * 0.5;
 
         const float3 normal = normalize(float3(-dx, -dy, bumpScale));
     
@@ -60,7 +60,7 @@ void main(const uint2 DTid : SV_DispatchThreadID)
         const float3 ambient = kA * center;
 
         const float3 diffuse = kD * center * saturate(dot(normal, light));
-
+        
         const float3 color = ambient + diffuse;
 
         originTex[DTid] = float4(color, 1.0);
