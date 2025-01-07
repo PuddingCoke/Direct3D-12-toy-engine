@@ -310,13 +310,21 @@ public:
 
 		context->setGlobalConstantBuffer(simulationParamBuffer);
 
-		splatVelocityAndColor();
+		if (Keyboard::onKeyDown(Keyboard::L))
+		{
+			logicRunning = !logicRunning;
+		}
 
-		vorticityConfinement();
+		if (logicRunning)
+		{
+			splatVelocityAndColor();
 
-		project();
+			vorticityConfinement();
 
-		advect();
+			project();
+
+			advect();
+		}
 
 		context->setTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		context->setPipelineState(fluidFinalState.Get());
@@ -401,6 +409,8 @@ private:
 		float padding0;
 		DirectX::XMFLOAT4 padding1[10];
 	} simulationParam;
+
+	bool logicRunning = true;
 
 	bool diffuseShading = true;
 
