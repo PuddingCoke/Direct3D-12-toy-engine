@@ -4,7 +4,7 @@
 
 int main(int argc, const char* argv[])
 {
-	Configuration config(1920, 1080, L"Fluid Simulation", Configuration::EngineUsage::NORMAL, false);
+	Configuration config(1920, 1080, L"Fluid Simulation", Configuration::EngineUsage::NORMAL, true);
 
 	Gear::initialize();
 

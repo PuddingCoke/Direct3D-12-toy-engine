@@ -11,6 +11,9 @@ cbuffer SimulationParam : register(b1)
     float velocityDissipationSpeed;
     float vorticityIntensity;
     float splatRadius;
+    float kA;
+    float kD;
+    float bumpScale;
 }
 
 cbuffer TextureIndices : register(b2)
@@ -28,31 +31,38 @@ void main(const uint2 DTid : SV_DispatchThreadID)
 {
     if (DTid.x > 0 && DTid.x < colorTextureSize.x - 1 && DTid.y > 0 && DTid.y < colorTextureSize.y - 1)
     {
-        //author:https://github.com/PavelDoGreat
-        //
-        float3 color = colorTex[DTid].rgb;
+        const float3 center = colorTex[DTid].rgb;
     
-        const float3 R = colorTex[DTid + uint2(1, 0)].rgb;
-                                                                                       
-        const float3 L = colorTex[DTid - uint2(1, 0)].rgb;
-                                                                                       
-        const float3 T = colorTex[DTid + uint2(0, 1)].rgb;
-                                                                                       
-        const float3 B = colorTex[DTid - uint2(0, 1)].rgb;
-    
-        const float dx = length(R) - length(L);
+        const float3 right = colorTex[DTid + uint2(1, 0)].rgb;
 
-        const float dy = length(T) - length(B);
-    
-        const float3 normal = normalize(float3(dx, dy, length(colorTexelSize)));
+        const float3 left = colorTex[DTid - uint2(1, 0)].rgb;
+
+        const float3 top = colorTex[DTid + uint2(0, 1)].rgb;
+
+        const float3 bottom = colorTex[DTid - uint2(0, 1)].rgb;
+
+        float leftHeight = dot(left.rgb, float3(0.299, 0.587, 0.114));
+
+        float rightHeight = dot(right.rgb, float3(0.299, 0.587, 0.114));
+
+        float topHeight = dot(top.rgb, float3(0.299, 0.587, 0.114));
+
+        float bottomHeight = dot(bottom.rgb, float3(0.299, 0.587, 0.114));
+   
+        float dx = (rightHeight - leftHeight) * 0.5;
+
+        float dy = (topHeight - bottomHeight) * 0.5;
+
+        const float3 normal = normalize(float3(-dx, -dy, bumpScale));
     
         const float3 light = float3(0.0, 0.0, 1.0);
     
-        const float diffuse = clamp(dot(normal, light) + 0.7, 0.7, 1.0);
-    
-        color *= diffuse;
-        //
-        
+        const float3 ambient = kA * center;
+
+        const float3 diffuse = kD * center * saturate(dot(normal, light));
+
+        const float3 color = ambient + diffuse;
+
         originTex[DTid] = float4(color, 1.0);
     }
     else
