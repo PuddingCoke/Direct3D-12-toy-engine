@@ -80,7 +80,7 @@ public:
 
 		simulationParam.vorticityIntensity = config.vorticityIntensity;
 
-		simulationParam.splatRadius = config.splatRadius / 100.f * Graphics::getAspectRatio();
+		simulationParam.splatRadius = config.splatRadius / 55.f;
 
 		PipelineState::createComputeState(&splatVelocityState, splatVelocityCS);
 
@@ -139,6 +139,17 @@ public:
 		delete velocityBoundaryCS;
 		delete pressureBoundaryCS;
 		delete fluidFinalCS;
+	}
+
+	void imGUICall() override
+	{
+		ImGui::Begin("Parameters");
+		ImGui::SliderFloat("kA", &simulationParam.kA, 0.f, 1.f);
+		ImGui::SliderFloat("kD", &simulationParam.kD, 0.f, 1.f);
+		ImGui::SliderFloat("bumpScale", &config.bumpScale, 100.f, 500.f);
+		ImGui::End();
+
+		effect->imGUICall();
 	}
 
 	void splatVelocityAndColor()
@@ -293,6 +304,8 @@ public:
 			simulationParam.splatColor = { c.r,c.g,c.b,1.f };
 		}
 
+		simulationParam.bumpScale = 1.f / config.bumpScale;
+
 		simulationParamBuffer->update(&simulationParam, sizeof(SimulationParam));
 
 		context->setGlobalConstantBuffer(simulationParamBuffer);
@@ -312,7 +325,30 @@ public:
 		context->dispatch(originTexture->getTexture()->getWidth() / 16, originTexture->getTexture()->getHeight() / 9, 1);
 		context->uavBarrier({ originTexture->getTexture() });
 
-		TextureRenderView* const outputTexture = effect->process(originTexture);
+		if (Keyboard::onKeyDown(Keyboard::K))
+		{
+			diffuseShading = !diffuseShading;
+
+			if (diffuseShading)
+			{
+				std::cout << "enable diffuse shading\n";
+			}
+			else
+			{
+				std::cout << "disable diffuse shading\n";
+			}
+		}
+
+		TextureRenderView* outputTexture = nullptr;
+
+		if (diffuseShading)
+		{
+			outputTexture = effect->process(originTexture);
+		}
+		else
+		{
+			outputTexture = effect->process(colorTex->read());
+		}
 
 		blit(outputTexture);
 	}
@@ -343,6 +379,7 @@ private:
 		float splatForce = 6000.f;//施加速度的强度
 		const unsigned int pressureIteraion = 35;//雅可比迭代次数 这个值越高物理模拟越不容易出错 NVIDIA的文章有提到通常20-50次就够了
 		const unsigned int resolutionFactor = 2;//物理模拟分辨率
+		float bumpScale = 300.f;
 	}config;
 
 	struct SimulationParam
@@ -358,8 +395,14 @@ private:
 		float velocityDissipationSpeed;
 		float vorticityIntensity;
 		float splatRadius;
-		DirectX::XMFLOAT4 padding[11];
+		float kA = 0.5;
+		float kD = 0.5;
+		float bumpScale;
+		float padding0;
+		DirectX::XMFLOAT4 padding1[10];
 	} simulationParam;
+
+	bool diffuseShading = true;
 
 	ConstantBuffer* simulationParamBuffer;
 

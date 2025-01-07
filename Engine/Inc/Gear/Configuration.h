@@ -23,6 +23,7 @@ public:
 
 	const bool enableImGuiSurface;
 
+	//disable imgui before using nsight otherwise program will crash somehow
 	Configuration(const unsigned int width, const unsigned int height, const std::wstring& title, const EngineUsage usage = EngineUsage::NORMAL, const bool enableImGuiSurface = true);
 
 };
