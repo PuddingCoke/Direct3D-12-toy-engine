@@ -14,17 +14,18 @@ cbuffer SimulationParam : register(b1)
     float kA;
     float kD;
     float bumpScale;
+    float edgeMagnitudeScale;
 }
 
 cbuffer TextureIndices : register(b2)
 {
     uint colorTexIndex;
-    uint originTexIndex;
+    uint edgeHighlightTexIndex;
 }
 
 static Texture2D<float4> colorTex = ResourceDescriptorHeap[colorTexIndex];
 
-static RWTexture2D<float4> originTex = ResourceDescriptorHeap[originTexIndex];
+static RWTexture2D<float4> edgeHighlightTex = ResourceDescriptorHeap[edgeHighlightTexIndex];
 
 [numthreads(16, 9, 1)]
 void main(const uint2 DTid : SV_DispatchThreadID)
@@ -41,32 +42,26 @@ void main(const uint2 DTid : SV_DispatchThreadID)
 
         const float3 bottom = colorTex[DTid - uint2(0, 1)].rgb;
 
-        const float leftHeight = dot(left, float3(0.299, 0.587, 0.114));
+        const float leftLuma = dot(left, float3(0.299, 0.587, 0.114));
 
-        const float rightHeight = dot(right, float3(0.299, 0.587, 0.114));
+        const float rightLuma = dot(right, float3(0.299, 0.587, 0.114));
 
-        const float topHeight = dot(top, float3(0.299, 0.587, 0.114));
+        const float topLuma = dot(top, float3(0.299, 0.587, 0.114));
 
-        const float bottomHeight = dot(bottom, float3(0.299, 0.587, 0.114));
+        const float bottomLuma = dot(bottom, float3(0.299, 0.587, 0.114));
    
-        const float dx = (rightHeight - leftHeight) * 0.5;
+        const float dx = (rightLuma - leftLuma) * 0.5;
 
-        const float dy = (topHeight - bottomHeight) * 0.5;
+        const float dy = (topLuma - bottomLuma) * 0.5;
 
-        const float3 normal = normalize(float3(-dx, -dy, bumpScale));
-    
-        const float3 light = float3(0.0, 0.0, 1.0);
-    
-        const float3 ambient = kA * center;
+        const float edgeMagnitude = length(float2(dx, dy)) * edgeMagnitudeScale;
 
-        const float3 diffuse = kD * center * saturate(dot(normal, light));
+        const float3 color = center * (1.0 + edgeMagnitude);
         
-        const float3 color = ambient + diffuse;
-
-        originTex[DTid] = float4(color, 1.0);
+        edgeHighlightTex[DTid] = float4(color, 1.0);
     }
     else
     {
-        originTex[DTid] = float4(0.0, 0.0, 0.0, 1.0);
+        edgeHighlightTex[DTid] = float4(0.0, 0.0, 0.0, 1.0);
     }
 }

@@ -67,7 +67,7 @@
     <FxCompile Include="VelocityBoundaryCS.hlsl">
       <Filter>HLSL\SimTexture</Filter>
     </FxCompile>
-    <FxCompile Include="FluidFinalCS.hlsl">
+    <FxCompile Include="DiffuseShadeCS.hlsl">
       <Filter>HLSL\ColorTexture</Filter>
     </FxCompile>
     <FxCompile Include="VorticityCS.hlsl">
@@ -76,6 +76,7 @@
     <FxCompile Include="VorticityConfinementCS.hlsl">
       <Filter>HLSL\SimTexture</Filter>
     </FxCompile>
+    <FxCompile Include="EdgeHighlightCS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Utility.hlsli">

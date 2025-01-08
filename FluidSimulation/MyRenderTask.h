@@ -26,7 +26,8 @@ public:
 		colorAdvectionCS(new Shader(Utils::getRootFolder() + "ColorAdvectionCS.cso")),
 		velocityBoundaryCS(new Shader(Utils::getRootFolder() + "VelocityBoundaryCS.cso")),
 		pressureBoundaryCS(new Shader(Utils::getRootFolder() + "PressureBoundaryCS.cso")),
-		fluidFinalCS(new Shader(Utils::getRootFolder() + "FluidFinalCS.cso"))
+		diffuseShadeCS(new Shader(Utils::getRootFolder() + "DiffuseShadeCS.cso")),
+		edgeHighlightCS(new Shader(Utils::getRootFolder() + "EdgeHighlightCS.cso"))
 	{
 		const DirectX::XMUINT2 simRes = { Graphics::getWidth() / config.resolutionFactor,Graphics::getHeight() / config.resolutionFactor };
 
@@ -61,8 +62,11 @@ public:
 
 		vorticityTex->getTexture()->getResource()->SetName(L"Vorticity Texture");
 
-		originTexture = ResourceManager::createTextureRenderView(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R16G16B16A16_FLOAT, 1, 1, false, true,
+		diffuseShadeTexture = ResourceManager::createTextureRenderView(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R16G16B16A16_FLOAT, 1, 1, false, true,
 			DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_UNKNOWN);
+
+		edgeHighlightTexture = ResourceManager::createTextureRenderView(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R8G8B8A8_UNORM, 1, 1, false, true,
+			DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_UNKNOWN);
 
 		simulationParamBuffer = ResourceManager::createConstantBuffer(sizeof(SimulationParam), true);
 
@@ -106,7 +110,9 @@ public:
 
 		PipelineState::createComputeState(&pressureBoundaryState, pressureBoundaryCS);
 
-		PipelineState::createComputeState(&fluidFinalState, fluidFinalCS);
+		PipelineState::createComputeState(&diffuseShadeState, diffuseShadeCS);
+
+		PipelineState::createComputeState(&edgeHighlightState, edgeHighlightCS);
 
 		effect = new BloomEffect(context, Graphics::getWidth(), Graphics::getHeight(), resManager);
 
@@ -130,6 +136,20 @@ public:
 			{
 				config.logicRunning = !config.logicRunning;
 			});
+
+		iDownEventID = Keyboard::addKeyDownEvent(Keyboard::I, [this]()
+			{
+				config.edgeHighlight = !config.edgeHighlight;
+
+				if (config.edgeHighlight)
+				{
+					std::cout << "enable edge highlight\n";
+				}
+				else
+				{
+					std::cout << "disable edge highlight\n";
+				}
+			});
 	}
 
 	~MyRenderTask()
@@ -138,6 +158,8 @@ public:
 
 		Keyboard::removeKeyDownEvent(Keyboard::L, lDownEventID);
 
+		Keyboard::removeKeyDownEvent(Keyboard::I, iDownEventID);
+
 		delete effect;
 
 		delete colorTex;
@@ -145,7 +167,9 @@ public:
 		delete vorticityTex;
 		delete divergenceTex;
 		delete pressureTex;
-		delete originTexture;
+
+		delete diffuseShadeTexture;
+		delete edgeHighlightTexture;
 
 		delete simulationParamBuffer;
 
@@ -161,7 +185,8 @@ public:
 		delete colorAdvectionCS;
 		delete velocityBoundaryCS;
 		delete pressureBoundaryCS;
-		delete fluidFinalCS;
+		delete diffuseShadeCS;
+		delete edgeHighlightCS;
 	}
 
 	void imGUICall() override
@@ -170,6 +195,7 @@ public:
 		ImGui::SliderFloat("kA", &simulationParam.kA, 0.f, 2.f);
 		ImGui::SliderFloat("kD", &simulationParam.kD, 0.f, 2.f);
 		ImGui::SliderFloat("bumpScale", &config.bumpScale, 100.f, 500.f);
+		ImGui::SliderFloat("edgeMagnitudeScale", &simulationParam.edgeMagnitudeScale, 0.f, 6.f);
 		ImGui::End();
 
 		effect->imGUICall();
@@ -344,25 +370,37 @@ public:
 			advect();
 		}
 
-		context->setTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		context->setPipelineState(fluidFinalState.Get());
-		context->setCSConstants({ colorTex->read()->getAllSRVIndex(),originTexture->getUAVMipIndex(0) }, 0);
-		context->transitionResources();
-		context->dispatch(originTexture->getTexture()->getWidth() / 16, originTexture->getTexture()->getHeight() / 9, 1);
-		context->uavBarrier({ originTexture->getTexture() });
-
 		TextureRenderView* outputTexture = nullptr;
 
 		if (config.diffuseShading)
 		{
-			outputTexture = effect->process(originTexture);
+			context->setPipelineState(diffuseShadeState.Get());
+			context->setCSConstants({ colorTex->read()->getAllSRVIndex(),diffuseShadeTexture->getUAVMipIndex(0) }, 0);
+			context->transitionResources();
+			context->dispatch(diffuseShadeTexture->getTexture()->getWidth() / 16, diffuseShadeTexture->getTexture()->getHeight() / 9, 1);
+			context->uavBarrier({ diffuseShadeTexture->getTexture() });
+
+			outputTexture = effect->process(diffuseShadeTexture);
 		}
 		else
 		{
 			outputTexture = effect->process(colorTex->read());
 		}
 
-		blit(outputTexture);
+		if (config.edgeHighlight)
+		{
+			context->setPipelineState(edgeHighlightState.Get());
+			context->setCSConstants({ outputTexture->getAllSRVIndex(),edgeHighlightTexture->getUAVMipIndex(0) }, 0);
+			context->transitionResources();
+			context->dispatch(edgeHighlightTexture->getTexture()->getWidth() / 16, edgeHighlightTexture->getTexture()->getHeight() / 9, 1);
+			context->uavBarrier({ edgeHighlightTexture->getTexture() });
+
+			blit(edgeHighlightTexture);
+		}
+		else
+		{
+			blit(outputTexture);
+		}
 	}
 
 private:
@@ -379,7 +417,9 @@ private:
 
 	SwapTexture* pressureTex;
 
-	TextureRenderView* originTexture;
+	TextureRenderView* diffuseShadeTexture;
+
+	TextureRenderView* edgeHighlightTexture;
 
 	struct Configuration
 	{
@@ -394,6 +434,7 @@ private:
 		float bumpScale = 300.f;
 		bool logicRunning = true;
 		bool diffuseShading = true;
+		bool edgeHighlight = true;
 	}config;
 
 	struct SimulationParam
@@ -409,16 +450,18 @@ private:
 		float velocityDissipationSpeed;
 		float vorticityIntensity;
 		float splatRadius;
-		float kA = 0.6;
-		float kD = 0.4;
+		float kA = 0.6f;
+		float kD = 0.4f;
 		float bumpScale;
-		float padding0;
+		float edgeMagnitudeScale = 2.f;
 		DirectX::XMFLOAT4 padding1[10];
 	} simulationParam;
 
 	int kDownEventID;
 
 	int lDownEventID;
+
+	int iDownEventID;
 
 	ConstantBuffer* simulationParamBuffer;
 
@@ -472,7 +515,12 @@ private:
 
 	ComPtr<ID3D12PipelineState> pressureBoundaryState;
 
-	Shader* fluidFinalCS;
+	Shader* diffuseShadeCS;
 
-	ComPtr<ID3D12PipelineState> fluidFinalState;
+	ComPtr<ID3D12PipelineState> diffuseShadeState;
+
+	Shader* edgeHighlightCS;
+
+	ComPtr<ID3D12PipelineState> edgeHighlightState;
+
 };
