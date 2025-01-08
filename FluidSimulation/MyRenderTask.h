@@ -111,10 +111,33 @@ public:
 		effect = new BloomEffect(context, Graphics::getWidth(), Graphics::getHeight(), resManager);
 
 		effect->setThreshold(0.f);
+
+		kDownEventID = Keyboard::addKeyDownEvent(Keyboard::K, [this]()
+			{
+				config.diffuseShading = !config.diffuseShading;
+
+				if (config.diffuseShading)
+				{
+					std::cout << "enable diffuse shading\n";
+				}
+				else
+				{
+					std::cout << "disable diffuse shading\n";
+				}
+			});
+
+		lDownEventID = Keyboard::addKeyDownEvent(Keyboard::L, [this]()
+			{
+				config.logicRunning = !config.logicRunning;
+			});
 	}
 
 	~MyRenderTask()
 	{
+		Keyboard::removeKeyDownEvent(Keyboard::K, kDownEventID);
+
+		Keyboard::removeKeyDownEvent(Keyboard::L, lDownEventID);
+
 		delete effect;
 
 		delete colorTex;
@@ -310,12 +333,7 @@ public:
 
 		context->setGlobalConstantBuffer(simulationParamBuffer);
 
-		if (Keyboard::onKeyDown(Keyboard::L))
-		{
-			logicRunning = !logicRunning;
-		}
-
-		if (logicRunning)
+		if (config.logicRunning)
 		{
 			splatVelocityAndColor();
 
@@ -333,23 +351,9 @@ public:
 		context->dispatch(originTexture->getTexture()->getWidth() / 16, originTexture->getTexture()->getHeight() / 9, 1);
 		context->uavBarrier({ originTexture->getTexture() });
 
-		if (Keyboard::onKeyDown(Keyboard::K))
-		{
-			diffuseShading = !diffuseShading;
-
-			if (diffuseShading)
-			{
-				std::cout << "enable diffuse shading\n";
-			}
-			else
-			{
-				std::cout << "disable diffuse shading\n";
-			}
-		}
-
 		TextureRenderView* outputTexture = nullptr;
 
-		if (diffuseShading)
+		if (config.diffuseShading)
 		{
 			outputTexture = effect->process(originTexture);
 		}
@@ -388,6 +392,8 @@ private:
 		const unsigned int pressureIteraion = 35;//雅可比迭代次数 这个值越高物理模拟越不容易出错 NVIDIA的文章有提到通常20-50次就够了
 		const unsigned int resolutionFactor = 2;//物理模拟分辨率
 		float bumpScale = 300.f;
+		bool logicRunning = true;
+		bool diffuseShading = true;
 	}config;
 
 	struct SimulationParam
@@ -403,16 +409,16 @@ private:
 		float velocityDissipationSpeed;
 		float vorticityIntensity;
 		float splatRadius;
-		float kA = 0.5;
-		float kD = 0.5;
+		float kA = 0.6;
+		float kD = 0.4;
 		float bumpScale;
 		float padding0;
 		DirectX::XMFLOAT4 padding1[10];
 	} simulationParam;
 
-	bool logicRunning = true;
+	int kDownEventID;
 
-	bool diffuseShading = true;
+	int lDownEventID;
 
 	ConstantBuffer* simulationParamBuffer;
 
