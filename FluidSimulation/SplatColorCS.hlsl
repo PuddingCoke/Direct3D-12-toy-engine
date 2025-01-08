@@ -32,7 +32,7 @@ float3 ColorAt(const uint2 loc)
     
     relativePos -= pos;
     
-    const float3 color = exp(-dot(relativePos, relativePos) / (splatRadius * colorTextureSize.y * colorTextureSize.y)) * splatColor.rgb * 0.15;
+    const float3 color = exp(-dot(relativePos, relativePos) / (splatRadius * float(colorTextureSize.y) * float(colorTextureSize.y))) * splatColor.rgb * 0.15;
         
     const float3 curColor = colorReadTex[loc].rgb;
     
