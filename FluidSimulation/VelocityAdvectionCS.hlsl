@@ -33,9 +33,9 @@ float2 VelocityAt(const uint2 loc)
 
     const float2 velocity = velocityReadTex.SampleLevel(linearClampSampler, texCoord, 0.0);
     
-    const float decay = 1.0 + velocityDissipationSpeed * perframeResource.deltaTime;
+    const float dissipation = 1.0 + velocityDissipationSpeed * perframeResource.deltaTime;
     
-    return velocity / decay;
+    return velocity / dissipation;
 }
 
 [numthreads(16, 9, 1)]

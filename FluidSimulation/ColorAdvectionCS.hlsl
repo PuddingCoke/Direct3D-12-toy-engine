@@ -36,9 +36,9 @@ float3 ColorAt(const uint2 loc)
     
     const float3 color = colorReadTex.SampleLevel(linearClampSampler, texCoord, 0.0).rgb;
     
-    const float decay = 1.0 + colorDissipationSpeed * perframeResource.deltaTime;
+    const float dissipation = 1.0 + colorDissipationSpeed * perframeResource.deltaTime;
     
-    return color / decay;
+    return color / dissipation;
 }
 
 [numthreads(16, 9, 1)]
