@@ -26,7 +26,7 @@ public:
 		colorAdvectionCS(new Shader(Utils::getRootFolder() + "ColorAdvectionCS.cso")),
 		velocityBoundaryCS(new Shader(Utils::getRootFolder() + "VelocityBoundaryCS.cso")),
 		pressureBoundaryCS(new Shader(Utils::getRootFolder() + "PressureBoundaryCS.cso")),
-		diffuseShadeCS(new Shader(Utils::getRootFolder() + "DiffuseShadeCS.cso")),
+		phongShadeCS(new Shader(Utils::getRootFolder() + "PhongShadeCS.cso")),
 		edgeHighlightCS(new Shader(Utils::getRootFolder() + "EdgeHighlightCS.cso"))
 	{
 		const DirectX::XMUINT2 simRes = { Graphics::getWidth() / config.resolutionFactor,Graphics::getHeight() / config.resolutionFactor };
@@ -62,7 +62,7 @@ public:
 
 		vorticityTex->getTexture()->getResource()->SetName(L"Vorticity Texture");
 
-		diffuseShadeTexture = ResourceManager::createTextureRenderView(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R16G16B16A16_FLOAT, 1, 1, false, true,
+		phongShadeTexture = ResourceManager::createTextureRenderView(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R16G16B16A16_FLOAT, 1, 1, false, true,
 			DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_UNKNOWN);
 
 		edgeHighlightTexture = ResourceManager::createTextureRenderView(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R8G8B8A8_UNORM, 1, 1, false, true,
@@ -110,7 +110,7 @@ public:
 
 		PipelineState::createComputeState(&pressureBoundaryState, pressureBoundaryCS);
 
-		PipelineState::createComputeState(&diffuseShadeState, diffuseShadeCS);
+		PipelineState::createComputeState(&phongShadeState, phongShadeCS);
 
 		PipelineState::createComputeState(&edgeHighlightState, edgeHighlightCS);
 
@@ -120,15 +120,15 @@ public:
 
 		kDownEventID = Keyboard::addKeyDownEvent(Keyboard::K, [this]()
 			{
-				config.diffuseShading = !config.diffuseShading;
+				config.phongShading = !config.phongShading;
 
-				if (config.diffuseShading)
+				if (config.phongShading)
 				{
-					std::cout << "enable diffuse shading\n";
+					std::cout << "enable phong shading\n";
 				}
 				else
 				{
-					std::cout << "disable diffuse shading\n";
+					std::cout << "disable phong shading\n";
 				}
 			});
 
@@ -168,7 +168,7 @@ public:
 		delete divergenceTex;
 		delete pressureTex;
 
-		delete diffuseShadeTexture;
+		delete phongShadeTexture;
 		delete edgeHighlightTexture;
 
 		delete simulationParamBuffer;
@@ -185,7 +185,7 @@ public:
 		delete colorAdvectionCS;
 		delete velocityBoundaryCS;
 		delete pressureBoundaryCS;
-		delete diffuseShadeCS;
+		delete phongShadeCS;
 		delete edgeHighlightCS;
 	}
 
@@ -372,15 +372,15 @@ public:
 
 		TextureRenderView* outputTexture = nullptr;
 
-		if (config.diffuseShading)
+		if (config.phongShading)
 		{
-			context->setPipelineState(diffuseShadeState.Get());
-			context->setCSConstants({ colorTex->read()->getAllSRVIndex(),diffuseShadeTexture->getUAVMipIndex(0) }, 0);
+			context->setPipelineState(phongShadeState.Get());
+			context->setCSConstants({ colorTex->read()->getAllSRVIndex(),phongShadeTexture->getUAVMipIndex(0) }, 0);
 			context->transitionResources();
-			context->dispatch(diffuseShadeTexture->getTexture()->getWidth() / 16, diffuseShadeTexture->getTexture()->getHeight() / 9, 1);
-			context->uavBarrier({ diffuseShadeTexture->getTexture() });
+			context->dispatch(phongShadeTexture->getTexture()->getWidth() / 16, phongShadeTexture->getTexture()->getHeight() / 9, 1);
+			context->uavBarrier({ phongShadeTexture->getTexture() });
 
-			outputTexture = effect->process(diffuseShadeTexture);
+			outputTexture = effect->process(phongShadeTexture);
 		}
 		else
 		{
@@ -417,7 +417,7 @@ private:
 
 	SwapTexture* pressureTex;
 
-	TextureRenderView* diffuseShadeTexture;
+	TextureRenderView* phongShadeTexture;
 
 	TextureRenderView* edgeHighlightTexture;
 
@@ -433,7 +433,7 @@ private:
 		const unsigned int resolutionFactor = 2;//物理模拟分辨率
 		float bumpScale = 300.f;
 		bool logicRunning = true;
-		bool diffuseShading = true;
+		bool phongShading = true;
 		bool edgeHighlight = true;
 	}config;
 
@@ -515,9 +515,9 @@ private:
 
 	ComPtr<ID3D12PipelineState> pressureBoundaryState;
 
-	Shader* diffuseShadeCS;
+	Shader* phongShadeCS;
 
-	ComPtr<ID3D12PipelineState> diffuseShadeState;
+	ComPtr<ID3D12PipelineState> phongShadeState;
 
 	Shader* edgeHighlightCS;
 
