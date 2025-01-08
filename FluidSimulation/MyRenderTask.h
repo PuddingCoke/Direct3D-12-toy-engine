@@ -167,8 +167,8 @@ public:
 	void imGUICall() override
 	{
 		ImGui::Begin("Parameters");
-		ImGui::SliderFloat("kA", &simulationParam.kA, 0.f, 1.f);
-		ImGui::SliderFloat("kD", &simulationParam.kD, 0.f, 1.f);
+		ImGui::SliderFloat("kA", &simulationParam.kA, 0.f, 2.f);
+		ImGui::SliderFloat("kD", &simulationParam.kD, 0.f, 2.f);
 		ImGui::SliderFloat("bumpScale", &config.bumpScale, 100.f, 500.f);
 		ImGui::End();
 
