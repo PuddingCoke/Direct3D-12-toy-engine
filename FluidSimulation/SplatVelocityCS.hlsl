@@ -25,15 +25,11 @@ static RWTexture2D<float2> velocityWriteTex = ResourceDescriptorHeap[velocityWri
 
 float2 VelocityAt(const uint2 loc)
 {
-    float2 texCoord = (float2(loc) + float2(0.5, 0.5)) * simTexelSize;
+    float2 relativePos = float2(loc) + float2(0.5, 0.5);
     
-    texCoord -= pos;
+    relativePos -= colorTexelSize.y / simTexelSize.y * pos;
     
-    const float aspectRatio = 16.0 / 9.0;
-    
-    texCoord.x *= aspectRatio;
-    
-    const float2 velocity = exp(-dot(texCoord, texCoord) / splatRadius) * posDelta;
+    const float2 velocity = exp(-dot(relativePos, relativePos) / (splatRadius * simTextureSize.y * simTextureSize.y)) * posDelta;
     
     const float2 curVelocity = velocityReadTex[loc];
     

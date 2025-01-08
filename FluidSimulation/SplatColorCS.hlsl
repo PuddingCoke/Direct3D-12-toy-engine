@@ -28,15 +28,11 @@ static RWTexture2D<float4> colorWriteTex = ResourceDescriptorHeap[colorWriteTexI
 
 float3 ColorAt(const uint2 loc)
 {
-    float2 texCoord = (float2(loc) + float2(0.5, 0.5)) * colorTexelSize;
-        
-    texCoord -= pos;
+    float2 relativePos = float2(loc) + float2(0.5, 0.5);
     
-    const float aspectRatio = 16.0 / 9.0;
+    relativePos -= pos;
     
-    texCoord.x *= aspectRatio;
-    
-    const float3 color = exp(-dot(texCoord, texCoord) / splatRadius) * splatColor.rgb * 0.15;
+    const float3 color = exp(-dot(relativePos, relativePos) / (splatRadius * colorTextureSize.y * colorTextureSize.y)) * splatColor.rgb * 0.15;
         
     const float3 curColor = colorReadTex[loc].rgb;
     
@@ -52,9 +48,9 @@ void main(const uint2 DTid : SV_DispatchThreadID)
     
     const float2 scaledPosition = obstaclePosition * scale;
     
-    const float2 dir = (float2(DTid) + float2(0.5, 0.5)) - scaledPosition;
-    
-    if (DTid.x == 0 || DTid.x == colorTextureSize.x - 1 || DTid.y == 0 || DTid.y == colorTextureSize.y - 1 || length(dir) < scaledRadius)
+    if (DTid.x == 0 || DTid.x == colorTextureSize.x - 1 ||
+        DTid.y == 0 || DTid.y == colorTextureSize.y - 1 ||
+        distance(float2(DTid) + float2(0.5, 0.5), scaledPosition) < scaledRadius)
     {
         colorWriteTex[DTid] = float4(0.0, 0.0, 0.0, 1.0);
     }
