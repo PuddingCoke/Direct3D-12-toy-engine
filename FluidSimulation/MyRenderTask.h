@@ -84,7 +84,7 @@ public:
 
 		simulationParam.vorticityIntensity = config.vorticityIntensity;
 
-		simulationParam.splatRadius = config.splatRadius / 55.f;
+		simulationParam.splatRadius = config.radius / 50.f;
 
 		PipelineState::createComputeState(&splatVelocityState, splatVelocityCS);
 
@@ -196,6 +196,9 @@ public:
 		ImGui::SliderFloat("kD", &simulationParam.kD, 0.f, 2.f);
 		ImGui::SliderFloat("bumpScale", &config.bumpScale, 100.f, 500.f);
 		ImGui::SliderFloat("edgeMagnitudeScale", &simulationParam.edgeMagnitudeScale, 0.f, 6.f);
+		ImGui::Checkbox("logic running", &config.logicRunning);
+		ImGui::Checkbox("phong shade", &config.phongShading);
+		ImGui::Checkbox("edge detection & highlight", &config.edgeHighlight);
 		ImGui::End();
 
 		effect->imGUICall();
@@ -329,17 +332,9 @@ public:
 
 	void recordCommand() override
 	{
-		const DirectX::XMFLOAT2 pos =
-		{
-			(float)Mouse::getX() / Graphics::getWidth(),
-			(float)(Graphics::getHeight() - Mouse::getY()) / Graphics::getHeight()
-		};
+		const DirectX::XMFLOAT2 pos = { (float)Mouse::getX(),(float)(Graphics::getHeight() - Mouse::getY()) };
 
-		const DirectX::XMFLOAT2 posDelta =
-		{
-			(pos.x - simulationParam.pos.x) * config.splatForce,
-			((pos.y - simulationParam.pos.y) / Graphics::getAspectRatio()) * config.splatForce
-		};
+		const DirectX::XMFLOAT2 posDelta = { (pos.x - simulationParam.pos.x) * config.force,(pos.y - simulationParam.pos.y) * config.force };
 
 		simulationParam.pos = pos;
 		simulationParam.posDelta = posDelta;
@@ -427,8 +422,8 @@ private:
 		float colorDissipationSpeed = 1.f;//颜色消散速度
 		float velocityDissipationSpeed = 0.00f;//速度消散速度
 		float vorticityIntensity = 80.f;//涡流强度
-		float splatRadius = 0.25f;//施加颜色的半径
-		float splatForce = 6000.f;//施加速度的强度
+		float radius = 0.25f;//施加颜色的半径
+		float force = 4.f;//施加速度的强度
 		const unsigned int pressureIteraion = 35;//雅可比迭代次数 这个值越高物理模拟越不容易出错 NVIDIA的文章有提到通常20-50次就够了
 		const unsigned int resolutionFactor = 2;//物理模拟分辨率
 		float bumpScale = 300.f;
@@ -452,9 +447,9 @@ private:
 		float splatRadius;
 		float kA = 0.6f;
 		float kD = 0.4f;
-		float bumpScale;
+		float bumpScale = 1.f / 300.f;
 		float edgeMagnitudeScale = 2.f;
-		DirectX::XMFLOAT4 padding1[10];
+		DirectX::XMFLOAT4 padding1[10] = {};
 	} simulationParam;
 
 	int kDownEventID;
