@@ -29,7 +29,7 @@ float2 VelocityAt(const uint2 loc)
     
     relativePos -= colorTexelSize.y / simTexelSize.y * pos;
     
-    const float2 velocity = exp(-dot(relativePos, relativePos) / (splatRadius * simTextureSize.y * simTextureSize.y)) * posDelta;
+    const float2 velocity = exp(-dot(relativePos, relativePos) / (splatRadius * float(simTextureSize.y) * float(simTextureSize.y))) * posDelta;
     
     const float2 curVelocity = velocityReadTex[loc];
     

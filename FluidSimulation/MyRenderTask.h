@@ -29,7 +29,7 @@ public:
 		phongShadeCS(new Shader(Utils::getRootFolder() + "PhongShadeCS.cso")),
 		edgeHighlightCS(new Shader(Utils::getRootFolder() + "EdgeHighlightCS.cso"))
 	{
-		const DirectX::XMUINT2 simRes = { Graphics::getWidth() / config.resolutionFactor,Graphics::getHeight() / config.resolutionFactor };
+		const DirectX::XMUINT2 simRes = { Graphics::getWidth() >> config.resolutionFactor,Graphics::getHeight() >> config.resolutionFactor };
 
 		velocityTex = new SwapTexture([=] {return ResourceManager::createTextureRenderView(simRes.x, simRes.y, DXGI_FORMAT_R32G32_FLOAT, 1, 1, false, true,
 			DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_UNKNOWN); });
@@ -83,8 +83,6 @@ public:
 		simulationParam.velocityDissipationSpeed = config.velocityDissipationSpeed;
 
 		simulationParam.vorticityIntensity = config.vorticityIntensity;
-
-		simulationParam.splatRadius = config.radius / 50.f;
 
 		PipelineState::createComputeState(&splatVelocityState, splatVelocityCS);
 
@@ -348,6 +346,8 @@ public:
 			simulationParam.splatColor = { c.r,c.g,c.b,1.f };
 		}
 
+		simulationParam.splatRadius = config.splatRadius / 50.f;
+
 		simulationParam.bumpScale = 1.f / config.bumpScale;
 
 		simulationParamBuffer->update(&simulationParam, sizeof(SimulationParam));
@@ -422,10 +422,10 @@ private:
 		float colorDissipationSpeed = 1.f;//颜色消散速度
 		float velocityDissipationSpeed = 0.00f;//速度消散速度
 		float vorticityIntensity = 80.f;//涡流强度
-		float radius = 0.25f;//施加颜色的半径
-		float force = 4.f;//施加速度的强度
+		float splatRadius = 0.25f;//施加颜色的半径
+		float force = 4.f;//施加速度的力度
 		const unsigned int pressureIteraion = 35;//雅可比迭代次数 这个值越高物理模拟越不容易出错 NVIDIA的文章有提到通常20-50次就够了
-		const unsigned int resolutionFactor = 2;//物理模拟分辨率
+		const unsigned int resolutionFactor = 1;//物理模拟分辨率 resolution >> resolutionFactor
 		float bumpScale = 300.f;
 		bool logicRunning = true;
 		bool phongShading = true;
