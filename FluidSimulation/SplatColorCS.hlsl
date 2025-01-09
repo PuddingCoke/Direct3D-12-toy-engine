@@ -26,7 +26,7 @@ static Texture2D<float4> colorReadTex = ResourceDescriptorHeap[colorReadTexIndex
 
 static RWTexture2D<float4> colorWriteTex = ResourceDescriptorHeap[colorWriteTexIndex];
 
-float3 ColorAt(const uint2 loc)
+float4 ColorAt(const uint2 loc)
 {
     float2 relativePos = float2(loc) + float2(0.5, 0.5);
     
@@ -36,7 +36,7 @@ float3 ColorAt(const uint2 loc)
         
     const float3 curColor = colorReadTex[loc].rgb;
     
-    return color + curColor;
+    return float4(color + curColor, 1.0);
 }
 
 [numthreads(16, 9, 1)]
@@ -54,6 +54,6 @@ void main(const uint2 DTid : SV_DispatchThreadID)
     }
     else
     {
-        colorWriteTex[DTid] = float4(ColorAt(DTid), 1.0);
+        colorWriteTex[DTid] = ColorAt(DTid);
     }
 }
