@@ -118,45 +118,15 @@ public:
 
 		kDownEventID = Keyboard::addKeyDownEvent(Keyboard::K, [this]()
 			{
-				config.phongShading = !config.phongShading;
-
-				if (config.phongShading)
-				{
-					std::cout << "enable phong shading\n";
-				}
-				else
-				{
-					std::cout << "disable phong shading\n";
-				}
-			});
-
-		lDownEventID = Keyboard::addKeyDownEvent(Keyboard::L, [this]()
-			{
 				config.logicRunning = !config.logicRunning;
 			});
 
-		iDownEventID = Keyboard::addKeyDownEvent(Keyboard::I, [this]()
-			{
-				config.edgeHighlight = !config.edgeHighlight;
-
-				if (config.edgeHighlight)
-				{
-					std::cout << "enable edge highlight\n";
-				}
-				else
-				{
-					std::cout << "disable edge highlight\n";
-				}
-			});
 	}
 
 	~MyRenderTask()
 	{
 		Keyboard::removeKeyDownEvent(Keyboard::K, kDownEventID);
 
-		Keyboard::removeKeyDownEvent(Keyboard::L, lDownEventID);
-
-		Keyboard::removeKeyDownEvent(Keyboard::I, iDownEventID);
 
 		delete effect;
 
@@ -197,6 +167,7 @@ public:
 		ImGui::Checkbox("logic running", &config.logicRunning);
 		ImGui::Checkbox("phong shade", &config.phongShading);
 		ImGui::Checkbox("edge detection & highlight", &config.edgeHighlight);
+		ImGui::Checkbox("vortex", &config.vortex);
 		ImGui::End();
 
 		effect->imGUICall();
@@ -204,7 +175,7 @@ public:
 
 	void splatVelocityAndColor()
 	{
-		if (Mouse::onMove() && Mouse::getLeftDown())
+		if (config.vortex || (Mouse::onMove() && Mouse::getLeftDown()))
 		{
 			context->setPipelineState(splatVelocityState.Get());
 			context->setCSConstants({ velocityTex->read()->getAllSRVIndex(),velocityTex->write()->getUAVMipIndex(0) }, 0);
@@ -334,11 +305,18 @@ public:
 
 		const DirectX::XMFLOAT2 posDelta = { (pos.x - simulationParam.pos.x) * config.force,(pos.y - simulationParam.pos.y) * config.force };
 
-		simulationParam.pos = pos;
-		simulationParam.posDelta = posDelta;
+		if (config.vortex)
+		{
+			simulationParam.pos = DirectX::XMFLOAT2(200.f, Graphics::getHeight() / 2.f);
 
-		//simulationParam.pos = DirectX::XMFLOAT2(0.10, 0.5);
-		//simulationParam.posDelta = DirectX::XMFLOAT2(15.0, 0.0);
+			simulationParam.posDelta = DirectX::XMFLOAT2(50.0f, 0.0f);
+		}
+		else
+		{
+			simulationParam.pos = pos;
+
+			simulationParam.posDelta = posDelta;
+		}
 
 		if (colorUpdateTimer.update(Graphics::getDeltaTime() * config.colorChangeSpeed))
 		{
@@ -430,6 +408,7 @@ private:
 		bool logicRunning = true;
 		bool phongShading = true;
 		bool edgeHighlight = true;
+		bool vortex = false;
 	}config;
 
 	struct SimulationParam
@@ -453,10 +432,6 @@ private:
 	} simulationParam;
 
 	int kDownEventID;
-
-	int lDownEventID;
-
-	int iDownEventID;
 
 	ConstantBuffer* simulationParamBuffer;
 
