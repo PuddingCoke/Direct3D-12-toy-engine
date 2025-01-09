@@ -41,7 +41,7 @@ void main(const uint2 DTid : SV_DispatchThreadID)
     }
     else if (len < obstacleRadius + 1.0)
     {
-        velocityWriteTex[DTid] = -velocityReadTex.SampleLevel(linearClampSampler, (position + normalize(dir) * 2.0) * simTexelSize, 0.0);
+        velocityWriteTex[DTid] = -velocityReadTex.SampleLevel(linearClampSampler, (position + normalize(dir)) * simTexelSize, 0.0);
     }
     else
     {
