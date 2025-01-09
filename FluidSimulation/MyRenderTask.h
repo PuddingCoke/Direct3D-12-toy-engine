@@ -401,7 +401,7 @@ private:
 		float velocityDissipationSpeed = 0.00f;//速度消散速度
 		float vorticityIntensity = 80.f;//涡流强度
 		float splatRadius = 0.25f;//施加颜色的半径
-		float force = 4.f;//施加速度的力度
+		float force = 6.f;//施加速度的力度
 		const unsigned int pressureIteraion = 35;//雅可比迭代次数 这个值越高物理模拟越不容易出错 NVIDIA的文章有提到通常20-50次就够了
 		const unsigned int resolutionFactor = 1;//物理模拟分辨率 resolution >> resolutionFactor
 		float bumpScale = 300.f;
@@ -427,7 +427,7 @@ private:
 		float kA = 0.6f;
 		float kD = 0.4f;
 		float bumpScale = 1.f / 300.f;
-		float edgeMagnitudeScale = 2.f;
+		float edgeMagnitudeScale = 1.5f;
 		DirectX::XMFLOAT4 padding1[10] = {};
 	} simulationParam;
 
