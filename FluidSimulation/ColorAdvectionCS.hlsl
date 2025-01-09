@@ -28,7 +28,7 @@ static Texture2D<float4> colorReadTex = ResourceDescriptorHeap[colorReadTexIndex
 
 static RWTexture2D<float4> colorWriteTex = ResourceDescriptorHeap[colorWriteTexIndex];
 
-float3 ColorAt(const uint2 loc)
+float4 ColorAt(const uint2 loc)
 {
     float2 texCoord = (float2(loc) + float2(0.5, 0.5)) * colorTexelSize;
     
@@ -38,18 +38,62 @@ float3 ColorAt(const uint2 loc)
     
     const float dissipation = 1.0 + colorDissipationSpeed * perframeResource.deltaTime;
     
-    return color / dissipation;
+    return float4(color / dissipation, 1.0);
 }
 
 [numthreads(16, 9, 1)]
 void main(const uint2 DTid : SV_DispatchThreadID)
-{
-    if (DTid.x == 0 || DTid.x == colorTextureSize.x - 1 || DTid.y == 0 || DTid.y == colorTextureSize.y - 1)
+{ 
+    //interior texel
+    if (DTid.x > 0 && DTid.x < colorTextureSize.x - 1 && DTid.y > 0 && DTid.y < colorTextureSize.y - 1)
     {
-        colorWriteTex[DTid] = float4(0.0, 0.0, 0.0, 1.0);
+        colorWriteTex[DTid] = ColorAt(DTid);
     }
-    else
+    //row texel
+    else if (DTid.x > 0 && DTid.x < colorTextureSize.x - 1)
     {
-        colorWriteTex[DTid] = float4(ColorAt(DTid), 1.0);
+        if (DTid.y == 0)
+        {
+            colorWriteTex[DTid] = ColorAt(uint2(DTid.x, 1));
+        }
+        else if (DTid.y == colorTextureSize.y - 1)
+        {
+            colorWriteTex[DTid] = ColorAt(uint2(DTid.x, colorTextureSize.y - 2));
+        }
+    }
+    //column texel
+    else if (DTid.y > 0 && DTid.y < colorTextureSize.y - 1)
+    {
+        if (DTid.x == 0)
+        {
+            colorWriteTex[DTid] = ColorAt(uint2(1, DTid.y));
+        }
+        else if (DTid.x == colorTextureSize.x - 1)
+        {
+            colorWriteTex[DTid] = ColorAt(uint2(colorTextureSize.x - 2, DTid.y));
+        }
+    }
+    //corner texel
+    else if (DTid.y == 0)
+    {
+        if (DTid.x == 0)
+        {
+            colorWriteTex[DTid] = ColorAt(uint2(1, 1));
+        }
+        else if (DTid.x == colorTextureSize.x - 1)
+        {
+            colorWriteTex[DTid] = ColorAt(uint2(colorTextureSize.x - 2, 1));
+        }
+    }
+    else if (DTid.y == colorTextureSize.y - 1)
+    {
+        if (DTid.x == 0)
+        {
+            colorWriteTex[DTid] = ColorAt(uint2(1, colorTextureSize.y - 2));
+        }
+        else if (DTid.x == colorTextureSize.x - 1)
+        {
+            colorWriteTex[DTid] = ColorAt(uint2(colorTextureSize.x - 2, colorTextureSize.y - 2));
+        }
     }
 }
