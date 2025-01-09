@@ -48,9 +48,7 @@ void main(const uint2 DTid : SV_DispatchThreadID)
     
     const float2 scaledPosition = obstaclePosition * scale;
     
-    if (DTid.x == 0 || DTid.x == colorTextureSize.x - 1 ||
-        DTid.y == 0 || DTid.y == colorTextureSize.y - 1 ||
-        distance(float2(DTid) + float2(0.5, 0.5), scaledPosition) < scaledRadius)
+    if (distance(float2(DTid) + float2(0.5, 0.5), scaledPosition) < scaledRadius)
     {
         colorWriteTex[DTid] = float4(0.0, 0.0, 0.0, 1.0);
     }
