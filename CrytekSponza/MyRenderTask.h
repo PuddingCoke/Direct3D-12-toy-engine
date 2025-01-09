@@ -4,6 +4,7 @@
 #include<Gear/Core/Shader.h>
 
 #include<Gear/Core/Effect/BloomEffect.h>
+#include<Gear/Core/Effect/FXAAEffect.h>
 
 #include<DirectXColors.h>
 
@@ -102,15 +103,6 @@ public:
 			desc.PS = deferredFinal->getByteCode();
 
 			GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&deferredFinalPipelineState));
-		}
-
-		{
-			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = PipelineState::getDefaultFullScreenState();
-			desc.NumRenderTargets = 1;
-			desc.RTVFormats[0] = Graphics::BackBufferFormat;
-			desc.PS = Shader::fullScreenPS->getByteCode();
-
-			GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&fullScreenBlitState));
 		}
 
 		{
@@ -223,13 +215,15 @@ public:
 			}
 		}
 
-		effect = new BloomEffect(context, Graphics::getWidth(), Graphics::getHeight(), resManager);
+		bloomEffect = new BloomEffect(context, Graphics::getWidth(), Graphics::getHeight(), resManager);
 
-		effect->setIntensity(0.5f);
+		bloomEffect->setIntensity(0.5f);
 
-		effect->setExposure(0.574f);
+		bloomEffect->setExposure(0.574f);
 
-		effect->setGamma(1.578f);
+		bloomEffect->setGamma(1.578f);
+
+		fxaaEffect = new FXAAEffect(context, Graphics::getWidth(), Graphics::getHeight());
 
 		scene = new Scene(assetPath + "/sponza.dae", resManager);
 
@@ -273,12 +267,15 @@ public:
 		delete cubeRenderBouncePS;
 		delete skyboxPShader;
 
-		delete effect;
+		delete bloomEffect;
+		delete fxaaEffect;
 	}
 
 	void imGUICall() override
 	{
-		effect->imGUICall();
+		bloomEffect->imGUICall();
+
+		fxaaEffect->imGUICall();
 	}
 
 protected:
@@ -524,25 +521,11 @@ protected:
 
 		context->draw(36, 1, 0, 0);
 
-		TextureRenderView* bloomTexture = effect->process(originTexture);
+		TextureRenderView* const bloomTexture = bloomEffect->process(originTexture);
 
-		context->setPipelineState(fullScreenBlitState.Get());
+		TextureRenderView* const fxaaTexture = fxaaEffect->process(bloomTexture);
 
-		context->setViewport(Graphics::getWidth(), Graphics::getHeight());
-
-		context->setScissorRect(0, 0, Graphics::getWidth(), Graphics::getHeight());
-
-		context->setTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-		context->setDefRenderTarget();
-
-		context->setPSConstants({ bloomTexture->getAllSRVIndex() }, 0);
-
-		context->transitionResources();
-
-		context->clearDefRenderTarget(DirectX::Colors::Black);
-
-		context->draw(3, 1, 0, 0);
+		blit(fxaaTexture);
 	}
 
 	UINT ProbeGridPosToIndex(const DirectX::XMUINT3& probeGridPos)
@@ -622,8 +605,6 @@ protected:
 
 	ComPtr<ID3D12PipelineState> deferredFinalPipelineState;
 
-	ComPtr<ID3D12PipelineState> fullScreenBlitState;
-
 	ComPtr<ID3D12PipelineState> probeCapturePipelineState;
 
 	ComPtr<ID3D12PipelineState> probeCaptureBouncePipelineState;
@@ -654,6 +635,8 @@ protected:
 
 	Shader* skyboxPShader;
 
-	BloomEffect* effect;
+	BloomEffect* bloomEffect;
+
+	FXAAEffect* fxaaEffect;
 
 };

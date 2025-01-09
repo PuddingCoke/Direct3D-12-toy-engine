@@ -160,6 +160,12 @@ public:
 	void imGUICall() override
 	{
 		ImGui::Begin("Parameters");
+		ImGui::SliderFloat("color change speed", &config.colorChangeSpeed, 0.f, 50.f);
+		ImGui::SliderFloat("color dissipation speed", &simulationParam.colorDissipationSpeed, 0.f, 10.f);
+		ImGui::SliderFloat("velocity dissipation speed", &simulationParam.velocityDissipationSpeed, 0.f, 1.f);
+		ImGui::SliderFloat("vorticity intensity", &simulationParam.vorticityIntensity, 0.f, 100.f);
+		ImGui::SliderFloat("radius", &config.splatRadius, 0.f, 1.0f);
+		ImGui::SliderFloat("force", &config.force, 0.f, 10.f);
 		ImGui::SliderFloat("kA", &simulationParam.kA, 0.f, 2.f);
 		ImGui::SliderFloat("kD", &simulationParam.kD, 0.f, 2.f);
 		ImGui::SliderFloat("bumpScale", &config.bumpScale, 100.f, 500.f);
