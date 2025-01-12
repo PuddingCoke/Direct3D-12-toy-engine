@@ -31,9 +31,9 @@ ConstantBufferManager::ConstantBufferManager() :
 		for (UINT subregionIndex = 0; subregionIndex < numSubRegion[regionIndex]; subregionIndex++)
 		{
 			//every frame need a upload heap since we are using triple buffering
-			uploadHeaps[regionIndex][subregionIndex] = std::vector<UploadHeap*>(Graphics::FrameBufferCount);
+			uploadHeaps[regionIndex][subregionIndex] = std::vector<UploadHeap*>(Graphics::getFrameBufferCount());
 
-			for (UINT uploadHeapIndex = 0; uploadHeapIndex < Graphics::FrameBufferCount; uploadHeapIndex++)
+			for (UINT uploadHeapIndex = 0; uploadHeapIndex < Graphics::getFrameBufferCount(); uploadHeapIndex++)
 			{
 				uploadHeaps[regionIndex][subregionIndex][uploadHeapIndex] = new UploadHeap((256 << regionIndex));
 
@@ -91,7 +91,7 @@ ConstantBufferManager::~ConstantBufferManager()
 	{
 		for (UINT subregionIndex = 0; subregionIndex < numSubRegion[regionIndex]; subregionIndex++)
 		{
-			for (UINT uploadHeapIndex = 0; uploadHeapIndex < Graphics::FrameBufferCount; uploadHeapIndex++)
+			for (UINT uploadHeapIndex = 0; uploadHeapIndex < Graphics::getFrameBufferCount(); uploadHeapIndex++)
 			{
 				delete uploadHeaps[regionIndex][subregionIndex][uploadHeapIndex];
 			}
@@ -169,7 +169,7 @@ void ConstantBufferManager::recordCommands(CommandList* const commandList)
 		updateSubregionIndices[regionIndex].clear();
 	}
 
-	updateUploadHeapIndex = (updateUploadHeapIndex + 1) % Graphics::FrameBufferCount;
+	updateUploadHeapIndex = (updateUploadHeapIndex + 1) % Graphics::getFrameBufferCount();
 
 	commandList->pushResourceTrackList(buffer);
 

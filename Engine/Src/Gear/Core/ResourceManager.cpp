@@ -1,13 +1,15 @@
 #include<Gear/Core/ResourceManager.h>
 
 ResourceManager::ResourceManager(GraphicsContext* const context) :
-	context(context), commandList(context->getCommandList())
+	context(context), commandList(context->getCommandList()),
+	resources(new std::vector<Resource*>[Graphics::getFrameBufferCount()]),
+	engineResources(new std::vector<EngineResource*>[Graphics::getFrameBufferCount()])
 {
 }
 
 ResourceManager::~ResourceManager()
 {
-	for (UINT i = 0; i < Graphics::FrameBufferCount; i++)
+	for (UINT i = 0; i < Graphics::getFrameBufferCount(); i++)
 	{
 		for (const Resource* const resource : resources[i])
 		{
@@ -23,6 +25,10 @@ ResourceManager::~ResourceManager()
 
 		engineResources[i].clear();
 	}
+
+	delete[] resources;
+
+	delete[] engineResources;
 }
 
 void ResourceManager::release(Resource* const resource)

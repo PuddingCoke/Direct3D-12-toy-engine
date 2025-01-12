@@ -139,9 +139,9 @@ BufferView::BufferView(Buffer* const buffer, const UINT structureByteStride, con
 
 	if (cpuWritable)
 	{
-		uploadHeaps = new UploadHeap * [Graphics::FrameBufferCount];
+		uploadHeaps = new UploadHeap * [Graphics::getFrameBufferCount()];
 
-		for (UINT i = 0; i < Graphics::FrameBufferCount; i++)
+		for (UINT i = 0; i < Graphics::getFrameBufferCount(); i++)
 		{
 			uploadHeaps[i] = new UploadHeap(size);
 		}
@@ -162,7 +162,7 @@ BufferView::~BufferView()
 
 	if (uploadHeaps)
 	{
-		for (UINT i = 0; i < Graphics::FrameBufferCount; i++)
+		for (UINT i = 0; i < Graphics::getFrameBufferCount(); i++)
 		{
 			delete uploadHeaps[i];
 		}

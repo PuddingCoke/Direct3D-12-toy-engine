@@ -125,7 +125,7 @@ IDxcBlob* DXCCompiler::compile(const std::string filePath,const ShaderProfile pr
 
 	ComPtr<IDxcBlobEncoding> textBlob;
 
-	CHECKERROR(dxcUtils->CreateBlobFromPinned(shaderString.c_str(), shaderString.size(), codePage, &textBlob));
+	CHECKERROR(dxcUtils->CreateBlobFromPinned(shaderString.c_str(), static_cast<UINT32>(shaderString.size()), codePage, &textBlob));
 
 	DxcBuffer source = {};
 	source.Ptr = textBlob->GetBufferPointer();

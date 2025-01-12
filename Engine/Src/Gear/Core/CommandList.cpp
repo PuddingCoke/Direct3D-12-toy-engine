@@ -1,8 +1,12 @@
 #include<Gear/Core/CommandList.h>
 
+D3D12_CPU_DESCRIPTOR_HANDLE CommandList::backBufferHandle;
+
 CommandList::CommandList(const D3D12_COMMAND_LIST_TYPE type)
 {
-	for (UINT i = 0; i < Graphics::FrameBufferCount; i++)
+	allocators = new CommandAllocator * [Graphics::getFrameBufferCount()];
+
+	for (UINT i = 0; i < Graphics::getFrameBufferCount(); i++)
 	{
 		allocators[i] = new CommandAllocator(type);
 	}
@@ -14,13 +18,12 @@ CommandList::CommandList(const D3D12_COMMAND_LIST_TYPE type)
 
 CommandList::~CommandList()
 {
-	for (UINT i = 0; i < Graphics::FrameBufferCount; i++)
+	for (UINT i = 0; i < Graphics::getFrameBufferCount(); i++)
 	{
-		if (allocators[i])
-		{
-			delete allocators[i];
-		}
+		delete allocators[i];
 	}
+
+	delete[] allocators;
 }
 
 void CommandList::resourceBarrier(const UINT numBarriers, const D3D12_RESOURCE_BARRIER* const pBarriers) const
@@ -165,9 +168,12 @@ void CommandList::setComputePipelineResources(const std::initializer_list<Shader
 
 void CommandList::setDefRenderTarget() const
 {
-	const D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = Graphics::getBackBufferHandle();
+	commandList->OMSetRenderTargets(1, &backBufferHandle, FALSE, nullptr);
+}
 
-	commandList->OMSetRenderTargets(1, &rtvHandle, FALSE, nullptr);
+void CommandList::clearDefRenderTarget(const FLOAT clearValue[4]) const
+{
+	commandList->ClearRenderTargetView(backBufferHandle, clearValue, 0, nullptr);
 }
 
 void CommandList::setRenderTargets(const std::initializer_list<RenderTargetDesc>& renderTargets, const DepthStencilDesc* const depthStencils)

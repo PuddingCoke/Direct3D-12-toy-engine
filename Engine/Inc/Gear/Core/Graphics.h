@@ -11,31 +11,27 @@ class Graphics
 {
 public:
 
-	static constexpr UINT FrameBufferCount = 3;
+	static UINT getFrameBufferCount();
 
 	static UINT getFrameIndex();
 
-	static FLOAT getDeltaTime();
+	static float getDeltaTime();
 
-	static FLOAT getTimeElapsed();
+	static float getTimeElapsed();
 
 	static UINT getWidth();
 
 	static UINT getHeight();
 
-	static FLOAT getAspectRatio();
-
-	static D3D12_CPU_DESCRIPTOR_HANDLE getBackBufferHandle();
+	static float getAspectRatio();
 
 	static constexpr DXGI_FORMAT BackBufferFormat = DXGI_FORMAT_B8G8R8A8_UNORM;
 
 private:
 
-	friend class Gear;
-
 	friend class RenderEngine;
 
-	static D3D12_CPU_DESCRIPTOR_HANDLE backBufferHandles[FrameBufferCount];
+	static UINT frameBufferCount;
 
 	static UINT frameIndex;
 
@@ -43,15 +39,11 @@ private:
 
 	static UINT height;
 
-	static FLOAT aspectRatio;
+	static float aspectRatio;
 
-	static struct Time
-	{
-		FLOAT deltaTime;
-		FLOAT timeElapsed;
-		UINT uintSeed;
-		FLOAT floatSeed;
-	} time;
+	static float deltaTime;
+
+	static float timeElapsed;
 
 };
 

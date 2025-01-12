@@ -104,9 +104,9 @@ public:
 
 private:
 
-	std::vector<Resource*> resources[Graphics::FrameBufferCount];
+	std::vector<Resource*>* resources;
 
-	std::vector<EngineResource*> engineResources[Graphics::FrameBufferCount];
+	std::vector<EngineResource*>* engineResources;
 
 	//high level task such as create texture cube from equirectangular map
 	GraphicsContext* const context;
