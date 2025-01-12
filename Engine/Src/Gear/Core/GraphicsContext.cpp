@@ -28,7 +28,7 @@ void GraphicsContext::updateBuffer(BufferView* const bufferView, const void* con
 
 	commandList->copyBufferRegion(buffer, 0, uploadHeap, 0, size);
 
-	bufferView->uploadHeapIndex = (bufferView->uploadHeapIndex + 1) % Graphics::FrameBufferCount;
+	bufferView->uploadHeapIndex = (bufferView->uploadHeapIndex + 1) % Graphics::getFrameBufferCount();
 }
 
 void GraphicsContext::setGlobalConstantBuffer(const IndexConstantBuffer* const indexBuffer)
@@ -221,9 +221,7 @@ void GraphicsContext::setDefRenderTarget() const
 
 void GraphicsContext::clearDefRenderTarget(const FLOAT clearValue[4]) const
 {
-	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = Graphics::getBackBufferHandle();
-
-	commandList->get()->ClearRenderTargetView(rtvHandle, clearValue, 0, nullptr);
+	commandList->clearDefRenderTarget(clearValue);
 }
 
 void GraphicsContext::setVertexBuffers(const UINT startSlot, const std::initializer_list<VertexBufferDesc>& vertexBuffers)

@@ -64,6 +64,8 @@ public:
 
 	void setDefRenderTarget() const;
 
+	void clearDefRenderTarget(const FLOAT clearValue[4]) const;
+
 	void setRenderTargets(const std::initializer_list<RenderTargetDesc>& renderTargets, const DepthStencilDesc* const depthStencils);
 
 	void setVertexBuffers(const UINT startSlot, const std::initializer_list<VertexBufferDesc>& vertexBuffers);
@@ -95,7 +97,9 @@ private:
 	template<typename T>
 	IsCorrectType<T> setPipelineResources(const T& descs, const UINT targetSRVState);
 
-	CommandAllocator* allocators[Graphics::FrameBufferCount];
+	static D3D12_CPU_DESCRIPTOR_HANDLE backBufferHandle;
+
+	CommandAllocator** allocators;
 
 	ComPtr<ID3D12GraphicsCommandList6> commandList;
 

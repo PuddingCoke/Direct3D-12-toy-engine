@@ -28,29 +28,25 @@ int Gear::iniEngine(const Configuration& config, const int argc, const char* arg
 		ShowWindow(winform->getHandle(), SW_HIDE);
 	}
 
-	Graphics::width = config.width;
-	Graphics::height = config.height;
-	Graphics::aspectRatio = static_cast<float>(Graphics::width) / static_cast<float>(Graphics::height);
-
 	switch (config.usage)
 	{
 	case Configuration::EngineUsage::NORMAL:
-		RenderEngine::instance = new RenderEngine(winform->getHandle(), true, config.enableImGuiSurface);
+		RenderEngine::instance = new RenderEngine(config.width, config.height, winform->getHandle(), true, config.enableImGuiSurface);
 		break;
 
 	case Configuration::EngineUsage::VIDEOPLAYBACK:
-		RenderEngine::instance = new RenderEngine(winform->getHandle(), false, false);
+		RenderEngine::instance = new RenderEngine(config.width, config.height, winform->getHandle(), false, false);
 		break;
 
 	default:
 		break;
 	}
 
-	std::cout << "[class Gear] resolution " << Graphics::width << "x" << Graphics::height << "\n";
+	std::cout << "[class Gear] resolution " << Graphics::getWidth() << "x" << Graphics::getHeight() << "\n";
 
-	std::cout << "[class Gear] aspect ratio " << Graphics::aspectRatio << "\n";
+	std::cout << "[class Gear] aspect ratio " << Graphics::getAspectRatio() << "\n";
 
-	std::cout << "[class Gear] back buffer count " << Graphics::FrameBufferCount << "\n";
+	std::cout << "[class Gear] back buffer count " << Graphics::getFrameBufferCount() << "\n";
 
 	switch (usage)
 	{
@@ -100,17 +96,23 @@ void Gear::release()
 
 void Gear::runGame()
 {
+	RenderEngine::get()->setDeltaTime(0.0001f);
+
 	while (winform->pollEvents())
 	{
 		const std::chrono::high_resolution_clock::time_point startPoint = std::chrono::high_resolution_clock::now();
 
+		RenderEngine::get()->setDefRenderTexture();
+
 		RenderEngine::get()->begin();
 
-		game->update(Graphics::time.deltaTime);
+		game->update(Graphics::getDeltaTime());
 
 		game->render();
 
 		RenderEngine::get()->end();
+
+		RenderEngine::get()->present();
 
 		RenderEngine::get()->waitForNextFrame();
 
@@ -120,17 +122,13 @@ void Gear::runGame()
 
 		const std::chrono::high_resolution_clock::time_point endPoint = std::chrono::high_resolution_clock::now();
 
-		const float lastDeltaTime = std::chrono::duration<float>(endPoint - startPoint).count();
+		const float deltaTime = std::chrono::duration<float>(endPoint - startPoint).count();
 
-		const float lerpDeltaTime = dtEstimator.getDeltaTime(lastDeltaTime);
+		const float lerpDeltaTime = dtEstimator.getDeltaTime(deltaTime);
 
-		Graphics::time.deltaTime = lerpDeltaTime;
+		RenderEngine::get()->setDeltaTime(lerpDeltaTime);
 
-		Graphics::time.timeElapsed += lerpDeltaTime;
-
-		Graphics::time.uintSeed = Random::Uint();
-
-		Graphics::time.floatSeed = Random::Float();
+		RenderEngine::get()->updateTimeElapsed();
 	}
 }
 
@@ -153,13 +151,46 @@ void Gear::runEncode()
 		break;
 	}
 
-	Graphics::time.deltaTime = 1.f / 60.f;
+	const UINT numTextures = Encoder::LookaheadDepth + 1 + 90;
 
-	do
+	Texture* renderTextures[numTextures] = {};
+
+	D3D12_CPU_DESCRIPTOR_HANDLE textureHandles[numTextures] = {};
+
 	{
+		DescriptorHandle descriptorHandle = GlobalDescriptorHeap::getRenderTargetHeap()->allocStaticDescriptor(numTextures);
+
+		D3D12_RENDER_TARGET_VIEW_DESC rtvDesc = {};
+		rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
+		rtvDesc.Format = Graphics::BackBufferFormat;
+		rtvDesc.Texture2D.MipSlice = 0;
+		rtvDesc.Texture2D.PlaneSlice = 0;
+
+		for (UINT i = 0; i < numTextures; i++)
+		{
+			const D3D12_CLEAR_VALUE clearValue = { Graphics::BackBufferFormat ,{0.f,0.f,0.f,1.f} };
+
+			renderTextures[i] = new Texture(Graphics::getWidth(), Graphics::getHeight(), Graphics::BackBufferFormat, 1, 1, true, D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET, &clearValue);
+
+			GraphicsDevice::get()->CreateRenderTargetView(renderTextures[i]->getResource(), &rtvDesc, descriptorHandle.getCPUHandle());
+
+			textureHandles[i] = descriptorHandle.getCPUHandle();
+
+			descriptorHandle.move();
+		}
+	}
+
+	UINT index = 0;
+
+	RenderEngine::get()->setDeltaTime(1.f / static_cast<float>(Encoder::FrameRate));
+
+	while (true)
+	{
+		RenderEngine::get()->setRenderTexture(renderTextures[index], textureHandles[index]);
+
 		RenderEngine::get()->begin();
 
-		game->update(Graphics::time.deltaTime);
+		game->update(Graphics::getDeltaTime());
 
 		game->render();
 
@@ -167,13 +198,20 @@ void Gear::runEncode()
 
 		RenderEngine::get()->waitForPreviousFrame();
 
-		Graphics::time.timeElapsed += Graphics::time.deltaTime;
+		RenderEngine::get()->updateTimeElapsed();
 
-		Graphics::time.uintSeed = Random::Uint();
+		if (!encoder->encode(RenderEngine::get()->getRenderTexture()))
+		{
+			break;
+		}
 
-		Graphics::time.floatSeed = Random::Float();
+		index = (index + 1) % numTextures;
+	}
 
-	} while (encoder->encode(RenderEngine::get()->getCurrentRenderTexture()));
+	for (UINT i = 0; i < numTextures; i++)
+	{
+		delete renderTextures[i];
+	}
 
 	delete encoder;
 

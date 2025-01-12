@@ -37,7 +37,7 @@ public:
 
 	GPUVendor getVendor() const;
 
-	Texture* getCurrentRenderTexture() const;
+	Texture* getRenderTexture() const;
 
 	bool getDisplayImGuiSurface() const;
 
@@ -59,6 +59,8 @@ private:
 
 	void end();
 
+	void present();
+
 	void updateConstantBuffer();
 
 	void initializeResources();
@@ -69,7 +71,15 @@ private:
 
 	void drawImGuiFrame(CommandList* const targetCommandList);
 
-	RenderEngine(const HWND hwnd, const bool useSwapChainBuffer, const bool initializeImGuiSurface);
+	void setDefRenderTexture();
+
+	void setRenderTexture(Texture* const renderTexture, const D3D12_CPU_DESCRIPTOR_HANDLE handle);
+
+	void setDeltaTime(const float deltaTime) const;
+
+	void updateTimeElapsed() const;
+
+	RenderEngine(const UINT width, const UINT height, const HWND hwnd, const bool useSwapChainBuffer, const bool initializeImGuiSurface);
 
 	~RenderEngine();
 
@@ -87,19 +97,26 @@ private:
 
 	ComPtr<ID3D12Fence> fence;
 
-	UINT64 fenceValues[Graphics::FrameBufferCount];
+	UINT64* fenceValues;
 
 	HANDLE fenceEvent;
 
 	CommandList* prepareCommandList;
 
-	Texture* backBufferResources[Graphics::FrameBufferCount];
+	Texture** backBufferTextures;
+
+	D3D12_CPU_DESCRIPTOR_HANDLE* backBufferHandles;
+
+	Texture* renderTexture;
 
 	std::mutex submitCommandListLock;
 
 	struct PerFrameResource
 	{
-		Graphics::Time time;
+		float deltaTime;
+		float timeElapsed;
+		UINT uintSeed;
+		float floatSeed;
 		Camera::CameraMatrices matrices;
 		DirectX::XMFLOAT2 screenSize;
 		DirectX::XMFLOAT2 screenTexelSize;

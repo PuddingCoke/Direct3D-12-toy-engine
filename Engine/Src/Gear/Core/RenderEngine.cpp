@@ -178,33 +178,31 @@ void RenderEngine::processCommandLists()
 
 void RenderEngine::waitForPreviousFrame()
 {
-	commandQueue->Signal(fence.Get(), fenceValues[Graphics::frameIndex]);
+	commandQueue->Signal(fence.Get(), fenceValues[Graphics::getFrameIndex()]);
 
-	fence->SetEventOnCompletion(fenceValues[Graphics::frameIndex], fenceEvent);
+	fence->SetEventOnCompletion(fenceValues[Graphics::getFrameIndex()], fenceEvent);
 
 	WaitForSingleObjectEx(fenceEvent, INFINITE, FALSE);
 
-	fenceValues[Graphics::frameIndex]++;
+	fenceValues[Graphics::getFrameIndex()]++;
 }
 
 void RenderEngine::waitForNextFrame()
 {
-	swapChain->Present(1, 0);
-
-	const UINT64 currentFenceValue = fenceValues[Graphics::frameIndex];
+	const UINT64 currentFenceValue = fenceValues[Graphics::getFrameIndex()];
 
 	commandQueue->Signal(fence.Get(), currentFenceValue);
 
 	Graphics::frameIndex = swapChain->GetCurrentBackBufferIndex();
 
-	if (fence->GetCompletedValue() < fenceValues[Graphics::frameIndex])
+	if (fence->GetCompletedValue() < fenceValues[Graphics::getFrameIndex()])
 	{
-		fence->SetEventOnCompletion(fenceValues[Graphics::frameIndex], fenceEvent);
+		fence->SetEventOnCompletion(fenceValues[Graphics::getFrameIndex()], fenceEvent);
 
 		WaitForSingleObjectEx(fenceEvent, INFINITE, FALSE);
 	}
 
-	fenceValues[Graphics::frameIndex] = currentFenceValue + 1;
+	fenceValues[Graphics::getFrameIndex()] = currentFenceValue + 1;
 }
 
 void RenderEngine::begin()
@@ -231,12 +229,18 @@ void RenderEngine::end()
 	//update all constant buffers
 	{
 		{
-			prepareCommandList->pushResourceTrackList(getCurrentRenderTexture());
+			prepareCommandList->pushResourceTrackList(getRenderTexture());
 
-			getCurrentRenderTexture()->setAllState(D3D12_RESOURCE_STATE_RENDER_TARGET);
+			getRenderTexture()->setAllState(D3D12_RESOURCE_STATE_RENDER_TARGET);
 		}
 
-		perFrameResource.time = Graphics::time;
+		perFrameResource.deltaTime = Graphics::getDeltaTime();
+
+		perFrameResource.timeElapsed = Graphics::getTimeElapsed();
+
+		perFrameResource.uintSeed = Random::Uint();
+
+		perFrameResource.floatSeed = Random::Float();
 
 		perFrameResource.matrices = Camera::matrices;
 
@@ -257,14 +261,19 @@ void RenderEngine::end()
 
 		drawImGuiFrame(finishCommandList);
 
-		finishCommandList->pushResourceTrackList(getCurrentRenderTexture());
+		finishCommandList->pushResourceTrackList(getRenderTexture());
 
-		getCurrentRenderTexture()->setAllState(D3D12_RESOURCE_STATE_PRESENT);
+		getRenderTexture()->setAllState(D3D12_RESOURCE_STATE_PRESENT);
 
 		finishCommandList->transitionResources();
 	}
 
 	processCommandLists();
+}
+
+void RenderEngine::present()
+{
+	swapChain->Present(1, 0);
 }
 
 void RenderEngine::updateConstantBuffer()
@@ -277,9 +286,9 @@ GPUVendor RenderEngine::getVendor() const
 	return vendor;
 }
 
-Texture* RenderEngine::getCurrentRenderTexture() const
+Texture* RenderEngine::getRenderTexture() const
 {
-	return backBufferResources[Graphics::getFrameIndex()];
+	return renderTexture;
 }
 
 bool RenderEngine::getDisplayImGuiSurface() const
@@ -385,9 +394,46 @@ void RenderEngine::drawImGuiFrame(CommandList* const targetCommandList)
 	}
 }
 
-RenderEngine::RenderEngine(const HWND hwnd, const bool useSwapChainBuffer, const bool initializeImGuiSurface) :
-	fenceValues{}, fenceEvent(nullptr), vendor(GPUVendor::UNKNOWN), perFrameResource{}, initializeImGuiSurface(initializeImGuiSurface), displayImGUISurface(false)
+void RenderEngine::setDefRenderTexture()
 {
+	setRenderTexture(backBufferTextures[Graphics::getFrameIndex()], backBufferHandles[Graphics::getFrameIndex()]);
+}
+
+void RenderEngine::setRenderTexture(Texture* const renderTexture, const D3D12_CPU_DESCRIPTOR_HANDLE handle)
+{
+	//state transition
+	this->renderTexture = renderTexture;
+
+	//set render target
+	CommandList::backBufferHandle = handle;
+}
+
+void RenderEngine::setDeltaTime(const float deltaTime) const
+{
+	Graphics::deltaTime = deltaTime;
+}
+
+void RenderEngine::updateTimeElapsed() const
+{
+	Graphics::timeElapsed += Graphics::getDeltaTime();
+}
+
+RenderEngine::RenderEngine(const UINT width, const UINT height, const HWND hwnd, const bool useSwapChainBuffer, const bool initializeImGuiSurface) :
+	backBufferTextures(nullptr),
+	backBufferHandles(nullptr),
+	fenceEvent(CreateEvent(nullptr, FALSE, FALSE, nullptr)),
+	vendor(GPUVendor::UNKNOWN), perFrameResource{},
+	initializeImGuiSurface(initializeImGuiSurface),
+	displayImGUISurface(false)
+{
+	Graphics::frameBufferCount = useSwapChainBuffer ? 3 : 1;
+
+	Graphics::width = width;
+
+	Graphics::height = height;
+
+	Graphics::aspectRatio = static_cast<float>(Graphics::getWidth()) / static_cast<float>(Graphics::getHeight());
+
 	ComPtr<IDXGIFactory7> factory;
 
 #ifdef _DEBUG
@@ -418,6 +464,8 @@ RenderEngine::RenderEngine(const HWND hwnd, const bool useSwapChainBuffer, const
 		queueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
 
 		GraphicsDevice::get()->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&commandQueue));
+
+		commandQueue->SetName(L"Graphics Command Queue");
 	}
 
 	Shader::createGlobalShaders();
@@ -434,7 +482,7 @@ RenderEngine::RenderEngine(const HWND hwnd, const bool useSwapChainBuffer, const
 
 	{
 		DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
-		swapChainDesc.BufferCount = Graphics::FrameBufferCount;
+		swapChainDesc.BufferCount = useSwapChainBuffer ? Graphics::getFrameBufferCount() : 2;
 		swapChainDesc.Width = Graphics::getWidth();
 		swapChainDesc.Height = Graphics::getHeight();
 		swapChainDesc.Format = Graphics::BackBufferFormat;
@@ -452,68 +500,45 @@ RenderEngine::RenderEngine(const HWND hwnd, const bool useSwapChainBuffer, const
 		swapChain1.As(&swapChain);
 	}
 
-	GraphicsDevice::get()->CreateFence(fenceValues[Graphics::frameIndex], D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
+	fenceValues = new UINT64[Graphics::getFrameBufferCount()];
 
-	fenceValues[Graphics::frameIndex]++;
+	for (UINT i = 0; i < Graphics::getFrameBufferCount(); i++)
+	{
+		fenceValues[i] = 0;
+	}
 
-	fenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+	GraphicsDevice::get()->CreateFence(fenceValues[Graphics::getFrameIndex()], D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
+
+	fenceValues[Graphics::getFrameIndex()]++;
 
 	prepareCommandList = new CommandList(D3D12_COMMAND_LIST_TYPE_DIRECT);
 
 	GraphicsContext::globalConstantBuffer = ResourceManager::createConstantBuffer(sizeof(PerFrameResource), true);
 
 	//make sure beginCommandList is always the first element of recordCommandLists
-	//and we may need constant buffer for resource creation 
 	begin();
 
+	if (useSwapChainBuffer)
 	{
-		DescriptorHandle descriptorHandle = GlobalDescriptorHeap::getRenderTargetHeap()->allocStaticDescriptor(Graphics::FrameBufferCount);
+		DescriptorHandle descriptorHandle = GlobalDescriptorHeap::getRenderTargetHeap()->allocStaticDescriptor(Graphics::getFrameBufferCount());
 
-		if (useSwapChainBuffer)
+		backBufferTextures = new Texture * [Graphics::getFrameBufferCount()];
+
+		backBufferHandles = new D3D12_CPU_DESCRIPTOR_HANDLE[Graphics::getFrameBufferCount()];
+
+		for (UINT i = 0; i < Graphics::getFrameBufferCount(); i++)
 		{
-			for (UINT i = 0; i < Graphics::FrameBufferCount; i++)
-			{
-				ComPtr<ID3D12Resource> texture;
+			ComPtr<ID3D12Resource> texture;
 
-				swapChain->GetBuffer(i, IID_PPV_ARGS(&texture));
+			swapChain->GetBuffer(i, IID_PPV_ARGS(&texture));
 
-				GraphicsDevice::get()->CreateRenderTargetView(texture.Get(), nullptr, descriptorHandle.getCPUHandle());
+			GraphicsDevice::get()->CreateRenderTargetView(texture.Get(), nullptr, descriptorHandle.getCPUHandle());
 
-				Graphics::backBufferHandles[i] = descriptorHandle.getCPUHandle();
+			backBufferHandles[i] = descriptorHandle.getCPUHandle();
 
-				descriptorHandle.move();
+			descriptorHandle.move();
 
-				backBufferResources[i] = new Texture(texture, true, D3D12_RESOURCE_STATE_PRESENT);
-			}
-		}
-		else
-		{
-			D3D12_RENDER_TARGET_VIEW_DESC rtvDesc = {};
-			rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
-			rtvDesc.Format = Graphics::BackBufferFormat;
-			rtvDesc.Texture2D.MipSlice = 0;
-			rtvDesc.Texture2D.PlaneSlice = 0;
-
-			for (UINT i = 0; i < Graphics::FrameBufferCount; i++)
-			{
-				ComPtr<ID3D12Resource> texture;
-
-				const CD3DX12_HEAP_PROPERTIES heapProperties = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
-
-				const CD3DX12_RESOURCE_DESC resourceDesc = CD3DX12_RESOURCE_DESC::Tex2D(Graphics::BackBufferFormat, Graphics::width, Graphics::height, 1, 1, 1, 0, D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET);
-
-				const D3D12_CLEAR_VALUE clearValue = { Graphics::BackBufferFormat ,{0.f,0.f,0.f,1.f} };
-
-				GraphicsDevice::get()->CreateCommittedResource(&heapProperties, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_PRESENT, &clearValue, IID_PPV_ARGS(&texture));
-
-				GraphicsDevice::get()->CreateRenderTargetView(texture.Get(), &rtvDesc, descriptorHandle.getCPUHandle());
-
-				Graphics::backBufferHandles[i] = descriptorHandle.getCPUHandle();
-
-				descriptorHandle.move();
-
-				backBufferResources[i] = new Texture(texture, true, D3D12_RESOURCE_STATE_PRESENT);
-			}
+			backBufferTextures[i] = new Texture(texture, true, D3D12_RESOURCE_STATE_PRESENT);
 		}
 	}
 
@@ -531,7 +556,7 @@ RenderEngine::RenderEngine(const HWND hwnd, const bool useSwapChainBuffer, const
 		const DescriptorHandle handle = GlobalDescriptorHeap::getResourceHeap()->allocStaticDescriptor(1);
 
 		ImGui_ImplWin32_Init(hwnd);
-		ImGui_ImplDX12_Init(GraphicsDevice::get(), Graphics::FrameBufferCount, Graphics::BackBufferFormat,
+		ImGui_ImplDX12_Init(GraphicsDevice::get(), Graphics::getFrameBufferCount(), Graphics::BackBufferFormat,
 			GlobalDescriptorHeap::getResourceHeap()->get(), handle.getCPUHandle(), handle.getGPUHandle());
 	}
 	else
@@ -581,8 +606,23 @@ RenderEngine::~RenderEngine()
 		delete prepareCommandList;
 	}
 
-	for (UINT i = 0; i < Graphics::FrameBufferCount; i++)
+	if (fenceValues)
 	{
-		delete backBufferResources[i];
+		delete[] fenceValues;
+	}
+
+	if (backBufferTextures)
+	{
+		for (UINT i = 0; i < Graphics::getFrameBufferCount(); i++)
+		{
+			delete backBufferTextures[i];
+		}
+
+		delete[] backBufferTextures;
+	}
+
+	if (backBufferHandles)
+	{
+		delete[] backBufferHandles;
 	}
 }
