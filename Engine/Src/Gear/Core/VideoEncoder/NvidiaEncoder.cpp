@@ -241,6 +241,8 @@ bool NvidiaEncoder::encode(Texture* const inputTexture)
 
 		if ((outputResources.size() == LookaheadDepth + 1) && (status == NV_ENC_SUCCESS || status == NV_ENC_ERR_NEED_MORE_INPUT))
 		{
+			frameEncoded++;
+
 			NV_ENC_LOCK_BITSTREAM lockBitstream = { NV_ENC_LOCK_BITSTREAM_VER };
 
 			lockBitstream.outputBitstream = &outputResources.front();
@@ -253,7 +255,7 @@ bool NvidiaEncoder::encode(Texture* const inputTexture)
 
 			const int bitstreamSize = lockBitstream.bitstreamSizeInBytes;
 
-			pkt->pts = av_rescale_q(frameEncoded + 1, AVRational{ 1,(int)FrameRate }, outStream->time_base);
+			pkt->pts = av_rescale_q(frameEncoded, AVRational{ 1,(int)FrameRate }, outStream->time_base);
 
 			pkt->dts = pkt->pts;
 
@@ -280,8 +282,6 @@ bool NvidiaEncoder::encode(Texture* const inputTexture)
 			nvencAPI.nvEncUnregisterResource(encoder, registeredInputResourcePtrs.front());
 
 			registeredInputResourcePtrs.pop();
-
-			frameEncoded++;
 		}
 		else if (status != NV_ENC_SUCCESS && status != NV_ENC_ERR_NEED_MORE_INPUT)
 		{
