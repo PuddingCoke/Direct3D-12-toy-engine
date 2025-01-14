@@ -21,7 +21,7 @@ extern "C"
 #define NVENCCALL(func) \
 {\
 const NVENCSTATUS status = func;\
-if(status != NV_ENC_SUCCESS)\
+if(status != NV_ENC_SUCCESS && status != NV_ENC_ERR_NEED_MORE_INPUT)\
 {\
 std::cout<<"error occured at function "<<#func<<"\n";\
 const char* error = nvencAPI.nvEncGetLastErrorString(encoder);\
@@ -95,17 +95,15 @@ private:
 
 	AVPacket* pkt;
 
-	bool populated;
-
 	std::queue<NV_ENC_REGISTERED_PTR> registeredInputResourcePtrs;
 
 	std::queue<NV_ENC_INPUT_PTR> mappedInputResourcePtrs;
 
+	std::queue<NV_ENC_OUTPUT_RESOURCE_D3D12> outputResources;
+
 	NV_ENC_REGISTERED_PTR registeredOutputResourcePtr;
 
 	NV_ENC_INPUT_PTR mappedOutputResourcePtr;
-
-	std::queue<NV_ENC_OUTPUT_RESOURCE_D3D12> outputD3D12Resources;
 
 };
 

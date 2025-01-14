@@ -26,7 +26,7 @@ public:
 
 	virtual bool encode(Texture* const inputTexture) = 0;
 
-	static constexpr UINT LookaheadDepth = 29;
+	static constexpr UINT LookaheadDepth = 31;
 
 	static constexpr UINT FrameRate = 60;
 

@@ -151,7 +151,7 @@ void Gear::runEncode()
 		break;
 	}
 
-	const UINT numTextures = Encoder::LookaheadDepth + 1 + 90;
+	const UINT numTextures = Encoder::LookaheadDepth + 1;
 
 	Texture* renderTextures[numTextures] = {};
 

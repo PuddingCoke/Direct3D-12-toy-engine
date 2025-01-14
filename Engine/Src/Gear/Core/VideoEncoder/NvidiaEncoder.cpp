@@ -5,8 +5,7 @@ NvidiaEncoder::NvidiaEncoder(const UINT frameToEncode) :
 	readbackHeap(new ReadbackHeap(2 * 4 * Graphics::getWidth() * Graphics::getHeight())),
 	outCtx(nullptr), outStream(nullptr), pkt(nullptr),
 	nvencAPI{ NV_ENCODE_API_FUNCTION_LIST_VER },
-	outputFenceValue(0),
-	populated(false)
+	outputFenceValue(0)
 {
 	moduleNvEncAPI = LoadLibraryA("nvEncodeAPI64.dll");
 
@@ -76,11 +75,7 @@ NvidiaEncoder::NvidiaEncoder(const UINT frameToEncode) :
 
 	std::cout << "[class NvidiaEncoder] start encoding\n";
 
-	avformat_network_init();
-
-	avformat_alloc_output_context2(&outCtx, nullptr, "mp4", nullptr);
-
-	outCtx->url = av_strdup("output.mp4");
+	avformat_alloc_output_context2(&outCtx, nullptr, "mp4", "output.mp4");
 
 	outStream = avformat_new_stream(outCtx, nullptr);
 
@@ -92,7 +87,7 @@ NvidiaEncoder::NvidiaEncoder(const UINT frameToEncode) :
 	vpar->width = Graphics::getWidth();
 	vpar->height = Graphics::getHeight();
 
-	avio_open(&outCtx->pb, outCtx->url, AVIO_FLAG_WRITE);
+	avio_open(&outCtx->pb, "output.mp4", AVIO_FLAG_WRITE);
 
 	avformat_write_header(outCtx, nullptr);
 
@@ -160,10 +155,10 @@ bool NvidiaEncoder::encode(Texture* const inputTexture)
 {
 	timeStart = std::chrono::steady_clock::now();
 
-	NV_ENC_PIC_PARAMS picParams = { NV_ENC_PIC_PARAMS_VER };
-
 	if (frameEncoded == frameToEncode)
 	{
+		NV_ENC_PIC_PARAMS picParams = { NV_ENC_PIC_PARAMS_VER };
+
 		picParams.encodePicFlags = NV_ENC_PIC_FLAG_EOS;
 
 		NVENCCALL(nvencAPI.nvEncEncodePicture(encoder, &picParams));
@@ -176,73 +171,79 @@ bool NvidiaEncoder::encode(Texture* const inputTexture)
 	}
 	else
 	{
-		NV_ENC_REGISTER_RESOURCE registerInputResource = { NV_ENC_REGISTER_RESOURCE_VER };
-		registerInputResource.bufferFormat = bufferFormat;
-		registerInputResource.bufferUsage = NV_ENC_INPUT_IMAGE;
-		registerInputResource.resourceType = NV_ENC_INPUT_RESOURCE_TYPE_DIRECTX;
-		registerInputResource.resourceToRegister = inputTexture->getResource();
-		registerInputResource.subResourceIndex = 0;
-		registerInputResource.width = Graphics::getWidth();
-		registerInputResource.height = Graphics::getHeight();
-		registerInputResource.pitch = 0;
-		registerInputResource.pInputFencePoint = nullptr;
+		NVENCSTATUS status;
 
-		NVENCCALL(nvencAPI.nvEncRegisterResource(encoder, &registerInputResource));
-
-		registeredInputResourcePtrs.push(registerInputResource.registeredResource);
-
-		NV_ENC_MAP_INPUT_RESOURCE mapInputResource = { NV_ENC_MAP_INPUT_RESOURCE_VER };
-		mapInputResource.registeredResource = registerInputResource.registeredResource;
-
-		NVENCCALL(nvencAPI.nvEncMapInputResource(encoder, &mapInputResource));
-
-		mappedInputResourcePtrs.push(mapInputResource.mappedResource);
-
-		InterlockedIncrement(&outputFenceValue);
-
-		NV_ENC_INPUT_RESOURCE_D3D12 inputResource = { NV_ENC_INPUT_RESOURCE_D3D12_VER };
-		inputResource.pInputBuffer = mapInputResource.mappedResource;
-		inputResource.inputFencePoint = NV_ENC_FENCE_POINT_D3D12{ NV_ENC_FENCE_POINT_D3D12_VER };
-
-		NV_ENC_OUTPUT_RESOURCE_D3D12 outputResource = { NV_ENC_INPUT_RESOURCE_D3D12_VER };
-		outputResource.pOutputBuffer = mappedOutputResourcePtr;
-		outputResource.outputFencePoint = NV_ENC_FENCE_POINT_D3D12{ NV_ENC_FENCE_POINT_D3D12_VER };
-		outputResource.outputFencePoint.pFence = outputFence.Get();
-		outputResource.outputFencePoint.signalValue = outputFenceValue;
-		outputResource.outputFencePoint.bSignal = true;
-
-		outputD3D12Resources.push(outputResource);
-
-		picParams.pictureStruct = NV_ENC_PIC_STRUCT_FRAME;
-
-		picParams.inputBuffer = &inputResource;
-
-		picParams.outputBitstream = &outputResource;
-
-		picParams.bufferFmt = bufferFormat;
-
-		picParams.inputWidth = Graphics::getWidth();
-
-		picParams.inputHeight = Graphics::getHeight();
-
-		picParams.completionEvent = nullptr;
-
-		const NVENCSTATUS status = nvencAPI.nvEncEncodePicture(encoder, &picParams);
-
-		std::cout << "status " << status << " " << registeredInputResourcePtrs.size() << "\n";
-
-		if (registeredInputResourcePtrs.size() == LookaheadDepth)
 		{
-			std::cout << "populated\n";
+			NV_ENC_REGISTER_RESOURCE registerInputResource = { NV_ENC_REGISTER_RESOURCE_VER };
+			registerInputResource.bufferFormat = bufferFormat;
+			registerInputResource.bufferUsage = NV_ENC_INPUT_IMAGE;
+			registerInputResource.resourceType = NV_ENC_INPUT_RESOURCE_TYPE_DIRECTX;
+			registerInputResource.resourceToRegister = inputTexture->getResource();
+			registerInputResource.subResourceIndex = 0;
+			registerInputResource.width = Graphics::getWidth();
+			registerInputResource.height = Graphics::getHeight();
+			registerInputResource.pitch = 0;
+			registerInputResource.pInputFencePoint = nullptr;
 
-			populated = true;
+			NVENCCALL(nvencAPI.nvEncRegisterResource(encoder, &registerInputResource));
+
+			registeredInputResourcePtrs.push(registerInputResource.registeredResource);
+
+			NV_ENC_MAP_INPUT_RESOURCE mapInputResource = { NV_ENC_MAP_INPUT_RESOURCE_VER };
+			mapInputResource.registeredResource = registerInputResource.registeredResource;
+
+			NVENCCALL(nvencAPI.nvEncMapInputResource(encoder, &mapInputResource));
+
+			mappedInputResourcePtrs.push(mapInputResource.mappedResource);
+
+			NV_ENC_INPUT_RESOURCE_D3D12 inputResource = { NV_ENC_INPUT_RESOURCE_D3D12_VER };
+			inputResource.pInputBuffer = mapInputResource.mappedResource;
+			inputResource.inputFencePoint = NV_ENC_FENCE_POINT_D3D12{ NV_ENC_FENCE_POINT_D3D12_VER };
+
+			NV_ENC_OUTPUT_RESOURCE_D3D12 outputResource = { NV_ENC_INPUT_RESOURCE_D3D12_VER };
+			outputResource.pOutputBuffer = mappedOutputResourcePtr;
+			outputResource.outputFencePoint = NV_ENC_FENCE_POINT_D3D12{ NV_ENC_FENCE_POINT_D3D12_VER };
+			outputResource.outputFencePoint.pFence = outputFence.Get();
+			outputResource.outputFencePoint.signalValue = ++outputFenceValue;
+			outputResource.outputFencePoint.bSignal = true;
+
+			outputResources.push(outputResource);
+
+			NV_ENC_PIC_PARAMS picParams = { NV_ENC_PIC_PARAMS_VER };
+
+			picParams.pictureStruct = NV_ENC_PIC_STRUCT_FRAME;
+
+			picParams.inputBuffer = &inputResource;
+
+			picParams.outputBitstream = &outputResource;
+
+			picParams.bufferFmt = bufferFormat;
+
+			picParams.inputWidth = Graphics::getWidth();
+
+			picParams.inputHeight = Graphics::getHeight();
+
+			picParams.completionEvent = nullptr;
+
+			status = nvencAPI.nvEncEncodePicture(encoder, &picParams);
+
+			if (status != NV_ENC_SUCCESS && status != NV_ENC_ERR_NEED_MORE_INPUT)
+			{
+				const char* error = nvencAPI.nvEncGetLastErrorString(encoder);
+
+				std::cout << "status " << status << "\n";
+
+				std::cout << error << "\n";
+
+				__debugbreak();
+			}
 		}
 
-		if (status == NV_ENC_SUCCESS)
+		if ((outputResources.size() == LookaheadDepth + 1) && (status == NV_ENC_SUCCESS || status == NV_ENC_ERR_NEED_MORE_INPUT))
 		{
 			NV_ENC_LOCK_BITSTREAM lockBitstream = { NV_ENC_LOCK_BITSTREAM_VER };
 
-			lockBitstream.outputBitstream = &outputD3D12Resources.front();
+			lockBitstream.outputBitstream = &outputResources.front();
 
 			lockBitstream.doNotWait = 0;
 
@@ -256,20 +257,13 @@ bool NvidiaEncoder::encode(Texture* const inputTexture)
 
 			pkt->dts = pkt->pts;
 
+			pkt->duration = av_rescale_q(1, AVRational{ 1,(int)FrameRate }, outStream->time_base);
+
 			pkt->stream_index = outStream->index;
 
 			pkt->data = bitstreamPtr;
 
 			pkt->size = bitstreamSize;
-
-			if (!memcmp(bitstreamPtr, "\x00\x00\x00\x01", 4) && ((bitstreamPtr[4] & 31) == 5))
-			{
-				pkt->flags = AV_PKT_FLAG_KEY;
-			}
-			else
-			{
-				pkt->flags = 0;
-			}
 
 			av_write_frame(outCtx, pkt);
 
@@ -277,10 +271,7 @@ bool NvidiaEncoder::encode(Texture* const inputTexture)
 
 			NVENCCALL(nvencAPI.nvEncUnlockBitstream(encoder, lockBitstream.outputBitstream));
 
-			//unmap and unregister first resource in queue since nvenc finish encoding this frame 
-			//and we need our graphics to reuse related texture
-
-			outputD3D12Resources.pop();
+			outputResources.pop();
 
 			nvencAPI.nvEncUnmapInputResource(encoder, mappedInputResourcePtrs.front());
 
@@ -292,10 +283,8 @@ bool NvidiaEncoder::encode(Texture* const inputTexture)
 
 			frameEncoded++;
 		}
-		else if (status != NV_ENC_ERR_NEED_MORE_INPUT)
+		else if (status != NV_ENC_SUCCESS && status != NV_ENC_ERR_NEED_MORE_INPUT)
 		{
-			std::cout << "error occured at function " << "nvencAPI.nvEncEncodePicture(encoder, &picParams)" << "\n";
-
 			const char* error = nvencAPI.nvEncGetLastErrorString(encoder);
 
 			std::cout << "status " << status << "\n";
@@ -306,7 +295,7 @@ bool NvidiaEncoder::encode(Texture* const inputTexture)
 		}
 	}
 
-	//displayProgress();
+	displayProgress();
 
 	timeEnd = std::chrono::steady_clock::now();
 
