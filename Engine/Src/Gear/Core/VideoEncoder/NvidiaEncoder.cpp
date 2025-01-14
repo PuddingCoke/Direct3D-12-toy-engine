@@ -283,16 +283,6 @@ bool NvidiaEncoder::encode(Texture* const inputTexture)
 
 			registeredInputResourcePtrs.pop();
 		}
-		else if (status != NV_ENC_SUCCESS && status != NV_ENC_ERR_NEED_MORE_INPUT)
-		{
-			const char* error = nvencAPI.nvEncGetLastErrorString(encoder);
-
-			std::cout << "status " << status << "\n";
-
-			std::cout << error << "\n";
-
-			__debugbreak();
-		}
 	}
 
 	displayProgress();
