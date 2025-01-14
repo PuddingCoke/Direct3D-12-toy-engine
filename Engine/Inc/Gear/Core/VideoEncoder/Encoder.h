@@ -26,13 +26,13 @@ public:
 
 	virtual bool encode(Texture* const inputTexture) = 0;
 
-	static constexpr UINT LookaheadDepth = 31;
+	static constexpr UINT lookaheadDepth = 31;
 
-	static constexpr UINT FrameRate = 60;
+	static constexpr UINT frameRate = 60;
 
 protected:
 
-	static constexpr UINT ProgressBarWidth = 30;
+	static constexpr UINT progressBarWidth = 30;
 
 	void displayProgress() const;
 

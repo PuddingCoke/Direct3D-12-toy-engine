@@ -151,7 +151,7 @@ void Gear::runEncode()
 		break;
 	}
 
-	const UINT numTextures = Encoder::LookaheadDepth + 1;
+	const UINT numTextures = Encoder::lookaheadDepth + 1;
 
 	Texture* renderTextures[numTextures] = {};
 
@@ -182,7 +182,7 @@ void Gear::runEncode()
 
 	UINT index = 0;
 
-	RenderEngine::get()->setDeltaTime(1.f / static_cast<float>(Encoder::FrameRate));
+	RenderEngine::get()->setDeltaTime(1.f / static_cast<float>(Encoder::frameRate));
 
 	while (true)
 	{
