@@ -38,7 +38,7 @@ NvidiaEncoder::NvidiaEncoder(const UINT frameToEncode) :
 	config.gopLength = 120;
 	config.frameIntervalP = 1;
 	config.rcParams.enableLookahead = 1;
-	config.rcParams.lookaheadDepth = LookaheadDepth;
+	config.rcParams.lookaheadDepth = lookaheadDepth;
 	config.rcParams.rateControlMode = NV_ENC_PARAMS_RC_VBR;
 	config.rcParams.averageBitRate = 20000000U;
 	config.rcParams.maxBitRate = 40000000U;
@@ -57,7 +57,7 @@ NvidiaEncoder::NvidiaEncoder(const UINT frameToEncode) :
 	encoderParams.darHeight = Graphics::getHeight();
 	encoderParams.maxEncodeWidth = Graphics::getWidth();
 	encoderParams.maxEncodeHeight = Graphics::getHeight();
-	encoderParams.frameRateNum = FrameRate;
+	encoderParams.frameRateNum = frameRate;
 	encoderParams.frameRateDen = 1;
 	encoderParams.enablePTD = 1;
 	encoderParams.enableOutputInVidmem = 0;
@@ -69,7 +69,7 @@ NvidiaEncoder::NvidiaEncoder(const UINT frameToEncode) :
 
 	std::cout << "[class NvidiaEncoder] render at " << Graphics::getWidth() << " x " << Graphics::getHeight() << "\n";
 
-	std::cout << "[class NvidiaEncoder] frameRate " << FrameRate << "\n";
+	std::cout << "[class NvidiaEncoder] frameRate " << frameRate << "\n";
 
 	std::cout << "[class NvidiaEncoder] frameToEncode " << frameToEncode << "\n";
 
@@ -239,7 +239,7 @@ bool NvidiaEncoder::encode(Texture* const inputTexture)
 			}
 		}
 
-		if ((outputResources.size() == LookaheadDepth + 1) && (status == NV_ENC_SUCCESS || status == NV_ENC_ERR_NEED_MORE_INPUT))
+		if ((outputResources.size() == lookaheadDepth + 1) && (status == NV_ENC_SUCCESS || status == NV_ENC_ERR_NEED_MORE_INPUT))
 		{
 			frameEncoded++;
 
@@ -255,11 +255,11 @@ bool NvidiaEncoder::encode(Texture* const inputTexture)
 
 			const int bitstreamSize = lockBitstream.bitstreamSizeInBytes;
 
-			pkt->pts = av_rescale_q(frameEncoded, AVRational{ 1,(int)FrameRate }, outStream->time_base);
+			pkt->pts = av_rescale_q(frameEncoded, AVRational{ 1,(int)frameRate }, outStream->time_base);
 
 			pkt->dts = pkt->pts;
 
-			pkt->duration = av_rescale_q(1, AVRational{ 1,(int)FrameRate }, outStream->time_base);
+			pkt->duration = av_rescale_q(1, AVRational{ 1,(int)frameRate }, outStream->time_base);
 
 			pkt->stream_index = outStream->index;
 
