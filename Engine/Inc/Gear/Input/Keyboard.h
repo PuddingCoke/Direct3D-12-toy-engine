@@ -130,14 +130,14 @@ public:
 	static bool onKeyDown(const Key key);
 
 	//do not record command here
-	static int addKeyDownEvent(const Key key,const std::function<void(void)>& func);
+	static uint64_t addKeyDownEvent(const Key key,const std::function<void(void)>& func);
 
 	//do not record command here
-	static int addKeyUpEvent(const Key key,const std::function<void(void)>& func);
+	static uint64_t addKeyUpEvent(const Key key,const std::function<void(void)>& func);
 
-	static void removeKeyDownEvent(const Key key, const int id);
+	static void removeKeyDownEvent(const Key key, const uint64_t id);
 
-	static void removeKeyUpEvent(const Key key, const int id);
+	static void removeKeyUpEvent(const Key key, const uint64_t id);
 
 private:
 

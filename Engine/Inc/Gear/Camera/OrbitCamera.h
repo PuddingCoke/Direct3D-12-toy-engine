@@ -40,9 +40,9 @@ private:
 
 	const DirectX::XMVECTOR up;
 
-	int moveEventID;
+	uint64_t moveEventID;
 
-	int scrollEventID;
+	uint64_t scrollEventID;
 
 };
 
