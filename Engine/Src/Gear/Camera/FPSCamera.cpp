@@ -3,7 +3,7 @@
 FPSCamera::FPSCamera(const DirectX::XMVECTOR& eye, const DirectX::XMVECTOR& lookDir, const DirectX::XMVECTOR& up, const float moveSpeed):
 	eye(eye), lookDir(lookDir), up(up), moveSpeed(moveSpeed)
 {
-	eventID = Mouse::addMoveEvent([this]()
+	moveEventID = Mouse::addMoveEvent([this]()
 		{
 			if (Mouse::getLeftDown())
 			{
@@ -39,7 +39,7 @@ FPSCamera::FPSCamera(const DirectX::XMVECTOR& eye, const DirectX::XMVECTOR& look
 
 FPSCamera::~FPSCamera()
 {
-	Mouse::removeMoveEvent(eventID);
+	Mouse::removeMoveEvent(moveEventID);
 }
 
 void FPSCamera::applyInput(const float dt)

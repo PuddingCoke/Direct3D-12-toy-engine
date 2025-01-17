@@ -5,14 +5,15 @@ Event::Event() :
 {
 }
 
-void Event::operator-=(const int id)
+void Event::operator-=(const uint64_t id)
 {
 	functions.erase(id);
 }
 
-int Event::operator+=(const std::function<void(void)>& func)
+uint64_t Event::operator+=(const std::function<void(void)>& func)
 {
 	functions.emplace(++idx, func);
+
 	return idx;
 }
 

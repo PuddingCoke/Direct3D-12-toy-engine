@@ -5,6 +5,7 @@
 
 #include<map>
 #include<functional>
+#include<cstdint>
 
 class Event
 {
@@ -12,17 +13,17 @@ public:
 
 	Event();
 
-	void operator-=(const int id);
+	void operator-=(const uint64_t id);
 
- 	int operator+=(const std::function<void(void)>& func);
+	uint64_t operator+=(const std::function<void(void)>& func);
 
 	void operator()();
 
 private:
 
-	int idx;
+	uint64_t idx;
 
-	std::map<int, std::function<void(void)>> functions;
+	std::map<uint64_t, std::function<void(void)>> functions;
 
 };
 

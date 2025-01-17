@@ -38,34 +38,34 @@ public:
 	static bool onScroll();
 
 	//do not record command here
-	static int addMoveEvent(const std::function<void(void)>& func);
+	static uint64_t addMoveEvent(const std::function<void(void)>& func);
 
 	//do not record command here
-	static int addLeftDownEvent(const std::function<void(void)>& func);
+	static uint64_t addLeftDownEvent(const std::function<void(void)>& func);
 
 	//do not record command here
-	static int addRightDownEvent(const std::function<void(void)>& func);
+	static uint64_t addRightDownEvent(const std::function<void(void)>& func);
 
 	//do not record command here
-	static int addLeftUpEvent(const std::function<void(void)>& func);
+	static uint64_t addLeftUpEvent(const std::function<void(void)>& func);
 
 	//do not record command here
-	static int addRightUpEvent(const std::function<void(void)>& func);
+	static uint64_t addRightUpEvent(const std::function<void(void)>& func);
 
 	//do not record command here
-	static int addScrollEvent(const std::function<void(void)>& func);
+	static uint64_t addScrollEvent(const std::function<void(void)>& func);
 
-	static void removeMoveEvent(const int id);
+	static void removeMoveEvent(const uint64_t id);
 
-	static void removeLeftDownEvent(const int id);
+	static void removeLeftDownEvent(const uint64_t id);
 
-	static void removeRightDownEvent(const int id);
+	static void removeRightDownEvent(const uint64_t id);
 
-	static void removeLeftUpEvent(const int id);
+	static void removeLeftUpEvent(const uint64_t id);
 
-	static void removeRightUpEvent(const int id);
+	static void removeRightUpEvent(const uint64_t id);
 
-	static void removeScrollEvent(const int id);
+	static void removeScrollEvent(const uint64_t id);
 
 private:
 

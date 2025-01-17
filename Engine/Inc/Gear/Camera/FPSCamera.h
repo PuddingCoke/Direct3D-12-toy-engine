@@ -40,7 +40,7 @@ private:
 
 	DirectX::XMVECTOR up;
 
-	int eventID;
+	uint64_t moveEventID;
 
 };
 

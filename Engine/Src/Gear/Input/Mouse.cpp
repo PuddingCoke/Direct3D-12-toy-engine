@@ -78,62 +78,62 @@ bool Mouse::onScroll()
 	return onScrolled;
 }
 
-int Mouse::addMoveEvent(const std::function<void(void)>& func)
+uint64_t Mouse::addMoveEvent(const std::function<void(void)>& func)
 {
 	return moveEvent += func;
 }
 
-int Mouse::addLeftDownEvent(const std::function<void(void)>& func)
+uint64_t Mouse::addLeftDownEvent(const std::function<void(void)>& func)
 {
 	return leftDownEvent += func;
 }
 
-int Mouse::addRightDownEvent(const std::function<void(void)>& func)
+uint64_t Mouse::addRightDownEvent(const std::function<void(void)>& func)
 {
 	return rightDownEvent += func;
 }
 
-int Mouse::addLeftUpEvent(const std::function<void(void)>& func)
+uint64_t Mouse::addLeftUpEvent(const std::function<void(void)>& func)
 {
 	return leftUpEvent += func;
 }
 
-int Mouse::addRightUpEvent(const std::function<void(void)>& func)
+uint64_t Mouse::addRightUpEvent(const std::function<void(void)>& func)
 {
 	return rightUpEvent += func;
 }
 
-int Mouse::addScrollEvent(const std::function<void(void)>& func)
+uint64_t Mouse::addScrollEvent(const std::function<void(void)>& func)
 {
 	return scrollEvent += func;
 }
 
-void Mouse::removeMoveEvent(const int id)
+void Mouse::removeMoveEvent(const uint64_t id)
 {
 	moveEvent -= id;
 }
 
-void Mouse::removeLeftDownEvent(const int id)
+void Mouse::removeLeftDownEvent(const uint64_t id)
 {
 	leftDownEvent -= id;
 }
 
-void Mouse::removeRightDownEvent(const int id)
+void Mouse::removeRightDownEvent(const uint64_t id)
 {
 	rightDownEvent -= id;
 }
 
-void Mouse::removeLeftUpEvent(const int id)
+void Mouse::removeLeftUpEvent(const uint64_t id)
 {
 	leftUpEvent -= id;
 }
 
-void Mouse::removeRightUpEvent(const int id)
+void Mouse::removeRightUpEvent(const uint64_t id)
 {
 	rightUpEvent -= id;
 }
 
-void Mouse::removeScrollEvent(const int id)
+void Mouse::removeScrollEvent(const uint64_t id)
 {
 	scrollEvent -= id;
 }
@@ -141,9 +141,14 @@ void Mouse::removeScrollEvent(const int id)
 void Mouse::resetDeltaInfo()
 {
 	dx = 0;
+
 	dy = 0;
+
 	onMoved = false;
+
 	onLeftDowned = false;
+
 	onRightDowned = false;
+
 	onScrolled = false;
 }

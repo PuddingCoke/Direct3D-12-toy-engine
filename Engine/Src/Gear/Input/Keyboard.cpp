@@ -438,22 +438,22 @@ bool Keyboard::onKeyDown(const Key key)
 	return onKeyDownMap[key];
 }
 
-int Keyboard::addKeyDownEvent(const Key key,const std::function<void(void)>& func)
+uint64_t Keyboard::addKeyDownEvent(const Key key,const std::function<void(void)>& func)
 {
 	return keyDownEvents[key] += func;
 }
 
-int Keyboard::addKeyUpEvent(const Key key,const std::function<void(void)>& func)
+uint64_t Keyboard::addKeyUpEvent(const Key key,const std::function<void(void)>& func)
 {
 	return keyUpEvents[key] += func;
 }
 
-void Keyboard::removeKeyDownEvent(const Key key, const int id)
+void Keyboard::removeKeyDownEvent(const Key key, const uint64_t id)
 {
 	keyDownEvents[key] -= id;
 }
 
-void Keyboard::removeKeyUpEvent(const Key key, const int id)
+void Keyboard::removeKeyUpEvent(const Key key, const uint64_t id)
 {
 	keyUpEvents[key] -= id;
 }
