@@ -1,16 +1,16 @@
 #include<Gear/Core/DX/Buffer.h>
 
-Buffer::Buffer(const UINT size, const bool stateTracking, const D3D12_RESOURCE_FLAGS resFlags, const D3D12_RESOURCE_STATES initialState) :
-	Resource(CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE, CD3DX12_RESOURCE_DESC::Buffer(size, resFlags), stateTracking, initialState, nullptr),
-	globalState(std::make_shared<UINT>(initialState)),
+Buffer::Buffer(const uint64_t size, const bool stateTracking, const D3D12_RESOURCE_FLAGS resFlags, const uint32_t initialState) :
+	Resource(CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE, CD3DX12_RESOURCE_DESC::Buffer(size, resFlags), stateTracking, static_cast<D3D12_RESOURCE_STATES>(initialState), nullptr),
+	globalState(std::make_shared<uint32_t>(initialState)),
 	internalState(initialState),
 	transitionState(D3D12_RESOURCE_STATE_UNKNOWN)
 {
 }
 
-Buffer::Buffer(const ComPtr<ID3D12Resource>& buffer, const bool stateTracking, const UINT initialState) :
+Buffer::Buffer(const ComPtr<ID3D12Resource>& buffer, const bool stateTracking, const uint32_t initialState) :
 	Resource(buffer, stateTracking),
-	globalState(std::make_shared<UINT>(initialState)),
+	globalState(std::make_shared<uint32_t>(initialState)),
 	internalState(initialState),
 	transitionState(D3D12_RESOURCE_STATE_UNKNOWN)
 {
@@ -76,7 +76,7 @@ void Buffer::transition(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers,
 	resetTransitionStates();
 }
 
-void Buffer::setState(const UINT state)
+void Buffer::setState(const uint32_t state)
 {
 	if (transitionState == D3D12_RESOURCE_STATE_UNKNOWN)
 	{
@@ -88,7 +88,7 @@ void Buffer::setState(const UINT state)
 	}
 }
 
-UINT Buffer::getState() const
+uint32_t Buffer::getState() const
 {
 	return internalState;
 }

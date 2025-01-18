@@ -20,22 +20,22 @@ public:
 	~ConstantBufferManager();
 
 	//256bytes 512bytes 1024bytes ......
-	static constexpr UINT numRegion = 3;
+	static constexpr uint32_t numRegion = 3;
 
 	//define number of each region's subregion
-	static constexpr UINT numSubRegion[numRegion] = { 1024,512,512 };
+	static constexpr uint32_t numSubRegion[numRegion] = { 1024,512,512 };
 
 	struct AvailableDescriptor
 	{
 		//provide gpu address to directly bind constant buffer
 		const D3D12_GPU_VIRTUAL_ADDRESS gpuAddress;
 		//provide index to directly access resource in resource descriptor heap
-		const UINT descriptorIndex;
-	} requestDescriptor(const UINT regionIndex);
+		const uint32_t descriptorIndex;
+	} requestDescriptor(const uint32_t regionIndex);
 
-	void retrieveDescriptor(const UINT regionIndex, const UINT descriptorIndex);
+	void retrieveDescriptor(const uint32_t regionIndex, const uint32_t descriptorIndex);
 
-	void updateSubregion(const UINT regionIndex, const UINT descriptorIndex, const void* const data, const UINT size);
+	void updateSubregion(const uint32_t regionIndex, const uint32_t descriptorIndex, const void* const data, const uint32_t size);
 
 	static ConstantBufferManager* get();
 
@@ -50,10 +50,10 @@ private:
 	Buffer* buffer;
 
 	//bufferGPULocation + baseAddressOffset + (256 << regionIndex) * subregionIndex = constantBufferAddress
-	UINT baseAddressOffsets[numRegion];
+	uint32_t baseAddressOffsets[numRegion];
 
 	//descriptorIndex - baseDescriptorIndex = subregionIndex
-	UINT baseDescriptorIndices[numRegion];
+	uint32_t baseDescriptorIndices[numRegion];
 
 	//for each frame and each subregion we need [FrameBufferCount] uploadheaps
 	std::vector<std::vector<UploadHeap*>> uploadHeaps[numRegion];
@@ -63,16 +63,16 @@ private:
 
 	//store available descriptor indices
 	//we use mutex to protect this container
-	std::vector<UINT> availableDescriptorIndices[numRegion];
+	std::vector<uint32_t> availableDescriptorIndices[numRegion];
 
 	//prevent race condition
 	std::mutex mutexes[numRegion];
 
 	//record subregionIndex of each region that need update
-	std::vector<UINT> updateSubregionIndices[numRegion];
+	std::vector<uint32_t> updateSubregionIndices[numRegion];
 
 	//indicate which uploadheap of subregion need update
-	UINT updateUploadHeapIndex;
+	uint32_t updateUploadHeapIndex;
 
 };
 

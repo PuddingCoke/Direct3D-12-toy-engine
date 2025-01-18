@@ -9,21 +9,21 @@ struct GeometryObject
 {
 	Buffer* vertexBuffer;//must not be nullptr
 
-	UINT64 vertexByteOffset;//might create BLAS from single vertex buffer
+	uint64_t vertexByteOffset;//might create BLAS from single vertex buffer
 
-	UINT vertexCount;//must not be 0
+	uint32_t vertexCount;//must not be 0
 
-	UINT vertexSize;//must not be 0
+	uint32_t vertexSize;//must not be 0
 
 	Buffer* indexBuffer;//optional
 
-	UINT64 indexByteOffset;//optional
+	uint64_t indexByteOffset;//optional
 
-	UINT indexCount;//optional
+	uint32_t indexCount;//optional
 
 	Buffer* transformBuffer;//optional
 
-	UINT64 transformByteOffset;//optional
+	uint64_t transformByteOffset;//optional
 
 	bool opaque;//must choose a value
 };
@@ -51,9 +51,9 @@ private:
 	//note:addGeometryObject will throw error if input buffer does't need state tracking while without mentioned state set
 	std::vector<Buffer*> transitionBuffers;
 
-	UINT scratchBufferSize;
+	uint32_t scratchBufferSize;
 
-	UINT blasBufferSize;
+	uint32_t blasBufferSize;
 
 	const D3D12_RAYTRACING_ACCELERATION_STRUCTURE_BUILD_FLAGS buildFlag;
 

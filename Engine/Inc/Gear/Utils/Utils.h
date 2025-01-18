@@ -22,7 +22,7 @@ public:
 
 	static std::string getRootFolder();
 	
-	static UINT getPixelSize(const DXGI_FORMAT format);
+	static uint32_t getPixelSize(const DXGI_FORMAT format);
 
 	class File
 	{

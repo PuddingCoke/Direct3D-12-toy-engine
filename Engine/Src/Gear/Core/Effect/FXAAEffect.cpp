@@ -1,6 +1,6 @@
 #include<Gear/Core/Effect/FXAAEffect.h>
 
-FXAAEffect::FXAAEffect(GraphicsContext* const context, const UINT width, const UINT height) :
+FXAAEffect::FXAAEffect(GraphicsContext* const context, const uint32_t width, const uint32_t height) :
 	Effect(context, width, height, DXGI_FORMAT_R8G8B8A8_UNORM), fxaaParam{ 1.0f,0.75f,0.166f,0.0633f },
 	colorLumaTexture(ResourceManager::createTextureRenderView(width, height, DXGI_FORMAT_R8G8B8A8_UNORM, 1, 1, false, true,
 		DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_R8G8B8A8_UNORM))

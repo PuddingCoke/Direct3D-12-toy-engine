@@ -20,25 +20,25 @@ public:
 
 	void operator=(const Encoder&) = delete;
 
-	Encoder(const UINT frameToEncode);
+	Encoder(const uint32_t frameToEncode);
 
 	virtual ~Encoder();
 
 	virtual bool encode(Texture* const inputTexture) = 0;
 
-	static constexpr UINT lookaheadDepth = 31;
+	static constexpr uint32_t lookaheadDepth = 31;
 
-	static constexpr UINT frameRate = 60;
+	static constexpr uint32_t frameRate = 60;
 
 protected:
 
-	static constexpr UINT progressBarWidth = 30;
+	static constexpr uint32_t progressBarWidth = 30;
 
 	void displayProgress() const;
 
-	UINT frameEncoded;
+	uint32_t frameEncoded;
 
-	const UINT frameToEncode;
+	const uint32_t frameToEncode;
 
 	bool encoding;
 

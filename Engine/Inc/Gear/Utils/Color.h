@@ -28,7 +28,7 @@ struct Color
 
 	static Color random();
 
-	static Color HSVtoRGB(const Color& c);
+	static Color hsvToRgb(const Color& c);
 
 };
 

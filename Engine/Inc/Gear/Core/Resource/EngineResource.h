@@ -26,7 +26,7 @@ protected:
 
 	D3D12_CPU_DESCRIPTOR_HANDLE srvUAVCBVHandleStart;
 
-	UINT numSRVUAVCBVDescriptors;
+	uint32_t numSRVUAVCBVDescriptors;
 
 };
 

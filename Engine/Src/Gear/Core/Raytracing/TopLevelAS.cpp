@@ -38,7 +38,7 @@ void TopLevelAS::generateTLAS(CommandList* const commandList)
 		D3D12_BUILD_RAYTRACING_ACCELERATION_STRUCTURE_INPUTS inputs = {};
 		inputs.Type = D3D12_RAYTRACING_ACCELERATION_STRUCTURE_TYPE_TOP_LEVEL;
 		inputs.DescsLayout = D3D12_ELEMENTS_LAYOUT_ARRAY;
-		inputs.NumDescs = instances.size();
+		inputs.NumDescs = static_cast<uint32_t>(instances.size());
 		inputs.Flags = buildFlag;
 
 		D3D12_RAYTRACING_ACCELERATION_STRUCTURE_PREBUILD_INFO info = {};
@@ -61,7 +61,7 @@ void TopLevelAS::generateTLAS(CommandList* const commandList)
 	{
 		std::vector<D3D12_RAYTRACING_INSTANCE_DESC> instanceDescs = std::vector<D3D12_RAYTRACING_INSTANCE_DESC>(instances.size());
 
-		for (UINT i = 0; i < instanceDescs.size(); i++)
+		for (uint32_t i = 0; i < instanceDescs.size(); i++)
 		{
 			instanceDescs[i].InstanceID = instances[i].instanceID;
 
@@ -83,7 +83,7 @@ void TopLevelAS::generateTLAS(CommandList* const commandList)
 		D3D12_BUILD_RAYTRACING_ACCELERATION_STRUCTURE_DESC desc = {};
 		desc.Inputs.Type = D3D12_RAYTRACING_ACCELERATION_STRUCTURE_TYPE_TOP_LEVEL;
 		desc.Inputs.DescsLayout = D3D12_ELEMENTS_LAYOUT_ARRAY;
-		desc.Inputs.NumDescs = instances.size();
+		desc.Inputs.NumDescs = static_cast<uint32_t>(instances.size());
 		desc.Inputs.InstanceDescs = instanceBuffer->getGPUAddress();
 		desc.Inputs.Flags = D3D12_RAYTRACING_ACCELERATION_STRUCTURE_BUILD_FLAG_NONE;
 		desc.ScratchAccelerationStructureData = scratchBuffer->getGPUAddress();

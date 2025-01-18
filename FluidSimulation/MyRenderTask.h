@@ -326,7 +326,8 @@ public:
 
 		if (colorUpdateTimer.update(Graphics::getDeltaTime() * config.colorChangeSpeed))
 		{
-			Color c = Color::HSVtoRGB({ Random::Float(),1.f,1.f });
+			Color c = Color::hsvToRgb({ Random::genFloat(),1.f,1.f });
+
 			simulationParam.splatColor = { c.r,c.g,c.b,1.f };
 		}
 

@@ -24,13 +24,13 @@ class BloomEffect :public Effect
 {
 public:
 
-	static constexpr UINT blurSteps = 5;
+	static constexpr uint32_t blurSteps = 5;
 
-	static constexpr unsigned int iteration[blurSteps] = { 2,3,4,5,6 };
+	static constexpr uint32_t iteration[blurSteps] = { 2,3,4,5,6 };
 
 	static constexpr DirectX::XMUINT2 workGroupSize = { 60,16 };
 
-	BloomEffect(GraphicsContext* const context, const UINT width, const UINT height, ResourceManager* const resManager);
+	BloomEffect(GraphicsContext* const context, const uint32_t width, const uint32_t height, ResourceManager* const resManager);
 
 	~BloomEffect();
 
@@ -54,7 +54,7 @@ public:
 
 private:
 
-	void updateCurve(const UINT index);
+	void updateCurve(const uint32_t index);
 
 	Shader* bloomFilter;
 
@@ -106,7 +106,7 @@ private:
 		float weight[8];
 		float offset[8];
 		DirectX::XMFLOAT2 texelSize;
-		UINT iteration;
+		uint32_t iteration;
 		float sigma;
 		DirectX::XMFLOAT4 padding[11];
 	}blurParam[blurSteps];

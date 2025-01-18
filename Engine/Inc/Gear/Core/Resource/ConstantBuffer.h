@@ -14,13 +14,13 @@ class ConstantBuffer :public EngineResource
 {
 public:
 
-	ConstantBuffer(Buffer* const buffer, const UINT size, const bool persistent);
+	ConstantBuffer(Buffer* const buffer, const uint32_t size, const bool persistent);
 
 	ConstantBuffer(const ConstantBuffer&) = delete;
 
 	void operator=(const ConstantBuffer&) = delete;
 
-	void update(const void* const data, const UINT size) const;
+	void update(const void* const data, const uint32_t size) const;
 
 	~ConstantBuffer();
 
@@ -38,9 +38,9 @@ private:
 
 	D3D12_GPU_VIRTUAL_ADDRESS gpuAddress;
 
-	UINT bufferIndex;
+	uint32_t bufferIndex;
 
-	UINT regionIndex;
+	uint32_t regionIndex;
 
 	Buffer* buffer;
 

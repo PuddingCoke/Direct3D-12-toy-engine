@@ -61,7 +61,7 @@ std::string Utils::getRootFolder()
 	return exeRootPath;
 }
 
-UINT Utils::getPixelSize(const DXGI_FORMAT format)
+uint32_t Utils::getPixelSize(const DXGI_FORMAT format)
 {
 	switch(format)
     {

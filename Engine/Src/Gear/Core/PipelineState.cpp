@@ -80,7 +80,7 @@ PipelineState::PipelineState()
 		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = getDefaultFullScreenState();
 		desc.PS = Shader::fullScreenPS->getByteCode();
 		desc.NumRenderTargets = 1;
-		desc.RTVFormats[0] = Graphics::BackBufferFormat;
+		desc.RTVFormats[0] = Graphics::backBufferFormat;
 
 		GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&fullScreenBlitState));
 

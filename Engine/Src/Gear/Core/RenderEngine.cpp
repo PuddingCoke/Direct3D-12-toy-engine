@@ -44,9 +44,9 @@ void RenderEngine::submitCommandList(CommandList* const commandList)
 
 					if ((*(pendingBarrier.texture->globalState)).allState == D3D12_RESOURCE_STATE_UNKNOWN)
 					{
-						const UINT tempState = (*(pendingBarrier.texture->globalState)).mipLevelStates[0];
+						const uint32_t tempState = (*(pendingBarrier.texture->globalState)).mipLevelStates[0];
 
-						for (UINT mipSlice = 0; mipSlice < pendingBarrier.texture->mipLevels; mipSlice++)
+						for (uint32_t mipSlice = 0; mipSlice < pendingBarrier.texture->mipLevels; mipSlice++)
 						{
 							if ((*(pendingBarrier.texture->globalState)).mipLevelStates[mipSlice] != tempState)
 							{
@@ -73,11 +73,11 @@ void RenderEngine::submitCommandList(CommandList* const commandList)
 					}
 					else
 					{
-						for (UINT mipSlice = 0; mipSlice < pendingBarrier.texture->mipLevels; mipSlice++)
+						for (uint32_t mipSlice = 0; mipSlice < pendingBarrier.texture->mipLevels; mipSlice++)
 						{
 							if ((*(pendingBarrier.texture->globalState)).mipLevelStates[mipSlice] != pendingBarrier.afterState)
 							{
-								for (UINT arraySlice = 0; arraySlice < pendingBarrier.texture->arraySize; arraySlice++)
+								for (uint32_t arraySlice = 0; arraySlice < pendingBarrier.texture->arraySize; arraySlice++)
 								{
 									D3D12_RESOURCE_BARRIER barrier = {};
 									barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
@@ -115,7 +115,7 @@ void RenderEngine::submitCommandList(CommandList* const commandList)
 				{
 					if ((*(pendingBarrier.texture->globalState)).mipLevelStates[pendingBarrier.mipSlice] != pendingBarrier.afterState)
 					{
-						for (UINT arraySlice = 0; arraySlice < pendingBarrier.texture->arraySize; arraySlice++)
+						for (uint32_t arraySlice = 0; arraySlice < pendingBarrier.texture->arraySize; arraySlice++)
 						{
 							D3D12_RESOURCE_BARRIER barrier = {};
 							barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
@@ -144,7 +144,7 @@ void RenderEngine::submitCommandList(CommandList* const commandList)
 
 	if (barriers.size() > 0)
 	{
-		helperCommandList->resourceBarrier(static_cast<UINT>(barriers.size()), barriers.data());
+		helperCommandList->resourceBarrier(static_cast<uint32_t>(barriers.size()), barriers.data());
 	}
 
 	//we should not close prepareCommandList 
@@ -173,7 +173,7 @@ void RenderEngine::processCommandLists()
 
 	recordCommandLists.clear();
 
-	commandQueue->ExecuteCommandLists(static_cast<UINT>(commandLists.size()), commandLists.data());
+	commandQueue->ExecuteCommandLists(static_cast<uint32_t>(commandLists.size()), commandLists.data());
 }
 
 void RenderEngine::waitForPreviousFrame()
@@ -189,7 +189,7 @@ void RenderEngine::waitForPreviousFrame()
 
 void RenderEngine::waitForNextFrame()
 {
-	const UINT64 currentFenceValue = fenceValues[Graphics::getFrameIndex()];
+	const uint64_t currentFenceValue = fenceValues[Graphics::getFrameIndex()];
 
 	commandQueue->Signal(fence.Get(), currentFenceValue);
 
@@ -238,9 +238,9 @@ void RenderEngine::end()
 
 		perFrameResource.timeElapsed = Graphics::getTimeElapsed();
 
-		perFrameResource.uintSeed = Random::Uint();
+		perFrameResource.uintSeed = Random::genUint();
 
-		perFrameResource.floatSeed = Random::Float();
+		perFrameResource.floatSeed = Random::genFloat();
 
 		perFrameResource.matrices = Camera::matrices;
 
@@ -300,7 +300,7 @@ ComPtr<IDXGIAdapter4> RenderEngine::getBestAdapterAndVendor(IDXGIFactory7* const
 {
 	ComPtr<IDXGIAdapter4> adapter;
 
-	for (UINT adapterIndex = 0;
+	for (uint32_t adapterIndex = 0;
 		SUCCEEDED(factory->EnumAdapterByGpuPreference(adapterIndex, DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE, IID_PPV_ARGS(&adapter)));
 		adapterIndex++)
 	{
@@ -315,7 +315,7 @@ ComPtr<IDXGIAdapter4> RenderEngine::getBestAdapterAndVendor(IDXGIFactory7* const
 
 		if (SUCCEEDED(D3D12CreateDevice(adapter.Get(), D3D_FEATURE_LEVEL_11_0, _uuidof(ID3D12Device), nullptr)))
 		{
-			const UINT vendorID = desc.VendorId;
+			const uint32_t vendorID = desc.VendorId;
 
 			std::cout << "[class RenderEngine] GPU VendorID 0x" << std::hex << vendorID << std::dec << " Vendor:";
 
@@ -418,7 +418,7 @@ void RenderEngine::updateTimeElapsed() const
 	Graphics::timeElapsed += Graphics::getDeltaTime();
 }
 
-RenderEngine::RenderEngine(const UINT width, const UINT height, const HWND hwnd, const bool useSwapChainBuffer, const bool initializeImGuiSurface) :
+RenderEngine::RenderEngine(const uint32_t width, const uint32_t height, const HWND hwnd, const bool useSwapChainBuffer, const bool initializeImGuiSurface) :
 	backBufferTextures(nullptr),
 	backBufferHandles(nullptr),
 	fenceEvent(CreateEvent(nullptr, FALSE, FALSE, nullptr)),
@@ -485,7 +485,7 @@ RenderEngine::RenderEngine(const UINT width, const UINT height, const HWND hwnd,
 		swapChainDesc.BufferCount = useSwapChainBuffer ? Graphics::getFrameBufferCount() : 2;
 		swapChainDesc.Width = Graphics::getWidth();
 		swapChainDesc.Height = Graphics::getHeight();
-		swapChainDesc.Format = Graphics::BackBufferFormat;
+		swapChainDesc.Format = Graphics::backBufferFormat;
 		swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 		swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 		swapChainDesc.SampleDesc.Count = 1;
@@ -500,9 +500,9 @@ RenderEngine::RenderEngine(const UINT width, const UINT height, const HWND hwnd,
 		swapChain1.As(&swapChain);
 	}
 
-	fenceValues = new UINT64[Graphics::getFrameBufferCount()];
+	fenceValues = new uint64_t[Graphics::getFrameBufferCount()];
 
-	for (UINT i = 0; i < Graphics::getFrameBufferCount(); i++)
+	for (uint32_t i = 0; i < Graphics::getFrameBufferCount(); i++)
 	{
 		fenceValues[i] = 0;
 	}
@@ -526,7 +526,7 @@ RenderEngine::RenderEngine(const UINT width, const UINT height, const HWND hwnd,
 
 		backBufferHandles = new D3D12_CPU_DESCRIPTOR_HANDLE[Graphics::getFrameBufferCount()];
 
-		for (UINT i = 0; i < Graphics::getFrameBufferCount(); i++)
+		for (uint32_t i = 0; i < Graphics::getFrameBufferCount(); i++)
 		{
 			ComPtr<ID3D12Resource> texture;
 
@@ -556,7 +556,7 @@ RenderEngine::RenderEngine(const UINT width, const UINT height, const HWND hwnd,
 		const DescriptorHandle handle = GlobalDescriptorHeap::getResourceHeap()->allocStaticDescriptor(1);
 
 		ImGui_ImplWin32_Init(hwnd);
-		ImGui_ImplDX12_Init(GraphicsDevice::get(), Graphics::getFrameBufferCount(), Graphics::BackBufferFormat,
+		ImGui_ImplDX12_Init(GraphicsDevice::get(), Graphics::getFrameBufferCount(), Graphics::backBufferFormat,
 			GlobalDescriptorHeap::getResourceHeap()->get(), handle.getCPUHandle(), handle.getGPUHandle());
 	}
 	else
@@ -613,7 +613,7 @@ RenderEngine::~RenderEngine()
 
 	if (backBufferTextures)
 	{
-		for (UINT i = 0; i < Graphics::getFrameBufferCount(); i++)
+		for (uint32_t i = 0; i < Graphics::getFrameBufferCount(); i++)
 		{
 			delete backBufferTextures[i];
 		}

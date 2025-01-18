@@ -23,7 +23,7 @@ private:
 
 	float sortedDeltaTime[11];
 
-	unsigned int historyDeltaTimeIndex;
+	uint32_t historyDeltaTimeIndex;
 
 	bool populated;
 

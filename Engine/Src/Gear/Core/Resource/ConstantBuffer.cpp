@@ -1,6 +1,6 @@
 #include<Gear/Core/Resource/ConstantBuffer.h>
 
-ConstantBuffer::ConstantBuffer(Buffer* const buffer, const UINT size, const bool persistent) :
+ConstantBuffer::ConstantBuffer(Buffer* const buffer, const uint32_t size, const bool persistent) :
 	EngineResource(persistent), buffer(buffer)
 {
 	if (size % 256 != 0)
@@ -63,7 +63,7 @@ ConstantBuffer::ConstantBuffer(Buffer* const buffer, const UINT size, const bool
 	}
 }
 
-void ConstantBuffer::update(const void* const data, const UINT size) const
+void ConstantBuffer::update(const void* const data, const uint32_t size) const
 {
 	ConstantBufferManager::get()->updateSubregion(regionIndex, bufferIndex, data, size);
 }

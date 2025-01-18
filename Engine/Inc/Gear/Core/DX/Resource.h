@@ -8,23 +8,14 @@
 
 #include<memory>
 
-//texture transition requirement
-//getRTV texture mipSlice RTV rtvHandle
-//getDSV texture mipSlice DSV dsvHandle
-//getSRV texture mipSlice SRV resourceIndex
-//getUAV texture mipSlice UAV resourceIndex
+constexpr uint32_t D3D12_RESOURCE_STATE_UNKNOWN = 0xFFFFFFFF;
 
+constexpr uint32_t D3D12_TRANSITION_ALL_MIPLEVELS = 0xFFFFFFFF;
 
-//buffer transition requirement
-//getSRV buffer state resourceIndex
-//getUAV buffer state resourceIndex
-
-constexpr UINT D3D12_RESOURCE_STATE_UNKNOWN = 0xFFFFFFFF;
-
-//a encompass b
-constexpr bool bitFlagSubset(const UINT a, const UINT b)
+//does a have b?
+constexpr bool bitFlagSubset(const uint32_t a, const uint32_t b)
 {
-	return b != 0 ? ((a & b) == b) : false;
+	return b && ((a & b) == b);
 }
 
 class Buffer;
@@ -46,12 +37,12 @@ struct ShaderResourceDesc
 		CBV
 	} state;
 
-	UINT resourceIndex;
+	uint32_t resourceIndex;
 
 	struct TextureTransitionDesc
 	{
 		Texture* texture;
-		UINT mipSlice;
+		uint32_t mipSlice;
 	};
 
 	struct BufferTransitionDesc
@@ -70,14 +61,14 @@ struct ShaderResourceDesc
 struct RenderTargetDesc
 {
 	Texture* texture;
-	UINT mipSlice;
+	uint32_t mipSlice;
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle;
 };
 
 struct DepthStencilDesc
 {
 	Texture* texture;
-	UINT mipSlice;
+	uint32_t mipSlice;
 	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle;
 };
 
@@ -104,7 +95,7 @@ struct ClearUAVDesc
 	struct TextureClearDesc
 	{
 		Texture* texture;
-		UINT mipSlice;
+		uint32_t mipSlice;
 	};
 
 	struct BufferClearDesc

@@ -1,6 +1,6 @@
 #include<Gear/Core/VideoEncoder/NvidiaEncoder.h>
 
-NvidiaEncoder::NvidiaEncoder(const UINT frameToEncode) :
+NvidiaEncoder::NvidiaEncoder(const uint32_t frameToEncode) :
 	Encoder(frameToEncode), encoder(nullptr),
 	readbackHeap(new ReadbackHeap(2 * 4 * Graphics::getWidth() * Graphics::getHeight())),
 	outCtx(nullptr), outStream(nullptr), pkt(nullptr),
@@ -236,21 +236,17 @@ bool NvidiaEncoder::encode(Texture* const inputTexture)
 
 			NVENCCALL(nvencAPI.nvEncLockBitstream(encoder, &lockBitstream));
 
-			uint8_t* const bitstreamPtr = (uint8_t*)lockBitstream.bitstreamBufferPtr;
-
-			const int bitstreamSize = lockBitstream.bitstreamSizeInBytes;
-
-			pkt->pts = av_rescale_q(frameEncoded, AVRational{ 1,(int)frameRate }, outStream->time_base);
+			pkt->pts = av_rescale_q(frameEncoded, AVRational{ 1,static_cast<int>(frameRate) }, outStream->time_base);
 
 			pkt->dts = pkt->pts;
 
-			pkt->duration = av_rescale_q(1, AVRational{ 1,(int)frameRate }, outStream->time_base);
+			pkt->duration = av_rescale_q(1, AVRational{ 1,static_cast<int>(frameRate) }, outStream->time_base);
 
 			pkt->stream_index = outStream->index;
 
-			pkt->data = bitstreamPtr;
+			pkt->data = reinterpret_cast<uint8_t*>(lockBitstream.bitstreamBufferPtr);
 
-			pkt->size = bitstreamSize;
+			pkt->size = lockBitstream.bitstreamSizeInBytes;
 
 			av_write_frame(outCtx, pkt);
 

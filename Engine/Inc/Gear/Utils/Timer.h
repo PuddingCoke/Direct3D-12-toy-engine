@@ -27,5 +27,4 @@ private:
 
 };
 
-
 #endif // !_TIMER_H_

@@ -15,9 +15,9 @@ struct GeometryInstance
 
 	DirectX::XMMATRIX transform;//require row major matrix and directxmath use row major matrix
 
-	UINT instanceID;
+	uint32_t instanceID;
 
-	UINT hitGroupIndex;
+	uint32_t hitGroupIndex;
 };
 
 class TopLevelAS :public EngineResource
@@ -40,11 +40,11 @@ private:
 
 	std::vector<GeometryInstance> instances;
 
-	UINT scratchBufferSize;
+	uint32_t scratchBufferSize;
 
-	UINT tlasBufferSize;
+	uint32_t tlasBufferSize;
 
-	UINT instanceBufferSize;
+	uint32_t instanceBufferSize;
 
 	const D3D12_RAYTRACING_ACCELERATION_STRUCTURE_BUILD_FLAGS buildFlag;
 
@@ -54,7 +54,7 @@ private:
 
 	UploadHeap* instanceBuffer;
 
-	UINT srvIndex;
+	uint32_t srvIndex;
 
 	const bool persistent;
 

@@ -19,7 +19,7 @@ public:
 
 	void operator=(const Effect&) = delete;
 
-	Effect(GraphicsContext* const context, const UINT width, const UINT height, const DXGI_FORMAT format);
+	Effect(GraphicsContext* const context, const uint32_t width, const uint32_t height, const DXGI_FORMAT format);
 
 	virtual ~Effect();
 
@@ -31,9 +31,9 @@ protected:
 
 	GraphicsContext* context;
 
-	const UINT width;
+	const uint32_t width;
 
-	const UINT height;
+	const uint32_t height;
 
 };
 

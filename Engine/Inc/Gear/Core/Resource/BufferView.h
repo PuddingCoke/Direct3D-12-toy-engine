@@ -18,7 +18,7 @@ class BufferView :public EngineResource
 {
 public:
 
-	BufferView(Buffer* const buffer, const UINT structureByteStride, const DXGI_FORMAT format, const UINT size, const bool createSRV, const bool createUAV, const bool createVBV, const bool createIBV, const bool cpuWritable, const bool persistent);
+	BufferView(Buffer* const buffer, const uint32_t structureByteStride, const DXGI_FORMAT format, const uint64_t size, const bool createSRV, const bool createUAV, const bool createVBV, const bool createIBV, const bool cpuWritable, const bool persistent);
 
 	~BufferView();
 
@@ -48,9 +48,9 @@ private:
 
 	CounterBufferView* counterBuffer;
 
-	UINT srvIndex;
+	uint32_t srvIndex;
 
-	UINT uavIndex;
+	uint32_t uavIndex;
 
 	D3D12_GPU_DESCRIPTOR_HANDLE viewGPUHandle;
 
@@ -65,7 +65,7 @@ private:
 
 	UploadHeap** uploadHeaps;
 
-	UINT uploadHeapIndex;
+	uint32_t uploadHeapIndex;
 
 	Buffer* buffer;
 };
