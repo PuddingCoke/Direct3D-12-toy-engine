@@ -13,16 +13,16 @@ struct PendingBufferBarrier
 {
 	Buffer* buffer;
 
-	UINT afterState;
+	uint32_t afterState;
 };
 
 class Buffer :public Resource
 {
 public:
 
-	Buffer(const UINT size, const bool stateTracking, const D3D12_RESOURCE_FLAGS resFlags, const D3D12_RESOURCE_STATES initialState = D3D12_RESOURCE_STATE_COPY_DEST);
+	Buffer(const uint64_t size, const bool stateTracking, const D3D12_RESOURCE_FLAGS resFlags, const uint32_t initialState = D3D12_RESOURCE_STATE_COPY_DEST);
 
-	Buffer(const ComPtr<ID3D12Resource>& buffer, const bool stateTracking, const UINT initialState);
+	Buffer(const ComPtr<ID3D12Resource>& buffer, const bool stateTracking, const uint32_t initialState);
 
 	Buffer(Buffer&);
 
@@ -40,21 +40,20 @@ public:
 
 	void transition(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers, std::vector<PendingBufferBarrier>& pendingBarriers);
 
-	void setState(const UINT state);
+	void setState(const uint32_t state);
 
-	UINT getState() const;
+	uint32_t getState() const;
 
 private:
 
 	friend class RenderEngine;
 
-	std::shared_ptr<UINT> globalState;
+	std::shared_ptr<uint32_t> globalState;
 
-	UINT internalState;
+	uint32_t internalState;
 
-	UINT transitionState;
+	uint32_t transitionState;
 
 };
 
 #endif // !_BUFFER_H_
-

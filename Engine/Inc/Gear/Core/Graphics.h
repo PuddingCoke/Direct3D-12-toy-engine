@@ -11,33 +11,33 @@ class Graphics
 {
 public:
 
-	static UINT getFrameBufferCount();
+	static uint32_t getFrameBufferCount();
 
-	static UINT getFrameIndex();
+	static uint32_t getFrameIndex();
 
 	static float getDeltaTime();
 
 	static float getTimeElapsed();
 
-	static UINT getWidth();
+	static uint32_t getWidth();
 
-	static UINT getHeight();
+	static uint32_t getHeight();
 
 	static float getAspectRatio();
 
-	static constexpr DXGI_FORMAT BackBufferFormat = DXGI_FORMAT_B8G8R8A8_UNORM;
+	static constexpr DXGI_FORMAT backBufferFormat = DXGI_FORMAT_B8G8R8A8_UNORM;
 
 private:
 
 	friend class RenderEngine;
 
-	static UINT frameBufferCount;
+	static uint32_t frameBufferCount;
 
-	static UINT frameIndex;
+	static uint32_t frameIndex;
 
-	static UINT width;
+	static uint32_t width;
 
-	static UINT height;
+	static uint32_t height;
 
 	static float aspectRatio;
 

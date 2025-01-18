@@ -30,7 +30,7 @@ public:
 	
 	~CommandList();
 
-	void resourceBarrier(const UINT numBarriers, const D3D12_RESOURCE_BARRIER* const pBarriers) const;
+	void resourceBarrier(const uint32_t numBarriers, const D3D12_RESOURCE_BARRIER* const pBarriers) const;
 
 	ID3D12GraphicsCommandList6* get() const;
 
@@ -54,9 +54,9 @@ public:
 
 	void setAllPipelineResources(const std::initializer_list<ShaderResourceDesc>& descs);
 
-	void setGraphicsPipelineResources(const std::vector<ShaderResourceDesc>& descs, const UINT targetSRVState);
+	void setGraphicsPipelineResources(const std::vector<ShaderResourceDesc>& descs, const uint32_t targetSRVState);
 
-	void setGraphicsPipelineResources(const std::initializer_list<ShaderResourceDesc>& descs, const UINT targetSRVState);
+	void setGraphicsPipelineResources(const std::initializer_list<ShaderResourceDesc>& descs, const uint32_t targetSRVState);
 
 	void setComputePipelineResources(const std::vector<ShaderResourceDesc>& descs);
 
@@ -64,29 +64,29 @@ public:
 
 	void setDefRenderTarget() const;
 
-	void clearDefRenderTarget(const FLOAT clearValue[4]) const;
+	void clearDefRenderTarget(const float clearValue[4]) const;
 
 	void setRenderTargets(const std::initializer_list<RenderTargetDesc>& renderTargets, const DepthStencilDesc* const depthStencils);
 
-	void setVertexBuffers(const UINT startSlot, const std::initializer_list<VertexBufferDesc>& vertexBuffers);
+	void setVertexBuffers(const uint32_t startSlot, const std::initializer_list<VertexBufferDesc>& vertexBuffers);
 
 	void setIndexBuffer(const IndexBufferDesc& indexBuffer);
 	
-	void copyBufferRegion(Buffer* const dstBuffer, const UINT64 dstOffset, UploadHeap* srcBuffer, const UINT64 srcOffset, const UINT64 numBytes);
+	void copyBufferRegion(Buffer* const dstBuffer, const uint64_t dstOffset, UploadHeap* srcBuffer, const uint64_t srcOffset, const uint64_t numBytes);
 
-	void copyBufferRegion(Buffer* const dstBuffer, const UINT64 dstOffset, Buffer* srcBuffer, const UINT64 srcOffset, const UINT64 numBytes);
+	void copyBufferRegion(Buffer* const dstBuffer, const uint64_t dstOffset, Buffer* srcBuffer, const uint64_t srcOffset, const uint64_t numBytes);
 
 	void copyResource(Buffer* const dstBuffer, UploadHeap* const srcBuffer);
 
 	void copyResource(Buffer* const dstBuffer, Buffer* const srcBuffer);
 
-	void copyTextureRegion(Texture* const dstTexture, const UINT dstSubresource, Texture* const srcTexture, const UINT srcSubresource);
+	void copyTextureRegion(Texture* const dstTexture, const uint32_t dstSubresource, Texture* const srcTexture, const uint32_t srcSubresource);
 
 	void uavBarrier(const std::initializer_list<Resource*>& resources);
 
 	void clearUnorderedAccessView(const ClearUAVDesc& desc, const float values[4]);
 
-	void clearUnorderedAccessView(const ClearUAVDesc& desc, const UINT values[4]);
+	void clearUnorderedAccessView(const ClearUAVDesc& desc, const uint32_t values[4]);
 
 private:
 
@@ -95,7 +95,7 @@ private:
 	void updateReferredResStates();
 
 	template<typename T>
-	IsCorrectType<T> setPipelineResources(const T& descs, const UINT targetSRVState);
+	IsCorrectType<T> setPipelineResources(const T& descs, const uint32_t targetSRVState);
 
 	static D3D12_CPU_DESCRIPTOR_HANDLE backBufferHandle;
 
@@ -126,7 +126,7 @@ private:
 #endif // !_COMMANDLIST_H_
 
 template<typename T>
-inline IsCorrectType<T> CommandList::setPipelineResources(const T& descs, const UINT targetSRVState)
+inline IsCorrectType<T> CommandList::setPipelineResources(const T& descs, const uint32_t targetSRVState)
 {
 	for (const ShaderResourceDesc& desc : descs)
 	{

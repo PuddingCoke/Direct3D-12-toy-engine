@@ -14,33 +14,33 @@ class DescriptorHeap
 {
 public:
 
-	DescriptorHeap(const UINT numDescriptors, const UINT subRegionSize, const D3D12_DESCRIPTOR_HEAP_TYPE type, const D3D12_DESCRIPTOR_HEAP_FLAGS flags);
+	DescriptorHeap(const uint32_t numDescriptors, const uint32_t subRegionSize, const D3D12_DESCRIPTOR_HEAP_TYPE type, const D3D12_DESCRIPTOR_HEAP_FLAGS flags);
 
-	UINT getNumDescriptors() const;
+	uint32_t getNumDescriptors() const;
 
-	UINT getSubRegionSize() const;
+	uint32_t getSubRegionSize() const;
 
 	D3D12_DESCRIPTOR_HEAP_TYPE getDescriptorHeapType() const;
 
-	UINT getIncrementSize() const;
+	uint32_t getIncrementSize() const;
 
 	ID3D12DescriptorHeap* get() const;
 
-	DescriptorHandle allocStaticDescriptor(const UINT num);
+	DescriptorHandle allocStaticDescriptor(const uint32_t num);
 
-	DescriptorHandle allocDynamicDescriptor(const UINT num);
+	DescriptorHandle allocDynamicDescriptor(const uint32_t num);
 
 private:
 
 	friend class DescriptorHandle;
 
-	const UINT numDescriptors;
+	const uint32_t numDescriptors;
 
-	const UINT subRegionSize;
+	const uint32_t subRegionSize;
 
 	const D3D12_DESCRIPTOR_HEAP_TYPE type;
 
-	const UINT incrementSize;
+	const uint32_t incrementSize;
 
 	ComPtr<ID3D12DescriptorHeap> descriptorHeap;
 
@@ -74,7 +74,7 @@ public:
 
 	DescriptorHandle(const CD3DX12_CPU_DESCRIPTOR_HANDLE cpuHandle, const CD3DX12_GPU_DESCRIPTOR_HANDLE gpuHandle, const DescriptorHeap* const descriptorHeap);
 
-	UINT getCurrentIndex() const;
+	uint32_t getCurrentIndex() const;
 
 	CD3DX12_CPU_DESCRIPTOR_HANDLE getCPUHandle() const;
 
@@ -82,7 +82,7 @@ public:
 
 	void move();
 
-	void offset(const UINT num);
+	void offset(const uint32_t num);
 
 protected:
 

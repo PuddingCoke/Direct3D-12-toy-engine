@@ -1,6 +1,6 @@
 #include<Gear/Core/Effect/BloomEffect.h>
 
-BloomEffect::BloomEffect(GraphicsContext* const context, const UINT width, const UINT height, ResourceManager* const resManager) :
+BloomEffect::BloomEffect(GraphicsContext* const context, const uint32_t width, const uint32_t height, ResourceManager* const resManager) :
 	Effect(context, width, height, DXGI_FORMAT_R16G16B16A16_FLOAT),
 	lensDirtTexture(resManager->createTextureRenderView(Utils::getRootFolder() + "bloom_dirt_mask.png", true)),
 	filteredTexture(ResourceManager::createTextureRenderView(width, height, DXGI_FORMAT_R16G16B16A16_FLOAT, 1, 1, false, true,
@@ -16,7 +16,7 @@ BloomEffect::BloomEffect(GraphicsContext* const context, const UINT width, const
 	{
 		const float sigma[blurSteps] = { 0.44f,0.57f,0.8f,1.32f,3.3f };
 
-		for (UINT i = 0; i < blurSteps; i++)
+		for (uint32_t i = 0; i < blurSteps; i++)
 		{
 			resolutions[i] = DirectX::XMUINT2(width >> (i + 1), height >> (i + 1));
 
@@ -121,7 +121,7 @@ BloomEffect::BloomEffect(GraphicsContext* const context, const UINT width, const
 
 BloomEffect::~BloomEffect()
 {
-	for (unsigned int i = 0; i < blurSteps; i++)
+	for (uint32_t i = 0; i < blurSteps; i++)
 	{
 		delete swapTexture[i];
 		delete blurParamBuffer[i];
@@ -163,7 +163,7 @@ TextureRenderView* BloomEffect::process(TextureRenderView* const inputTexture) c
 
 	context->setPipelineState(bloomDownSampleState.Get());
 
-	for (UINT i = 0; i < blurSteps - 1; i++)
+	for (uint32_t i = 0; i < blurSteps - 1; i++)
 	{
 		context->setViewportSimple(resolutions[i + 1].x, resolutions[i + 1].y);
 		context->setRenderTargets({ swapTexture[i + 1]->write()->getRTVMipHandle(0) }, {});
@@ -197,7 +197,7 @@ TextureRenderView* BloomEffect::process(TextureRenderView* const inputTexture) c
 	context->uavBarrier({ swapTexture[blurSteps - 1]->write()->getTexture() });
 	swapTexture[blurSteps - 1]->swap();
 
-	for (UINT i = 0; i < blurSteps - 1; i++)
+	for (uint32_t i = 0; i < blurSteps - 1; i++)
 	{
 		context->setCSConstantBuffer(blurParamBuffer[blurSteps - 2 - i]);
 
@@ -287,11 +287,11 @@ float BloomEffect::getGamma() const
 	return bloomParam.gamma;
 }
 
-void BloomEffect::updateCurve(const UINT index)
+void BloomEffect::updateCurve(const uint32_t index)
 {
 	blurParam[index].weight[0] = Math::gauss(blurParam[index].sigma, 0.f);
 
-	for (unsigned int i = 1; i < (iteration[index] - 1) * 2 + 1; i += 2)
+	for (uint32_t i = 1; i < (iteration[index] - 1) * 2 + 1; i += 2)
 	{
 		const float g1 = Math::gauss(blurParam[index].sigma, (float)i);
 		const float g2 = Math::gauss(blurParam[index].sigma, (float)(i + 1));

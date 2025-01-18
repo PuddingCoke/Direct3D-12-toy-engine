@@ -9,7 +9,7 @@ class UploadHeap :public Resource
 {
 public:
 
-	UploadHeap(const UINT64 size, const D3D12_HEAP_FLAGS flags = D3D12_HEAP_FLAG_NONE);
+	UploadHeap(const uint64_t size, const D3D12_HEAP_FLAGS flags = D3D12_HEAP_FLAG_NONE);
 
 	UploadHeap(UploadHeap&);
 
@@ -19,7 +19,7 @@ public:
 
 	UploadHeap(const UploadHeap&) = delete;
 
-	void update(const void* const data, const UINT64 size) const;
+	void update(const void* const data, const uint64_t size) const;
 
 	void updateGlobalStates() override;
 

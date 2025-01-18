@@ -3,8 +3,8 @@
 TextureDepthView::TextureDepthView(Texture* const texture, const bool isTextureCube, const bool persistent) :
 	EngineResource(persistent), texture(texture), dsvMipHandleStart(), allDepthIndex(0), allStencilIndex(0), depthMipIndexStart(0), stencilMipIndexStart(0)
 {
-	const UINT mipLevels = texture->getMipLevels();
-	const UINT arraySize = texture->getArraySize();
+	const uint32_t mipLevels = texture->getMipLevels();
+	const uint32_t arraySize = texture->getArraySize();
 	const DXGI_FORMAT resFormat = texture->getFormat();
 
 	DXGI_FORMAT depthSRVFormat = DXGI_FORMAT_UNKNOWN;
@@ -63,7 +63,7 @@ TextureDepthView::TextureDepthView(Texture* const texture, const bool isTextureC
 
 		dsvMipHandleStart = descriptorHandle.getCPUHandle();
 
-		for (UINT i = 0; i < mipLevels; i++)
+		for (uint32_t i = 0; i < mipLevels; i++)
 		{
 			if (arraySize > 1)
 			{
@@ -92,7 +92,7 @@ TextureDepthView::TextureDepthView(Texture* const texture, const bool isTextureC
 		}
 	}
 
-	numSRVUAVCBVDescriptors = (static_cast<UINT>((stencilSRVFormat != DXGI_FORMAT_UNKNOWN)) + static_cast<UINT>((depthSRVFormat != DXGI_FORMAT_UNKNOWN))) * (1 + mipLevels);
+	numSRVUAVCBVDescriptors = (static_cast<uint32_t>((stencilSRVFormat != DXGI_FORMAT_UNKNOWN)) + static_cast<uint32_t>((depthSRVFormat != DXGI_FORMAT_UNKNOWN))) * (1 + mipLevels);
 
 	if (numSRVUAVCBVDescriptors)
 	{
@@ -122,7 +122,7 @@ TextureDepthView::TextureDepthView(Texture* const texture, const bool isTextureC
 			//create depth srvs
 			if (isTextureCube)
 			{
-				const UINT numCube = arraySize / 6;
+				const uint32_t numCube = arraySize / 6;
 
 				if (numCube > 1)
 				{
@@ -142,7 +142,7 @@ TextureDepthView::TextureDepthView(Texture* const texture, const bool isTextureC
 						descriptorHandle.move();
 					}
 
-					for (UINT i = 0; i < mipLevels; i++)
+					for (uint32_t i = 0; i < mipLevels; i++)
 					{
 						D3D12_SHADER_RESOURCE_VIEW_DESC desc = {};
 						desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
@@ -175,7 +175,7 @@ TextureDepthView::TextureDepthView(Texture* const texture, const bool isTextureC
 						descriptorHandle.move();
 					}
 
-					for (UINT i = 0; i < mipLevels; i++)
+					for (uint32_t i = 0; i < mipLevels; i++)
 					{
 						D3D12_SHADER_RESOURCE_VIEW_DESC desc = {};
 						desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
@@ -212,7 +212,7 @@ TextureDepthView::TextureDepthView(Texture* const texture, const bool isTextureC
 						descriptorHandle.move();
 					}
 
-					for (UINT i = 0; i < mipLevels; i++)
+					for (uint32_t i = 0; i < mipLevels; i++)
 					{
 						D3D12_SHADER_RESOURCE_VIEW_DESC desc = {};
 						desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
@@ -246,7 +246,7 @@ TextureDepthView::TextureDepthView(Texture* const texture, const bool isTextureC
 						descriptorHandle.move();
 					}
 
-					for (UINT i = 0; i < mipLevels; i++)
+					for (uint32_t i = 0; i < mipLevels; i++)
 					{
 						D3D12_SHADER_RESOURCE_VIEW_DESC desc = {};
 						desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
@@ -270,7 +270,7 @@ TextureDepthView::TextureDepthView(Texture* const texture, const bool isTextureC
 			//create stencil srvs
 			if (isTextureCube)
 			{
-				const UINT numCube = arraySize / 6;
+				const uint32_t numCube = arraySize / 6;
 
 				if (numCube > 1)
 				{
@@ -290,7 +290,7 @@ TextureDepthView::TextureDepthView(Texture* const texture, const bool isTextureC
 						descriptorHandle.move();
 					}
 
-					for (UINT i = 0; i < mipLevels; i++)
+					for (uint32_t i = 0; i < mipLevels; i++)
 					{
 						D3D12_SHADER_RESOURCE_VIEW_DESC desc = {};
 						desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
@@ -323,7 +323,7 @@ TextureDepthView::TextureDepthView(Texture* const texture, const bool isTextureC
 						descriptorHandle.move();
 					}
 
-					for (UINT i = 0; i < mipLevels; i++)
+					for (uint32_t i = 0; i < mipLevels; i++)
 					{
 						D3D12_SHADER_RESOURCE_VIEW_DESC desc = {};
 						desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
@@ -360,7 +360,7 @@ TextureDepthView::TextureDepthView(Texture* const texture, const bool isTextureC
 						descriptorHandle.move();
 					}
 
-					for (UINT i = 0; i < mipLevels; i++)
+					for (uint32_t i = 0; i < mipLevels; i++)
 					{
 						D3D12_SHADER_RESOURCE_VIEW_DESC desc = {};
 						desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
@@ -394,7 +394,7 @@ TextureDepthView::TextureDepthView(Texture* const texture, const bool isTextureC
 						descriptorHandle.move();
 					}
 
-					for (UINT i = 0; i < mipLevels; i++)
+					for (uint32_t i = 0; i < mipLevels; i++)
 					{
 						D3D12_SHADER_RESOURCE_VIEW_DESC desc = {};
 						desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
@@ -458,7 +458,7 @@ ShaderResourceDesc TextureDepthView::getAllStencilIndex() const
 	return desc;
 }
 
-ShaderResourceDesc TextureDepthView::getDepthMipIndex(const UINT mipSlice) const
+ShaderResourceDesc TextureDepthView::getDepthMipIndex(const uint32_t mipSlice) const
 {
 	ShaderResourceDesc desc = {};
 	desc.type = ShaderResourceDesc::TEXTURE;
@@ -470,7 +470,7 @@ ShaderResourceDesc TextureDepthView::getDepthMipIndex(const UINT mipSlice) const
 	return desc;
 }
 
-ShaderResourceDesc TextureDepthView::getStencilMipIndex(const UINT mipSlice) const
+ShaderResourceDesc TextureDepthView::getStencilMipIndex(const uint32_t mipSlice) const
 {
 	ShaderResourceDesc desc = {};
 	desc.type = ShaderResourceDesc::TEXTURE;
@@ -482,7 +482,7 @@ ShaderResourceDesc TextureDepthView::getStencilMipIndex(const UINT mipSlice) con
 	return desc;
 }
 
-DepthStencilDesc TextureDepthView::getDSVMipHandle(const UINT mipSlice) const
+DepthStencilDesc TextureDepthView::getDSVMipHandle(const uint32_t mipSlice) const
 {
 	DepthStencilDesc desc = {};
 	desc.texture = texture;

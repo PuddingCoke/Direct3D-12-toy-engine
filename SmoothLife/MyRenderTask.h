@@ -68,7 +68,7 @@ protected:
 
 		context->setCSConstants({ swapTexture->write()->getUAVMipIndex(0) }, 0);
 
-		UINT uintSeed = Random::Uint();
+		UINT uintSeed = Random::genUint();
 
 		context->setCSConstants(1, &uintSeed, 1);
 

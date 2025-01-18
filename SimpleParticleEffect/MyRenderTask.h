@@ -65,11 +65,11 @@ public:
 
 			for (UINT i = 0; i < numParticles; i++)
 			{
-				const float radius = 0.3f * Random::Float() + 0.3f;
+				const float radius = 0.3f * Random::genFloat() + 0.3f;
 
-				const float theta = Random::Float() * Math::two_pi;
+				const float theta = Random::genFloat() * Math::two_pi;
 
-				const float phi = Random::Float() * Math::two_pi;
+				const float phi = Random::genFloat() * Math::two_pi;
 
 				positions[i] = DirectX::XMFLOAT4(radius * cosf(theta) * sinf(phi), radius * cosf(theta) * cosf(phi), radius * sinf(theta), 1.f);
 

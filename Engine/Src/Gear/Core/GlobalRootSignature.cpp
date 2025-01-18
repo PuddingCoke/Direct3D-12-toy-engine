@@ -16,7 +16,7 @@ GlobalRootSignature::GlobalRootSignature()
 {
 	CD3DX12_STATIC_SAMPLER_DESC samplerDesc[7] = {};
 
-	for (UINT i = 0; i < 7; i++)
+	for (uint32_t i = 0; i < 7; i++)
 	{
 		samplerDesc[i].ShaderRegister = i;
 		samplerDesc[i].RegisterSpace = 0;

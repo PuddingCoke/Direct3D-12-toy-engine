@@ -26,11 +26,11 @@ public:
 
 	ShaderResourceDesc getAllStencilIndex() const;
 
-	ShaderResourceDesc getDepthMipIndex(const UINT mipSlice) const;
+	ShaderResourceDesc getDepthMipIndex(const uint32_t mipSlice) const;
 
-	ShaderResourceDesc getStencilMipIndex(const UINT mipSlice) const;
+	ShaderResourceDesc getStencilMipIndex(const uint32_t mipSlice) const;
 
-	DepthStencilDesc getDSVMipHandle(const UINT mipSlice) const;
+	DepthStencilDesc getDSVMipHandle(const uint32_t mipSlice) const;
 
 	Texture* getTexture() const;
 
@@ -38,18 +38,17 @@ public:
 
 private:
 
-	UINT allDepthIndex;
+	uint32_t allDepthIndex;
 
-	UINT allStencilIndex;
+	uint32_t allStencilIndex;
 
-	UINT depthMipIndexStart;
+	uint32_t depthMipIndexStart;
 
-	UINT stencilMipIndexStart;
+	uint32_t stencilMipIndexStart;
 
 	D3D12_CPU_DESCRIPTOR_HANDLE dsvMipHandleStart;
 
 	Texture* texture;
 };
-
 
 #endif // !_TEXTUREDEPTHVIEW_H_

@@ -12,7 +12,7 @@ class FXAAEffect :public Effect
 {
 public:
 
-	FXAAEffect(GraphicsContext* const context, const UINT width, const UINT height);
+	FXAAEffect(GraphicsContext* const context, const uint32_t width, const uint32_t height);
 
 	~FXAAEffect();
 

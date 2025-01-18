@@ -59,7 +59,7 @@ public:
 
 	NvidiaEncoder(const NvidiaEncoder&) = delete;
 
-	NvidiaEncoder(const UINT frameToEncode);
+	NvidiaEncoder(const uint32_t frameToEncode);
 
 	~NvidiaEncoder();
 
@@ -87,7 +87,7 @@ private:
 
 	ComPtr<ID3D12Fence> outputFence;
 
-	UINT outputFenceValue;
+	uint32_t outputFenceValue;
 
 	AVFormatContext* outCtx;
 

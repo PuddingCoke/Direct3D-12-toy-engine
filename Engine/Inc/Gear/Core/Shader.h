@@ -40,7 +40,7 @@ public:
 
 private:
 
-	static constexpr UINT codePage = CP_UTF8;
+	static constexpr uint32_t codePage = CP_UTF8;
 
 	ComPtr<IDxcCompiler3> dxcCompiler;
 
@@ -92,7 +92,5 @@ private:
 	static DXCCompiler* dxcCompiler;
 	
 };
-
-
 
 #endif // !_SHADER_H_

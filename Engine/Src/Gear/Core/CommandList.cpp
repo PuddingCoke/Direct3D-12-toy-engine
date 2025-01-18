@@ -6,7 +6,7 @@ CommandList::CommandList(const D3D12_COMMAND_LIST_TYPE type)
 {
 	allocators = new CommandAllocator * [Graphics::getFrameBufferCount()];
 
-	for (UINT i = 0; i < Graphics::getFrameBufferCount(); i++)
+	for (uint32_t i = 0; i < Graphics::getFrameBufferCount(); i++)
 	{
 		allocators[i] = new CommandAllocator(type);
 	}
@@ -18,7 +18,7 @@ CommandList::CommandList(const D3D12_COMMAND_LIST_TYPE type)
 
 CommandList::~CommandList()
 {
-	for (UINT i = 0; i < Graphics::getFrameBufferCount(); i++)
+	for (uint32_t i = 0; i < Graphics::getFrameBufferCount(); i++)
 	{
 		delete allocators[i];
 	}
@@ -26,7 +26,7 @@ CommandList::~CommandList()
 	delete[] allocators;
 }
 
-void CommandList::resourceBarrier(const UINT numBarriers, const D3D12_RESOURCE_BARRIER* const pBarriers) const
+void CommandList::resourceBarrier(const uint32_t numBarriers, const D3D12_RESOURCE_BARRIER* const pBarriers) const
 {
 	commandList->ResourceBarrier(numBarriers, pBarriers);
 }
@@ -83,7 +83,7 @@ void CommandList::transitionResources()
 
 	if (transitionBarriers.size())
 	{
-		commandList->ResourceBarrier(static_cast<UINT>(transitionBarriers.size()), transitionBarriers.data());
+		commandList->ResourceBarrier(static_cast<uint32_t>(transitionBarriers.size()), transitionBarriers.data());
 
 		transitionBarriers.clear();
 	}
@@ -146,12 +146,12 @@ void CommandList::setAllPipelineResources(const std::initializer_list<ShaderReso
 	setPipelineResources(descs, D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
 }
 
-void CommandList::setGraphicsPipelineResources(const std::vector<ShaderResourceDesc>& descs, const UINT targetSRVState)
+void CommandList::setGraphicsPipelineResources(const std::vector<ShaderResourceDesc>& descs, const uint32_t targetSRVState)
 {
 	setPipelineResources(descs, targetSRVState);
 }
 
-void CommandList::setGraphicsPipelineResources(const std::initializer_list<ShaderResourceDesc>& descs, const UINT targetSRVState)
+void CommandList::setGraphicsPipelineResources(const std::initializer_list<ShaderResourceDesc>& descs, const uint32_t targetSRVState)
 {
 	setPipelineResources(descs, targetSRVState);
 }
@@ -171,7 +171,7 @@ void CommandList::setDefRenderTarget() const
 	commandList->OMSetRenderTargets(1, &backBufferHandle, FALSE, nullptr);
 }
 
-void CommandList::clearDefRenderTarget(const FLOAT clearValue[4]) const
+void CommandList::clearDefRenderTarget(const float clearValue[4]) const
 {
 	commandList->ClearRenderTargetView(backBufferHandle, clearValue, 0, nullptr);
 }
@@ -203,15 +203,15 @@ void CommandList::setRenderTargets(const std::initializer_list<RenderTargetDesc>
 
 	if (depthStencils)
 	{
-		commandList->OMSetRenderTargets(static_cast<UINT>(transientRTVHandles.size()), transientRTVHandles.data(), FALSE, &(depthStencils->dsvHandle));
+		commandList->OMSetRenderTargets(static_cast<uint32_t>(transientRTVHandles.size()), transientRTVHandles.data(), FALSE, &(depthStencils->dsvHandle));
 	}
 	else
 	{
-		commandList->OMSetRenderTargets(static_cast<UINT>(transientRTVHandles.size()), transientRTVHandles.data(), FALSE, nullptr);
+		commandList->OMSetRenderTargets(static_cast<uint32_t>(transientRTVHandles.size()), transientRTVHandles.data(), FALSE, nullptr);
 	}
 }
 
-void CommandList::setVertexBuffers(const UINT startSlot, const std::initializer_list<VertexBufferDesc>& vertexBuffers)
+void CommandList::setVertexBuffers(const uint32_t startSlot, const std::initializer_list<VertexBufferDesc>& vertexBuffers)
 {
 	transientVBViews.clear();
 
@@ -226,7 +226,7 @@ void CommandList::setVertexBuffers(const UINT startSlot, const std::initializer_
 		buffer->setState(D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
 	}
 
-	commandList->IASetVertexBuffers(startSlot, static_cast<UINT>(transientVBViews.size()), transientVBViews.data());
+	commandList->IASetVertexBuffers(startSlot, static_cast<uint32_t>(transientVBViews.size()), transientVBViews.data());
 }
 
 void CommandList::setIndexBuffer(const IndexBufferDesc& indexBuffer)
@@ -240,7 +240,7 @@ void CommandList::setIndexBuffer(const IndexBufferDesc& indexBuffer)
 	commandList->IASetIndexBuffer(&indexBuffer.ibv);
 }
 
-void CommandList::copyBufferRegion(Buffer* const dstBuffer, const UINT64 dstOffset, UploadHeap* srcBuffer, const UINT64 srcOffset, const UINT64 numBytes)
+void CommandList::copyBufferRegion(Buffer* const dstBuffer, const uint64_t dstOffset, UploadHeap* srcBuffer, const uint64_t srcOffset, const uint64_t numBytes)
 {
 	pushResourceTrackList(dstBuffer);
 
@@ -251,7 +251,7 @@ void CommandList::copyBufferRegion(Buffer* const dstBuffer, const UINT64 dstOffs
 	commandList->CopyBufferRegion(dstBuffer->getResource(), dstOffset, srcBuffer->getResource(), srcOffset, numBytes);
 }
 
-void CommandList::copyBufferRegion(Buffer* const dstBuffer, const UINT64 dstOffset, Buffer* srcBuffer, const UINT64 srcOffset, const UINT64 numBytes)
+void CommandList::copyBufferRegion(Buffer* const dstBuffer, const uint64_t dstOffset, Buffer* srcBuffer, const uint64_t srcOffset, const uint64_t numBytes)
 {
 	pushResourceTrackList(dstBuffer);
 
@@ -292,7 +292,7 @@ void CommandList::copyResource(Buffer* const dstBuffer, Buffer* const srcBuffer)
 	commandList->CopyResource(dstBuffer->getResource(), srcBuffer->getResource());
 }
 
-void CommandList::copyTextureRegion(Texture* const dstTexture, const UINT dstSubresource, Texture* const srcTexture, const UINT srcSubresource)
+void CommandList::copyTextureRegion(Texture* const dstTexture, const uint32_t dstSubresource, Texture* const srcTexture, const uint32_t srcSubresource)
 {
 	pushResourceTrackList(dstTexture);
 
@@ -331,7 +331,7 @@ void CommandList::uavBarrier(const std::initializer_list<Resource*>& resources)
 		transientUAVBarriers.emplace_back(barrier);
 	}
 
-	commandList->ResourceBarrier(static_cast<UINT>(transientUAVBarriers.size()), transientUAVBarriers.data());
+	commandList->ResourceBarrier(static_cast<uint32_t>(transientUAVBarriers.size()), transientUAVBarriers.data());
 }
 
 void CommandList::clearUnorderedAccessView(const ClearUAVDesc& desc, const float values[4])
@@ -373,7 +373,7 @@ void CommandList::clearUnorderedAccessView(const ClearUAVDesc& desc, const float
 	commandList->ResourceBarrier(1, &barrier);
 }
 
-void CommandList::clearUnorderedAccessView(const ClearUAVDesc& desc, const UINT values[4])
+void CommandList::clearUnorderedAccessView(const ClearUAVDesc& desc, const uint32_t values[4])
 {
 	ID3D12Resource* resource = nullptr;
 

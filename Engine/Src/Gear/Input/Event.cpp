@@ -12,9 +12,11 @@ void Event::operator-=(const uint64_t id)
 
 uint64_t Event::operator+=(const std::function<void(void)>& func)
 {
-	functions.emplace(++idx, func);
+	const uint64_t retIdx = idx++;
 
-	return idx;
+	functions.emplace(retIdx, func);
+
+	return retIdx;
 }
 
 void Event::operator()()

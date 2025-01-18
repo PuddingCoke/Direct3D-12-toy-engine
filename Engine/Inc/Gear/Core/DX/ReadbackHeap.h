@@ -9,7 +9,7 @@ class ReadbackHeap :public Resource
 {
 public:
 
-	ReadbackHeap(const UINT size, const D3D12_HEAP_FLAGS flags = D3D12_HEAP_FLAG_NONE);
+	ReadbackHeap(const uint64_t size, const D3D12_HEAP_FLAGS flags = D3D12_HEAP_FLAG_NONE);
 
 	ReadbackHeap(ReadbackHeap&);
 

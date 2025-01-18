@@ -27,9 +27,9 @@ public:
 
 private:
 
-	UINT srvIndex;
+	uint32_t srvIndex;
 
-	UINT uavIndex;
+	uint32_t uavIndex;
 
 	D3D12_GPU_DESCRIPTOR_HANDLE viewGPUHandle;
 
@@ -39,4 +39,3 @@ private:
 };
 
 #endif // !_COUNTERBUFFERVIEW_H_
-

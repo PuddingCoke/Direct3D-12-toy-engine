@@ -27,9 +27,9 @@ public:
 
 	void swap();
 
-	const UINT width;
+	const uint32_t width;
 
-	const UINT height;
+	const uint32_t height;
 
 };
 

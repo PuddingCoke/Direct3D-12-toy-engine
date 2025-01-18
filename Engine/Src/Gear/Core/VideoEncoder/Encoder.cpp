@@ -1,6 +1,6 @@
 #include<Gear/Core/VideoEncoder/Encoder.h>
 
-Encoder::Encoder(const UINT frameToEncode) :
+Encoder::Encoder(const uint32_t frameToEncode) :
 	frameToEncode(frameToEncode), frameEncoded(0), encoding(true), encodeTime(0.f), hConsole(GetStdHandle(STD_OUTPUT_HANDLE))
 {
 }
@@ -17,7 +17,7 @@ void Encoder::displayProgress() const
 
 		GetConsoleScreenBufferInfo(hConsole, &csbi);
 
-		const UINT num = progressBarWidth * frameEncoded / frameToEncode;
+		const uint32_t num = progressBarWidth * frameEncoded / frameToEncode;
 
 		std::cout << "Encoding... [" << std::string(num, '*') << std::string(progressBarWidth - num, '/') << "] " << std::fixed << std::setprecision(2) << 100.f * static_cast<float>(frameEncoded) / static_cast<float>(frameToEncode) << "%";
 

@@ -79,7 +79,7 @@ private:
 
 	void updateTimeElapsed() const;
 
-	RenderEngine(const UINT width, const UINT height, const HWND hwnd, const bool useSwapChainBuffer, const bool initializeImGuiSurface);
+	RenderEngine(const uint32_t width, const uint32_t height, const HWND hwnd, const bool useSwapChainBuffer, const bool initializeImGuiSurface);
 
 	~RenderEngine();
 
@@ -97,7 +97,7 @@ private:
 
 	ComPtr<ID3D12Fence> fence;
 
-	UINT64* fenceValues;
+	uint64_t* fenceValues;
 
 	HANDLE fenceEvent;
 
@@ -115,7 +115,7 @@ private:
 	{
 		float deltaTime;
 		float timeElapsed;
-		UINT uintSeed;
+		uint32_t uintSeed;
 		float floatSeed;
 		Camera::CameraMatrices matrices;
 		DirectX::XMFLOAT2 screenSize;

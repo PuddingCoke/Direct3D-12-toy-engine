@@ -25,13 +25,13 @@ public:
 
 	ShaderResourceDesc getAllSRVIndex() const;
 
-	ShaderResourceDesc getSRVMipIndex(const UINT mipSlice) const;
+	ShaderResourceDesc getSRVMipIndex(const uint32_t mipSlice) const;
 
-	ShaderResourceDesc getUAVMipIndex(const UINT mipSlice) const;
+	ShaderResourceDesc getUAVMipIndex(const uint32_t mipSlice) const;
 
-	RenderTargetDesc getRTVMipHandle(const UINT mipSlice) const;
+	RenderTargetDesc getRTVMipHandle(const uint32_t mipSlice) const;
 
-	ClearUAVDesc getClearUAVDesc(const UINT mipSlice) const;
+	ClearUAVDesc getClearUAVDesc(const uint32_t mipSlice) const;
 
 	Texture* getTexture() const;
 
@@ -43,11 +43,11 @@ public:
 
 private:
 
-	UINT allSRVIndex;
+	uint32_t allSRVIndex;
 
-	UINT srvMipIndexStart;
+	uint32_t srvMipIndexStart;
 
-	UINT uavMipIndexStart;
+	uint32_t uavMipIndexStart;
 
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvMipHandleStart;
 

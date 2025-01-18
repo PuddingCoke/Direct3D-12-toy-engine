@@ -1,6 +1,6 @@
 #include<Gear/Window/Win32Form.h>
 
-Win32Form::Win32Form(const std::wstring& title, const UINT width, const UINT height, const DWORD windowStyle, LRESULT(*windowCallback)(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)):
+Win32Form::Win32Form(const std::wstring& title, const uint32_t width, const uint32_t height, const DWORD windowStyle, LRESULT(*windowCallback)(HWND hwnd, uint32_t msg, WPARAM wParam, LPARAM lParam)):
 	hwnd(nullptr), msg{}
 {
 	SetProcessDPIAware();
@@ -11,7 +11,7 @@ Win32Form::Win32Form(const std::wstring& title, const UINT width, const UINT hei
 	wcex.cbSize = sizeof(WNDCLASSEX);
 	wcex.style = CS_HREDRAW | CS_VREDRAW;
 	wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
-	wcex.hbrBackground = (HBRUSH)GetStockObject(NULL_BRUSH);
+	wcex.hbrBackground = reinterpret_cast<HBRUSH>(GetStockObject(NULL_BRUSH));
 	wcex.hIcon = LoadIcon(0, IDI_APPLICATION);
 	wcex.hIconSm = LoadIcon(0, IDI_APPLICATION);
 	wcex.lpszClassName = L"MyWindowClass";

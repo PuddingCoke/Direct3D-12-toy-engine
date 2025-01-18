@@ -1,12 +1,12 @@
 #include<Gear/Core/Graphics.h>
 
-UINT Graphics::frameBufferCount = 0;
+uint32_t Graphics::frameBufferCount = 0;
 
-UINT Graphics::frameIndex = 0;
+uint32_t Graphics::frameIndex = 0;
 
-UINT Graphics::width = 0;
+uint32_t Graphics::width = 0;
 
-UINT Graphics::height = 0;
+uint32_t Graphics::height = 0;
 
 float Graphics::aspectRatio = 0.f;
 
@@ -14,12 +14,12 @@ float Graphics::deltaTime = 0.f;
 
 float Graphics::timeElapsed = 0.f;
 
-UINT Graphics::getFrameBufferCount()
+uint32_t Graphics::getFrameBufferCount()
 {
 	return frameBufferCount;
 }
 
-UINT Graphics::getFrameIndex()
+uint32_t Graphics::getFrameIndex()
 {
 	return frameIndex;
 }
@@ -34,17 +34,17 @@ float Graphics::getTimeElapsed()
 	return timeElapsed;
 }
 
-UINT Graphics::getWidth()
+uint32_t Graphics::getWidth()
 {
 	return width;
 }
 
-UINT Graphics::getHeight()
+uint32_t Graphics::getHeight()
 {
 	return height;
 }
 
-FLOAT Graphics::getAspectRatio()
+float Graphics::getAspectRatio()
 {
 	return aspectRatio;
 }

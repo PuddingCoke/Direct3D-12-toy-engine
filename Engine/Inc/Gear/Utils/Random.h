@@ -18,15 +18,15 @@ public:
 	void operator=(const Random&) = delete;
 
 	//mean 0 sd(sigma) 1
-	static float Gauss();
+	static float genGauss();
 
-	static float Float();
+	static float genFloat();
 
-	static double Double();
+	static double genDouble();
 
-	static int Int();
+	static int genInt();
 
-	static unsigned int Uint();
+	static uint32_t genUint();
 
 private:
 
@@ -40,7 +40,7 @@ private:
 
 	static std::uniform_int_distribution<int> intDistribution;
 
-	static std::uniform_int_distribution<unsigned int> uintDistribution;
+	static std::uniform_int_distribution<uint32_t> uintDistribution;
 
 };
 

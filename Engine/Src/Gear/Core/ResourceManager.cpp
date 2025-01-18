@@ -9,7 +9,7 @@ ResourceManager::ResourceManager(GraphicsContext* const context) :
 
 ResourceManager::~ResourceManager()
 {
-	for (UINT i = 0; i < Graphics::getFrameBufferCount(); i++)
+	for (uint32_t i = 0; i < Graphics::getFrameBufferCount(); i++)
 	{
 		for (const Resource* const resource : resources[i])
 		{
@@ -68,7 +68,7 @@ CommandList* ResourceManager::getCommandList() const
 	return commandList;
 }
 
-Buffer* ResourceManager::createBuffer(const void* const data, const UINT size, const D3D12_RESOURCE_FLAGS resFlags)
+Buffer* ResourceManager::createBuffer(const void* const data, const uint64_t size, const D3D12_RESOURCE_FLAGS resFlags)
 {
 	Buffer* buffer = new Buffer(size, true, resFlags);
 
@@ -103,17 +103,17 @@ Texture* ResourceManager::createTexture(const std::string& filePath, const D3D12
 	{
 		int textureWidth, textureHeight, channels;
 
-		unsigned char* pixels = stbi_load(filePath.c_str(), &textureWidth, &textureHeight, &channels, 4);
+		unsigned char* const pixels = stbi_load(filePath.c_str(), &textureWidth, &textureHeight, &channels, 4);
 
-		const UINT width = static_cast<UINT>(textureWidth);
-		const UINT height = static_cast<UINT>(textureHeight);
+		const uint32_t width = static_cast<uint32_t>(textureWidth);
+		const uint32_t height = static_cast<uint32_t>(textureHeight);
 		const DXGI_FORMAT format = DXGI_FORMAT_R8G8B8A8_UNORM;
 
 		if (pixels)
 		{
 			texture = new Texture(width, height, format, 1, 1, true, resFlags);
 
-			const UINT64 uploadHeapSize = GetRequiredIntermediateSize(texture->getResource(), 0, 1);
+			const uint64_t uploadHeapSize = GetRequiredIntermediateSize(texture->getResource(), 0, 1);
 
 			UploadHeap* uploadHeap = new UploadHeap(uploadHeapSize);
 
@@ -137,17 +137,17 @@ Texture* ResourceManager::createTexture(const std::string& filePath, const D3D12
 	{
 		int textureWidth, textureHeight, channels;
 
-		float* pixels = stbi_loadf(filePath.c_str(), &textureWidth, &textureHeight, &channels, 4);
+		float* const pixels = stbi_loadf(filePath.c_str(), &textureWidth, &textureHeight, &channels, 4);
 
-		const UINT width = static_cast<UINT>(textureWidth);
-		const UINT height = static_cast<UINT>(textureHeight);
+		const uint32_t width = static_cast<uint32_t>(textureWidth);
+		const uint32_t height = static_cast<uint32_t>(textureHeight);
 		const DXGI_FORMAT format = DXGI_FORMAT_R32G32B32A32_FLOAT;
 
 		if (pixels)
 		{
 			texture = new Texture(width, height, format, 1, 1, true, resFlags);
 
-			const UINT64 uploadHeapSize = GetRequiredIntermediateSize(texture->getResource(), 0, 1);
+			const uint64_t uploadHeapSize = GetRequiredIntermediateSize(texture->getResource(), 0, 1);
 
 			UploadHeap* uploadHeap = new UploadHeap(uploadHeapSize);
 
@@ -181,13 +181,13 @@ Texture* ResourceManager::createTexture(const std::string& filePath, const D3D12
 
 		texture = new Texture(tex, true, D3D12_RESOURCE_STATE_COPY_DEST);
 
-		const UINT64 uploadHeapSize = GetRequiredIntermediateSize(texture->getResource(), 0, static_cast<UINT>(subresources.size()));
+		const uint64_t uploadHeapSize = GetRequiredIntermediateSize(texture->getResource(), 0, static_cast<uint32_t>(subresources.size()));
 
 		UploadHeap* uploadHeap = new UploadHeap(uploadHeapSize);
 
 		release(uploadHeap);
 
-		UpdateSubresources(commandList->get(), texture->getResource(), uploadHeap->getResource(), 0, 0, static_cast<UINT>(subresources.size()), subresources.data());
+		UpdateSubresources(commandList->get(), texture->getResource(), uploadHeap->getResource(), 0, 0, static_cast<uint32_t>(subresources.size()), subresources.data());
 	}
 	else
 	{
@@ -199,7 +199,7 @@ Texture* ResourceManager::createTexture(const std::string& filePath, const D3D12
 	return texture;
 }
 
-Texture* ResourceManager::createTexture(const UINT width, const UINT height, const RandomDataType type, const D3D12_RESOURCE_FLAGS resFlags)
+Texture* ResourceManager::createTexture(const uint32_t width, const uint32_t height, const RandomDataType type, const D3D12_RESOURCE_FLAGS resFlags)
 {
 	Texture* texture = nullptr;
 
@@ -207,25 +207,25 @@ Texture* ResourceManager::createTexture(const UINT width, const UINT height, con
 	{
 		struct Col
 		{
-			UINT8 r, g, b, a;
+			uint8_t r, g, b, a;
 		};
 
 		std::vector<Col> colors(width * height);
 
-		for (UINT i = 0; i < width * height; i++)
+		for (uint32_t i = 0; i < width * height; i++)
 		{
 			colors[i] =
 			{
-				static_cast<UINT8>(Random::Uint() % 256u),
-				static_cast<UINT8>(Random::Uint() % 256u),
-				static_cast<UINT8>(Random::Uint() % 256u),
-				static_cast<UINT8>(Random::Uint() % 256u)
+				static_cast<uint8_t>(Random::genUint() % 256u),
+				static_cast<uint8_t>(Random::genUint() % 256u),
+				static_cast<uint8_t>(Random::genUint() % 256u),
+				static_cast<uint8_t>(Random::genUint() % 256u)
 			};
 		}
 
 		texture = new Texture(width, height, DXGI_FORMAT_R8G8B8A8_UNORM, 1, 1, true, resFlags);
 
-		const UINT64 uploadHeapSize = GetRequiredIntermediateSize(texture->getResource(), 0, 1);
+		const uint64_t uploadHeapSize = GetRequiredIntermediateSize(texture->getResource(), 0, 1);
 
 		UploadHeap* uploadHeap = new UploadHeap(uploadHeapSize);
 
@@ -247,20 +247,20 @@ Texture* ResourceManager::createTexture(const UINT width, const UINT height, con
 
 		std::vector<Col> colors(width * height);
 
-		for (UINT i = 0; i < width * height; i++)
+		for (uint32_t i = 0; i < width * height; i++)
 		{
 			colors[i] =
 			{
-				DirectX::PackedVector::XMConvertFloatToHalf(Random::Gauss()),
-				DirectX::PackedVector::XMConvertFloatToHalf(Random::Gauss()),
-				DirectX::PackedVector::XMConvertFloatToHalf(Random::Gauss()),
-				DirectX::PackedVector::XMConvertFloatToHalf(Random::Gauss())
+				DirectX::PackedVector::XMConvertFloatToHalf(Random::genGauss()),
+				DirectX::PackedVector::XMConvertFloatToHalf(Random::genGauss()),
+				DirectX::PackedVector::XMConvertFloatToHalf(Random::genGauss()),
+				DirectX::PackedVector::XMConvertFloatToHalf(Random::genGauss())
 			};
 		}
 
 		texture = new Texture(width, height, DXGI_FORMAT_R16G16B16A16_FLOAT, 1, 1, true, resFlags);
 
-		const UINT64 uploadHeapSize = GetRequiredIntermediateSize(texture->getResource(), 0, 1);
+		const uint64_t uploadHeapSize = GetRequiredIntermediateSize(texture->getResource(), 0, 1);
 
 		UploadHeap* uploadHeap = new UploadHeap(uploadHeapSize);
 
@@ -277,7 +277,7 @@ Texture* ResourceManager::createTexture(const UINT width, const UINT height, con
 	return texture;
 }
 
-ConstantBuffer* ResourceManager::createConstantBuffer(const UINT size, const bool cpuWritable, const void* const data, const bool persistent)
+ConstantBuffer* ResourceManager::createConstantBuffer(const uint32_t size, const bool cpuWritable, const void* const data, const bool persistent)
 {
 	ConstantBuffer* constantBuffer = nullptr;
 
@@ -308,12 +308,12 @@ ConstantBuffer* ResourceManager::createConstantBuffer(const UINT size, const boo
 	return constantBuffer;
 }
 
-ConstantBuffer* ResourceManager::createConstantBuffer(const UINT size, const bool persistent)
+ConstantBuffer* ResourceManager::createConstantBuffer(const uint32_t size, const bool persistent)
 {
 	return new ConstantBuffer(nullptr, size, persistent);
 }
 
-BufferView* ResourceManager::createTypedBufferView(const DXGI_FORMAT format, const UINT size, const bool createSRV, const bool createUAV, const bool createVBV, const bool createIBV, const bool cpuWritable, const bool persistent, const void* const data)
+BufferView* ResourceManager::createTypedBufferView(const DXGI_FORMAT format, const uint64_t size, const bool createSRV, const bool createUAV, const bool createVBV, const bool createIBV, const bool cpuWritable, const bool persistent, const void* const data)
 {
 	if (createVBV && createIBV)
 	{
@@ -331,7 +331,7 @@ BufferView* ResourceManager::createTypedBufferView(const DXGI_FORMAT format, con
 
 	if (!cpuWritable && !createUAV)
 	{
-		UINT finalState = 0;
+		uint32_t finalState = 0;
 
 		if (createSRV)
 		{
@@ -360,7 +360,7 @@ BufferView* ResourceManager::createTypedBufferView(const DXGI_FORMAT format, con
 	return new BufferView(buffer, 0, format, size, createSRV, createUAV, createVBV, createIBV, cpuWritable, persistent);
 }
 
-BufferView* ResourceManager::createTypedBufferView(const DXGI_FORMAT format, const UINT size, const bool createSRV, const bool createUAV, const bool createVBV, const bool createIBV, const bool cpuWritable, const bool persistent)
+BufferView* ResourceManager::createTypedBufferView(const DXGI_FORMAT format, const uint64_t size, const bool createSRV, const bool createUAV, const bool createVBV, const bool createIBV, const bool cpuWritable, const bool persistent)
 {
 	if (createVBV && createIBV)
 	{
@@ -379,7 +379,7 @@ BufferView* ResourceManager::createTypedBufferView(const DXGI_FORMAT format, con
 	return new BufferView(buffer, 0, format, size, createSRV, createUAV, createVBV, createIBV, cpuWritable, persistent);
 }
 
-BufferView* ResourceManager::createStructuredBufferView(const UINT structureByteStride, const UINT size, const bool createSRV, const bool createUAV, const bool createVBV, const bool cpuWritable, const bool persistent, const void* const data)
+BufferView* ResourceManager::createStructuredBufferView(const uint32_t structureByteStride, const uint64_t size, const bool createSRV, const bool createUAV, const bool createVBV, const bool cpuWritable, const bool persistent, const void* const data)
 {
 	D3D12_RESOURCE_FLAGS resFlags = D3D12_RESOURCE_FLAG_NONE;
 
@@ -392,7 +392,7 @@ BufferView* ResourceManager::createStructuredBufferView(const UINT structureByte
 
 	if (!cpuWritable && !createUAV)
 	{
-		UINT finalState = 0;
+		uint32_t finalState = 0;
 
 		if (createSRV)
 		{
@@ -416,7 +416,7 @@ BufferView* ResourceManager::createStructuredBufferView(const UINT structureByte
 	return new BufferView(buffer, structureByteStride, DXGI_FORMAT_UNKNOWN, size, createSRV, createUAV, createVBV, false, cpuWritable, persistent);
 }
 
-BufferView* ResourceManager::createStructuredBufferView(const UINT structureByteStride, const UINT size, const bool createSRV, const bool createUAV, const bool createVBV, const bool cpuWritable, const bool persistent)
+BufferView* ResourceManager::createStructuredBufferView(const uint32_t structureByteStride, const uint64_t size, const bool createSRV, const bool createUAV, const bool createVBV, const bool cpuWritable, const bool persistent)
 {
 	D3D12_RESOURCE_FLAGS resFlags = D3D12_RESOURCE_FLAG_NONE;
 
@@ -430,7 +430,7 @@ BufferView* ResourceManager::createStructuredBufferView(const UINT structureByte
 	return new BufferView(buffer, structureByteStride, DXGI_FORMAT_UNKNOWN, size, createSRV, createUAV, createVBV, false, cpuWritable, persistent);
 }
 
-BufferView* ResourceManager::createByteAddressBufferView(const UINT size, const bool createSRV, const bool createUAV, const bool cpuWritable, const bool persistent, const void* const data)
+BufferView* ResourceManager::createByteAddressBufferView(const uint64_t size, const bool createSRV, const bool createUAV, const bool cpuWritable, const bool persistent, const void* const data)
 {
 	D3D12_RESOURCE_FLAGS resFlags = D3D12_RESOURCE_FLAG_NONE;
 
@@ -443,7 +443,7 @@ BufferView* ResourceManager::createByteAddressBufferView(const UINT size, const 
 
 	if (!cpuWritable && !createUAV)
 	{
-		UINT finalState = 0;
+		uint32_t finalState = 0;
 
 		if (createSRV)
 		{
@@ -462,7 +462,7 @@ BufferView* ResourceManager::createByteAddressBufferView(const UINT size, const 
 	return new BufferView(buffer, 0, DXGI_FORMAT_UNKNOWN, size, createSRV, createUAV, false, false, cpuWritable, persistent);
 }
 
-BufferView* ResourceManager::createByteAddressBufferView(const UINT size, const bool createSRV, const bool createUAV, const bool cpuWritable, const bool persistent)
+BufferView* ResourceManager::createByteAddressBufferView(const uint64_t size, const bool createSRV, const bool createUAV, const bool cpuWritable, const bool persistent)
 {
 	D3D12_RESOURCE_FLAGS resFlags = D3D12_RESOURCE_FLAG_NONE;
 
@@ -478,12 +478,12 @@ BufferView* ResourceManager::createByteAddressBufferView(const UINT size, const 
 
 IndexConstantBuffer* ResourceManager::createIndexConstantBuffer(const std::initializer_list<ShaderResourceDesc>& descs, const bool cpuWritable, const bool persistent)
 {
-	const UINT alignedIndicesNum = ((descs.size() + 63) & ~63);
+	const uint32_t alignedIndicesNum = ((descs.size() + 63) & ~63);
 
-	std::vector<UINT> indices = std::vector<UINT>(alignedIndicesNum);
+	std::vector<uint32_t> indices = std::vector<uint32_t>(alignedIndicesNum);
 
 	{
-		UINT index = 0;
+		uint32_t index = 0;
 
 		for (const ShaderResourceDesc& desc : descs)
 		{
@@ -493,21 +493,21 @@ IndexConstantBuffer* ResourceManager::createIndexConstantBuffer(const std::initi
 		}
 	}
 
-	ConstantBuffer* constantBuffer = createConstantBuffer(sizeof(UINT) * alignedIndicesNum, cpuWritable, indices.data(), persistent);
+	ConstantBuffer* constantBuffer = createConstantBuffer(sizeof(uint32_t) * alignedIndicesNum, cpuWritable, indices.data(), persistent);
 
 	return new IndexConstantBuffer(constantBuffer, descs);
 }
 
-IndexConstantBuffer* ResourceManager::createIndexConstantBuffer(const UINT indicesNum, const bool persistent)
+IndexConstantBuffer* ResourceManager::createIndexConstantBuffer(const uint32_t indicesNum, const bool persistent)
 {
-	const UINT alignedIndicesNum = ((indicesNum + 63) & ~63);
+	const uint32_t alignedIndicesNum = ((indicesNum + 63) & ~63);
 
-	ConstantBuffer* constantBuffer = createConstantBuffer(alignedIndicesNum * sizeof(UINT), persistent);
+	ConstantBuffer* constantBuffer = createConstantBuffer(alignedIndicesNum * sizeof(uint32_t), persistent);
 
 	return new IndexConstantBuffer(constantBuffer);
 }
 
-TextureDepthView* ResourceManager::createTextureDepthView(const UINT width, const UINT height, const DXGI_FORMAT resFormat, const UINT arraySize, const UINT mipLevels, const bool isTextureCube, const bool persistent)
+TextureDepthView* ResourceManager::createTextureDepthView(const uint32_t width, const uint32_t height, const DXGI_FORMAT resFormat, const uint32_t arraySize, const uint32_t mipLevels, const bool isTextureCube, const bool persistent)
 {
 	DXGI_FORMAT clearValueFormat = DXGI_FORMAT_UNKNOWN;
 
@@ -596,7 +596,7 @@ TextureRenderView* ResourceManager::createTextureRenderView(const std::string& f
 	}
 }
 
-TextureRenderView* ResourceManager::createTextureRenderView(const UINT width, const UINT height, const RandomDataType type, const bool persistent, const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat)
+TextureRenderView* ResourceManager::createTextureRenderView(const uint32_t width, const uint32_t height, const RandomDataType type, const bool persistent, const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat)
 {
 	const bool hasRTV = (rtvFormat != DXGI_FORMAT_UNKNOWN);
 
@@ -646,7 +646,7 @@ TextureRenderView* ResourceManager::createTextureRenderView(const UINT width, co
 	}
 }
 
-TextureRenderView* ResourceManager::createTextureRenderView(const UINT width, const UINT height, const DXGI_FORMAT resFormat, const UINT arraySize, const UINT mipLevels, const bool isTextureCube, const bool persistent, const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat, const float* const color)
+TextureRenderView* ResourceManager::createTextureRenderView(const uint32_t width, const uint32_t height, const DXGI_FORMAT resFormat, const uint32_t arraySize, const uint32_t mipLevels, const bool isTextureCube, const bool persistent, const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat, const float* const color)
 {
 	const bool hasRTV = (rtvFormat != DXGI_FORMAT_UNKNOWN);
 
@@ -691,7 +691,7 @@ TextureRenderView* ResourceManager::createTextureRenderView(const UINT width, co
 	return new TextureRenderView(texture, isTextureCube, persistent, srvFormat, uavFormat, rtvFormat);
 }
 
-TextureRenderView* ResourceManager::createTextureCube(const std::string& filePath, const UINT texturecubeResolution, const bool persistent, const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat)
+TextureRenderView* ResourceManager::createTextureCube(const std::string& filePath, const uint32_t texturecubeResolution, const bool persistent, const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat)
 {
 	TextureRenderView* const equirectangularMap = createTextureRenderView(filePath, false);
 
@@ -748,7 +748,7 @@ TextureRenderView* ResourceManager::createTextureCube(const std::string& filePat
 
 		const DirectX::XMMATRIX projMatrix = DirectX::XMMatrixPerspectiveFovLH(Math::pi / 2.f, 1.f, 0.1f, 10.f);
 
-		for (UINT i = 0; i < 6; i++)
+		for (uint32_t i = 0; i < 6; i++)
 		{
 			const DirectX::XMMATRIX viewMatrix = DirectX::XMMatrixLookAtLH({ 0.f,0.f,0.f }, focusPoints[i], upVectors[i]);
 			const DirectX::XMMATRIX viewProj = DirectX::XMMatrixTranspose(viewMatrix * projMatrix);
@@ -817,11 +817,11 @@ TextureRenderView* ResourceManager::createTextureCube(const std::string& filePat
 
 	Texture* srcTexture = cubemap->getTexture();
 
-	for (UINT i = 0; i < 6; i++)
+	for (uint32_t i = 0; i < 6; i++)
 	{
-		const UINT dstSubresource = D3D12CalcSubresource(0, i, 0, dstTexture->getMipLevels(), dstTexture->getArraySize());
+		const uint32_t dstSubresource = D3D12CalcSubresource(0, i, 0, dstTexture->getMipLevels(), dstTexture->getArraySize());
 
-		const UINT srcSubresource = D3D12CalcSubresource(0, i, 0, srcTexture->getMipLevels(), srcTexture->getArraySize());
+		const uint32_t srcSubresource = D3D12CalcSubresource(0, i, 0, srcTexture->getMipLevels(), srcTexture->getArraySize());
 
 		commandList->copyTextureRegion(dstTexture, dstSubresource, srcTexture, srcSubresource);
 	}
@@ -852,7 +852,7 @@ TextureRenderView* ResourceManager::createTextureCube(const std::initializer_lis
 	Texture* srcTextures[6] = {};
 
 	{
-		UINT index = 0;
+		uint32_t index = 0;
 
 		for (const std::string& filePath : texturesPath)
 		{
@@ -891,11 +891,11 @@ TextureRenderView* ResourceManager::createTextureCube(const std::initializer_lis
 
 	Texture* dstTexture = new Texture(srcTextures[0]->getWidth(), srcTextures[0]->getHeight(), srcTextures[0]->getFormat(), 6, 1, true, resFlags);
 
-	for (UINT i = 0; i < 6; i++)
+	for (uint32_t i = 0; i < 6; i++)
 	{
-		const UINT dstSubresource = D3D12CalcSubresource(0, i, 0, dstTexture->getMipLevels(), dstTexture->getArraySize());
+		const uint32_t dstSubresource = D3D12CalcSubresource(0, i, 0, dstTexture->getMipLevels(), dstTexture->getArraySize());
 
-		const UINT srcSubresource = D3D12CalcSubresource(0, 0, 0, srcTextures[i]->getMipLevels(), srcTextures[i]->getArraySize());
+		const uint32_t srcSubresource = D3D12CalcSubresource(0, 0, 0, srcTextures[i]->getMipLevels(), srcTextures[i]->getArraySize());
 
 		commandList->copyTextureRegion(dstTexture, dstSubresource, srcTextures[i], srcSubresource);
 	}

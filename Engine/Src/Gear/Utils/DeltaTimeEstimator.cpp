@@ -31,7 +31,7 @@ float DeltaTimeEstimator::getDeltaTime(const float lastDeltaTime)
 
 	float averageDeltaTime = 0.f;
 
-	for (unsigned int i = 2; i < 9; i++)
+	for (uint32_t i = 2; i < 9; i++)
 	{
 		averageDeltaTime += sortedDeltaTime[i];
 	}

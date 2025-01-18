@@ -151,7 +151,7 @@ void Gear::runEncode()
 		break;
 	}
 
-	const UINT numTextures = Encoder::lookaheadDepth + 1;
+	const uint32_t numTextures = Encoder::lookaheadDepth + 1;
 
 	Texture* renderTextures[numTextures] = {};
 
@@ -162,15 +162,15 @@ void Gear::runEncode()
 
 		D3D12_RENDER_TARGET_VIEW_DESC rtvDesc = {};
 		rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
-		rtvDesc.Format = Graphics::BackBufferFormat;
+		rtvDesc.Format = Graphics::backBufferFormat;
 		rtvDesc.Texture2D.MipSlice = 0;
 		rtvDesc.Texture2D.PlaneSlice = 0;
 
-		for (UINT i = 0; i < numTextures; i++)
+		for (uint32_t i = 0; i < numTextures; i++)
 		{
-			const D3D12_CLEAR_VALUE clearValue = { Graphics::BackBufferFormat ,{0.f,0.f,0.f,1.f} };
+			const D3D12_CLEAR_VALUE clearValue = { Graphics::backBufferFormat ,{0.f,0.f,0.f,1.f} };
 
-			renderTextures[i] = new Texture(Graphics::getWidth(), Graphics::getHeight(), Graphics::BackBufferFormat, 1, 1, true, D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET, &clearValue);
+			renderTextures[i] = new Texture(Graphics::getWidth(), Graphics::getHeight(), Graphics::backBufferFormat, 1, 1, true, D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET, &clearValue);
 
 			GraphicsDevice::get()->CreateRenderTargetView(renderTextures[i]->getResource(), &rtvDesc, descriptorHandle.getCPUHandle());
 
@@ -180,7 +180,7 @@ void Gear::runEncode()
 		}
 	}
 
-	UINT index = 0;
+	uint32_t index = 0;
 
 	RenderEngine::get()->setDeltaTime(1.f / static_cast<float>(Encoder::frameRate));
 
@@ -208,7 +208,7 @@ void Gear::runEncode()
 		index = (index + 1) % numTextures;
 	}
 
-	for (UINT i = 0; i < numTextures; i++)
+	for (uint32_t i = 0; i < numTextures; i++)
 	{
 		delete renderTextures[i];
 	}
@@ -263,16 +263,16 @@ Gear::~Gear()
 
 }
 
-void Gear::iniWindow(const std::wstring& title, const UINT width, const UINT height)
+void Gear::iniWindow(const std::wstring& title, const uint32_t width, const uint32_t height)
 {
 	switch (usage)
 	{
 	case Configuration::EngineUsage::NORMAL:
-		winform = new Win32Form(title, width, height, normalWndStyle, Gear::WindowProc);
+		winform = new Win32Form(title, width, height, normalWndStyle, Gear::windowCallback);
 		break;
 
 	case Configuration::EngineUsage::VIDEOPLAYBACK:
-		winform = new Win32Form(title, 100, 100, normalWndStyle, Gear::EncodeProc);
+		winform = new Win32Form(title, 100, 100, normalWndStyle, Gear::encodeCallback);
 		break;
 
 	default:
@@ -280,7 +280,7 @@ void Gear::iniWindow(const std::wstring& title, const UINT width, const UINT hei
 	}
 }
 
-LRESULT Gear::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT Gear::windowCallback(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam)
 {
 	if (ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam))
 		return true;
@@ -290,19 +290,25 @@ LRESULT Gear::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_PAINT:
 	{
 		PAINTSTRUCT ps;
+
 		BeginPaint(hWnd, &ps);
+
 		EndPaint(hWnd, &ps);
 	}
 	break;
 
 	case WM_MOUSEMOVE:
 	{
-		const float curX = (float)GET_X_LPARAM(lParam);
-		const float curY = (float)Graphics::getHeight() - (float)GET_Y_LPARAM(lParam);
+		const float curX = static_cast<float>(LOWORD(lParam));
+
+		const float curY = static_cast<float>(Graphics::getHeight()) - static_cast<float>(HIWORD(lParam));
 
 		Mouse::dx = curX - Mouse::x;
+
 		Mouse::dy = curY - Mouse::y;
+
 		Mouse::x = curX;
+
 		Mouse::y = curY;
 
 		Mouse::onMoved = true;
@@ -313,44 +319,55 @@ LRESULT Gear::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 	case WM_LBUTTONDOWN:
 		Mouse::leftDown = true;
+
 		Mouse::onLeftDowned = true;
+
 		Mouse::leftDownEvent();
 		break;
 
 	case WM_RBUTTONDOWN:
 		Mouse::rightDown = true;
+
 		Mouse::onRightDowned = true;
+
 		Mouse::rightDownEvent();
 		break;
 
 	case WM_LBUTTONUP:
 		Mouse::leftDown = false;
+
 		Mouse::leftUpEvent();
 		break;
 
 	case WM_RBUTTONUP:
 		Mouse::rightDown = false;
+
 		Mouse::rightUpEvent();
 		break;
 
 	case WM_MOUSEWHEEL:
-		Mouse::wheelDelta = (float)GET_WHEEL_DELTA_WPARAM(wParam) / 120.f;
+		Mouse::wheelDelta = GET_WHEEL_DELTA_WPARAM(wParam) / 120.f;
+
 		Mouse::onScrolled = true;
+
 		Mouse::scrollEvent();
 		break;
 
 	case WM_KEYDOWN:
 		if ((HIWORD(lParam) & KF_REPEAT) == 0)
 		{
-			Keyboard::keyDownMap[(Keyboard::Key)wParam] = true;
-			Keyboard::onKeyDownMap[(Keyboard::Key)wParam] = true;
-			Keyboard::keyDownEvents[(Keyboard::Key)wParam]();
+			Keyboard::keyDownMap[static_cast<Keyboard::Key>(wParam)] = true;
+
+			Keyboard::onKeyDownMap[static_cast<Keyboard::Key>(wParam)] = true;
+
+			Keyboard::keyDownEvents[static_cast<Keyboard::Key>(wParam)]();
 		}
 		break;
 
 	case WM_KEYUP:
-		Keyboard::keyDownMap[(Keyboard::Key)wParam] = false;
-		Keyboard::keyUpEvents[(Keyboard::Key)wParam]();
+		Keyboard::keyDownMap[static_cast<Keyboard::Key>(wParam)] = false;
+
+		Keyboard::keyUpEvents[static_cast<Keyboard::Key>(wParam)]();
 		break;
 
 	case WM_DESTROY:
@@ -364,14 +381,16 @@ LRESULT Gear::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
-LRESULT Gear::EncodeProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT Gear::encodeCallback(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)
 	{
 	case WM_PAINT:
 	{
 		PAINTSTRUCT ps;
+
 		BeginPaint(hWnd, &ps);
+
 		EndPaint(hWnd, &ps);
 	}
 	break;

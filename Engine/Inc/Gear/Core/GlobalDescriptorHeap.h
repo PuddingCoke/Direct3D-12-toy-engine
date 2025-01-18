@@ -23,13 +23,13 @@ public:
 
 	static DescriptorHeap* getNonShaderVisibleResourceHeap();
 
-	static UINT getResourceIncrementSize();
+	static uint32_t getResourceIncrementSize();
 
-	static UINT getRenderTargetIncrementSize();
+	static uint32_t getRenderTargetIncrementSize();
 
-	static UINT getDepthStencilIncrementSize();
+	static uint32_t getDepthStencilIncrementSize();
 
-	static UINT getSamplerIncrementSize();
+	static uint32_t getSamplerIncrementSize();
 
 private:
 
@@ -37,13 +37,13 @@ private:
 
 	static GlobalDescriptorHeap* instance;
 
-	static UINT resourceIncrementSize;
+	static uint32_t resourceIncrementSize;
 
-	static UINT renderTargetIncrementSize;
+	static uint32_t renderTargetIncrementSize;
 
-	static UINT depthStencilIncrementSize;
+	static uint32_t depthStencilIncrementSize;
 
-	static UINT samplerIncrementSize;
+	static uint32_t samplerIncrementSize;
 
 	GlobalDescriptorHeap();
 

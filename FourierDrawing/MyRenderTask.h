@@ -65,7 +65,7 @@ public:
 	bool connected;
 
 	MyRenderTask() :
-		pBatch{ new PrimitiveBatch(Graphics::BackBufferFormat,context),new PrimitiveBatch(DXGI_FORMAT_R8G8B8A8_UNORM,context) },
+		pBatch{ new PrimitiveBatch(Graphics::backBufferFormat,context),new PrimitiveBatch(DXGI_FORMAT_R8G8B8A8_UNORM,context) },
 		renderTexture(ResourceManager::createTextureRenderView(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R8G8B8A8_UNORM, 1, 1, false, true,
 			DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_R8G8B8A8_UNORM)),
 		curFrame(0),
@@ -90,7 +90,7 @@ public:
 			desc.SampleMask = UINT_MAX;
 			desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 			desc.NumRenderTargets = 1;
-			desc.RTVFormats[0] = Graphics::BackBufferFormat;
+			desc.RTVFormats[0] = Graphics::backBufferFormat;
 			desc.SampleDesc.Count = 1;
 
 			GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&fullScreenPipelineState));

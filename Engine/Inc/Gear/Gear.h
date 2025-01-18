@@ -20,7 +20,7 @@
 #include<windowsx.h>
 #include<dxgidebug.h>
 
-extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, uint32_t msg, WPARAM wParam, LPARAM lParam);
 
 class Gear
 {
@@ -64,13 +64,13 @@ private:
 
 	DeltaTimeEstimator dtEstimator;
 
-	void iniWindow(const std::wstring& title, const UINT width, const UINT height);
+	void iniWindow(const std::wstring& title, const uint32_t width, const uint32_t height);
 
 	static constexpr DWORD normalWndStyle = WS_CAPTION | WS_SYSMENU;
 
-	static LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+	static LRESULT CALLBACK windowCallback(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam);
 
-	static LRESULT CALLBACK EncodeProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+	static LRESULT CALLBACK encodeCallback(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam);
 };
 
 #endif // !_GEAR_H_

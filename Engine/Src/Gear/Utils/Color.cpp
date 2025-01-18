@@ -2,24 +2,30 @@
 
 int Color::toInt() const
 {
-	return ((int)(255 * a) << 24) | ((int)(255 * b) << 16) | ((int)(255 * g) << 8) | ((int)(255 * r));
+	return (static_cast<int>(255 * a) << 24) | (static_cast<int>(255 * b) << 16) | (static_cast<int>(255 * g) << 8) | (static_cast<int>(255 * r));
 }
 
 Color Color::random()
 {
-	return { Random::Float(),Random::Float() ,Random::Float(),1.f };
+	return { Random::genFloat(),Random::genFloat() ,Random::genFloat(),1.f };
 }
 
-Color Color::HSVtoRGB(const Color& c)
+Color Color::hsvToRgb(const Color& c)
 {
 	float r, g, b, f, p, q, t;
-	const int i = (int)floorf(c.r * 6.f);
+
+	const int i = static_cast<int>(floorf(c.r * 6.f));
+
 	f = c.r * 6 - i;
+
 	p = c.b * (1 - c.g);
+
 	q = c.b * (1 - f * c.g);
+
 	t = c.b * (1 - (1 - f) * c.g);
 
-	switch (i % 6) {
+	switch (i % 6)
+	{
 	default:
 	case 0: r = c.b, g = t, b = p; break;
 	case 1: r = q, g = c.b, b = p; break;

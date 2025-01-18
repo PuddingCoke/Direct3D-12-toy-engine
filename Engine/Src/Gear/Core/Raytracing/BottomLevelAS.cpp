@@ -85,7 +85,7 @@ void BottomLevelAS::generateBLAS(CommandList* const commandList)
 		D3D12_BUILD_RAYTRACING_ACCELERATION_STRUCTURE_INPUTS inputs = {};
 		inputs.Type = D3D12_RAYTRACING_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL;
 		inputs.DescsLayout = D3D12_ELEMENTS_LAYOUT_ARRAY;
-		inputs.NumDescs = geometryDescs.size();
+		inputs.NumDescs = static_cast<uint32_t>(geometryDescs.size());
 		inputs.pGeometryDescs = geometryDescs.data();
 		inputs.Flags = buildFlag;
 
@@ -105,7 +105,7 @@ void BottomLevelAS::generateBLAS(CommandList* const commandList)
 	D3D12_BUILD_RAYTRACING_ACCELERATION_STRUCTURE_DESC desc = {};
 	desc.Inputs.Type = D3D12_RAYTRACING_ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL;
 	desc.Inputs.DescsLayout = D3D12_ELEMENTS_LAYOUT_ARRAY;
-	desc.Inputs.NumDescs = geometryDescs.size();
+	desc.Inputs.NumDescs = static_cast<uint32_t>(geometryDescs.size());
 	desc.Inputs.pGeometryDescs = geometryDescs.data();
 	desc.Inputs.Flags = D3D12_RAYTRACING_ACCELERATION_STRUCTURE_BUILD_FLAG_NONE;
 	desc.ScratchAccelerationStructureData = scratchBuffer->getGPUAddress();

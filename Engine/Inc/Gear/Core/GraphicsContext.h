@@ -16,7 +16,7 @@ public:
 
 	~GraphicsContext();
 
-	void updateBuffer(BufferView* const bufferView, const void* const data, const UINT size);
+	void updateBuffer(BufferView* const bufferView, const void* const data, const uint32_t size);
 
 	//per frame global resources transition immediate
 	void setGlobalConstantBuffer(const IndexConstantBuffer* const indexBuffer);
@@ -24,40 +24,40 @@ public:
 	void setGlobalConstantBuffer(const ConstantBuffer* const constantBuffer);
 
 	//4 values availiable
-	void setVSConstants(const std::initializer_list<ShaderResourceDesc>& descs, const UINT offset);
+	void setVSConstants(const std::initializer_list<ShaderResourceDesc>& descs, const uint32_t offset);
 
 	//4 values availiable
-	void setVSConstants(const UINT numValues, const void* const data, const UINT offset);
+	void setVSConstants(const uint32_t numValues, const void* const data, const uint32_t offset);
 
 	//4 values availiable
-	void setHSConstants(const std::initializer_list<ShaderResourceDesc>& descs, const UINT offset);
+	void setHSConstants(const std::initializer_list<ShaderResourceDesc>& descs, const uint32_t offset);
 
 	//4 values availiable
-	void setHSConstants(const UINT numValues, const void* const data, const UINT offset);
+	void setHSConstants(const uint32_t numValues, const void* const data, const uint32_t offset);
 
 	//8 values availiable
-	void setDSConstants(const std::initializer_list<ShaderResourceDesc>& descs, const UINT offset);
+	void setDSConstants(const std::initializer_list<ShaderResourceDesc>& descs, const uint32_t offset);
 
 	//8 values availiable
-	void setDSConstants(const UINT numValues, const void* const data, const UINT offset);
+	void setDSConstants(const uint32_t numValues, const void* const data, const uint32_t offset);
 
 	//4 values availiable
-	void setGSConstants(const std::initializer_list<ShaderResourceDesc>& descs, const UINT offset);
+	void setGSConstants(const std::initializer_list<ShaderResourceDesc>& descs, const uint32_t offset);
 
 	//4 values availiable
-	void setGSConstants(const UINT numValues, const void* const data, const UINT offset);
+	void setGSConstants(const uint32_t numValues, const void* const data, const uint32_t offset);
 
 	//24 values availiable
-	void setPSConstants(const std::initializer_list<ShaderResourceDesc>& descs, const UINT offset);
+	void setPSConstants(const std::initializer_list<ShaderResourceDesc>& descs, const uint32_t offset);
 
 	//24 values availiable
-	void setPSConstants(const UINT numValues, const void* const data, const UINT offset);
+	void setPSConstants(const uint32_t numValues, const void* const data, const uint32_t offset);
 
 	//32 values availiable
-	void setCSConstants(const std::initializer_list<ShaderResourceDesc>& descs, const UINT offset);
+	void setCSConstants(const std::initializer_list<ShaderResourceDesc>& descs, const uint32_t offset);
 
 	//32 values availiable
-	void setCSConstants(const UINT numValues, const void* const data, const UINT offset);
+	void setCSConstants(const uint32_t numValues, const void* const data, const uint32_t offset);
 
 	void setVSConstantBuffer(const IndexConstantBuffer* const constantBuffer);
 
@@ -90,9 +90,9 @@ public:
 
 	void setDefRenderTarget() const;
 
-	void clearDefRenderTarget(const FLOAT clearValue[4]) const;
+	void clearDefRenderTarget(const float clearValue[4]) const;
 
-	void setVertexBuffers(const UINT startSlot, const std::initializer_list<VertexBufferDesc>& vertexBuffers);
+	void setVertexBuffers(const uint32_t startSlot, const std::initializer_list<VertexBufferDesc>& vertexBuffers);
 
 	void setIndexBuffer(const IndexBufferDesc& indexBuffers);
 
@@ -100,33 +100,33 @@ public:
 
 	void setViewport(const float width, const float height);
 
-	void setViewport(const UINT width, const UINT height);
+	void setViewport(const uint32_t width, const uint32_t height);
 
-	void setScissorRect(const UINT left, const UINT top, const UINT right, const UINT bottom);
+	void setScissorRect(const uint32_t left, const uint32_t top, const uint32_t right, const uint32_t bottom);
 
 	void setScissorRect(const float left, const float top, const float right, const float bottom);
 
 	void setViewportSimple(const float width, const float height);
 
-	void setViewportSimple(const UINT width, const UINT height);
+	void setViewportSimple(const uint32_t width, const uint32_t height);
 
 	void setPipelineState(ID3D12PipelineState* const pipelineState) const;
 
-	void clearRenderTarget(const RenderTargetDesc& desc, const FLOAT clearValue[4]) const;
+	void clearRenderTarget(const RenderTargetDesc& desc, const float clearValue[4]) const;
 
-	void clearDepthStencil(const DepthStencilDesc& desc, const D3D12_CLEAR_FLAGS flags, const FLOAT depth, const UINT8 stencil) const;
+	void clearDepthStencil(const DepthStencilDesc& desc, const D3D12_CLEAR_FLAGS flags, const float depth, const uint8_t stencil) const;
 
-	void clearUnorderedAccess(const ClearUAVDesc& desc, const FLOAT values[4]);
+	void clearUnorderedAccess(const ClearUAVDesc& desc, const float values[4]);
 
-	void clearUnorderedAccess(const ClearUAVDesc& desc, const UINT values[4]);
+	void clearUnorderedAccess(const ClearUAVDesc& desc, const uint32_t values[4]);
 
 	void uavBarrier(const std::initializer_list<Resource*>& resources) const;
 
-	void draw(const UINT vertexCountPerInstance, const UINT instanceCount, const UINT startVertexLocation, const UINT startInstanceLocation) const;
+	void draw(const uint32_t vertexCountPerInstance, const uint32_t instanceCount, const uint32_t startVertexLocation, const uint32_t startInstanceLocation) const;
 
-	void drawIndexed(const UINT indexCountPerInstance, const UINT instanceCount, const UINT startIndexLocation, const INT baseVertexLocation, const UINT startInstanceLocation) const;
+	void drawIndexed(const uint32_t indexCountPerInstance, const uint32_t instanceCount, const uint32_t startIndexLocation, const int baseVertexLocation, const uint32_t startInstanceLocation) const;
 
-	void dispatch(const UINT threadGroupCountX, const UINT threadGroupCountY, const UINT threadGroupCountZ) const;
+	void dispatch(const uint32_t threadGroupCountX, const uint32_t threadGroupCountY, const uint32_t threadGroupCountZ) const;
 
 	void begin() const;
 
@@ -140,7 +140,7 @@ private:
 
 	static ConstantBuffer* globalConstantBuffer;
 
-	void getIndicesFromResourceDescs(const std::initializer_list<ShaderResourceDesc>& descs, UINT* const dst) const;
+	void getIndicesFromResourceDescs(const std::initializer_list<ShaderResourceDesc>& descs, uint32_t* const dst) const;
 
 	D3D12_VIEWPORT vp;
 
@@ -148,7 +148,7 @@ private:
 
 	CommandList* const commandList;
 
-	UINT tempResourceIndices[32];
+	uint32_t tempResourceIndices[32];
 
 };
 

@@ -116,7 +116,4 @@ void GraphicsDevice::checkFeatureSupport()
 		std::cout << "\n";
 	}
 
-
-
-
 }

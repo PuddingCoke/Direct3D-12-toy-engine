@@ -9,24 +9,22 @@
 
 class Texture;
 
-constexpr UINT D3D12_TRANSITION_ALL_MIPLEVELS = 0xFFFFFFFF;
-
 struct PendingTextureBarrier
 {
 	Texture* texture;
 
-	UINT mipSlice;
+	uint32_t mipSlice;
 
-	UINT afterState;
+	uint32_t afterState;
 };
 
 class Texture :public Resource
 {
 public:
 
-	Texture(const UINT width, const UINT height, const DXGI_FORMAT format, const UINT arraySize, const UINT mipLevels, const bool stateTracking, const D3D12_RESOURCE_FLAGS resFlags,const D3D12_CLEAR_VALUE* const clearValue = nullptr);
+	Texture(const uint32_t width, const uint32_t height, const DXGI_FORMAT format, const uint32_t arraySize, const uint32_t mipLevels, const bool stateTracking, const D3D12_RESOURCE_FLAGS resFlags,const D3D12_CLEAR_VALUE* const clearValue = nullptr);
 
-	Texture(const ComPtr<ID3D12Resource>& texture, const bool stateTracking, const UINT initialState);
+	Texture(const ComPtr<ID3D12Resource>& texture, const bool stateTracking, const uint32_t initialState);
 
 	Texture(Texture&);
 
@@ -44,43 +42,43 @@ public:
 
 	void transition(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers, std::vector<PendingTextureBarrier>& pendingBarriers);
 
-	UINT getWidth() const;
+	uint32_t getWidth() const;
 
-	UINT getHeight() const;
+	uint32_t getHeight() const;
 
-	UINT getArraySize() const;
+	uint32_t getArraySize() const;
 
-	UINT getMipLevels() const;
+	uint32_t getMipLevels() const;
 
 	DXGI_FORMAT getFormat() const;
 
-	void setAllState(const UINT state);
+	void setAllState(const uint32_t state);
 
-	void setMipSliceState(const UINT mipSlice, const UINT state);
+	void setMipSliceState(const uint32_t mipSlice, const uint32_t state);
 
-	UINT getAllState() const;
+	uint32_t getAllState() const;
 
-	UINT getMipSliceState(const UINT mipSlice);
+	uint32_t getMipSliceState(const uint32_t mipSlice);
 
 private:
 
 	friend class RenderEngine;
 
-	UINT width;
+	uint32_t width;
 
-	UINT height;
+	uint32_t height;
 
-	UINT arraySize;
+	uint32_t arraySize;
 
-	UINT mipLevels;
+	uint32_t mipLevels;
 
 	DXGI_FORMAT format;
 
 	struct STATES
 	{
-		UINT allState;
+		uint32_t allState;
 
-		std::vector<UINT> mipLevelStates;
+		std::vector<uint32_t> mipLevelStates;
 	};
 
 	std::shared_ptr<STATES> globalState;

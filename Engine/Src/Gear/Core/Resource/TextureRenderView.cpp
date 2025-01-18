@@ -6,7 +6,7 @@ TextureRenderView::TextureRenderView(Texture* const texture, const bool isTextur
 	//create srv uav descriptors
 	{
 		//plus 1 because there is a additional srv to acess all mipslices
-		numSRVUAVCBVDescriptors = 1 + texture->getMipLevels() + static_cast<UINT>(hasUAV) * texture->getMipLevels();
+		numSRVUAVCBVDescriptors = 1 + texture->getMipLevels() + static_cast<uint32_t>(hasUAV) * texture->getMipLevels();
 
 		DescriptorHandle descriptorHandle = DescriptorHandle();
 
@@ -29,7 +29,7 @@ TextureRenderView::TextureRenderView(Texture* const texture, const bool isTextur
 
 		if (isTextureCube) //TextureCube srv creation
 		{
-			const UINT cubeNum = texture->getArraySize() / 6;
+			const uint32_t cubeNum = texture->getArraySize() / 6;
 
 			if (cubeNum > 1)
 			{
@@ -51,7 +51,7 @@ TextureRenderView::TextureRenderView(Texture* const texture, const bool isTextur
 				}
 
 				//create srv acess each mipSlice
-				for (UINT i = 0; i < texture->getMipLevels(); i++)
+				for (uint32_t i = 0; i < texture->getMipLevels(); i++)
 				{
 					D3D12_SHADER_RESOURCE_VIEW_DESC desc = {};
 					desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
@@ -86,7 +86,7 @@ TextureRenderView::TextureRenderView(Texture* const texture, const bool isTextur
 				}
 
 				//create srv acess each mipSlice
-				for (UINT i = 0; i < texture->getMipLevels(); i++)
+				for (uint32_t i = 0; i < texture->getMipLevels(); i++)
 				{
 					D3D12_SHADER_RESOURCE_VIEW_DESC desc = {};
 					desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
@@ -125,7 +125,7 @@ TextureRenderView::TextureRenderView(Texture* const texture, const bool isTextur
 				}
 
 				//create srv acess each mipSlice
-				for (UINT i = 0; i < texture->getMipLevels(); i++)
+				for (uint32_t i = 0; i < texture->getMipLevels(); i++)
 				{
 					D3D12_SHADER_RESOURCE_VIEW_DESC desc = {};
 					desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
@@ -162,7 +162,7 @@ TextureRenderView::TextureRenderView(Texture* const texture, const bool isTextur
 				}
 
 				//create srv acess each mipSlice
-				for (UINT i = 0; i < texture->getMipLevels(); i++)
+				for (uint32_t i = 0; i < texture->getMipLevels(); i++)
 				{
 					D3D12_SHADER_RESOURCE_VIEW_DESC desc = {};
 					desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
@@ -201,7 +201,7 @@ TextureRenderView::TextureRenderView(Texture* const texture, const bool isTextur
 
 			if (texture->getArraySize() > 1)
 			{
-				for (UINT i = 0; i < texture->getMipLevels(); i++)
+				for (uint32_t i = 0; i < texture->getMipLevels(); i++)
 				{
 					D3D12_UNORDERED_ACCESS_VIEW_DESC desc = {};
 					desc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2DARRAY;
@@ -226,7 +226,7 @@ TextureRenderView::TextureRenderView(Texture* const texture, const bool isTextur
 			}
 			else
 			{
-				for (UINT i = 0; i < texture->getMipLevels(); i++)
+				for (uint32_t i = 0; i < texture->getMipLevels(); i++)
 				{
 					D3D12_UNORDERED_ACCESS_VIEW_DESC desc = {};
 					desc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
@@ -268,7 +268,7 @@ TextureRenderView::TextureRenderView(Texture* const texture, const bool isTextur
 
 		if (texture->getArraySize() > 1)
 		{
-			for (UINT i = 0; i < texture->getMipLevels(); i++)
+			for (uint32_t i = 0; i < texture->getMipLevels(); i++)
 			{
 				D3D12_RENDER_TARGET_VIEW_DESC desc = {};
 				desc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2DARRAY;
@@ -285,7 +285,7 @@ TextureRenderView::TextureRenderView(Texture* const texture, const bool isTextur
 		}
 		else
 		{
-			for (UINT i = 0; i < texture->getMipLevels(); i++)
+			for (uint32_t i = 0; i < texture->getMipLevels(); i++)
 			{
 				D3D12_RENDER_TARGET_VIEW_DESC desc = {};
 				desc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
@@ -335,7 +335,7 @@ ShaderResourceDesc TextureRenderView::getAllSRVIndex() const
 	return desc;
 }
 
-ShaderResourceDesc TextureRenderView::getSRVMipIndex(const UINT mipSlice) const
+ShaderResourceDesc TextureRenderView::getSRVMipIndex(const uint32_t mipSlice) const
 {
 	ShaderResourceDesc desc = {};
 	desc.type = ShaderResourceDesc::TEXTURE;
@@ -347,7 +347,7 @@ ShaderResourceDesc TextureRenderView::getSRVMipIndex(const UINT mipSlice) const
 	return desc;
 }
 
-ShaderResourceDesc TextureRenderView::getUAVMipIndex(const UINT mipSlice) const
+ShaderResourceDesc TextureRenderView::getUAVMipIndex(const uint32_t mipSlice) const
 {
 	ShaderResourceDesc desc = {};
 	desc.type = ShaderResourceDesc::TEXTURE;
@@ -359,7 +359,7 @@ ShaderResourceDesc TextureRenderView::getUAVMipIndex(const UINT mipSlice) const
 	return desc;
 }
 
-RenderTargetDesc TextureRenderView::getRTVMipHandle(const UINT mipSlice) const
+RenderTargetDesc TextureRenderView::getRTVMipHandle(const uint32_t mipSlice) const
 {
 	RenderTargetDesc desc = {};
 	desc.texture = texture;
@@ -369,7 +369,7 @@ RenderTargetDesc TextureRenderView::getRTVMipHandle(const UINT mipSlice) const
 	return desc;
 }
 
-ClearUAVDesc TextureRenderView::getClearUAVDesc(const UINT mipSlice) const
+ClearUAVDesc TextureRenderView::getClearUAVDesc(const uint32_t mipSlice) const
 {
 	ClearUAVDesc desc = {};
 	desc.type = ClearUAVDesc::TEXTURE;

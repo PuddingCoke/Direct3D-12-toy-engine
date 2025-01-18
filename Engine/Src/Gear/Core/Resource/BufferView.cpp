@@ -1,9 +1,9 @@
 #include<Gear/Core/Resource/BufferView.h>
 
-BufferView::BufferView(Buffer* const buffer, const UINT structureByteStride, const DXGI_FORMAT format, const UINT size, const bool createSRV, const bool createUAV, const bool createVBV, const bool createIBV, const bool cpuWritable, const bool persistent) :
+BufferView::BufferView(Buffer* const buffer, const uint32_t structureByteStride, const DXGI_FORMAT format, const uint64_t size, const bool createSRV, const bool createUAV, const bool createVBV, const bool createIBV, const bool cpuWritable, const bool persistent) :
 	EngineResource(persistent), buffer(buffer), counterBuffer(nullptr), vbv{}, srvIndex(0), uavIndex(0), uploadHeaps(nullptr), uploadHeapIndex(0), hasSRV(createSRV), hasUAV(createUAV), viewCPUHandle(), viewGPUHandle()
 {
-	numSRVUAVCBVDescriptors = static_cast<UINT>(createSRV) + static_cast<UINT>(createUAV);
+	numSRVUAVCBVDescriptors = static_cast<uint32_t>(createSRV) + static_cast<uint32_t>(createUAV);
 
 	const bool isTypedBuffer = (structureByteStride == 0 && format != DXGI_FORMAT_UNKNOWN);
 
@@ -41,17 +41,17 @@ BufferView::BufferView(Buffer* const buffer, const UINT structureByteStride, con
 			if (isTypedBuffer)
 			{
 				desc.Format = format;
-				desc.Buffer.NumElements = size / Utils::getPixelSize(format);
+				desc.Buffer.NumElements = static_cast<uint32_t>(size) / Utils::getPixelSize(format);
 			}
 			else if (isStructuredBuffer)
 			{
-				desc.Buffer.NumElements = size / structureByteStride;
+				desc.Buffer.NumElements = static_cast<uint32_t>(size) / structureByteStride;
 				desc.Buffer.StructureByteStride = structureByteStride;
 			}
 			else if (isByteAddressBuffer)
 			{
 				desc.Format = DXGI_FORMAT_R32_TYPELESS;
-				desc.Buffer.NumElements = size / 4;
+				desc.Buffer.NumElements = static_cast<uint32_t>(size) / 4;
 				desc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_RAW;
 			}
 
@@ -70,17 +70,17 @@ BufferView::BufferView(Buffer* const buffer, const UINT structureByteStride, con
 			if (isTypedBuffer)
 			{
 				desc.Format = format;
-				desc.Buffer.NumElements = size / Utils::getPixelSize(format);
+				desc.Buffer.NumElements = static_cast<uint32_t>(size) / Utils::getPixelSize(format);
 			}
 			else if (isStructuredBuffer)
 			{
-				desc.Buffer.NumElements = size / structureByteStride;
+				desc.Buffer.NumElements = static_cast<uint32_t>(size) / structureByteStride;
 				desc.Buffer.StructureByteStride = structureByteStride;
 			}
 			else if (isByteAddressBuffer)
 			{
 				desc.Format = DXGI_FORMAT_R32_TYPELESS;
-				desc.Buffer.NumElements = size / 4;
+				desc.Buffer.NumElements = static_cast<uint32_t>(size) / 4;
 				desc.Buffer.Flags = D3D12_BUFFER_UAV_FLAG_RAW;
 			}
 
@@ -126,14 +126,14 @@ BufferView::BufferView(Buffer* const buffer, const UINT structureByteStride, con
 	if (createVBV)
 	{
 		vbv.BufferLocation = buffer->getGPUAddress();
-		vbv.SizeInBytes = size;
+		vbv.SizeInBytes = static_cast<uint32_t>(size);
 		vbv.StrideInBytes = (isStructuredBuffer ? structureByteStride : Utils::getPixelSize(format));
 	}
 
 	if (createIBV)
 	{
 		ibv.BufferLocation = buffer->getGPUAddress();
-		ibv.SizeInBytes = size;
+		ibv.SizeInBytes = static_cast<uint32_t>(size);
 		ibv.Format = format;
 	}
 
@@ -141,7 +141,7 @@ BufferView::BufferView(Buffer* const buffer, const UINT structureByteStride, con
 	{
 		uploadHeaps = new UploadHeap * [Graphics::getFrameBufferCount()];
 
-		for (UINT i = 0; i < Graphics::getFrameBufferCount(); i++)
+		for (uint32_t i = 0; i < Graphics::getFrameBufferCount(); i++)
 		{
 			uploadHeaps[i] = new UploadHeap(size);
 		}
@@ -162,7 +162,7 @@ BufferView::~BufferView()
 
 	if (uploadHeaps)
 	{
-		for (UINT i = 0; i < Graphics::getFrameBufferCount(); i++)
+		for (uint32_t i = 0; i < Graphics::getFrameBufferCount(); i++)
 		{
 			delete uploadHeaps[i];
 		}

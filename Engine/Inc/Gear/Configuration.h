@@ -15,16 +15,16 @@ public:
 		VIDEOPLAYBACK
 	} usage;
 
-	const unsigned int width;
+	const uint32_t width;
 
-	const unsigned int height;
+	const uint32_t height;
 
 	const std::wstring title;
 
 	const bool enableImGuiSurface;
 
 	//disable imgui before using nsight otherwise program will crash somehow
-	Configuration(const unsigned int width, const unsigned int height, const std::wstring& title, const EngineUsage usage = EngineUsage::NORMAL, const bool enableImGuiSurface = true);
+	Configuration(const uint32_t width, const uint32_t height, const std::wstring& title, const EngineUsage usage = EngineUsage::NORMAL, const bool enableImGuiSurface = true);
 
 };
 

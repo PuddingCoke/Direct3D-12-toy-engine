@@ -2,13 +2,13 @@
 
 GlobalDescriptorHeap* GlobalDescriptorHeap::instance = nullptr;
 
-UINT GlobalDescriptorHeap::resourceIncrementSize = 0;
+uint32_t GlobalDescriptorHeap::resourceIncrementSize = 0;
 
-UINT GlobalDescriptorHeap::renderTargetIncrementSize = 0;
+uint32_t GlobalDescriptorHeap::renderTargetIncrementSize = 0;
 
-UINT GlobalDescriptorHeap::depthStencilIncrementSize = 0;
+uint32_t GlobalDescriptorHeap::depthStencilIncrementSize = 0;
 
-UINT GlobalDescriptorHeap::samplerIncrementSize = 0;
+uint32_t GlobalDescriptorHeap::samplerIncrementSize = 0;
 
 GlobalDescriptorHeap::GlobalDescriptorHeap()
 {
@@ -86,22 +86,22 @@ DescriptorHeap* GlobalDescriptorHeap::getNonShaderVisibleResourceHeap()
 	return instance->nonShaderVisibleResourceHeap;
 }
 
-UINT GlobalDescriptorHeap::getResourceIncrementSize()
+uint32_t GlobalDescriptorHeap::getResourceIncrementSize()
 {
 	return resourceIncrementSize;
 }
 
-UINT GlobalDescriptorHeap::getRenderTargetIncrementSize()
+uint32_t GlobalDescriptorHeap::getRenderTargetIncrementSize()
 {
 	return renderTargetIncrementSize;
 }
 
-UINT GlobalDescriptorHeap::getDepthStencilIncrementSize()
+uint32_t GlobalDescriptorHeap::getDepthStencilIncrementSize()
 {
 	return depthStencilIncrementSize;
 }
 
-UINT GlobalDescriptorHeap::getSamplerIncrementSize()
+uint32_t GlobalDescriptorHeap::getSamplerIncrementSize()
 {
 	return samplerIncrementSize;
 }
