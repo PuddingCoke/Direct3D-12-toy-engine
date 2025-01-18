@@ -7,6 +7,8 @@
 #include<Gear/Core/Resource/BufferView.h>
 #include<Gear/Core/Resource/ConstantBuffer.h>
 #include<Gear/Core/Resource/IndexConstantBuffer.h>
+#include<Gear/Core/GlobalDescriptorHeap.h>
+#include<Gear/Core/GlobalRootSignature.h>
 
 class GraphicsContext
 {

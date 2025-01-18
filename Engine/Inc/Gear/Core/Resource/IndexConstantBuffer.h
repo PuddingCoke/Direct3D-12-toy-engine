@@ -33,9 +33,11 @@ public:
 
 	void setTransitionResources(const std::initializer_list<ShaderResourceDesc>& transitionDescs);
 
-private:
+	const std::vector<ShaderResourceDesc>& getDescs() const;
 
-	friend class GraphicsContext;
+	ConstantBuffer* getConstantBuffer() const;
+
+private:
 
 	std::vector<ShaderResourceDesc> descs;
 

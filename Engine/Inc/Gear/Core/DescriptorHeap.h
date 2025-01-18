@@ -4,7 +4,6 @@
 #define _DESCRIPTORHEAP_H_
 
 #include<Gear/Core/GraphicsDevice.h>
-#include<Gear/Core/Graphics.h>
 
 #include<mutex>
 

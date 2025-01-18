@@ -625,4 +625,9 @@ RenderEngine::~RenderEngine()
 	{
 		delete[] backBufferHandles;
 	}
+
+	if (GraphicsDevice::instance)
+	{
+		delete GraphicsDevice::instance;
+	}
 }

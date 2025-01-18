@@ -9,7 +9,6 @@
 #include<fstream>
 #include<sstream>
 #include<algorithm>
-#include<Windows.h>
 #include<dxgiformat.h>
 
 class Utils

@@ -256,3 +256,14 @@ void BufferView::copyDescriptors()
 		viewGPUHandle = shaderVisibleHandle.getGPUHandle();
 	}
 }
+
+BufferView::UpdateStruct BufferView::update(const void* const data, const uint64_t size)
+{
+	const UpdateStruct updateStruct = { buffer,uploadHeaps[uploadHeapIndex] };
+
+	uploadHeaps[uploadHeapIndex]->update(data, size);
+
+	uploadHeapIndex = (uploadHeapIndex + 1) % Graphics::getFrameBufferCount();
+
+	return updateStruct;
+}

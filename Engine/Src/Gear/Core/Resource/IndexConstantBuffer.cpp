@@ -39,6 +39,16 @@ void IndexConstantBuffer::setTransitionResources(const std::initializer_list<Sha
 	constantBuffer->update(indices.data(), static_cast<uint32_t>(sizeof(uint32_t) * indices.size()));
 }
 
+const std::vector<ShaderResourceDesc>& IndexConstantBuffer::getDescs() const
+{
+	return descs;
+}
+
+ConstantBuffer* IndexConstantBuffer::getConstantBuffer() const
+{
+	return constantBuffer;
+}
+
 IndexConstantBuffer::~IndexConstantBuffer()
 {
 	if (constantBuffer)

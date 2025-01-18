@@ -20,20 +20,14 @@ GraphicsContext::~GraphicsContext()
 
 void GraphicsContext::updateBuffer(BufferView* const bufferView, const void* const data, const uint32_t size)
 {
-	Buffer* const buffer = bufferView->buffer;
+	const BufferView::UpdateStruct updateStruct = bufferView->update(data, size);
 
-	UploadHeap* const uploadHeap = bufferView->uploadHeaps[bufferView->uploadHeapIndex];
-
-	uploadHeap->update(data, size);
-
-	commandList->copyBufferRegion(buffer, 0, uploadHeap, 0, size);
-
-	bufferView->uploadHeapIndex = (bufferView->uploadHeapIndex + 1) % Graphics::getFrameBufferCount();
+	commandList->copyBufferRegion(updateStruct.buffer, 0, updateStruct.uploadHeap, 0, size);
 }
 
 void GraphicsContext::setGlobalConstantBuffer(const IndexConstantBuffer* const indexBuffer)
 {
-	commandList->setAllPipelineResources(indexBuffer->descs);
+	commandList->setAllPipelineResources(indexBuffer->getDescs());
 
 	transitionResources();
 
@@ -133,9 +127,9 @@ void GraphicsContext::setCSConstants(const uint32_t numValues, const void* const
 
 void GraphicsContext::setVSConstantBuffer(const IndexConstantBuffer* const constantBuffer)
 {
-	commandList->setGraphicsPipelineResources(constantBuffer->descs, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
+	commandList->setGraphicsPipelineResources(constantBuffer->getDescs(), D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
 
-	setVSConstantBuffer(constantBuffer->constantBuffer);
+	setVSConstantBuffer(constantBuffer->getConstantBuffer());
 }
 
 void GraphicsContext::setVSConstantBuffer(const ConstantBuffer* const constantBuffer)
@@ -145,9 +139,9 @@ void GraphicsContext::setVSConstantBuffer(const ConstantBuffer* const constantBu
 
 void GraphicsContext::setHSConstantBuffer(const IndexConstantBuffer* const constantBuffer)
 {
-	commandList->setGraphicsPipelineResources(constantBuffer->descs, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
+	commandList->setGraphicsPipelineResources(constantBuffer->getDescs(), D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
 
-	setHSConstantBuffer(constantBuffer->constantBuffer);
+	setHSConstantBuffer(constantBuffer->getConstantBuffer());
 }
 
 void GraphicsContext::setHSConstantBuffer(const ConstantBuffer* const constantBuffer)
@@ -157,9 +151,9 @@ void GraphicsContext::setHSConstantBuffer(const ConstantBuffer* const constantBu
 
 void GraphicsContext::setDSConstantBuffer(const IndexConstantBuffer* const constantBuffer)
 {
-	commandList->setGraphicsPipelineResources(constantBuffer->descs, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
+	commandList->setGraphicsPipelineResources(constantBuffer->getDescs(), D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
 
-	setDSConstantBuffer(constantBuffer->constantBuffer);
+	setDSConstantBuffer(constantBuffer->getConstantBuffer());
 }
 
 void GraphicsContext::setDSConstantBuffer(const ConstantBuffer* const constantBuffer)
@@ -169,9 +163,9 @@ void GraphicsContext::setDSConstantBuffer(const ConstantBuffer* const constantBu
 
 void GraphicsContext::setGSConstantBuffer(const IndexConstantBuffer* const constantBuffer)
 {
-	commandList->setGraphicsPipelineResources(constantBuffer->descs, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
+	commandList->setGraphicsPipelineResources(constantBuffer->getDescs(), D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
 
-	setGSConstantBuffer(constantBuffer->constantBuffer);
+	setGSConstantBuffer(constantBuffer->getConstantBuffer());
 }
 
 void GraphicsContext::setGSConstantBuffer(const ConstantBuffer* const constantBuffer)
@@ -181,9 +175,9 @@ void GraphicsContext::setGSConstantBuffer(const ConstantBuffer* const constantBu
 
 void GraphicsContext::setPSConstantBuffer(const IndexConstantBuffer* const constantBuffer)
 {
-	commandList->setGraphicsPipelineResources(constantBuffer->descs, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+	commandList->setGraphicsPipelineResources(constantBuffer->getDescs(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 
-	setPSConstantBuffer(constantBuffer->constantBuffer);
+	setPSConstantBuffer(constantBuffer->getConstantBuffer());
 }
 
 void GraphicsContext::setPSConstantBuffer(const ConstantBuffer* const constantBuffer)
@@ -193,9 +187,9 @@ void GraphicsContext::setPSConstantBuffer(const ConstantBuffer* const constantBu
 
 void GraphicsContext::setCSConstantBuffer(const IndexConstantBuffer* const constantBuffer)
 {
-	commandList->setComputePipelineResources(constantBuffer->descs);
+	commandList->setComputePipelineResources(constantBuffer->getDescs());
 
-	setCSConstantBuffer(constantBuffer->constantBuffer);
+	setCSConstantBuffer(constantBuffer->getConstantBuffer());
 }
 
 void GraphicsContext::setCSConstantBuffer(const ConstantBuffer* const constantBuffer)
