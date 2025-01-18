@@ -6,7 +6,6 @@
 #include<Gear/Core/States.h>
 #include<Gear/Core/Shader.h>
 #include<Gear/Core/Graphics.h>
-#include<Gear/Core/GraphicsDevice.h>
 #include<Gear/Core/GlobalRootSignature.h>
 
 #include<Gear/CompiledShaders/EquirectangularVS.h>

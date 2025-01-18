@@ -4,6 +4,7 @@
 #define _GRAPHICSDEVICE_H_
 
 #include<D3D12Headers/d3dx12.h>
+#include<dxgi1_6.h>
 #include<wrl/client.h>
 #include<iostream>
 #include<comdef.h>
@@ -27,6 +28,16 @@ __debugbreak();\
 //only works for power of 2
 #define ROUND_UP(x,y) ((x + (y-1)) & ~(y-1))
 
+#define CONSOLE_LOG(str) std::cout<< "[" << typeid(decltype(*this)).name() << "] " << str
+
+//enum INFOSTATES
+//{
+//	NORMAL,
+//	ENGINE,
+//	FAILED,
+//	SUCCEEDED
+//};
+
 class GraphicsDevice
 {
 public:
@@ -38,8 +49,6 @@ public:
 	static ID3D12Device9* get();
 
 private:
-
-	friend class Gear;
 
 	friend class RenderEngine;
 

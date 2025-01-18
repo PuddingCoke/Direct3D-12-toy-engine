@@ -7,8 +7,8 @@
 
 #include<Gear/Core/CommandAllocator.h>
 #include<Gear/Core/Graphics.h>
-#include<Gear/Core/GlobalDescriptorHeap.h>
-#include<Gear/Core/GlobalRootSignature.h>
+#include<Gear/Core/DescriptorHeap.h>
+#include<Gear/Core/RootSignature.h>
 
 #include<Gear/Core/DX/Buffer.h>
 #include<Gear/Core/DX/Texture.h>

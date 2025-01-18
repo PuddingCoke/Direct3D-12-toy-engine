@@ -4,10 +4,8 @@
 #define _GEAR_H_
 
 #include<Gear/Core/RenderEngine.h>
-#include<Gear/Core/Graphics.h>
 #include<Gear/Window/Win32Form.h>
 #include<Gear/Utils/Utils.h>
-#include<Gear/Utils/Random.h>
 #include<Gear/Utils/DeltaTimeEstimator.h>
 #include<Gear/Input/Keyboard.h>
 #include<Gear/Input/Mouse.h>
@@ -15,9 +13,6 @@
 #include<Gear/Game.h>
 #include<Gear/Core/VideoEncoder/NvidiaEncoder.h>
 
-#include<iostream>
-#include<chrono>
-#include<windowsx.h>
 #include<dxgidebug.h>
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, uint32_t msg, WPARAM wParam, LPARAM lParam);

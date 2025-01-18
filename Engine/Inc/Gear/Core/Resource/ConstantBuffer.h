@@ -34,8 +34,6 @@ public:
 
 private:
 
-	friend class RenderEngine;
-
 	D3D12_GPU_VIRTUAL_ADDRESS gpuAddress;
 
 	uint32_t bufferIndex;

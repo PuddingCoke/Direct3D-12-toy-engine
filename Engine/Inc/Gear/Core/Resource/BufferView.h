@@ -11,6 +11,8 @@
 
 #include<Gear/Core/Resource/CounterBufferView.h>
 
+#include<Gear/Core/Graphics.h>
+
 #include"EngineResource.h"
 
 //versatile buffer
@@ -38,13 +40,17 @@ public:
 
 	void copyDescriptors() override;
 
+	struct UpdateStruct
+	{
+		Buffer* const buffer;
+		UploadHeap* const uploadHeap;
+	}update(const void* const data, const uint64_t size);
+
 	const bool hasSRV;
 
 	const bool hasUAV;
 
 private:
-
-	friend class GraphicsContext;
 
 	CounterBufferView* counterBuffer;
 

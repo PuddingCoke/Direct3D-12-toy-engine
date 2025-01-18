@@ -4,7 +4,6 @@
 #define _RESOURCE_H_
 
 #include<Gear/Core/GraphicsDevice.h>
-#include<Gear/Core/GlobalDescriptorHeap.h>
 
 #include<memory>
 
