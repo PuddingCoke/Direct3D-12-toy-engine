@@ -30,7 +30,7 @@ GlobalDescriptorHeap::GlobalDescriptorHeap()
 
 	nonShaderVisibleResourceHeap = new DescriptorHeap(1000000, 900000, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, D3D12_DESCRIPTOR_HEAP_FLAG_NONE);
 
-	std::cout << "[class GlobalDescriptorHeap] create global descriptor heaps succeeded\n";
+	LOGSUCCESS("create global descriptor heaps succeeded");
 }
 
 GlobalDescriptorHeap::~GlobalDescriptorHeap()

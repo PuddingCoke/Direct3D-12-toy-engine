@@ -3,10 +3,11 @@
 #ifndef _GRAPHICSDEVICE_H_
 #define _GRAPHICSDEVICE_H_
 
+#include<Gear/Utils/Logger.h>
+
 #include<D3D12Headers/d3dx12.h>
 #include<dxgi1_6.h>
 #include<wrl/client.h>
-#include<iostream>
 #include<comdef.h>
 
 using Microsoft::WRL::ComPtr;
@@ -16,27 +17,13 @@ using Microsoft::WRL::ComPtr;
 HRESULT hr = x;\
 if(FAILED(hr))\
 {\
-std::cout<<__FILE__<<" Line:"<<__LINE__<<"\n";\
-std::cout<<"Function name "<<__FUNCTION__ <<"\n";\
-std::cout<<"Failed with 0x"<<std::hex<<hr<<std::dec<<"\n";\
 _com_error err(hr);\
-std::wcout<<"Failed reason "<<err.ErrorMessage()<<"\n";\
-__debugbreak();\
+LOGERROR("Failed with",std::hex,static_cast<uint32_t>(hr),std::dec,"Failed reason",err.ErrorMessage());\
 }\
 }\
 
 //only works for power of 2
 #define ROUND_UP(x,y) ((x + (y-1)) & ~(y-1))
-
-#define CONSOLE_LOG(str) std::cout<< "[" << typeid(decltype(*this)).name() << "] " << str
-
-//enum INFOSTATES
-//{
-//	NORMAL,
-//	ENGINE,
-//	FAILED,
-//	SUCCEEDED
-//};
 
 class GraphicsDevice
 {

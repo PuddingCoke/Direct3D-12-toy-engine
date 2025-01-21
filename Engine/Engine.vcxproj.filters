@@ -306,9 +306,6 @@
     <ClInclude Include="Inc\ImGUI\imstb_truetype.h">
       <Filter>Header\ExternalHeader\ImGUi</Filter>
     </ClInclude>
-    <ClInclude Include="Inc\stb_image\stb_image.h">
-      <Filter>Header\ExternalHeader\stbi</Filter>
-    </ClInclude>
     <ClInclude Include="External\stb_image\stb_image_write.h">
       <Filter>Header\ExternalHeader\stbi</Filter>
     </ClInclude>
@@ -316,6 +313,12 @@
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="Inc\Gear\Core\RenderTask.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Gear\Utils\Logger.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\WICTextureLoader\WICTextureLoader12.h">
       <Filter>Header</Filter>
     </ClInclude>
   </ItemGroup>
@@ -497,13 +500,16 @@
     <ClCompile Include="Inc\ImGUI\imgui_widgets.cpp">
       <Filter>Source\ExternalSource\ImGUi</Filter>
     </ClCompile>
-    <ClCompile Include="Inc\stb_image\stb_image.cpp">
-      <Filter>Source\ExternalSource\stbi</Filter>
-    </ClCompile>
     <ClCompile Include="Src\Gear\Core\ConstantBufferManager.cpp">
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="Src\Gear\Core\RenderTask.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gear\Utils\Logger.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Inc\WICTextureLoader\WICTextureLoader12.cpp">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>

@@ -9,18 +9,9 @@ Encoder::~Encoder()
 {
 }
 
-void Encoder::displayProgress() const
+void Encoder::displayResult() const
 {
-	if (encoding)
-	{
-		CONSOLE_SCREEN_BUFFER_INFO csbi = {};
+	LOGENGINE("encode complete");
 
-		GetConsoleScreenBufferInfo(hConsole, &csbi);
-
-		const uint32_t num = progressBarWidth * frameEncoded / frameToEncode;
-
-		std::cout << "Encoding... [" << std::string(num, '*') << std::string(progressBarWidth - num, '/') << "] " << std::fixed << std::setprecision(2) << 100.f * static_cast<float>(frameEncoded) / static_cast<float>(frameToEncode) << "%";
-
-		SetConsoleCursorPosition(hConsole, csbi.dwCursorPosition);
-	}
+	LOGENGINE("encode average speed", frameToEncode / encodeTime);
 }

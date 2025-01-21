@@ -18,7 +18,7 @@ ConstantBufferManager::ConstantBufferManager() :
 
 		buffer->setName(L"Large Constant Buffer");
 
-		std::cout << "[class ConstantBufferManager] create " << requiredSize / 1024.f << "kbytes constant buffer\n";
+		LOGSUCCESS("create", requiredSize / 1024.f, "kbytes constant buffer succeeded");
 	}
 
 	//create all neccessary containers
@@ -132,7 +132,7 @@ void ConstantBufferManager::updateSubregion(const uint32_t regionIndex, const ui
 
 	if (updateIndicators[regionIndex][subregionIndex])
 	{
-		throw "you cannot update a constant buffer in a frame multiple time";
+		LOGERROR("a constant buffer in a frame can't be updated multiple times");
 	}
 
 	updateIndicators[regionIndex][subregionIndex] = true;

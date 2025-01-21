@@ -32,9 +32,7 @@ public:
 
 protected:
 
-	static constexpr uint32_t progressBarWidth = 30;
-
-	void displayProgress() const;
+	void displayResult() const;
 
 	uint32_t frameEncoded;
 

@@ -5,7 +5,7 @@ ConstantBuffer::ConstantBuffer(Buffer* const buffer, const uint32_t size, const 
 {
 	if (size % 256 != 0)
 	{
-		throw "size of constant buffer must be multiply of 256";
+		LOGERROR("size of constant buffer must be multiply of 256");
 	}
 
 	if (buffer == nullptr)
@@ -22,7 +22,7 @@ ConstantBuffer::ConstantBuffer(Buffer* const buffer, const uint32_t size, const 
 			regionIndex = 2;
 			break;
 		default:
-			throw "size should be one of 256 512 1024";
+			LOGERROR("size should be one of 256 512 1024");
 			break;
 		}
 

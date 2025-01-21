@@ -22,19 +22,19 @@ public:
 		renderParamBuffer(ResourceManager::createConstantBuffer(sizeof(RenderParam), true)),
 		spectrumParamBuffer{ ResourceManager::createConstantBuffer(sizeof(SpectrumParam), true),ResourceManager::createConstantBuffer(sizeof(SpectrumParam), true),ResourceManager::createConstantBuffer(sizeof(SpectrumParam), true) },
 		cascade{ new WaveCascade(textureResolution,context),new WaveCascade(textureResolution,context),new WaveCascade(textureResolution,context) },
-		textureCubePS(new Shader(Utils::getRootFolder() + "TextureCubePS.cso")),
-		gridDebugVS(new Shader(Utils::getRootFolder() + "GridDebugVS.cso")),
-		gridDebugPS(new Shader(Utils::getRootFolder() + "GridDebugPS.cso")),
-		oceanVS(new Shader(Utils::getRootFolder() + "OceanVS.cso")),
-		oceanHS(new Shader(Utils::getRootFolder() + "OceanHS.cso")),
-		oceanDS(new Shader(Utils::getRootFolder() + "OceanDS.cso")),
-		oceanPS(new Shader(Utils::getRootFolder() + "OceanPS.cso")),
-		spectrumCS(new Shader(Utils::getRootFolder() + "SpectrumCS.cso")),
-		conjugateCS(new Shader(Utils::getRootFolder() + "ConjugateCS.cso")),
-		displacementSpectrumCS(new Shader(Utils::getRootFolder() + "DisplacementSpectrumCS.cso")),
-		ifftCS(new Shader(Utils::getRootFolder() + "IFFTCS.cso")),
-		permutationCS(new Shader(Utils::getRootFolder() + "PermutationCS.cso")),
-		waveMergeCS(new Shader(Utils::getRootFolder() + "WaveMergeCS.cso"))
+		textureCubePS(new Shader(Utils::getRootFolder() + L"TextureCubePS.cso")),
+		gridDebugVS(new Shader(Utils::getRootFolder() + L"GridDebugVS.cso")),
+		gridDebugPS(new Shader(Utils::getRootFolder() + L"GridDebugPS.cso")),
+		oceanVS(new Shader(Utils::getRootFolder() + L"OceanVS.cso")),
+		oceanHS(new Shader(Utils::getRootFolder() + L"OceanHS.cso")),
+		oceanDS(new Shader(Utils::getRootFolder() + L"OceanDS.cso")),
+		oceanPS(new Shader(Utils::getRootFolder() + L"OceanPS.cso")),
+		spectrumCS(new Shader(Utils::getRootFolder() + L"SpectrumCS.cso")),
+		conjugateCS(new Shader(Utils::getRootFolder() + L"ConjugateCS.cso")),
+		displacementSpectrumCS(new Shader(Utils::getRootFolder() + L"DisplacementSpectrumCS.cso")),
+		ifftCS(new Shader(Utils::getRootFolder() + L"IFFTCS.cso")),
+		permutationCS(new Shader(Utils::getRootFolder() + L"PermutationCS.cso")),
+		waveMergeCS(new Shader(Utils::getRootFolder() + L"WaveMergeCS.cso"))
 	{
 		spectrumParam[0].mapLength = lengthScale0;
 
@@ -186,7 +186,7 @@ public:
 
 		WaveCascade::randomGaussTexture = randomGaussTexture;
 
-		enviromentCube = resManager->createTextureCube("E:\\Assets\\Ocean\\clear_sky_field_sky_dome_8k.hdr", 1024, true);
+		enviromentCube = resManager->createTextureCube(L"E:\\Assets\\Ocean\\clear_sky_field_sky_dome_8k.hdr", 1024, true);
 
 		calculateInitialSpectrum();
 
@@ -205,6 +205,8 @@ public:
 		effect->setExposure(0.59f);
 
 		effect->setGamma(0.972f);
+
+		effect->setSoftThreshold(0.8f);
 	}
 
 	~MyRenderTask()

@@ -24,17 +24,17 @@ void BottomLevelAS::addGeometryObject(const GeometryObject object)
 {
 	if (!(object.vertexBuffer->getStateTracking()) && !bitFlagSubset(object.vertexBuffer->getState(), D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE))
 	{
-		throw "input vertex buffer does not need state tracking however its internal state does not have D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE";
+		LOGERROR("input vertex buffer does not need state tracking however its internal state does not have D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE");
 	}
 
 	if (object.indexBuffer && !(object.indexBuffer->getStateTracking()) && !bitFlagSubset(object.indexBuffer->getState(), D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE))
 	{
-		throw "input index buffer does not need state tracking however its internal state does not have D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE";
+		LOGERROR("input index buffer does not need state tracking however its internal state does not have D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE");
 	}
 
 	if (object.transformBuffer && !(object.transformBuffer->getStateTracking()) && !bitFlagSubset(object.transformBuffer->getState(), D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE))
 	{
-		throw "input transform buffer does not need state tracking however its internal state does not have D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE";
+		LOGERROR("input transform buffer does not need state tracking however its internal state does not have D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE");
 	}
 
 	D3D12_RAYTRACING_GEOMETRY_DESC desc = {};

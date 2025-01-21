@@ -131,8 +131,7 @@ void RenderEngine::submitCommandList(CommandList* const commandList)
 				}
 				else
 				{
-					throw "Transition texture with only 1 miplevel however its pending mipslice is not D3D12_TRANSITION_ALL_MIPLEVELS is not allowed!\n";
-					//in this case target mipslice is not D3D12_TRANSITION_ALL_MIPLEVELS for texture has only 1 miplevel
+					LOGERROR("when transition a texture that has only 1 miplevel,pending mipslice must be D3D12_TRANSITION_ALL_MIPLEVELS");
 				}
 			}
 		}
@@ -317,28 +316,42 @@ ComPtr<IDXGIAdapter4> RenderEngine::getBestAdapterAndVendor(IDXGIFactory7* const
 		{
 			const uint32_t vendorID = desc.VendorId;
 
-			std::cout << "[class RenderEngine] GPU VendorID 0x" << std::hex << vendorID << std::dec << " Vendor:";
+			std::wstring vendorName;
 
 			if (vendorID == 0x10DE)
 			{
-				std::cout << "NVIDIA\n";
 				vendor = GPUVendor::NVIDIA;
+
+				vendorName = L"NVIDIA";
 			}
 			else if (vendorID == 0x1002 || vendorID == 0x1022)
 			{
-				std::cout << "AMD\n";
 				vendor = GPUVendor::AMD;
+
+				vendorName = L"AMD";
 			}
 			else if (vendorID == 0x163C || vendorID == 0x8086 || vendorID == 0x8087)
 			{
-				std::cout << "INTEL\n";
 				vendor = GPUVendor::INTEL;
+
+				vendorName = L"INTEL";
 			}
 			else
 			{
-				std::cout << "UNKNOWN\n";
 				vendor = GPUVendor::UNKNOWN;
+
+				vendorName = L"UNKNOWN";
 			}
+
+			LOGENGINE("following are information about selected GPU");
+
+			LOG(Logger::brightYellow, "GPU Name", desc.Description);
+
+			LOG("GPU Vendor ID", std::hex, vendorID, std::dec);
+
+			LOG("GPU Vendor Name", vendorName);
+
+			LOG("GPU Dedicated Memory", static_cast<float>(desc.DedicatedVideoMemory) / 1024.f / 1024.f / 1024.f, "gigabytes");
 
 			break;
 		}
@@ -437,7 +450,7 @@ RenderEngine::RenderEngine(const uint32_t width, const uint32_t height, const HW
 	ComPtr<IDXGIFactory7> factory;
 
 #ifdef _DEBUG
-	std::cout << "[class RenderEngine] enable debug layer\n";
+	LOGENGINE("enable debug layer");
 
 	ComPtr<ID3D12Debug> debugController;
 
@@ -447,7 +460,7 @@ RenderEngine::RenderEngine(const uint32_t width, const uint32_t height, const HW
 
 	CreateDXGIFactory2(DXGI_CREATE_FACTORY_DEBUG, IID_PPV_ARGS(&factory));
 #else
-	std::cout << "[class RenderEngine] disable debug layer\n";
+	LOGENGINE("disable debug layer");
 
 	CreateDXGIFactory2(0, IID_PPV_ARGS(&factory));
 #endif // _DEBUG
@@ -544,7 +557,7 @@ RenderEngine::RenderEngine(const uint32_t width, const uint32_t height, const HW
 
 	if (initializeImGuiSurface)
 	{
-		std::cout << "[class RenderEngine] enable ImGui\n";
+		LOGENGINE("enable ImGui");
 
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
@@ -561,12 +574,16 @@ RenderEngine::RenderEngine(const uint32_t width, const uint32_t height, const HW
 	}
 	else
 	{
-		std::cout << "[class RenderEngine] disable ImGui\n";
+		LOGENGINE("disable ImGui");
 	}
+
+	CHECKERROR(CoInitializeEx(0, COINIT_MULTITHREADED));
 }
 
 RenderEngine::~RenderEngine()
 {
+	CoUninitialize();
+
 	if (initializeImGuiSurface)
 	{
 		ImGui_ImplDX12_Shutdown();

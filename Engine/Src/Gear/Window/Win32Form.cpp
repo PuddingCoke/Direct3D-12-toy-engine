@@ -29,7 +29,7 @@ Win32Form::Win32Form(const std::wstring& title, const uint32_t width, const uint
 
 	if (!hwnd)
 	{
-		throw "Failed when create window";
+		LOGERROR("create window failed");
 	}
 
 	ShowWindow(hwnd, SW_SHOW);

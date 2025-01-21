@@ -365,3 +365,5 @@ FodyWeavers.xsd
 Engine.lib
 Engine-d.lib
 Engine-d.idb
+
+log.txt

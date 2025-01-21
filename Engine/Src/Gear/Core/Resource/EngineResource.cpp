@@ -22,7 +22,7 @@ DescriptorHandle EngineResource::getTransientDescriptorHandle() const
 {
 	if (persistent)
 	{
-		throw "copy descriptors for persistent resources is not allowed";
+		LOGERROR("call getTransientDescriptorHandle for persistent resources is not allowed");
 	}
 
 	DescriptorHandle shaderVisibleHandle = GlobalDescriptorHeap::getResourceHeap()->allocDynamicDescriptor(numSRVUAVCBVDescriptors);

@@ -5,6 +5,7 @@
 
 #include<Windows.h>
 #include<string>
+#include<Gear/Utils/Logger.h>
 
 class Win32Form
 {

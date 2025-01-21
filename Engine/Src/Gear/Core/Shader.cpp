@@ -1,4 +1,4 @@
-#include<Gear/Core/Shader.h>
+﻿#include<Gear/Core/Shader.h>
 
 Shader* Shader::fullScreenVS = nullptr;
 
@@ -8,49 +8,34 @@ Shader* Shader::textureCubeVS = nullptr;
 
 DXCCompiler* Shader::dxcCompiler = nullptr;
 
-Shader::Shader(const BYTE* const bytes, const size_t byteSize)
+Shader::Shader(const uint8_t* const bytes, const size_t byteSize)
 {
 	shaderByteCode.pShaderBytecode = bytes;
 
 	shaderByteCode.BytecodeLength = byteSize;
 }
 
-Shader::Shader(const std::string& filePath)
+Shader::Shader(const std::wstring& filePath)
 {
-	if (Utils::File::getExtension(filePath) == "cso")
+	if (Utils::File::getExtension(filePath) == L"cso")
 	{
-		std::ifstream file(filePath, std::ios::ate | std::ios::binary);
+		bytes = Utils::File::readAllBinary(filePath);
 
-		if (!file.is_open())
-		{
-			throw "cannot open file";
-		}
+		shaderByteCode.pShaderBytecode = bytes.data();
 
-		size_t fileSize = static_cast<size_t>(file.tellg());
+		shaderByteCode.BytecodeLength = bytes.size();
 
-		codes = std::vector<BYTE>(fileSize);
-
-		file.seekg(0);
-
-		file.read(reinterpret_cast<char*>(codes.data()), fileSize);
-
-		file.close();
-
-		shaderByteCode.pShaderBytecode = codes.data();
-
-		shaderByteCode.BytecodeLength = codes.size();
-
-		std::cout << "[class Shader] read byte code at " << filePath << " succeeded\n";
+		LOGSUCCESS("read byte code at", Logger::brightMagenta, filePath, Logger::resetColor(), "succeeded");
 	}
 	else
 	{
-		throw "not supported file format";
+		LOGERROR("input file's extension must be cso");
 	}
 }
 
-Shader::Shader(const std::string& filePath, const ShaderProfile profile)
+Shader::Shader(const std::wstring& filePath, const ShaderProfile profile)
 {
-	if (Utils::File::getExtension(filePath) == "hlsl")
+	if (Utils::File::getExtension(filePath) == L"hlsl")
 	{
 		shaderBlob = dxcCompiler->compile(filePath, profile);
 
@@ -58,11 +43,11 @@ Shader::Shader(const std::string& filePath, const ShaderProfile profile)
 
 		shaderByteCode.BytecodeLength = shaderBlob->GetBufferSize();
 
-		std::cout << "[class Shader] compile shader at " << filePath << " succeeded\n";
+		LOGSUCCESS("compile shader at", Logger::brightMagenta, filePath, Logger::resetColor(), "succeeded");
 	}
 	else
 	{
-		throw "not supported file format";
+		LOGERROR("input file's extension must be hlsl");
 	}
 }
 
@@ -119,13 +104,13 @@ DXCCompiler::~DXCCompiler()
 
 }
 
-IDxcBlob* DXCCompiler::compile(const std::string filePath,const ShaderProfile profile) const
+IDxcBlob* DXCCompiler::compile(const std::wstring filePath, const ShaderProfile profile) const
 {
-	const std::string shaderString = Utils::File::readAllText(filePath);
-
+	const std::vector<uint8_t> bytes = Utils::File::readAllBinary(filePath);
+	
 	ComPtr<IDxcBlobEncoding> textBlob;
 
-	CHECKERROR(dxcUtils->CreateBlobFromPinned(shaderString.c_str(), static_cast<UINT32>(shaderString.size()), codePage, &textBlob));
+	CHECKERROR(dxcUtils->CreateBlobFromPinned(bytes.data(), static_cast<uint32_t>(bytes.size()), codePage, &textBlob));
 
 	DxcBuffer source = {};
 	source.Ptr = textBlob->GetBufferPointer();
@@ -135,39 +120,37 @@ IDxcBlob* DXCCompiler::compile(const std::string filePath,const ShaderProfile pr
 	ComPtr<IDxcCompilerArgs> args;
 
 	{
-		const std::wstring wFilePath = std::wstring(filePath.begin(), filePath.end());
-
 		switch (profile)
 		{
 		case VERTEX:
-			dxcUtils->BuildArguments(wFilePath.c_str(), L"main", L"vs_6_6", nullptr, 0, nullptr, 0, &args);
+			dxcUtils->BuildArguments(filePath.c_str(), L"main", L"vs_6_6", nullptr, 0, nullptr, 0, &args);
 			break;
 		case HULL:
-			dxcUtils->BuildArguments(wFilePath.c_str(), L"main", L"hs_6_6", nullptr, 0, nullptr, 0, &args);
+			dxcUtils->BuildArguments(filePath.c_str(), L"main", L"hs_6_6", nullptr, 0, nullptr, 0, &args);
 			break;
 		case DOMAIN:
-			dxcUtils->BuildArguments(wFilePath.c_str(), L"main", L"ds_6_6", nullptr, 0, nullptr, 0, &args);
+			dxcUtils->BuildArguments(filePath.c_str(), L"main", L"ds_6_6", nullptr, 0, nullptr, 0, &args);
 			break;
 		case GEOMETRY:
-			dxcUtils->BuildArguments(wFilePath.c_str(), L"main", L"gs_6_6", nullptr, 0, nullptr, 0, &args);
+			dxcUtils->BuildArguments(filePath.c_str(), L"main", L"gs_6_6", nullptr, 0, nullptr, 0, &args);
 			break;
 		case PIXEL:
-			dxcUtils->BuildArguments(wFilePath.c_str(), L"main", L"ps_6_6", nullptr, 0, nullptr, 0, &args);
+			dxcUtils->BuildArguments(filePath.c_str(), L"main", L"ps_6_6", nullptr, 0, nullptr, 0, &args);
 			break;
 		case AMPLIFICATION:
-			dxcUtils->BuildArguments(wFilePath.c_str(), L"main", L"as_6_6", nullptr, 0, nullptr, 0, &args);
+			dxcUtils->BuildArguments(filePath.c_str(), L"main", L"as_6_6", nullptr, 0, nullptr, 0, &args);
 			break;
 		case MESH:
-			dxcUtils->BuildArguments(wFilePath.c_str(), L"main", L"ms_6_6", nullptr, 0, nullptr, 0, &args);
+			dxcUtils->BuildArguments(filePath.c_str(), L"main", L"ms_6_6", nullptr, 0, nullptr, 0, &args);
 			break;
 		case COMPUTE:
-			dxcUtils->BuildArguments(wFilePath.c_str(), L"main", L"cs_6_6", nullptr, 0, nullptr, 0, &args);
+			dxcUtils->BuildArguments(filePath.c_str(), L"main", L"cs_6_6", nullptr, 0, nullptr, 0, &args);
 			break;
 		case LIBRARY:
-			dxcUtils->BuildArguments(wFilePath.c_str(), L"", L"lib_6_6", nullptr, 0, nullptr, 0, &args);
+			dxcUtils->BuildArguments(filePath.c_str(), L"", L"lib_6_6", nullptr, 0, nullptr, 0, &args);
 			break;
 		default:
-			throw "not supported profile";
+			LOGERROR("not supported shader profile");
 			break;
 		}
 	}

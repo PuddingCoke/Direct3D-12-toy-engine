@@ -9,7 +9,10 @@
 #include<fstream>
 #include<sstream>
 #include<algorithm>
+#include<vector>
 #include<dxgiformat.h>
+
+#include"Logger.h"
 
 class Utils
 {
@@ -19,7 +22,7 @@ public:
 
 	Utils(const Utils&) = delete;
 
-	static std::string getRootFolder();
+	static std::wstring getRootFolder();
 	
 	static uint32_t getPixelSize(const DXGI_FORMAT format);
 
@@ -31,13 +34,15 @@ public:
 
 		File(const File&) = delete;
 
-		static std::string backslashToSlash(const std::string& filePath);
+		static std::wstring backslashToSlash(const std::wstring& filePath);
 
-		static std::string getParentFolder(const std::string& filePath);
+		static std::wstring getParentFolder(const std::wstring& filePath);
 
-		static std::string getExtension(const std::string& filePath);
+		static std::wstring getExtension(const std::wstring& filePath);
 
-		static std::string readAllText(const std::string& filePath);
+		static std::wstring readAllText(const std::wstring& filePath);
+
+		static std::vector<uint8_t> readAllBinary(const std::wstring& filePath);
 
 	};
 
@@ -45,7 +50,7 @@ private:
 
 	friend class Gear;
 
-	static std::string exeRootPath;
+	static std::wstring exeRootPath;
 
 };
 

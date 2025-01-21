@@ -16,7 +16,7 @@ NvidiaEncoder::NvidiaEncoder(const uint32_t frameToEncode) :
 
 	NVENCSTATUS(__stdcall * NVENCAPICreateInstance)(NV_ENCODE_API_FUNCTION_LIST*) = (NVENCSTATUS(*)(NV_ENCODE_API_FUNCTION_LIST*))GetProcAddress(moduleNvEncAPI, "NvEncodeAPICreateInstance");
 
-	std::cout << "[class NvidiaEncoder] api instance create status " << NVENCAPICreateInstance(&nvencAPI) << "\n";
+	LOGENGINE("api create instance status", static_cast<uint32_t>(NVENCAPICreateInstance(&nvencAPI)));
 
 	NV_ENC_OPEN_ENCODE_SESSION_EX_PARAMS sessionParams = { NV_ENC_OPEN_ENCODE_SESSION_EX_PARAMS_VER };
 	sessionParams.device = GraphicsDevice::get();
@@ -67,13 +67,11 @@ NvidiaEncoder::NvidiaEncoder(const uint32_t frameToEncode) :
 
 	GraphicsDevice::get()->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&outputFence));
 
-	std::cout << "[class NvidiaEncoder] render at " << Graphics::getWidth() << " x " << Graphics::getHeight() << "\n";
+	LOGENGINE("frame rate", frameRate);
 
-	std::cout << "[class NvidiaEncoder] frameRate " << frameRate << "\n";
+	LOGENGINE("frame to encode", frameToEncode);
 
-	std::cout << "[class NvidiaEncoder] frameToEncode " << frameToEncode << "\n";
-
-	std::cout << "[class NvidiaEncoder] start encoding\n";
+	LOGENGINE("start encoding");
 
 	avformat_alloc_output_context2(&outCtx, nullptr, "mp4", "output.mp4");
 
@@ -165,9 +163,7 @@ bool NvidiaEncoder::encode(Texture* const inputTexture)
 
 		encoding = false;
 
-		std::cout << "\n[class NvidiaEncoder] encode complete!\n";
-
-		std::cout << "[class NvidiaEncoder] frame encode avg speed " << frameToEncode / encodeTime << "\n";
+		displayResult();
 	}
 	else
 	{
@@ -275,8 +271,6 @@ bool NvidiaEncoder::encode(Texture* const inputTexture)
 			__debugbreak();
 		}
 	}
-
-	displayProgress();
 
 	timeEnd = std::chrono::steady_clock::now();
 

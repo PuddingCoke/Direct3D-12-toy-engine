@@ -83,118 +83,99 @@ Buffer* ResourceManager::createBuffer(const void* const data, const uint64_t siz
 	return buffer;
 }
 
-Texture* ResourceManager::createTexture(const std::string& filePath, const D3D12_RESOURCE_FLAGS resFlags, bool* const isTextureCube)
+Texture* ResourceManager::createTexture(const std::wstring& filePath, const D3D12_RESOURCE_FLAGS resFlags, bool* const isTextureCube)
 {
 	Texture* texture = nullptr;
 
-	std::string fileExtension = Utils::File::getExtension(filePath);
-
-	for (char& c : fileExtension)
-	{
-		c = static_cast<char>(std::tolower(c));
-	}
+	std::wstring fileExtension = Utils::File::getExtension(filePath);
 
 	if (isTextureCube)
 	{
 		*isTextureCube = false;
 	}
 
-	if (fileExtension == "jpg" || fileExtension == "jpeg" || fileExtension == "png")
+	if (fileExtension == L"bmp" || fileExtension == L"jpg" || fileExtension == L"jpeg" || fileExtension == L"png" || fileExtension == L"tiff")
 	{
-		int textureWidth, textureHeight, channels;
+		std::unique_ptr<uint8_t[]> decodedData;
 
-		unsigned char* const pixels = stbi_load(filePath.c_str(), &textureWidth, &textureHeight, &channels, 4);
+		D3D12_SUBRESOURCE_DATA subresource;
 
-		const uint32_t width = static_cast<uint32_t>(textureWidth);
-		const uint32_t height = static_cast<uint32_t>(textureHeight);
-		const DXGI_FORMAT format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		ComPtr<ID3D12Resource> tex;
 
-		if (pixels)
-		{
-			texture = new Texture(width, height, format, 1, 1, true, resFlags);
+		CHECKERROR(DirectX::LoadWICTextureFromFileEx(GraphicsDevice::get(), filePath.c_str(), 0, resFlags, DirectX::WIC_LOADER_DEFAULT, &tex, decodedData, subresource));
 
-			const uint64_t uploadHeapSize = GetRequiredIntermediateSize(texture->getResource(), 0, 1);
+		texture = new Texture(tex, true, D3D12_RESOURCE_STATE_COPY_DEST);
 
-			UploadHeap* uploadHeap = new UploadHeap(uploadHeapSize);
+		const uint64_t uploadHeapSize = GetRequiredIntermediateSize(texture->getResource(), 0, 1);
 
-			release(uploadHeap);
+		UploadHeap* const uploadHeap = new UploadHeap(uploadHeapSize);
 
-			D3D12_SUBRESOURCE_DATA subresourceData = {};
-			subresourceData.pData = pixels;
-			subresourceData.RowPitch = width * 4u;
-			subresourceData.SlicePitch = subresourceData.RowPitch * height;
+		release(uploadHeap);
 
-			UpdateSubresources(commandList->get(), texture->getResource(), uploadHeap->getResource(), 0, 0, 1, &subresourceData);
-
-			stbi_image_free(pixels);
-		}
-		else
-		{
-			throw "Cannot open file named " + filePath;
-		}
+		UpdateSubresources(commandList->get(), texture->getResource(), uploadHeap->getResource(), 0, 0, 1, &subresource);
 	}
-	else if (fileExtension == "hdr")
+	else if (fileExtension == L"dds")
 	{
-		int textureWidth, textureHeight, channels;
-
-		float* const pixels = stbi_loadf(filePath.c_str(), &textureWidth, &textureHeight, &channels, 4);
-
-		const uint32_t width = static_cast<uint32_t>(textureWidth);
-		const uint32_t height = static_cast<uint32_t>(textureHeight);
-		const DXGI_FORMAT format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-
-		if (pixels)
-		{
-			texture = new Texture(width, height, format, 1, 1, true, resFlags);
-
-			const uint64_t uploadHeapSize = GetRequiredIntermediateSize(texture->getResource(), 0, 1);
-
-			UploadHeap* uploadHeap = new UploadHeap(uploadHeapSize);
-
-			release(uploadHeap);
-
-			D3D12_SUBRESOURCE_DATA subresourceData = {};
-			subresourceData.pData = pixels;
-			subresourceData.RowPitch = width * 16u;
-			subresourceData.SlicePitch = subresourceData.RowPitch * height;
-
-			UpdateSubresources(commandList->get(), texture->getResource(), uploadHeap->getResource(), 0, 0, 1, &subresourceData);
-
-			stbi_image_free(pixels);
-		}
-		else
-		{
-			throw "Cannot open file named " + filePath;
-		}
-	}
-	else if (fileExtension == "dds")
-	{
-		std::wstring wFilePath = std::wstring(filePath.begin(), filePath.end());
-
-		std::unique_ptr<uint8_t[]> ddsData;
+		std::unique_ptr<uint8_t[]> decodedData;
 
 		std::vector<D3D12_SUBRESOURCE_DATA> subresources;
 
 		ComPtr<ID3D12Resource> tex;
 
-		DirectX::LoadDDSTextureFromFileEx(GraphicsDevice::get(), wFilePath.c_str(), 0, resFlags, DirectX::DDS_LOADER_DEFAULT, &tex, ddsData, subresources, nullptr, isTextureCube);
+		CHECKERROR(DirectX::LoadDDSTextureFromFileEx(GraphicsDevice::get(), filePath.c_str(), 0, resFlags, DirectX::DDS_LOADER_DEFAULT, &tex, decodedData, subresources, nullptr, isTextureCube));
 
 		texture = new Texture(tex, true, D3D12_RESOURCE_STATE_COPY_DEST);
 
 		const uint64_t uploadHeapSize = GetRequiredIntermediateSize(texture->getResource(), 0, static_cast<uint32_t>(subresources.size()));
 
-		UploadHeap* uploadHeap = new UploadHeap(uploadHeapSize);
+		UploadHeap* const uploadHeap = new UploadHeap(uploadHeapSize);
 
 		release(uploadHeap);
 
 		UpdateSubresources(commandList->get(), texture->getResource(), uploadHeap->getResource(), 0, 0, static_cast<uint32_t>(subresources.size()), subresources.data());
 	}
+	else if (fileExtension == L"hdr" || fileExtension == L"tga")
+	{
+		DirectX::TexMetadata metadata;
+
+		DirectX::ScratchImage scratchImage;
+
+		if (fileExtension == L"hdr")
+		{
+			CHECKERROR(DirectX::LoadFromHDRFile(filePath.c_str(), &metadata, scratchImage));
+		}
+		else
+		{
+			CHECKERROR(DirectX::LoadFromTGAFile(filePath.c_str(), &metadata, scratchImage));
+		}
+
+		const DirectX::Image* image = scratchImage.GetImage(0, 0, 0);
+
+		D3D12_SUBRESOURCE_DATA subresource;
+		subresource.pData = image->pixels;
+		subresource.RowPitch = image->rowPitch;
+		subresource.SlicePitch = image->slicePitch;
+
+		ComPtr<ID3D12Resource> tex;
+
+		CHECKERROR(DirectX::CreateTextureEx(GraphicsDevice::get(), metadata, resFlags, DirectX::CREATETEX_DEFAULT, &tex));
+
+		texture = new Texture(tex, true, D3D12_RESOURCE_STATE_COPY_DEST);
+
+		const uint64_t uploadHeapSize = GetRequiredIntermediateSize(texture->getResource(), 0, 1);
+
+		UploadHeap* const uploadHeap = new UploadHeap(uploadHeapSize);
+
+		release(uploadHeap);
+
+		UpdateSubresources(commandList->get(), texture->getResource(), uploadHeap->getResource(), 0, 0, 1, &subresource);
+	}
 	else
 	{
-		throw "Format not supported";
+		LOGERROR(fileExtension, "is not supported");
 	}
 
-	std::cout << "[class ResourceManager] load texture from " << filePath << " succeeded\n";
+	LOGSUCCESS("load texture from", Logger::brightMagenta, filePath, Logger::resetColor(), "succeeded");
 
 	return texture;
 }
@@ -317,7 +298,7 @@ BufferView* ResourceManager::createTypedBufferView(const DXGI_FORMAT format, con
 {
 	if (createVBV && createIBV)
 	{
-		throw "a buffer cannot be used as VBV and IBV at the same time";
+		LOGERROR("a buffer cannot be used as VBV and IBV at the same time");
 	}
 
 	D3D12_RESOURCE_FLAGS resFlags = D3D12_RESOURCE_FLAG_NONE;
@@ -364,7 +345,7 @@ BufferView* ResourceManager::createTypedBufferView(const DXGI_FORMAT format, con
 {
 	if (createVBV && createIBV)
 	{
-		throw "a buffer cannot be used as VBV and IBV at the same time";
+		LOGERROR("a bufffer cannot be used as VBV and IBV at the same time");
 	}
 
 	D3D12_RESOURCE_FLAGS resFlags = D3D12_RESOURCE_FLAG_NONE;
@@ -530,7 +511,7 @@ TextureDepthView* ResourceManager::createTextureDepthView(const uint32_t width, 
 		clearValueFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 		break;
 	default:
-		throw "Unknown format";
+		LOGERROR("not supported dsv format");
 		break;
 	}
 
@@ -544,7 +525,7 @@ TextureDepthView* ResourceManager::createTextureDepthView(const uint32_t width, 
 	return new TextureDepthView(texture, isTextureCube, persistent);
 }
 
-TextureRenderView* ResourceManager::createTextureRenderView(const std::string& filePath, const bool persistent, const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat)
+TextureRenderView* ResourceManager::createTextureRenderView(const std::wstring& filePath, const bool persistent, const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat)
 {
 	const bool hasRTV = (rtvFormat != DXGI_FORMAT_UNKNOWN);
 
@@ -654,11 +635,11 @@ TextureRenderView* ResourceManager::createTextureRenderView(const uint32_t width
 
 	if ((!hasRTV) && (!hasUAV))
 	{
-		throw "With only SRV flag set is not allowed here";
+		LOGERROR("you must set UAV or RTV format for customized render texture view");
 	}
 	else if (srvFormat == DXGI_FORMAT_UNKNOWN)
 	{
-		throw "SRV format cannot be DXGI_FORMAT_UNKNOWN";
+		LOGERROR("customized render texture view must have a valid SRV format");
 	}
 
 	D3D12_RESOURCE_FLAGS resFlags = D3D12_RESOURCE_FLAG_NONE;
@@ -691,7 +672,7 @@ TextureRenderView* ResourceManager::createTextureRenderView(const uint32_t width
 	return new TextureRenderView(texture, isTextureCube, persistent, srvFormat, uavFormat, rtvFormat);
 }
 
-TextureRenderView* ResourceManager::createTextureCube(const std::string& filePath, const uint32_t texturecubeResolution, const bool persistent, const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat)
+TextureRenderView* ResourceManager::createTextureCube(const std::wstring& filePath, const uint32_t texturecubeResolution, const bool persistent, const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat)
 {
 	TextureRenderView* const equirectangularMap = createTextureRenderView(filePath, false);
 
@@ -701,17 +682,17 @@ TextureRenderView* ResourceManager::createTextureCube(const std::string& filePat
 
 	DXGI_FORMAT resFormat = DXGI_FORMAT_UNKNOWN;
 
-	switch (equirectangularMap->getTexture()->getFormat())
+	switch (Utils::getPixelSize(equirectangularMap->getTexture()->getFormat()))
 	{
-	default:
-		throw "";
-		break;
-	case DXGI_FORMAT_B8G8R8A8_UNORM:
-	case DXGI_FORMAT_R8G8B8A8_UNORM:
+	case 4:
 		resFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 		break;
-	case DXGI_FORMAT_R32G32B32A32_FLOAT:
+	case 8:
+	case 16:
 		resFormat = DXGI_FORMAT_R16G16B16A16_FLOAT;
+		break;
+	default:
+		LOGERROR("not supported equirectangular texture format");
 		break;
 	}
 
@@ -765,9 +746,6 @@ TextureRenderView* ResourceManager::createTextureCube(const std::string& filePat
 
 	switch (resFormat)
 	{
-	default:
-		throw "";
-		break;
 	case DXGI_FORMAT_R8G8B8A8_UNORM:
 		pipelineState = PipelineState::get()->equirectangularR8State.Get();
 		break;
@@ -847,14 +825,14 @@ TextureRenderView* ResourceManager::createTextureCube(const std::string& filePat
 	}
 }
 
-TextureRenderView* ResourceManager::createTextureCube(const std::initializer_list<std::string>& texturesPath, const bool persistent, const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat)
+TextureRenderView* ResourceManager::createTextureCube(const std::initializer_list<std::wstring>& texturesPath, const bool persistent, const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat)
 {
 	Texture* srcTextures[6] = {};
 
 	{
 		uint32_t index = 0;
 
-		for (const std::string& filePath : texturesPath)
+		for (const std::wstring& filePath : texturesPath)
 		{
 			srcTextures[index] = createTexture(filePath, D3D12_RESOURCE_FLAG_NONE, nullptr);
 
