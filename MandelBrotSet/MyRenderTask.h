@@ -10,7 +10,7 @@ class MyRenderTask :public RenderTask
 public:
 
 	MyRenderTask() :
-		computeCS(new Shader(Utils::getRootFolder() + "ComputeCS.cso")),
+		computeCS(new Shader(Utils::getRootFolder() + L"ComputeCS.cso")),
 		originTexture(ResourceManager::createTextureRenderView(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R16G16B16A16_UNORM, 1, 1, false, true,
 			DXGI_FORMAT_R16G16B16A16_UNORM, DXGI_FORMAT_R16G16B16A16_UNORM, DXGI_FORMAT_UNKNOWN))
 	{

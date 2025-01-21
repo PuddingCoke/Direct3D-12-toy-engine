@@ -2,6 +2,8 @@
 
 const std::string assetPath = "E:/Assets/Sponza";
 
+const std::wstring wAssetPath = L"E:/Assets/Sponza";
+
 #include"Model.h"
 #include"Material.h"
 

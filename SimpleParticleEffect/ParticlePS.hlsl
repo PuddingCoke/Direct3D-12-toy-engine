@@ -1,4 +1,4 @@
-struct PixelInput
+﻿struct PixelInput
 {
     float4 color : COLOR;
 };

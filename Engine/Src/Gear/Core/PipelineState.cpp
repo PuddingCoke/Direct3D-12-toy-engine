@@ -67,13 +67,13 @@ PipelineState::PipelineState()
 
 		GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&equirectangularR8State));
 
-		std::cout << "[class PipelineState] create equirectangularR8State\n";
+		LOGSUCCESS("create", Logger::brightMagenta, "equirectangularR8State", Logger::resetColor(), "succeeded");
 
 		desc.RTVFormats[0] = DXGI_FORMAT_R16G16B16A16_FLOAT;
 
 		GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&equirectangularR16State));
 
-		std::cout << "[class PipelineState] create equirectangularR16State\n";
+		LOGSUCCESS("create", Logger::brightMagenta, "equirectangularR16State", Logger::resetColor(), "succeeded");
 	}
 
 	{
@@ -84,7 +84,7 @@ PipelineState::PipelineState()
 
 		GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&fullScreenBlitState));
 
-		std::cout << "[class PipelineState] create fullScreenBlitState\n";
+		LOGSUCCESS("create", Logger::brightMagenta, "fullScreenBlitState", Logger::resetColor(), "succeeded");
 	}
 }
 

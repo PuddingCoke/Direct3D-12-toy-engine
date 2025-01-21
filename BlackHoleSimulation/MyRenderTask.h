@@ -11,7 +11,7 @@ class MyRenderTask :public RenderTask
 public:
 
 	MyRenderTask() :
-		blackHoleAccumulateCS(new Shader(Utils::getRootFolder() + "BlackHoleAccumulateCS.cso"))
+		blackHoleAccumulateCS(new Shader(Utils::getRootFolder() + L"BlackHoleAccumulateCS.cso"))
 	{
 		accumulateTexture = ResourceManager::createTextureRenderView(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R16G16B16A16_FLOAT, 1, 1, false, true,
 			DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_UNKNOWN);
@@ -30,11 +30,11 @@ public:
 				}
 			});
 
-		envCube = resManager->createTextureCube("E:\\Assets\\SpaceShip\\360-Space-Panorama-III.hdr", 2048, true);
+		envCube = resManager->createTextureCube(L"E:\\Assets\\SpaceShip\\360-Space-Panorama-III.hdr", 2048, true);
 
 		noiseTexture = resManager->createTextureRenderView(512, 512, RandomDataType::NOISE, true);
 
-		diskTexture = resManager->createTextureRenderView("DiskTexture.jpg", true);
+		diskTexture = resManager->createTextureRenderView(L"DiskTexture.jpg", true);
 
 		effect = new BloomEffect(context, Graphics::getWidth(), Graphics::getHeight(), resManager);
 

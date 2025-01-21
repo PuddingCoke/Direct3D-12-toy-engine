@@ -145,7 +145,7 @@ GlobalRootSignature::GlobalRootSignature()
 		computeRootSignature = new RootSignature(rootSignatureDesc);
 	}
 
-	std::cout << "[class GlobalRootSignature] create global graphics and global compute root signatures succeeded\n";
+	LOGSUCCESS("create global graphics root signature and global compute root signature succeeded");
 }
 
 GlobalRootSignature::~GlobalRootSignature()

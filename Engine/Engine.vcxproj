@@ -149,6 +149,7 @@
     <ClInclude Include="Inc\Gear\Utils\DeltaTimeEstimator.h" />
     <ClInclude Include="Inc\Gear\Core\Resource\BufferView.h" />
     <ClInclude Include="Inc\Gear\Core\Resource\CounterBufferView.h" />
+    <ClInclude Include="Inc\Gear\Utils\Logger.h" />
     <ClInclude Include="Inc\ImGUI\imconfig.h" />
     <ClInclude Include="Inc\ImGUI\imgui.h" />
     <ClInclude Include="Inc\ImGUI\imgui_impl_dx12.h" />
@@ -157,7 +158,6 @@
     <ClInclude Include="Inc\ImGUI\imstb_rectpack.h" />
     <ClInclude Include="Inc\ImGUI\imstb_textedit.h" />
     <ClInclude Include="Inc\ImGUI\imstb_truetype.h" />
-    <ClInclude Include="Inc\stb_image\stb_image.h" />
     <ClInclude Include="External\stb_image\stb_image_write.h" />
     <ClInclude Include="Inc\Gear\Camera\FPSCamera.h" />
     <ClInclude Include="Inc\Gear\Configuration.h" />
@@ -203,6 +203,7 @@
     <ClInclude Include="Inc\Gear\Utils\Timer.h" />
     <ClInclude Include="Inc\Gear\Utils\Utils.h" />
     <ClInclude Include="Inc\Gear\Window\Win32Form.h" />
+    <ClInclude Include="Inc\WICTextureLoader\WICTextureLoader12.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Inc\DDSTextureLoader\DDSTextureLoader12.cpp" />
@@ -213,7 +214,7 @@
     <ClCompile Include="Inc\ImGUI\imgui_impl_win32.cpp" />
     <ClCompile Include="Inc\ImGUI\imgui_tables.cpp" />
     <ClCompile Include="Inc\ImGUI\imgui_widgets.cpp" />
-    <ClCompile Include="Inc\stb_image\stb_image.cpp" />
+    <ClCompile Include="Inc\WICTextureLoader\WICTextureLoader12.cpp" />
     <ClCompile Include="Src\Gear\Camera\FPSCamera.cpp" />
     <ClCompile Include="Src\Gear\Camera\OrbitCamera.cpp" />
     <ClCompile Include="Src\Gear\Core\Camera.cpp" />
@@ -262,6 +263,7 @@
     <ClCompile Include="Src\Gear\Input\Keyboard.cpp" />
     <ClCompile Include="Src\Gear\Input\Mouse.cpp" />
     <ClCompile Include="Src\Gear\Utils\Color.cpp" />
+    <ClCompile Include="Src\Gear\Utils\Logger.cpp" />
     <ClCompile Include="Src\Gear\Utils\Math.cpp" />
     <ClCompile Include="Src\Gear\Utils\Random.cpp" />
     <ClCompile Include="Src\Gear\Utils\Timer.cpp" />

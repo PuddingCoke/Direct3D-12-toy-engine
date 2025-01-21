@@ -1,62 +1,84 @@
 ﻿#include<Gear/Utils/Utils.h>
 
-std::string Utils::exeRootPath;
+std::wstring Utils::exeRootPath;
 
-std::string Utils::File::backslashToSlash(const std::string& filePath)
+std::wstring Utils::File::backslashToSlash(const std::wstring& filePath)
 {
-	std::string result = filePath;
+	std::wstring result = filePath;
 
-	std::replace(result.begin(), result.end(), '\\', '/');
+    std::replace(result.begin(), result.end(), L'\\', L'/');
 
 	return result;
 }
 
-std::string Utils::File::getParentFolder(const std::string& filePath)
+std::wstring Utils::File::getParentFolder(const std::wstring& filePath)
 {
-	size_t idx = filePath.find_last_of('\\');
+	size_t idx = filePath.find_last_of(L'\\');
 
-	if (idx == std::string::npos)
+	if (idx == std::wstring::npos)
 	{
-		idx = filePath.find_last_of('/');
+		idx = filePath.find_last_of(L'/');
 
-		if (idx == std::string::npos)
+		if (idx == std::wstring::npos)
 		{
-			return "";
+            return L"";
 		}
 	}
 
 	return filePath.substr(0, idx + 1);
 }
 
-std::string Utils::File::getExtension(const std::string& filePath)
+std::wstring Utils::File::getExtension(const std::wstring& filePath)
 {
-	const size_t idx = filePath.find_last_of('.');
+	const size_t idx = filePath.find_last_of(L'.');
 
-    if (idx == std::string::npos)
+    if (idx == std::wstring::npos)
     {
-        return "";
+        return L"";
     }
 
 	return filePath.substr(idx + 1, filePath.size() - idx - 1);
 }
 
-std::string Utils::File::readAllText(const std::string& filePath)
+std::wstring Utils::File::readAllText(const std::wstring& filePath)
 {
-    std::ifstream file(filePath);
+    std::wifstream file(filePath);
 
     if (!file.is_open())
     {
-        throw "cannot open file";
+        LOGERROR("open file", filePath, "failed");
     }
 
-    std::stringstream stringStream;
+    std::wstringstream stringStream;
 
     stringStream << file.rdbuf();
 
     return stringStream.str();
 }
 
-std::string Utils::getRootFolder()
+std::vector<uint8_t> Utils::File::readAllBinary(const std::wstring& filePath)
+{
+    std::ifstream file(filePath, std::ios::ate | std::ios::binary);
+
+    if (!file.is_open())
+    {
+        LOGERROR("open file", filePath, "failed");
+    }
+
+    const size_t fileSize = static_cast<size_t>(file.tellg());
+
+    std::vector<uint8_t> bytes = std::vector<uint8_t>(fileSize);
+
+    file.seekg(0);
+
+    file.read(reinterpret_cast<char*>(bytes.data()), fileSize);
+
+    file.close();
+
+    return bytes;
+}
+
+std::wstring Utils::getRootFolder()
 {
 	return exeRootPath;
 }

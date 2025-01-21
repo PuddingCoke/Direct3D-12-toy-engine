@@ -9,14 +9,16 @@ Gear* Gear::get()
 
 int Gear::iniEngine(const Configuration& config, const int argc, const char* argv[])
 {
-	std::wcout.imbue(std::locale(""));
+	Logger::instance = new Logger();
 
 	{
 		const std::string exeRootPath = argv[0];
 
-		Utils::exeRootPath = Utils::File::backslashToSlash(Utils::File::getParentFolder(exeRootPath));
+		const std::wstring wRootPath = std::wstring(exeRootPath.begin(), exeRootPath.end());
 
-		std::cout << "[class Gear] executable path " << Utils::exeRootPath << "\n";
+		Utils::exeRootPath = Utils::File::backslashToSlash(Utils::File::getParentFolder(wRootPath));
+
+		LOGENGINE("executable path", Utils::getRootFolder());
 	}
 
 	usage = config.usage;
@@ -42,20 +44,20 @@ int Gear::iniEngine(const Configuration& config, const int argc, const char* arg
 		break;
 	}
 
-	std::cout << "[class Gear] resolution " << Graphics::getWidth() << "x" << Graphics::getHeight() << "\n";
+	LOGENGINE("resolution", Graphics::getWidth(), "x", Graphics::getHeight());
 
-	std::cout << "[class Gear] aspect ratio " << Graphics::getAspectRatio() << "\n";
+	LOGENGINE("aspect ratio", Graphics::getAspectRatio());
 
-	std::cout << "[class Gear] back buffer count " << Graphics::getFrameBufferCount() << "\n";
+	LOGENGINE("back buffer count", Graphics::getFrameBufferCount());
 
 	switch (usage)
 	{
 	default:
 	case Configuration::EngineUsage::NORMAL:
-		std::cout << "[class Gear] usage normal\n";
+		LOGENGINE("engine usage normal");
 		break;
 	case Configuration::EngineUsage::VIDEOPLAYBACK:
-		std::cout << "[class Gear] usage video playback\n";
+		LOGENGINE("engine usage video playback");
 		break;
 	}
 
@@ -78,10 +80,6 @@ void Gear::iniGame(Game* const gamePtr)
 		runEncode();
 		break;
 	}
-
-	RenderEngine::get()->waitForPreviousFrame();
-
-	destroy();
 }
 
 void Gear::initialize()
@@ -218,21 +216,6 @@ void Gear::runEncode()
 	std::cin.get();
 }
 
-void Gear::destroy() const
-{
-	delete game;
-
-	delete winform;
-
-	delete RenderEngine::instance;
-
-#ifdef _DEBUG
-
-	reportLiveObjects();
-
-#endif // _DEBUG
-}
-
 void Gear::reportLiveObjects() const
 {
 	ComPtr<IDXGIDebug1> dxgiDebug;
@@ -255,7 +238,36 @@ Gear::Gear() :
 
 Gear::~Gear()
 {
+	if (RenderEngine::instance)
+	{
+		RenderEngine::get()->waitForPreviousFrame();
+	}
 
+	if (game)
+	{
+		delete game;
+	}
+
+	if (winform)
+	{
+		delete winform;
+	}
+
+	if (RenderEngine::instance)
+	{
+		delete RenderEngine::instance;
+	}
+
+	if (Logger::instance)
+	{
+		delete Logger::instance;
+	}
+
+#ifdef _DEBUG
+
+	reportLiveObjects();
+
+#endif // _DEBUG
 }
 
 void Gear::iniWindow(const std::wstring& title, const uint32_t width, const uint32_t height)

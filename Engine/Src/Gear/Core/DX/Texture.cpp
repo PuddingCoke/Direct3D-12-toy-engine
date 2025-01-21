@@ -353,10 +353,7 @@ void Texture::transition(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers
 		}
 		else
 		{
-			throw "Transition texture with only 1 miplevel transition state's allState must be known\n";
-			//in this case transition state's all state is unknown
-			//but for texture has only 1 miplevel transition state's all state must be known
-			//so not handling this part 
+			LOGERROR("when transition texture that has only 1 miplevel,its allState must be known");
 		}
 	}
 

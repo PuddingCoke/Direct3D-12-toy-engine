@@ -36,7 +36,7 @@ public:
 
 	~DXCCompiler();
 
-	IDxcBlob* compile(const std::string filePath, const ShaderProfile profile) const;
+	IDxcBlob* compile(const std::wstring filePath, const ShaderProfile profile) const;
 
 private:
 
@@ -55,14 +55,14 @@ class Shader
 public:
 
 	//byte code
-	Shader(const BYTE* const bytes, const size_t byteSize);
+	Shader(const uint8_t* const bytes, const size_t byteSize);
 
 	//cso
-	Shader(const std::string& filePath);
+	Shader(const std::wstring& filePath);
 
 	//hlsl
 	//note:should copy Common.hlsl under Engine/Shaders to project directory if you want to use Common.hlsl
-	Shader(const std::string& filePath, const ShaderProfile profile);
+	Shader(const std::wstring& filePath, const ShaderProfile profile);
 
 	D3D12_SHADER_BYTECODE getByteCode() const;
 
@@ -80,7 +80,7 @@ private:
 	D3D12_SHADER_BYTECODE shaderByteCode;
 
 	//read byte code from file
-	std::vector<BYTE> codes;
+	std::vector<uint8_t> bytes;
 
 	//compiled code from file
 	ComPtr<IDxcBlob> shaderBlob;

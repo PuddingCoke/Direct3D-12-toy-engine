@@ -9,11 +9,17 @@ public:
 
 	Material(ResourceManager* const resManager, const std::string& diffusePath, const std::string& specularPath, std::string& normalPath)
 	{
-		diffuse = resManager->createTextureRenderView(diffusePath, true);
+		const std::wstring wDiffusePath = std::wstring(diffusePath.begin(), diffusePath.end());
 
-		specular = resManager->createTextureRenderView(specularPath, true);
+		const std::wstring wSpecularPath = std::wstring(specularPath.begin(), specularPath.end());
 
-		normal = resManager->createTextureRenderView(normalPath, true);
+		const std::wstring wNormalPath = std::wstring(normalPath.begin(), normalPath.end());
+
+		diffuse = resManager->createTextureRenderView(wDiffusePath, true);
+
+		specular = resManager->createTextureRenderView(wSpecularPath, true);
+
+		normal = resManager->createTextureRenderView(wNormalPath, true);
 	}
 
 	~Material()

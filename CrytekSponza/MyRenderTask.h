@@ -31,16 +31,16 @@ public:
 			DXGI_FORMAT_R32_FLOAT, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_R32_FLOAT, distanceCubeClearColor)),
 		depthCube(ResourceManager::createTextureDepthView(probeCaptureResolution, probeCaptureResolution, DXGI_FORMAT_D32_FLOAT, 6, 1, true, true)),
 		irradianceVolumeBuffer(ResourceManager::createConstantBuffer(sizeof(IrradianceVolume), true)),
-		shadowVS(new Shader(Utils::getRootFolder() + "ShadowVS.cso")),
-		deferredVShader(new Shader(Utils::getRootFolder() + "DeferredVShader.cso")),
-		deferredPShader(new Shader(Utils::getRootFolder() + "DeferredPShader.cso")),
-		deferredFinal(new Shader(Utils::getRootFolder() + "DeferredFinal.cso")),
-		cubeRenderVS(new Shader(Utils::getRootFolder() + "CubeRenderVS.cso")),
-		cubeRenderPS(new Shader(Utils::getRootFolder() + "CubeRenderPS.cso")),
-		cubeRenderBouncePS(new Shader(Utils::getRootFolder() + "CubeRenderBouncePS.cso")),
-		irradianceOctahedralEncode(new Shader(Utils::getRootFolder() + "IrradianceOctahedralEncode.cso")),
-		depthOctahedralEncode(new Shader(Utils::getRootFolder() + "DepthOctahedralEncode.cso")),
-		skyboxPShader(new Shader(Utils::getRootFolder() + "SkybosPShader.cso")),
+		shadowVS(new Shader(Utils::getRootFolder() + L"ShadowVS.cso")),
+		deferredVShader(new Shader(Utils::getRootFolder() + L"DeferredVShader.cso")),
+		deferredPShader(new Shader(Utils::getRootFolder() + L"DeferredPShader.cso")),
+		deferredFinal(new Shader(Utils::getRootFolder() + L"DeferredFinal.cso")),
+		cubeRenderVS(new Shader(Utils::getRootFolder() + L"CubeRenderVS.cso")),
+		cubeRenderPS(new Shader(Utils::getRootFolder() + L"CubeRenderPS.cso")),
+		cubeRenderBouncePS(new Shader(Utils::getRootFolder() + L"CubeRenderBouncePS.cso")),
+		irradianceOctahedralEncode(new Shader(Utils::getRootFolder() + L"IrradianceOctahedralEncode.cso")),
+		depthOctahedralEncode(new Shader(Utils::getRootFolder() + L"DepthOctahedralEncode.cso")),
+		skyboxPShader(new Shader(Utils::getRootFolder() + L"SkybosPShader.cso")),
 		sunAngle(Math::half_pi - 0.01f)
 	{
 		irradianceOctahedralMap = ResourceManager::createTextureRenderView(6, 6, DXGI_FORMAT_R11G11B10_FLOAT, probeCount, 1, false, true,
@@ -158,7 +158,7 @@ public:
 
 		PipelineState::createComputeState(&depthOctahedralEncodeState, depthOctahedralEncode);
 
-		skybox = resManager->createTextureCube(assetPath + "/sky/kloppenheim_05_4k.hdr", 1024, true);
+		skybox = resManager->createTextureCube(wAssetPath + L"/sky/kloppenheim_05_4k.hdr", 1024, true);
 
 		{
 			struct CubeRenderParam

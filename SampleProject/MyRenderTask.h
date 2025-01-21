@@ -11,9 +11,9 @@ public:
 
 	MyRenderTask()
 	{
-		vertexShader = new Shader(Utils::getRootFolder() + "VertexShader.cso");
+		vertexShader = new Shader(Utils::getRootFolder() + L"VertexShader.cso");
 
-		pixelShader = new Shader(Utils::getRootFolder() + "PixelShader.cso");
+		pixelShader = new Shader(Utils::getRootFolder() + L"PixelShader.cso");
 		
 		{
 			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = {};
