@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #ifndef _INDEXCONSTANTBUFFER_H_
 #define _INDEXCONSTANTBUFFER_H_

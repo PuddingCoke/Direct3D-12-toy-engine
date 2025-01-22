@@ -1,4 +1,4 @@
-#include<Gear/Core/Resource/TextureDepthView.h>
+﻿#include<Gear/Core/Resource/TextureDepthView.h>
 
 TextureDepthView::TextureDepthView(Texture* const texture, const bool isTextureCube, const bool persistent) :
 	EngineResource(persistent), texture(texture), dsvMipHandleStart(), allDepthIndex(0), allStencilIndex(0), depthMipIndexStart(0), stencilMipIndexStart(0)

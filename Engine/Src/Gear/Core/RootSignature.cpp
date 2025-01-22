@@ -1,4 +1,4 @@
-#include<Gear/Core/RootSignature.h>
+﻿#include<Gear/Core/RootSignature.h>
 
 RootSignature::RootSignature(const CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC& desc)
 {

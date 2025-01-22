@@ -1,4 +1,4 @@
-#include<Gear/Core/RenderEngine.h>
+﻿#include<Gear/Core/RenderEngine.h>
 
 RenderEngine* RenderEngine::instance = nullptr;
 

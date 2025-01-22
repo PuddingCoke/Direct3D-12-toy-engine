@@ -1,4 +1,4 @@
-#include<Gear/Core/Camera.h>
+﻿#include<Gear/Core/Camera.h>
 
 DirectX::XMMATRIX Camera::projMatrix;
 

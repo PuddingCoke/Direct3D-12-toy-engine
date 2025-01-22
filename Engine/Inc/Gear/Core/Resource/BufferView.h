@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #ifndef _BUFFERVIEW_H_
 #define _BUFFERVIEW_H_

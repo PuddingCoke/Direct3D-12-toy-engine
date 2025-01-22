@@ -1,4 +1,4 @@
-#include<Gear/Core/CommandList.h>
+﻿#include<Gear/Core/CommandList.h>
 
 D3D12_CPU_DESCRIPTOR_HANDLE CommandList::backBufferHandle;
 

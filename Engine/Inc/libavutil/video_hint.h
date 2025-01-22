@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Copyright 2023 Elias Carotti <eliascrt at amazon dot it>
  *
  * This file is part of FFmpeg.

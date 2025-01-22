@@ -1,4 +1,4 @@
-#include<Gear/Core/Resource/ConstantBuffer.h>
+﻿#include<Gear/Core/Resource/ConstantBuffer.h>
 
 ConstantBuffer::ConstantBuffer(Buffer* const buffer, const uint32_t size, const bool persistent) :
 	EngineResource(persistent), buffer(buffer)

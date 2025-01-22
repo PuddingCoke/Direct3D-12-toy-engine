@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #ifndef _PIPELINESTATE_H_
 #define _PIPELINESTATE_H_

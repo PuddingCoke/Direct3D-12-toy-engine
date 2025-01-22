@@ -1,4 +1,4 @@
-#include<Gear/Utils/Math.h>
+﻿#include<Gear/Utils/Math.h>
 
 float Math::lerp(const float x, const float y, const float s)
 {

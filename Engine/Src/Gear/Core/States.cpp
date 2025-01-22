@@ -1,4 +1,4 @@
-#include<Gear/Core/States.h>
+﻿#include<Gear/Core/States.h>
 
 D3D12_BLEND_DESC States::defBlendDesc = {};
 

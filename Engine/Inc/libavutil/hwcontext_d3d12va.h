@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Direct3D 12 HW acceleration.
  *
  * copyright (c) 2022-2023 Wu Jianhua <toqsxw@outlook.com>

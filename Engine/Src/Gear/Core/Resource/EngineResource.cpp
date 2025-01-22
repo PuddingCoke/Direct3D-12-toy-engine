@@ -1,4 +1,4 @@
-#include<Gear/Core/Resource/EngineResource.h>
+﻿#include<Gear/Core/Resource/EngineResource.h>
 
 EngineResource::EngineResource(const bool persistent) :
 	persistent(persistent), numSRVUAVCBVDescriptors(0), srvUAVCBVHandleStart()

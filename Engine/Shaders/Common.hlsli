@@ -1,4 +1,4 @@
-struct PerframeResource
+﻿struct PerframeResource
 {
     float deltaTime;
     float timeElapsed;

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #ifndef _BOTTOMLEVELAS_H_
 #define _BOTTOMLEVELAS_H_

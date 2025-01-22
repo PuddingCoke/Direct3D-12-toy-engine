@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #ifndef _TOPLEVELAS_H_
 #define _TOPLEVELAS_H_

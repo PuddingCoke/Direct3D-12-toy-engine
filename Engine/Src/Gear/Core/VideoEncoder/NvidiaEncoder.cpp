@@ -1,4 +1,4 @@
-#include<Gear/Core/VideoEncoder/NvidiaEncoder.h>
+﻿#include<Gear/Core/VideoEncoder/NvidiaEncoder.h>
 
 NvidiaEncoder::NvidiaEncoder(const uint32_t frameToEncode) :
 	Encoder(frameToEncode), encoder(nullptr),

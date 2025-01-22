@@ -1,4 +1,4 @@
-#include<Gear/Core/RenderTask.h>
+﻿#include<Gear/Core/RenderTask.h>
 
 RenderTask::RenderTask() :
 	context(new GraphicsContext()),

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #ifndef _DELTATIMEESTIMATOR_H_
 #define _DELTATIMEESTIMATOR_H_

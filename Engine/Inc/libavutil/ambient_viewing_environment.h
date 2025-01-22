@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (c) 2023 Jan Ekström <jeebjp@gmail.com>
  *
  * This file is part of FFmpeg.

@@ -1,4 +1,4 @@
-#include<Gear/Core/CommandAllocator.h>
+﻿#include<Gear/Core/CommandAllocator.h>
 
 CommandAllocator::CommandAllocator(const D3D12_COMMAND_LIST_TYPE type)
 {

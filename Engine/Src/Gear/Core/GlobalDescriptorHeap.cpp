@@ -1,4 +1,4 @@
-#include<Gear/Core/GlobalDescriptorHeap.h>
+﻿#include<Gear/Core/GlobalDescriptorHeap.h>
 
 GlobalDescriptorHeap* GlobalDescriptorHeap::instance = nullptr;
 

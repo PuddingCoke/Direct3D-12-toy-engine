@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #ifndef _GRAPHICSDEVICE_H_
 #define _GRAPHICSDEVICE_H_

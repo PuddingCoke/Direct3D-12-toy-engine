@@ -1,4 +1,4 @@
-#include<Gear/Core/Effect/FXAAEffect.h>
+﻿#include<Gear/Core/Effect/FXAAEffect.h>
 
 FXAAEffect::FXAAEffect(GraphicsContext* const context, const uint32_t width, const uint32_t height) :
 	Effect(context, width, height, DXGI_FORMAT_R8G8B8A8_UNORM), fxaaParam{ 1.0f,0.75f,0.166f,0.0633f },

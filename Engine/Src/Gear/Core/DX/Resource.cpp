@@ -1,4 +1,4 @@
-#include<Gear/Core/DX/Resource.h>
+﻿#include<Gear/Core/DX/Resource.h>
 
 ID3D12Resource* Resource::getResource() const
 {

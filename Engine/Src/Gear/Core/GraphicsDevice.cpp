@@ -1,4 +1,4 @@
-#include<Gear/Core/GraphicsDevice.h>
+﻿#include<Gear/Core/GraphicsDevice.h>
 
 GraphicsDevice* GraphicsDevice::instance = nullptr;
 

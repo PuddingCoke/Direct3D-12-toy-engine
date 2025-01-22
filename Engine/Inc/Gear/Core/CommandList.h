@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #ifndef _COMMANDLIST_H_
 #define _COMMANDLIST_H_

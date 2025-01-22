@@ -1,4 +1,4 @@
-#include<Gear/Core/Raytracing/BottomLevelAS.h>
+﻿#include<Gear/Core/Raytracing/BottomLevelAS.h>
 
 BottomLevelAS::BottomLevelAS(const bool allowUpdate) :
 	scratchBufferSize(0), blasBufferSize(0), scratchBuffer(nullptr), blasBuffer(nullptr),

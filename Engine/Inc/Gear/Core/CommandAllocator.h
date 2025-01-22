@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #ifndef _COMMANDALLOCATOR_H_
 #define _COMMANDALLOCATOR_H_

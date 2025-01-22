@@ -1,4 +1,4 @@
-#include<Gear/Utils/Logger.h>
+﻿#include<Gear/Utils/Logger.h>
 
 Logger* Logger::instance = nullptr;
 

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #ifndef _EFFECT_H_
 #define _EFFECT_H_
