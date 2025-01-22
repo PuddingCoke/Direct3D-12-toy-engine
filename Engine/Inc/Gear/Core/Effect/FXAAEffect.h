@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #ifndef _FXAAEFFECT_H_
 #define _FXAAEFFECT_H_

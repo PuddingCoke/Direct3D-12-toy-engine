@@ -1,4 +1,4 @@
-#include<Gear/Core/Resource/SwapTexture.h>
+﻿#include<Gear/Core/Resource/SwapTexture.h>
 
 SwapTexture::SwapTexture(const std::function<TextureRenderView* (void)>& factoryFunc) :
 	texture0(factoryFunc()), texture1(factoryFunc()),

@@ -1,4 +1,4 @@
-/*
+﻿/*
  * AVPacket public API
  *
  * This file is part of FFmpeg.

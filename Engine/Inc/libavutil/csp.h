@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (c) 2015 Kevin Wheatley <kevin.j.wheatley@gmail.com>
  * Copyright (c) 2016 Ronald S. Bultje <rsbultje@gmail.com>
  * Copyright (c) 2023 Leo Izen <leo.izen@gmail.com>

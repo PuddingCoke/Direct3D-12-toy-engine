@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #ifndef _CONSTANTBUFFERMANAGER_H_
 #define _CONSTANTBUFFERMANAGER_H_

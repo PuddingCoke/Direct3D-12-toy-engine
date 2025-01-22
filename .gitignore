@@ -367,3 +367,5 @@ Engine-d.lib
 Engine-d.idb
 
 log.txt
+
+CompiledShaders/

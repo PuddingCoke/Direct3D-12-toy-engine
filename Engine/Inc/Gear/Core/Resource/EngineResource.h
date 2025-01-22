@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #ifndef _ENGINERESOURCE_H_
 #define _ENGINERESOURCE_H_

@@ -1,4 +1,4 @@
-#include<Gear/Window/Win32Form.h>
+﻿#include<Gear/Window/Win32Form.h>
 
 Win32Form::Win32Form(const std::wstring& title, const uint32_t width, const uint32_t height, const DWORD windowStyle, LRESULT(*windowCallback)(HWND hwnd, uint32_t msg, WPARAM wParam, LPARAM lParam)):
 	hwnd(nullptr), msg{}

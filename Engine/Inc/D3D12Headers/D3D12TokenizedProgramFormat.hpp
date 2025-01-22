@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 //*********************************************************
 //
 // Copyright (c) Microsoft Corporation.

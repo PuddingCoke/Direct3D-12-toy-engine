@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (c) 2021 Limin Wang <lance.lmwang at gmail.com>
  *
  * This file is part of FFmpeg.

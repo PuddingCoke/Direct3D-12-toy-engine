@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Codec IDs
  *
  * This file is part of FFmpeg.

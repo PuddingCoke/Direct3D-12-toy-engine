@@ -1,4 +1,4 @@
-#include"Common.hlsli"
+﻿#include"Common.hlsli"
 
 static const float3 vertices[36] =
 {

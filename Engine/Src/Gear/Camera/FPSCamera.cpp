@@ -1,4 +1,4 @@
-#include<Gear/Camera/FPSCamera.h>
+﻿#include<Gear/Camera/FPSCamera.h>
 
 FPSCamera::FPSCamera(const DirectX::XMVECTOR& eye, const DirectX::XMVECTOR& lookDir, const DirectX::XMVECTOR& up, const float moveSpeed):
 	eye(eye), lookDir(lookDir), up(up), moveSpeed(moveSpeed)

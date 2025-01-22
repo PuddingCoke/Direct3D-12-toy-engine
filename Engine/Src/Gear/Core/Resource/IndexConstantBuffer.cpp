@@ -1,4 +1,4 @@
-#include<Gear/Core/Resource/IndexConstantBuffer.h>
+﻿#include<Gear/Core/Resource/IndexConstantBuffer.h>
 
 IndexConstantBuffer::IndexConstantBuffer(ConstantBuffer* const constantBuffer, const std::initializer_list<ShaderResourceDesc>& transitionDescs) :
 	EngineResource(constantBuffer->getPersistent()), constantBuffer(constantBuffer)

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #ifndef _SHADER_H_
 #define _SHADER_H_

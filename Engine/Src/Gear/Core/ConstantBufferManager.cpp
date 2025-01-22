@@ -1,4 +1,4 @@
-#include<Gear/Core/ConstantBufferManager.h>
+﻿#include<Gear/Core/ConstantBufferManager.h>
 
 ConstantBufferManager* ConstantBufferManager::instance = nullptr;
 

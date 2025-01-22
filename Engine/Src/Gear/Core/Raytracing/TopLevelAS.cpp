@@ -1,4 +1,4 @@
-#include<Gear/Core/Raytracing/TopLevelAS.h>
+﻿#include<Gear/Core/Raytracing/TopLevelAS.h>
 
 TopLevelAS::TopLevelAS(const bool allowUpdate, const bool persistent) :
 	EngineResource(persistent),

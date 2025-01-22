@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Immersive Audio Model and Formats helper functions and defines
  *
  * This file is part of FFmpeg.

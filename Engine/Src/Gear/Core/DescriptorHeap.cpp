@@ -1,4 +1,4 @@
-#include<Gear/Core/DescriptorHeap.h>
+﻿#include<Gear/Core/DescriptorHeap.h>
 
 DescriptorHeap::DescriptorHeap(const uint32_t numDescriptors, const uint32_t subRegionSize, const D3D12_DESCRIPTOR_HEAP_TYPE type, const D3D12_DESCRIPTOR_HEAP_FLAGS flags) :
 	numDescriptors(numDescriptors), subRegionSize(subRegionSize), type(type),

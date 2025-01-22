@@ -1,4 +1,4 @@
-#include<Gear/Core/PipelineState.h>
+﻿#include<Gear/Core/PipelineState.h>
 
 PipelineState* PipelineState::instance = nullptr;
 

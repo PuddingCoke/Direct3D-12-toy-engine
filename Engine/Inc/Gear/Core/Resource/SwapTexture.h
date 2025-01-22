@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #ifndef _SWAPTEXTURE_H_
 #define _SWAPTEXTURE_H_

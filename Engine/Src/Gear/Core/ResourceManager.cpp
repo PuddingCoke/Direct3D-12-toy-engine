@@ -1,4 +1,4 @@
-#include<Gear/Core/ResourceManager.h>
+﻿#include<Gear/Core/ResourceManager.h>
 
 ResourceManager::ResourceManager(GraphicsContext* const context) :
 	context(context), commandList(context->getCommandList()),

@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (c) 2020 Vacing Fang <vacingfang@tencent.com>
  *
  * This file is part of FFmpeg.

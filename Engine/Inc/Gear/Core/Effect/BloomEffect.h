@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #ifndef _BLOOMEFFECT_H_
 #define _BLOOMEFFECT_H_

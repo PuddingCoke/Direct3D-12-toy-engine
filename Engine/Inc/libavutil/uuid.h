@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (c) 2022 Pierre-Anthony Lemieux <pal@palemieux.com>
  *                    Zane van Iperen <zane@zanevaniperen.com>
  *

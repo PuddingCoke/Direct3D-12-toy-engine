@@ -1,4 +1,4 @@
-#include<Gear/Core/Gear2D/PrimitiveBatch.h>
+﻿#include<Gear/Core/Gear2D/PrimitiveBatch.h>
 
 PrimitiveBatch::PrimitiveBatch(const DXGI_FORMAT format, GraphicsContext* const context) :
 	context(context), lineWidth(1.f)

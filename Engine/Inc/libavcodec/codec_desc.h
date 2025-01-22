@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Codec descriptors public API
  *
  * This file is part of FFmpeg.

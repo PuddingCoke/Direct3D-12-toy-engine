@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #ifndef _ROOTSIGNATURE_H_
 #define _ROOTSIGNATURE_H_

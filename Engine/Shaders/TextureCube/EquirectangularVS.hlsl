@@ -1,4 +1,4 @@
-cbuffer ProjMatrices : register(b3)
+﻿cbuffer ProjMatrices : register(b3)
 {
     matrix viewProj[6];
 }

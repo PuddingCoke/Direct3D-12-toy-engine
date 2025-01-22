@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #ifndef _RESOURCEMANAGER_H_
 #define _RESOURCEMANAGER_H_

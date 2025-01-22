@@ -1,4 +1,4 @@
-#include<Gear/Core/Resource/CounterBufferView.h>
+﻿#include<Gear/Core/Resource/CounterBufferView.h>
 
 CounterBufferView::CounterBufferView(const bool persistent) :
 	EngineResource(persistent), buffer(new Buffer(4, true, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS)), srvIndex(0), uavIndex(0), viewGPUHandle(), viewCPUHandle()

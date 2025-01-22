@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #ifndef _RENDERTASK_H_
 #define _RENDERTASK_H_

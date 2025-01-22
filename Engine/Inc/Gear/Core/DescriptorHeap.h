@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #ifndef _DESCRIPTORHEAP_H_
 #define _DESCRIPTORHEAP_H_
