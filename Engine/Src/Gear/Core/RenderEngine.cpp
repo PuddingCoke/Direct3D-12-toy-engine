@@ -578,10 +578,14 @@ RenderEngine::RenderEngine(const uint32_t width, const uint32_t height, const HW
 	}
 
 	CHECKERROR(CoInitializeEx(0, COINIT_MULTITHREADED));
+
+	StaticEffect::initializeStaticEffects();
 }
 
 RenderEngine::~RenderEngine()
 {
+	StaticEffect::releaseStaticEffects();
+
 	CoUninitialize();
 
 	if (initializeImGuiSurface)

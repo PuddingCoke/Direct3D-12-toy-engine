@@ -134,7 +134,7 @@ Texture* ResourceManager::createTexture(const std::wstring& filePath, const D3D1
 
 		UpdateSubresources(commandList->get(), texture->getResource(), uploadHeap->getResource(), 0, 0, static_cast<uint32_t>(subresources.size()), subresources.data());
 	}
-	else if (fileExtension == L"hdr" || fileExtension == L"tga")
+	else if (fileExtension == L"hdr" || fileExtension == L"tga" || fileExtension == L"exr")
 	{
 		DirectX::TexMetadata metadata;
 
@@ -144,9 +144,13 @@ Texture* ResourceManager::createTexture(const std::wstring& filePath, const D3D1
 		{
 			CHECKERROR(DirectX::LoadFromHDRFile(filePath.c_str(), &metadata, scratchImage));
 		}
-		else
+		else if (fileExtension == L"tga")
 		{
 			CHECKERROR(DirectX::LoadFromTGAFile(filePath.c_str(), &metadata, scratchImage));
+		}
+		else
+		{
+			CHECKERROR(DirectX::LoadFromEXRFile(filePath.c_str(), &metadata, scratchImage));
 		}
 
 		const DirectX::Image* image = scratchImage.GetImage(0, 0, 0);
@@ -175,7 +179,7 @@ Texture* ResourceManager::createTexture(const std::wstring& filePath, const D3D1
 		LOGERROR(fileExtension, "is not supported");
 	}
 
-	LOGSUCCESS("load texture from", Logger::brightMagenta, filePath, Logger::resetColor(), "succeeded");
+	LOGSUCCESS("load texture from", Logger::brightBlue, filePath, Logger::resetColor(), "succeeded");
 
 	return texture;
 }
@@ -525,12 +529,8 @@ TextureDepthView* ResourceManager::createTextureDepthView(const uint32_t width, 
 	return new TextureDepthView(texture, isTextureCube, persistent);
 }
 
-TextureRenderView* ResourceManager::createTextureRenderView(const std::wstring& filePath, const bool persistent, const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat)
+TextureRenderView* ResourceManager::createTextureRenderView(const std::wstring& filePath, const bool persistent, const bool hasUAV, const bool hasRTV)
 {
-	const bool hasRTV = (rtvFormat != DXGI_FORMAT_UNKNOWN);
-
-	const bool hasUAV = (uavFormat != DXGI_FORMAT_UNKNOWN);
-
 	bool stateTracking = true;
 
 	D3D12_RESOURCE_FLAGS resFlags = D3D12_RESOURCE_FLAG_NONE;
@@ -554,7 +554,7 @@ TextureRenderView* ResourceManager::createTextureRenderView(const std::wstring& 
 
 	bool isTextureCube = false;
 
-	Texture* texture = createTexture(filePath, resFlags, &isTextureCube);
+	Texture* const texture = createTexture(filePath, resFlags, &isTextureCube);
 
 	if (!stateTracking)
 	{
@@ -567,13 +567,15 @@ TextureRenderView* ResourceManager::createTextureRenderView(const std::wstring& 
 		texture->setStateTracking(false);
 	}
 
-	if (srvFormat == DXGI_FORMAT_UNKNOWN)
+	if (stateTracking)
 	{
-		return new TextureRenderView(texture, isTextureCube, persistent, texture->getFormat(), DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN);
+		return new TextureRenderView(texture, isTextureCube, persistent, texture->getFormat(),
+			hasUAV ? texture->getFormat() : DXGI_FORMAT_UNKNOWN, hasRTV ? texture->getFormat() : DXGI_FORMAT_UNKNOWN);
 	}
 	else
 	{
-		return new TextureRenderView(texture, isTextureCube, persistent, srvFormat, uavFormat, rtvFormat);
+		return new TextureRenderView(texture, isTextureCube, persistent, texture->getFormat(),
+			DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN);
 	}
 }
 
@@ -672,13 +674,15 @@ TextureRenderView* ResourceManager::createTextureRenderView(const uint32_t width
 	return new TextureRenderView(texture, isTextureCube, persistent, srvFormat, uavFormat, rtvFormat);
 }
 
-TextureRenderView* ResourceManager::createTextureCube(const std::wstring& filePath, const uint32_t texturecubeResolution, const bool persistent, const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat)
+TextureRenderView* ResourceManager::createTextureCube(const std::wstring& filePath, const uint32_t texturecubeResolution, const bool persistent, const bool hasUAV, const bool hasRTV)
 {
-	TextureRenderView* const equirectangularMap = createTextureRenderView(filePath, false);
+	TextureRenderView* const equirectangularMap = createTextureRenderView(filePath, false, true, false);
 
 	equirectangularMap->copyDescriptors();
 
 	release(equirectangularMap);
+
+	HDRClampEffect::get()->process(context, equirectangularMap);
 
 	DXGI_FORMAT resFormat = DXGI_FORMAT_UNKNOWN;
 
@@ -688,7 +692,6 @@ TextureRenderView* ResourceManager::createTextureCube(const std::wstring& filePa
 		resFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 		break;
 	case 8:
-	case 16:
 		resFormat = DXGI_FORMAT_R16G16B16A16_FLOAT;
 		break;
 	default:
@@ -766,10 +769,6 @@ TextureRenderView* ResourceManager::createTextureCube(const std::wstring& filePa
 
 	context->draw(36, 6, 0, 0);
 
-	const bool hasRTV = (rtvFormat != DXGI_FORMAT_UNKNOWN);
-
-	const bool hasUAV = (uavFormat != DXGI_FORMAT_UNKNOWN);
-
 	bool stateTracking = true;
 
 	D3D12_RESOURCE_FLAGS resFlags = D3D12_RESOURCE_FLAG_NONE;
@@ -815,13 +814,15 @@ TextureRenderView* ResourceManager::createTextureCube(const std::wstring& filePa
 		dstTexture->setStateTracking(false);
 	}
 
-	if (srvFormat == DXGI_FORMAT_UNKNOWN)
+	if (stateTracking)
 	{
-		return new TextureRenderView(dstTexture, true, persistent, dstTexture->getFormat(), DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN);
+		return new TextureRenderView(dstTexture, true, persistent, dstTexture->getFormat(),
+			hasUAV ? dstTexture->getFormat() : DXGI_FORMAT_UNKNOWN, hasRTV ? dstTexture->getFormat() : DXGI_FORMAT_UNKNOWN);
 	}
 	else
 	{
-		return new TextureRenderView(dstTexture, true, persistent, srvFormat, uavFormat, rtvFormat);
+		return new TextureRenderView(dstTexture, true, persistent, dstTexture->getFormat(),
+			DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_UNKNOWN);
 	}
 }
 

@@ -146,6 +146,8 @@
     <ClInclude Include="Inc\Gear\Core\Raytracing\BottomLevelAS.h" />
     <ClInclude Include="Inc\Gear\Core\Raytracing\TopLevelAS.h" />
     <ClInclude Include="Inc\Gear\Core\RenderTask.h" />
+    <ClInclude Include="Inc\Gear\Core\StaticEffect\HDRClampEffect.h" />
+    <ClInclude Include="Inc\Gear\Core\StaticEffect\StaticEffect.h" />
     <ClInclude Include="Inc\Gear\Utils\DeltaTimeEstimator.h" />
     <ClInclude Include="Inc\Gear\Core\Resource\BufferView.h" />
     <ClInclude Include="Inc\Gear\Core\Resource\CounterBufferView.h" />
@@ -207,6 +209,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Inc\DDSTextureLoader\DDSTextureLoader12.cpp" />
+    <ClCompile Include="Src\Gear\Core\StaticEffect\StaticEffect.cpp" />
     <ClCompile Include="Inc\ImGUI\imgui.cpp" />
     <ClCompile Include="Inc\ImGUI\imgui_demo.cpp" />
     <ClCompile Include="Inc\ImGUI\imgui_draw.cpp" />
@@ -223,6 +226,7 @@
     <ClCompile Include="Src\Gear\Core\Raytracing\BottomLevelAS.cpp" />
     <ClCompile Include="Src\Gear\Core\Raytracing\TopLevelAS.cpp" />
     <ClCompile Include="Src\Gear\Core\RenderTask.cpp" />
+    <ClCompile Include="Src\Gear\Core\StaticEffect\HDRClampEffect.cpp" />
     <ClCompile Include="Src\Gear\Utils\DeltaTimeEstimator.cpp" />
     <ClCompile Include="Src\Gear\Core\DescriptorHeap.cpp" />
     <ClCompile Include="Src\Gear\Core\DX\ReadbackHeap.cpp" />
@@ -474,6 +478,28 @@
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">g_%(Filename)Bytes</VariableName>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Inc/Gear/CompiledShaders/%(Filename).h</HeaderFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Inc/Gear/CompiledShaders/%(Filename).h</HeaderFileOutput>
+    </FxCompile>
+    <FxCompile Include="Shaders\HDRClampCS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">6.6</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">6.6</ShaderModel>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">g_%(Filename)Bytes</VariableName>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </ObjectFileOutput>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">g_%(Filename)Bytes</VariableName>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </ObjectFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Inc/Gear/CompiledShaders/%(Filename).h</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Inc/Gear/CompiledShaders/%(Filename).h</HeaderFileOutput>
+      <DisableOptimizations Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</DisableOptimizations>
+      <EnableDebuggingInformation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</EnableDebuggingInformation>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SolutionDir)Engine\Shaders;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)Engine\Shaders;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </FxCompile>
     <FxCompile Include="Shaders\PrimitiveBatch\PrimitiveBatchCircleVS.hlsl">
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">6.6</ShaderModel>

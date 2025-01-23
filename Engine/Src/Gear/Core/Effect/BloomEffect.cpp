@@ -6,6 +6,8 @@ BloomEffect::BloomEffect(GraphicsContext* const context, const uint32_t width, c
 	filteredTexture(ResourceManager::createTextureRenderView(width, height, DXGI_FORMAT_R16G16B16A16_FLOAT, 1, 1, false, true,
 		DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_R16G16B16A16_FLOAT))
 {
+	filteredTexture->getTexture()->setName(L"Bloom Effect Filtered Texture");
+
 	bloomFilter = new Shader(g_BloomFilterPSBytes, sizeof(g_BloomFilterPSBytes));
 	bloomFinal = new Shader(g_BloomFinalPSBytes, sizeof(g_BloomFinalPSBytes));
 	bloomVBlur = new Shader(g_BloomVBlurCSBytes, sizeof(g_BloomVBlurCSBytes));

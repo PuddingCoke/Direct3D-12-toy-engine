@@ -5,6 +5,7 @@
 
 #include<DDSTextureLoader/DDSTextureLoader12.h>
 #include<WICTextureLoader/WICTextureLoader12.h>
+#include<DirectXTex/DirectXTexEXR.h>
 #include<DirectXTex/DirectXTex.h>
 
 #include<Gear/Core/GraphicsContext.h>
@@ -23,6 +24,8 @@
 #include<Gear/Core/Resource/BufferView.h>
 #include<Gear/Core/Resource/TextureRenderView.h>
 #include<Gear/Core/Resource/TextureDepthView.h>
+
+#include<Gear/Core/StaticEffect/HDRClampEffect.h>
 
 enum class RandomDataType
 {
@@ -86,8 +89,7 @@ public:
 	static TextureDepthView* createTextureDepthView(const uint32_t width, const uint32_t height, const DXGI_FORMAT resFormat, const uint32_t arraySize, const uint32_t mipLevels, const bool isTextureCube, const bool persistent);
 
 	//load jpg jpeg png hdr dds(auto detect texturecube) textures
-	TextureRenderView* createTextureRenderView(const std::wstring& filePath, const bool persistent,
-		const DXGI_FORMAT srvFormat = DXGI_FORMAT_UNKNOWN, const DXGI_FORMAT uavFormat = DXGI_FORMAT_UNKNOWN, const DXGI_FORMAT rtvFormat = DXGI_FORMAT_UNKNOWN);
+	TextureRenderView* createTextureRenderView(const std::wstring& filePath, const bool persistent, const bool hasUAV = false, const bool hasRTV = false);
 
 	//create texture render view from random data
 	TextureRenderView* createTextureRenderView(const uint32_t width, const uint32_t height, const RandomDataType type, const bool persistent,
@@ -98,8 +100,7 @@ public:
 		const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat, const float* const color = nullptr);
 
 	//create texture cube from equirectangular map
-	TextureRenderView* createTextureCube(const std::wstring& filePath, const uint32_t texturecubeResolution, const bool persistent,
-		const DXGI_FORMAT srvFormat = DXGI_FORMAT_UNKNOWN, const DXGI_FORMAT uavFormat = DXGI_FORMAT_UNKNOWN, const DXGI_FORMAT rtvFormat = DXGI_FORMAT_UNKNOWN);
+	TextureRenderView* createTextureCube(const std::wstring& filePath, const uint32_t texturecubeResolution, const bool persistent, const bool hasUAV = false, const bool hasRTV = false);
 
 	//create texture cube from 6 seperate textures
 	TextureRenderView* createTextureCube(const std::initializer_list<std::wstring>& texturesPath, const bool persistent,
