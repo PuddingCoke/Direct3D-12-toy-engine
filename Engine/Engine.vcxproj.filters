@@ -321,6 +321,12 @@
     <ClInclude Include="Inc\WICTextureLoader\WICTextureLoader12.h">
       <Filter>Header</Filter>
     </ClInclude>
+    <ClInclude Include="Inc\Gear\Core\StaticEffect\HDRClampEffect.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Gear\Core\StaticEffect\StaticEffect.h">
+      <Filter>Header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Gear\Configuration.cpp">
@@ -512,6 +518,12 @@
     <ClCompile Include="Inc\WICTextureLoader\WICTextureLoader12.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="Src\Gear\Core\StaticEffect\HDRClampEffect.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gear\Core\StaticEffect\StaticEffect.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\Bloom\BloomDownSamplePS.hlsl">
@@ -574,6 +586,7 @@
     <FxCompile Include="Shaders\FXAA\FXAA.hlsl">
       <Filter>Shaders\FXAA</Filter>
     </FxCompile>
+    <FxCompile Include="Shaders\HDRClampCS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\Common.hlsli">

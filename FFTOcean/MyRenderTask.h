@@ -186,7 +186,7 @@ public:
 
 		WaveCascade::randomGaussTexture = randomGaussTexture;
 
-		enviromentCube = resManager->createTextureCube(L"E:\\Assets\\Ocean\\clear_sky_field_sky_dome_8k.hdr", 1024, true);
+		enviromentCube = resManager->createTextureCube(L"E:\\Assets\\Ocean\\autumn_field_puresky_4k.exr", 1024, true);
 
 		calculateInitialSpectrum();
 

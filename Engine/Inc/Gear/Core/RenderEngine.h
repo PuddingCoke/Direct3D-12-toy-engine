@@ -15,6 +15,7 @@
 #include<Gear/Core/Shader.h>
 #include<Gear/Core/States.h>
 #include<Gear/Core/PipelineState.h>
+#include<Gear/Core/StaticEffect/StaticEffect.h>
 
 enum class GPUVendor
 {
