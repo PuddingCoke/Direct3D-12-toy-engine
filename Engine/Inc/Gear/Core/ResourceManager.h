@@ -25,8 +25,6 @@
 #include<Gear/Core/Resource/TextureRenderView.h>
 #include<Gear/Core/Resource/TextureDepthView.h>
 
-#include<Gear/Core/StaticEffect/HDRClampEffect.h>
-
 enum class RandomDataType
 {
 	NOISE,
@@ -39,7 +37,11 @@ class ResourceManager
 {
 public:
 
-	ResourceManager(GraphicsContext* const context);
+	ResourceManager(const ResourceManager&) = delete;
+
+	void operator=(const ResourceManager&) = delete;
+
+	ResourceManager();
 
 	~ResourceManager();
 
@@ -106,17 +108,19 @@ public:
 	TextureRenderView* createTextureCube(const std::initializer_list<std::wstring>& texturesPath, const bool persistent,
 		const DXGI_FORMAT srvFormat = DXGI_FORMAT_UNKNOWN, const DXGI_FORMAT uavFormat = DXGI_FORMAT_UNKNOWN, const DXGI_FORMAT rtvFormat = DXGI_FORMAT_UNKNOWN);
 
-private:
-
-	std::vector<Resource*>* resources;
-
-	std::vector<EngineResource*>* engineResources;
+protected:
 
 	//high level task such as create texture cube from equirectangular map
 	GraphicsContext* const context;
 
 	//low level task such as initalize texture with data
 	CommandList* const commandList;
+
+private:
+
+	std::vector<Resource*>* resources;
+
+	std::vector<EngineResource*>* engineResources;
 
 };
 

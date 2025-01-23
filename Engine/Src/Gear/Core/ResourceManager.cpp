@@ -1,7 +1,11 @@
 ﻿#include<Gear/Core/ResourceManager.h>
 
-ResourceManager::ResourceManager(GraphicsContext* const context) :
-	context(context), commandList(context->getCommandList()),
+#include<Gear/Core/StaticEffect/HDRClampEffect.h>
+
+#include<Gear/Core/StaticEffect/LatLongMapToCubeMapEffect.h>
+
+ResourceManager::ResourceManager() :
+	context(new GraphicsContext()), commandList(context->getCommandList()),
 	resources(new std::vector<Resource*>[Graphics::getFrameBufferCount()]),
 	engineResources(new std::vector<EngineResource*>[Graphics::getFrameBufferCount()])
 {
@@ -29,6 +33,8 @@ ResourceManager::~ResourceManager()
 	delete[] resources;
 
 	delete[] engineResources;
+
+	delete context;
 }
 
 void ResourceManager::release(Resource* const resource)
@@ -694,6 +700,9 @@ TextureRenderView* ResourceManager::createTextureCube(const std::wstring& filePa
 	case 8:
 		resFormat = DXGI_FORMAT_R16G16B16A16_FLOAT;
 		break;
+	case 16:
+		resFormat = DXGI_FORMAT_R32G32B32A32_FLOAT;
+		break;
 	default:
 		LOGERROR("not supported equirectangular texture format");
 		break;
@@ -704,70 +713,7 @@ TextureRenderView* ResourceManager::createTextureCube(const std::wstring& filePa
 
 	release(cubemap);
 
-	struct Matrices
-	{
-		DirectX::XMMATRIX matrices[6];
-		DirectX::XMFLOAT4 padding[8];
-	} matrices{};
-
-	{
-		const DirectX::XMVECTOR focusPoints[6] =
-		{
-			{1.0f,  0.0f,  0.0f},
-			{-1.0f,  0.0f,  0.0f},
-			{0.0f,  1.0f,  0.0f},
-			{0.0f, -1.0f,  0.0f},
-			{0.0f,  0.0f,  1.0f},
-			{0.0f,  0.0f, -1.0f}
-		};
-		const DirectX::XMVECTOR upVectors[6] =
-		{
-			{0.0f, 1.0f,  0.0f},
-			{0.0f, 1.0f,  0.0f},
-			{0.0f,  0.0f,  -1.0f},
-			{0.0f,  0.0f, 1.0f},
-			{0.0f, 1.0f,  0.0f},
-			{0.0f, 1.0f,  0.0f}
-		};
-
-		const DirectX::XMMATRIX projMatrix = DirectX::XMMatrixPerspectiveFovLH(Math::pi / 2.f, 1.f, 0.1f, 10.f);
-
-		for (uint32_t i = 0; i < 6; i++)
-		{
-			const DirectX::XMMATRIX viewMatrix = DirectX::XMMatrixLookAtLH({ 0.f,0.f,0.f }, focusPoints[i], upVectors[i]);
-			const DirectX::XMMATRIX viewProj = DirectX::XMMatrixTranspose(viewMatrix * projMatrix);
-
-			matrices.matrices[i] = viewProj;
-		}
-	}
-
-	ConstantBuffer* constantBuffer = createConstantBuffer(sizeof(Matrices), false, &matrices, false);
-
-	release(constantBuffer);
-
-	ID3D12PipelineState* pipelineState = nullptr;
-
-	switch (resFormat)
-	{
-	case DXGI_FORMAT_R8G8B8A8_UNORM:
-		pipelineState = PipelineState::get()->equirectangularR8State.Get();
-		break;
-	case DXGI_FORMAT_R16G16B16A16_FLOAT:
-		pipelineState = PipelineState::get()->equirectangularR16State.Get();
-		break;
-	}
-
-	context->setPipelineState(pipelineState);
-	context->setViewport(texturecubeResolution, texturecubeResolution);
-	context->setScissorRect(0, 0, texturecubeResolution, texturecubeResolution);
-	context->setTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-	context->setRenderTargets({ cubemap->getRTVMipHandle(0) }, {});
-	context->setVSConstantBuffer(constantBuffer);
-	context->setPSConstants({ equirectangularMap->getAllSRVIndex() }, 0);
-	context->transitionResources();
-
-	context->draw(36, 6, 0, 0);
+	LatLongMapToCubeMapEffect::get()->process(context, equirectangularMap, cubemap);
 
 	bool stateTracking = true;
 

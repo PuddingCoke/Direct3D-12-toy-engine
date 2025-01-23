@@ -41,9 +41,9 @@ protected:
 
 	virtual void recordCommand() = 0;
 
-	GraphicsContext* const context;
-
 	ResourceManager* const resManager;
+
+	GraphicsContext* const context;
 
 private:
 
@@ -61,9 +61,11 @@ private:
 
 };
 
-template <typename RenderTaskType, typename First, typename... Rest>
+template <typename First, typename... Rest>
 std::future<void> createRenderTaskAsync(const First& first, const Rest&... args)
 {
+	using RenderTaskType = std::remove_pointer_t<std::remove_pointer_t<First>>;
+
 	return std::async(std::launch::async, [=]()
 		{
 			*first = new RenderTaskType(args...);

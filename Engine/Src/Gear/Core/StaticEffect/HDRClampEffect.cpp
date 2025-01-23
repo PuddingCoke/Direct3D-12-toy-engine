@@ -9,27 +9,17 @@ HDRClampEffect* HDRClampEffect::get()
 
 void HDRClampEffect::process(GraphicsContext* const context, TextureRenderView* const inOutTexture)
 {
-	context->setPipelineState(hdrClampState.Get());
-
-	context->setCSConstants({ inOutTexture->getUAVMipIndex(0) }, 0);
-
-	context->transitionResources();
-
-	context->dispatch(inOutTexture->getTexture()->getWidth() / 16 + 1, inOutTexture->getTexture()->getHeight() / 16 + 1, 1);
-
-	context->uavBarrier({ inOutTexture->getTexture() });
-}
-
-void HDRClampEffect::initialize()
-{
-	instance = new HDRClampEffect();
-}
-
-void HDRClampEffect::release()
-{
-	if (instance)
+	if (inOutTexture->getTexture()->getFormat() == DXGI_FORMAT_R16G16B16A16_FLOAT)
 	{
-		delete instance;
+		context->setPipelineState(hdrClampState.Get());
+
+		context->setCSConstants({ inOutTexture->getUAVMipIndex(0) }, 0);
+
+		context->transitionResources();
+
+		context->dispatch(inOutTexture->getTexture()->getWidth() / 16 + 1, inOutTexture->getTexture()->getHeight() / 16 + 1, 1);
+
+		context->uavBarrier({ inOutTexture->getTexture() });
 	}
 }
 

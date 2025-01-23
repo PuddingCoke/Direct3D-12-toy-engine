@@ -372,6 +372,10 @@ void RenderEngine::initializeResources()
 
 	//wait little seconds here
 	waitForPreviousFrame();
+
+	//the creation of static resources like constant buffers and read-only textures will create uploadheap
+	//so we need to release transient resources here
+	StaticResourceManager::get()->cleanTransientResources();
 }
 
 void RenderEngine::toggleImGuiSurface()
@@ -579,12 +583,17 @@ RenderEngine::RenderEngine(const uint32_t width, const uint32_t height, const HW
 
 	CHECKERROR(CoInitializeEx(0, COINIT_MULTITHREADED));
 
-	StaticEffect::initializeStaticEffects();
+	StaticResourceManager::instance = new StaticResourceManager();
+
+	submitCommandList(StaticResourceManager::get()->commandList);
 }
 
 RenderEngine::~RenderEngine()
 {
-	StaticEffect::releaseStaticEffects();
+	if (StaticResourceManager::instance)
+	{
+		delete StaticResourceManager::instance;
+	}
 
 	CoUninitialize();
 
