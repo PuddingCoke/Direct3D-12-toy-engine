@@ -16,10 +16,6 @@ class PipelineState
 {
 public:
 
-	ComPtr<ID3D12PipelineState> equirectangularR8State;
-
-	ComPtr<ID3D12PipelineState> equirectangularR16State;
-
 	//simply draw texture to backbuffer
 	ComPtr<ID3D12PipelineState> fullScreenBlitState;
 

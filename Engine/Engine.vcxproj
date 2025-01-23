@@ -147,7 +147,8 @@
     <ClInclude Include="Inc\Gear\Core\Raytracing\TopLevelAS.h" />
     <ClInclude Include="Inc\Gear\Core\RenderTask.h" />
     <ClInclude Include="Inc\Gear\Core\StaticEffect\HDRClampEffect.h" />
-    <ClInclude Include="Inc\Gear\Core\StaticEffect\StaticEffect.h" />
+    <ClInclude Include="Inc\Gear\Core\StaticEffect\LatLongMapToCubeMapEffect.h" />
+    <ClInclude Include="Inc\Gear\Core\StaticResourceManager.h" />
     <ClInclude Include="Inc\Gear\Utils\DeltaTimeEstimator.h" />
     <ClInclude Include="Inc\Gear\Core\Resource\BufferView.h" />
     <ClInclude Include="Inc\Gear\Core\Resource\CounterBufferView.h" />
@@ -209,7 +210,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Inc\DDSTextureLoader\DDSTextureLoader12.cpp" />
-    <ClCompile Include="Src\Gear\Core\StaticEffect\StaticEffect.cpp" />
+    <ClCompile Include="Src\Gear\Core\StaticEffect\LatLongMapToCubeMapEffect.cpp" />
     <ClCompile Include="Inc\ImGUI\imgui.cpp" />
     <ClCompile Include="Inc\ImGUI\imgui_demo.cpp" />
     <ClCompile Include="Inc\ImGUI\imgui_draw.cpp" />
@@ -227,6 +228,7 @@
     <ClCompile Include="Src\Gear\Core\Raytracing\TopLevelAS.cpp" />
     <ClCompile Include="Src\Gear\Core\RenderTask.cpp" />
     <ClCompile Include="Src\Gear\Core\StaticEffect\HDRClampEffect.cpp" />
+    <ClCompile Include="Src\Gear\Core\StaticResourceManager.cpp" />
     <ClCompile Include="Src\Gear\Utils\DeltaTimeEstimator.cpp" />
     <ClCompile Include="Src\Gear\Core\DescriptorHeap.cpp" />
     <ClCompile Include="Src\Gear\Core\DX\ReadbackHeap.cpp" />

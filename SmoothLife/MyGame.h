@@ -10,7 +10,7 @@ public:
 
 	MyGame()
 	{
-		pushCreateFuture(createRenderTaskAsync<MyRenderTask>(&renderTask));
+		pushCreateFuture(createRenderTaskAsync(&renderTask));
 
 		scheduleAllTasks();
 	}

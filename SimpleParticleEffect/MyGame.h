@@ -15,7 +15,7 @@ public:
 	{
 		Camera::setProj(Math::pi / 4.f, Graphics::getAspectRatio(), 0.01f, 512.f);
 
-		pushCreateFuture(createRenderTaskAsync<MyRenderTask>(&renderTask));
+		pushCreateFuture(createRenderTaskAsync(&renderTask));
 
 		scheduleAllTasks();
 	}

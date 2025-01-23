@@ -324,7 +324,10 @@
     <ClInclude Include="Inc\Gear\Core\StaticEffect\HDRClampEffect.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="Inc\Gear\Core\StaticEffect\StaticEffect.h">
+    <ClInclude Include="Inc\Gear\Core\StaticEffect\LatLongMapToCubeMapEffect.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Gear\Core\StaticResourceManager.h">
       <Filter>Header</Filter>
     </ClInclude>
   </ItemGroup>
@@ -521,7 +524,10 @@
     <ClCompile Include="Src\Gear\Core\StaticEffect\HDRClampEffect.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Core\StaticEffect\StaticEffect.cpp">
+    <ClCompile Include="Src\Gear\Core\StaticEffect\LatLongMapToCubeMapEffect.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gear\Core\StaticResourceManager.cpp">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>

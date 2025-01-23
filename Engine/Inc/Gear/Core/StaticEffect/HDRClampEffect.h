@@ -25,13 +25,9 @@ public:
 
 private:
 
-	friend class StaticEffect;
+	friend class StaticResourceManager;
 
 	static HDRClampEffect* instance;
-
-	static void initialize();
-
-	static void release();
 
 	HDRClampEffect();
 

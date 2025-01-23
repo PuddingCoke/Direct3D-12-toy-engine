@@ -1,8 +1,8 @@
 ﻿#include<Gear/Core/RenderTask.h>
 
 RenderTask::RenderTask() :
-	context(new GraphicsContext()),
-	resManager(new ResourceManager(context)),
+	resManager(new ResourceManager()),
+	context(resManager->getGraphicsContext()),
 	taskCompleted(true),
 	isRunning(true),
 	workerThread(std::thread(&RenderTask::workerLoop, this))
@@ -19,11 +19,6 @@ RenderTask::~RenderTask()
 	if (workerThread.joinable())
 	{
 		workerThread.join();
-	}
-
-	if (context)
-	{
-		delete context;
 	}
 
 	if (resManager)
