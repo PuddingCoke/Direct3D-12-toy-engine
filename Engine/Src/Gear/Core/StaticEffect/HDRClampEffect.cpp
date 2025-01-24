@@ -1,5 +1,7 @@
 ﻿#include<Gear/Core/StaticEffect/HDRClampEffect.h>
 
+#include<Gear/CompiledShaders/HDRClampCS.h>
+
 HDRClampEffect* HDRClampEffect::instance = nullptr;
 
 HDRClampEffect* HDRClampEffect::get()
@@ -28,6 +30,8 @@ HDRClampEffect::HDRClampEffect()
 	hdrClampShader = new Shader(g_HDRClampCSBytes, sizeof(g_HDRClampCSBytes));
 
 	PipelineState::createComputeState(&hdrClampState, hdrClampShader);
+
+	LOGSUCCESS("create", Logger::brightMagenta, "HDRClampEffect", Logger::resetColor(), "succeeded");
 }
 
 HDRClampEffect::~HDRClampEffect()

@@ -1,5 +1,7 @@
 ﻿#include<Gear/Core/RenderTask.h>
 
+#include<Gear/Core/StaticEffect/BackBufferBlitEffect.h>
+
 RenderTask::RenderTask() :
 	resManager(new ResourceManager()),
 	context(resManager->getGraphicsContext()),
@@ -55,19 +57,7 @@ void RenderTask::imGUICall()
 
 void RenderTask::blit(TextureRenderView* const texture) const
 {
-	context->setPipelineState(PipelineState::get()->fullScreenBlitState.Get());
-
-	context->setDefRenderTarget();
-
-	context->setViewportSimple(Graphics::getWidth(), Graphics::getHeight());
-
-	context->setTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-	context->setPSConstants({ texture->getAllSRVIndex() }, 0);
-
-	context->transitionResources();
-
-	context->draw(3, 1, 0, 0);
+	BackBufferBlitEffect::get()->process(context, texture);
 }
 
 void RenderTask::workerLoop()

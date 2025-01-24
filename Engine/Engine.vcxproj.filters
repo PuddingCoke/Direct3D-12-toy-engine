@@ -330,6 +330,9 @@
     <ClInclude Include="Inc\Gear\Core\StaticResourceManager.h">
       <Filter>Header</Filter>
     </ClInclude>
+    <ClInclude Include="Inc\Gear\Core\StaticEffect\BackBufferBlitEffect.h">
+      <Filter>Header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Gear\Configuration.cpp">
@@ -528,6 +531,9 @@
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="Src\Gear\Core\StaticResourceManager.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gear\Core\StaticEffect\BackBufferBlitEffect.cpp">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>

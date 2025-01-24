@@ -11,8 +11,6 @@
 
 #include<Gear/Core/Resource/TextureRenderView.h>
 
-#include<Gear/CompiledShaders/HDRClampCS.h>
-
 //it seems OpenEXR api won't handle nan or nif case when cast float to half
 //this effect require a compute texture input and then reset its nan and inf texels
 class HDRClampEffect

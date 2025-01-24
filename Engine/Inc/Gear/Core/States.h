@@ -3,7 +3,7 @@
 #ifndef _STATES_H_
 #define _STATES_H_
 
-#include<Gear/Core/GraphicsDevice.h>
+#include<d3d12.h>
 
 class States
 {

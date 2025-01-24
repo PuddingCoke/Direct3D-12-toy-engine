@@ -5,10 +5,6 @@
 
 #include<Gear/Core/ResourceManager.h>
 
-#include<Gear/Core/StaticEffect/HDRClampEffect.h>
-
-#include<Gear/Core/StaticEffect/LatLongMapToCubeMapEffect.h>
-
 class StaticResourceManager :public ResourceManager
 {
 private:

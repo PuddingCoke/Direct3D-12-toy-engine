@@ -7,10 +7,6 @@
 
 #include<Gear/Utils/Utils.h>
 
-#include<Gear/CompiledShaders/FullScreenVS.h>
-#include<Gear/CompiledShaders/FullScreenPS.h>
-#include<Gear/CompiledShaders/TextureCubeVS.h>
-
 #include<dxccompiler/dxcapi.h>
 
 #undef DOMAIN
