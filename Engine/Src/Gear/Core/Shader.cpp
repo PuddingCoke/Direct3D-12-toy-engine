@@ -1,5 +1,11 @@
 ﻿#include<Gear/Core/Shader.h>
 
+#include<Gear/CompiledShaders/FullScreenVS.h>
+
+#include<Gear/CompiledShaders/FullScreenPS.h>
+
+#include<Gear/CompiledShaders/TextureCubeVS.h>
+
 Shader* Shader::fullScreenVS = nullptr;
 
 Shader* Shader::fullScreenPS = nullptr;

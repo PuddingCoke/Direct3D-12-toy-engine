@@ -14,7 +14,6 @@
 #include<Gear/Core/Camera.h>
 #include<Gear/Core/Shader.h>
 #include<Gear/Core/States.h>
-#include<Gear/Core/PipelineState.h>
 #include<Gear/Core/StaticResourceManager.h>
 
 enum class GPUVendor

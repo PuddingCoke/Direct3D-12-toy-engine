@@ -146,6 +146,7 @@
     <ClInclude Include="Inc\Gear\Core\Raytracing\BottomLevelAS.h" />
     <ClInclude Include="Inc\Gear\Core\Raytracing\TopLevelAS.h" />
     <ClInclude Include="Inc\Gear\Core\RenderTask.h" />
+    <ClInclude Include="Inc\Gear\Core\StaticEffect\BackBufferBlitEffect.h" />
     <ClInclude Include="Inc\Gear\Core\StaticEffect\HDRClampEffect.h" />
     <ClInclude Include="Inc\Gear\Core\StaticEffect\LatLongMapToCubeMapEffect.h" />
     <ClInclude Include="Inc\Gear\Core\StaticResourceManager.h" />
@@ -210,6 +211,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Inc\DDSTextureLoader\DDSTextureLoader12.cpp" />
+    <ClCompile Include="Src\Gear\Core\StaticEffect\BackBufferBlitEffect.cpp" />
     <ClCompile Include="Src\Gear\Core\StaticEffect\LatLongMapToCubeMapEffect.cpp" />
     <ClCompile Include="Inc\ImGUI\imgui.cpp" />
     <ClCompile Include="Inc\ImGUI\imgui_demo.cpp" />

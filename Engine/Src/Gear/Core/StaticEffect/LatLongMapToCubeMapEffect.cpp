@@ -1,5 +1,9 @@
 ﻿#include<Gear/Core/StaticEffect/LatLongMapToCubeMapEffect.h>
 
+#include<Gear/CompiledShaders/EquirectangularVS.h>
+
+#include<Gear/CompiledShaders/EquirectangularPS.h>
+
 LatLongMapToCubeMapEffect* LatLongMapToCubeMapEffect::instance = nullptr;
 
 LatLongMapToCubeMapEffect* LatLongMapToCubeMapEffect::get()
@@ -9,29 +13,29 @@ LatLongMapToCubeMapEffect* LatLongMapToCubeMapEffect::get()
 
 void LatLongMapToCubeMapEffect::process(GraphicsContext* const context, TextureRenderView* const inputTexture, TextureRenderView* const outputTexture)
 {
-	ID3D12PipelineState* pipelineState = nullptr;
-
 	switch (outputTexture->getTexture()->getFormat())
 	{
 	case DXGI_FORMAT_R8G8B8A8_UNORM:
-		pipelineState = equirectangularR8State.Get();
+		context->setPipelineState(equirectangularR8State.Get());
 		break;
 	case DXGI_FORMAT_R16G16B16A16_FLOAT:
-		pipelineState = equirectangularR16State.Get();
+		context->setPipelineState(equirectangularR16State.Get());
 		break;
 	case DXGI_FORMAT_R32G32B32A32_FLOAT:
-		pipelineState = equirectangularR32State.Get();
+		context->setPipelineState(equirectangularR32State.Get());
 		break;
 	}
 
-	context->setPipelineState(pipelineState);
-	context->setViewport(outputTexture->getTexture()->getWidth(), outputTexture->getTexture()->getHeight());
-	context->setScissorRect(0, 0, outputTexture->getTexture()->getWidth(), outputTexture->getTexture()->getHeight());
+	context->setViewportSimple(outputTexture->getTexture()->getWidth(), outputTexture->getTexture()->getHeight());
+
 	context->setTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	context->setRenderTargets({ outputTexture->getRTVMipHandle(0) }, {});
+
 	context->setVSConstantBuffer(matricesBuffer);
+
 	context->setPSConstants({ inputTexture->getAllSRVIndex() }, 0);
+
 	context->transitionResources();
 
 	context->draw(36, 6, 0, 0);
@@ -108,6 +112,8 @@ LatLongMapToCubeMapEffect::LatLongMapToCubeMapEffect(ResourceManager* const resM
 
 		matricesBuffer = resManager->createConstantBuffer(sizeof(Matrices), false, &matrices, false);
 	}
+
+	LOGSUCCESS("create", Logger::brightMagenta, "LatLongMapToCubeMapEffect", Logger::resetColor(), "succeeded");
 }
 
 LatLongMapToCubeMapEffect::~LatLongMapToCubeMapEffect()

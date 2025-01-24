@@ -495,8 +495,6 @@ RenderEngine::RenderEngine(const uint32_t width, const uint32_t height, const HW
 
 	ConstantBufferManager::instance = new ConstantBufferManager();
 
-	PipelineState::instance = new PipelineState();
-
 	{
 		DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
 		swapChainDesc.BufferCount = useSwapChainBuffer ? Graphics::getFrameBufferCount() : 2;
@@ -622,11 +620,6 @@ RenderEngine::~RenderEngine()
 	if (ConstantBufferManager::instance)
 	{
 		delete ConstantBufferManager::instance;
-	}
-
-	if (PipelineState::instance)
-	{
-		delete PipelineState::instance;
 	}
 
 	Shader::releaseGlobalShaders();

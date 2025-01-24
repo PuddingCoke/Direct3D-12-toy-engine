@@ -8,18 +8,10 @@
 #include<Gear/Core/Graphics.h>
 #include<Gear/Core/GlobalRootSignature.h>
 
-#include<Gear/CompiledShaders/EquirectangularVS.h>
-#include<Gear/CompiledShaders/EquirectangularPS.h>
-
 //defined some useful state
 class PipelineState
 {
 public:
-
-	//simply draw texture to backbuffer
-	ComPtr<ID3D12PipelineState> fullScreenBlitState;
-
-	static PipelineState* get();
 
 	//configure
 	//InputLayout
@@ -39,16 +31,6 @@ public:
 	static D3D12_GRAPHICS_PIPELINE_STATE_DESC getDefaultFullScreenState();
 
 	static void createComputeState(ID3D12PipelineState** pipelineState, const Shader* const shader);
-
-private:
-
-	friend class RenderEngine;
-
-	PipelineState();
-
-	~PipelineState();
-
-	static PipelineState* instance;
 
 };
 
