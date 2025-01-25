@@ -1,5 +1,13 @@
 ﻿#include<Gear/Utils/Utils.h>
 
+#include<fstream>
+
+#include<sstream>
+
+#include<algorithm>
+
+#include<vector>
+
 std::wstring Utils::exeRootPath;
 
 std::wstring Utils::File::backslashToSlash(const std::wstring& filePath)

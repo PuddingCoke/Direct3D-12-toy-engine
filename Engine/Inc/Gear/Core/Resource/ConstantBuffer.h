@@ -3,7 +3,7 @@
 #ifndef _CONSTANTBUFFER_H_
 #define _CONSTANTBUFFER_H_
 
-#include<Gear/Core/ConstantBufferManager.h>
+#include<Gear/Core/DX/Buffer.h>
 
 #include"EngineResource.h"
 

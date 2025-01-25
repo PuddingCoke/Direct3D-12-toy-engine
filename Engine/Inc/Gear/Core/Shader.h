@@ -5,8 +5,6 @@
 
 #include<Gear/Core/GraphicsDevice.h>
 
-#include<Gear/Utils/Utils.h>
-
 #include<dxccompiler/dxcapi.h>
 
 #undef DOMAIN

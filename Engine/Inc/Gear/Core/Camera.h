@@ -3,7 +3,7 @@
 #ifndef _CAMERA_H_
 #define _CAMERA_H_
 
-#include<DirectXMath.h>
+#include<Gear/Utils/Math.h>
 
 class Camera
 {

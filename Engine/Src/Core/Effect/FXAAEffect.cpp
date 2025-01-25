@@ -1,5 +1,9 @@
 ﻿#include<Gear/Core/Effect/FXAAEffect.h>
 
+#include<Gear/CompiledShaders/ColorToColorLuma.h>
+
+#include<Gear/CompiledShaders/FXAA.h>
+
 FXAAEffect::FXAAEffect(GraphicsContext* const context, const uint32_t width, const uint32_t height) :
 	Effect(context, width, height, DXGI_FORMAT_R8G8B8A8_UNORM), fxaaParam{ 1.0f,0.75f,0.166f,0.0633f },
 	colorLumaTexture(ResourceManager::createTextureRenderView(width, height, DXGI_FORMAT_R8G8B8A8_UNORM, 1, 1, false, true,
@@ -39,7 +43,7 @@ TextureRenderView* FXAAEffect::process(TextureRenderView* const inputTexture) co
 {
 	context->setPipelineState(colorToColorLumaState.Get());
 
-	context->setViewportSimple(Graphics::getWidth(), Graphics::getHeight());
+	context->setViewportSimple(width, height);
 
 	context->setTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
@@ -53,7 +57,7 @@ TextureRenderView* FXAAEffect::process(TextureRenderView* const inputTexture) co
 
 	context->setPipelineState(fxaaState.Get());
 
-	context->setViewportSimple(Graphics::getWidth(), Graphics::getHeight());
+	context->setViewportSimple(width, height);
 
 	context->setTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 

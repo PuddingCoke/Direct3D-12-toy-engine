@@ -5,9 +5,6 @@
 
 #include"Effect.h"
 
-#include<Gear/CompiledShaders/ColorToColorLuma.h>
-#include<Gear/CompiledShaders/FXAA.h>
-
 class FXAAEffect :public Effect
 {
 public:

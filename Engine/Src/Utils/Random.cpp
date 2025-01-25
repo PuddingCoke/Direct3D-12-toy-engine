@@ -1,5 +1,9 @@
 ﻿#include<Gear/Utils/Random.h>
 
+#include<cstdlib>
+
+#include<ctime>
+
 std::mt19937 Random::randomEngine = std::mt19937(static_cast<uint32_t>(time(nullptr)));
 
 std::normal_distribution<float> Random::normalDistribution = std::normal_distribution<float>(0.f, 1.f);

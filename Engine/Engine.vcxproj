@@ -169,6 +169,7 @@
     <ClInclude Include="Inc\Gear\Core\StaticEffect\BackBufferBlitEffect.h" />
     <ClInclude Include="Inc\Gear\Core\StaticEffect\HDRClampEffect.h" />
     <ClInclude Include="Inc\Gear\Core\StaticEffect\LatLongMapToCubeMapEffect.h" />
+    <ClInclude Include="Inc\Gear\Core\StaticEffect\StaticEffectHeader.h" />
     <ClInclude Include="Inc\Gear\Core\StaticResourceManager.h" />
     <ClInclude Include="Inc\Gear\Utils\DeltaTimeEstimator.h" />
     <ClInclude Include="Inc\Gear\Core\Resource\BufferView.h" />

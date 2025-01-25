@@ -4,11 +4,12 @@
 #define _LOGGER_H_
 
 #include<iostream>
+
 #include<fstream>
+
 #include<string>
+
 #include<regex>
-#include<iomanip>
-#include<Windows.h>
 
 /// <summary>
 /// a simple logger that output text with colors depend on different situations

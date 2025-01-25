@@ -3,17 +3,21 @@
 #ifndef _COMMANDLIST_H_
 #define _COMMANDLIST_H_
 
-#include<unordered_set>
-
 #include<Gear/Core/CommandAllocator.h>
-#include<Gear/Core/Graphics.h>
+
 #include<Gear/Core/DescriptorHeap.h>
+
 #include<Gear/Core/RootSignature.h>
 
 #include<Gear/Core/DX/Buffer.h>
+
 #include<Gear/Core/DX/Texture.h>
+
 #include<Gear/Core/DX/UploadHeap.h>
+
 #include<Gear/Core/DX/ReadbackHeap.h>
+
+#include<unordered_set>
 
 template<typename T>
 using IsCorrectType = std::enable_if_t<

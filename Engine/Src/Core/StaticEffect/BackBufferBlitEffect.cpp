@@ -4,6 +4,8 @@
 
 #include<Gear/Core/States.h>
 
+#include<Gear/Core/Graphics.h>
+
 BackBufferBlitEffect* BackBufferBlitEffect::instance = nullptr;
 
 BackBufferBlitEffect* BackBufferBlitEffect::get()

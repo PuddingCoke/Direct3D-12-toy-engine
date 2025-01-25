@@ -3,9 +3,13 @@
 #ifndef _EFFECT_H_
 #define _EFFECT_H_
 
-#include<Gear/Core/GraphicsContext.h>
-
 #include<Gear/Core/ResourceManager.h>
+
+#include<Gear/Core/Shader.h>
+
+#include<Gear/Core/PipelineState.h>
+
+#include<Gear/Core/States.h>
 
 #include<ImGUI/imgui.h>
 

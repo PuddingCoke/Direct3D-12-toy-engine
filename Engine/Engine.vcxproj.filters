@@ -399,6 +399,9 @@
     <ClInclude Include="Inc\D3D12Headers\dxgiformat.h">
       <Filter>Header</Filter>
     </ClInclude>
+    <ClInclude Include="Inc\Gear\Core\StaticEffect\StaticEffectHeader.h">
+      <Filter>Header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Configuration.cpp">

@@ -1,5 +1,21 @@
 ﻿#include<Gear/Core/Gear2D/PrimitiveBatch.h>
 
+#include<Gear/Core/States.h>
+
+#include<Gear/Core/PipelineState.h>
+
+#include<Gear/CompiledShaders/PrimitiveBatchLineVS.h>
+
+#include<Gear/CompiledShaders/PrimitiveBatchCircleVS.h>
+
+#include<Gear/CompiledShaders/PrimitiveBatchRCLineVS.h>
+
+#include<Gear/CompiledShaders/PrimitiveBatchRCLineGS.h>
+
+#include<Gear/CompiledShaders/PrimitiveBatchLineGS.h>
+
+#include<Gear/CompiledShaders/PrimitiveBatchPS.h>
+
 PrimitiveBatch::PrimitiveBatch(const DXGI_FORMAT format, GraphicsContext* const context) :
 	context(context), lineWidth(1.f)
 {
@@ -22,9 +38,8 @@ PrimitiveBatch::PrimitiveBatch(const DXGI_FORMAT format, GraphicsContext* const 
 			{"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 8, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
 		};
 
-		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = {};
+		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = PipelineState::getDefaultGraphicsDesc();
 		desc.InputLayout = { layout,_countof(layout) };
-		desc.pRootSignature = GlobalRootSignature::getGraphicsRootSignature()->get();
 		desc.VS = lineVS->getByteCode();
 		desc.GS = lineGS->getByteCode();
 		desc.PS = primitivePS->getByteCode();
@@ -32,11 +47,9 @@ PrimitiveBatch::PrimitiveBatch(const DXGI_FORMAT format, GraphicsContext* const 
 		desc.BlendState = States::defBlendDesc;
 		desc.DepthStencilState.DepthEnable = FALSE;
 		desc.DepthStencilState.StencilEnable = FALSE;
-		desc.SampleMask = UINT_MAX;
 		desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE;
 		desc.NumRenderTargets = 1;
 		desc.RTVFormats[0] = format;
-		desc.SampleDesc.Count = 1;
 
 		GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&lineState));
 	}
@@ -49,9 +62,8 @@ PrimitiveBatch::PrimitiveBatch(const DXGI_FORMAT format, GraphicsContext* const 
 			{"COLOR",0,DXGI_FORMAT_R32G32B32A32_FLOAT,0,12,D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA,1}
 		};
 
-		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = {};
+		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = PipelineState::getDefaultGraphicsDesc();
 		desc.InputLayout = { layout,_countof(layout) };
-		desc.pRootSignature = GlobalRootSignature::getGraphicsRootSignature()->get();
 		desc.VS = circleVS->getByteCode();
 		desc.GS = lineGS->getByteCode();
 		desc.PS = primitivePS->getByteCode();
@@ -59,11 +71,9 @@ PrimitiveBatch::PrimitiveBatch(const DXGI_FORMAT format, GraphicsContext* const 
 		desc.BlendState = States::defBlendDesc;
 		desc.DepthStencilState.DepthEnable = FALSE;
 		desc.DepthStencilState.StencilEnable = FALSE;
-		desc.SampleMask = UINT_MAX;
 		desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE;
 		desc.NumRenderTargets = 1;
 		desc.RTVFormats[0] = format;
-		desc.SampleDesc.Count = 1;
 
 		GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&circleState));
 	}
@@ -76,9 +86,8 @@ PrimitiveBatch::PrimitiveBatch(const DXGI_FORMAT format, GraphicsContext* const 
 			{"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
 		};
 
-		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = {};
+		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = PipelineState::getDefaultGraphicsDesc();
 		desc.InputLayout = { layout,_countof(layout) };
-		desc.pRootSignature = GlobalRootSignature::getGraphicsRootSignature()->get();
 		desc.VS = rcLineVS->getByteCode();
 		desc.GS = rcLineGS->getByteCode();
 		desc.PS = primitivePS->getByteCode();
@@ -86,11 +95,9 @@ PrimitiveBatch::PrimitiveBatch(const DXGI_FORMAT format, GraphicsContext* const 
 		desc.BlendState = States::defBlendDesc;
 		desc.DepthStencilState.DepthEnable = FALSE;
 		desc.DepthStencilState.StencilEnable = FALSE;
-		desc.SampleMask = UINT_MAX;
 		desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE;
 		desc.NumRenderTargets = 1;
 		desc.RTVFormats[0] = format;
-		desc.SampleDesc.Count = 1;
 
 		GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&roundCapLineState));
 	}

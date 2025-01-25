@@ -3,18 +3,15 @@
 #ifndef _RENDERENGINE_H_
 #define _RENDERENGINE_H_
 
-#include<ImGUI/imgui.h>
-#include<ImGUI/imgui_impl_win32.h>
-#include<ImGUI/imgui_impl_dx12.h>
+#include<Gear/Core/CommandList.h>
 
-#include<Gear/Core/GraphicsContext.h>
-#include<Gear/Core/ResourceManager.h>
-#include<Gear/Core/ConstantBufferManager.h>
-#include<Gear/Core/Graphics.h>
 #include<Gear/Core/Camera.h>
-#include<Gear/Core/Shader.h>
-#include<Gear/Core/States.h>
-#include<Gear/Core/StaticResourceManager.h>
+
+#include<ImGUI/imgui.h>
+
+#include<ImGUI/imgui_impl_win32.h>
+
+#include<ImGUI/imgui_impl_dx12.h>
 
 enum class GPUVendor
 {

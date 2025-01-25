@@ -3,19 +3,9 @@
 #ifndef _PRIMITIVEBATCH_H_
 #define _PRIMITIVEBATCH_H_
 
-#include<Gear/Core/GraphicsContext.h>
 #include<Gear/Core/ResourceManager.h>
+
 #include<Gear/Core/Shader.h>
-#include<Gear/Core/States.h>
-
-#include<Gear/CompiledShaders/PrimitiveBatchLineVS.h>
-#include<Gear/CompiledShaders/PrimitiveBatchCircleVS.h>
-#include<Gear/CompiledShaders/PrimitiveBatchRCLineVS.h>
-
-#include<Gear/CompiledShaders/PrimitiveBatchRCLineGS.h>
-#include<Gear/CompiledShaders/PrimitiveBatchLineGS.h>
-
-#include<Gear/CompiledShaders/PrimitiveBatchPS.h>
 
 //due to limitations
 //create multiple instances for multiple render targets

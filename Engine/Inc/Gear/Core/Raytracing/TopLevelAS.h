@@ -3,7 +3,7 @@
 #ifndef _TOPLEVELAS_H_
 #define _TOPLEVELAS_H_
 
-#include<DirectXMath.h>
+#include<Gear/Utils/Math.h>
 
 #include<Gear/Core/Resource/EngineResource.h>
 
@@ -55,8 +55,6 @@ private:
 	UploadHeap* instanceBuffer;
 
 	uint32_t srvIndex;
-
-	const bool persistent;
 
 };
 

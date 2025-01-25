@@ -1,5 +1,7 @@
 ﻿#include<Gear/Core/GraphicsContext.h>
 
+#include<Gear/Core/GlobalRootSignature.h>
+
 ConstantBuffer* GraphicsContext::globalConstantBuffer = nullptr;
 
 GraphicsContext::GraphicsContext() :

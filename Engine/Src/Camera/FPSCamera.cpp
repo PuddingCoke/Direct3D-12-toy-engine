@@ -1,5 +1,11 @@
 ﻿#include<Gear/Camera/FPSCamera.h>
 
+#include<Gear/Core/Camera.h>
+
+#include<Gear/Input/Mouse.h>
+
+#include<Gear/Input/Keyboard.h>
+
 FPSCamera::FPSCamera(const DirectX::XMVECTOR& eye, const DirectX::XMVECTOR& lookDir, const DirectX::XMVECTOR& up, const float moveSpeed):
 	eye(eye), lookDir(lookDir), up(up), moveSpeed(moveSpeed)
 {

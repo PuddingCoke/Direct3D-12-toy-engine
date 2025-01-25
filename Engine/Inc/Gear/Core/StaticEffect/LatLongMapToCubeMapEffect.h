@@ -3,11 +3,7 @@
 #ifndef _LATLONGMAPTOCUBEMAPEFFECT_H_
 #define _LATLONGMAPTOCUBEMAPEFFECT_H_
 
-#include<Gear/Core/ResourceManager.h>
-
-#include<Gear/Core/Shader.h>
-
-#include<Gear/Core/PipelineState.h>
+#include"StaticEffectHeader.h"
 
 //this effect convert equirectangular map to cube map
 class LatLongMapToCubeMapEffect

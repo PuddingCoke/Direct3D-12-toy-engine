@@ -1,5 +1,19 @@
 ﻿#include<Gear/Core/Effect/BloomEffect.h>
 
+#include<Gear/Utils/Utils.h>
+
+#include<Gear/CompiledShaders/BloomFilterPS.h>
+
+#include<Gear/CompiledShaders/BloomFinalPS.h>
+
+#include<Gear/CompiledShaders/BloomVBlurCS.h>
+
+#include<Gear/CompiledShaders/BloomHBlurCS.h>
+
+#include<Gear/CompiledShaders/BloomDownSamplePS.h>
+
+#include<Gear/CompiledShaders/BloomKarisAveragePS.h>
+
 BloomEffect::BloomEffect(GraphicsContext* const context, const uint32_t width, const uint32_t height, ResourceManager* const resManager) :
 	Effect(context, width, height, DXGI_FORMAT_R16G16B16A16_FLOAT),
 	lensDirtTexture(resManager->createTextureRenderView(Utils::getRootFolder() + L"bloom_dirt_mask.png", true)),
@@ -48,18 +62,15 @@ BloomEffect::BloomEffect(GraphicsContext* const context, const uint32_t width, c
 	//PS BlendState
 	auto getDefaultPipelineState =
 		[] {
-		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = {};
+		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = PipelineState::getDefaultGraphicsDesc();
 		desc.InputLayout = {};
-		desc.pRootSignature = GlobalRootSignature::getGraphicsRootSignature()->get();
 		desc.VS = Shader::fullScreenVS->getByteCode();
 		desc.RasterizerState = States::rasterCullBack;
 		desc.DepthStencilState.DepthEnable = FALSE;
 		desc.DepthStencilState.StencilEnable = FALSE;
-		desc.SampleMask = UINT_MAX;
 		desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 		desc.NumRenderTargets = 1;
 		desc.RTVFormats[0] = DXGI_FORMAT_R16G16B16A16_FLOAT;
-		desc.SampleDesc.Count = 1;
 		return desc;
 		};
 
@@ -103,21 +114,9 @@ BloomEffect::BloomEffect(GraphicsContext* const context, const uint32_t width, c
 		GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&bloomFinalState));
 	}
 
-	{
-		D3D12_COMPUTE_PIPELINE_STATE_DESC desc = {};
-		desc.pRootSignature = GlobalRootSignature::getComputeRootSignature()->get();
-		desc.CS = bloomHBlur->getByteCode();
+	PipelineState::createComputeState(&bloomHBlurState, bloomHBlur);
 
-		GraphicsDevice::get()->CreateComputePipelineState(&desc, IID_PPV_ARGS(&bloomHBlurState));
-	}
-
-	{
-		D3D12_COMPUTE_PIPELINE_STATE_DESC desc = {};
-		desc.pRootSignature = GlobalRootSignature::getComputeRootSignature()->get();
-		desc.CS = bloomVBlur->getByteCode();
-
-		GraphicsDevice::get()->CreateComputePipelineState(&desc, IID_PPV_ARGS(&bloomVBlurState));
-	}
+	PipelineState::createComputeState(&bloomVBlurState, bloomVBlur);
 
 }
 

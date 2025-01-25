@@ -3,10 +3,7 @@
 #ifndef _PIPELINESTATE_H_
 #define _PIPELINESTATE_H_
 
-#include<Gear/Core/States.h>
 #include<Gear/Core/Shader.h>
-#include<Gear/Core/Graphics.h>
-#include<Gear/Core/GlobalRootSignature.h>
 
 //defined some useful state
 class PipelineState

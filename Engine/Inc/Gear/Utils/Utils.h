@@ -5,14 +5,11 @@
 
 #define NOMINMAX
 
-#include<string>
-#include<fstream>
-#include<sstream>
-#include<algorithm>
-#include<vector>
-#include<dxgiformat.h>
-
 #include"Logger.h"
+
+#include<string>
+
+#include<dxgiformat.h>
 
 class Utils
 {

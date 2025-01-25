@@ -1,5 +1,7 @@
 ﻿#include<Gear/Utils/DeltaTimeEstimator.h>
 
+#include<algorithm>
+
 DeltaTimeEstimator::DeltaTimeEstimator() :
 	historyDeltatime{}, sortedDeltaTime{}, historyDeltaTimeIndex(0), populated(false)
 {

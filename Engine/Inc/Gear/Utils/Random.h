@@ -4,8 +4,6 @@
 #define _RANDOM_H_
 
 #include<random>
-#include<cstdlib>
-#include<ctime>
 
 class Random
 {

@@ -3,22 +3,11 @@
 #ifndef _BLOOMEFFECT_H_
 #define _BLOOMEFFECT_H_
 
-#include"Effect.h"
-
-#include<Gear/CompiledShaders/BloomFilterPS.h>
-#include<Gear/CompiledShaders/BloomFinalPS.h>
-#include<Gear/CompiledShaders/BloomVBlurCS.h>
-#include<Gear/CompiledShaders/BloomHBlurCS.h>
-#include<Gear/CompiledShaders/BloomDownSamplePS.h>
-#include<Gear/CompiledShaders/BloomKarisAveragePS.h>
-
 #include<Gear/Core/Resource/SwapTexture.h>
 
-#include<Gear/Core/Shader.h>
-
-#include<Gear/Core/States.h>
-
 #include<Gear/Utils/Math.h>
+
+#include"Effect.h"
 
 class BloomEffect :public Effect
 {

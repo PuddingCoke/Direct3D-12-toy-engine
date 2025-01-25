@@ -1,5 +1,7 @@
 ﻿#include<Gear/Core/Shader.h>
 
+#include<Gear/Utils/Utils.h>
+
 #include<Gear/CompiledShaders/FullScreenVS.h>
 
 #include<Gear/CompiledShaders/FullScreenPS.h>

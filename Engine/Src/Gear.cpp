@@ -1,5 +1,13 @@
 ﻿#include<Gear/Gear.h>
 
+#include<Gear/Core/Graphics.h>
+
+#include<Gear/Core/VideoEncoder/NvidiaEncoder.h>
+
+#include<Gear/Utils/Logger.h>
+
+#include<dxgidebug.h>
+
 Gear* Gear::instance = nullptr;
 
 Gear* Gear::get()
