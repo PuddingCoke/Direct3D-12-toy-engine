@@ -279,7 +279,7 @@
     <ClInclude Include="Inc\Gear\Core\DescriptorHeap.h">
       <Filter>Header\Core</Filter>
     </ClInclude>
-    <ClInclude Include="Inc\DDSTextureLoader\DDSTextureLoader12.h">
+    <ClInclude Include="Inc\DirectXTex\DDSTextureLoader12.h">
       <Filter>Header\ExternalHeader\DDSTextureLoader</Filter>
     </ClInclude>
     <ClInclude Include="Inc\ImGUI\imconfig.h">
@@ -318,7 +318,7 @@
     <ClInclude Include="Inc\Gear\Utils\Logger.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="Inc\WICTextureLoader\WICTextureLoader12.h">
+    <ClInclude Include="Inc\DirectXTex\WICTextureLoader12.h">
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="Inc\Gear\Core\StaticEffect\HDRClampEffect.h">
@@ -333,162 +333,228 @@
     <ClInclude Include="Inc\Gear\Core\StaticEffect\BackBufferBlitEffect.h">
       <Filter>Header</Filter>
     </ClInclude>
+    <ClInclude Include="Inc\D3D12Headers\d3d12.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\D3D12Headers\d3d12compatibility.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\D3D12Headers\d3d12sdklayers.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\D3D12Headers\d3d12shader.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\D3D12Headers\D3D12TokenizedProgramFormat.hpp">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\D3D12Headers\d3d12video.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\D3D12Headers\d3dcommon.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\D3D12Headers\d3dx12.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\D3D12Headers\d3dx12_barriers.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\D3D12Headers\d3dx12_check_feature_support.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\D3D12Headers\d3dx12_core.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\D3D12Headers\d3dx12_default.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\D3D12Headers\d3dx12_pipeline_state_stream.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\D3D12Headers\d3dx12_property_format_table.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\D3D12Headers\d3dx12_render_pass.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\D3D12Headers\d3dx12_resource_helpers.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\D3D12Headers\d3dx12_root_signature.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\D3D12Headers\d3dx12_state_object.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\D3D12Headers\dxcore.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\D3D12Headers\dxcore_interface.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\D3D12Headers\dxgicommon.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\D3D12Headers\dxgiformat.h">
+      <Filter>Header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Src\Gear\Configuration.cpp">
+    <ClCompile Include="Src\Configuration.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Gear.cpp">
+    <ClCompile Include="Src\Gear.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Game.cpp">
+    <ClCompile Include="Src\Game.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Camera\FPSCamera.cpp">
+    <ClCompile Include="Src\Camera\FPSCamera.cpp">
       <Filter>Source\Camera</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Camera\OrbitCamera.cpp">
+    <ClCompile Include="Src\Camera\OrbitCamera.cpp">
       <Filter>Source\Camera</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Core\DX\Buffer.cpp">
+    <ClCompile Include="Src\Core\DX\Buffer.cpp">
       <Filter>Source\Core\DX</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Core\DX\ReadbackHeap.cpp">
+    <ClCompile Include="Src\Core\DX\ReadbackHeap.cpp">
       <Filter>Source\Core\DX</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Core\DX\Resource.cpp">
+    <ClCompile Include="Src\Core\DX\Resource.cpp">
       <Filter>Source\Core\DX</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Core\DX\Texture.cpp">
+    <ClCompile Include="Src\Core\DX\Texture.cpp">
       <Filter>Source\Core\DX</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Core\DX\UploadHeap.cpp">
+    <ClCompile Include="Src\Core\DX\UploadHeap.cpp">
       <Filter>Source\Core\DX</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Core\Effect\BloomEffect.cpp">
+    <ClCompile Include="Src\Core\Effect\BloomEffect.cpp">
       <Filter>Source\Core\Effect</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Core\Effect\Effect.cpp">
+    <ClCompile Include="Src\Core\Effect\Effect.cpp">
       <Filter>Source\Core\Effect</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Core\Effect\FXAAEffect.cpp">
+    <ClCompile Include="Src\Core\Effect\FXAAEffect.cpp">
       <Filter>Source\Core\Effect</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Core\Gear2D\PrimitiveBatch.cpp">
+    <ClCompile Include="Src\Core\Gear2D\PrimitiveBatch.cpp">
       <Filter>Source\Core\Gear2D</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Core\Raytracing\TopLevelAS.cpp">
+    <ClCompile Include="Src\Core\Raytracing\TopLevelAS.cpp">
       <Filter>Source\Core\Raytracing</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Core\Raytracing\BottomLevelAS.cpp">
+    <ClCompile Include="Src\Core\Raytracing\BottomLevelAS.cpp">
       <Filter>Source\Core\Raytracing</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Core\Resource\BufferView.cpp">
+    <ClCompile Include="Src\Core\Resource\BufferView.cpp">
       <Filter>Source\Core\Resource</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Core\Resource\ConstantBuffer.cpp">
+    <ClCompile Include="Src\Core\Resource\ConstantBuffer.cpp">
       <Filter>Source\Core\Resource</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Core\Resource\CounterBufferView.cpp">
+    <ClCompile Include="Src\Core\Resource\CounterBufferView.cpp">
       <Filter>Source\Core\Resource</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Core\Resource\EngineResource.cpp">
+    <ClCompile Include="Src\Core\Resource\EngineResource.cpp">
       <Filter>Source\Core\Resource</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Core\Resource\IndexConstantBuffer.cpp">
+    <ClCompile Include="Src\Core\Resource\IndexConstantBuffer.cpp">
       <Filter>Source\Core\Resource</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Core\Resource\SwapTexture.cpp">
+    <ClCompile Include="Src\Core\Resource\SwapTexture.cpp">
       <Filter>Source\Core\Resource</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Core\Resource\TextureDepthView.cpp">
+    <ClCompile Include="Src\Core\Resource\TextureDepthView.cpp">
       <Filter>Source\Core\Resource</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Core\Resource\TextureRenderView.cpp">
+    <ClCompile Include="Src\Core\Resource\TextureRenderView.cpp">
       <Filter>Source\Core\Resource</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Core\VideoEncoder\NvidiaEncoder.cpp">
+    <ClCompile Include="Src\Core\VideoEncoder\NvidiaEncoder.cpp">
       <Filter>Source\Core\VideoEncoder</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Input\Event.cpp">
+    <ClCompile Include="Src\Input\Event.cpp">
       <Filter>Source\Input</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Input\Mouse.cpp">
+    <ClCompile Include="Src\Input\Mouse.cpp">
       <Filter>Source\Input</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Input\Keyboard.cpp">
+    <ClCompile Include="Src\Input\Keyboard.cpp">
       <Filter>Source\Input</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Core\VideoEncoder\Encoder.cpp">
+    <ClCompile Include="Src\Core\VideoEncoder\Encoder.cpp">
       <Filter>Source\Core\VideoEncoder</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Utils\Color.cpp">
+    <ClCompile Include="Src\Utils\Color.cpp">
       <Filter>Source\Utils</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Utils\DeltaTimeEstimator.cpp">
+    <ClCompile Include="Src\Utils\DeltaTimeEstimator.cpp">
       <Filter>Source\Utils</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Utils\Math.cpp">
+    <ClCompile Include="Src\Utils\Math.cpp">
       <Filter>Source\Utils</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Utils\Random.cpp">
+    <ClCompile Include="Src\Utils\Random.cpp">
       <Filter>Source\Utils</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Utils\Timer.cpp">
+    <ClCompile Include="Src\Utils\Timer.cpp">
       <Filter>Source\Utils</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Utils\Utils.cpp">
+    <ClCompile Include="Src\Utils\Utils.cpp">
       <Filter>Source\Utils</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Window\Win32Form.cpp">
+    <ClCompile Include="Src\Window\Win32Form.cpp">
       <Filter>Source\Window</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Core\Camera.cpp">
+    <ClCompile Include="Src\Core\Camera.cpp">
       <Filter>Source\Core</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Core\CommandAllocator.cpp">
+    <ClCompile Include="Src\Core\CommandAllocator.cpp">
       <Filter>Source\Core</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Core\CommandList.cpp">
+    <ClCompile Include="Src\Core\CommandList.cpp">
       <Filter>Source\Core</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Core\DescriptorHeap.cpp">
+    <ClCompile Include="Src\Core\DescriptorHeap.cpp">
       <Filter>Source\Core</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Core\GlobalDescriptorHeap.cpp">
+    <ClCompile Include="Src\Core\GlobalDescriptorHeap.cpp">
       <Filter>Source\Core</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Core\GlobalRootSignature.cpp">
+    <ClCompile Include="Src\Core\GlobalRootSignature.cpp">
       <Filter>Source\Core</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Core\Graphics.cpp">
+    <ClCompile Include="Src\Core\Graphics.cpp">
       <Filter>Source\Core</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Core\GraphicsContext.cpp">
+    <ClCompile Include="Src\Core\GraphicsContext.cpp">
       <Filter>Source\Core</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Core\GraphicsDevice.cpp">
+    <ClCompile Include="Src\Core\GraphicsDevice.cpp">
       <Filter>Source\Core</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Core\PipelineState.cpp">
+    <ClCompile Include="Src\Core\PipelineState.cpp">
       <Filter>Source\Core</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Core\RenderEngine.cpp">
+    <ClCompile Include="Src\Core\RenderEngine.cpp">
       <Filter>Source\Core</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Core\ResourceManager.cpp">
+    <ClCompile Include="Src\Core\ResourceManager.cpp">
       <Filter>Source\Core</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Core\RootSignature.cpp">
+    <ClCompile Include="Src\Core\RootSignature.cpp">
       <Filter>Source\Core</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Core\Shader.cpp">
+    <ClCompile Include="Src\Core\Shader.cpp">
       <Filter>Source\Core</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Core\States.cpp">
+    <ClCompile Include="Src\Core\States.cpp">
       <Filter>Source\Core</Filter>
     </ClCompile>
-    <ClCompile Include="Inc\DDSTextureLoader\DDSTextureLoader12.cpp">
+    <ClCompile Include="Inc\DirectXTex\DDSTextureLoader12.cpp">
       <Filter>Source\ExternalSource\DDSTextureLoader</Filter>
     </ClCompile>
     <ClCompile Include="Inc\ImGUI\imgui.cpp">
@@ -512,28 +578,28 @@
     <ClCompile Include="Inc\ImGUI\imgui_widgets.cpp">
       <Filter>Source\ExternalSource\ImGUi</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Core\ConstantBufferManager.cpp">
+    <ClCompile Include="Src\Core\ConstantBufferManager.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Core\RenderTask.cpp">
+    <ClCompile Include="Src\Core\RenderTask.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Utils\Logger.cpp">
+    <ClCompile Include="Src\Utils\Logger.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="Inc\WICTextureLoader\WICTextureLoader12.cpp">
+    <ClCompile Include="Inc\DirectXTex\WICTextureLoader12.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Core\StaticEffect\HDRClampEffect.cpp">
+    <ClCompile Include="Src\Core\StaticEffect\HDRClampEffect.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Core\StaticEffect\LatLongMapToCubeMapEffect.cpp">
+    <ClCompile Include="Src\Core\StaticEffect\LatLongMapToCubeMapEffect.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Core\StaticResourceManager.cpp">
+    <ClCompile Include="Src\Core\StaticResourceManager.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Core\StaticEffect\BackBufferBlitEffect.cpp">
+    <ClCompile Include="Src\Core\StaticEffect\BackBufferBlitEffect.cpp">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>

@@ -3,8 +3,8 @@
 #ifndef _RESOURCEMANAGER_H_
 #define _RESOURCEMANAGER_H_
 
-#include<DDSTextureLoader/DDSTextureLoader12.h>
-#include<WICTextureLoader/WICTextureLoader12.h>
+#include<DirectXTex/DDSTextureLoader12.h>
+#include<DirectXTex/WICTextureLoader12.h>
 #include<DirectXTex/DirectXTexEXR.h>
 #include<DirectXTex/DirectXTex.h>
 
