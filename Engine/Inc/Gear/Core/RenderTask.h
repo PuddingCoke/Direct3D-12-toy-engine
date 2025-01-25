@@ -39,6 +39,10 @@ class RenderTask
 {
 public:
 
+	RenderTask(const RenderTask&) = delete;
+
+	void operator=(const RenderTask&) = delete;
+
 	RenderTask();
 
 	virtual ~RenderTask();

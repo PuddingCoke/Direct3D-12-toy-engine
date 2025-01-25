@@ -9,6 +9,8 @@ class Camera
 {
 public:
 
+	Camera() = delete;
+
 	Camera(const Camera&) = delete;
 
 	void operator=(const Camera&) = delete;

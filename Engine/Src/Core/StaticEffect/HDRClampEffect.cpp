@@ -25,10 +25,9 @@ void HDRClampEffect::process(GraphicsContext* const context, TextureRenderView* 
 	}
 }
 
-HDRClampEffect::HDRClampEffect()
+HDRClampEffect::HDRClampEffect() :
+	hdrClampShader(new Shader(g_HDRClampCSBytes, sizeof(g_HDRClampCSBytes)))
 {
-	hdrClampShader = new Shader(g_HDRClampCSBytes, sizeof(g_HDRClampCSBytes));
-
 	PipelineState::createComputeState(&hdrClampState, hdrClampShader);
 
 	LOGSUCCESS("create", Logger::brightMagenta, "HDRClampEffect", Logger::resetColor(), "succeeded");

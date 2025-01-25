@@ -10,6 +10,10 @@ class BackBufferBlitEffect
 {
 public:
 
+	BackBufferBlitEffect(const BackBufferBlitEffect&) = delete;
+
+	void operator=(const BackBufferBlitEffect&) = delete;
+
 	static BackBufferBlitEffect* get();
 
 	void process(GraphicsContext* const context, TextureRenderView* const inputTexture);

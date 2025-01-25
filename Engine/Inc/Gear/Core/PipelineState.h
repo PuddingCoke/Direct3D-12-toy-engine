@@ -10,6 +10,12 @@ class PipelineState
 {
 public:
 
+	PipelineState() = delete;
+
+	PipelineState(const PipelineState&) = delete;
+
+	void operator=(const PipelineState&) = delete;
+
 	//configure
 	//InputLayout
 	//BlendState

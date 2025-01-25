@@ -9,15 +9,17 @@ class UploadHeap :public Resource
 {
 public:
 
+	UploadHeap() = delete;
+
+	UploadHeap(const UploadHeap&) = delete;
+
+	void operator=(const UploadHeap&) = delete;
+
 	UploadHeap(const uint64_t size, const D3D12_HEAP_FLAGS flags = D3D12_HEAP_FLAG_NONE);
 
 	UploadHeap(UploadHeap&);
 
 	virtual ~UploadHeap();
-
-	void operator=(const UploadHeap&) = delete;
-
-	UploadHeap(const UploadHeap&) = delete;
 
 	void update(const void* const data, const uint64_t size) const;
 

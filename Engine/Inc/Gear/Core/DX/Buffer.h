@@ -20,15 +20,17 @@ class Buffer :public Resource
 {
 public:
 
+	Buffer() = delete;
+
+	Buffer(const Buffer&) = delete;
+
+	void operator=(const Buffer&) = delete;
+
 	Buffer(const uint64_t size, const bool stateTracking, const D3D12_RESOURCE_FLAGS resFlags, const uint32_t initialState = D3D12_RESOURCE_STATE_COPY_DEST);
 
 	Buffer(const ComPtr<ID3D12Resource>& buffer, const bool stateTracking, const uint32_t initialState);
 
 	Buffer(Buffer&);
-
-	Buffer(const Buffer&) = delete;
-
-	void operator=(const Buffer&) = delete;
 
 	virtual ~Buffer();
 

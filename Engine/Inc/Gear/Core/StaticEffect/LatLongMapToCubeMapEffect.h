@@ -10,6 +10,10 @@ class LatLongMapToCubeMapEffect
 {
 public:
 
+	LatLongMapToCubeMapEffect(const LatLongMapToCubeMapEffect&) = delete;
+
+	void operator=(const LatLongMapToCubeMapEffect&) = delete;
+
 	static LatLongMapToCubeMapEffect* get();
 
 	void process(GraphicsContext* const context, TextureRenderView* const inputTexture, TextureRenderView* const outputTexture);

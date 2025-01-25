@@ -13,6 +13,12 @@ class DescriptorHeap
 {
 public:
 
+	DescriptorHeap() = delete;
+
+	DescriptorHeap(const DescriptorHeap&) = delete;
+
+	void operator=(const DescriptorHeap&) = delete;
+
 	DescriptorHeap(const uint32_t numDescriptors, const uint32_t subRegionSize, const D3D12_DESCRIPTOR_HEAP_TYPE type, const D3D12_DESCRIPTOR_HEAP_FLAGS flags);
 
 	uint32_t getNumDescriptors() const;

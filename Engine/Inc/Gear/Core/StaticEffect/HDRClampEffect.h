@@ -11,6 +11,10 @@ class HDRClampEffect
 {
 public:
 
+	HDRClampEffect(const HDRClampEffect&) = delete;
+
+	void operator=(const HDRClampEffect&) = delete;
+
 	static HDRClampEffect* get();
 
 	void process(GraphicsContext* const context, TextureRenderView* const inOutTexture);
@@ -25,7 +29,7 @@ private:
 
 	~HDRClampEffect();
 
-	Shader* hdrClampShader;
+	Shader* const hdrClampShader;
 
 	ComPtr<ID3D12PipelineState> hdrClampState;
 

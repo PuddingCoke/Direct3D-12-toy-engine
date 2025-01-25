@@ -17,6 +17,8 @@ public:
 
 	virtual void imGUICall();
 
+	Game(const Game&) = delete;
+
 	void operator=(const Game&) = delete;
 
 	virtual void update(const float dt) = 0;

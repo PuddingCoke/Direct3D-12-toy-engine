@@ -109,7 +109,7 @@ Texture* ResourceManager::createTexture(const std::wstring& filePath, const D3D1
 {
 	Texture* texture = nullptr;
 
-	std::wstring fileExtension = Utils::File::getExtension(filePath);
+	const std::wstring fileExtension = Utils::File::getExtension(filePath);
 
 	if (isTextureCube)
 	{

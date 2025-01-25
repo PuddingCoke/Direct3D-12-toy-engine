@@ -17,6 +17,8 @@ class IndexConstantBuffer :public EngineResource
 {
 public:
 
+	IndexConstantBuffer() = delete;
+
 	IndexConstantBuffer(ConstantBuffer* const constantBuffer, const std::initializer_list<ShaderResourceDesc>& transitionDescs);
 
 	IndexConstantBuffer(ConstantBuffer* const constantBuffer);

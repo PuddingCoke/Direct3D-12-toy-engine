@@ -17,6 +17,8 @@ class TextureRenderView :public EngineResource
 {
 public:
 
+	TextureRenderView() = delete;
+
 	TextureRenderView(Texture* const texture, const bool isTextureCube, const bool persistent, const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat);
 
 	TextureRenderView(const TextureRenderView&);

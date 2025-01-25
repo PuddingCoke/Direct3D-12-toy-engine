@@ -9,6 +9,10 @@ class DeltaTimeEstimator
 {
 public:
 
+	DeltaTimeEstimator(const DeltaTimeEstimator&) = delete;
+
+	void operator=(const DeltaTimeEstimator&) = delete;
+
 	DeltaTimeEstimator();
 
 	~DeltaTimeEstimator();

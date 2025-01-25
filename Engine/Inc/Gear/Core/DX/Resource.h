@@ -117,9 +117,11 @@ class Resource
 {
 public:
 
-	ID3D12Resource* getResource() const;
+	Resource() = delete;
 
-	virtual ~Resource();
+	Resource(const Resource&) = delete;
+
+	void operator=(const Resource&) = delete;
 
 	Resource(const ComPtr<ID3D12Resource>& resource, const bool stateTracking);
 
@@ -128,17 +130,15 @@ public:
 
 	Resource(Resource&);
 
-	Resource() = delete;
-
-	Resource(const Resource&) = delete;
-
-	void operator=(const Resource&) = delete;
+	virtual ~Resource();
 
 	virtual void updateGlobalStates() = 0;
 
 	virtual void resetInternalStates() = 0;
 
 	virtual void resetTransitionStates() = 0;
+
+	ID3D12Resource* getResource() const;
 
 	D3D12_GPU_VIRTUAL_ADDRESS getGPUAddress() const;
 
@@ -154,7 +154,7 @@ private:
 
 	ComPtr<ID3D12Resource> resource;
 
-	bool stateTracking;
+	std::shared_ptr<bool> stateTracking;
 
 	std::shared_ptr<bool> sharedResource;
 
