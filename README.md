@@ -1,2 +1,6 @@
-# Direct3D 12 toy engine
-still in draft
+# Intro
+A toy graphics engine written mainly for learning purpose
+
+# To Do
+1.Copy all dll files under Dlls directory to exe directory
+2.Copy resource files under Resources directory to exe directory
