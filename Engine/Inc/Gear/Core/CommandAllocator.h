@@ -11,6 +11,8 @@ public:
 
 	CommandAllocator() = delete;
 
+	CommandAllocator(const CommandAllocator&) = delete;
+
 	void operator=(const CommandAllocator&) = delete;
 
 	CommandAllocator(const D3D12_COMMAND_LIST_TYPE type);

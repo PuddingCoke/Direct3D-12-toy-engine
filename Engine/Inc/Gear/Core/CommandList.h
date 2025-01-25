@@ -30,6 +30,12 @@ class CommandList
 {
 public:
 
+	CommandList() = delete;
+
+	CommandList(const CommandList&) = delete;
+
+	void operator=(const CommandList&) = delete;
+
 	CommandList(const D3D12_COMMAND_LIST_TYPE type);
 	
 	~CommandList();

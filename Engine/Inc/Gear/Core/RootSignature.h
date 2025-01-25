@@ -11,6 +11,8 @@ public:
 
 	RootSignature(const CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC& desc);
 
+	RootSignature() = delete;
+
 	RootSignature(const RootSignature&) = delete;
 
 	void operator=(const RootSignature&) = delete;

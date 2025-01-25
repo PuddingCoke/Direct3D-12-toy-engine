@@ -11,6 +11,8 @@ class CounterBufferView :public EngineResource
 {
 public:
 
+	CounterBufferView() = delete;
+
 	CounterBufferView(const bool persistent);
 
 	~CounterBufferView();

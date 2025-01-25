@@ -16,6 +16,10 @@ class ConstantBufferManager
 {
 public:
 
+	ConstantBufferManager(const ConstantBufferManager&) = delete;
+
+	void operator=(const ConstantBufferManager&) = delete;
+
 	ConstantBufferManager();
 
 	~ConstantBufferManager();

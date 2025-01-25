@@ -14,6 +14,8 @@ class ConstantBuffer :public EngineResource
 {
 public:
 
+	ConstantBuffer() = delete;
+
 	ConstantBuffer(Buffer* const buffer, const uint32_t size, const bool persistent);
 
 	ConstantBuffer(const ConstantBuffer&) = delete;

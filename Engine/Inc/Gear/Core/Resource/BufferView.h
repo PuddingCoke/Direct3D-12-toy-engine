@@ -12,6 +12,8 @@ class BufferView :public EngineResource
 {
 public:
 
+	BufferView() = delete;
+
 	BufferView(Buffer* const buffer, const uint32_t structureByteStride, const DXGI_FORMAT format, const uint64_t size, const bool createSRV, const bool createUAV, const bool createVBV, const bool createIBV, const bool cpuWritable, const bool persistent);
 
 	~BufferView();

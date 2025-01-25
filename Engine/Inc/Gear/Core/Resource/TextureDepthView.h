@@ -11,6 +11,8 @@ class TextureDepthView :public EngineResource
 {
 public:
 
+	TextureDepthView() = delete;
+
 	//supported types
 	//R32_TYPELESS 
 	//R16_TYPELESS 

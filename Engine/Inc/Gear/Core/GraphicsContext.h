@@ -14,6 +14,10 @@
 class GraphicsContext
 {
 public:
+
+	GraphicsContext(const GraphicsContext&) = delete;
+
+	void operator=(const GraphicsContext&) = delete;
 	
 	GraphicsContext();
 

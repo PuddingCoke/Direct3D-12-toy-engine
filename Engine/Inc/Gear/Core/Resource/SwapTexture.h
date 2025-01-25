@@ -17,6 +17,8 @@ private:
 
 public:
 
+	SwapTexture() = delete;
+
 	SwapTexture(const std::function<TextureRenderView* (void)>& factoryFunc);
 
 	~SwapTexture();

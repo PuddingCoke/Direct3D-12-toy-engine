@@ -9,6 +9,8 @@ class EngineResource
 {
 public:
 
+	EngineResource() = delete;
+
 	EngineResource(const bool persistent);
 
 	virtual ~EngineResource();

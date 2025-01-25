@@ -25,6 +25,12 @@ class RenderEngine
 {
 public:
 
+	RenderEngine() = delete;
+
+	RenderEngine(const RenderEngine&) = delete;
+
+	void operator=(const RenderEngine&) = delete;
+
 	static RenderEngine* get();
 
 	void submitCommandList(CommandList* const commandList);

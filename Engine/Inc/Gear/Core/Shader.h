@@ -26,6 +26,10 @@ class DXCCompiler
 {
 public:
 
+	DXCCompiler(const DXCCompiler&) = delete;
+
+	void operator=(const DXCCompiler&) = delete;
+
 	DXCCompiler();
 
 	~DXCCompiler();

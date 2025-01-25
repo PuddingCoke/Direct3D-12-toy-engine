@@ -9,15 +9,17 @@ class ReadbackHeap :public Resource
 {
 public:
 
+	ReadbackHeap() = delete;
+
+	ReadbackHeap(const ReadbackHeap&) = delete;
+
+	void operator=(const ReadbackHeap&) = delete;
+
 	ReadbackHeap(const uint64_t size, const D3D12_HEAP_FLAGS flags = D3D12_HEAP_FLAG_NONE);
 
 	ReadbackHeap(ReadbackHeap&);
 
 	virtual ~ReadbackHeap();
-
-	void operator=(const ReadbackHeap&) = delete;
-
-	ReadbackHeap(const ReadbackHeap&) = delete;
 
 	void* map(const D3D12_RANGE readRange) const;
 

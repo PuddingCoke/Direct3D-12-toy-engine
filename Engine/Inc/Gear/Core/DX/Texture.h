@@ -22,15 +22,17 @@ class Texture :public Resource
 {
 public:
 
+	Texture() = delete;
+
+	Texture(const Texture&) = delete;
+
+	void operator=(const Texture&) = delete;
+
 	Texture(const uint32_t width, const uint32_t height, const DXGI_FORMAT format, const uint32_t arraySize, const uint32_t mipLevels, const bool stateTracking, const D3D12_RESOURCE_FLAGS resFlags,const D3D12_CLEAR_VALUE* const clearValue = nullptr);
 
 	Texture(const ComPtr<ID3D12Resource>& texture, const bool stateTracking, const uint32_t initialState);
 
 	Texture(Texture&);
-
-	void operator=(const Texture&) = delete;
-
-	Texture(const Texture&) = delete;
 
 	virtual ~Texture();
 

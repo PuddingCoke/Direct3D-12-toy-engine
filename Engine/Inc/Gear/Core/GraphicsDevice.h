@@ -32,6 +32,8 @@ class GraphicsDevice
 {
 public:
 
+	GraphicsDevice() = delete;
+
 	GraphicsDevice(const GraphicsDevice&) = delete;
 
 	void operator=(const GraphicsDevice&) = delete;

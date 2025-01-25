@@ -9,6 +9,10 @@ class StaticResourceManager :public ResourceManager
 {
 private:
 
+	StaticResourceManager(const StaticResourceManager&) = delete;
+
+	void operator=(const StaticResourceManager&) = delete;
+
 	friend class RenderEngine;
 
 	static StaticResourceManager* instance;

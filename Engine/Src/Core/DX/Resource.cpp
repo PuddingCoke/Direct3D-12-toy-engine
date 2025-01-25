@@ -10,13 +10,13 @@ Resource::~Resource()
 }
 
 Resource::Resource(const ComPtr<ID3D12Resource>& resource, const bool stateTracking) :
-	resource(resource), stateTracking(stateTracking), sharedResource(std::make_shared<bool>(false))
+	resource(resource), stateTracking(std::make_shared<bool>(stateTracking)), sharedResource(std::make_shared<bool>(false))
 {
 }
 
 Resource::Resource(const D3D12_HEAP_PROPERTIES properties, const D3D12_HEAP_FLAGS flags, const D3D12_RESOURCE_DESC desc,
 	const bool stateTracking, const D3D12_RESOURCE_STATES initialState, const D3D12_CLEAR_VALUE* clearValues) :
-	stateTracking(stateTracking), sharedResource(std::make_shared<bool>(false))
+	stateTracking(std::make_shared<bool>(stateTracking)), sharedResource(std::make_shared<bool>(false))
 {
 	GraphicsDevice::get()->CreateCommittedResource(&properties, flags, &desc, initialState, clearValues, IID_PPV_ARGS(&resource));
 }
@@ -36,12 +36,12 @@ D3D12_GPU_VIRTUAL_ADDRESS Resource::getGPUAddress() const
 
 void Resource::setStateTracking(const bool state)
 {
-	stateTracking = state;
+	*stateTracking = state;
 }
 
 bool Resource::getStateTracking() const
 {
-	return stateTracking;
+	return *stateTracking;
 }
 
 bool Resource::isSharedResource() const
