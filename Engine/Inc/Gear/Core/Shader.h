@@ -52,6 +52,12 @@ class Shader
 {
 public:
 
+	Shader() = delete;
+
+	Shader(const Shader&) = delete;
+
+	void operator=(const Shader&) = delete;
+
 	//byte code
 	Shader(const uint8_t* const bytes, const size_t byteSize);
 
