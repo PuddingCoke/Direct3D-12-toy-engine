@@ -3,9 +3,9 @@
 #ifndef _NVIDIAENCODER_H_
 #define _NVIDIAENCODER_H_
 
-#include"Encoder.h"
-
 #include<Gear/Core/DX/ReadbackHeap.h>
+
+#include"Encoder.h"
 
 #include<NvEnc/nvEncodeAPI.h>
 

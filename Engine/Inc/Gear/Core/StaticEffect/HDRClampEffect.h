@@ -3,13 +3,7 @@
 #ifndef _HDRCLAMPEFFECT_H_
 #define _HDRCLAMPEFFECT_H_
 
-#include<Gear/Core/GraphicsContext.h>
-
-#include<Gear/Core/Shader.h>
-
-#include<Gear/Core/PipelineState.h>
-
-#include<Gear/Core/Resource/TextureRenderView.h>
+#include"StaticEffectHeader.h"
 
 //it seems OpenEXR api won't handle nan or nif case when cast float to half
 //this effect require a compute texture input and then reset its nan and inf texels

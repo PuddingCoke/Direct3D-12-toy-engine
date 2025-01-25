@@ -5,17 +5,34 @@
 
 #include<Gear/Core/RenderEngine.h>
 
+#include<Gear/Core/ResourceManager.h>
+
+#include<Gear/Core/PipelineState.h>
+
+#include<Gear/Core/States.h>
+
+#include<Gear/Core/Graphics.h>
+
 #include<Gear/Input/Mouse.h>
+
 #include<Gear/Input/Keyboard.h>
 
 #include<Gear/Utils/Math.h>
+
 #include<Gear/Utils/Random.h>
+
 #include<Gear/Utils/Utils.h>
+
 #include<Gear/Utils/Timer.h>
 
+#include<Gear/Utils/Color.h>
+
 #include<future>
+
 #include<thread>
+
 #include<condition_variable>
+
 #include<mutex>
 
 class RenderTask

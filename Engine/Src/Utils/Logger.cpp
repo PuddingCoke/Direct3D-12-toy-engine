@@ -1,5 +1,9 @@
 ﻿#include<Gear/Utils/Logger.h>
 
+#include<iomanip>
+
+#include<Windows.h>
+
 Logger* Logger::instance = nullptr;
 
 const std::wregex Logger::escapeCodeRegex = std::wregex(L"\033\\[(\\d+)m");

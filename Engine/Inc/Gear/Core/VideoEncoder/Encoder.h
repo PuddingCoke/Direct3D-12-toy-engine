@@ -3,12 +3,11 @@
 #ifndef _ENCODER_H_
 #define _ENCODER_H_
 
-#include<chrono>
-#include<iomanip>
-
 #include<Gear/Core/Graphics.h>
 
 #include<Gear/Core/DX/Texture.h>
+
+#include<chrono>
 
 class Encoder
 {

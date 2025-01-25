@@ -1,8 +1,24 @@
 ﻿#include<Gear/Core/ResourceManager.h>
 
+#include<Gear/Core/Graphics.h>
+
 #include<Gear/Core/StaticEffect/HDRClampEffect.h>
 
 #include<Gear/Core/StaticEffect/LatLongMapToCubeMapEffect.h>
+
+#include<Gear/Utils/Math.h>
+
+#include<Gear/Utils/Random.h>
+
+#include<Gear/Utils/Utils.h>
+
+#include<DirectXTex/DDSTextureLoader12.h>
+
+#include<DirectXTex/WICTextureLoader12.h>
+
+#include<DirectXTex/DirectXTexEXR.h>
+
+#include<DirectXTex/DirectXTex.h>
 
 ResourceManager::ResourceManager() :
 	context(new GraphicsContext()), commandList(context->getCommandList()),

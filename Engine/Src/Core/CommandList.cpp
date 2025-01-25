@@ -1,5 +1,7 @@
 ﻿#include<Gear/Core/CommandList.h>
 
+#include<Gear/Core/Graphics.h>
+
 D3D12_CPU_DESCRIPTOR_HANDLE CommandList::backBufferHandle;
 
 CommandList::CommandList(const D3D12_COMMAND_LIST_TYPE type)

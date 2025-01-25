@@ -5,8 +5,6 @@
 
 #include<Gear/Core/Resource/ConstantBuffer.h>
 
-#include"EngineResource.h"
-
 //Buffer SRV/UAV/CBV
 //Texture SRV/UAV
 

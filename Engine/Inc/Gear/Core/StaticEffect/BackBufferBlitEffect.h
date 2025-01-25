@@ -3,11 +3,7 @@
 #ifndef _BACKBUFFERBLITEFFECT_H_
 #define _BACKBUFFERBLITEFFECT_H_
 
-#include<Gear/Core/GraphicsContext.h>
-
-#include<Gear/Core/Resource/TextureRenderView.h>
-
-#include<Gear/Core/Shader.h>
+#include"StaticEffectHeader.h"
 
 //draw texture to back buffer
 class BackBufferBlitEffect

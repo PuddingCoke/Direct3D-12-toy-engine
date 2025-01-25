@@ -1,5 +1,19 @@
 ﻿#include<Gear/Core/RenderEngine.h>
 
+#include<Gear/Core/Graphics.h>
+
+#include<Gear/Core/Shader.h>
+
+#include<Gear/Core/States.h>
+
+#include<Gear/Core/ConstantBufferManager.h>
+
+#include<Gear/Core/GlobalRootSignature.h>
+
+#include<Gear/Core/StaticResourceManager.h>
+
+#include<Gear/Utils/Random.h>
+
 RenderEngine* RenderEngine::instance = nullptr;
 
 RenderEngine* RenderEngine::get()

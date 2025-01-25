@@ -5,8 +5,6 @@
 
 #include<Gear/Core/GraphicsDevice.h>
 
-using Microsoft::WRL::ComPtr;
-
 class Graphics
 {
 public:

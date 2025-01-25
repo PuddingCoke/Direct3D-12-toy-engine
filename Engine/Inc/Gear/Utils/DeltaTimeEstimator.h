@@ -3,7 +3,7 @@
 #ifndef _DELTATIMEESTIMATOR_H_
 #define _DELTATIMEESTIMATOR_H_
 
-#include<algorithm>
+#include<cstdint>
 
 class DeltaTimeEstimator
 {

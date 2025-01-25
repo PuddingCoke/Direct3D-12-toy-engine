@@ -3,26 +3,24 @@
 #ifndef _RESOURCEMANAGER_H_
 #define _RESOURCEMANAGER_H_
 
-#include<DirectXTex/DDSTextureLoader12.h>
-#include<DirectXTex/WICTextureLoader12.h>
-#include<DirectXTex/DirectXTexEXR.h>
-#include<DirectXTex/DirectXTex.h>
-
 #include<Gear/Core/GraphicsContext.h>
-#include<Gear/Core/PipelineState.h>
-
-#include<Gear/Utils/Math.h>
-#include<Gear/Utils/Random.h>
 
 #include<Gear/Core/DX/Buffer.h>
+
 #include<Gear/Core/DX/Texture.h>
+
 #include<Gear/Core/DX/UploadHeap.h>
 
 #include<Gear/Core/Resource/SwapTexture.h>
+
 #include<Gear/Core/Resource/ConstantBuffer.h>
+
 #include<Gear/Core/Resource/IndexConstantBuffer.h>
+
 #include<Gear/Core/Resource/BufferView.h>
+
 #include<Gear/Core/Resource/TextureRenderView.h>
+
 #include<Gear/Core/Resource/TextureDepthView.h>
 
 enum class RandomDataType

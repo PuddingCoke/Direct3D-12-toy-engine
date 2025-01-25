@@ -1,5 +1,9 @@
 ﻿#include<Gear/Core/StaticEffect/LatLongMapToCubeMapEffect.h>
 
+#include<Gear/Core/States.h>
+
+#include<Gear/Utils/Math.h>
+
 #include<Gear/CompiledShaders/EquirectangularVS.h>
 
 #include<Gear/CompiledShaders/EquirectangularPS.h>
@@ -46,20 +50,17 @@ LatLongMapToCubeMapEffect::LatLongMapToCubeMapEffect(ResourceManager* const resM
 	equirectangularPS(new Shader(g_EquirectangularPSBytes, sizeof(g_EquirectangularPSBytes)))
 {
 	{
-		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = {};
+		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = PipelineState::getDefaultGraphicsDesc();
 		desc.InputLayout = {};
-		desc.pRootSignature = GlobalRootSignature::getGraphicsRootSignature()->get();
 		desc.VS = equirectangularVS->getByteCode();
 		desc.PS = equirectangularPS->getByteCode();
 		desc.RasterizerState = States::rasterCullNone;
 		desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
 		desc.DepthStencilState.DepthEnable = FALSE;
 		desc.DepthStencilState.StencilEnable = FALSE;
-		desc.SampleMask = UINT_MAX;
 		desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 		desc.NumRenderTargets = 1;
 		desc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
-		desc.SampleDesc.Count = 1;
 
 		GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&equirectangularR8State));
 

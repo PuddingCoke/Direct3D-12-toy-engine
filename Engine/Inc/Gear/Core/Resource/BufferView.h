@@ -3,17 +3,9 @@
 #ifndef _BUFFERVIEW_H_
 #define _BUFFERVIEW_H_
 
-#include<Gear/Core/DX/Buffer.h>
-
 #include<Gear/Core/DX/UploadHeap.h>
 
-#include<Gear/Utils/Utils.h>
-
-#include<Gear/Core/Resource/CounterBufferView.h>
-
-#include<Gear/Core/Graphics.h>
-
-#include"EngineResource.h"
+#include"CounterBufferView.h"
 
 //versatile buffer
 class BufferView :public EngineResource

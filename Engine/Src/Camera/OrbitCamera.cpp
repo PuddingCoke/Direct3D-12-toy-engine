@@ -1,5 +1,11 @@
 ﻿#include<Gear/Camera/OrbitCamera.h>
 
+#include<Gear/Core/Camera.h>
+
+#include<Gear/Input/Mouse.h>
+
+#include<Gear/Input/Keyboard.h>
+
 OrbitCamera::OrbitCamera(const DirectX::XMVECTOR& eye, const DirectX::XMVECTOR& up, const float zoomSpeed) :
 	eye(DirectX::XMVector3Normalize(eye)), up(DirectX::XMVector3Normalize(up)), zoomSpeed(zoomSpeed)
 {

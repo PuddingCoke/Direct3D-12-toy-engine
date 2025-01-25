@@ -4,16 +4,14 @@
 #define _GEAR_H_
 
 #include<Gear/Core/RenderEngine.h>
-#include<Gear/Window/Win32Form.h>
-#include<Gear/Utils/Utils.h>
-#include<Gear/Utils/DeltaTimeEstimator.h>
-#include<Gear/Input/Keyboard.h>
-#include<Gear/Input/Mouse.h>
-#include<Gear/Configuration.h>
-#include<Gear/Game.h>
-#include<Gear/Core/VideoEncoder/NvidiaEncoder.h>
 
-#include<dxgidebug.h>
+#include<Gear/Window/Win32Form.h>
+
+#include<Gear/Utils/DeltaTimeEstimator.h>
+
+#include<Gear/Configuration.h>
+
+#include<Gear/Game.h>
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, uint32_t msg, WPARAM wParam, LPARAM lParam);
 

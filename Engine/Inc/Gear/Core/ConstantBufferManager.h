@@ -4,8 +4,9 @@
 #define _CONSTANTBUFFERMANAGER_H_
 
 #include<Gear/Core/CommandList.h>
-#include<Gear/Core/GlobalDescriptorHeap.h>
+
 #include<Gear/Core/DX/Buffer.h>
+
 #include<Gear/Core/DX/UploadHeap.h>
 
 //create a large buffer and divide it into 256bytes 512bytes 1024bytes ...... aligned regions

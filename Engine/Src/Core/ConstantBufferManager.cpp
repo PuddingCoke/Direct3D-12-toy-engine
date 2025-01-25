@@ -1,5 +1,9 @@
 ﻿#include<Gear/Core/ConstantBufferManager.h>
 
+#include<Gear/Core/GlobalDescriptorHeap.h>
+
+#include<Gear/Core/Graphics.h>
+
 ConstantBufferManager* ConstantBufferManager::instance = nullptr;
 
 ConstantBufferManager::ConstantBufferManager() :

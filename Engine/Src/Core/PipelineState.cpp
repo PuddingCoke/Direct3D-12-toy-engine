@@ -1,5 +1,11 @@
 ﻿#include<Gear/Core/PipelineState.h>
 
+#include<Gear/Core/States.h>
+
+#include<Gear/Core/Shader.h>
+
+#include<Gear/Core/GlobalRootSignature.h>
+
 D3D12_GRAPHICS_PIPELINE_STATE_DESC PipelineState::getDefaultGraphicsDesc()
 {
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = {};

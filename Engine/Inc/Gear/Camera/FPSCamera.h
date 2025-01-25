@@ -3,9 +3,6 @@
 #ifndef _FPSCAMERA_H_
 #define _FPSCAMERA_H_
 
-#include<Gear/Core/Camera.h>
-#include<Gear/Input/Mouse.h>
-#include<Gear/Input/Keyboard.h>
 #include<Gear/Utils/Math.h>
 
 class FPSCamera
