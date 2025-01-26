@@ -17,7 +17,7 @@ public:
 
 	virtual void copyDescriptors();
 
-	bool getPersistent();
+	bool getPersistent() const;
 
 protected:
 

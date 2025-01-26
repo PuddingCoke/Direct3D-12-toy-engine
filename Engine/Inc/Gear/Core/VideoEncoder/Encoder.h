@@ -45,10 +45,6 @@ protected:
 
 	float encodeTime;
 
-private:
-
-	HANDLE hConsole;
-
 };
 
 #endif // !_ENCODER_H_

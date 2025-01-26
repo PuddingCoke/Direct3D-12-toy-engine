@@ -23,85 +23,85 @@ public:
 
 	~GraphicsContext();
 
-	void updateBuffer(BufferView* const bufferView, const void* const data, const uint32_t size);
+	void updateBuffer(BufferView* const bufferView, const void* const data, const uint32_t size) const;
 
 	//per frame global resources transition immediate
-	void setGlobalConstantBuffer(const IndexConstantBuffer* const indexBuffer);
+	void setGlobalConstantBuffer(const IndexConstantBuffer* const indexBuffer) const;
 
-	void setGlobalConstantBuffer(const ConstantBuffer* const constantBuffer);
+	void setGlobalConstantBuffer(const ConstantBuffer* const constantBuffer) const;
 
 	//4 values availiable
 	void setVSConstants(const std::initializer_list<ShaderResourceDesc>& descs, const uint32_t offset);
 
 	//4 values availiable
-	void setVSConstants(const uint32_t numValues, const void* const data, const uint32_t offset);
+	void setVSConstants(const uint32_t numValues, const void* const data, const uint32_t offset) const;
 
 	//4 values availiable
 	void setHSConstants(const std::initializer_list<ShaderResourceDesc>& descs, const uint32_t offset);
 
 	//4 values availiable
-	void setHSConstants(const uint32_t numValues, const void* const data, const uint32_t offset);
+	void setHSConstants(const uint32_t numValues, const void* const data, const uint32_t offset) const;
 
 	//8 values availiable
 	void setDSConstants(const std::initializer_list<ShaderResourceDesc>& descs, const uint32_t offset);
 
 	//8 values availiable
-	void setDSConstants(const uint32_t numValues, const void* const data, const uint32_t offset);
+	void setDSConstants(const uint32_t numValues, const void* const data, const uint32_t offset) const;
 
 	//4 values availiable
 	void setGSConstants(const std::initializer_list<ShaderResourceDesc>& descs, const uint32_t offset);
 
 	//4 values availiable
-	void setGSConstants(const uint32_t numValues, const void* const data, const uint32_t offset);
+	void setGSConstants(const uint32_t numValues, const void* const data, const uint32_t offset) const;
 
 	//24 values availiable
 	void setPSConstants(const std::initializer_list<ShaderResourceDesc>& descs, const uint32_t offset);
 
 	//24 values availiable
-	void setPSConstants(const uint32_t numValues, const void* const data, const uint32_t offset);
+	void setPSConstants(const uint32_t numValues, const void* const data, const uint32_t offset) const;
 
 	//32 values availiable
 	void setCSConstants(const std::initializer_list<ShaderResourceDesc>& descs, const uint32_t offset);
 
 	//32 values availiable
-	void setCSConstants(const uint32_t numValues, const void* const data, const uint32_t offset);
+	void setCSConstants(const uint32_t numValues, const void* const data, const uint32_t offset) const;
 
 	void setVSConstantBuffer(const IndexConstantBuffer* const constantBuffer);
 
-	void setVSConstantBuffer(const ConstantBuffer* const constantBuffer);
+	void setVSConstantBuffer(const ConstantBuffer* const constantBuffer) const;
 
 	void setHSConstantBuffer(const IndexConstantBuffer* const constantBuffer);
 
-	void setHSConstantBuffer(const ConstantBuffer* const constantBuffer);
+	void setHSConstantBuffer(const ConstantBuffer* const constantBuffer) const;
 
 	void setDSConstantBuffer(const IndexConstantBuffer* const constantBuffer);
 
-	void setDSConstantBuffer(const ConstantBuffer* const constantBuffer);
+	void setDSConstantBuffer(const ConstantBuffer* const constantBuffer) const;
 
 	void setGSConstantBuffer(const IndexConstantBuffer* const constantBuffer);
 
-	void setGSConstantBuffer(const ConstantBuffer* const constantBuffer);
+	void setGSConstantBuffer(const ConstantBuffer* const constantBuffer) const;
 
 	void setPSConstantBuffer(const IndexConstantBuffer* const constantBuffer);
 
-	void setPSConstantBuffer(const ConstantBuffer* const constantBuffer);
+	void setPSConstantBuffer(const ConstantBuffer* const constantBuffer) const;
 
 	void setCSConstantBuffer(const IndexConstantBuffer* const constantBuffer);
 
-	void setCSConstantBuffer(const ConstantBuffer* const constantBuffer);
+	void setCSConstantBuffer(const ConstantBuffer* const constantBuffer) const;
 
 	//must call this method after all resource binding methods
-	void transitionResources();
+	void transitionResources() const;
 
-	void setRenderTargets(const std::initializer_list<RenderTargetDesc>& renderTargets, const DepthStencilDesc* const depthStencils = nullptr);
+	void setRenderTargets(const std::initializer_list<RenderTargetDesc>& renderTargets, const DepthStencilDesc* const depthStencils = nullptr) const;
 
 	void setDefRenderTarget() const;
 
 	void clearDefRenderTarget(const float clearValue[4]) const;
 
-	void setVertexBuffers(const uint32_t startSlot, const std::initializer_list<VertexBufferDesc>& vertexBuffers);
+	void setVertexBuffers(const uint32_t startSlot, const std::initializer_list<VertexBufferDesc>& vertexBuffers) const;
 
-	void setIndexBuffer(const IndexBufferDesc& indexBuffers);
+	void setIndexBuffer(const IndexBufferDesc& indexBuffers) const;
 
 	void setTopology(const D3D12_PRIMITIVE_TOPOLOGY topology) const;
 

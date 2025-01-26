@@ -15,7 +15,7 @@ LatLongMapToCubeMapEffect* LatLongMapToCubeMapEffect::get()
 	return instance;
 }
 
-void LatLongMapToCubeMapEffect::process(GraphicsContext* const context, TextureRenderView* const inputTexture, TextureRenderView* const outputTexture)
+void LatLongMapToCubeMapEffect::process(GraphicsContext* const context, TextureRenderView* const inputTexture, TextureRenderView* const outputTexture) const
 {
 	switch (outputTexture->getTexture()->getFormat())
 	{

@@ -13,12 +13,14 @@ class PrimitiveBatch
 {
 public:
 
-	//render target format
-	PrimitiveBatch(const DXGI_FORMAT format, GraphicsContext* const context);
+	PrimitiveBatch() = delete;
 
 	PrimitiveBatch(const PrimitiveBatch&) = delete;
 
 	void operator=(const PrimitiveBatch&) = delete;
+
+	//render target format
+	PrimitiveBatch(const DXGI_FORMAT format, GraphicsContext* const context);
 
 	~PrimitiveBatch();
 

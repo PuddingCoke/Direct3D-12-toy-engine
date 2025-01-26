@@ -46,7 +46,7 @@ private:
 
 	GraphicsDevice(IUnknown* const adapter);
 
-	void checkFeatureSupport();
+	void checkFeatureSupport() const;
 
 	static GraphicsDevice* instance;
 

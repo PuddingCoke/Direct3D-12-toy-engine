@@ -284,12 +284,12 @@ void RenderEngine::end()
 	processCommandLists();
 }
 
-void RenderEngine::present()
+void RenderEngine::present() const
 {
 	swapChain->Present(1, 0);
 }
 
-void RenderEngine::updateConstantBuffer()
+void RenderEngine::updateConstantBuffer() const
 {
 	ConstantBufferManager::get()->recordCommands(prepareCommandList);
 }

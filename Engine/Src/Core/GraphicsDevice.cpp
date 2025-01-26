@@ -19,7 +19,7 @@ GraphicsDevice::GraphicsDevice(IUnknown* const adapter)
 	}
 }
 
-void GraphicsDevice::checkFeatureSupport()
+void GraphicsDevice::checkFeatureSupport() const
 {
 	LOGENGINE("following are feature support data");
 

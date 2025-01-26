@@ -51,7 +51,7 @@ public:
 
 	void waitTask();
 
-	CommandList* getCommandList();
+	CommandList* getCommandList() const;
 
 	virtual void imGUICall();
 

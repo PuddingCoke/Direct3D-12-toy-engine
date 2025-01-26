@@ -31,9 +31,9 @@ public:
 
 protected:
 
-	TextureRenderView* outputTexture;
+	TextureRenderView* const outputTexture;
 
-	GraphicsContext* context;
+	GraphicsContext* const context;
 
 	const uint32_t width;
 

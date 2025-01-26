@@ -45,7 +45,7 @@ void RenderTask::waitTask()
 	taskCondition.wait(lock, [this]() {return taskCompleted; });
 }
 
-CommandList* RenderTask::getCommandList()
+CommandList* RenderTask::getCommandList() const
 {
 	return context->getCommandList();
 }
