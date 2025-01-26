@@ -111,6 +111,8 @@ private:
 
 	std::mutex submitCommandListLock;
 
+	int32_t syncInterval;
+
 	struct PerFrameResource
 	{
 		float deltaTime;
