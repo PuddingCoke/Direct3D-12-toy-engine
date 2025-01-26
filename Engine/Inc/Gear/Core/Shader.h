@@ -34,7 +34,11 @@ public:
 
 	~DXCCompiler();
 
-	IDxcBlob* compile(const std::wstring filePath, const ShaderProfile profile) const;
+	//hlsl
+	ComPtr<IDxcBlob> compile(const std::wstring& filePath, const ShaderProfile profile) const;
+
+	//cso
+	ComPtr<IDxcBlob> read(const std::wstring& filePath) const;
 
 private:
 
@@ -83,10 +87,6 @@ private:
 
 	D3D12_SHADER_BYTECODE shaderByteCode;
 
-	//read byte code from file
-	std::vector<uint8_t> bytes;
-
-	//compiled code from file
 	ComPtr<IDxcBlob> shaderBlob;
 
 	static void createGlobalShaders();
