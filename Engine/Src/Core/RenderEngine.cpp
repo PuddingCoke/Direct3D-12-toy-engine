@@ -235,6 +235,7 @@ void RenderEngine::end()
 		ImGui::Text("TimeElapsed %.2f", Graphics::getTimeElapsed());
 		ImGui::Text("FrameTime %.8f", ImGui::GetIO().DeltaTime * 1000.f);
 		ImGui::Text("FrameRate %.1f", ImGui::GetIO().Framerate);
+		ImGui::SliderInt("Sync Interval", &syncInterval, 0, 3);
 		ImGui::End();
 	}
 
@@ -286,7 +287,7 @@ void RenderEngine::end()
 
 void RenderEngine::present() const
 {
-	swapChain->Present(1, 0);
+	swapChain->Present(static_cast<uint32_t>(syncInterval), 0);
 }
 
 void RenderEngine::updateConstantBuffer() const
@@ -455,7 +456,8 @@ RenderEngine::RenderEngine(const uint32_t width, const uint32_t height, const HW
 	fenceEvent(CreateEvent(nullptr, FALSE, FALSE, nullptr)),
 	vendor(GPUVendor::UNKNOWN), perFrameResource{},
 	initializeImGuiSurface(initializeImGuiSurface),
-	displayImGUISurface(false)
+	displayImGUISurface(false),
+	syncInterval(1)
 {
 	Graphics::frameBufferCount = useSwapChainBuffer ? 3 : 1;
 
