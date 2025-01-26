@@ -34,12 +34,14 @@ void GraphicsContext::setGlobalConstantBuffer(const IndexConstantBuffer* const i
 	transitionResources();
 
 	commandList->get()->SetGraphicsRootConstantBufferView(1, indexBuffer->getGPUAddress());
+
 	commandList->get()->SetComputeRootConstantBufferView(1, indexBuffer->getGPUAddress());
 }
 
 void GraphicsContext::setGlobalConstantBuffer(const ConstantBuffer* const constantBuffer) const
 {
 	commandList->get()->SetGraphicsRootConstantBufferView(1, constantBuffer->getGPUAddress());
+
 	commandList->get()->SetComputeRootConstantBufferView(1, constantBuffer->getGPUAddress());
 }
 

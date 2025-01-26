@@ -6,8 +6,7 @@
 
 ConstantBufferManager* ConstantBufferManager::instance = nullptr;
 
-ConstantBufferManager::ConstantBufferManager() :
-	updateUploadHeapIndex(0)
+ConstantBufferManager::ConstantBufferManager()
 {
 	//create a large buffer that used as constant buffer
 	{
@@ -141,7 +140,7 @@ void ConstantBufferManager::updateSubregion(const uint32_t regionIndex, const ui
 
 	updateIndicators[regionIndex][subregionIndex] = true;
 
-	uploadHeaps[regionIndex][subregionIndex][updateUploadHeapIndex]->update(data, size);
+	uploadHeaps[regionIndex][subregionIndex][Graphics::getFrameIndex()]->update(data, size);
 
 	updateSubregionIndices[regionIndex].push_back(subregionIndex);
 }
@@ -167,13 +166,11 @@ void ConstantBufferManager::recordCommands(CommandList* const commandList)
 
 			updateIndicators[regionIndex][subregionIndex] = false;
 
-			commandList->get()->CopyBufferRegion(buffer->getResource(), dstOffset, uploadHeaps[regionIndex][subregionIndex][updateUploadHeapIndex]->getResource(), 0, (256 << regionIndex));
+			commandList->get()->CopyBufferRegion(buffer->getResource(), dstOffset, uploadHeaps[regionIndex][subregionIndex][Graphics::getFrameIndex()]->getResource(), 0, (256 << regionIndex));
 		}
 
 		updateSubregionIndices[regionIndex].clear();
 	}
-
-	updateUploadHeapIndex = (updateUploadHeapIndex + 1) % Graphics::getFrameBufferCount();
 
 	commandList->pushResourceTrackList(buffer);
 

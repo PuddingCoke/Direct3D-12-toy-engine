@@ -5,7 +5,7 @@
 #include<Gear/Utils/Utils.h>
 
 BufferView::BufferView(Buffer* const buffer, const uint32_t structureByteStride, const DXGI_FORMAT format, const uint64_t size, const bool createSRV, const bool createUAV, const bool createVBV, const bool createIBV, const bool cpuWritable, const bool persistent) :
-	EngineResource(persistent), buffer(buffer), counterBuffer(nullptr), vbv{}, srvIndex(0), uavIndex(0), uploadHeaps(nullptr), uploadHeapIndex(0), hasSRV(createSRV), hasUAV(createUAV), viewCPUHandle(), viewGPUHandle()
+	EngineResource(persistent), buffer(buffer), counterBuffer(nullptr), vbv{}, srvIndex(0), uavIndex(0), uploadHeaps(nullptr), hasSRV(createSRV), hasUAV(createUAV), viewCPUHandle(), viewGPUHandle()
 {
 	numSRVUAVCBVDescriptors = static_cast<uint32_t>(createSRV) + static_cast<uint32_t>(createUAV);
 
@@ -263,11 +263,9 @@ void BufferView::copyDescriptors()
 
 BufferView::UpdateStruct BufferView::update(const void* const data, const uint64_t size)
 {
-	const UpdateStruct updateStruct = { buffer,uploadHeaps[uploadHeapIndex] };
+	uploadHeaps[Graphics::getFrameIndex()]->update(data, size);
 
-	uploadHeaps[uploadHeapIndex]->update(data, size);
-
-	uploadHeapIndex = (uploadHeapIndex + 1) % Graphics::getFrameBufferCount();
+	const UpdateStruct updateStruct = { buffer,uploadHeaps[Graphics::getFrameIndex()] };
 
 	return updateStruct;
 }

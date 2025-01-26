@@ -76,9 +76,6 @@ private:
 	//record subregionIndex of each region that need update
 	std::vector<uint32_t> updateSubregionIndices[numRegion];
 
-	//indicate which uploadheap of subregion need update
-	uint32_t updateUploadHeapIndex;
-
 };
 
 #endif // !_CONSTANTBUFFERMANAGER_H_
