@@ -27,11 +27,11 @@ Shader::Shader(const std::wstring& filePath)
 {
 	if (Utils::File::getExtension(filePath) == L"cso")
 	{
-		bytes = Utils::File::readAllBinary(filePath);
+		shaderBlob = dxcCompiler->read(filePath);
 
-		shaderByteCode.pShaderBytecode = bytes.data();
+		shaderByteCode.pShaderBytecode = shaderBlob->GetBufferPointer();
 
-		shaderByteCode.BytecodeLength = bytes.size();
+		shaderByteCode.BytecodeLength = shaderBlob->GetBufferSize();
 
 		LOGSUCCESS("read byte code at", Logger::brightBlue, filePath, Logger::resetColor(), "succeeded");
 	}
@@ -112,7 +112,7 @@ DXCCompiler::~DXCCompiler()
 
 }
 
-IDxcBlob* DXCCompiler::compile(const std::wstring filePath, const ShaderProfile profile) const
+ComPtr<IDxcBlob> DXCCompiler::compile(const std::wstring& filePath, const ShaderProfile profile) const
 {
 	const std::vector<uint8_t> bytes = Utils::File::readAllBinary(filePath);
 
@@ -165,9 +165,22 @@ IDxcBlob* DXCCompiler::compile(const std::wstring filePath, const ShaderProfile 
 
 	CHECKERROR(dxcCompiler->Compile(&source, args->GetArguments(), args->GetCount(), dxcIncludeHanlder.Get(), IID_PPV_ARGS(&result)));
 
-	IDxcBlob* shaderBlob = nullptr;
+	ComPtr<IDxcBlob> shaderBlob;
 
 	CHECKERROR(result->GetResult(&shaderBlob));
+
+	return shaderBlob;
+}
+
+ComPtr<IDxcBlob> DXCCompiler::read(const std::wstring& filePath) const
+{
+	const std::vector<uint8_t> bytes = Utils::File::readAllBinary(filePath);
+
+	ComPtr<IDxcBlobEncoding> textBlob;
+
+	CHECKERROR(dxcUtils->CreateBlob(bytes.data(), static_cast<uint32_t>(bytes.size()), CP_NONE, &textBlob));
+
+	ComPtr<IDxcBlob> shaderBlob = textBlob;
 
 	return shaderBlob;
 }

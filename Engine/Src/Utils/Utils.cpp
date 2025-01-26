@@ -29,6 +29,8 @@ std::wstring Utils::File::getParentFolder(const std::wstring& filePath)
 
 		if (idx == std::wstring::npos)
 		{
+            LOGERROR(filePath, "does not have parent folder");
+
             return L"";
 		}
 	}
@@ -42,6 +44,8 @@ std::wstring Utils::File::getExtension(const std::wstring& filePath)
 
     if (idx == std::wstring::npos)
     {
+        LOGERROR(filePath, "does not have extension");
+
         return L"";
     }
 
