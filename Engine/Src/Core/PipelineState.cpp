@@ -33,7 +33,7 @@ D3D12_GRAPHICS_PIPELINE_STATE_DESC PipelineState::getDefaultFullScreenState()
 	return desc;
 }
 
-void PipelineState::createComputeState(ID3D12PipelineState** pipelineState, const Shader* const shader)
+void PipelineState::createComputeState(ID3D12PipelineState** const pipelineState, const Shader* const shader)
 {
 	D3D12_COMPUTE_PIPELINE_STATE_DESC desc = {};
 	desc.pRootSignature = GlobalRootSignature::getComputeRootSignature()->get();

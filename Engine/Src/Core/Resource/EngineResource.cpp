@@ -13,7 +13,7 @@ void EngineResource::copyDescriptors()
 {
 }
 
-bool EngineResource::getPersistent()
+bool EngineResource::getPersistent() const
 {
 	return persistent;
 }

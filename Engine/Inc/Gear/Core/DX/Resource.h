@@ -148,7 +148,7 @@ public:
 
 	bool isSharedResource() const;
 
-	void setName(LPCWSTR const name);
+	void setName(LPCWSTR const name) const;
 
 private:
 

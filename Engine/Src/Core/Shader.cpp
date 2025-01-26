@@ -115,7 +115,7 @@ DXCCompiler::~DXCCompiler()
 IDxcBlob* DXCCompiler::compile(const std::wstring filePath, const ShaderProfile profile) const
 {
 	const std::vector<uint8_t> bytes = Utils::File::readAllBinary(filePath);
-	
+
 	ComPtr<IDxcBlobEncoding> textBlob;
 
 	CHECKERROR(dxcUtils->CreateBlobFromPinned(bytes.data(), static_cast<uint32_t>(bytes.size()), codePage, &textBlob));
@@ -127,40 +127,38 @@ IDxcBlob* DXCCompiler::compile(const std::wstring filePath, const ShaderProfile 
 
 	ComPtr<IDxcCompilerArgs> args;
 
+	switch (profile)
 	{
-		switch (profile)
-		{
-		case VERTEX:
-			dxcUtils->BuildArguments(filePath.c_str(), L"main", L"vs_6_6", nullptr, 0, nullptr, 0, &args);
-			break;
-		case HULL:
-			dxcUtils->BuildArguments(filePath.c_str(), L"main", L"hs_6_6", nullptr, 0, nullptr, 0, &args);
-			break;
-		case DOMAIN:
-			dxcUtils->BuildArguments(filePath.c_str(), L"main", L"ds_6_6", nullptr, 0, nullptr, 0, &args);
-			break;
-		case GEOMETRY:
-			dxcUtils->BuildArguments(filePath.c_str(), L"main", L"gs_6_6", nullptr, 0, nullptr, 0, &args);
-			break;
-		case PIXEL:
-			dxcUtils->BuildArguments(filePath.c_str(), L"main", L"ps_6_6", nullptr, 0, nullptr, 0, &args);
-			break;
-		case AMPLIFICATION:
-			dxcUtils->BuildArguments(filePath.c_str(), L"main", L"as_6_6", nullptr, 0, nullptr, 0, &args);
-			break;
-		case MESH:
-			dxcUtils->BuildArguments(filePath.c_str(), L"main", L"ms_6_6", nullptr, 0, nullptr, 0, &args);
-			break;
-		case COMPUTE:
-			dxcUtils->BuildArguments(filePath.c_str(), L"main", L"cs_6_6", nullptr, 0, nullptr, 0, &args);
-			break;
-		case LIBRARY:
-			dxcUtils->BuildArguments(filePath.c_str(), L"", L"lib_6_6", nullptr, 0, nullptr, 0, &args);
-			break;
-		default:
-			LOGERROR("not supported shader profile");
-			break;
-		}
+	case VERTEX:
+		dxcUtils->BuildArguments(filePath.c_str(), L"main", L"vs_6_6", nullptr, 0, nullptr, 0, &args);
+		break;
+	case HULL:
+		dxcUtils->BuildArguments(filePath.c_str(), L"main", L"hs_6_6", nullptr, 0, nullptr, 0, &args);
+		break;
+	case DOMAIN:
+		dxcUtils->BuildArguments(filePath.c_str(), L"main", L"ds_6_6", nullptr, 0, nullptr, 0, &args);
+		break;
+	case GEOMETRY:
+		dxcUtils->BuildArguments(filePath.c_str(), L"main", L"gs_6_6", nullptr, 0, nullptr, 0, &args);
+		break;
+	case PIXEL:
+		dxcUtils->BuildArguments(filePath.c_str(), L"main", L"ps_6_6", nullptr, 0, nullptr, 0, &args);
+		break;
+	case AMPLIFICATION:
+		dxcUtils->BuildArguments(filePath.c_str(), L"main", L"as_6_6", nullptr, 0, nullptr, 0, &args);
+		break;
+	case MESH:
+		dxcUtils->BuildArguments(filePath.c_str(), L"main", L"ms_6_6", nullptr, 0, nullptr, 0, &args);
+		break;
+	case COMPUTE:
+		dxcUtils->BuildArguments(filePath.c_str(), L"main", L"cs_6_6", nullptr, 0, nullptr, 0, &args);
+		break;
+	case LIBRARY:
+		dxcUtils->BuildArguments(filePath.c_str(), L"", L"lib_6_6", nullptr, 0, nullptr, 0, &args);
+		break;
+	default:
+		LOGERROR("not supported shader profile");
+		break;
 	}
 
 	ComPtr<IDxcOperationResult> result;

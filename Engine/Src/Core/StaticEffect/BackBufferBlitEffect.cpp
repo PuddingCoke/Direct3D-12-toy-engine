@@ -13,7 +13,7 @@ BackBufferBlitEffect* BackBufferBlitEffect::get()
 	return instance;
 }
 
-void BackBufferBlitEffect::process(GraphicsContext* const context, TextureRenderView* const inputTexture)
+void BackBufferBlitEffect::process(GraphicsContext* const context, TextureRenderView* const inputTexture) const
 {
 	context->setPipelineState(backBufferBlitState.Get());
 

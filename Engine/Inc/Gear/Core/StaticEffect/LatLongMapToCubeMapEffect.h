@@ -16,7 +16,7 @@ public:
 
 	static LatLongMapToCubeMapEffect* get();
 
-	void process(GraphicsContext* const context, TextureRenderView* const inputTexture, TextureRenderView* const outputTexture);
+	void process(GraphicsContext* const context, TextureRenderView* const inputTexture, TextureRenderView* const outputTexture) const;
 
 private:
 

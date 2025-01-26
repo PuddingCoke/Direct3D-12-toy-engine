@@ -60,7 +60,7 @@ public:
 
 	uint32_t getAllState() const;
 
-	uint32_t getMipSliceState(const uint32_t mipSlice);
+	uint32_t getMipSliceState(const uint32_t mipSlice) const;
 
 private:
 

@@ -49,7 +49,7 @@ bool Resource::isSharedResource() const
 	return *sharedResource;
 }
 
-void Resource::setName(LPCWSTR const name)
+void Resource::setName(LPCWSTR const name) const
 {
 	resource->SetName(name);
 }

@@ -59,9 +59,9 @@ private:
 
 	void end();
 
-	void present();
+	void present() const;
 
-	void updateConstantBuffer();
+	void updateConstantBuffer() const;
 
 	void initializeResources();
 

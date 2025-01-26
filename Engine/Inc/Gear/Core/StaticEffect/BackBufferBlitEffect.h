@@ -16,7 +16,7 @@ public:
 
 	static BackBufferBlitEffect* get();
 
-	void process(GraphicsContext* const context, TextureRenderView* const inputTexture);
+	void process(GraphicsContext* const context, TextureRenderView* const inputTexture) const;
 
 private:
 

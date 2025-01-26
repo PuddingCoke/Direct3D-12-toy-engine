@@ -493,7 +493,7 @@ uint32_t Texture::getAllState() const
 	return internalState.allState;
 }
 
-uint32_t Texture::getMipSliceState(const uint32_t mipSlice)
+uint32_t Texture::getMipSliceState(const uint32_t mipSlice) const
 {
 	return internalState.mipLevelStates[mipSlice];
 }

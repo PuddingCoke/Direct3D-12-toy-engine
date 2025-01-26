@@ -17,7 +17,7 @@ public:
 
 	static HDRClampEffect* get();
 
-	void process(GraphicsContext* const context, TextureRenderView* const inOutTexture);
+	void process(GraphicsContext* const context, TextureRenderView* const inOutTexture) const;
 
 private:
 

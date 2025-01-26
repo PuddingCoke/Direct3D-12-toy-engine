@@ -197,7 +197,7 @@ public:
 
 		effect->setGamma(0.972f);
 
-		effect->setSoftThreshold(0.8f);
+		effect->setSoftThreshold(0.85f);
 	}
 
 	~MyRenderTask()

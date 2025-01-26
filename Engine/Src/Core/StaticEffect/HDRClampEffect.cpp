@@ -9,7 +9,7 @@ HDRClampEffect* HDRClampEffect::get()
 	return instance;
 }
 
-void HDRClampEffect::process(GraphicsContext* const context, TextureRenderView* const inOutTexture)
+void HDRClampEffect::process(GraphicsContext* const context, TextureRenderView* const inOutTexture) const
 {
 	if (inOutTexture->getTexture()->getFormat() == DXGI_FORMAT_R16G16B16A16_FLOAT)
 	{
