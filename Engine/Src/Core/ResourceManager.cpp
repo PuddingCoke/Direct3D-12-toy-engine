@@ -724,12 +724,12 @@ TextureRenderView* ResourceManager::createTextureCube(const std::wstring& filePa
 		break;
 	}
 
-	TextureRenderView* const cubemap = createTextureRenderView(texturecubeResolution, texturecubeResolution, resFormat, 6, 1, true, false,
+	TextureRenderView* const cubeMap = createTextureRenderView(texturecubeResolution, texturecubeResolution, resFormat, 6, 1, true, false,
 		resFormat, DXGI_FORMAT_UNKNOWN, resFormat);
 
-	release(cubemap);
+	release(cubeMap);
 
-	LatLongMapToCubeMapEffect::get()->process(context, equirectangularMap, cubemap);
+	LatLongMapToCubeMapEffect::get()->process(context, equirectangularMap, cubeMap);
 
 	bool stateTracking = true;
 
@@ -754,7 +754,7 @@ TextureRenderView* ResourceManager::createTextureCube(const std::wstring& filePa
 
 	Texture* dstTexture = new Texture(texturecubeResolution, texturecubeResolution, resFormat, 6, 1, true, resFlags);
 
-	Texture* srcTexture = cubemap->getTexture();
+	Texture* srcTexture = cubeMap->getTexture();
 
 	for (uint32_t i = 0; i < 6; i++)
 	{

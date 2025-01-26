@@ -65,8 +65,6 @@ private:
 
 	UploadHeap** uploadHeaps;
 
-	uint32_t uploadHeapIndex;
-
 	Buffer* buffer;
 };
 
