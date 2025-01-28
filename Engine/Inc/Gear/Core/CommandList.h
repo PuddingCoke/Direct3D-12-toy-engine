@@ -9,13 +9,13 @@
 
 #include<Gear/Core/RootSignature.h>
 
-#include<Gear/Core/DX/Buffer.h>
+#include<Gear/Core/Resource/D3D12Resource/Buffer.h>
 
-#include<Gear/Core/DX/Texture.h>
+#include<Gear/Core/Resource/D3D12Resource/Texture.h>
 
-#include<Gear/Core/DX/UploadHeap.h>
+#include<Gear/Core/Resource/D3D12Resource/UploadHeap.h>
 
-#include<Gear/Core/DX/ReadbackHeap.h>
+#include<Gear/Core/Resource/D3D12Resource/ReadbackHeap.h>
 
 #include<unordered_set>
 

@@ -315,7 +315,13 @@ public:
 		{
 			simulationParam.pos = DirectX::XMFLOAT2(200.f, Graphics::getHeight() / 2.f);
 
-			simulationParam.posDelta = DirectX::XMFLOAT2(50.0f, 0.0f);
+			simulationParam.splatColor.x *= Graphics::getDeltaTime() * 144.f;
+
+			simulationParam.splatColor.y *= Graphics::getDeltaTime() * 144.f;
+
+			simulationParam.splatColor.z *= Graphics::getDeltaTime() * 144.f;
+
+			simulationParam.posDelta = DirectX::XMFLOAT2(7200.0f * Graphics::getDeltaTime(), 0.0f);
 		}
 		else
 		{

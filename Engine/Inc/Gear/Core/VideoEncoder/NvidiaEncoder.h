@@ -3,7 +3,7 @@
 #ifndef _NVIDIAENCODER_H_
 #define _NVIDIAENCODER_H_
 
-#include<Gear/Core/DX/ReadbackHeap.h>
+#include<Gear/Core/Resource/D3D12Resource/ReadbackHeap.h>
 
 #include"Encoder.h"
 

@@ -3,7 +3,7 @@
 #ifndef _COUNTERBUFFERVIEW_H_
 #define _COUNTERBUFFERVIEW_H_
 
-#include<Gear/Core/DX/Buffer.h>
+#include"D3D12Resource/Buffer.h"
 
 #include"EngineResource.h"
 

@@ -3,7 +3,7 @@
 #ifndef _TEXTURERENDERVIEW_H_
 #define _TEXTURERENDERVIEW_H_
 
-#include<Gear/Core/DX/Texture.h>
+#include"D3D12Resource/Texture.h"
 
 #include"EngineResource.h"
 
