@@ -8,7 +8,7 @@
 //Buffer SRV/UAV/CBV
 //Texture SRV/UAV
 
-//IndexConstantBuffer* icb=new IndexConstantBuffer({srv->getSRV(),});
+//IndexConstantBuffer* icb = new IndexConstantBuffer({srv->getSRV(),});
 
 //specialized constant buffer for indexing resources in CBV/SRV/UAV heap
 //texture mipSlice srvIndexInHeap

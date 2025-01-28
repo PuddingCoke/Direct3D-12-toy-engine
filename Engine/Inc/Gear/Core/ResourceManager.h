@@ -5,12 +5,6 @@
 
 #include<Gear/Core/GraphicsContext.h>
 
-#include<Gear/Core/DX/Buffer.h>
-
-#include<Gear/Core/DX/Texture.h>
-
-#include<Gear/Core/DX/UploadHeap.h>
-
 #include<Gear/Core/Resource/SwapTexture.h>
 
 #include<Gear/Core/Resource/ConstantBuffer.h>

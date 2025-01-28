@@ -5,9 +5,9 @@
 
 #include<Gear/Core/CommandList.h>
 
-#include<Gear/Core/DX/Buffer.h>
+#include<Gear/Core/Resource/D3D12Resource/Buffer.h>
 
-#include<Gear/Core/DX/UploadHeap.h>
+#include<Gear/Core/Resource/D3D12Resource/UploadHeap.h>
 
 //create a large buffer and divide it into 256bytes 512bytes 1024bytes ...... aligned regions
 //1024bytes can hold 16 matrices or 64 float4 this is enough for most case(maybe?)

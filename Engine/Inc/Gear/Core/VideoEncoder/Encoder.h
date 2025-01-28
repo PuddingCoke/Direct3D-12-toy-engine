@@ -5,7 +5,7 @@
 
 #include<Gear/Core/Graphics.h>
 
-#include<Gear/Core/DX/Texture.h>
+#include<Gear/Core/Resource/D3D12Resource/Texture.h>
 
 #include<chrono>
 

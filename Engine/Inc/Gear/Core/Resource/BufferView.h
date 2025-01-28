@@ -3,7 +3,7 @@
 #ifndef _BUFFERVIEW_H_
 #define _BUFFERVIEW_H_
 
-#include<Gear/Core/DX/UploadHeap.h>
+#include"D3D12Resource/UploadHeap.h"
 
 #include"CounterBufferView.h"
 

@@ -141,19 +141,19 @@
     <ClInclude Include="Inc\Gear\Camera\FPSCamera.h">
       <Filter>Header\Camera</Filter>
     </ClInclude>
-    <ClInclude Include="Inc\Gear\Core\DX\Buffer.h">
+    <ClInclude Include="Inc\Gear\Core\Resource\D3D12Resource\Buffer.h">
       <Filter>Header\Core\DX</Filter>
     </ClInclude>
-    <ClInclude Include="Inc\Gear\Core\DX\ReadbackHeap.h">
+    <ClInclude Include="Inc\Gear\Core\Resource\D3D12Resource\ReadbackHeap.h">
       <Filter>Header\Core\DX</Filter>
     </ClInclude>
-    <ClInclude Include="Inc\Gear\Core\DX\Resource.h">
+    <ClInclude Include="Inc\Gear\Core\Resource\D3D12Resource\Resource.h">
       <Filter>Header\Core\DX</Filter>
     </ClInclude>
-    <ClInclude Include="Inc\Gear\Core\DX\Texture.h">
+    <ClInclude Include="Inc\Gear\Core\Resource\D3D12Resource\Texture.h">
       <Filter>Header\Core\DX</Filter>
     </ClInclude>
-    <ClInclude Include="Inc\Gear\Core\DX\UploadHeap.h">
+    <ClInclude Include="Inc\Gear\Core\Resource\D3D12Resource\UploadHeap.h">
       <Filter>Header\Core\DX</Filter>
     </ClInclude>
     <ClInclude Include="Inc\Gear\Core\Effect\BloomEffect.h">
@@ -419,19 +419,19 @@
     <ClCompile Include="Src\Camera\OrbitCamera.cpp">
       <Filter>Source\Camera</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Core\DX\Buffer.cpp">
+    <ClCompile Include="Src\Core\Resource\D3D12Resource\Buffer.cpp">
       <Filter>Source\Core\DX</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Core\DX\ReadbackHeap.cpp">
+    <ClCompile Include="Src\Core\Resource\D3D12Resource\ReadbackHeap.cpp">
       <Filter>Source\Core\DX</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Core\DX\Resource.cpp">
+    <ClCompile Include="Src\Core\Resource\D3D12Resource\Resource.cpp">
       <Filter>Source\Core\DX</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Core\DX\Texture.cpp">
+    <ClCompile Include="Src\Core\Resource\D3D12Resource\Texture.cpp">
       <Filter>Source\Core\DX</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Core\DX\UploadHeap.cpp">
+    <ClCompile Include="Src\Core\Resource\D3D12Resource\UploadHeap.cpp">
       <Filter>Source\Core\DX</Filter>
     </ClCompile>
     <ClCompile Include="Src\Core\Effect\BloomEffect.cpp">
