@@ -15,7 +15,7 @@
 
 #include<Gear/Core/Resource/D3D12Resource/UploadHeap.h>
 
-#include<Gear/Core/Resource/D3D12Resource/ReadbackHeap.h>
+#include<Gear/Core/Resource/EngineResource.h>
 
 #include<unordered_set>
 
@@ -113,11 +113,11 @@ private:
 
 	ComPtr<ID3D12GraphicsCommandList6> commandList;
 
-	std::unordered_set<Resource*> referredResources;
+	std::vector<Resource*> referredResources;
 
-	std::unordered_set<Buffer*> transitionBuffers;
+	std::vector<Buffer*> transitionBuffers;
 
-	std::unordered_set<Texture*> transitionTextures;
+	std::vector<Texture*> transitionTextures;
 
 	std::vector<D3D12_RESOURCE_BARRIER> transitionBarriers;
 
