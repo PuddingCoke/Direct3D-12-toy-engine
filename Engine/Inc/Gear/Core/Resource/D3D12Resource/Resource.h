@@ -7,8 +7,10 @@
 
 #include<memory>
 
+//used for internal state,transition state,global state
 constexpr uint32_t D3D12_RESOURCE_STATE_UNKNOWN = 0xFFFFFFFF;
 
+//used for pending resource barrier
 constexpr uint32_t D3D12_TRANSITION_ALL_MIPLEVELS = 0xFFFFFFFF;
 
 //does a have b?
@@ -16,102 +18,6 @@ constexpr bool bitFlagSubset(const uint32_t a, const uint32_t b)
 {
 	return b && ((a & b) == b);
 }
-
-class Buffer;
-
-class Texture;
-
-struct ShaderResourceDesc
-{
-	enum ResourceType
-	{
-		BUFFER,
-		TEXTURE
-	} type;
-
-	enum TargetStates
-	{
-		SRV,
-		UAV,
-		CBV
-	} state;
-
-	uint32_t resourceIndex;
-
-	struct TextureTransitionDesc
-	{
-		Texture* texture;
-		uint32_t mipSlice;
-	};
-
-	struct BufferTransitionDesc
-	{
-		Buffer* buffer;
-		Buffer* counterBuffer;
-	};
-
-	union
-	{
-		TextureTransitionDesc textureDesc;
-		BufferTransitionDesc bufferDesc;
-	};
-};
-
-struct RenderTargetDesc
-{
-	Texture* texture;
-	uint32_t mipSlice;
-	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle;
-};
-
-struct DepthStencilDesc
-{
-	Texture* texture;
-	uint32_t mipSlice;
-	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle;
-};
-
-struct VertexBufferDesc
-{
-	Buffer* buffer;
-	D3D12_VERTEX_BUFFER_VIEW vbv;
-};
-
-struct IndexBufferDesc
-{
-	Buffer* buffer;
-	D3D12_INDEX_BUFFER_VIEW ibv;
-};
-
-struct ClearUAVDesc
-{
-	enum ResourceType
-	{
-		BUFFER,
-		TEXTURE
-	} type;
-
-	struct TextureClearDesc
-	{
-		Texture* texture;
-		uint32_t mipSlice;
-	};
-
-	struct BufferClearDesc
-	{
-		Buffer* buffer;
-	};
-
-	union
-	{
-		TextureClearDesc textureDesc;
-		BufferClearDesc bufferDesc;
-	};
-
-	D3D12_GPU_DESCRIPTOR_HANDLE viewGPUHandle;
-
-	D3D12_CPU_DESCRIPTOR_HANDLE viewCPUHandle;
-};
 
 class Resource
 {
@@ -146,9 +52,19 @@ public:
 
 	bool getStateTracking() const;
 
-	bool isSharedResource() const;
+	bool getSharedResource() const;
 
 	void setName(LPCWSTR const name) const;
+
+	bool getInTrackingList() const;
+
+	void pushToReferredList(std::vector<Resource*>& referredList);
+
+	void popFromReferredList();
+
+	void pushToTrackingList();
+
+	void popFromTrackingList();
 
 private:
 
@@ -157,6 +73,10 @@ private:
 	std::shared_ptr<bool> stateTracking;
 
 	std::shared_ptr<bool> sharedResource;
+
+	bool inReferredList;
+
+	bool inTrackingList;
 
 };
 

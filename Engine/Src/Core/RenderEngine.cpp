@@ -27,6 +27,7 @@ void RenderEngine::submitCommandList(CommandList* const commandList)
 
 	std::vector<D3D12_RESOURCE_BARRIER> barriers;
 
+	if (commandList->pendingBufferBarrier.size())
 	{
 		for (const PendingBufferBarrier& pendingBarrier : commandList->pendingBufferBarrier)
 		{
@@ -47,6 +48,7 @@ void RenderEngine::submitCommandList(CommandList* const commandList)
 		commandList->pendingBufferBarrier.clear();
 	}
 
+	if (commandList->pendingTextureBarrier.size())
 	{
 		for (const PendingTextureBarrier& pendingBarrier : commandList->pendingTextureBarrier)
 		{

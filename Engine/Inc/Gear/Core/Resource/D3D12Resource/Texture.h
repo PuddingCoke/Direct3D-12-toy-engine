@@ -28,7 +28,7 @@ public:
 
 	void operator=(const Texture&) = delete;
 
-	Texture(const uint32_t width, const uint32_t height, const DXGI_FORMAT format, const uint32_t arraySize, const uint32_t mipLevels, const bool stateTracking, const D3D12_RESOURCE_FLAGS resFlags,const D3D12_CLEAR_VALUE* const clearValue = nullptr);
+	Texture(const uint32_t width, const uint32_t height, const DXGI_FORMAT format, const uint32_t arraySize, const uint32_t mipLevels, const bool stateTracking, const D3D12_RESOURCE_FLAGS resFlags, const D3D12_CLEAR_VALUE* const clearValue = nullptr);
 
 	Texture(const ComPtr<ID3D12Resource>& texture, const bool stateTracking, const uint32_t initialState);
 
@@ -61,6 +61,8 @@ public:
 	uint32_t getAllState() const;
 
 	uint32_t getMipSliceState(const uint32_t mipSlice) const;
+
+	void pushToTrackingList(std::vector<Texture*>& trackingList);
 
 private:
 

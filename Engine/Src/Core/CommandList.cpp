@@ -72,6 +72,8 @@ void CommandList::transitionResources()
 	for (Buffer* const buff : transitionBuffers)
 	{
 		buff->transition(transitionBarriers, pendingBufferBarrier);
+
+		buff->popFromTrackingList();
 	}
 
 	transitionBuffers.clear();
@@ -79,6 +81,8 @@ void CommandList::transitionResources()
 	for (Texture* const tex : transitionTextures)
 	{
 		tex->transition(transitionBarriers, pendingTextureBarrier);
+
+		tex->popFromTrackingList();
 	}
 
 	transitionTextures.clear();
@@ -97,10 +101,9 @@ void CommandList::updateReferredResStates()
 	{
 		res->updateGlobalStates();
 
-		if (res->isSharedResource())
-		{
-			res->resetInternalStates();
-		}
+		res->resetInternalStates();
+
+		res->popFromReferredList();
 	}
 
 	referredResources.clear();
@@ -108,34 +111,16 @@ void CommandList::updateReferredResStates()
 
 void CommandList::pushResourceTrackList(Texture* const texture)
 {
-	if (texture->getStateTracking())
-	{
-		if (referredResources.find(texture) == referredResources.end())
-		{
-			referredResources.insert(texture);
-		}
+	texture->pushToReferredList(referredResources);
 
-		if (transitionTextures.find(texture) == transitionTextures.end())
-		{
-			transitionTextures.insert(texture);
-		}
-	}
+	texture->pushToTrackingList(transitionTextures);
 }
 
 void CommandList::pushResourceTrackList(Buffer* const buffer)
 {
-	if (buffer->getStateTracking())
-	{
-		if (referredResources.find(buffer) == referredResources.end())
-		{
-			referredResources.insert(buffer);
-		}
+	buffer->pushToReferredList(referredResources);
 
-		if (transitionBuffers.find(buffer) == transitionBuffers.end())
-		{
-			transitionBuffers.insert(buffer);
-		}
-	}
+	buffer->pushToTrackingList(transitionBuffers);
 }
 
 void CommandList::setAllPipelineResources(const std::vector<ShaderResourceDesc>& descs)

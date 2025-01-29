@@ -46,6 +46,8 @@ public:
 
 	uint32_t getState() const;
 
+	void pushToTrackingList(std::vector<Buffer*>& trackingList);
+
 private:
 
 	friend class RenderEngine;

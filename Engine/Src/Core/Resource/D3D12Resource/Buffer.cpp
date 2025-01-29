@@ -92,3 +92,13 @@ uint32_t Buffer::getState() const
 {
 	return internalState;
 }
+
+void Buffer::pushToTrackingList(std::vector<Buffer*>& trackingList)
+{
+	if (getStateTracking() && !getInTrackingList())
+	{
+		trackingList.push_back(this);
+
+		Resource::pushToTrackingList();
+	}
+}

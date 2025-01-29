@@ -1,6 +1,6 @@
 ﻿#include<Gear/Core/Resource/D3D12Resource/Texture.h>
 
-Texture::Texture(const uint32_t width, const uint32_t height, const DXGI_FORMAT format, const uint32_t arraySize, const uint32_t mipLevels, const bool stateTracking, const D3D12_RESOURCE_FLAGS resFlags,const D3D12_CLEAR_VALUE* const clearValue) :
+Texture::Texture(const uint32_t width, const uint32_t height, const DXGI_FORMAT format, const uint32_t arraySize, const uint32_t mipLevels, const bool stateTracking, const D3D12_RESOURCE_FLAGS resFlags, const D3D12_CLEAR_VALUE* const clearValue) :
 	Resource(CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE, CD3DX12_RESOURCE_DESC::Tex2D(format, width, height, arraySize, mipLevels, 1, 0, resFlags), stateTracking, D3D12_RESOURCE_STATE_COPY_DEST, clearValue),
 	width(width),
 	height(height),
@@ -496,4 +496,14 @@ uint32_t Texture::getAllState() const
 uint32_t Texture::getMipSliceState(const uint32_t mipSlice) const
 {
 	return internalState.mipLevelStates[mipSlice];
+}
+
+void Texture::pushToTrackingList(std::vector<Texture*>& trackingList)
+{
+	if (getStateTracking() && !getInTrackingList())
+	{
+		trackingList.push_back(this);
+
+		Resource::pushToTrackingList();
+	}
 }
