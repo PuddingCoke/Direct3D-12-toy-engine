@@ -65,7 +65,7 @@ BloomEffect::BloomEffect(GraphicsContext* const context, const uint32_t width, c
 		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = PipelineState::getDefaultGraphicsDesc();
 		desc.InputLayout = {};
 		desc.VS = Shader::fullScreenVS->getByteCode();
-		desc.RasterizerState = States::rasterCullBack;
+		desc.RasterizerState = PipelineState::rasterCullBack;
 		desc.DepthStencilState.DepthEnable = FALSE;
 		desc.DepthStencilState.StencilEnable = FALSE;
 		desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
@@ -101,7 +101,7 @@ BloomEffect::BloomEffect(GraphicsContext* const context, const uint32_t width, c
 	{
 		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = getDefaultPipelineState();
 		desc.PS = Shader::fullScreenPS->getByteCode();
-		desc.BlendState = States::addtiveBlendDesc;
+		desc.BlendState = PipelineState::addtiveBlendDesc;
 
 		GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&bloomUpSampleState));
 	}

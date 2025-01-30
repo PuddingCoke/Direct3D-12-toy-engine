@@ -1,7 +1,5 @@
 ﻿#include<Gear/Core/Gear2D/PrimitiveBatch.h>
 
-#include<Gear/Core/States.h>
-
 #include<Gear/Core/PipelineState.h>
 
 #include<Gear/CompiledShaders/PrimitiveBatchLineVS.h>
@@ -43,8 +41,8 @@ PrimitiveBatch::PrimitiveBatch(const DXGI_FORMAT format, GraphicsContext* const 
 		desc.VS = lineVS->getByteCode();
 		desc.GS = lineGS->getByteCode();
 		desc.PS = primitivePS->getByteCode();
-		desc.RasterizerState = States::rasterCullBack;
-		desc.BlendState = States::defBlendDesc;
+		desc.RasterizerState = PipelineState::rasterCullBack;
+		desc.BlendState = PipelineState::defBlendDesc;
 		desc.DepthStencilState.DepthEnable = FALSE;
 		desc.DepthStencilState.StencilEnable = FALSE;
 		desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE;
@@ -67,8 +65,8 @@ PrimitiveBatch::PrimitiveBatch(const DXGI_FORMAT format, GraphicsContext* const 
 		desc.VS = circleVS->getByteCode();
 		desc.GS = lineGS->getByteCode();
 		desc.PS = primitivePS->getByteCode();
-		desc.RasterizerState = States::rasterCullBack;
-		desc.BlendState = States::defBlendDesc;
+		desc.RasterizerState = PipelineState::rasterCullBack;
+		desc.BlendState = PipelineState::defBlendDesc;
 		desc.DepthStencilState.DepthEnable = FALSE;
 		desc.DepthStencilState.StencilEnable = FALSE;
 		desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE;
@@ -91,8 +89,8 @@ PrimitiveBatch::PrimitiveBatch(const DXGI_FORMAT format, GraphicsContext* const 
 		desc.VS = rcLineVS->getByteCode();
 		desc.GS = rcLineGS->getByteCode();
 		desc.PS = primitivePS->getByteCode();
-		desc.RasterizerState = States::rasterCullBack;
-		desc.BlendState = States::defBlendDesc;
+		desc.RasterizerState = PipelineState::rasterCullBack;
+		desc.BlendState = PipelineState::defBlendDesc;
 		desc.DepthStencilState.DepthEnable = FALSE;
 		desc.DepthStencilState.StencilEnable = FALSE;
 		desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE;

@@ -27,7 +27,7 @@ public:
 			desc.VS = Shader::fullScreenVS->getByteCode();
 			desc.PS = accumulateShader->getByteCode();
 			desc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
-			desc.BlendState = States::defBlendDesc;
+			desc.BlendState = PipelineState::defBlendDesc;
 			desc.DepthStencilState.DepthEnable = FALSE;
 			desc.DepthStencilState.StencilEnable = FALSE;
 			desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;

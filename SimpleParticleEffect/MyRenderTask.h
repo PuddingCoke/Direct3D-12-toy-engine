@@ -38,9 +38,9 @@ public:
 			desc.VS = particleVS->getByteCode();
 			desc.GS = particleGS->getByteCode();
 			desc.PS = particlePS->getByteCode();
-			desc.BlendState = States::addtiveBlendDesc;
-			desc.RasterizerState = States::rasterCullBack;
-			desc.DepthStencilState = States::depthLess;
+			desc.BlendState = PipelineState::addtiveBlendDesc;
+			desc.RasterizerState = PipelineState::rasterCullBack;
+			desc.DepthStencilState = PipelineState::depthLess;
 			desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_POINT;
 			desc.NumRenderTargets = 1;
 			desc.RTVFormats[0] = DXGI_FORMAT_R16G16B16A16_FLOAT;

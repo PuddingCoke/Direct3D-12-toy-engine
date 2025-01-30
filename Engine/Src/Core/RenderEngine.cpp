@@ -4,7 +4,7 @@
 
 #include<Gear/Core/Shader.h>
 
-#include<Gear/Core/States.h>
+#include<Gear/Core/PipelineState.h>
 
 #include<Gear/Core/ConstantBufferManager.h>
 
@@ -379,7 +379,7 @@ RenderEngine::RenderEngine(const uint32_t width, const uint32_t height, const HW
 
 	Shader::createGlobalShaders();
 
-	States::initialize();
+	PipelineState::initialize();
 
 	GlobalDescriptorHeap::instance = new GlobalDescriptorHeap();
 

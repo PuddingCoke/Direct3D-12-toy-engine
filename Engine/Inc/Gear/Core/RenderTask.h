@@ -9,8 +9,6 @@
 
 #include<Gear/Core/PipelineState.h>
 
-#include<Gear/Core/States.h>
-
 #include<Gear/Core/Graphics.h>
 
 #include<Gear/Input/Mouse.h>

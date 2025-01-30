@@ -1,7 +1,5 @@
 ﻿#include<Gear/Core/StaticEffect/LatLongMapToCubeMapEffect.h>
 
-#include<Gear/Core/States.h>
-
 #include<Gear/Utils/Math.h>
 
 #include<Gear/CompiledShaders/EquirectangularVS.h>
@@ -54,7 +52,7 @@ LatLongMapToCubeMapEffect::LatLongMapToCubeMapEffect(ResourceManager* const resM
 		desc.InputLayout = {};
 		desc.VS = equirectangularVS->getByteCode();
 		desc.PS = equirectangularPS->getByteCode();
-		desc.RasterizerState = States::rasterCullNone;
+		desc.RasterizerState = PipelineState::rasterCullNone;
 		desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
 		desc.DepthStencilState.DepthEnable = FALSE;
 		desc.DepthStencilState.StencilEnable = FALSE;

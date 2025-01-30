@@ -9,6 +9,4 @@
 
 #include<Gear/Core/PipelineState.h>
 
-#include<Gear/Core/States.h>
-
 #endif // !_STATICEFFECTHEADER_H_
