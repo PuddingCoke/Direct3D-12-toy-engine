@@ -261,9 +261,6 @@
     <ClInclude Include="Inc\Gear\Core\Shader.h">
       <Filter>Header\Core</Filter>
     </ClInclude>
-    <ClInclude Include="Inc\Gear\Core\States.h">
-      <Filter>Header\Core</Filter>
-    </ClInclude>
     <ClInclude Include="Inc\Gear\Core\RootSignature.h">
       <Filter>Header\Core</Filter>
     </ClInclude>
@@ -552,9 +549,6 @@
       <Filter>Source\Core</Filter>
     </ClCompile>
     <ClCompile Include="Src\Core\Shader.cpp">
-      <Filter>Source\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Core\States.cpp">
       <Filter>Source\Core</Filter>
     </ClCompile>
     <ClCompile Include="Inc\DirectXTex\DDSTextureLoader12.cpp">

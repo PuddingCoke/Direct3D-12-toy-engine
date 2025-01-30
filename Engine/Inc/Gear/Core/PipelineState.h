@@ -16,6 +16,24 @@ public:
 
 	void operator=(const PipelineState&) = delete;
 
+	static D3D12_BLEND_DESC defBlendDesc;
+
+	static D3D12_BLEND_DESC addtiveBlendDesc;
+
+	static D3D12_RASTERIZER_DESC rasterShadow;
+
+	static D3D12_RASTERIZER_DESC rasterCullBack;
+
+	static D3D12_RASTERIZER_DESC rasterCullFront;
+
+	static D3D12_RASTERIZER_DESC rasterCullNone;
+
+	static D3D12_RASTERIZER_DESC rasterWireFrame;
+
+	static D3D12_DEPTH_STENCIL_DESC depthLessEqual;
+
+	static D3D12_DEPTH_STENCIL_DESC depthLess;
+
 	//configure
 	//InputLayout
 	//BlendState
@@ -34,6 +52,12 @@ public:
 	static D3D12_GRAPHICS_PIPELINE_STATE_DESC getDefaultFullScreenState();
 
 	static void createComputeState(ID3D12PipelineState** const pipelineState, const Shader* const shader);
+
+private:
+
+	friend class RenderEngine;
+
+	static void initialize();
 
 };
 

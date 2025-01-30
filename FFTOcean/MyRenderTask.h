@@ -46,7 +46,7 @@ public:
 			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = PipelineState::getDefaultGraphicsDesc();
 			desc.InputLayout = {};
 			desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
-			desc.RasterizerState = States::rasterCullBack;
+			desc.RasterizerState = PipelineState::rasterCullBack;
 			desc.DepthStencilState.DepthEnable = false;
 			desc.DepthStencilState.StencilEnable = false;
 			desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
@@ -67,7 +67,7 @@ public:
 			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = PipelineState::getDefaultGraphicsDesc();
 			desc.InputLayout = { inputLayoutDesc,_countof(inputLayoutDesc) };
 			desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
-			desc.RasterizerState = States::rasterCullBack;
+			desc.RasterizerState = PipelineState::rasterCullBack;
 			desc.DepthStencilState.DepthEnable = FALSE;
 			desc.DepthStencilState.StencilEnable = FALSE;
 			desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
@@ -88,8 +88,8 @@ public:
 			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = PipelineState::getDefaultGraphicsDesc();
 			desc.InputLayout = { inputLayoutDesc,_countof(inputLayoutDesc) };
 			desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
-			desc.RasterizerState = States::rasterCullBack;
-			desc.DepthStencilState = States::depthLess;
+			desc.RasterizerState = PipelineState::rasterCullBack;
+			desc.DepthStencilState = PipelineState::depthLess;
 			desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_PATCH;
 			desc.NumRenderTargets = 1;
 			desc.RTVFormats[0] = DXGI_FORMAT_R16G16B16A16_FLOAT;

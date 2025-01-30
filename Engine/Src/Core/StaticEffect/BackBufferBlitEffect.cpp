@@ -1,9 +1,5 @@
 ﻿#include<Gear/Core/StaticEffect/BackBufferBlitEffect.h>
 
-#include<Gear/Core/PipelineState.h>
-
-#include<Gear/Core/States.h>
-
 #include<Gear/Core/Graphics.h>
 
 BackBufferBlitEffect* BackBufferBlitEffect::instance = nullptr;

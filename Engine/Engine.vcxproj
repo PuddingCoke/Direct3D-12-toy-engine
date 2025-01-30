@@ -214,7 +214,6 @@
     <ClInclude Include="Inc\Gear\Core\Resource\TextureRenderView.h" />
     <ClInclude Include="Inc\Gear\Core\RootSignature.h" />
     <ClInclude Include="Inc\Gear\Core\Shader.h" />
-    <ClInclude Include="Inc\Gear\Core\States.h" />
     <ClInclude Include="Inc\Gear\Core\Resource\SwapTexture.h" />
     <ClInclude Include="Inc\Gear\Core\VideoEncoder\Encoder.h" />
     <ClInclude Include="Inc\Gear\Core\VideoEncoder\NvidiaEncoder.h" />
@@ -284,7 +283,6 @@
     <ClCompile Include="Src\Core\Resource\TextureRenderView.cpp" />
     <ClCompile Include="Src\Core\RootSignature.cpp" />
     <ClCompile Include="Src\Core\Shader.cpp" />
-    <ClCompile Include="Src\Core\States.cpp" />
     <ClCompile Include="Src\Core\VideoEncoder\Encoder.cpp" />
     <ClCompile Include="Src\Core\VideoEncoder\NvidiaEncoder.cpp" />
     <ClCompile Include="Src\Game.cpp" />
