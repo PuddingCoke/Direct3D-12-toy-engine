@@ -27,133 +27,7 @@ void RenderEngine::submitCommandList(CommandList* const commandList)
 
 	std::vector<D3D12_RESOURCE_BARRIER> barriers;
 
-	if (commandList->pendingBufferBarrier.size())
-	{
-		for (const PendingBufferBarrier& pendingBarrier : commandList->pendingBufferBarrier)
-		{
-			if ((*(pendingBarrier.buffer->globalState)) != pendingBarrier.afterState)
-			{
-				D3D12_RESOURCE_BARRIER barrier = {};
-				barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-				barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-				barrier.Transition.pResource = pendingBarrier.buffer->getResource();
-				barrier.Transition.StateBefore = static_cast<D3D12_RESOURCE_STATES>(*(pendingBarrier.buffer->globalState));
-				barrier.Transition.StateAfter = static_cast<D3D12_RESOURCE_STATES>(pendingBarrier.afterState);
-				barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-
-				barriers.push_back(barrier);
-			}
-		}
-
-		commandList->pendingBufferBarrier.clear();
-	}
-
-	if (commandList->pendingTextureBarrier.size())
-	{
-		for (const PendingTextureBarrier& pendingBarrier : commandList->pendingTextureBarrier)
-		{
-			if (pendingBarrier.mipSlice == D3D12_TRANSITION_ALL_MIPLEVELS)
-			{
-				if (pendingBarrier.texture->mipLevels > 1)
-				{
-					bool uniformState = true;
-
-					if ((*(pendingBarrier.texture->globalState)).allState == D3D12_RESOURCE_STATE_UNKNOWN)
-					{
-						const uint32_t tempState = (*(pendingBarrier.texture->globalState)).mipLevelStates[0];
-
-						for (uint32_t mipSlice = 0; mipSlice < pendingBarrier.texture->mipLevels; mipSlice++)
-						{
-							if ((*(pendingBarrier.texture->globalState)).mipLevelStates[mipSlice] != tempState)
-							{
-								uniformState = false;
-								break;
-							}
-						}
-					}
-
-					if (uniformState)
-					{
-						if ((*(pendingBarrier.texture->globalState)).mipLevelStates[0] != pendingBarrier.afterState)
-						{
-							D3D12_RESOURCE_BARRIER barrier = {};
-							barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-							barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-							barrier.Transition.pResource = pendingBarrier.texture->getResource();
-							barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-							barrier.Transition.StateBefore = static_cast<D3D12_RESOURCE_STATES>((*(pendingBarrier.texture->globalState)).mipLevelStates[0]);
-							barrier.Transition.StateAfter = static_cast<D3D12_RESOURCE_STATES>(pendingBarrier.afterState);
-
-							barriers.push_back(barrier);
-						}
-					}
-					else
-					{
-						for (uint32_t mipSlice = 0; mipSlice < pendingBarrier.texture->mipLevels; mipSlice++)
-						{
-							if ((*(pendingBarrier.texture->globalState)).mipLevelStates[mipSlice] != pendingBarrier.afterState)
-							{
-								for (uint32_t arraySlice = 0; arraySlice < pendingBarrier.texture->arraySize; arraySlice++)
-								{
-									D3D12_RESOURCE_BARRIER barrier = {};
-									barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-									barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-									barrier.Transition.pResource = pendingBarrier.texture->getResource();
-									barrier.Transition.Subresource = D3D12CalcSubresource(mipSlice, arraySlice, 0, pendingBarrier.texture->mipLevels, pendingBarrier.texture->arraySize);
-									barrier.Transition.StateBefore = static_cast<D3D12_RESOURCE_STATES>((*(pendingBarrier.texture->globalState)).mipLevelStates[mipSlice]);
-									barrier.Transition.StateAfter = static_cast<D3D12_RESOURCE_STATES>(pendingBarrier.afterState);
-
-									barriers.push_back(barrier);
-								}
-							}
-						}
-					}
-				}
-				else
-				{
-					if ((*(pendingBarrier.texture->globalState)).allState != pendingBarrier.afterState)
-					{
-						D3D12_RESOURCE_BARRIER barrier = {};
-						barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-						barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-						barrier.Transition.pResource = pendingBarrier.texture->getResource();
-						barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-						barrier.Transition.StateBefore = static_cast<D3D12_RESOURCE_STATES>((*(pendingBarrier.texture->globalState)).allState);
-						barrier.Transition.StateAfter = static_cast<D3D12_RESOURCE_STATES>(pendingBarrier.afterState);
-
-						barriers.push_back(barrier);
-					}
-				}
-			}
-			else
-			{
-				if (pendingBarrier.texture->mipLevels > 1)
-				{
-					if ((*(pendingBarrier.texture->globalState)).mipLevelStates[pendingBarrier.mipSlice] != pendingBarrier.afterState)
-					{
-						for (uint32_t arraySlice = 0; arraySlice < pendingBarrier.texture->arraySize; arraySlice++)
-						{
-							D3D12_RESOURCE_BARRIER barrier = {};
-							barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-							barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-							barrier.Transition.pResource = pendingBarrier.texture->getResource();
-							barrier.Transition.Subresource = D3D12CalcSubresource(pendingBarrier.mipSlice, arraySlice, 0, pendingBarrier.texture->mipLevels, pendingBarrier.texture->arraySize);
-							barrier.Transition.StateBefore = static_cast<D3D12_RESOURCE_STATES>((*(pendingBarrier.texture->globalState)).mipLevelStates[pendingBarrier.mipSlice]);
-							barrier.Transition.StateAfter = static_cast<D3D12_RESOURCE_STATES>(pendingBarrier.afterState);
-
-							barriers.push_back(barrier);
-						}
-					}
-				}
-				else
-				{
-					LOGERROR("when transition a texture that has only 1 miplevel,pending mipslice must be D3D12_TRANSITION_ALL_MIPLEVELS");
-				}
-			}
-		}
-
-		commandList->pendingTextureBarrier.clear();
-	}
+	commandList->solvePendingBarriers(barriers);
 
 	CommandList* const helperCommandList = recordCommandLists.back();
 
@@ -170,7 +44,7 @@ void RenderEngine::submitCommandList(CommandList* const commandList)
 
 	recordCommandLists.push_back(commandList);
 
-	commandList->updateReferredResStates();
+	commandList->updateReferredSharedResourceStates();
 }
 
 void RenderEngine::processCommandLists()
@@ -264,7 +138,7 @@ void RenderEngine::end()
 
 		perFrameResource.screenTexelSize = DirectX::XMFLOAT2(1.f / Graphics::getWidth(), 1.f / Graphics::getHeight());
 
-		GraphicsContext::globalConstantBuffer->update(&perFrameResource, sizeof(PerFrameResource));
+		reservedGlobalConstantBuffer->update(&perFrameResource, sizeof(PerFrameResource));
 
 		updateConstantBuffer();
 	}
@@ -439,7 +313,7 @@ void RenderEngine::setRenderTexture(Texture* const renderTexture, const D3D12_CP
 	this->renderTexture = renderTexture;
 
 	//set render target
-	CommandList::backBufferHandle = handle;
+	CommandList::setBackBufferHandle(handle);
 }
 
 void RenderEngine::setDeltaTime(const float deltaTime) const
@@ -546,7 +420,9 @@ RenderEngine::RenderEngine(const uint32_t width, const uint32_t height, const HW
 
 	prepareCommandList = new CommandList(D3D12_COMMAND_LIST_TYPE_DIRECT);
 
-	GraphicsContext::globalConstantBuffer = ResourceManager::createConstantBuffer(sizeof(PerFrameResource), true);
+	reservedGlobalConstantBuffer = ResourceManager::createConstantBuffer(sizeof(PerFrameResource), true);
+
+	GraphicsContext::setReservedGlobalConstantBuffer(reservedGlobalConstantBuffer);
 
 	//make sure beginCommandList is always the first element of recordCommandLists
 	begin();
@@ -620,10 +496,7 @@ RenderEngine::~RenderEngine()
 		ImGui::DestroyContext();
 	}
 
-	if (GraphicsContext::globalConstantBuffer)
-	{
-		delete GraphicsContext::globalConstantBuffer;
-	}
+	delete reservedGlobalConstantBuffer;
 
 	if (GlobalDescriptorHeap::instance)
 	{

@@ -44,6 +44,8 @@ public:
 
 	void transition(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers, std::vector<PendingTextureBarrier>& pendingBarriers);
 
+	void solvePendingBarrier(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers, const uint32_t targetMipSlice, const uint32_t targetState);
+
 	uint32_t getWidth() const;
 
 	uint32_t getHeight() const;
@@ -65,8 +67,6 @@ public:
 	void pushToTrackingList(std::vector<Texture*>& trackingList);
 
 private:
-
-	friend class RenderEngine;
 
 	uint32_t width;
 

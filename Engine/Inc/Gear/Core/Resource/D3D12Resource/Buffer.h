@@ -42,6 +42,8 @@ public:
 
 	void transition(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers, std::vector<PendingBufferBarrier>& pendingBarriers);
 
+	void solvePendingBarrier(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers, const uint32_t targetState);
+
 	void setState(const uint32_t state);
 
 	uint32_t getState() const;
@@ -49,8 +51,6 @@ public:
 	void pushToTrackingList(std::vector<Buffer*>& trackingList);
 
 private:
-
-	friend class RenderEngine;
 
 	std::shared_ptr<uint32_t> globalState;
 

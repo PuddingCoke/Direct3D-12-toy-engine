@@ -7,6 +7,8 @@
 
 #include<Gear/Core/Camera.h>
 
+#include<Gear/Core/Resource/ConstantBuffer.h>
+
 #include<ImGUI/imgui.h>
 
 #include<ImGUI/imgui_impl_win32.h>
@@ -112,6 +114,8 @@ private:
 	std::mutex submitCommandListLock;
 
 	int32_t syncInterval;
+
+	ConstantBuffer* reservedGlobalConstantBuffer;
 
 	struct PerFrameResource
 	{
