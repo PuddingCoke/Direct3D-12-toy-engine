@@ -76,6 +76,22 @@ void Buffer::transition(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers,
 	resetTransitionStates();
 }
 
+void Buffer::solvePendingBarrier(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers, const uint32_t targetState)
+{
+	if (*globalState != targetState)
+	{
+		D3D12_RESOURCE_BARRIER barrier = {};
+		barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+		barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+		barrier.Transition.pResource = getResource();
+		barrier.Transition.StateBefore = static_cast<D3D12_RESOURCE_STATES>(*globalState);
+		barrier.Transition.StateAfter = static_cast<D3D12_RESOURCE_STATES>(targetState);
+		barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+
+		transitionBarriers.push_back(barrier);
+	}
+}
+
 void Buffer::setState(const uint32_t state)
 {
 	if (transitionState == D3D12_RESOURCE_STATE_UNKNOWN)

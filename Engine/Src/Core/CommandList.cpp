@@ -95,7 +95,7 @@ void CommandList::transitionResources()
 	}
 }
 
-void CommandList::updateReferredResStates()
+void CommandList::updateReferredSharedResourceStates()
 {
 	for (Resource* const res : referredResources)
 	{
@@ -107,6 +107,11 @@ void CommandList::updateReferredResStates()
 	}
 
 	referredResources.clear();
+}
+
+void CommandList::setBackBufferHandle(const D3D12_CPU_DESCRIPTOR_HANDLE handle)
+{
+	backBufferHandle = handle;
 }
 
 void CommandList::pushResourceTrackList(Texture* const texture)
@@ -388,4 +393,27 @@ void CommandList::clearUnorderedAccessView(const ClearUAVDesc& desc, const uint3
 	transitionResources();
 
 	commandList->ClearUnorderedAccessViewUint(desc.viewGPUHandle, desc.viewCPUHandle, resource, values, 0, nullptr);
+}
+
+void CommandList::solvePendingBarriers(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers)
+{
+	if (pendingBufferBarrier.size())
+	{
+		for (const PendingBufferBarrier& pendingBarrier : pendingBufferBarrier)
+		{
+			pendingBarrier.buffer->solvePendingBarrier(transitionBarriers, pendingBarrier.afterState);
+		}
+
+		pendingBufferBarrier.clear();
+	}
+
+	if (pendingTextureBarrier.size())
+	{
+		for (const PendingTextureBarrier& pendingBarrier : pendingTextureBarrier)
+		{
+			pendingBarrier.texture->solvePendingBarrier(transitionBarriers, pendingBarrier.mipSlice, pendingBarrier.afterState);
+		}
+
+		pendingTextureBarrier.clear();
+	}
 }

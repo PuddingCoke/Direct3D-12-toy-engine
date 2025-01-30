@@ -141,11 +141,11 @@ public:
 
 	CommandList* getCommandList() const;
 
+	static void setReservedGlobalConstantBuffer(ConstantBuffer* const buffer);
+
 private:
 
-	friend class RenderEngine;
-
-	static ConstantBuffer* globalConstantBuffer;
+	static ConstantBuffer* reservedGlobalConstantBuffer;
 
 	void getIndicesFromResourceDescs(const std::initializer_list<ShaderResourceDesc>& descs, uint32_t* const dst) const;
 

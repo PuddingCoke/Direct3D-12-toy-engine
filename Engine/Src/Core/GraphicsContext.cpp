@@ -2,7 +2,7 @@
 
 #include<Gear/Core/GlobalRootSignature.h>
 
-ConstantBuffer* GraphicsContext::globalConstantBuffer = nullptr;
+ConstantBuffer* GraphicsContext::reservedGlobalConstantBuffer = nullptr;
 
 GraphicsContext::GraphicsContext() :
 	commandList(new CommandList(D3D12_COMMAND_LIST_TYPE_DIRECT)),
@@ -332,9 +332,9 @@ void GraphicsContext::begin() const
 
 	commandList->setComputeRootSignature(GlobalRootSignature::getComputeRootSignature());
 
-	commandList->get()->SetGraphicsRootConstantBufferView(0, globalConstantBuffer->getGPUAddress());
+	commandList->get()->SetGraphicsRootConstantBufferView(0, reservedGlobalConstantBuffer->getGPUAddress());
 
-	commandList->get()->SetComputeRootConstantBufferView(0, globalConstantBuffer->getGPUAddress());
+	commandList->get()->SetComputeRootConstantBufferView(0, reservedGlobalConstantBuffer->getGPUAddress());
 }
 
 void GraphicsContext::end() const
@@ -345,6 +345,11 @@ void GraphicsContext::end() const
 CommandList* GraphicsContext::getCommandList() const
 {
 	return commandList;
+}
+
+void GraphicsContext::setReservedGlobalConstantBuffer(ConstantBuffer* const buffer)
+{
+	reservedGlobalConstantBuffer = buffer;
 }
 
 void GraphicsContext::getIndicesFromResourceDescs(const std::initializer_list<ShaderResourceDesc>& descs, uint32_t* const dst) const
