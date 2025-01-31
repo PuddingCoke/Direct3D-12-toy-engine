@@ -139,98 +139,76 @@ void Texture::transition(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers
 		}
 	}
 
-	//if allState of transitionState is determined
+	//if allState of transitionState is known
 	if (transitionState.allState != D3D12_RESOURCE_STATE_UNKNOWN)
 	{
 		//if texture has multiple mipslices
 		if (mipLevels > 1)
 		{
-			//first we check if mipslice states of internalState are all unknown
-			bool allStatesUnknown = true;
-
-			for (uint32_t i = 0; i < mipLevels; i++)
+			//this is the best case,transitionState.allState and internalState.allState are all known
+			if (internalState.allState != D3D12_RESOURCE_STATE_UNKNOWN)
 			{
-				if (internalState.mipLevelStates[i] != D3D12_RESOURCE_STATE_UNKNOWN)
+				if (!bitFlagSubset(internalState.allState, transitionState.allState))
 				{
-					allStatesUnknown = false;
-					break;
+					D3D12_RESOURCE_BARRIER barrier = {};
+					barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+					barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+					barrier.Transition.pResource = getResource();
+					barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+					barrier.Transition.StateBefore = static_cast<D3D12_RESOURCE_STATES>(internalState.allState);
+					barrier.Transition.StateAfter = static_cast<D3D12_RESOURCE_STATES>(transitionState.allState);
+
+					transitionBarriers.push_back(barrier);
+
+					internalState.allState = transitionState.allState;
+
+					for (uint32_t i = 0; i < mipLevels; i++)
+					{
+						internalState.mipLevelStates[i] = transitionState.mipLevelStates[i];
+					}
 				}
 			}
-
-			//if mipslice states of internalState are all unknown
-			//then we need main render thread to solve this problem for us
-			if (allStatesUnknown)
+			//internalState.allState equals to D3D12_RESOURCE_STATE_UNKNOWN
+			//in this case we need furthur checking
+			else
 			{
-				PendingTextureBarrier barrier = {};
-				barrier.texture = this;
-				barrier.mipSlice = D3D12_TRANSITION_ALL_MIPLEVELS;
-				barrier.afterState = transitionState.allState;
-
-				pendingBarriers.push_back(barrier);
-
-				internalState.allState = transitionState.allState;
+				//first we check if all mipslice states of internalState are all unknown
+				bool allStatesUnknown = true;
 
 				for (uint32_t i = 0; i < mipLevels; i++)
 				{
-					internalState.mipLevelStates[i] = transitionState.mipLevelStates[i];
+					if (internalState.mipLevelStates[i] != D3D12_RESOURCE_STATE_UNKNOWN)
+					{
+						allStatesUnknown = false;
+						break;
+					}
 				}
-			}
-			//some mipslice states of internalState are known
-			else
-			{
-				//check if each mipslice state of internalState is the same
-				bool uniformState = true;
 
-				if (internalState.allState == D3D12_RESOURCE_STATE_UNKNOWN)
+				//if mipslice states of internalState are all unknown
+				//we set barrier.mipSlice to D3D12_TRANSITION_ALL_MIPLEVELS
+				//handle this when commandList is submitted for execution
+				if (allStatesUnknown)
 				{
-					const uint32_t tempState = internalState.mipLevelStates[0];
+					PendingTextureBarrier barrier = {};
+					barrier.texture = this;
+					barrier.mipSlice = D3D12_TRANSITION_ALL_MIPLEVELS;
+					barrier.afterState = transitionState.allState;
 
-					if (tempState == D3D12_RESOURCE_STATE_UNKNOWN)
+					pendingBarriers.push_back(barrier);
+
+					internalState.allState = transitionState.allState;
+
+					for (uint32_t i = 0; i < mipLevels; i++)
 					{
-						uniformState = false;
-					}
-					else
-					{
-						for (uint32_t i = 0; i < mipLevels; i++)
-						{
-							if (internalState.mipLevelStates[i] != tempState)
-							{
-								uniformState = false;
-								break;
-							}
-						}
+						internalState.mipLevelStates[i] = transitionState.mipLevelStates[i];
 					}
 				}
-
-				//this is the best case
-				if (uniformState)
-				{
-					if (!bitFlagSubset(internalState.mipLevelStates[0], transitionState.mipLevelStates[0]))
-					{
-						D3D12_RESOURCE_BARRIER barrier = {};
-						barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-						barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-						barrier.Transition.pResource = getResource();
-						barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-						barrier.Transition.StateBefore = static_cast<D3D12_RESOURCE_STATES>(internalState.mipLevelStates[0]);
-						barrier.Transition.StateAfter = static_cast<D3D12_RESOURCE_STATES>(transitionState.mipLevelStates[0]);
-
-						transitionBarriers.push_back(barrier);
-
-						internalState.allState = transitionState.allState;
-
-						for (uint32_t i = 0; i < mipLevels; i++)
-						{
-							internalState.mipLevelStates[i] = transitionState.mipLevelStates[i];
-						}
-					}
-				}
-				//not unifromState this means some states might be known some are not
+				//some mipslice states of internalState are known
 				//in this case we need to check each mipslice state
+				//for unknown internal state we push PendingTextureBarrier
+				//for known internal state we push D3D12_RESOURCE_BARRIER
 				else
 				{
-					//for unknown internal state just push pending barrier 
-					//for known internal state just push barrier for this mipslice
 					for (uint32_t mipSlice = 0; mipSlice < mipLevels; mipSlice++)
 					{
 						//unknown
@@ -357,9 +335,8 @@ void Texture::transition(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers
 		}
 	}
 
-	//up to this point transitions for this texture are all completed
-	//we need to check mipslice states of internalState
-
+	//previous operation might make each mipslice state of internal state the same
+	//so we need to check mipslice states of internal state and set internalState.allState base on it
 	bool uniformState = true;
 
 	const uint32_t tempState = internalState.mipLevelStates[0];
@@ -389,7 +366,8 @@ void Texture::transition(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers
 		internalState.allState = D3D12_RESOURCE_STATE_UNKNOWN;
 	}
 
-	//reset transition state for transition next time
+	//at last reset transition state
+	//this is important because we need to make this resource is available for subsequent uses
 	resetTransitionStates();
 }
 

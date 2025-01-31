@@ -40,8 +40,6 @@ public:
 
 	void resetInternalStates() override;
 
-	void resetTransitionStates() override;
-
 	void transition(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers, std::vector<PendingTextureBarrier>& pendingBarriers);
 
 	void solvePendingBarrier(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers, const uint32_t targetMipSlice, const uint32_t targetState);
@@ -65,6 +63,10 @@ public:
 	uint32_t getMipSliceState(const uint32_t mipSlice) const;
 
 	void pushToTrackingList(std::vector<Texture*>& trackingList);
+
+protected:
+
+	void resetTransitionStates() override;
 
 private:
 

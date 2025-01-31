@@ -42,8 +42,6 @@ public:
 
 	virtual void resetInternalStates() = 0;
 
-	virtual void resetTransitionStates() = 0;
-
 	ID3D12Resource* getResource() const;
 
 	D3D12_GPU_VIRTUAL_ADDRESS getGPUAddress() const;
@@ -65,6 +63,10 @@ public:
 	void pushToTrackingList();
 
 	void popFromTrackingList();
+
+protected:
+
+	virtual void resetTransitionStates() = 0;
 
 private:
 
