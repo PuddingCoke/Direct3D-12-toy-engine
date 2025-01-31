@@ -29,6 +29,8 @@ public:
 
 	void resetInternalStates() override;
 
+protected:
+
 	void resetTransitionStates() override;
 
 };
