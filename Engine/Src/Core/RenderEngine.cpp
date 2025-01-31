@@ -496,35 +496,6 @@ RenderEngine::~RenderEngine()
 		ImGui::DestroyContext();
 	}
 
-	delete reservedGlobalConstantBuffer;
-
-	if (GlobalDescriptorHeap::instance)
-	{
-		delete GlobalDescriptorHeap::instance;
-	}
-
-	if (GlobalRootSignature::instance)
-	{
-		delete GlobalRootSignature::instance;
-	}
-
-	if (ConstantBufferManager::instance)
-	{
-		delete ConstantBufferManager::instance;
-	}
-
-	Shader::releaseGlobalShaders();
-
-	if (prepareCommandList)
-	{
-		delete prepareCommandList;
-	}
-
-	if (fenceValues)
-	{
-		delete[] fenceValues;
-	}
-
 	if (backBufferTextures)
 	{
 		for (uint32_t i = 0; i < Graphics::getFrameBufferCount(); i++)
@@ -539,6 +510,44 @@ RenderEngine::~RenderEngine()
 	{
 		delete[] backBufferHandles;
 	}
+
+	if (reservedGlobalConstantBuffer)
+	{
+		delete reservedGlobalConstantBuffer;
+	}
+
+	if (prepareCommandList)
+	{
+		delete prepareCommandList;
+	}
+
+	fence = nullptr;
+
+	if (fenceValues)
+	{
+		delete[] fenceValues;
+	}
+
+	swapChain = nullptr;
+
+	if (ConstantBufferManager::instance)
+	{
+		delete ConstantBufferManager::instance;
+	}
+
+	if (GlobalRootSignature::instance)
+	{
+		delete GlobalRootSignature::instance;
+	}
+
+	if (GlobalDescriptorHeap::instance)
+	{
+		delete GlobalDescriptorHeap::instance;
+	}
+
+	Shader::releaseGlobalShaders();
+
+	commandQueue = nullptr;
 
 	if (GraphicsDevice::instance)
 	{
