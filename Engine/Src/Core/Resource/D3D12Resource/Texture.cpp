@@ -139,6 +139,8 @@ void Texture::transition(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers
 		}
 	}
 
+	bool finalStateChecking = false;
+
 	//if allState of transitionState is known
 	if (transitionState.allState != D3D12_RESOURCE_STATE_UNKNOWN)
 	{
@@ -214,6 +216,8 @@ void Texture::transition(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers
 						//unknown
 						if (internalState.mipLevelStates[mipSlice] == D3D12_RESOURCE_STATE_UNKNOWN)
 						{
+							finalStateChecking = true;
+
 							PendingTextureBarrier barrier = {};
 							barrier.texture = this;
 							barrier.mipSlice = mipSlice;
@@ -228,6 +232,8 @@ void Texture::transition(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers
 						{
 							if (!bitFlagSubset(internalState.mipLevelStates[mipSlice], transitionState.mipLevelStates[mipSlice]))
 							{
+								finalStateChecking = true;
+
 								for (uint32_t arraySlice = 0; arraySlice < arraySize; arraySlice++)
 								{
 									D3D12_RESOURCE_BARRIER barrier = {};
@@ -297,6 +303,8 @@ void Texture::transition(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers
 				{
 					if (internalState.mipLevelStates[mipSlice] == D3D12_RESOURCE_STATE_UNKNOWN)
 					{
+						finalStateChecking = true;
+
 						PendingTextureBarrier barrier = {};
 						barrier.texture = this;
 						barrier.mipSlice = mipSlice;
@@ -310,6 +318,8 @@ void Texture::transition(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers
 					{
 						if (!bitFlagSubset(internalState.mipLevelStates[mipSlice], transitionState.mipLevelStates[mipSlice]))
 						{
+							finalStateChecking = true;
+
 							for (uint32_t arraySlice = 0; arraySlice < arraySize; arraySlice++)
 							{
 								D3D12_RESOURCE_BARRIER barrier = {};
@@ -336,38 +346,41 @@ void Texture::transition(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers
 	}
 
 	//previous operation might make each mipslice state of internal state the same
-	//so we need to check mipslice states of internal state and set internalState.allState base on it
-	bool uniformState = true;
-
-	const uint32_t tempState = internalState.mipLevelStates[0];
-
-	if (tempState == D3D12_RESOURCE_STATE_UNKNOWN)
+	//so we need to check each mipslice state of internal state and set internalState.allState base on it
+	if (finalStateChecking)
 	{
-		uniformState = false;
-	}
-	else
-	{
-		for (uint32_t i = 0; i < mipLevels; i++)
+		bool uniformState = true;
+
+		const uint32_t tempState = internalState.mipLevelStates[0];
+
+		if (tempState == D3D12_RESOURCE_STATE_UNKNOWN)
 		{
-			if (tempState != internalState.mipLevelStates[i])
+			uniformState = false;
+		}
+		else
+		{
+			for (uint32_t i = 0; i < mipLevels; i++)
 			{
-				uniformState = false;
-				break;
+				if (tempState != internalState.mipLevelStates[i])
+				{
+					uniformState = false;
+					break;
+				}
 			}
+		}
+
+		if (uniformState)
+		{
+			internalState.allState = tempState;
+		}
+		else
+		{
+			internalState.allState = D3D12_RESOURCE_STATE_UNKNOWN;
 		}
 	}
 
-	if (uniformState)
-	{
-		internalState.allState = tempState;
-	}
-	else
-	{
-		internalState.allState = D3D12_RESOURCE_STATE_UNKNOWN;
-	}
-
 	//at last reset transition state
-	//this is important because we need to make this resource is available for subsequent uses
+	//this is important because we need to make this resource available for subsequent uses
 	resetTransitionStates();
 }
 
