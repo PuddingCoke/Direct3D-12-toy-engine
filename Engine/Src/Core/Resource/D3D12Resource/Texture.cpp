@@ -58,20 +58,20 @@ Texture::~Texture()
 
 void Texture::updateGlobalStates()
 {
-	for (uint32_t mipSlice = 0; mipSlice < mipLevels; mipSlice++)
-	{
-		if (internalState->mipLevelStates[mipSlice] != D3D12_RESOURCE_STATE_UNKNOWN)
-		{
-			globalState->mipLevelStates[mipSlice] = internalState->mipLevelStates[mipSlice];
-		}
-	}
-
 	if (internalState->allState != D3D12_RESOURCE_STATE_UNKNOWN)
 	{
-		globalState->allState = internalState->allState;
+		globalState->set(internalState->allState);
 	}
 	else
 	{
+		for (uint32_t mipSlice = 0; mipSlice < mipLevels; mipSlice++)
+		{
+			if (internalState->mipLevelStates[mipSlice] != D3D12_RESOURCE_STATE_UNKNOWN)
+			{
+				globalState->mipLevelStates[mipSlice] = internalState->mipLevelStates[mipSlice];
+			}
+		}
+
 		const uint32_t tempState = globalState->mipLevelStates[0];
 
 		const bool uniformState = globalState->allOfEqual(tempState);
