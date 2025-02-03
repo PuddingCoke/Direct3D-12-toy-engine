@@ -354,12 +354,9 @@ void GraphicsContext::setReservedGlobalConstantBuffer(ConstantBuffer* const buff
 
 void GraphicsContext::getIndicesFromResourceDescs(const std::initializer_list<ShaderResourceDesc>& descs, uint32_t* const dst) const
 {
-	uint32_t index = 0;
-
-	for (const ShaderResourceDesc& desc : descs)
-	{
-		dst[index] = desc.resourceIndex;
-
-		index++;
-	}
+	std::transform(descs.begin(), descs.end(), dst,
+		[](const ShaderResourceDesc& desc)
+		{
+			return desc.resourceIndex;
+		});
 }

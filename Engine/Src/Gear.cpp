@@ -22,7 +22,7 @@ int Gear::iniEngine(const Configuration& config, const int argc, const char* arg
 	{
 		const std::string exeRootPath = argv[0];
 
-		const std::wstring wRootPath = std::wstring(exeRootPath.begin(), exeRootPath.end());
+		const std::wstring wRootPath = std::wstring(exeRootPath.cbegin(), exeRootPath.cend());
 
 		Utils::exeRootPath = Utils::File::backslashToSlash(Utils::File::getParentFolder(wRootPath));
 
