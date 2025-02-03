@@ -3,6 +3,12 @@
 #ifndef _GRAPHICSDEVICE_H_
 #define _GRAPHICSDEVICE_H_
 
+static_assert(sizeof(int) == 4, "size of int must be 4");
+
+static_assert(sizeof(float) == 4, "size of float must be 4");
+
+static_assert(sizeof(double) == 8, "size of double must be 8");
+
 #include<Gear/Utils/Logger.h>
 
 #include<D3D12Headers/d3dx12.h>
@@ -17,7 +23,7 @@ using Microsoft::WRL::ComPtr;
 
 #define CHECKERROR(x) \
 {\
-HRESULT hr = x;\
+const HRESULT hr = x;\
 if(FAILED(hr))\
 {\
 _com_error err(hr);\

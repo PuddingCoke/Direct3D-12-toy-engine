@@ -46,7 +46,7 @@ void GraphicsDevice::checkFeatureSupport() const
 			break;
 		}
 
-		LOG(Logger::brightYellow, "resource binding tier", Logger::brightMagenta, bindingTierString);
+		LOGENGINE("resource binding tier", Logger::brightMagenta, bindingTierString);
 	}
 
 	{
@@ -89,7 +89,7 @@ void GraphicsDevice::checkFeatureSupport() const
 			break;
 		}
 
-		LOG(Logger::brightYellow, "highest supported shader model", Logger::brightMagenta, shaderModelString);
+		LOGENGINE("highest supported shader model", Logger::brightMagenta, shaderModelString);
 
 		if (shaderModel < D3D_SHADER_MODEL_6_6)
 		{
@@ -100,7 +100,7 @@ void GraphicsDevice::checkFeatureSupport() const
 	{
 		const BOOL typedUAVLoad = features.TypedUAVLoadAdditionalFormats();
 
-		LOG(Logger::brightYellow, "typed uav load", (typedUAVLoad ? Logger::brightGreen : Logger::brightRed), (typedUAVLoad ? "yes" : "no"));
+		LOGENGINE("typed uav load", (typedUAVLoad ? Logger::brightGreen : Logger::brightRed), (typedUAVLoad ? "yes" : "no"));
 
 		if (!typedUAVLoad)
 		{
@@ -127,7 +127,7 @@ void GraphicsDevice::checkFeatureSupport() const
 			break;
 		}
 
-		LOG(Logger::brightYellow, "raytracing tier", Logger::brightMagenta, raytracingTierString);
+		LOGENGINE("raytracing tier", Logger::brightMagenta, raytracingTierString);
 	}
 
 }

@@ -236,13 +236,13 @@ ComPtr<IDXGIAdapter4> RenderEngine::getBestAdapterAndVendor(IDXGIFactory7* const
 
 			LOGENGINE("following are information about selected GPU");
 
-			LOG(Logger::brightYellow, "GPU Name", desc.Description);
+			LOGENGINE("GPU Name", desc.Description);
 
-			LOG("GPU Vendor ID", std::hex, vendorID, std::dec);
+			LOGENGINE("GPU Vendor ID", std::hex, vendorID, std::dec);
 
-			LOG("GPU Vendor Name", vendorName);
+			LOGENGINE("GPU Vendor Name", vendorName);
 
-			LOG("GPU Dedicated Memory", static_cast<float>(desc.DedicatedVideoMemory) / 1024.f / 1024.f / 1024.f, "gigabytes");
+			LOGENGINE("GPU Dedicated Memory", static_cast<float>(desc.DedicatedVideoMemory) / 1024.f / 1024.f / 1024.f, "gigabytes");
 
 			break;
 		}

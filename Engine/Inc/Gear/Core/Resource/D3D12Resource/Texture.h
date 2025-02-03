@@ -80,19 +80,48 @@ private:
 
 	DXGI_FORMAT format;
 
-	struct STATES
+	struct States
 	{
+		States() = delete;
+
+		States(const States&) = delete;
+
+		void operator=(const States&) = delete;
+
+		explicit States(const uint32_t initialState, const uint32_t mipLevels);
+
+		~States();
+
+		void set(const uint32_t state);
+
+		void combine(const uint32_t state);
+
+		void reset();
+
+		bool allOfEqual(const uint32_t state) const;
+
+		template<typename Func>
+		void forEach(const Func& func) const;
+
+		const uint32_t mipLevels;
+
 		uint32_t allState;
 
-		std::vector<uint32_t> mipLevelStates;
+		uint32_t* mipLevelStates;
 	};
 
-	std::shared_ptr<STATES> globalState;
+	std::shared_ptr<States> globalState;
 
-	STATES internalState;
+	States* internalState;
 
-	STATES transitionState;
+	States* transitionState;
 
 };
 
 #endif // !_TEXTURE_H_
+
+template<typename Func>
+inline void Texture::States::forEach(const Func& func) const
+{
+	std::for_each(mipLevelStates, mipLevelStates + mipLevels, func);
+}
