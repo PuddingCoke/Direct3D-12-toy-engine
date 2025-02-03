@@ -7,9 +7,9 @@ Texture::Texture(const uint32_t width, const uint32_t height, const DXGI_FORMAT 
 	arraySize(arraySize),
 	mipLevels(mipLevels),
 	format(format),
-	globalState(std::make_shared<STATES>(STATES{ D3D12_RESOURCE_STATE_COPY_DEST,std::vector<uint32_t>(mipLevels,D3D12_RESOURCE_STATE_COPY_DEST) })),
-	internalState(STATES{ D3D12_RESOURCE_STATE_COPY_DEST,std::vector<uint32_t>(mipLevels,D3D12_RESOURCE_STATE_COPY_DEST) }),
-	transitionState(STATES{ D3D12_RESOURCE_STATE_UNKNOWN,std::vector<uint32_t>(mipLevels,D3D12_RESOURCE_STATE_UNKNOWN) })
+	globalState(std::make_shared<States>(D3D12_RESOURCE_STATE_COPY_DEST, mipLevels)),
+	internalState(new States(D3D12_RESOURCE_STATE_COPY_DEST, mipLevels)),
+	transitionState(new States(D3D12_RESOURCE_STATE_UNKNOWN, mipLevels))
 {
 
 }
@@ -24,9 +24,9 @@ Texture::Texture(const ComPtr<ID3D12Resource>& texture, const bool stateTracking
 	mipLevels = desc.MipLevels;
 	format = desc.Format;
 
-	globalState = std::make_shared<STATES>(STATES{ initialState,std::vector<uint32_t>(mipLevels,initialState) });
-	internalState = STATES{ initialState,std::vector<uint32_t>(mipLevels,initialState) };
-	transitionState = STATES{ D3D12_RESOURCE_STATE_UNKNOWN,std::vector<uint32_t>(mipLevels,D3D12_RESOURCE_STATE_UNKNOWN) };
+	globalState = std::make_shared<States>(initialState, mipLevels);
+	internalState = new States(initialState, mipLevels);
+	transitionState = new States(D3D12_RESOURCE_STATE_UNKNOWN, mipLevels);
 }
 
 Texture::Texture(Texture& tex) :
@@ -37,44 +37,44 @@ Texture::Texture(Texture& tex) :
 	mipLevels(tex.mipLevels),
 	format(tex.format),
 	globalState(tex.globalState),
-	internalState(STATES{ D3D12_RESOURCE_STATE_UNKNOWN,std::vector<uint32_t>(mipLevels,D3D12_RESOURCE_STATE_UNKNOWN) }),
-	transitionState(STATES{ D3D12_RESOURCE_STATE_UNKNOWN,std::vector<uint32_t>(mipLevels,D3D12_RESOURCE_STATE_UNKNOWN) })
+	internalState(new States(D3D12_RESOURCE_STATE_UNKNOWN, mipLevels)),
+	transitionState(new States(D3D12_RESOURCE_STATE_UNKNOWN, mipLevels))
 {
 
 }
 
 Texture::~Texture()
 {
+	if (internalState)
+	{
+		delete internalState;
+	}
+
+	if (transitionState)
+	{
+		delete transitionState;
+	}
 }
 
 void Texture::updateGlobalStates()
 {
 	for (uint32_t mipSlice = 0; mipSlice < mipLevels; mipSlice++)
 	{
-		if (internalState.mipLevelStates[mipSlice] != D3D12_RESOURCE_STATE_UNKNOWN)
+		if (internalState->mipLevelStates[mipSlice] != D3D12_RESOURCE_STATE_UNKNOWN)
 		{
-			globalState->mipLevelStates[mipSlice] = internalState.mipLevelStates[mipSlice];
+			globalState->mipLevelStates[mipSlice] = internalState->mipLevelStates[mipSlice];
 		}
 	}
 
-	if (internalState.allState != D3D12_RESOURCE_STATE_UNKNOWN)
+	if (internalState->allState != D3D12_RESOURCE_STATE_UNKNOWN)
 	{
-		globalState->allState = internalState.allState;
+		globalState->allState = internalState->allState;
 	}
 	else
 	{
-		bool uniformState = true;
-
 		const uint32_t tempState = globalState->mipLevelStates[0];
 
-		for (uint32_t i = 0; i < mipLevels; i++)
-		{
-			if (globalState->mipLevelStates[i] != tempState)
-			{
-				uniformState = false;
-				break;
-			}
-		}
+		const bool uniformState = globalState->allOfEqual(tempState);
 
 		if (uniformState)
 		{
@@ -89,102 +89,62 @@ void Texture::updateGlobalStates()
 
 void Texture::resetInternalStates()
 {
-	internalState.allState = D3D12_RESOURCE_STATE_UNKNOWN;
-
-	for (uint32_t i = 0; i < mipLevels; i++)
-	{
-		internalState.mipLevelStates[i] = D3D12_RESOURCE_STATE_UNKNOWN;
-	}
+	internalState->reset();
 }
 
 void Texture::resetTransitionStates()
 {
-	transitionState.allState = D3D12_RESOURCE_STATE_UNKNOWN;
-
-	for (uint32_t i = 0; i < mipLevels; i++)
-	{
-		transitionState.mipLevelStates[i] = D3D12_RESOURCE_STATE_UNKNOWN;
-	}
+	transitionState->reset();
 }
 
 void Texture::transition(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers, std::vector<PendingTextureBarrier>& pendingBarriers)
 {
 	//check each mipslice state of transitionState
 	//if they are the same then we set allState to that state
-	if (transitionState.allState == D3D12_RESOURCE_STATE_UNKNOWN)
+	if (transitionState->allState == D3D12_RESOURCE_STATE_UNKNOWN)
 	{
-		bool uniformState = true;
+		const uint32_t tempState = transitionState->mipLevelStates[0];
 
-		const uint32_t tempState = transitionState.mipLevelStates[0];
-
-		if (tempState == D3D12_RESOURCE_STATE_UNKNOWN)
-		{
-			uniformState = false;
-		}
-		else
-		{
-			for (uint32_t i = 0; i < mipLevels; i++)
-			{
-				if (tempState != transitionState.mipLevelStates[i])
-				{
-					uniformState = false;
-					break;
-				}
-			}
-		}
+		const bool uniformState = ((tempState == D3D12_RESOURCE_STATE_UNKNOWN) ? false : transitionState->allOfEqual(tempState));
 
 		if (uniformState)
 		{
-			transitionState.allState = tempState;
+			transitionState->allState = tempState;
 		}
 	}
 
 	bool finalStateChecking = false;
 
 	//if allState of transitionState is known
-	if (transitionState.allState != D3D12_RESOURCE_STATE_UNKNOWN)
+	if (transitionState->allState != D3D12_RESOURCE_STATE_UNKNOWN)
 	{
 		//if texture has multiple mipslices
 		if (mipLevels > 1)
 		{
-			//this is the best case,transitionState.allState and internalState.allState are all known
-			if (internalState.allState != D3D12_RESOURCE_STATE_UNKNOWN)
+			//this is the best case,transitionState->allState and internalState->allState are all known
+			if (internalState->allState != D3D12_RESOURCE_STATE_UNKNOWN)
 			{
-				if (!bitFlagSubset(internalState.allState, transitionState.allState))
+				if (!bitFlagSubset(internalState->allState, transitionState->allState))
 				{
 					D3D12_RESOURCE_BARRIER barrier = {};
 					barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 					barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
 					barrier.Transition.pResource = getResource();
 					barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-					barrier.Transition.StateBefore = static_cast<D3D12_RESOURCE_STATES>(internalState.allState);
-					barrier.Transition.StateAfter = static_cast<D3D12_RESOURCE_STATES>(transitionState.allState);
+					barrier.Transition.StateBefore = static_cast<D3D12_RESOURCE_STATES>(internalState->allState);
+					barrier.Transition.StateAfter = static_cast<D3D12_RESOURCE_STATES>(transitionState->allState);
 
 					transitionBarriers.push_back(barrier);
 
-					internalState.allState = transitionState.allState;
-
-					for (uint32_t i = 0; i < mipLevels; i++)
-					{
-						internalState.mipLevelStates[i] = transitionState.mipLevelStates[i];
-					}
+					internalState->set(transitionState->allState);
 				}
 			}
-			//internalState.allState equals to D3D12_RESOURCE_STATE_UNKNOWN
+			//internalState->allState equals to D3D12_RESOURCE_STATE_UNKNOWN
 			//in this case we need furthur checking
 			else
 			{
 				//first we check if all mipslice states of internalState are all unknown
-				bool allStatesUnknown = true;
-
-				for (uint32_t i = 0; i < mipLevels; i++)
-				{
-					if (internalState.mipLevelStates[i] != D3D12_RESOURCE_STATE_UNKNOWN)
-					{
-						allStatesUnknown = false;
-						break;
-					}
-				}
+				const bool allStatesUnknown = internalState->allOfEqual(D3D12_RESOURCE_STATE_UNKNOWN);
 
 				//if mipslice states of internalState are all unknown
 				//we set barrier.mipSlice to D3D12_TRANSITION_ALL_MIPLEVELS
@@ -194,43 +154,38 @@ void Texture::transition(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers
 					PendingTextureBarrier barrier = {};
 					barrier.texture = this;
 					barrier.mipSlice = D3D12_TRANSITION_ALL_MIPLEVELS;
-					barrier.afterState = transitionState.allState;
+					barrier.afterState = transitionState->allState;
 
 					pendingBarriers.push_back(barrier);
 
-					internalState.allState = transitionState.allState;
-
-					for (uint32_t i = 0; i < mipLevels; i++)
-					{
-						internalState.mipLevelStates[i] = transitionState.mipLevelStates[i];
-					}
+					internalState->set(transitionState->allState);
 				}
 				//some mipslice states of internalState are known
 				//in this case we need to check each mipslice state
-				//for unknown internal state we push PendingTextureBarrier
-				//for known internal state we push D3D12_RESOURCE_BARRIER
 				else
 				{
+					//for unknown internal state we push PendingTextureBarrier
+					//for known internal state we push D3D12_RESOURCE_BARRIER
 					for (uint32_t mipSlice = 0; mipSlice < mipLevels; mipSlice++)
 					{
 						//unknown
-						if (internalState.mipLevelStates[mipSlice] == D3D12_RESOURCE_STATE_UNKNOWN)
+						if (internalState->mipLevelStates[mipSlice] == D3D12_RESOURCE_STATE_UNKNOWN)
 						{
 							finalStateChecking = true;
 
 							PendingTextureBarrier barrier = {};
 							barrier.texture = this;
 							barrier.mipSlice = mipSlice;
-							barrier.afterState = transitionState.mipLevelStates[mipSlice];
+							barrier.afterState = transitionState->mipLevelStates[mipSlice];
 
 							pendingBarriers.push_back(barrier);
 
-							internalState.mipLevelStates[mipSlice] = transitionState.mipLevelStates[mipSlice];
+							internalState->mipLevelStates[mipSlice] = transitionState->mipLevelStates[mipSlice];
 						}
 						//known
 						else
 						{
-							if (!bitFlagSubset(internalState.mipLevelStates[mipSlice], transitionState.mipLevelStates[mipSlice]))
+							if (!bitFlagSubset(internalState->mipLevelStates[mipSlice], transitionState->mipLevelStates[mipSlice]))
 							{
 								finalStateChecking = true;
 
@@ -241,13 +196,13 @@ void Texture::transition(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers
 									barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
 									barrier.Transition.pResource = getResource();
 									barrier.Transition.Subresource = D3D12CalcSubresource(mipSlice, arraySlice, 0, mipLevels, arraySize);
-									barrier.Transition.StateBefore = static_cast<D3D12_RESOURCE_STATES>(internalState.mipLevelStates[mipSlice]);
-									barrier.Transition.StateAfter = static_cast<D3D12_RESOURCE_STATES>(transitionState.mipLevelStates[mipSlice]);
+									barrier.Transition.StateBefore = static_cast<D3D12_RESOURCE_STATES>(internalState->mipLevelStates[mipSlice]);
+									barrier.Transition.StateAfter = static_cast<D3D12_RESOURCE_STATES>(transitionState->mipLevelStates[mipSlice]);
 
 									transitionBarriers.push_back(barrier);
 								}
 
-								internalState.mipLevelStates[mipSlice] = transitionState.mipLevelStates[mipSlice];
+								internalState->mipLevelStates[mipSlice] = transitionState->mipLevelStates[mipSlice];
 							}
 						}
 					}
@@ -257,36 +212,32 @@ void Texture::transition(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers
 		//if texture has only one mipslice
 		else
 		{
-			if (internalState.allState == D3D12_RESOURCE_STATE_UNKNOWN)
+			if (internalState->allState == D3D12_RESOURCE_STATE_UNKNOWN)
 			{
 				PendingTextureBarrier barrier = {};
 				barrier.texture = this;
 				barrier.mipSlice = D3D12_TRANSITION_ALL_MIPLEVELS;
-				barrier.afterState = transitionState.allState;
+				barrier.afterState = transitionState->allState;
 
 				pendingBarriers.push_back(barrier);
 
-				internalState.allState = transitionState.allState;
-
-				internalState.mipLevelStates[0] = transitionState.mipLevelStates[0];
+				internalState->set(transitionState->allState);
 			}
 			else
 			{
-				if (!bitFlagSubset(internalState.allState, transitionState.allState))
+				if (!bitFlagSubset(internalState->allState, transitionState->allState))
 				{
 					D3D12_RESOURCE_BARRIER barrier = {};
 					barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 					barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
 					barrier.Transition.pResource = getResource();
 					barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-					barrier.Transition.StateBefore = static_cast<D3D12_RESOURCE_STATES>(internalState.allState);
-					barrier.Transition.StateAfter = static_cast<D3D12_RESOURCE_STATES>(transitionState.allState);
+					barrier.Transition.StateBefore = static_cast<D3D12_RESOURCE_STATES>(internalState->allState);
+					barrier.Transition.StateAfter = static_cast<D3D12_RESOURCE_STATES>(transitionState->allState);
 
 					transitionBarriers.push_back(barrier);
 
-					internalState.allState = transitionState.allState;
-
-					internalState.mipLevelStates[0] = transitionState.mipLevelStates[0];
+					internalState->set(transitionState->allState);
 				}
 			}
 		}
@@ -299,24 +250,24 @@ void Texture::transition(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers
 		{
 			for (uint32_t mipSlice = 0; mipSlice < mipLevels; mipSlice++)
 			{
-				if (transitionState.mipLevelStates[mipSlice] != D3D12_RESOURCE_STATE_UNKNOWN)
+				if (transitionState->mipLevelStates[mipSlice] != D3D12_RESOURCE_STATE_UNKNOWN)
 				{
-					if (internalState.mipLevelStates[mipSlice] == D3D12_RESOURCE_STATE_UNKNOWN)
+					if (internalState->mipLevelStates[mipSlice] == D3D12_RESOURCE_STATE_UNKNOWN)
 					{
 						finalStateChecking = true;
 
 						PendingTextureBarrier barrier = {};
 						barrier.texture = this;
 						barrier.mipSlice = mipSlice;
-						barrier.afterState = transitionState.mipLevelStates[mipSlice];
+						barrier.afterState = transitionState->mipLevelStates[mipSlice];
 
 						pendingBarriers.push_back(barrier);
 
-						internalState.mipLevelStates[mipSlice] = transitionState.mipLevelStates[mipSlice];
+						internalState->mipLevelStates[mipSlice] = transitionState->mipLevelStates[mipSlice];
 					}
 					else
 					{
-						if (!bitFlagSubset(internalState.mipLevelStates[mipSlice], transitionState.mipLevelStates[mipSlice]))
+						if (!bitFlagSubset(internalState->mipLevelStates[mipSlice], transitionState->mipLevelStates[mipSlice]))
 						{
 							finalStateChecking = true;
 
@@ -327,13 +278,13 @@ void Texture::transition(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers
 								barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
 								barrier.Transition.pResource = getResource();
 								barrier.Transition.Subresource = D3D12CalcSubresource(mipSlice, arraySlice, 0, mipLevels, arraySize);
-								barrier.Transition.StateBefore = static_cast<D3D12_RESOURCE_STATES>(internalState.mipLevelStates[mipSlice]);
-								barrier.Transition.StateAfter = static_cast<D3D12_RESOURCE_STATES>(transitionState.mipLevelStates[mipSlice]);
+								barrier.Transition.StateBefore = static_cast<D3D12_RESOURCE_STATES>(internalState->mipLevelStates[mipSlice]);
+								barrier.Transition.StateAfter = static_cast<D3D12_RESOURCE_STATES>(transitionState->mipLevelStates[mipSlice]);
 
 								transitionBarriers.push_back(barrier);
 							}
 
-							internalState.mipLevelStates[mipSlice] = transitionState.mipLevelStates[mipSlice];
+							internalState->mipLevelStates[mipSlice] = transitionState->mipLevelStates[mipSlice];
 						}
 					}
 				}
@@ -346,36 +297,20 @@ void Texture::transition(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers
 	}
 
 	//previous operation might make each mipslice state of internal state the same
-	//so we need to check each mipslice state of internal state and set internalState.allState base on it
+	//so we need to check each mipslice state of internal state and set internalState->allState base on it
 	if (finalStateChecking)
 	{
-		bool uniformState = true;
+		const uint32_t tempState = internalState->mipLevelStates[0];
 
-		const uint32_t tempState = internalState.mipLevelStates[0];
-
-		if (tempState == D3D12_RESOURCE_STATE_UNKNOWN)
-		{
-			uniformState = false;
-		}
-		else
-		{
-			for (uint32_t i = 0; i < mipLevels; i++)
-			{
-				if (tempState != internalState.mipLevelStates[i])
-				{
-					uniformState = false;
-					break;
-				}
-			}
-		}
+		const bool uniformState = ((tempState == D3D12_RESOURCE_STATE_UNKNOWN) ? false : internalState->allOfEqual(tempState));
 
 		if (uniformState)
 		{
-			internalState.allState = tempState;
+			internalState->allState = tempState;
 		}
 		else
 		{
-			internalState.allState = D3D12_RESOURCE_STATE_UNKNOWN;
+			internalState->allState = D3D12_RESOURCE_STATE_UNKNOWN;
 		}
 	}
 
@@ -497,37 +432,30 @@ DXGI_FORMAT Texture::getFormat() const
 
 void Texture::setAllState(const uint32_t state)
 {
-	if (transitionState.allState == D3D12_RESOURCE_STATE_UNKNOWN)
+	if (transitionState->allState == D3D12_RESOURCE_STATE_UNKNOWN)
 	{
 		if (mipLevels > 1)
 		{
-			for (uint32_t i = 0; i < mipLevels; i++)
-			{
-				if (transitionState.mipLevelStates[i] == D3D12_RESOURCE_STATE_UNKNOWN)
+			transitionState->forEach([state](uint32_t& element)
 				{
-					transitionState.mipLevelStates[i] = state;
-				}
-				else
-				{
-					transitionState.mipLevelStates[i] = (transitionState.mipLevelStates[i] | state);
-				}
-			}
+					if (element == D3D12_RESOURCE_STATE_UNKNOWN)
+					{
+						element = state;
+					}
+					else
+					{
+						element = (element | state);
+					}
+				});
 		}
 		else
 		{
-			transitionState.allState = state;
-
-			transitionState.mipLevelStates[0] = state;
+			transitionState->set(state);
 		}
 	}
-	else if (!bitFlagSubset(internalState.allState, state))
+	else if (!bitFlagSubset(internalState->allState, state))
 	{
-		transitionState.allState = (transitionState.allState | state);
-
-		for (uint32_t i = 0; i < mipLevels; i++)
-		{
-			transitionState.mipLevelStates[i] = (transitionState.mipLevelStates[i] | state);
-		}
+		transitionState->combine(state);
 	}
 }
 
@@ -535,44 +463,40 @@ void Texture::setMipSliceState(const uint32_t mipSlice, const uint32_t state)
 {
 	if (mipLevels > 1)
 	{
-		if (transitionState.mipLevelStates[mipSlice] == D3D12_RESOURCE_STATE_UNKNOWN)
+		if (transitionState->mipLevelStates[mipSlice] == D3D12_RESOURCE_STATE_UNKNOWN)
 		{
-			transitionState.allState = D3D12_RESOURCE_STATE_UNKNOWN;
+			transitionState->allState = D3D12_RESOURCE_STATE_UNKNOWN;
 
-			transitionState.mipLevelStates[mipSlice] = state;
+			transitionState->mipLevelStates[mipSlice] = state;
 		}
-		else if (!bitFlagSubset(transitionState.mipLevelStates[mipSlice], state))
+		else if (!bitFlagSubset(transitionState->mipLevelStates[mipSlice], state))
 		{
-			transitionState.allState = D3D12_RESOURCE_STATE_UNKNOWN;
+			transitionState->allState = D3D12_RESOURCE_STATE_UNKNOWN;
 
-			transitionState.mipLevelStates[mipSlice] = (transitionState.mipLevelStates[mipSlice] | state);
+			transitionState->mipLevelStates[mipSlice] = (transitionState->mipLevelStates[mipSlice] | state);
 		}
 	}
 	else
 	{
-		if (transitionState.mipLevelStates[mipSlice] == D3D12_RESOURCE_STATE_UNKNOWN)
+		if (transitionState->mipLevelStates[mipSlice] == D3D12_RESOURCE_STATE_UNKNOWN)
 		{
-			transitionState.allState = state;
-
-			transitionState.mipLevelStates[mipSlice] = state;
+			transitionState->set(state);
 		}
 		else
 		{
-			transitionState.allState = (transitionState.allState | state);
-
-			transitionState.mipLevelStates[mipSlice] = (transitionState.mipLevelStates[mipSlice] | state);
+			transitionState->combine(state);
 		}
 	}
 }
 
 uint32_t Texture::getAllState() const
 {
-	return internalState.allState;
+	return internalState->allState;
 }
 
 uint32_t Texture::getMipSliceState(const uint32_t mipSlice) const
 {
-	return internalState.mipLevelStates[mipSlice];
+	return internalState->mipLevelStates[mipSlice];
 }
 
 void Texture::pushToTrackingList(std::vector<Texture*>& trackingList)
@@ -583,4 +507,49 @@ void Texture::pushToTrackingList(std::vector<Texture*>& trackingList)
 
 		Resource::pushToTrackingList();
 	}
+}
+
+Texture::States::States(const uint32_t initialState, const uint32_t mipLevels) :
+	mipLevels(mipLevels), mipLevelStates(new uint32_t[mipLevels])
+{
+	set(initialState);
+}
+
+Texture::States::~States()
+{
+	if (mipLevelStates)
+	{
+		delete[] mipLevelStates;
+	}
+}
+
+void Texture::States::set(const uint32_t state)
+{
+	allState = state;
+
+	std::fill(mipLevelStates, mipLevelStates + mipLevels, state);
+}
+
+void Texture::States::reset()
+{
+	set(D3D12_RESOURCE_STATE_UNKNOWN);
+}
+
+void Texture::States::combine(const uint32_t state)
+{
+	allState = (allState | state);
+
+	forEach([state](uint32_t& element)
+		{
+			element = (element | state);
+		});
+}
+
+bool Texture::States::allOfEqual(const uint32_t state) const
+{
+	return std::all_of(mipLevelStates, mipLevelStates + mipLevels,
+		[state](const uint32_t element)
+		{
+			return element == state;
+		});
 }
