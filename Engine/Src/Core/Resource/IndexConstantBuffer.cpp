@@ -25,16 +25,11 @@ void IndexConstantBuffer::setTransitionResources(const std::initializer_list<Sha
 
 	std::vector<uint32_t> indices = std::vector<uint32_t>(transitionDescs.size());
 
-	{
-		uint32_t index = 0;
-
-		for (const ShaderResourceDesc& desc : descs)
+	std::transform(descs.cbegin(), descs.cend(), indices.data(),
+		[](const ShaderResourceDesc& desc)
 		{
-			indices[index] = desc.resourceIndex;
-
-			index++;
-		}
-	}
+			return desc.resourceIndex;
+		});
 
 	constantBuffer->update(indices.data(), static_cast<uint32_t>(sizeof(uint32_t) * indices.size()));
 }
