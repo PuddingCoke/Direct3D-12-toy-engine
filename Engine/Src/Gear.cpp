@@ -15,19 +15,13 @@ Gear* Gear::get()
 	return instance;
 }
 
-int Gear::iniEngine(const Configuration& config, const int argc, const char* argv[])
+int Gear::iniEngine(const Configuration& config, const int argc, const wchar_t* argv[])
 {
 	Logger::instance = new Logger();
 
-	{
-		const std::string exeRootPath = argv[0];
+	Utils::exeRootPath = Utils::File::backslashToSlash(Utils::File::getParentFolder(argv[0]));
 
-		const std::wstring wRootPath = std::wstring(exeRootPath.cbegin(), exeRootPath.cend());
-
-		Utils::exeRootPath = Utils::File::backslashToSlash(Utils::File::getParentFolder(wRootPath));
-
-		LOGENGINE("executable path", Utils::getRootFolder());
-	}
+	LOGENGINE("executable path", Utils::getRootFolder());
 
 	usage = config.usage;
 

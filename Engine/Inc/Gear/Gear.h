@@ -25,7 +25,7 @@ public:
 
 	static Gear* get();
 
-	int iniEngine(const Configuration& config, const int argc, const char* argv[]);
+	int iniEngine(const Configuration& config, const int argc, const wchar_t* argv[]);
 
 	void iniGame(Game* const gamePtr);
 

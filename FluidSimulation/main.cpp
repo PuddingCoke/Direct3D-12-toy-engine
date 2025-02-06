@@ -2,7 +2,7 @@
 
 #include"MyGame.h"
 
-int main(int argc, const char* argv[])
+int wmain(int argc,const wchar_t* argv[])
 {
 	Configuration config(1920, 1080, L"Fluid Simulation", Configuration::EngineUsage::NORMAL, true);
 
