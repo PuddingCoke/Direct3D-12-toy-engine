@@ -4,7 +4,7 @@
 
 using EngineUsage = Configuration::EngineUsage;
 
-int main(int argc, const char* argv[])
+int wmain(int argc,const wchar_t* argv[])
 {
 	Configuration config(1000, 1000, L"Fourier Drawing", EngineUsage::NORMAL);
 
