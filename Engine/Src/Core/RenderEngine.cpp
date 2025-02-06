@@ -553,4 +553,6 @@ RenderEngine::~RenderEngine()
 	{
 		delete GraphicsDevice::instance;
 	}
+
+	CloseHandle(fenceEvent);
 }

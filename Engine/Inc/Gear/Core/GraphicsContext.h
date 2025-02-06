@@ -137,8 +137,6 @@ public:
 
 	void begin() const;
 
-	void end() const;
-
 	CommandList* getCommandList() const;
 
 	static void setReservedGlobalConstantBuffer(ConstantBuffer* const buffer);
@@ -147,7 +145,7 @@ private:
 
 	static ConstantBuffer* reservedGlobalConstantBuffer;
 
-	void getIndicesFromResourceDescs(const std::initializer_list<ShaderResourceDesc>& descs, uint32_t* const dst) const;
+	void getResourceIndicesFromDescs(const std::initializer_list<ShaderResourceDesc>& descs);
 
 	D3D12_VIEWPORT vp;
 
@@ -155,7 +153,7 @@ private:
 
 	CommandList* const commandList;
 
-	uint32_t tempResourceIndices[32];
+	uint32_t resourceIndices[32];
 
 };
 
