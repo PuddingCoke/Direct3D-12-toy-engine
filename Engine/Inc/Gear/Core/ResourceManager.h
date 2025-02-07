@@ -37,9 +37,9 @@ public:
 
 	~ResourceManager();
 
-	void release(Resource* const resource);
+	void deferredRelease(Resource* const resource);
 
-	void release(EngineResource* const engineResource);
+	void deferredRelease(EngineResource* const engineResource);
 
 	void cleanTransientResources();
 

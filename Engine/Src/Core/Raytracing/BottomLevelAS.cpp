@@ -123,9 +123,7 @@ void BottomLevelAS::generateBLAS(CommandList* const commandList)
 
 	commandList->get()->BuildRaytracingAccelerationStructure(&desc, 0, nullptr);
 
-	D3D12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::UAV(blasBuffer->getResource());
-
-	commandList->resourceBarrier(1, &barrier);
+	commandList->uavBarrier({ blasBuffer });
 }
 
 Buffer* BottomLevelAS::getBLASBuffer() const

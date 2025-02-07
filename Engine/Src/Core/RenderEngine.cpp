@@ -335,13 +335,7 @@ RenderEngine::RenderEngine(const uint32_t width, const uint32_t height, const HW
 	displayImGUISurface(false),
 	syncInterval(1)
 {
-	Graphics::frameBufferCount = useSwapChainBuffer ? 3 : 1;
-
-	Graphics::width = width;
-
-	Graphics::height = height;
-
-	Graphics::aspectRatio = static_cast<float>(Graphics::getWidth()) / static_cast<float>(Graphics::getHeight());
+	Graphics::initialize(useSwapChainBuffer ? 3 : 1, width, height);
 
 	ComPtr<IDXGIFactory7> factory;
 
