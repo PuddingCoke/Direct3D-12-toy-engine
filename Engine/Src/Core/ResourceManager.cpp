@@ -53,12 +53,12 @@ ResourceManager::~ResourceManager()
 	delete context;
 }
 
-void ResourceManager::release(Resource* const resource)
+void ResourceManager::deferredRelease(Resource* const resource)
 {
 	resources[Graphics::getFrameIndex()].push_back(resource);
 }
 
-void ResourceManager::release(EngineResource* const engineResource)
+void ResourceManager::deferredRelease(EngineResource* const engineResource)
 {
 	engineResources[Graphics::getFrameIndex()].push_back(engineResource);
 }
@@ -98,7 +98,7 @@ Buffer* ResourceManager::createBuffer(const void* const data, const uint64_t siz
 
 	uploadHeap->update(data, size);
 
-	release(uploadHeap);
+	deferredRelease(uploadHeap);
 
 	commandList->copyBufferRegion(buffer, 0, uploadHeap, 0, size);
 
@@ -132,7 +132,7 @@ Texture* ResourceManager::createTexture(const std::wstring& filePath, const D3D1
 
 		UploadHeap* const uploadHeap = new UploadHeap(uploadHeapSize);
 
-		release(uploadHeap);
+		deferredRelease(uploadHeap);
 
 		UpdateSubresources(commandList->get(), texture->getResource(), uploadHeap->getResource(), 0, 0, 1, &subresource);
 	}
@@ -152,7 +152,7 @@ Texture* ResourceManager::createTexture(const std::wstring& filePath, const D3D1
 
 		UploadHeap* const uploadHeap = new UploadHeap(uploadHeapSize);
 
-		release(uploadHeap);
+		deferredRelease(uploadHeap);
 
 		UpdateSubresources(commandList->get(), texture->getResource(), uploadHeap->getResource(), 0, 0, static_cast<uint32_t>(subresources.size()), subresources.data());
 	}
@@ -192,7 +192,7 @@ Texture* ResourceManager::createTexture(const std::wstring& filePath, const D3D1
 
 		UploadHeap* const uploadHeap = new UploadHeap(uploadHeapSize);
 
-		release(uploadHeap);
+		deferredRelease(uploadHeap);
 
 		UpdateSubresources(commandList->get(), texture->getResource(), uploadHeap->getResource(), 0, 0, 1, &subresource);
 	}
@@ -236,7 +236,7 @@ Texture* ResourceManager::createTexture(const uint32_t width, const uint32_t hei
 
 		UploadHeap* uploadHeap = new UploadHeap(uploadHeapSize);
 
-		release(uploadHeap);
+		deferredRelease(uploadHeap);
 
 		D3D12_SUBRESOURCE_DATA subresourceData = {};
 		subresourceData.pData = colors.data();
@@ -271,7 +271,7 @@ Texture* ResourceManager::createTexture(const uint32_t width, const uint32_t hei
 
 		UploadHeap* uploadHeap = new UploadHeap(uploadHeapSize);
 
-		release(uploadHeap);
+		deferredRelease(uploadHeap);
 
 		D3D12_SUBRESOURCE_DATA subresourceData = {};
 		subresourceData.pData = colors.data();
@@ -702,7 +702,7 @@ TextureRenderView* ResourceManager::createTextureCube(const std::wstring& filePa
 
 	equirectangularMap->copyDescriptors();
 
-	release(equirectangularMap);
+	deferredRelease(equirectangularMap);
 
 	HDRClampEffect::get()->process(context, equirectangularMap);
 
@@ -727,7 +727,7 @@ TextureRenderView* ResourceManager::createTextureCube(const std::wstring& filePa
 	TextureRenderView* const cubeMap = createTextureRenderView(texturecubeResolution, texturecubeResolution, resFormat, 6, 1, true, false,
 		resFormat, DXGI_FORMAT_UNKNOWN, resFormat);
 
-	release(cubeMap);
+	deferredRelease(cubeMap);
 
 	LatLongMapToCubeMapEffect::get()->process(context, equirectangularMap, cubeMap);
 
@@ -799,7 +799,7 @@ TextureRenderView* ResourceManager::createTextureCube(const std::initializer_lis
 		{
 			srcTextures[index] = createTexture(filePath, D3D12_RESOURCE_FLAG_NONE, nullptr);
 
-			release(srcTextures[index]);
+			deferredRelease(srcTextures[index]);
 
 			index++;
 		}

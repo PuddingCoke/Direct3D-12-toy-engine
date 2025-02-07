@@ -48,3 +48,14 @@ float Graphics::getAspectRatio()
 {
 	return aspectRatio;
 }
+
+void Graphics::initialize(const uint32_t frameBufferCount, const uint32_t width, const uint32_t height)
+{
+	Graphics::frameBufferCount = frameBufferCount;
+
+	Graphics::width = width;
+
+	Graphics::height = height;
+
+	Graphics::aspectRatio = static_cast<float>(width) / static_cast<float>(height);
+}

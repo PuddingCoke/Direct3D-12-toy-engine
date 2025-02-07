@@ -35,11 +35,19 @@ int Gear::iniEngine(const Configuration& config, const int argc, const wchar_t* 
 	switch (config.usage)
 	{
 	case Configuration::EngineUsage::NORMAL:
+
 		RenderEngine::instance = new RenderEngine(config.width, config.height, winform->getHandle(), true, config.enableImGuiSurface);
+
+		LOGENGINE("engine usage normal");
+
 		break;
 
 	case Configuration::EngineUsage::VIDEOPLAYBACK:
+
 		RenderEngine::instance = new RenderEngine(config.width, config.height, winform->getHandle(), false, false);
+
+		LOGENGINE("engine usage video playback");
+
 		break;
 
 	default:
@@ -51,17 +59,6 @@ int Gear::iniEngine(const Configuration& config, const int argc, const wchar_t* 
 	LOGENGINE("aspect ratio", Graphics::getAspectRatio());
 
 	LOGENGINE("back buffer count", Graphics::getFrameBufferCount());
-
-	switch (usage)
-	{
-	default:
-	case Configuration::EngineUsage::NORMAL:
-		LOGENGINE("engine usage normal");
-		break;
-	case Configuration::EngineUsage::VIDEOPLAYBACK:
-		LOGENGINE("engine usage video playback");
-		break;
-	}
 
 	return 0;
 }

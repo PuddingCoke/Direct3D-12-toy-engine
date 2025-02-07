@@ -35,6 +35,8 @@ private:
 
 	friend class RenderEngine;
 
+	static void initialize(const uint32_t frameBufferCount, const uint32_t width, const uint32_t height);
+
 	static uint32_t frameBufferCount;
 
 	static uint32_t frameIndex;
