@@ -40,7 +40,9 @@ Texture::Texture(Texture& tex) :
 	internalState(new States(D3D12_RESOURCE_STATE_UNKNOWN, mipLevels)),
 	transitionState(new States(D3D12_RESOURCE_STATE_UNKNOWN, mipLevels))
 {
+	resetInternalStates();
 
+	tex.resetInternalStates();
 }
 
 Texture::~Texture()

@@ -6,26 +6,59 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Engine", "Engine\Engine.vcxproj", "{0156D2EC-A542-46A9-97F6-8BB9CE5EC3D5}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SampleProject", "SampleProject\SampleProject.vcxproj", "{A13675B6-58B4-444D-877F-46BD07D9FC93}"
+	ProjectSection(ProjectDependencies) = postProject
+		{0156D2EC-A542-46A9-97F6-8BB9CE5EC3D5} = {0156D2EC-A542-46A9-97F6-8BB9CE5EC3D5}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FourierDrawing", "FourierDrawing\FourierDrawing.vcxproj", "{B18A355B-F353-4C89-AC23-2EFEC0C104CC}"
+	ProjectSection(ProjectDependencies) = postProject
+		{0156D2EC-A542-46A9-97F6-8BB9CE5EC3D5} = {0156D2EC-A542-46A9-97F6-8BB9CE5EC3D5}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EncodeTest", "EncodeTest\EncodeTest.vcxproj", "{B3A539E2-A69A-41B3-9D3D-BF7DF8428561}"
+	ProjectSection(ProjectDependencies) = postProject
+		{0156D2EC-A542-46A9-97F6-8BB9CE5EC3D5} = {0156D2EC-A542-46A9-97F6-8BB9CE5EC3D5}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FluidSimulation", "FluidSimulation\FluidSimulation.vcxproj", "{57BF9851-07E7-4C24-8C3F-A28F18F41942}"
+	ProjectSection(ProjectDependencies) = postProject
+		{0156D2EC-A542-46A9-97F6-8BB9CE5EC3D5} = {0156D2EC-A542-46A9-97F6-8BB9CE5EC3D5}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MandelBulb", "MandelBulb\MandelBulb.vcxproj", "{018B5D19-926B-45C3-BD59-30040FB50409}"
+	ProjectSection(ProjectDependencies) = postProject
+		{0156D2EC-A542-46A9-97F6-8BB9CE5EC3D5} = {0156D2EC-A542-46A9-97F6-8BB9CE5EC3D5}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CrytekSponza", "CrytekSponza\CrytekSponza.vcxproj", "{1DD61E0C-2055-4C30-B744-9923A093949F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{0156D2EC-A542-46A9-97F6-8BB9CE5EC3D5} = {0156D2EC-A542-46A9-97F6-8BB9CE5EC3D5}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SimpleParticleEffect", "SimpleParticleEffect\SimpleParticleEffect.vcxproj", "{BEF2256D-25B7-44CB-A6E4-CF6F4B4074E6}"
+	ProjectSection(ProjectDependencies) = postProject
+		{0156D2EC-A542-46A9-97F6-8BB9CE5EC3D5} = {0156D2EC-A542-46A9-97F6-8BB9CE5EC3D5}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FFTOcean", "FFTOcean\FFTOcean.vcxproj", "{A31E940D-A3E0-4ACD-81FF-008F5CB388B9}"
+	ProjectSection(ProjectDependencies) = postProject
+		{0156D2EC-A542-46A9-97F6-8BB9CE5EC3D5} = {0156D2EC-A542-46A9-97F6-8BB9CE5EC3D5}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SmoothLife", "SmoothLife\SmoothLife.vcxproj", "{AD086B5C-2421-47EF-B57F-8389A2075391}"
+	ProjectSection(ProjectDependencies) = postProject
+		{0156D2EC-A542-46A9-97F6-8BB9CE5EC3D5} = {0156D2EC-A542-46A9-97F6-8BB9CE5EC3D5}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MandelBrotSet", "MandelBrotSet\MandelBrotSet.vcxproj", "{81BE774F-99B5-4B2C-9887-E4BE4911E48E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{0156D2EC-A542-46A9-97F6-8BB9CE5EC3D5} = {0156D2EC-A542-46A9-97F6-8BB9CE5EC3D5}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BlackHoleSimulation", "BlackHoleSimulation\BlackHoleSimulation.vcxproj", "{17A3A53B-A11F-4BBA-8ED2-6F787D254C2B}"
+	ProjectSection(ProjectDependencies) = postProject
+		{0156D2EC-A542-46A9-97F6-8BB9CE5EC3D5} = {0156D2EC-A542-46A9-97F6-8BB9CE5EC3D5}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

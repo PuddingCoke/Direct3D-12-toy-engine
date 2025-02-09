@@ -27,7 +27,7 @@ Resource::Resource(Resource& res) :
 	resource(res.resource), stateTracking(res.stateTracking), sharedResource(res.sharedResource),
 	inReferredList(false), inTrackingList(false)
 {
-	*(res.sharedResource) = true;
+	*sharedResource = true;
 }
 
 D3D12_GPU_VIRTUAL_ADDRESS Resource::getGPUAddress() const

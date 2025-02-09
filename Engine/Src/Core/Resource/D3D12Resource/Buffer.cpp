@@ -22,6 +22,9 @@ Buffer::Buffer(Buffer& buff) :
 	internalState(D3D12_RESOURCE_STATE_UNKNOWN),
 	transitionState(D3D12_RESOURCE_STATE_UNKNOWN)
 {
+	resetInternalStates();
+
+	buff.resetInternalStates();
 }
 
 Buffer::~Buffer()
