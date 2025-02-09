@@ -17,7 +17,7 @@ public:
 
 	UploadHeap(const uint64_t size, const D3D12_HEAP_FLAGS flags = D3D12_HEAP_FLAG_NONE);
 
-	UploadHeap(UploadHeap&);
+	UploadHeap(UploadHeap* const);
 
 	virtual ~UploadHeap();
 

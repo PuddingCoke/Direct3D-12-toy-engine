@@ -32,7 +32,7 @@ public:
 
 	Texture(const ComPtr<ID3D12Resource>& texture, const bool stateTracking, const uint32_t initialState);
 
-	Texture(Texture&);
+	Texture(Texture* const);
 
 	virtual ~Texture();
 

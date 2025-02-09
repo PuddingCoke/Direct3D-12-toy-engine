@@ -5,7 +5,7 @@ ReadbackHeap::ReadbackHeap(const uint64_t size, const D3D12_HEAP_FLAGS flags) :
 {
 }
 
-ReadbackHeap::ReadbackHeap(ReadbackHeap& heap) :
+ReadbackHeap::ReadbackHeap(ReadbackHeap* const heap) :
 	Resource(heap)
 {
 }

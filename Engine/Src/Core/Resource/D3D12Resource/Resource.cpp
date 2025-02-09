@@ -23,8 +23,8 @@ Resource::Resource(const D3D12_HEAP_PROPERTIES properties, const D3D12_HEAP_FLAG
 	GraphicsDevice::get()->CreateCommittedResource(&properties, flags, &desc, initialState, clearValues, IID_PPV_ARGS(&resource));
 }
 
-Resource::Resource(Resource& res) :
-	resource(res.resource), stateTracking(res.stateTracking), sharedResource(res.sharedResource),
+Resource::Resource(Resource* const res) :
+	resource(res->resource), stateTracking(res->stateTracking), sharedResource(res->sharedResource),
 	inReferredList(false), inTrackingList(false)
 {
 	*sharedResource = true;

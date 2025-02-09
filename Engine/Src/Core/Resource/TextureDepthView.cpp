@@ -422,7 +422,7 @@ TextureDepthView::TextureDepthView(const TextureDepthView& tdv) :
 	depthMipIndexStart(tdv.depthMipIndexStart),
 	stencilMipIndexStart(tdv.stencilMipIndexStart),
 	dsvMipHandleStart(tdv.dsvMipHandleStart),
-	texture(new Texture(*(tdv.texture)))
+	texture(new Texture(tdv.texture))
 {
 }
 
