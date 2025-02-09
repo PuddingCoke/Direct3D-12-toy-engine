@@ -34,7 +34,7 @@ public:
 	Resource(const D3D12_HEAP_PROPERTIES properties, const D3D12_HEAP_FLAGS flags, const D3D12_RESOURCE_DESC desc,
 		const bool stateTracking, const D3D12_RESOURCE_STATES initialState, const D3D12_CLEAR_VALUE* clearValues);
 
-	Resource(Resource&);
+	Resource(Resource& res);
 
 	virtual ~Resource();
 
