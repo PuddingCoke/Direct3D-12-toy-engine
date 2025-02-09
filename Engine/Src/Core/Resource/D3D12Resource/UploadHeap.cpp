@@ -5,7 +5,7 @@ UploadHeap::UploadHeap(const uint64_t size, const D3D12_HEAP_FLAGS flags) :
 {
 }
 
-UploadHeap::UploadHeap(UploadHeap& heap) :
+UploadHeap::UploadHeap(UploadHeap* const heap) :
 	Resource(heap)
 {
 }

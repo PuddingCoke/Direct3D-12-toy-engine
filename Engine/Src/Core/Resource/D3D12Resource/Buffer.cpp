@@ -16,15 +16,13 @@ Buffer::Buffer(const ComPtr<ID3D12Resource>& buffer, const bool stateTracking, c
 {
 }
 
-Buffer::Buffer(Buffer& buff) :
+Buffer::Buffer(Buffer* const buff) :
 	Resource(buff),
-	globalState(buff.globalState),
+	globalState(buff->globalState),
 	internalState(D3D12_RESOURCE_STATE_UNKNOWN),
 	transitionState(D3D12_RESOURCE_STATE_UNKNOWN)
 {
-	resetInternalStates();
-
-	buff.resetInternalStates();
+	buff->resetInternalStates();
 }
 
 Buffer::~Buffer()

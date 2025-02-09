@@ -29,20 +29,18 @@ Texture::Texture(const ComPtr<ID3D12Resource>& texture, const bool stateTracking
 	transitionState = new States(D3D12_RESOURCE_STATE_UNKNOWN, mipLevels);
 }
 
-Texture::Texture(Texture& tex) :
+Texture::Texture(Texture* const tex) :
 	Resource(tex),
-	width(tex.width),
-	height(tex.height),
-	arraySize(tex.arraySize),
-	mipLevels(tex.mipLevels),
-	format(tex.format),
-	globalState(tex.globalState),
+	width(tex->width),
+	height(tex->height),
+	arraySize(tex->arraySize),
+	mipLevels(tex->mipLevels),
+	format(tex->format),
+	globalState(tex->globalState),
 	internalState(new States(D3D12_RESOURCE_STATE_UNKNOWN, mipLevels)),
 	transitionState(new States(D3D12_RESOURCE_STATE_UNKNOWN, mipLevels))
 {
-	resetInternalStates();
-
-	tex.resetInternalStates();
+	tex->resetInternalStates();
 }
 
 Texture::~Texture()

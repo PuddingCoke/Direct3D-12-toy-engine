@@ -311,7 +311,7 @@ TextureRenderView::TextureRenderView(const TextureRenderView& trv) :
 	rtvMipHandleStart(trv.rtvMipHandleStart),
 	viewGPUHandleStart(trv.viewGPUHandleStart),
 	viewCPUHandleStart(trv.viewCPUHandleStart),
-	texture(new Texture(*(trv.texture)))
+	texture(new Texture(trv.texture))
 {
 }
 
