@@ -55,7 +55,7 @@ void RenderEngine::processCommandLists()
 
 	std::vector<ID3D12CommandList*> commandLists;
 
-	for (CommandList* const commandList : recordCommandLists)
+	for (const CommandList* const commandList : recordCommandLists)
 	{
 		commandLists.push_back(commandList->get());
 	}
