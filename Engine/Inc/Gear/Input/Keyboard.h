@@ -145,6 +145,10 @@ private:
 
 	static void resetOnKeyDownMap();
 
+	static void pressKey(const Key key);
+
+	static void releaseKey(const Key key);
+
 	static std::map<Key, Event> keyDownEvents;
 
 	static std::map<Key, Event> keyUpEvents;

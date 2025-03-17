@@ -73,6 +73,18 @@ private:
 
 	static void resetDeltaInfo();
 
+	static void pressLeft();
+
+	static void pressRight();
+
+	static void releaseLeft();
+
+	static void releaseRight();
+
+	static void scroll(const float delta);
+
+	static void move(const float curX, const float curY);
+
 	static float x;
 	
 	static float y;

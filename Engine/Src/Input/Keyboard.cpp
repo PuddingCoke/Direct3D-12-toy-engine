@@ -465,3 +465,19 @@ void Keyboard::resetOnKeyDownMap()
 		pair.second = false;
 	}
 }
+
+void Keyboard::pressKey(const Key key)
+{
+	keyDownMap[key] = true;
+
+	onKeyDownMap[key] = true;
+
+	keyDownEvents[key]();
+}
+
+void Keyboard::releaseKey(const Key key)
+{
+	keyDownMap[key] = false;
+
+	keyUpEvents[key]();
+}

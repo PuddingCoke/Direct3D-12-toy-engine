@@ -304,76 +304,38 @@ LRESULT Gear::windowCallback(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lPa
 	break;
 
 	case WM_MOUSEMOVE:
-	{
-		const float curX = static_cast<float>(LOWORD(lParam));
-
-		const float curY = static_cast<float>(Graphics::getHeight()) - static_cast<float>(HIWORD(lParam));
-
-		Mouse::dx = curX - Mouse::x;
-
-		Mouse::dy = curY - Mouse::y;
-
-		Mouse::x = curX;
-
-		Mouse::y = curY;
-
-		Mouse::onMoved = true;
-
-		Mouse::moveEvent();
-	}
-	break;
+		Mouse::move(static_cast<float>(LOWORD(lParam)), static_cast<float>(Graphics::getHeight()) - static_cast<float>(HIWORD(lParam)));
+		break;
 
 	case WM_LBUTTONDOWN:
-		Mouse::leftDown = true;
-
-		Mouse::onLeftDowned = true;
-
-		Mouse::leftDownEvent();
+		Mouse::pressLeft();
 		break;
 
 	case WM_RBUTTONDOWN:
-		Mouse::rightDown = true;
-
-		Mouse::onRightDowned = true;
-
-		Mouse::rightDownEvent();
+		Mouse::pressRight();
 		break;
 
 	case WM_LBUTTONUP:
-		Mouse::leftDown = false;
-
-		Mouse::leftUpEvent();
+		Mouse::releaseLeft();
 		break;
 
 	case WM_RBUTTONUP:
-		Mouse::rightDown = false;
-
-		Mouse::rightUpEvent();
+		Mouse::releaseRight();
 		break;
 
 	case WM_MOUSEWHEEL:
-		Mouse::wheelDelta = GET_WHEEL_DELTA_WPARAM(wParam) / 120.f;
-
-		Mouse::onScrolled = true;
-
-		Mouse::scrollEvent();
+		Mouse::scroll(GET_WHEEL_DELTA_WPARAM(wParam) / 120.f);
 		break;
 
 	case WM_KEYDOWN:
 		if ((HIWORD(lParam) & KF_REPEAT) == 0)
 		{
-			Keyboard::keyDownMap[static_cast<Keyboard::Key>(wParam)] = true;
-
-			Keyboard::onKeyDownMap[static_cast<Keyboard::Key>(wParam)] = true;
-
-			Keyboard::keyDownEvents[static_cast<Keyboard::Key>(wParam)]();
+			Keyboard::pressKey(static_cast<Keyboard::Key>(wParam));
 		}
 		break;
 
 	case WM_KEYUP:
-		Keyboard::keyDownMap[static_cast<Keyboard::Key>(wParam)] = false;
-
-		Keyboard::keyUpEvents[static_cast<Keyboard::Key>(wParam)]();
+		Keyboard::releaseKey(static_cast<Keyboard::Key>(wParam));
 		break;
 
 	case WM_DESTROY:
