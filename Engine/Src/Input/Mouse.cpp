@@ -152,3 +152,60 @@ void Mouse::resetDeltaInfo()
 
 	onScrolled = false;
 }
+
+void Mouse::pressLeft()
+{
+	leftDown = true;
+
+	onLeftDowned = true;
+
+	leftDownEvent();
+}
+
+void Mouse::pressRight()
+{
+	rightDown = true;
+
+	onRightDowned = true;
+
+	rightDownEvent();
+}
+
+void Mouse::releaseLeft()
+{
+	leftDown = false;
+
+	leftUpEvent();
+}
+
+void Mouse::releaseRight()
+{
+	rightDown = false;
+
+	rightUpEvent();
+}
+
+void Mouse::scroll(const float delta)
+{
+	wheelDelta = delta;
+
+	onScrolled = true;
+
+	scrollEvent();
+}
+
+void Mouse::move(const float curX, const float curY)
+{
+	dx = curX - Mouse::x;
+
+	dy = curY - Mouse::y;
+
+	x = curX;
+
+	y = curY;
+
+	onMoved = true;
+
+	moveEvent();
+}
+
