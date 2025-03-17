@@ -20,25 +20,25 @@ float DeltaTimeEstimator::getDeltaTime(const float lastDeltaTime)
 		populated = true;
 	}
 
-	historyDeltaTimeIndex = (historyDeltaTimeIndex + 1) % 11;
+	historyDeltaTimeIndex = (historyDeltaTimeIndex + 1) % numRecord;
 
 	if (!populated)
 	{
 		return lastDeltaTime;
 	}
 
-	memcpy(sortedDeltaTime, historyDeltatime, sizeof(float) * 11);
+	memcpy(sortedDeltaTime, historyDeltatime, sizeof(float) * numRecord);
 
-	std::sort(sortedDeltaTime, sortedDeltaTime + 11);
+	std::sort(sortedDeltaTime, sortedDeltaTime + numRecord);
 
 	float averageDeltaTime = 0.f;
 
-	for (uint32_t i = 2; i < 9; i++)
+	for (uint32_t i = numDiscard; i < numRecord - numDiscard; i++)
 	{
 		averageDeltaTime += sortedDeltaTime[i];
 	}
 
-	averageDeltaTime /= 7.f;
+	averageDeltaTime /= static_cast<float>(numRecord - 2 * numDiscard);
 
 	const float lerpDeltaTime = averageDeltaTime * (1.f - lerpFactor) + lastDeltaTime * lerpFactor;
 

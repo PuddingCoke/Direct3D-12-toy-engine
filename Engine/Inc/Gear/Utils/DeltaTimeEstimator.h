@@ -23,9 +23,13 @@ private:
 
 	static constexpr float lerpFactor = 0.065f;
 
-	float historyDeltatime[11];
+	static constexpr uint32_t numRecord = 11;
 
-	float sortedDeltaTime[11];
+	static constexpr uint32_t numDiscard = 2;
+
+	float historyDeltatime[numRecord];
+
+	float sortedDeltaTime[numRecord];
 
 	uint32_t historyDeltaTimeIndex;
 
