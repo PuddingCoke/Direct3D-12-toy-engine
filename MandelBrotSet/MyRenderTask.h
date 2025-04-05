@@ -23,13 +23,13 @@ public:
 
 		effect.setGamma(1.2f);
 
-		effect.setIntensity(1.f);
+		effect.setIntensity(0.45f);
 
 		param.scale = 0.4f;
 
-		param.lerpFactor = 0.4f;
+		param.lerpFactor = 0.7f;
 
-		param.lerpFactor2 = 0.7f;
+		param.lerpFactor2 = 1.0f;
 	}
 
 	~MyRenderTask()

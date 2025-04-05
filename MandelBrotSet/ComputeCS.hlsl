@@ -13,6 +13,7 @@
 static RWTexture2D<float4> outputTexture = ResourceDescriptorHeap[outputTextureIndex];
 
 #define MAXITERATION 500
+
 #define ESCAPEBOUNDARY 16.0
 
 float2 ComplexSqr(in const float2 c)
@@ -131,23 +132,19 @@ void main(const uint2 DTid : SV_DispatchThreadID)
     
     const float iter_ratio = saturate(smoothed_i / float(MAXITERATION));
     
-    const float dist = 2.0 * log(length(z)) * length(z) / length(dz);
-    
-    const float t = saturate(tanh(dist * 1080.0));
-    
-    const float3 insideColor = interpolateColor(iter_ratio * lerpFactor) / 255.0;
-    
-    const float3 outsideColor = interpolateColor(iter_ratio * lerpFactor2) / 255.0 * t;
-    
     float3 color = float3(0.0, 0.0, 0.0);
     
     if (reason == 1)
     {
-        color = insideColor;
+        color = interpolateColor(iter_ratio * lerpFactor) / 255.0;
     }
     else if (reason == 2)
     {
-        color = outsideColor;
+        const float dist = 2.0 * log(length(z)) * length(z) / length(dz);
+        
+        const float t = saturate(tanh(dist * 1080.0));
+        
+        color = interpolateColor(iter_ratio * lerpFactor2) / 255.0 * t;
     }
     
     float fadeFactor = 1.0 - log(dot(z, z)) / power;
