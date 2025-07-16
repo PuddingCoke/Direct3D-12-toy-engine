@@ -96,6 +96,9 @@ void main(const uint2 DTid : SV_DispatchThreadID)
     
     const float2 c = float2(-0.5251993, -0.5251993);
     
+    //0.232366 0.562292
+    //0.000009
+    
     uint i = 0;
     
     uint reason = 0;

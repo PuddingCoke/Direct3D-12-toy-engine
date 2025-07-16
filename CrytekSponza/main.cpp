@@ -6,7 +6,7 @@ using EngineUsage = Configuration::EngineUsage;
 
 int wmain(int argc, const wchar_t* argv[])
 {
-	Configuration config(1920, 1080, L"Crytek Sponza", EngineUsage::NORMAL, true);
+	Configuration config(1920, 1080, L"Crytek Sponza", EngineUsage::NORMAL, false);
 
 	Gear::initialize();
 

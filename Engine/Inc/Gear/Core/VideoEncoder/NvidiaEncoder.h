@@ -11,13 +11,6 @@
 
 #include<queue>
 
-extern "C"
-{
-#include<libavutil/avutil.h>
-#include<libavformat/avformat.h>
-#include<libavcodec/avcodec.h>
-}
-
 #define NVENCCALL(func) \
 {\
 const NVENCSTATUS status = func;\
@@ -65,6 +58,8 @@ public:
 
 	bool encode(Texture* const inputTexture) override;
 
+	static constexpr uint32_t lookaheadDepth = 31;
+
 private:
 
 	static constexpr NV_ENC_BUFFER_FORMAT bufferFormat = NV_ENC_BUFFER_FORMAT_ARGB;
@@ -88,12 +83,6 @@ private:
 	ComPtr<ID3D12Fence> outputFence;
 
 	uint32_t outputFenceValue;
-
-	AVFormatContext* outCtx;
-
-	AVStream* outStream;
-
-	AVPacket* pkt;
 
 	std::queue<NV_ENC_REGISTERED_PTR> registeredInputResourcePtrs;
 

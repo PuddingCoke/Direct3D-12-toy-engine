@@ -148,66 +148,69 @@ void Gear::runEncode()
 		break;
 	}
 
-	const uint32_t numTextures = Encoder::lookaheadDepth + 1;
-
-	Texture* renderTextures[numTextures] = {};
-
-	D3D12_CPU_DESCRIPTOR_HANDLE textureHandles[numTextures] = {};
-
+	if (vendor == GPUVendor::NVIDIA)
 	{
-		DescriptorHandle descriptorHandle = GlobalDescriptorHeap::getRenderTargetHeap()->allocStaticDescriptor(numTextures);
+		const uint32_t numTextures = NvidiaEncoder::lookaheadDepth + 1;
 
-		D3D12_RENDER_TARGET_VIEW_DESC rtvDesc = {};
-		rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
-		rtvDesc.Format = Graphics::backBufferFormat;
-		rtvDesc.Texture2D.MipSlice = 0;
-		rtvDesc.Texture2D.PlaneSlice = 0;
+		Texture* renderTextures[numTextures] = {};
+
+		D3D12_CPU_DESCRIPTOR_HANDLE textureHandles[numTextures] = {};
+
+		{
+			DescriptorHandle descriptorHandle = GlobalDescriptorHeap::getRenderTargetHeap()->allocStaticDescriptor(numTextures);
+
+			D3D12_RENDER_TARGET_VIEW_DESC rtvDesc = {};
+			rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
+			rtvDesc.Format = Graphics::backBufferFormat;
+			rtvDesc.Texture2D.MipSlice = 0;
+			rtvDesc.Texture2D.PlaneSlice = 0;
+
+			for (uint32_t i = 0; i < numTextures; i++)
+			{
+				const D3D12_CLEAR_VALUE clearValue = { Graphics::backBufferFormat ,{0.f,0.f,0.f,1.f} };
+
+				renderTextures[i] = new Texture(Graphics::getWidth(), Graphics::getHeight(), Graphics::backBufferFormat, 1, 1, true, D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET, &clearValue);
+
+				GraphicsDevice::get()->CreateRenderTargetView(renderTextures[i]->getResource(), &rtvDesc, descriptorHandle.getCPUHandle());
+
+				textureHandles[i] = descriptorHandle.getCPUHandle();
+
+				descriptorHandle.move();
+			}
+		}
+
+		uint32_t index = 0;
+
+		RenderEngine::get()->setDeltaTime(1.f / static_cast<float>(Encoder::frameRate));
+
+		while (true)
+		{
+			RenderEngine::get()->setRenderTexture(renderTextures[index], textureHandles[index]);
+
+			RenderEngine::get()->begin();
+
+			game->update(Graphics::getDeltaTime());
+
+			game->render();
+
+			RenderEngine::get()->end();
+
+			RenderEngine::get()->waitForPreviousFrame();
+
+			RenderEngine::get()->updateTimeElapsed();
+
+			if (!encoder->encode(RenderEngine::get()->getRenderTexture()))
+			{
+				break;
+			}
+
+			index = (index + 1) % numTextures;
+		}
 
 		for (uint32_t i = 0; i < numTextures; i++)
 		{
-			const D3D12_CLEAR_VALUE clearValue = { Graphics::backBufferFormat ,{0.f,0.f,0.f,1.f} };
-
-			renderTextures[i] = new Texture(Graphics::getWidth(), Graphics::getHeight(), Graphics::backBufferFormat, 1, 1, true, D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET, &clearValue);
-
-			GraphicsDevice::get()->CreateRenderTargetView(renderTextures[i]->getResource(), &rtvDesc, descriptorHandle.getCPUHandle());
-
-			textureHandles[i] = descriptorHandle.getCPUHandle();
-
-			descriptorHandle.move();
+			delete renderTextures[i];
 		}
-	}
-
-	uint32_t index = 0;
-
-	RenderEngine::get()->setDeltaTime(1.f / static_cast<float>(Encoder::frameRate));
-
-	while (true)
-	{
-		RenderEngine::get()->setRenderTexture(renderTextures[index], textureHandles[index]);
-
-		RenderEngine::get()->begin();
-
-		game->update(Graphics::getDeltaTime());
-
-		game->render();
-
-		RenderEngine::get()->end();
-
-		RenderEngine::get()->waitForPreviousFrame();
-
-		RenderEngine::get()->updateTimeElapsed();
-
-		if (!encoder->encode(RenderEngine::get()->getRenderTexture()))
-		{
-			break;
-		}
-
-		index = (index + 1) % numTextures;
-	}
-
-	for (uint32_t i = 0; i < numTextures; i++)
-	{
-		delete renderTextures[i];
 	}
 
 	delete encoder;

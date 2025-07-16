@@ -45,6 +45,8 @@ public:
 		ImGui::SliderFloat("scale", &param.scale, 0.f, 1.f);
 		ImGui::SliderFloat("lerpFactor", &param.lerpFactor, 0.f, 1.f);
 		ImGui::SliderFloat("lerpFactor2", &param.lerpFactor2, 0.f, 1.f);
+		ImGui::Text("Position (%f,%f)", param.location.x, param.location.y);
+		ImGui::Text("Scale %f", param.scale);
 		ImGui::End();
 
 		effect.imGUICall();

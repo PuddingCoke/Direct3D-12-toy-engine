@@ -9,6 +9,8 @@
 FPSCamera::FPSCamera(const DirectX::XMVECTOR& eye, const DirectX::XMVECTOR& lookDir, const DirectX::XMVECTOR& up, const float moveSpeed):
 	eye(eye), lookDir(lookDir), up(up), moveSpeed(moveSpeed)
 {
+	this->lookDir = DirectX::XMVector3Normalize(this->lookDir);
+
 	moveEventID = Mouse::addMoveEvent([this]()
 		{
 			if (Mouse::getLeftDown())

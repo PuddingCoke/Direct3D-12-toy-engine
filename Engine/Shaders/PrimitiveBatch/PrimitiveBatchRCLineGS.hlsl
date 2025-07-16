@@ -64,7 +64,7 @@ void main(
     outputs.Append(output);
     
     [unroll]
-    for (i = 0; i < EDGENUM / 2 - 1; i++)
+    for (uint i = 0; i < EDGENUM / 2 - 1; i++)
     {
         v0 = rotTheta(v0);
         v1 = rotNTheta(v1);
