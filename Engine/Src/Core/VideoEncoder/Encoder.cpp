@@ -26,6 +26,10 @@ Encoder::~Encoder()
 {
 	sinkWriter->Finalize();
 
+	sinkWriter = nullptr;
+
+	mediaType = nullptr;
+
 	MFShutdown();
 }
 
