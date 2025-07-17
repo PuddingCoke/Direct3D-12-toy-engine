@@ -1,7 +1,7 @@
 ﻿#include<Gear/Core/VideoEncoder/NvidiaEncoder.h>
 
 NvidiaEncoder::NvidiaEncoder(const uint32_t frameToEncode) :
-	Encoder(frameToEncode), encoder(nullptr),
+	Encoder(frameToEncode, outputVideoFormat), encoder(nullptr),
 	readbackHeap(new ReadbackHeap(2 * 4 * Graphics::getWidth() * Graphics::getHeight())),
 	nvencAPI{ NV_ENCODE_API_FUNCTION_LIST_VER },
 	outputFenceValue(0)
@@ -41,8 +41,9 @@ NvidiaEncoder::NvidiaEncoder(const uint32_t frameToEncode) :
 	config.rcParams.rateControlMode = NV_ENC_PARAMS_RC_VBR;
 	config.rcParams.averageBitRate = 20000000U;
 	config.rcParams.maxBitRate = 40000000U;
-	config.rcParams.vbvBufferSize = config.rcParams.maxBitRate * 4;
+	config.rcParams.vbvBufferSize = config.rcParams.maxBitRate * 8;
 	config.rcParams.enableAQ = 1;
+	config.rcParams.multiPass = NV_ENC_TWO_PASS_FULL_RESOLUTION;
 
 	NV_ENC_INITIALIZE_PARAMS encoderParams = { NV_ENC_INITIALIZE_PARAMS_VER };
 	encoderParams.bufferFormat = bufferFormat;
@@ -65,10 +66,6 @@ NvidiaEncoder::NvidiaEncoder(const uint32_t frameToEncode) :
 	NVENCCALL(nvencAPI.nvEncInitializeEncoder(encoder, &encoderParams));
 
 	GraphicsDevice::get()->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&outputFence));
-
-	LOGENGINE("frame rate", frameRate);
-
-	LOGENGINE("frame to encode", frameToEncode);
 
 	LOGENGINE("start encoding");
 

@@ -17,13 +17,18 @@ class Encoder
 {
 public:
 
+	enum class OutputVideoFormat
+	{
+		H264, HEVC, AV1
+	};
+
 	Encoder() = delete;
 
 	Encoder(const Encoder&) = delete;
 
 	void operator=(const Encoder&) = delete;
 
-	Encoder(const uint32_t frameToEncode);
+	Encoder(const uint32_t frameToEncode, const OutputVideoFormat format);
 
 	virtual ~Encoder();
 
@@ -56,8 +61,6 @@ private:
 	float encodeTime;
 
 	ComPtr<IMFSinkWriter> sinkWriter;
-
-	ComPtr<IMFMediaType> mediaType;
 
 	DWORD streamIndex;
 

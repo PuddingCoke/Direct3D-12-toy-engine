@@ -1,17 +1,40 @@
 ﻿#include<Gear/Core/VideoEncoder/Encoder.h>
 
-Encoder::Encoder(const uint32_t frameToEncode) :
+Encoder::Encoder(const uint32_t frameToEncode, const OutputVideoFormat format) :
 	frameToEncode(frameToEncode), frameEncoded(0), isStartTimePoint(true), encodeTime(0.f), streamIndex(0), sampleDuration(10000000u / frameRate), sampleTime(0)
 {
 	CHECKERROR(MFStartup(MF_VERSION));
 
 	CHECKERROR(MFCreateSinkWriterFromURL(L"output.mp4", nullptr, nullptr, &sinkWriter));
 
+	ComPtr<IMFMediaType> mediaType;
+
 	CHECKERROR(MFCreateMediaType(&mediaType));
 
 	mediaType->SetGUID(MF_MT_MAJOR_TYPE, MFMediaType_Video);
 
-	mediaType->SetGUID(MF_MT_SUBTYPE, MFVideoFormat_H264);
+	switch (format)
+	{
+	case OutputVideoFormat::H264:
+		LOGENGINE("output video format", Logger::brightMagenta, "H264");
+		mediaType->SetGUID(MF_MT_SUBTYPE, MFVideoFormat_H264);
+		break;
+	case OutputVideoFormat::HEVC:
+		LOGENGINE("output video format", Logger::brightMagenta, "HEVC");
+		mediaType->SetGUID(MF_MT_SUBTYPE, MFVideoFormat_HEVC);
+		break;
+	case OutputVideoFormat::AV1:
+		LOGENGINE("output video format", Logger::brightMagenta, "AV1");
+		mediaType->SetGUID(MF_MT_SUBTYPE, MFVideoFormat_AV1);
+		break;
+	default:
+		LOGERROR("not supported output video format!");
+		break;
+	}
+
+	LOGENGINE("frame rate", frameRate);
+
+	LOGENGINE("frame to encode", frameToEncode);
 
 	MFSetAttributeSize(mediaType.Get(), MF_MT_FRAME_SIZE, Graphics::getWidth(), Graphics::getHeight());
 
@@ -27,8 +50,6 @@ Encoder::~Encoder()
 	sinkWriter->Finalize();
 
 	sinkWriter = nullptr;
-
-	mediaType = nullptr;
 
 	MFShutdown();
 }

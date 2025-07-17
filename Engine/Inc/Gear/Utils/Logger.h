@@ -151,7 +151,7 @@ private:
 
 #define LOGSUCCESS(...) Logger::get()->logSuccess("[",typeid(*this).name(),"]",__VA_ARGS__)
 
-#define LOGERROR(...) Logger::get()->logError("error occur at",__FILE__,"function",__FUNCTION__,"line",__LINE__,__VA_ARGS__); throw "see log.txt or console output for detailed information"
+#define LOGERROR(...) Logger::get()->logError("error occur at",__FILE__,"function",__FUNCTION__,"line",__LINE__,__VA_ARGS__); throw "check log.txt or console output for detailed information"
 
 #define LOGENGINE(...) Logger::get()->logEngine("[",typeid(*this).name(),"]",__VA_ARGS__)
 

@@ -66,6 +66,8 @@ private:
 
 	static constexpr NV_ENC_TUNING_INFO tuningInfo = NV_ENC_TUNING_INFO_HIGH_QUALITY;
 
+	static constexpr OutputVideoFormat outputVideoFormat = OutputVideoFormat::H264;
+
 	const GUID codec = NV_ENC_CODEC_H264_GUID;
 
 	const GUID preset = NV_ENC_PRESET_P7_GUID;
