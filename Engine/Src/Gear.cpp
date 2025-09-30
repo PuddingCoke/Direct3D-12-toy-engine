@@ -195,7 +195,7 @@ void Gear::runEncode()
 
 			RenderEngine::get()->end();
 
-			RenderEngine::get()->waitForPreviousFrame();
+			RenderEngine::get()->waitForCurrentFrame();
 
 			RenderEngine::get()->updateTimeElapsed();
 
@@ -213,7 +213,10 @@ void Gear::runEncode()
 		}
 	}
 
-	delete encoder;
+	if (encoder)
+	{
+		delete encoder;
+	}
 
 	std::cin.get();
 }
@@ -242,7 +245,7 @@ Gear::~Gear()
 {
 	if (RenderEngine::instance)
 	{
-		RenderEngine::get()->waitForPreviousFrame();
+		RenderEngine::get()->waitForCurrentFrame();
 	}
 
 	if (game)

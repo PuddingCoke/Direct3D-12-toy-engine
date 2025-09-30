@@ -53,7 +53,7 @@ private:
 
 	void processCommandLists();
 
-	void waitForPreviousFrame();
+	void waitForCurrentFrame();
 
 	void waitForNextFrame();
 

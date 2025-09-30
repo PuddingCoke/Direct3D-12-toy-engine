@@ -65,7 +65,7 @@ void RenderEngine::processCommandLists()
 	commandQueue->ExecuteCommandLists(static_cast<uint32_t>(commandLists.size()), commandLists.data());
 }
 
-void RenderEngine::waitForPreviousFrame()
+void RenderEngine::waitForCurrentFrame()
 {
 	commandQueue->Signal(fence.Get(), fenceValues[Graphics::getFrameIndex()]);
 
@@ -262,7 +262,7 @@ void RenderEngine::initializeResources()
 	processCommandLists();
 
 	//wait little seconds here
-	waitForPreviousFrame();
+	waitForCurrentFrame();
 
 	//the creation of static resources like constant buffers and read-only textures will create uploadheap
 	//so we need to release transient resources here

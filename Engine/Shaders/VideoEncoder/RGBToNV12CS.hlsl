@@ -22,10 +22,10 @@ float3 RGBToYUV(const float3 rgb)
     return float3(Y, U, V);
 }
 
-[numthreads(2, 2, 1)]
-void main(uint3 DTid : SV_DispatchThreadID)
+[numthreads(16, 16, 1)]
+void main(uint2 chromaWriteCoord : SV_DispatchThreadID)
 {
-    const uint2 lumaWriteCoord = DTid.xy * uint2(2, 2);
+    const uint2 lumaWriteCoord = chromaWriteCoord * uint2(2, 2);
     
     const float3 yuv00 = RGBToYUV(RGBATex[lumaWriteCoord + uint2(0, 0)].rgb);
     
@@ -43,9 +43,7 @@ void main(uint3 DTid : SV_DispatchThreadID)
     
     LumaTex[lumaWriteCoord + uint2(1, 1)] = yuv11.r;
     
-    const float2 uv = (yuv00.gb + yuv10.gb + yuv01.gb + yuv11.gb) / 4.0;
-    
-    const uint2 chromaWriteCoord = DTid.xy;
+    const float2 uv = (yuv00.gb + yuv10.gb + yuv01.gb + yuv11.gb) * 0.25;
     
     ChromaTex[chromaWriteCoord] = uv;
 }
