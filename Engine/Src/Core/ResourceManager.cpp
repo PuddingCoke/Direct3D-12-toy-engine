@@ -201,7 +201,7 @@ Texture* ResourceManager::createTexture(const std::wstring& filePath, const D3D1
 		LOGERROR(fileExtension, "is not supported");
 	}
 
-	LOGSUCCESS("load texture from", Logger::brightBlue, filePath, Logger::resetColor(), "succeeded");
+	LOGSUCCESS("load texture from", Logger::brightBlue, filePath, Logger::defaultColor, "succeeded");
 
 	return texture;
 }

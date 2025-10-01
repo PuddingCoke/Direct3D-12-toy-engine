@@ -9,6 +9,8 @@
 
 #include<string>
 
+#include<vector>
+
 #include<dxgiformat.h>
 
 class Utils

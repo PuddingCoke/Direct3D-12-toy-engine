@@ -7,6 +7,8 @@
 
 #include<vector>
 
+#include <algorithm>
+
 class Texture;
 
 struct PendingTextureBarrier

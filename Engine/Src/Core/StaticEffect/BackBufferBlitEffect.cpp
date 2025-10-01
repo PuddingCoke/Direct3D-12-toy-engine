@@ -35,7 +35,7 @@ BackBufferBlitEffect::BackBufferBlitEffect()
 
 	GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&backBufferBlitState));
 
-	LOGSUCCESS("create", Logger::brightMagenta, "BackBufferBlitEffect", Logger::resetColor(), "succeeded");
+	LOGSUCCESS("create", Logger::brightMagenta, "BackBufferBlitEffect", Logger::defaultColor, "succeeded");
 }
 
 BackBufferBlitEffect::~BackBufferBlitEffect()

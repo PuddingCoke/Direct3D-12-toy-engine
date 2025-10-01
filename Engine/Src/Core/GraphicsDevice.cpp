@@ -11,7 +11,7 @@ GraphicsDevice::GraphicsDevice(IUnknown* const adapter)
 {
 	if (SUCCEEDED(D3D12CreateDevice(adapter, D3D_FEATURE_LEVEL_12_2, IID_PPV_ARGS(&device))))
 	{
-		Logger::get()->logSuccess("[", typeid(*this).name(), "]", "create d3d12 device with feature level", Logger::brightMagenta, "D3D_FEATURE_LEVEL_12_2", Logger::resetColor(), "succeeded");
+		LOGSUCCESS("create d3d12 device with feature level", Logger::brightMagenta, "D3D_FEATURE_LEVEL_12_2", Logger::defaultColor, "succeeded");
 	}
 	else
 	{
@@ -100,7 +100,7 @@ void GraphicsDevice::checkFeatureSupport() const
 	{
 		const BOOL typedUAVLoad = features.TypedUAVLoadAdditionalFormats();
 
-		LOGENGINE("typed uav load", (typedUAVLoad ? Logger::brightGreen : Logger::brightRed), (typedUAVLoad ? "yes" : "no"));
+		LOGENGINE("typed uav load", (typedUAVLoad ? Logger::brightGreen : Logger::brightRed), (typedUAVLoad ? "YES" : "NO"));
 
 		if (!typedUAVLoad)
 		{

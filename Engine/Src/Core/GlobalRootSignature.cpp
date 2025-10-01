@@ -124,6 +124,8 @@ GlobalRootSignature::GlobalRootSignature()
 			D3D12_ROOT_SIGNATURE_FLAG_CBV_SRV_UAV_HEAP_DIRECTLY_INDEXED | D3D12_ROOT_SIGNATURE_FLAG_SAMPLER_HEAP_DIRECTLY_INDEXED);
 
 		graphicsRootSignature = new RootSignature(rootSignatureDesc);
+
+		LOGSUCCESS("create global graphics root signature succeeded");
 	}
 
 	{
@@ -143,9 +145,9 @@ GlobalRootSignature::GlobalRootSignature()
 			D3D12_ROOT_SIGNATURE_FLAG_CBV_SRV_UAV_HEAP_DIRECTLY_INDEXED | D3D12_ROOT_SIGNATURE_FLAG_SAMPLER_HEAP_DIRECTLY_INDEXED);
 
 		computeRootSignature = new RootSignature(rootSignatureDesc);
-	}
 
-	LOGSUCCESS("create global graphics root signature and global compute root signature succeeded");
+		LOGSUCCESS("create global compute root signature succeeded");
+	}
 }
 
 GlobalRootSignature::~GlobalRootSignature()
