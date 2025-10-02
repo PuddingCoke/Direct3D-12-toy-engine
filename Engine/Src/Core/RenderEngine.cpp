@@ -236,11 +236,11 @@ ComPtr<IDXGIAdapter4> RenderEngine::getBestAdapterAndVendor(IDXGIFactory7* const
 
 			LOGENGINE("following are information about selected GPU");
 
-			LOGENGINE("GPU Name", desc.Description);
+			LOGENGINE("GPU Name", LogColor::brightMagenta, desc.Description);
 
-			LOGENGINE("GPU Vendor ID", std::hex, vendorID, std::dec);
+			LOGENGINE("GPU Vendor ID", std::hex, vendorID);
 
-			LOGENGINE("GPU Vendor Name", vendorName);
+			LOGENGINE("GPU Vendor Name", LogColor::brightMagenta, vendorName);
 
 			LOGENGINE("GPU Dedicated Memory", static_cast<float>(desc.DedicatedVideoMemory) / 1024.f / 1024.f / 1024.f, "gigabytes");
 
@@ -340,7 +340,7 @@ RenderEngine::RenderEngine(const uint32_t width, const uint32_t height, const HW
 	ComPtr<IDXGIFactory7> factory;
 
 #ifdef _DEBUG
-	LOGENGINE("enable debug layer");
+	LOGENGINE(LogColor::green, "enable", LogColor::defaultColor, "debug layer");
 
 	ComPtr<ID3D12Debug> debugController;
 
@@ -350,7 +350,7 @@ RenderEngine::RenderEngine(const uint32_t width, const uint32_t height, const HW
 
 	CreateDXGIFactory2(DXGI_CREATE_FACTORY_DEBUG, IID_PPV_ARGS(&factory));
 #else
-	LOGENGINE("disable debug layer");
+	LOGENGINE(LogColor::red, "disable", LogColor::defaultColor, "debug layer");
 
 	CreateDXGIFactory2(0, IID_PPV_ARGS(&factory));
 #endif // _DEBUG

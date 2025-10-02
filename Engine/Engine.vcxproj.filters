@@ -402,6 +402,9 @@
     <ClInclude Include="Inc\Gear\Utils\LogColor.h">
       <Filter>Header</Filter>
     </ClInclude>
+    <ClInclude Include="Inc\Gear\Utils\LogContext.h">
+      <Filter>Header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Configuration.cpp">
@@ -603,6 +606,9 @@
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="Src\Utils\LogColor.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Utils\LogContext.cpp">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>

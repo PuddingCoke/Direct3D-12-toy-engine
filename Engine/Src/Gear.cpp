@@ -21,7 +21,7 @@ int Gear::iniEngine(const Configuration& config, const int argc, const wchar_t* 
 
 	Utils::exeRootPath = Utils::File::backslashToSlash(Utils::File::getParentFolder(argv[0]));
 
-	LOGENGINE("executable path", Utils::getRootFolder());
+	LOGENGINE("executable path", LogColor::brightBlue, Utils::getRootFolder());
 
 	usage = config.usage;
 

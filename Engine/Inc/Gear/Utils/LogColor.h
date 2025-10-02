@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #ifndef _LOGCOLOR_H_
 #define _LOGCOLOR_H_
