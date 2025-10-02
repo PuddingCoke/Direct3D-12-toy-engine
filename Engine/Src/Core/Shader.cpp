@@ -33,7 +33,7 @@ Shader::Shader(const std::wstring& filePath)
 
 		shaderByteCode.BytecodeLength = shaderBlob->GetBufferSize();
 
-		LOGSUCCESS("read byte code at", Logger::brightBlue, filePath, Logger::defaultColor, "succeeded");
+		LOGSUCCESS("read byte code at", LogColor::brightBlue, filePath, LogColor::defaultColor, "succeeded");
 	}
 	else
 	{
@@ -51,7 +51,7 @@ Shader::Shader(const std::wstring& filePath, const ShaderProfile profile)
 
 		shaderByteCode.BytecodeLength = shaderBlob->GetBufferSize();
 
-		LOGSUCCESS("compile shader at", Logger::brightBlue, filePath, Logger::defaultColor, "succeeded");
+		LOGSUCCESS("compile shader at", LogColor::brightBlue, filePath, LogColor::defaultColor, "succeeded");
 	}
 	else
 	{

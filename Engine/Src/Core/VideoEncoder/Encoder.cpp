@@ -16,15 +16,15 @@ Encoder::Encoder(const uint32_t frameToEncode, const OutputVideoFormat format) :
 	switch (format)
 	{
 	case OutputVideoFormat::H264:
-		LOGENGINE("output video format", Logger::brightMagenta, "H264");
+		LOGENGINE("output video format", LogColor::brightMagenta, "H264");
 		mediaType->SetGUID(MF_MT_SUBTYPE, MFVideoFormat_H264);
 		break;
 	case OutputVideoFormat::HEVC:
-		LOGENGINE("output video format", Logger::brightMagenta, "HEVC");
+		LOGENGINE("output video format", LogColor::brightMagenta, "HEVC");
 		mediaType->SetGUID(MF_MT_SUBTYPE, MFVideoFormat_HEVC);
 		break;
 	case OutputVideoFormat::AV1:
-		LOGENGINE("output video format", Logger::brightMagenta, "AV1");
+		LOGENGINE("output video format", LogColor::brightMagenta, "AV1");
 		mediaType->SetGUID(MF_MT_SUBTYPE, MFVideoFormat_AV1);
 		break;
 	default:

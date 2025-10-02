@@ -11,6 +11,8 @@
 
 #include<sstream>
 
+#include"LogColor.h"
+
 //output [hour:miniute:second]
 std::wstring getTimeStamp();
 
@@ -20,11 +22,30 @@ std::wstring getThreadId();
 //output (class name)
 std::wstring wrapClassName(const char* const className);
 
+enum class LogType
+{
+	LOG_SUCCESS,
+	LOG_ERROR,
+	LOG_ENGINE,
+	LOG_USER
+};
+
+struct LogHeader
+{
+	const std::wstring timeStamp;
+
+	const std::wstring threadId;
+
+	const std::wstring className;
+
+	const LogType type;
+};
+
 /// <summary>
 /// a simple logger that output text with colors depend on different situations
 /// and numeric value like int32_t uint32_t float_t have special color
 /// since i want to use utf-8 encoding so std::string is not supported
-/// do not use logger in loop or there will be performance impair!
+/// do not use logger in loop although there is optimization
 /// </summary>
 class Logger
 {
@@ -37,62 +58,10 @@ public:
 	static Logger* get();
 
 	template<typename... Args>
-	void logNormal(const Args&... args);
+	void logNormal(const LogHeader& header, const Args&... args);
 
 	template<typename... Args>
-	void logError(const Args&... args);
-
-	static const std::wstring black;
-
-	static const std::wstring red;
-
-	static const std::wstring green;
-
-	static const std::wstring yellow;
-
-	static const std::wstring blue;
-
-	static const std::wstring magenta;
-
-	static const std::wstring cyan;
-
-	static const std::wstring white;
-
-	static const std::wstring brightBlack;
-
-	static const std::wstring brightRed;
-
-	static const std::wstring brightGreen;
-
-	static const std::wstring brightYellow;
-
-	static const std::wstring brightBlue;
-
-	static const std::wstring brightMagenta;
-
-	static const std::wstring brightCyan;
-
-	static const std::wstring brightWhite;
-
-	//main text
-	static const std::wstring defaultColor;
-
-	static const std::wstring timeStampColor;
-
-	static const std::wstring threadIdColor;
-
-	static const std::wstring classNameColor;
-
-	static const std::wstring successColor;
-
-	static const std::wstring errorColor;
-
-	static const std::wstring engineColor;
-
-	static const std::wstring userColor;
-
-	//numeric value
-	static const std::wstring numericColor;
+	void logError(const LogHeader& header, const Args&... args);
 
 private:
 
@@ -101,8 +70,6 @@ private:
 	Logger();
 
 	~Logger();
-
-	static bool isEscapeCode(const std::wstring& str);
 
 	template<typename Arg>
 	static constexpr bool isInteger();
@@ -114,18 +81,18 @@ private:
 	static constexpr bool isString();
 
 	template<typename... Args>
-	void log(const Args&... args);
+	void log(const LogHeader& header, const Args&... args);
+
+	template<typename First, typename... Rest>
+	void printRestArgument(const First& first, const Rest&... rest);
+
+	void printRestArgument();
 
 	template<typename Arg>
 	void printInteger(const Arg& arg);
 
 	template<typename Arg>
 	void printFloatPoint(const Arg& arg);
-
-	void printRestArgument();
-
-	template<typename First, typename... Rest>
-	void printRestArgument(const First& first, const Rest&... rest);
 
 	template<typename Arg>
 	void printArgument(const Arg& arg);
@@ -146,9 +113,15 @@ private:
 
 	void printArgument(std::ios_base& __cdecl arg(std::ios_base&));
 
+	void printArgument(const LogColor& arg);
+
+	void setDisplayColor(const LogColor& color);
+
 	static Logger* instance;
 
-	std::wstring currentColor;
+	LogColor textColor;
+
+	LogColor displayColor;
 
 	std::wostringstream consoleOutputStream;
 
@@ -158,59 +131,32 @@ private:
 
 };
 
-#define LOGSUCCESS(...) Logger::get()->logNormal(Logger::timeStampColor,getTimeStamp(),Logger::threadIdColor,getThreadId(),Logger::classNameColor,wrapClassName(typeid(*this).name()),Logger::successColor,"<SUCCESS>",Logger::defaultColor,__VA_ARGS__)
+#define LOGSUCCESS(...) Logger::get()->logNormal(LogHeader{getTimeStamp(),getThreadId(),wrapClassName(typeid(*this).name()),LogType::LOG_SUCCESS},__VA_ARGS__)
 
-#define LOGENGINE(...) Logger::get()->logNormal(Logger::timeStampColor,getTimeStamp(),Logger::threadIdColor,getThreadId(),Logger::classNameColor,wrapClassName(typeid(*this).name()),Logger::engineColor,"<ENGINE>",Logger::defaultColor,__VA_ARGS__)
+#define LOGENGINE(...) Logger::get()->logNormal(LogHeader{getTimeStamp(),getThreadId(),wrapClassName(typeid(*this).name()),LogType::LOG_ENGINE},__VA_ARGS__)
 
-#define LOGUSER(...) Logger::get()->logNormal(Logger::timeStampColor,getTimeStamp(),Logger::threadIdColor,getThreadId(),Logger::classNameColor,wrapClassName(typeid(*this).name()),Logger::userColor,"<USER>",Logger::defaultColor,__VA_ARGS__)
+#define LOGUSER(...) Logger::get()->logNormal(LogHeader{getTimeStamp(),getThreadId(),wrapClassName(typeid(*this).name()),LogType::LOG_USER},__VA_ARGS__)
 
-#define LOGERROR(...) Logger::get()->logError(Logger::timeStampColor,getTimeStamp(),Logger::threadIdColor,getThreadId(),Logger::errorColor,"<ERROR>",Logger::defaultColor,__FILE__,"function",__FUNCTION__,"line",__LINE__,__VA_ARGS__)
+#define LOGERROR(...) \
+Logger::get()->logError(LogHeader{getTimeStamp(),getThreadId(),L"",LogType::LOG_ERROR},__FILE__,L"function",__FUNCTION__,L"line",__LINE__,__VA_ARGS__); \
+throw std::runtime_error("check log.txt or console output for detailed information") \
 
 #endif // !_LOGGER_H_
 
 template<typename ...Args>
-inline void Logger::logNormal(const Args & ...args)
+inline void Logger::logNormal(const LogHeader& header, const Args & ...args)
 {
-	log(args...);
+	log(header, args...);
 }
 
 template<typename ...Args>
-inline void Logger::logError(const Args & ...args)
+inline void Logger::logError(const LogHeader& header, const Args & ...args)
 {
-	logNormal(args ...);
+	logNormal(header, args ...);
 
 	if (file.is_open())
 	{
 		file.close();
-	}
-
-	throw std::runtime_error("check log.txt or console output for detailed information");
-}
-
-template<typename ...Args>
-inline void Logger::log(const Args & ...args)
-{
-	currentColor = defaultColor;
-
-	printRestArgument(args...);
-
-	consoleOutputStream << "\n";
-
-	std::wcout << consoleOutputStream.str();
-
-	consoleOutputStream.str(L"");
-
-	consoleOutputStream.clear();
-
-	if (file.is_open())
-	{
-		fileOutputStream << "\n";
-
-		file << fileOutputStream.str();
-
-		fileOutputStream.str(L"");
-
-		fileOutputStream.clear();
 	}
 }
 
@@ -236,42 +182,77 @@ inline constexpr bool Logger::isString()
 	return std::is_same<std::string, Arg>::value;
 }
 
-template<typename Arg>
-inline void Logger::printInteger(const Arg& arg)
+template<typename ...Args>
+inline void Logger::log(const LogHeader& header, const Args & ...args)
 {
-	static_assert(isInteger<Arg>(), "error input type is not integer");
+	textColor = { L"" };
 
-	//if it is hex mode then start with 0x
-	if (consoleOutputStream.flags() & std::ios::hex)
+	displayColor = { L"" };
+
+	printArgument(LogColor::timeStampColor);
+
+	printArgument(header.timeStamp);
+
+	printArgument(LogColor::threadIdColor);
+
+	printArgument(header.threadId);
+
+	if (header.type != LogType::LOG_ERROR)
 	{
-		consoleOutputStream << numericColor << "0x" << arg << " ";
+		printArgument(LogColor::classNameColor);
 
-		if (file.is_open())
-		{
-			fileOutputStream << "0x" << arg << " ";
-		}
+		printArgument(header.className);
 	}
-	else
+
+	switch (header.type)
 	{
-		consoleOutputStream << numericColor << arg << " ";
+	case LogType::LOG_SUCCESS:
+		printArgument(LogColor::successColor);
 
-		if (file.is_open())
-		{
-			fileOutputStream << arg << " ";
-		}
+		printArgument(L"<SUCCESS>");
+
+		break;
+	case LogType::LOG_ERROR:
+		printArgument(LogColor::errorColor);
+
+		printArgument(L"<ERROR>");
+
+		break;
+	case LogType::LOG_ENGINE:
+		printArgument(LogColor::engineColor);
+
+		printArgument(L"<ENGINE>");
+
+		break;
+	case LogType::LOG_USER:
+		printArgument(LogColor::userColor);
+
+		printArgument(L"<USER>");
+
+		break;
 	}
-}
 
-template<typename Arg>
-inline void Logger::printFloatPoint(const Arg& arg)
-{
-	static_assert(isFloatPoint<Arg>(), "error input type is not float point");
+	printArgument(LogColor::defaultColor);
 
-	consoleOutputStream << numericColor << arg << " ";
+	printRestArgument(args...);
+
+	consoleOutputStream << L"\n";
+
+	std::wcout << consoleOutputStream.str();
+
+	consoleOutputStream.str(L"");
+
+	consoleOutputStream.clear();
 
 	if (file.is_open())
 	{
-		fileOutputStream << arg << " ";
+		fileOutputStream << L"\n";
+
+		file << fileOutputStream.str();
+
+		fileOutputStream.str(L"");
+
+		fileOutputStream.clear();
 	}
 }
 
@@ -286,14 +267,57 @@ inline void Logger::printRestArgument(const First& first, const Rest& ...rest)
 }
 
 template<typename Arg>
-inline void Logger::printArgument(const Arg& arg)
+inline void Logger::printInteger(const Arg& arg)
 {
-	consoleOutputStream << currentColor << arg << " ";
+	static_assert(isInteger<Arg>(), "error input type is not integer");
 
-	if (file.is_open())
+	setDisplayColor(LogColor::numericColor);
+
+	//if it is hex mode then start with 0x
+	if (consoleOutputStream.flags() & std::ios::hex)
 	{
-		fileOutputStream << arg << " ";
+		consoleOutputStream << L"0x" << arg << L" ";
+
+		if (file.is_open())
+		{
+			fileOutputStream << L"0x" << arg << L" ";
+		}
+	}
+	else
+	{
+		consoleOutputStream << arg << L" ";
+
+		if (file.is_open())
+		{
+			fileOutputStream << arg << L" ";
+		}
 	}
 }
 
+template<typename Arg>
+inline void Logger::printFloatPoint(const Arg& arg)
+{
+	static_assert(isFloatPoint<Arg>(), "error input type is not float point");
 
+	setDisplayColor(LogColor::numericColor);
+
+	consoleOutputStream << arg << L" ";
+
+	if (file.is_open())
+	{
+		fileOutputStream << arg << L" ";
+	}
+}
+
+template<typename Arg>
+inline void Logger::printArgument(const Arg& arg)
+{
+	setDisplayColor(textColor);
+
+	consoleOutputStream << arg << L" ";
+
+	if (file.is_open())
+	{
+		fileOutputStream << arg << L" ";
+	}
+}

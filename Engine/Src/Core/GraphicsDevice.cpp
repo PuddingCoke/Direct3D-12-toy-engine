@@ -11,7 +11,7 @@ GraphicsDevice::GraphicsDevice(IUnknown* const adapter)
 {
 	if (SUCCEEDED(D3D12CreateDevice(adapter, D3D_FEATURE_LEVEL_12_2, IID_PPV_ARGS(&device))))
 	{
-		LOGSUCCESS("create d3d12 device with feature level", Logger::brightMagenta, "D3D_FEATURE_LEVEL_12_2", Logger::defaultColor, "succeeded");
+		LOGSUCCESS("create d3d12 device with feature level", LogColor::brightMagenta, "D3D_FEATURE_LEVEL_12_2", LogColor::defaultColor, "succeeded");
 	}
 	else
 	{
@@ -46,7 +46,7 @@ void GraphicsDevice::checkFeatureSupport() const
 			break;
 		}
 
-		LOGENGINE("resource binding tier", Logger::brightMagenta, bindingTierString);
+		LOGENGINE("resource binding tier", LogColor::brightMagenta, bindingTierString);
 	}
 
 	{
@@ -89,7 +89,7 @@ void GraphicsDevice::checkFeatureSupport() const
 			break;
 		}
 
-		LOGENGINE("highest supported shader model", Logger::brightMagenta, shaderModelString);
+		LOGENGINE("highest supported shader model", LogColor::brightMagenta, shaderModelString);
 
 		if (shaderModel < D3D_SHADER_MODEL_6_6)
 		{
@@ -100,7 +100,7 @@ void GraphicsDevice::checkFeatureSupport() const
 	{
 		const BOOL typedUAVLoad = features.TypedUAVLoadAdditionalFormats();
 
-		LOGENGINE("typed uav load", (typedUAVLoad ? Logger::brightGreen : Logger::brightRed), (typedUAVLoad ? "YES" : "NO"));
+		LOGENGINE("typed uav load", (typedUAVLoad ? LogColor::brightGreen : LogColor::brightRed), (typedUAVLoad ? "YES" : "NO"));
 
 		if (!typedUAVLoad)
 		{
@@ -127,7 +127,7 @@ void GraphicsDevice::checkFeatureSupport() const
 			break;
 		}
 
-		LOGENGINE("raytracing tier", Logger::brightMagenta, raytracingTierString);
+		LOGENGINE("raytracing tier", LogColor::brightMagenta, raytracingTierString);
 	}
 
 }

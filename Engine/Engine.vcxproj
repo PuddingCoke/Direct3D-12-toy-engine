@@ -175,6 +175,7 @@
     <ClInclude Include="Inc\Gear\Utils\DeltaTimeEstimator.h" />
     <ClInclude Include="Inc\Gear\Core\Resource\BufferView.h" />
     <ClInclude Include="Inc\Gear\Core\Resource\CounterBufferView.h" />
+    <ClInclude Include="Inc\Gear\Utils\LogColor.h" />
     <ClInclude Include="Inc\Gear\Utils\Logger.h" />
     <ClInclude Include="Inc\ImGUI\imconfig.h" />
     <ClInclude Include="Inc\ImGUI\imgui.h" />
@@ -291,6 +292,7 @@
     <ClCompile Include="Src\Input\Keyboard.cpp" />
     <ClCompile Include="Src\Input\Mouse.cpp" />
     <ClCompile Include="Src\Utils\Color.cpp" />
+    <ClCompile Include="Src\Utils\LogColor.cpp" />
     <ClCompile Include="Src\Utils\Logger.cpp" />
     <ClCompile Include="Src\Utils\Math.cpp" />
     <ClCompile Include="Src\Utils\Random.cpp" />
