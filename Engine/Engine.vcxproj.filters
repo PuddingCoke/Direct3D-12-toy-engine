@@ -399,10 +399,10 @@
     <ClInclude Include="Inc\Gear\Core\StaticEffect\StaticEffectHeader.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="Inc\Gear\Utils\LogColor.h">
+    <ClInclude Include="Inc\Gear\Utils\Logger\LogColor.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="Inc\Gear\Utils\LogContext.h">
+    <ClInclude Include="Inc\Gear\Utils\Logger\LogContext.h">
       <Filter>Header</Filter>
     </ClInclude>
   </ItemGroup>
@@ -605,10 +605,10 @@
     <ClCompile Include="Src\Core\StaticEffect\BackBufferBlitEffect.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Utils\LogColor.cpp">
+    <ClCompile Include="Src\Utils\Logger\LogColor.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Utils\LogContext.cpp">
+    <ClCompile Include="Src\Utils\Logger\LogContext.cpp">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>

@@ -7,7 +7,7 @@
 
 #include<fstream>
 
-#include"LogContext.h"
+#include"Logger/LogContext.h"
 
 using IntegerMode = LogContext::IntegerMode;
 
@@ -24,7 +24,7 @@ using IntegerMode = LogContext::IntegerMode;
 class Logger
 {
 public:
-	
+
 	Logger(const Logger&) = delete;
 
 	void operator=(const Logger&) = delete;
@@ -53,7 +53,7 @@ private:
 
 #define LOGUSER(...) Logger::get()->submitLogMessage(LogContext::createLogMessage(getTimeStamp(),getThreadId(),wrapClassName(typeid(*this).name()),LogType::LOG_USER,__VA_ARGS__))
 
-#define LOGERROR(...) Logger::get()->submitLogMessage(LogContext::createLogMessage(getTimeStamp(),getThreadId(),L"",LogType::LOG_ERROR,__FILEW__,L"FUNCTION",__FUNCTIONW__,L"LINE",__LINE__,__VA_ARGS__)); \
+#define LOGERROR(...) Logger::get()->submitLogMessage(LogContext::createLogMessage(getTimeStamp(),getThreadId(),L"",LogType::LOG_ERROR,__FILEW__,__FUNCTIONW__,L"LINE",__LINE__,__VA_ARGS__)); \
 throw std::runtime_error("check log.txt or console output for detailed information") \
 
 #endif // !_LOGGER_H_

@@ -1,4 +1,4 @@
-﻿#include<Gear/Utils/LogContext.h>
+﻿#include<Gear/Utils/Logger/LogContext.h>
 
 #include<thread>
 

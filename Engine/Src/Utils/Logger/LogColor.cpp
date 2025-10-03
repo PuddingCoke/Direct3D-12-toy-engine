@@ -1,4 +1,4 @@
-﻿#include<Gear/Utils/LogColor.h>
+﻿#include<Gear/Utils/Logger/LogColor.h>
 
 bool LogColor::operator!=(const LogColor& color) const
 {
