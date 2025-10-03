@@ -30,7 +30,7 @@ HDRClampEffect::HDRClampEffect() :
 {
 	PipelineState::createComputeState(&hdrClampState, hdrClampShader);
 
-	LOGSUCCESS("create", LogColor::brightMagenta, "HDRClampEffect", LogColor::defaultColor, "succeeded");
+	LOGSUCCESS(L"create", LogColor::brightMagenta, L"HDRClampEffect", LogColor::defaultColor, L"succeeded");
 }
 
 HDRClampEffect::~HDRClampEffect()

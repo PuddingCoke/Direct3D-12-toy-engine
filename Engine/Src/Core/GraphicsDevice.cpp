@@ -11,17 +11,17 @@ GraphicsDevice::GraphicsDevice(IUnknown* const adapter)
 {
 	if (SUCCEEDED(D3D12CreateDevice(adapter, D3D_FEATURE_LEVEL_12_2, IID_PPV_ARGS(&device))))
 	{
-		LOGSUCCESS("create d3d12 device with feature level", LogColor::brightMagenta, "D3D_FEATURE_LEVEL_12_2", LogColor::defaultColor, "succeeded");
+		LOGSUCCESS(L"create d3d12 device with feature level", LogColor::brightMagenta, L"D3D_FEATURE_LEVEL_12_2", LogColor::defaultColor, L"succeeded");
 	}
 	else
 	{
-		LOGERROR("your graphics card should support D3D_FEATURE_LEVEL_12_2");
+		LOGERROR(L"your graphics card should support D3D_FEATURE_LEVEL_12_2");
 	}
 }
 
 void GraphicsDevice::checkFeatureSupport() const
 {
-	LOGENGINE("following are feature support data");
+	LOGENGINE(L"following are feature support data");
 
 	CD3DX12FeatureSupport features;
 
@@ -46,7 +46,7 @@ void GraphicsDevice::checkFeatureSupport() const
 			break;
 		}
 
-		LOGENGINE("resource binding tier", LogColor::brightMagenta, bindingTierString);
+		LOGENGINE(L"resource binding tier", LogColor::brightMagenta, bindingTierString);
 	}
 
 	{
@@ -89,22 +89,22 @@ void GraphicsDevice::checkFeatureSupport() const
 			break;
 		}
 
-		LOGENGINE("highest supported shader model", LogColor::brightMagenta, shaderModelString);
+		LOGENGINE(L"highest supported shader model", LogColor::brightMagenta, shaderModelString);
 
 		if (shaderModel < D3D_SHADER_MODEL_6_6)
 		{
-			LOGERROR("your graphics card should at least support D3D_SHADER_MODEL_6_6");
+			LOGERROR(L"your graphics card should at least support D3D_SHADER_MODEL_6_6");
 		}
 	}
 
 	{
 		const BOOL typedUAVLoad = features.TypedUAVLoadAdditionalFormats();
 
-		LOGENGINE("typed uav load", (typedUAVLoad ? LogColor::brightGreen : LogColor::brightRed), (typedUAVLoad ? "YES" : "NO"));
+		LOGENGINE(L"typed uav load", (typedUAVLoad ? LogColor::brightGreen : LogColor::brightRed), (typedUAVLoad ? L"YES" : L"NO"));
 
 		if (!typedUAVLoad)
 		{
-			LOGERROR("your graphics card should support typed uav load");
+			LOGERROR(L"your graphics card should support typed uav load");
 		}
 	}
 
@@ -127,7 +127,7 @@ void GraphicsDevice::checkFeatureSupport() const
 			break;
 		}
 
-		LOGENGINE("raytracing tier", LogColor::brightMagenta, raytracingTierString);
+		LOGENGINE(L"raytracing tier", LogColor::brightMagenta, raytracingTierString);
 	}
 
 }

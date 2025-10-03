@@ -198,10 +198,10 @@ Texture* ResourceManager::createTexture(const std::wstring& filePath, const D3D1
 	}
 	else
 	{
-		LOGERROR(fileExtension, "is not supported");
+		LOGERROR(fileExtension, L"is not supported");
 	}
 
-	LOGSUCCESS("load texture from", LogColor::brightBlue, filePath, LogColor::defaultColor, "succeeded");
+	LOGSUCCESS(L"load texture from", LogColor::brightBlue, filePath, LogColor::defaultColor, L"succeeded");
 
 	return texture;
 }
@@ -324,7 +324,7 @@ BufferView* ResourceManager::createTypedBufferView(const DXGI_FORMAT format, con
 {
 	if (createVBV && createIBV)
 	{
-		LOGERROR("a buffer cannot be used as VBV and IBV at the same time");
+		LOGERROR(L"a buffer cannot be used as VBV and IBV at the same time");
 	}
 
 	D3D12_RESOURCE_FLAGS resFlags = D3D12_RESOURCE_FLAG_NONE;
@@ -371,7 +371,7 @@ BufferView* ResourceManager::createTypedBufferView(const DXGI_FORMAT format, con
 {
 	if (createVBV && createIBV)
 	{
-		LOGERROR("a bufffer cannot be used as VBV and IBV at the same time");
+		LOGERROR(L"a bufffer cannot be used as VBV and IBV at the same time");
 	}
 
 	D3D12_RESOURCE_FLAGS resFlags = D3D12_RESOURCE_FLAG_NONE;
@@ -537,7 +537,7 @@ TextureDepthView* ResourceManager::createTextureDepthView(const uint32_t width, 
 		clearValueFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 		break;
 	default:
-		LOGERROR("not supported dsv format");
+		LOGERROR(L"not supported dsv format");
 		break;
 	}
 
@@ -659,11 +659,11 @@ TextureRenderView* ResourceManager::createTextureRenderView(const uint32_t width
 
 	if ((!hasRTV) && (!hasUAV))
 	{
-		LOGERROR("you must set UAV or RTV format for customized render texture view");
+		LOGERROR(L"you must set UAV or RTV format for customized render texture view");
 	}
 	else if (srvFormat == DXGI_FORMAT_UNKNOWN)
 	{
-		LOGERROR("customized render texture view must have a valid SRV format");
+		LOGERROR(L"customized render texture view must have a valid SRV format");
 	}
 
 	D3D12_RESOURCE_FLAGS resFlags = D3D12_RESOURCE_FLAG_NONE;
@@ -720,7 +720,7 @@ TextureRenderView* ResourceManager::createTextureCube(const std::wstring& filePa
 		resFormat = DXGI_FORMAT_R32G32B32A32_FLOAT;
 		break;
 	default:
-		LOGERROR("not supported equirectangular texture format");
+		LOGERROR(L"not supported equirectangular texture format");
 		break;
 	}
 

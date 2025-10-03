@@ -16,25 +16,25 @@ Encoder::Encoder(const uint32_t frameToEncode, const OutputVideoFormat format) :
 	switch (format)
 	{
 	case OutputVideoFormat::H264:
-		LOGENGINE("output video format", LogColor::brightMagenta, "H264");
+		LOGENGINE(L"output video format", LogColor::brightMagenta, L"H264");
 		mediaType->SetGUID(MF_MT_SUBTYPE, MFVideoFormat_H264);
 		break;
 	case OutputVideoFormat::HEVC:
-		LOGENGINE("output video format", LogColor::brightMagenta, "HEVC");
+		LOGENGINE(L"output video format", LogColor::brightMagenta, L"HEVC");
 		mediaType->SetGUID(MF_MT_SUBTYPE, MFVideoFormat_HEVC);
 		break;
 	case OutputVideoFormat::AV1:
-		LOGENGINE("output video format", LogColor::brightMagenta, "AV1");
+		LOGENGINE(L"output video format", LogColor::brightMagenta, L"AV1");
 		mediaType->SetGUID(MF_MT_SUBTYPE, MFVideoFormat_AV1);
 		break;
 	default:
-		LOGERROR("not supported output video format!");
+		LOGERROR(L"not supported output video format!");
 		break;
 	}
 
-	LOGENGINE("frame rate", frameRate);
+	LOGENGINE(L"frame rate", frameRate);
 
-	LOGENGINE("frame to encode", frameToEncode);
+	LOGENGINE(L"frame to encode", frameToEncode);
 
 	MFSetAttributeSize(mediaType.Get(), MF_MT_FRAME_SIZE, Graphics::getWidth(), Graphics::getHeight());
 
@@ -56,11 +56,11 @@ Encoder::~Encoder()
 
 void Encoder::displayResult() const
 {
-	LOGENGINE("encode complete");
+	LOGENGINE(L"encode complete");
 
-	LOGENGINE("encode average speed", frameToEncode / encodeTime);
+	LOGENGINE(L"encode average speed", frameToEncode / encodeTime);
 
-	LOGENGINE("enter any key to quit");
+	LOGENGINE(L"enter any key to quit");
 }
 
 bool Encoder::writeFrame(const void* const bitstreamPtr, const uint32_t bitstreamSize, const bool cleanPoint)

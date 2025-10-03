@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include<Gear/Core/RenderTask.h>
 #include<Gear/Core/Shader.h>
@@ -30,6 +30,8 @@ public:
 
 			GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&pipelineState));
 		}
+
+		LOGUSER(L"示例项目", L"Sample Project", L"Пример проекта");
 	}
 
 	~MyRenderTask()

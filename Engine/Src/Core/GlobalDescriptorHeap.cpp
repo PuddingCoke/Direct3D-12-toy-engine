@@ -30,7 +30,7 @@ GlobalDescriptorHeap::GlobalDescriptorHeap()
 
 	nonShaderVisibleResourceHeap = new DescriptorHeap(1000000, 900000, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, D3D12_DESCRIPTOR_HEAP_FLAG_NONE);
 
-	LOGSUCCESS("create", LogColor::brightMagenta, "global descriptor heaps", LogColor::defaultColor, "succeeded");
+	LOGSUCCESS(L"create", LogColor::brightMagenta, L"global descriptor heaps", LogColor::defaultColor, L"succeeded");
 }
 
 GlobalDescriptorHeap::~GlobalDescriptorHeap()

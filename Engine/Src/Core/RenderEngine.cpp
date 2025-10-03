@@ -234,15 +234,15 @@ ComPtr<IDXGIAdapter4> RenderEngine::getBestAdapterAndVendor(IDXGIFactory7* const
 				vendorName = L"UNKNOWN";
 			}
 
-			LOGENGINE("following are information about selected GPU");
+			LOGENGINE(L"following are information about selected GPU");
 
-			LOGENGINE("GPU Name", LogColor::brightMagenta, desc.Description);
+			LOGENGINE(L"GPU Name", LogColor::brightMagenta, desc.Description);
 
-			LOGENGINE("GPU Vendor ID", std::hex, vendorID);
+			LOGENGINE(L"GPU Vendor ID", std::hex, vendorID, std::dec);
 
-			LOGENGINE("GPU Vendor Name", LogColor::brightMagenta, vendorName);
+			LOGENGINE(L"GPU Vendor Name", LogColor::brightMagenta, vendorName);
 
-			LOGENGINE("GPU Dedicated Memory", static_cast<float>(desc.DedicatedVideoMemory) / 1024.f / 1024.f / 1024.f, "gigabytes");
+			LOGENGINE(L"GPU Dedicated Memory", static_cast<float>(desc.DedicatedVideoMemory) / 1024.f / 1024.f / 1024.f, L"gigabytes");
 
 			break;
 		}
@@ -340,7 +340,7 @@ RenderEngine::RenderEngine(const uint32_t width, const uint32_t height, const HW
 	ComPtr<IDXGIFactory7> factory;
 
 #ifdef _DEBUG
-	LOGENGINE(LogColor::green, "enable", LogColor::defaultColor, "debug layer");
+	LOGENGINE(LogColor::green, L"enable", LogColor::defaultColor, L"debug layer");
 
 	ComPtr<ID3D12Debug> debugController;
 
@@ -350,7 +350,7 @@ RenderEngine::RenderEngine(const uint32_t width, const uint32_t height, const HW
 
 	CreateDXGIFactory2(DXGI_CREATE_FACTORY_DEBUG, IID_PPV_ARGS(&factory));
 #else
-	LOGENGINE(LogColor::red, "disable", LogColor::defaultColor, "debug layer");
+	LOGENGINE(LogColor::red, L"disable", LogColor::defaultColor, L"debug layer");
 
 	CreateDXGIFactory2(0, IID_PPV_ARGS(&factory));
 #endif // _DEBUG
@@ -448,7 +448,7 @@ RenderEngine::RenderEngine(const uint32_t width, const uint32_t height, const HW
 
 	if (initializeImGuiSurface)
 	{
-		LOGENGINE("enable ImGui");
+		LOGENGINE(L"enable ImGui");
 
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
@@ -465,7 +465,7 @@ RenderEngine::RenderEngine(const uint32_t width, const uint32_t height, const HW
 	}
 	else
 	{
-		LOGENGINE("disable ImGui");
+		LOGENGINE(L"disable ImGui");
 	}
 
 	CHECKERROR(CoInitializeEx(0, COINIT_MULTITHREADED));

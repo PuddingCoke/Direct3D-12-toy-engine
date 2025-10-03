@@ -112,7 +112,7 @@ LatLongMapToCubeMapEffect::LatLongMapToCubeMapEffect(ResourceManager* const resM
 		matricesBuffer = resManager->createConstantBuffer(sizeof(Matrices), false, &matrices, false);
 	}
 
-	LOGSUCCESS("create", LogColor::brightMagenta, "LatLongMapToCubeMapEffect", LogColor::defaultColor, "succeeded");
+	LOGSUCCESS(L"create", LogColor::brightMagenta, L"LatLongMapToCubeMapEffect", LogColor::defaultColor, L"succeeded");
 }
 
 LatLongMapToCubeMapEffect::~LatLongMapToCubeMapEffect()

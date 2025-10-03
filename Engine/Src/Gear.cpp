@@ -21,7 +21,7 @@ int Gear::iniEngine(const Configuration& config, const int argc, const wchar_t* 
 
 	Utils::exeRootPath = Utils::File::backslashToSlash(Utils::File::getParentFolder(argv[0]));
 
-	LOGENGINE("executable path", LogColor::brightBlue, Utils::getRootFolder());
+	LOGENGINE(L"executable path", LogColor::brightBlue, Utils::getRootFolder());
 
 	usage = config.usage;
 
@@ -38,7 +38,7 @@ int Gear::iniEngine(const Configuration& config, const int argc, const wchar_t* 
 
 		RenderEngine::instance = new RenderEngine(config.width, config.height, winform->getHandle(), true, config.enableImGuiSurface);
 
-		LOGENGINE("engine usage normal");
+		LOGENGINE(L"engine usage normal");
 
 		break;
 
@@ -46,7 +46,7 @@ int Gear::iniEngine(const Configuration& config, const int argc, const wchar_t* 
 
 		RenderEngine::instance = new RenderEngine(config.width, config.height, winform->getHandle(), false, false);
 
-		LOGENGINE("engine usage video playback");
+		LOGENGINE(L"engine usage video playback");
 
 		break;
 
@@ -54,11 +54,11 @@ int Gear::iniEngine(const Configuration& config, const int argc, const wchar_t* 
 		break;
 	}
 
-	LOGENGINE("resolution", Graphics::getWidth(), "x", Graphics::getHeight());
+	LOGENGINE(L"resolution", Graphics::getWidth(), L"x", Graphics::getHeight());
 
-	LOGENGINE("aspect ratio", Graphics::getAspectRatio());
+	LOGENGINE(L"aspect ratio", Graphics::getAspectRatio());
 
-	LOGENGINE("back buffer count", Graphics::getFrameBufferCount());
+	LOGENGINE(L"back buffer count", Graphics::getFrameBufferCount());
 
 	return 0;
 }

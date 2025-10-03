@@ -125,7 +125,7 @@ GlobalRootSignature::GlobalRootSignature()
 
 		graphicsRootSignature = new RootSignature(rootSignatureDesc);
 
-		LOGSUCCESS("create", LogColor::brightMagenta, "global graphics root signature", LogColor::defaultColor, "succeeded");
+		LOGSUCCESS(L"create", LogColor::brightMagenta, L"global graphics root signature", LogColor::defaultColor, L"succeeded");
 	}
 
 	{
@@ -146,7 +146,7 @@ GlobalRootSignature::GlobalRootSignature()
 
 		computeRootSignature = new RootSignature(rootSignatureDesc);
 
-		LOGSUCCESS("create", LogColor::brightMagenta, "global compute root signature", LogColor::defaultColor, "succeeded");
+		LOGSUCCESS(L"create", LogColor::brightMagenta, L"global compute root signature", LogColor::defaultColor, L"succeeded");
 	}
 }
 

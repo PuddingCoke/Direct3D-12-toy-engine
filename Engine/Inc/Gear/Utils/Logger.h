@@ -11,14 +11,18 @@
 
 /// <summary>
 /// a simple logger that output text with colors depend on different situations
-/// and numeric value like int32_t uint32_t float_t have special color
-/// since i want to use utf-8 encoding so std::string is not supported
-/// do not use logger in loop although there is optimization
+/// numeric value like int32_t,uint32_t,float_t have special color
+/// since i want to use utf-8 encoding so std::string and native string are not supported
+/// and do not use logger in loop although there is optimization
+/// following are supported format
+/// integer types are int32_t,int64_t,uint32_t,uint64_t
+/// float point types are float_t,double_t
+/// string types are std::wstring,const wchar_t*,const wchar_t[],wchar_t[]
 /// </summary>
 class Logger
 {
 public:
-
+	
 	Logger(const Logger&) = delete;
 
 	void operator=(const Logger&) = delete;
@@ -37,8 +41,6 @@ private:
 
 	static Logger* instance;
 
-	std::ostream::fmtflags initialFlag;
-
 	std::wofstream file;
 
 };
@@ -49,7 +51,7 @@ private:
 
 #define LOGUSER(...) Logger::get()->submitLogMessage(LogContext::createLogMessage(getTimeStamp(),getThreadId(),wrapClassName(typeid(*this).name()),LogType::LOG_USER,__VA_ARGS__))
 
-#define LOGERROR(...) Logger::get()->submitLogMessage(LogContext::createLogMessage(getTimeStamp(),getThreadId(),L"",LogType::LOG_ERROR,__FILE__,L"function",__FUNCTION__,L"line",__LINE__,__VA_ARGS__)); \
+#define LOGERROR(...) Logger::get()->submitLogMessage(LogContext::createLogMessage(getTimeStamp(),getThreadId(),L"",LogType::LOG_ERROR,__FILEW__,L"FUNCTION",__FUNCTIONW__,L"LINE",__LINE__,__VA_ARGS__)); \
 throw std::runtime_error("check log.txt or console output for detailed information") \
 
 #endif // !_LOGGER_H_

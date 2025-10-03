@@ -15,7 +15,7 @@ NvidiaEncoder::NvidiaEncoder(const uint32_t frameToEncode) :
 
 	NVENCSTATUS(__stdcall * NVENCAPICreateInstance)(NV_ENCODE_API_FUNCTION_LIST*) = (NVENCSTATUS(*)(NV_ENCODE_API_FUNCTION_LIST*))GetProcAddress(moduleNvEncAPI, "NvEncodeAPICreateInstance");
 
-	LOGENGINE("api create instance status", static_cast<uint32_t>(NVENCAPICreateInstance(&nvencAPI)));
+	LOGENGINE(L"api create instance status", static_cast<uint32_t>(NVENCAPICreateInstance(&nvencAPI)));
 
 	NV_ENC_OPEN_ENCODE_SESSION_EX_PARAMS sessionParams = { NV_ENC_OPEN_ENCODE_SESSION_EX_PARAMS_VER };
 	sessionParams.device = GraphicsDevice::get();
@@ -67,7 +67,7 @@ NvidiaEncoder::NvidiaEncoder(const uint32_t frameToEncode) :
 
 	GraphicsDevice::get()->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&outputFence));
 
-	LOGENGINE("start encoding");
+	LOGENGINE(L"start encoding");
 
 	NV_ENC_REGISTER_RESOURCE registerOutputResource = { NV_ENC_REGISTER_RESOURCE_VER };
 	registerOutputResource.bufferFormat = NV_ENC_BUFFER_FORMAT_U8;

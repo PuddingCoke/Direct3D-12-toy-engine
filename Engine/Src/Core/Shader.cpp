@@ -33,11 +33,11 @@ Shader::Shader(const std::wstring& filePath)
 
 		shaderByteCode.BytecodeLength = shaderBlob->GetBufferSize();
 
-		LOGSUCCESS("read byte code at", LogColor::brightBlue, filePath, LogColor::defaultColor, "succeeded");
+		LOGSUCCESS(L"read byte code at", LogColor::brightBlue, filePath, LogColor::defaultColor, L"succeeded");
 	}
 	else
 	{
-		LOGERROR("input file's extension must be cso");
+		LOGERROR(L"input file's extension must be cso");
 	}
 }
 
@@ -51,11 +51,11 @@ Shader::Shader(const std::wstring& filePath, const ShaderProfile profile)
 
 		shaderByteCode.BytecodeLength = shaderBlob->GetBufferSize();
 
-		LOGSUCCESS("compile shader at", LogColor::brightBlue, filePath, LogColor::defaultColor, "succeeded");
+		LOGSUCCESS(L"compile shader at", LogColor::brightBlue, filePath, LogColor::defaultColor, L"succeeded");
 	}
 	else
 	{
-		LOGERROR("input file's extension must be hlsl");
+		LOGERROR(L"input file's extension must be hlsl");
 	}
 }
 
@@ -157,7 +157,7 @@ ComPtr<IDxcBlob> DXCCompiler::compile(const std::wstring& filePath, const Shader
 		dxcUtils->BuildArguments(filePath.c_str(), L"", L"lib_6_6", nullptr, 0, nullptr, 0, &args);
 		break;
 	default:
-		LOGERROR("not supported shader profile");
+		LOGERROR(L"not supported shader profile");
 		break;
 	}
 

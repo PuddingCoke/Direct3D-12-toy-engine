@@ -62,6 +62,21 @@ private:
 	template<typename Arg>
 	static constexpr bool isString();
 
+	template<typename T>
+	struct isNativeString :std::false_type {};
+
+	template<size_t N>
+	struct isNativeString<const char[N]> : std::true_type {};
+
+	template<size_t N>
+	struct isNativeString<char[N]> : std::true_type {};
+
+	template<>
+	struct isNativeString<const char*> : std::true_type {};
+
+	template<>
+	struct isNativeString<char*> : std::true_type {};
+
 	template<typename First, typename... Rest>
 	void packRestArgument(const First& first, const Rest&... rest);
 
@@ -190,6 +205,8 @@ template<typename First, typename ...Rest>
 inline void LogContext::packRestArgument(const First& first, const Rest& ...rest)
 {
 	static_assert(!isString<First>(), "error input type is std::string");
+
+	static_assert(!isNativeString<First>::value, "error input type is native string");
 
 	packArgument(first);
 

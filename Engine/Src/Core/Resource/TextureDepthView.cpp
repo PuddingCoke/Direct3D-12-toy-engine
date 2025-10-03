@@ -44,7 +44,7 @@ TextureDepthView::TextureDepthView(Texture* const texture, const bool isTextureC
 		dsvFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 		break;
 	default:
-		LOGERROR("not supported depth stencil texture format");
+		LOGERROR(L"not supported depth stencil texture format");
 		break;
 	}
 

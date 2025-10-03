@@ -13,8 +13,6 @@ void Logger::submitLogMessage(const LogMessage& msg)
 {
 	std::wcout << msg.consoleOutputStr << L"\n";
 
-	std::wcout.flags(initialFlag);
-
 	if (file.is_open())
 	{
 		file << msg.fileOutputStr << L"\n";
@@ -26,16 +24,16 @@ void Logger::submitLogMessage(const LogMessage& msg)
 	}
 }
 
-Logger::Logger() :
-	initialFlag(std::wcout.flags())
+//to support multiple language first set global locale to .UTF-8
+//and then set console output code page to CP_UTF8
+//steps above will make sure console and log.txt have correct content
+Logger::Logger()
 {
-	//to support multiple language first set locale to .UTF-8
-	//and then set console output code page to CP_UTF8
 	std::locale::global(std::locale(".UTF-8"));
 
 	SetConsoleOutputCP(CP_UTF8);
 
-	file.open(L"log.txt", std::ios_base::out | std::ios_base::trunc);
+	file = std::wofstream(L"log.txt", std::ios_base::out | std::ios_base::trunc);
 }
 
 Logger::~Logger()

@@ -54,7 +54,7 @@ std::wstring Utils::File::readAllText(const std::wstring& filePath)
 
     if (!file.is_open())
     {
-        LOGERROR("open file", filePath, "failed");
+        LOGERROR(L"open file", filePath, L"failed");
     }
 
     std::wstringstream stringStream;
@@ -70,7 +70,7 @@ std::vector<uint8_t> Utils::File::readAllBinary(const std::wstring& filePath)
 
     if (!file.is_open())
     {
-        LOGERROR("open file", filePath, "failed");
+        LOGERROR(L"open file", filePath, L"failed");
     }
 
     const size_t fileSize = static_cast<size_t>(file.tellg());

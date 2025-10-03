@@ -292,7 +292,7 @@ void Texture::transition(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers
 		}
 		else
 		{
-			LOGERROR("when transition texture that has only 1 miplevel,its allState must be known");
+			LOGERROR(L"when transition texture that has only 1 miplevel,its allState must be known");
 		}
 	}
 
@@ -400,7 +400,7 @@ void Texture::solvePendingBarrier(std::vector<D3D12_RESOURCE_BARRIER>& transitio
 		}
 		else
 		{
-			LOGERROR("when transition a texture that has only 1 miplevel,pending mipslice must be D3D12_TRANSITION_ALL_MIPLEVELS");
+			LOGERROR(L"when transition a texture that has only 1 miplevel,pending mipslice must be D3D12_TRANSITION_ALL_MIPLEVELS");
 		}
 	}
 }
