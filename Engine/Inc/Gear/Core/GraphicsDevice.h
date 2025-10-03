@@ -27,7 +27,7 @@ const HRESULT hr = x;\
 if(FAILED(hr))\
 {\
 _com_error err(hr);\
-LOGERROR(L"Failed with",std::hex,static_cast<uint32_t>(hr),std::dec,L"Failed reason",err.ErrorMessage());\
+LOGERROR(L"Failed with",IntegerMode::HEX,static_cast<uint32_t>(hr),L"Failed reason",err.ErrorMessage());\
 }\
 }\
 

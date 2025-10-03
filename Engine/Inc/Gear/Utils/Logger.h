@@ -9,6 +9,8 @@
 
 #include"LogContext.h"
 
+using IntegerMode = LogContext::IntegerMode;
+
 /// <summary>
 /// a simple logger that output text with colors depend on different situations
 /// numeric value like int32_t,uint32_t,float_t have special color
@@ -17,7 +19,7 @@
 /// following are supported format
 /// integer types are int32_t,int64_t,uint32_t,uint64_t
 /// float point types are float_t,double_t
-/// string types are std::wstring,const wchar_t*,const wchar_t[],wchar_t[]
+/// string types are literal wchar_t array,std::wstring,const wchar_t*
 /// </summary>
 class Logger
 {

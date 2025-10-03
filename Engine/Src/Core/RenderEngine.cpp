@@ -238,7 +238,7 @@ ComPtr<IDXGIAdapter4> RenderEngine::getBestAdapterAndVendor(IDXGIFactory7* const
 
 			LOGENGINE(L"GPU Name", LogColor::brightMagenta, desc.Description);
 
-			LOGENGINE(L"GPU Vendor ID", std::hex, vendorID, std::dec);
+			LOGENGINE(L"GPU Vendor ID", IntegerMode::HEX, vendorID);
 
 			LOGENGINE(L"GPU Vendor Name", LogColor::brightMagenta, vendorName);
 

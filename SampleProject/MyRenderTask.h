@@ -14,7 +14,7 @@ public:
 		vertexShader = new Shader(Utils::getRootFolder() + L"VertexShader.cso");
 
 		pixelShader = new Shader(Utils::getRootFolder() + L"PixelShader.cso");
-		
+
 		{
 			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = PipelineState::getDefaultGraphicsDesc();
 			desc.InputLayout = {};
@@ -32,6 +32,16 @@ public:
 		}
 
 		LOGUSER(L"示例项目", L"Sample Project", L"Пример проекта");
+
+		LOGUSER(L"32位有符号整数测试", IntegerMode::HEX, 12895, -123456, INT_MAX, INT_MIN, IntegerMode::DEC, 12895, -123456, INT_MAX, INT_MIN);
+
+		LOGUSER(L"32位无符号整数测试", IntegerMode::HEX, 13689u, UINT_MAX, IntegerMode::DEC, 13689u, UINT_MAX);
+
+		LOGUSER(L"64位有符号整数测试", IntegerMode::HEX, 1222222ll, -188888ll, INT64_MAX, INT64_MIN, IntegerMode::DEC, 1222222ll, -188888ll, INT64_MAX, INT64_MIN);
+
+		LOGUSER(L"64位无符号整数测试", IntegerMode::HEX, 13579ull, UINT64_MAX, IntegerMode::DEC, 13579ull, UINT64_MAX);
+
+		LOGUSER(L"浮点测试", 125.6f, 125.7);
 	}
 
 	~MyRenderTask()
@@ -44,6 +54,8 @@ protected:
 
 	void recordCommand() override
 	{
+		LOGUSER(L"HELLO!");
+
 		context->setDefRenderTarget();
 
 		context->setPipelineState(pipelineState.Get());

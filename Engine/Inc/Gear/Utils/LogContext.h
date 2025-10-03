@@ -5,8 +5,6 @@
 
 #include"LogColor.h"
 
-#include<sstream>
-
 //output [hour:miniute:second]
 std::wstring getTimeStamp();
 
@@ -37,6 +35,11 @@ class LogContext
 {
 public:
 
+	enum class IntegerMode
+	{
+		DEC, HEX
+	};
+
 	LogContext(const LogContext&) = delete;
 
 	void operator=(const LogContext&) = delete;
@@ -52,15 +55,6 @@ private:
 
 	template<typename... Args>
 	LogMessage getLogMessage(const std::wstring& timeStamp, const std::wstring& threadId, const std::wstring& className, const LogType& type, const Args&... args);
-
-	template<typename Arg>
-	static constexpr bool isInteger();
-
-	template<typename Arg>
-	static constexpr bool isFloatPoint();
-
-	template<typename Arg>
-	static constexpr bool isString();
 
 	template<typename T>
 	struct isNativeString :std::false_type {};
@@ -83,41 +77,54 @@ private:
 	void packRestArgument();
 
 	template<typename Arg>
-	void packInteger(const Arg& arg);
-
-	template<typename Arg>
-	void packFloatPoint(const Arg& arg);
-
-	template<typename Arg>
 	void packArgument(const Arg& arg);
 
-	void packArgument(const int32_t& arg);
-
-	void packArgument(const int64_t& arg);
-
-	void packArgument(const uint32_t& arg);
-
-	void packArgument(const uint64_t& arg);
-
-	void packArgument(const float_t& arg);
-
-	void packArgument(const double_t& arg);
-
+	//literal wchar_t array
+	template<size_t N>
+	void packArgument(const wchar_t (&arg)[N]);
+	
+	//wstring
 	void packArgument(const std::wstring& arg);
 
-	void packArgument(std::ios_base& __cdecl arg(std::ios_base&));
+	//const wchar*
+	void packArgument(const wchar_t* arg);
 
+	//singed 32bit integer
+	void packArgument(const int32_t& arg);
+
+	//signed 64bit integer
+	void packArgument(const int64_t& arg);
+
+	//unsigned 32bit integer
+	void packArgument(const uint32_t& arg);
+
+	//unsigned 64bit integer
+	void packArgument(const uint64_t& arg);
+
+	//float
+	void packArgument(const float_t& arg);
+
+	//double
+	void packArgument(const double_t& arg);
+
+	//change integer mode
+	void packArgument(const IntegerMode& mode);
+
+	//change text color
 	void packArgument(const LogColor& arg);
 
+	//change display color
 	void setDisplayColor(const LogColor& color);
+
+	IntegerMode integerMode;
 
 	LogColor textColor;
 
 	LogColor displayColor;
 
-	std::wostringstream consoleOutputStream;
+	std::wstring consoleOutputStr;
 
-	std::wostringstream fileOutputStream;
+	std::wstring fileOutputStr;
 };
 
 template<typename ...Args>
@@ -176,35 +183,13 @@ inline LogMessage LogContext::getLogMessage(const std::wstring& timeStamp, const
 
 	packRestArgument(args...);
 
-	return LogMessage{ consoleOutputStream.str(),fileOutputStream.str(),type };
-}
-
-template<typename Arg>
-inline constexpr bool LogContext::isInteger()
-{
-	return std::is_same<int32_t, Arg>::value ||
-		std::is_same<int64_t, Arg>::value ||
-		std::is_same<uint32_t, Arg>::value ||
-		std::is_same<uint64_t, Arg>::value;
-}
-
-template<typename Arg>
-inline constexpr bool LogContext::isFloatPoint()
-{
-	return std::is_same<float_t, Arg>::value ||
-		std::is_same<double_t, Arg>::value;
-}
-
-template<typename Arg>
-inline constexpr bool LogContext::isString()
-{
-	return std::is_same<std::string, Arg>::value;
+	return LogMessage{ consoleOutputStr,fileOutputStr,type };
 }
 
 template<typename First, typename ...Rest>
 inline void LogContext::packRestArgument(const First& first, const Rest& ...rest)
 {
-	static_assert(!isString<First>(), "error input type is std::string");
+	static_assert(!std::is_same<std::string, First>::value, "error input type is std::string");
 
 	static_assert(!isNativeString<First>::value, "error input type is native string");
 
@@ -214,48 +199,30 @@ inline void LogContext::packRestArgument(const First& first, const Rest& ...rest
 }
 
 template<typename Arg>
-inline void LogContext::packInteger(const Arg& arg)
-{
-	static_assert(isInteger<Arg>(), "error input type is not integer");
-
-	setDisplayColor(LogColor::numericColor);
-
-	//if it is hex mode then start with 0x
-	if (consoleOutputStream.flags() & std::ios::hex)
-	{
-		consoleOutputStream << L"0x" << arg << L" ";
-
-		fileOutputStream << L"0x" << arg << L" ";
-
-	}
-	else
-	{
-		consoleOutputStream << arg << L" ";
-
-		fileOutputStream << arg << L" ";
-	}
-}
-
-template<typename Arg>
-inline void LogContext::packFloatPoint(const Arg& arg)
-{
-	static_assert(isFloatPoint<Arg>(), "error input type is not float point");
-
-	setDisplayColor(LogColor::numericColor);
-
-	consoleOutputStream << arg << L" ";
-
-	fileOutputStream << arg << L" ";
-}
-
-template<typename Arg>
 inline void LogContext::packArgument(const Arg& arg)
+{
+	static_assert(0, "not supported type");
+
+	//test use only
+	/*setDisplayColor(textColor);
+
+	const std::string ty = typeid(Arg).name();
+
+	packArgument(std::wstring(ty.cbegin(), ty.cend()));*/
+}
+
+template<size_t N>
+inline void LogContext::packArgument(const wchar_t (&arg)[N])
 {
 	setDisplayColor(textColor);
 
-	consoleOutputStream << arg << L" ";
+	consoleOutputStr += arg;
 
-	fileOutputStream << arg << L" ";
+	consoleOutputStr += L" ";
+
+	fileOutputStr += arg;
+
+	fileOutputStr += L" ";
 }
 
 #endif // !_LOGCONTEXT_H_

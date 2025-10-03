@@ -17,7 +17,7 @@ std::wstring getThreadId()
 {
 	const auto id = std::this_thread::get_id();
 
-	return L"{T" + std::to_wstring(*((unsigned int*)&id)) + L"}";
+	return L"{T" + std::to_wstring(*((uint32_t*)&id)) + L"}";
 }
 
 std::wstring wrapClassName(const char* const className)
@@ -29,7 +29,8 @@ std::wstring wrapClassName(const char* const className)
 
 LogContext::LogContext() :
 	textColor{ L"" },
-	displayColor{ L"" }
+	displayColor{ L"" },
+	integerMode(IntegerMode::DEC)
 {
 }
 
@@ -37,54 +38,173 @@ LogContext::~LogContext()
 {
 }
 
-void LogContext::packRestArgument(void)
+void LogContext::packRestArgument()
 {
-}
-
-void LogContext::packArgument(const int32_t& arg)
-{
-	packInteger(arg);
-}
-
-void LogContext::packArgument(const int64_t& arg)
-{
-	packInteger(arg);
-}
-
-void LogContext::packArgument(const uint32_t& arg)
-{
-	packInteger(arg);
-}
-
-void LogContext::packArgument(const uint64_t& arg)
-{
-	packInteger(arg);
-}
-
-void LogContext::packArgument(const float_t& arg)
-{
-	packFloatPoint(arg);
-}
-
-void LogContext::packArgument(const double_t& arg)
-{
-	packFloatPoint(arg);
 }
 
 void LogContext::packArgument(const std::wstring& arg)
 {
 	setDisplayColor(textColor);
 
-	consoleOutputStream << arg << L" ";
+	consoleOutputStr += arg + L" ";
 
-	fileOutputStream << arg << L" ";
+	fileOutputStr += arg + L" ";
 }
 
-void LogContext::packArgument(std::ios_base& __cdecl arg(std::ios_base&))
+void LogContext::packArgument(const wchar_t* arg)
 {
-	consoleOutputStream << arg;
+	setDisplayColor(textColor);
 
-	fileOutputStream << arg;
+	consoleOutputStr += arg;
+
+	consoleOutputStr += L" ";
+
+	fileOutputStr += arg;
+
+	fileOutputStr += L" ";
+}
+
+void LogContext::packArgument(const int32_t& arg)
+{
+	setDisplayColor(LogColor::numericColor);
+
+	if (integerMode == IntegerMode::HEX)
+	{
+		wchar_t buff[9] = {};
+
+		_itow_s(arg, buff, 9, 16);
+
+		consoleOutputStr += L"0x";
+
+		consoleOutputStr += buff;
+
+		fileOutputStr += L"0x";
+
+		fileOutputStr += buff;
+	}
+	else
+	{
+		consoleOutputStr += std::to_wstring(arg);
+
+		fileOutputStr += std::to_wstring(arg);
+	}
+
+	consoleOutputStr += L" ";
+
+	fileOutputStr += L" ";
+}
+
+void LogContext::packArgument(const int64_t& arg)
+{
+	setDisplayColor(LogColor::numericColor);
+
+	if (integerMode == IntegerMode::HEX)
+	{
+		wchar_t buff[17] = {};
+
+		_i64tow_s(arg, buff, 17, 16);
+
+		consoleOutputStr += L"0x";
+
+		consoleOutputStr += buff;
+
+		fileOutputStr += L"0x";
+
+		fileOutputStr += buff;
+	}
+	else
+	{
+		consoleOutputStr += std::to_wstring(arg);
+
+		fileOutputStr += std::to_wstring(arg);
+	}
+
+	consoleOutputStr += L" ";
+
+	fileOutputStr += L" ";
+}
+
+void LogContext::packArgument(const uint32_t& arg)
+{
+	setDisplayColor(LogColor::numericColor);
+
+	if (integerMode == IntegerMode::HEX)
+	{
+		wchar_t buff[9] = {};
+
+		_ultow_s(arg, buff, 9, 16);
+
+		consoleOutputStr += L"0x";
+
+		consoleOutputStr += buff;
+
+		fileOutputStr += L"0x";
+
+		fileOutputStr += buff;
+	}
+	else
+	{
+		consoleOutputStr += std::to_wstring(arg);
+
+		fileOutputStr += std::to_wstring(arg);
+	}
+
+	consoleOutputStr += L" ";
+
+	fileOutputStr += L" ";
+}
+
+void LogContext::packArgument(const uint64_t& arg)
+{
+	setDisplayColor(LogColor::numericColor);
+
+	if (integerMode == IntegerMode::HEX)
+	{
+		wchar_t buff[17] = {};
+
+		_ui64tow_s(arg, buff, 17, 16);
+
+		consoleOutputStr += L"0x";
+
+		consoleOutputStr += buff;
+
+		fileOutputStr += L"0x";
+
+		fileOutputStr += buff;
+	}
+	else
+	{
+		consoleOutputStr += std::to_wstring(arg);
+
+		fileOutputStr += std::to_wstring(arg);
+	}
+
+	consoleOutputStr += L" ";
+
+	fileOutputStr += L" ";
+}
+
+void LogContext::packArgument(const float_t& arg)
+{
+	setDisplayColor(LogColor::numericColor);
+
+	consoleOutputStr += std::to_wstring(arg) + L" ";
+
+	fileOutputStr += std::to_wstring(arg) + L" ";
+}
+
+void LogContext::packArgument(const double_t& arg)
+{
+	setDisplayColor(LogColor::numericColor);
+
+	consoleOutputStr += std::to_wstring(arg) + L" ";
+
+	fileOutputStr += std::to_wstring(arg) + L" ";
+}
+
+void LogContext::packArgument(const IntegerMode& mode)
+{
+	integerMode = mode;
 }
 
 void LogContext::packArgument(const LogColor& arg)
@@ -101,6 +221,6 @@ void LogContext::setDisplayColor(const LogColor& color)
 	{
 		displayColor = color;
 
-		consoleOutputStream << displayColor.code;
+		consoleOutputStr += displayColor.code;
 	}
 }
