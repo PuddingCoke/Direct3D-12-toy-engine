@@ -5,11 +5,7 @@
 
 #include"LogColor.h"
 
-//output [hour:miniute:second]
-std::wstring getTimeStamp();
-
-//output {TXXXX}
-std::wstring getThreadId();
+#include<thread>
 
 //output (class name)
 std::wstring wrapClassName(const char* const className);
@@ -24,9 +20,7 @@ enum class LogType
 
 struct LogMessage
 {
-	const std::wstring consoleOutputStr;
-
-	const std::wstring fileOutputStr;
+	const std::wstring messageStr;
 
 	const LogType type;
 };
@@ -40,6 +34,13 @@ public:
 		DEC, HEX
 	};
 
+	struct FloatPrecision
+	{
+		FloatPrecision(const int precision);
+
+		int precision;
+	};
+
 	LogContext(const LogContext&) = delete;
 
 	void operator=(const LogContext&) = delete;
@@ -49,12 +50,12 @@ public:
 	~LogContext();
 
 	template<typename... Args>
-	static LogMessage createLogMessage(const std::wstring& timeStamp, const std::wstring& threadId, const std::wstring& className, const LogType& type, const Args&... args);
+	static LogMessage createLogMessage(const std::wstring& className, const LogType& type, const Args&... args);
 
 private:
 
 	template<typename... Args>
-	LogMessage getLogMessage(const std::wstring& timeStamp, const std::wstring& threadId, const std::wstring& className, const LogType& type, const Args&... args);
+	LogMessage getLogMessage(const std::wstring& className, const LogType& type, const Args&... args);
 
 	template<typename T>
 	struct isNativeString :std::false_type {};
@@ -76,13 +77,10 @@ private:
 
 	void packRestArgument();
 
+	//forbidden default case
 	template<typename Arg>
 	void packArgument(const Arg& arg);
 
-	//literal wchar_t array
-	template<size_t N>
-	void packArgument(const wchar_t (&arg)[N]);
-	
 	//wstring
 	void packArgument(const std::wstring& arg);
 
@@ -101,6 +99,9 @@ private:
 	//unsigned 64bit integer
 	void packArgument(const uint64_t& arg);
 
+	template<typename Arg>
+	void packFloatPoint(const Arg& arg);
+
 	//float
 	void packArgument(const float_t& arg);
 
@@ -110,6 +111,9 @@ private:
 	//change integer mode
 	void packArgument(const IntegerMode& mode);
 
+	//change float precision
+	void packArgument(const FloatPrecision& precision);
+
 	//change text color
 	void packArgument(const LogColor& arg);
 
@@ -118,31 +122,46 @@ private:
 
 	IntegerMode integerMode;
 
+	FloatPrecision floatPrecision;
+
 	LogColor textColor;
 
 	LogColor displayColor;
 
-	std::wstring consoleOutputStr;
-
-	std::wstring fileOutputStr;
+	std::wstring messageStr;
 };
 
 template<typename ...Args>
-inline LogMessage LogContext::createLogMessage(const std::wstring& timeStamp, const std::wstring& threadId, const std::wstring& className, const LogType& type, const Args & ...args)
+inline LogMessage LogContext::createLogMessage(const std::wstring& className, const LogType& type, const Args & ...args)
 {
-	return LogContext().getLogMessage(timeStamp, threadId, className, type, args...);
+	return LogContext().getLogMessage(className, type, args...);
 }
 
 template<typename ...Args>
-inline LogMessage LogContext::getLogMessage(const std::wstring& timeStamp, const std::wstring& threadId, const std::wstring& className, const LogType& type, const Args & ...args)
+inline LogMessage LogContext::getLogMessage(const std::wstring& className, const LogType& type, const Args & ...args)
 {
-	packArgument(LogColor::timeStampColor);
+	{
+		const time_t currentTime = time(nullptr);
 
-	packArgument(timeStamp);
+		tm localTime = {};
 
-	packArgument(LogColor::threadIdColor);
+		localtime_s(&localTime, &currentTime);
 
-	packArgument(threadId);
+		/*5[8] 5{T10} */
+		//conservative length = 5+2+8+1+5+2+1+10+1+1 = 36
+		const size_t headerStrLen = 36ull;
+
+		wchar_t headerStr[headerStrLen] = {};
+
+		const std::thread::id id = std::this_thread::get_id();
+
+		const uint32_t threadId = *(uint32_t*)&id;
+
+		swprintf_s(headerStr, headerStrLen, L"%s[%d:%d:%d] %s{T%u} ", LogColor::timeStampColor.code, localTime.tm_hour, localTime.tm_min, localTime.tm_sec,
+			LogColor::threadIdColor.code, threadId);
+
+		messageStr += headerStr;
+	}
 
 	if (type != LogType::LOG_ERROR)
 	{
@@ -183,7 +202,7 @@ inline LogMessage LogContext::getLogMessage(const std::wstring& timeStamp, const
 
 	packRestArgument(args...);
 
-	return LogMessage{ consoleOutputStr,fileOutputStr,type };
+	return LogMessage{ std::move(messageStr),type };
 }
 
 template<typename First, typename ...Rest>
@@ -211,18 +230,18 @@ inline void LogContext::packArgument(const Arg& arg)
 	packArgument(std::wstring(ty.cbegin(), ty.cend()));*/
 }
 
-template<size_t N>
-inline void LogContext::packArgument(const wchar_t (&arg)[N])
+template<typename Arg>
+inline void LogContext::packFloatPoint(const Arg& arg)
 {
-	setDisplayColor(textColor);
+	setDisplayColor(LogColor::numericColor);
 
-	consoleOutputStr += arg;
+	const int len = _scwprintf(L"%.*f ", floatPrecision.precision, arg);
 
-	consoleOutputStr += L" ";
+	std::wstring floatStr = std::wstring(len, '\0');
 
-	fileOutputStr += arg;
+	swprintf_s(&floatStr[0], len + 1, L"%.*f ", floatPrecision.precision, arg);
 
-	fileOutputStr += L" ";
+	messageStr += floatStr;
 }
 
 #endif // !_LOGCONTEXT_H_

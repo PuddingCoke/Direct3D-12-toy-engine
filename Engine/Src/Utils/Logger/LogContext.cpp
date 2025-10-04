@@ -1,25 +1,5 @@
 ﻿#include<Gear/Utils/Logger/LogContext.h>
 
-#include<thread>
-
-std::wstring getTimeStamp()
-{
-	const time_t currentTime = time(nullptr);
-
-	tm localTime = {};
-
-	localtime_s(&localTime, &currentTime);
-
-	return L"[" + std::to_wstring(localTime.tm_hour) + L":" + std::to_wstring(localTime.tm_min) + L":" + std::to_wstring(localTime.tm_sec) + L"]";
-}
-
-std::wstring getThreadId()
-{
-	const auto id = std::this_thread::get_id();
-
-	return L"{T" + std::to_wstring(*((uint32_t*)&id)) + L"}";
-}
-
 std::wstring wrapClassName(const char* const className)
 {
 	const size_t len = strnlen_s(className, UINT64_MAX);
@@ -27,10 +7,16 @@ std::wstring wrapClassName(const char* const className)
 	return L"(" + std::wstring(className, className + len) + L")";
 }
 
+LogContext::FloatPrecision::FloatPrecision(const int precision) :
+	precision(precision)
+{
+}
+
 LogContext::LogContext() :
 	textColor{ L"" },
 	displayColor{ L"" },
-	integerMode(IntegerMode::DEC)
+	integerMode(IntegerMode::DEC),
+	floatPrecision(3)
 {
 }
 
@@ -46,22 +32,16 @@ void LogContext::packArgument(const std::wstring& arg)
 {
 	setDisplayColor(textColor);
 
-	consoleOutputStr += arg + L" ";
-
-	fileOutputStr += arg + L" ";
+	messageStr += arg + L" ";
 }
 
 void LogContext::packArgument(const wchar_t* arg)
 {
 	setDisplayColor(textColor);
 
-	consoleOutputStr += arg;
+	messageStr += arg;
 
-	consoleOutputStr += L" ";
-
-	fileOutputStr += arg;
-
-	fileOutputStr += L" ";
+	messageStr += L" ";
 }
 
 void LogContext::packArgument(const int32_t& arg)
@@ -70,28 +50,32 @@ void LogContext::packArgument(const int32_t& arg)
 
 	if (integerMode == IntegerMode::HEX)
 	{
-		wchar_t buff[9] = {};
+		//0xFFFFFFFF 11
+		const size_t hexMaxLength = 11ull;
 
-		_itow_s(arg, buff, 9, 16);
+		wchar_t buff[hexMaxLength] = {};
 
-		consoleOutputStr += L"0x";
+		_itow_s(arg, buff + 2, hexMaxLength - 2ull, 16);
 
-		consoleOutputStr += buff;
+		buff[0] = L'0';
 
-		fileOutputStr += L"0x";
+		buff[1] = L'x';
 
-		fileOutputStr += buff;
+		messageStr += buff;
 	}
 	else
 	{
-		consoleOutputStr += std::to_wstring(arg);
+		//-2147483648 12
+		const size_t decMaxLength = 12ull;
 
-		fileOutputStr += std::to_wstring(arg);
+		wchar_t buff[decMaxLength] = {};
+
+		_itow_s(arg, buff, decMaxLength, 10);
+
+		messageStr += buff;
 	}
 
-	consoleOutputStr += L" ";
-
-	fileOutputStr += L" ";
+	messageStr += L" ";
 }
 
 void LogContext::packArgument(const int64_t& arg)
@@ -100,28 +84,32 @@ void LogContext::packArgument(const int64_t& arg)
 
 	if (integerMode == IntegerMode::HEX)
 	{
-		wchar_t buff[17] = {};
+		//0xFFFFFFFFFFFFFFFF 19
+		const size_t hexMaxLength = 19ull;
 
-		_i64tow_s(arg, buff, 17, 16);
+		wchar_t buff[hexMaxLength] = {};
 
-		consoleOutputStr += L"0x";
+		_i64tow_s(arg, buff + 2, hexMaxLength - 2ull, 16);
 
-		consoleOutputStr += buff;
+		buff[0] = L'0';
 
-		fileOutputStr += L"0x";
+		buff[1] = L'x';
 
-		fileOutputStr += buff;
+		messageStr += buff;
 	}
 	else
 	{
-		consoleOutputStr += std::to_wstring(arg);
+		//-9223372036854775808 21
+		const size_t decMaxLength = 21ull;
 
-		fileOutputStr += std::to_wstring(arg);
+		wchar_t buff[decMaxLength] = {};
+
+		_i64tow_s(arg, buff, decMaxLength, 10);
+
+		messageStr += buff;
 	}
 
-	consoleOutputStr += L" ";
-
-	fileOutputStr += L" ";
+	messageStr += L" ";
 }
 
 void LogContext::packArgument(const uint32_t& arg)
@@ -130,28 +118,32 @@ void LogContext::packArgument(const uint32_t& arg)
 
 	if (integerMode == IntegerMode::HEX)
 	{
-		wchar_t buff[9] = {};
+		//0xFFFFFFFF 11
+		const size_t hexMaxLength = 11ull;
 
-		_ultow_s(arg, buff, 9, 16);
+		wchar_t buff[hexMaxLength] = {};
 
-		consoleOutputStr += L"0x";
+		_ultow_s(arg, buff + 2, hexMaxLength - 2ull, 16);
 
-		consoleOutputStr += buff;
+		buff[0] = L'0';
 
-		fileOutputStr += L"0x";
+		buff[1] = L'x';
 
-		fileOutputStr += buff;
+		messageStr += buff;
 	}
 	else
 	{
-		consoleOutputStr += std::to_wstring(arg);
+		//4294967295 11
+		const size_t decMaxLength = 11ull;
 
-		fileOutputStr += std::to_wstring(arg);
+		wchar_t buff[decMaxLength] = {};
+
+		_ultow_s(arg, buff, decMaxLength, 10);
+
+		messageStr += buff;
 	}
 
-	consoleOutputStr += L" ";
-
-	fileOutputStr += L" ";
+	messageStr += L" ";
 }
 
 void LogContext::packArgument(const uint64_t& arg)
@@ -160,51 +152,52 @@ void LogContext::packArgument(const uint64_t& arg)
 
 	if (integerMode == IntegerMode::HEX)
 	{
-		wchar_t buff[17] = {};
+		//0xFFFFFFFFFFFFFFFF 19
+		const size_t hexMaxLength = 19ull;
 
-		_ui64tow_s(arg, buff, 17, 16);
+		wchar_t buff[hexMaxLength] = {};
 
-		consoleOutputStr += L"0x";
+		_ui64tow_s(arg, buff + 2, hexMaxLength - 2ull, 16);
 
-		consoleOutputStr += buff;
+		buff[0] = L'0';
 
-		fileOutputStr += L"0x";
+		buff[1] = L'x';
 
-		fileOutputStr += buff;
+		messageStr += buff;
 	}
 	else
 	{
-		consoleOutputStr += std::to_wstring(arg);
+		//18446744073709551615 21
+		const size_t decMaxLength = 21ull;
 
-		fileOutputStr += std::to_wstring(arg);
+		wchar_t buff[decMaxLength] = {};
+
+		_ui64tow_s(arg, buff, decMaxLength, 10);
+
+		messageStr += buff;
 	}
 
-	consoleOutputStr += L" ";
-
-	fileOutputStr += L" ";
+	messageStr += L" ";
 }
 
 void LogContext::packArgument(const float_t& arg)
 {
-	setDisplayColor(LogColor::numericColor);
-
-	consoleOutputStr += std::to_wstring(arg) + L" ";
-
-	fileOutputStr += std::to_wstring(arg) + L" ";
+	packFloatPoint(arg);
 }
 
 void LogContext::packArgument(const double_t& arg)
 {
-	setDisplayColor(LogColor::numericColor);
-
-	consoleOutputStr += std::to_wstring(arg) + L" ";
-
-	fileOutputStr += std::to_wstring(arg) + L" ";
+	packFloatPoint(arg);
 }
 
 void LogContext::packArgument(const IntegerMode& mode)
 {
 	integerMode = mode;
+}
+
+void LogContext::packArgument(const FloatPrecision& precision)
+{
+	floatPrecision = precision;
 }
 
 void LogContext::packArgument(const LogColor& arg)
@@ -221,6 +214,6 @@ void LogContext::setDisplayColor(const LogColor& color)
 	{
 		displayColor = color;
 
-		consoleOutputStr += displayColor.code;
+		messageStr += displayColor.code;
 	}
 }

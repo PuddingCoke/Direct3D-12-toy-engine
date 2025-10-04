@@ -11,11 +11,11 @@ Logger* Logger::get()
 
 void Logger::submitLogMessage(const LogMessage& msg)
 {
-	std::wcout << msg.consoleOutputStr << L"\n";
+	std::wcout << msg.messageStr << L"\n";
 
 	if (file.is_open())
 	{
-		file << msg.fileOutputStr << L"\n";
+		file << msg.messageStr << L"\n";
 	}
 
 	if (msg.type == LogType::LOG_ERROR && file.is_open())
