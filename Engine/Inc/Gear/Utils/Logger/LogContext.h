@@ -33,7 +33,7 @@ public:
 
 	struct FloatPrecision
 	{
-		FloatPrecision(const int precision);
+		FloatPrecision(const int precision = 5);
 
 		int precision;
 	};
@@ -117,6 +117,8 @@ private:
 	//change display color
 	void setDisplayColor(const LogColor& color);
 
+	void resetState();
+
 	IntegerMode integerMode;
 
 	FloatPrecision floatPrecision;
@@ -133,11 +135,7 @@ inline LogMessage LogContext::createLogMessage(const std::wstring& className, co
 {
 	thread_local LogContext context;
 
-	context.messageStr.clear();
-
-	context.integerMode = IntegerMode::DEC;
-
-	context.floatPrecision = 5;
+	context.resetState();
 
 	return context.getLogMessage(className, type, args...);
 }

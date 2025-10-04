@@ -68,8 +68,6 @@ private:
 
 	void workerLoop();
 
-	std::thread workerThread;
-
 	bool taskCompleted;
 
 	bool isRunning;
@@ -77,6 +75,8 @@ private:
 	std::mutex taskMutex;
 
 	std::condition_variable taskCondition;
+
+	std::thread workerThread;
 
 };
 

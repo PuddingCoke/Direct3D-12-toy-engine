@@ -31,9 +31,11 @@ RenderTask::~RenderTask()
 
 void RenderTask::beginTask()
 {
-	std::lock_guard<std::mutex> lockGuard(taskMutex);
+	{
+		std::lock_guard<std::mutex> lockGuard(taskMutex);
 
-	taskCompleted = false;
+		taskCompleted = false;
+	}
 
 	taskCondition.notify_one();
 }
@@ -64,22 +66,24 @@ void RenderTask::workerLoop()
 {
 	while (true)
 	{
-		std::unique_lock<std::mutex> lock(taskMutex);
-
-		taskCondition.wait(lock, [this]() {return !taskCompleted; });
-
-		if (!isRunning)
 		{
-			break;
+			std::unique_lock<std::mutex> lock(taskMutex);
+
+			taskCondition.wait(lock, [this]() {return !taskCompleted; });
+
+			if (!isRunning)
+			{
+				break;
+			}
+
+			resManager->cleanTransientResources();
+
+			context->begin();
+
+			recordCommand();
+
+			taskCompleted = true;
 		}
-
-		resManager->cleanTransientResources();
-
-		context->begin();
-
-		recordCommand();
-
-		taskCompleted = true;
 
 		taskCondition.notify_one();
 	}

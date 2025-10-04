@@ -7,10 +7,9 @@ LogContext::FloatPrecision::FloatPrecision(const int precision) :
 
 LogContext::LogContext() :
 	textColor{ L"" },
-	displayColor{ L"" },
-	integerMode(IntegerMode::DEC),
-	floatPrecision(5)
+	displayColor{ L"" }
 {
+	resetState();
 }
 
 LogContext::~LogContext()
@@ -209,4 +208,13 @@ void LogContext::setDisplayColor(const LogColor& color)
 
 		messageStr += displayColor.code;
 	}
+}
+
+void LogContext::resetState()
+{
+	messageStr.clear();
+
+	integerMode = IntegerMode::DEC;
+
+	floatPrecision = 5;
 }

@@ -7,6 +7,12 @@
 
 #include<fstream>
 
+#include<queue>
+
+#include<mutex>
+
+#include<condition_variable>
+
 #include"Logger/LogContext.h"
 
 //output (class name)
@@ -30,8 +36,10 @@ using FloatPrecision = LogContext::FloatPrecision;
 /// you can use IntegerType to specify integer's output form
 /// such as LOGUSER(L"32位无符号整数测试", IntegerMode::HEX, 13689u, UINT_MAX, IntegerMode::DEC, 13689u, UINT_MAX);
 /// 
-/// you can use FloatPrecision to adjust fraction part's digit
+/// you can use FloatPrecision to adjust number of fraction part's digit
 /// such as LOGUSER(L"浮点测试", FloatPrecision(4), 125.6f, FloatPrecision(2), 125.7);
+/// 
+/// there are many available colors in LogColor class
 /// </summary>
 class Logger
 {
@@ -54,6 +62,16 @@ private:
 	~Logger();
 
 	static Logger* instance;
+
+	/*std::queue<LogMessage> messages;
+
+	bool isRunning;
+
+	std::mutex queueLock;
+
+	std::condition_variable cv;
+
+	std::thread worker;*/
 
 	std::wofstream file;
 
