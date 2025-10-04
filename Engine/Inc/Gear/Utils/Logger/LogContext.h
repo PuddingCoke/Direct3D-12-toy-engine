@@ -137,7 +137,7 @@ inline LogMessage LogContext::createLogMessage(const std::wstring& className, co
 
 	context.integerMode = IntegerMode::DEC;
 
-	context.floatPrecision = 3;
+	context.floatPrecision = 5;
 
 	return context.getLogMessage(className, type, args...);
 }

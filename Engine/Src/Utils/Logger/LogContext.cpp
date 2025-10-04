@@ -9,7 +9,7 @@ LogContext::LogContext() :
 	textColor{ L"" },
 	displayColor{ L"" },
 	integerMode(IntegerMode::DEC),
-	floatPrecision(3)
+	floatPrecision(5)
 {
 }
 
