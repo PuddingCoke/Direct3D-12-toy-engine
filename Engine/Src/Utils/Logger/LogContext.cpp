@@ -1,12 +1,5 @@
 ﻿#include<Gear/Utils/Logger/LogContext.h>
 
-std::wstring wrapClassName(const char* const className)
-{
-	const size_t len = strnlen_s(className, UINT64_MAX);
-
-	return L"(" + std::wstring(className, className + len) + L")";
-}
-
 LogContext::FloatPrecision::FloatPrecision(const int precision) :
 	precision(precision)
 {

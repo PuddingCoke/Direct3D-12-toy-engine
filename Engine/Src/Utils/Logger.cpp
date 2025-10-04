@@ -2,6 +2,13 @@
 
 #include<Windows.h>
 
+std::wstring wrapClassName(const char* const className)
+{
+	const size_t len = strnlen_s(className, UINT64_MAX);
+
+	return L"(" + std::wstring(className, className + len) + L")";
+}
+
 Logger* Logger::instance = nullptr;
 
 Logger* Logger::get()

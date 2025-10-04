@@ -7,9 +7,6 @@
 
 #include<thread>
 
-//output (class name)
-std::wstring wrapClassName(const char* const className);
-
 enum class LogType
 {
 	LOG_SUCCESS,
@@ -134,7 +131,15 @@ private:
 template<typename ...Args>
 inline LogMessage LogContext::createLogMessage(const std::wstring& className, const LogType& type, const Args & ...args)
 {
-	return LogContext().getLogMessage(className, type, args...);
+	thread_local LogContext context;
+
+	context.messageStr.clear();
+
+	context.integerMode = IntegerMode::DEC;
+
+	context.floatPrecision = 3;
+
+	return context.getLogMessage(className, type, args...);
 }
 
 template<typename ...Args>

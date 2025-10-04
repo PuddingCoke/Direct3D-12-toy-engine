@@ -9,6 +9,9 @@
 
 #include"Logger/LogContext.h"
 
+//output (class name)
+std::wstring wrapClassName(const char* const className);
+
 using IntegerMode = LogContext::IntegerMode;
 
 using FloatPrecision = LogContext::FloatPrecision;
