@@ -55,6 +55,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MandelBrotSet", "MandelBrot
 		{0156D2EC-A542-46A9-97F6-8BB9CE5EC3D5} = {0156D2EC-A542-46A9-97F6-8BB9CE5EC3D5}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LoggerTest", "LoggerTest\LoggerTest.vcxproj", "{1969F40F-0A40-450C-B292-63454C2E710B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -105,6 +107,10 @@ Global
 		{81BE774F-99B5-4B2C-9887-E4BE4911E48E}.Debug|x64.Build.0 = Debug|x64
 		{81BE774F-99B5-4B2C-9887-E4BE4911E48E}.Release|x64.ActiveCfg = Release|x64
 		{81BE774F-99B5-4B2C-9887-E4BE4911E48E}.Release|x64.Build.0 = Release|x64
+		{1969F40F-0A40-450C-B292-63454C2E710B}.Debug|x64.ActiveCfg = Debug|x64
+		{1969F40F-0A40-450C-B292-63454C2E710B}.Debug|x64.Build.0 = Debug|x64
+		{1969F40F-0A40-450C-B292-63454C2E710B}.Release|x64.ActiveCfg = Release|x64
+		{1969F40F-0A40-450C-B292-63454C2E710B}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

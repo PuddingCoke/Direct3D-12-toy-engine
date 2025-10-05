@@ -49,9 +49,7 @@ public:
 
 	void operator=(const Logger&) = delete;
 
-	static Logger* get();
-
-	void submitLogMessage(const LogMessage& msg);
+	static void submitLogMessage(const LogMessage& msg);
 
 private:
 
@@ -63,7 +61,15 @@ private:
 
 	static Logger* instance;
 
-	/*std::queue<LogMessage> messages;
+	void shutdown();
+
+	void submitMessage(const LogMessage& msg);
+
+	void workerLoop();
+
+	std::wofstream file;
+
+	std::queue<LogMessage> messages;
 
 	bool isRunning;
 
@@ -71,19 +77,17 @@ private:
 
 	std::condition_variable cv;
 
-	std::thread worker;*/
-
-	std::wofstream file;
+	std::thread worker;
 
 };
 
-#define LOGSUCCESS(...) Logger::get()->submitLogMessage(LogContext::createLogMessage(wrapClassName(typeid(*this).name()),LogType::LOG_SUCCESS,__VA_ARGS__))
+#define LOGSUCCESS(...) Logger::submitLogMessage(LogContext::createLogMessage(wrapClassName(typeid(*this).name()),LogType::LOG_SUCCESS,__VA_ARGS__))
 
-#define LOGENGINE(...) Logger::get()->submitLogMessage(LogContext::createLogMessage(wrapClassName(typeid(*this).name()),LogType::LOG_ENGINE,__VA_ARGS__))
+#define LOGENGINE(...) Logger::submitLogMessage(LogContext::createLogMessage(wrapClassName(typeid(*this).name()),LogType::LOG_ENGINE,__VA_ARGS__))
 
-#define LOGUSER(...) Logger::get()->submitLogMessage(LogContext::createLogMessage(wrapClassName(typeid(*this).name()),LogType::LOG_USER,__VA_ARGS__))
+#define LOGUSER(...) Logger::submitLogMessage(LogContext::createLogMessage(wrapClassName(typeid(*this).name()),LogType::LOG_USER,__VA_ARGS__))
 
-#define LOGERROR(...) Logger::get()->submitLogMessage(LogContext::createLogMessage(L"",LogType::LOG_ERROR,__FILEW__,__FUNCTIONW__,L"LINE",(int32_t)__LINE__,__VA_ARGS__)); \
+#define LOGERROR(...) Logger::submitLogMessage(LogContext::createLogMessage(L"",LogType::LOG_ERROR,__FILEW__,__FUNCTIONW__,L"LINE",(int32_t)__LINE__,__VA_ARGS__)); \
 throw std::runtime_error("check log.txt or console output for detailed information") \
 
 #endif // !_LOGGER_H_

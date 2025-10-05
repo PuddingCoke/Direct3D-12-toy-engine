@@ -17,7 +17,7 @@ enum class LogType
 
 struct LogMessage
 {
-	const std::wstring messageStr;
+	const std::wstring str;
 
 	const LogType type;
 };
@@ -238,13 +238,11 @@ inline void LogContext::packFloatPoint(const Arg& arg)
 {
 	setDisplayColor(LogColor::numericColor);
 
-	const int len = _scwprintf(L"%.*f ", floatPrecision.precision, arg);
+	wchar_t buff[_CVTBUFSIZE] = {};
 
-	std::wstring floatStr = std::wstring(len, '\0');
+	swprintf_s(buff, _CVTBUFSIZE, L"%.*f ", floatPrecision.precision, arg);
 
-	swprintf_s(&floatStr[0], len + 1, L"%.*f ", floatPrecision.precision, arg);
-
-	messageStr += floatStr;
+	messageStr += buff;
 }
 
 #endif // !_LOGCONTEXT_H_
