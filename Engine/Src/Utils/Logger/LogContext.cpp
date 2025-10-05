@@ -1,5 +1,13 @@
 ﻿#include<Gear/Utils/Logger/LogContext.h>
 
+//#include<iostream>
+
+LogMessage::LogMessage(std::wstring str, LogType type) :
+	str(std::move(str)), type(type)
+{
+	/*std::wcout << "Create ";*/
+}
+
 LogContext::FloatPrecision::FloatPrecision(const int precision) :
 	precision(precision)
 {
@@ -217,12 +225,4 @@ void LogContext::resetState()
 	integerMode = IntegerMode::DEC;
 
 	floatPrecision = 5;
-}
-
-//#include<iostream>
-
-LogMessage::LogMessage(std::wstring str, LogType type) :
-	str(std::move(str)), type(type)
-{
-	/*std::wcout << "Create ";*/
 }
