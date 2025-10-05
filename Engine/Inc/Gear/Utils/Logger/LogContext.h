@@ -17,6 +17,8 @@ enum class LogType
 
 struct LogMessage
 {
+	LogMessage(std::wstring str, LogType type);
+
 	const std::wstring str;
 
 	const LogType type;
@@ -205,7 +207,7 @@ inline LogMessage LogContext::getLogMessage(const std::wstring& className, const
 
 	packRestArgument(args...);
 
-	return LogMessage{ std::move(messageStr),type };
+	return LogMessage(messageStr, type);
 }
 
 template<typename First, typename ...Rest>

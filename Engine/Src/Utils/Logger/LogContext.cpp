@@ -218,3 +218,11 @@ void LogContext::resetState()
 
 	floatPrecision = 5;
 }
+
+//#include<iostream>
+
+LogMessage::LogMessage(std::wstring str, LogType type) :
+	str(std::move(str)), type(type)
+{
+	/*std::wcout << "Create ";*/
+}
