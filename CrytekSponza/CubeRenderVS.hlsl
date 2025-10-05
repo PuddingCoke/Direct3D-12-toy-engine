@@ -1,4 +1,4 @@
-struct VertexInput
+﻿struct VertexInput
 {
     float3 pos : POSITION;
     float2 uv : TEXCOORD;

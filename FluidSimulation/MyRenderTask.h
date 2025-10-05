@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include<Gear/Core/RenderTask.h>
 
@@ -409,14 +409,14 @@ private:
 
 	struct Configuration
 	{
-		float colorChangeSpeed = 10.f;//ÑÕÉ«¸Ä±äËÙ¶È
-		float colorDissipationSpeed = 1.f;//ÑÕÉ«ÏûÉ¢ËÙ¶È
-		float velocityDissipationSpeed = 0.00f;//ËÙ¶ÈÏûÉ¢ËÙ¶È
-		float vorticityIntensity = 80.f;//ÎÐÁ÷Ç¿¶È
-		float splatRadius = 0.25f;//Ê©¼ÓÑÕÉ«µÄ°ë¾¶
-		float force = 6.f;//Ê©¼ÓËÙ¶ÈµÄÁ¦¶È
-		const unsigned int pressureIteraion = 35;//ÑÅ¿É±Èµü´ú´ÎÊý Õâ¸öÖµÔ½¸ßÎïÀíÄ£ÄâÔ½²»ÈÝÒ×³ö´í NVIDIAµÄÎÄÕÂÓÐÌáµ½Í¨³£20-50´Î¾Í¹»ÁË
-		const unsigned int resolutionFactor = 1;//ÎïÀíÄ£Äâ·Ö±æÂÊ resolution >> resolutionFactor
+		float colorChangeSpeed = 10.f;//é¢œè‰²æ”¹å˜é€Ÿåº¦
+		float colorDissipationSpeed = 1.f;//é¢œè‰²æ¶ˆæ•£é€Ÿåº¦
+		float velocityDissipationSpeed = 0.00f;//é€Ÿåº¦æ¶ˆæ•£é€Ÿåº¦
+		float vorticityIntensity = 80.f;//æ¶¡æµå¼ºåº¦
+		float splatRadius = 0.25f;//æ–½åŠ é¢œè‰²çš„åŠå¾„
+		float force = 6.f;//æ–½åŠ é€Ÿåº¦çš„åŠ›åº¦
+		const unsigned int pressureIteraion = 35;//é›…å¯æ¯”è¿­ä»£æ¬¡æ•° è¿™ä¸ªå€¼è¶Šé«˜ç‰©ç†æ¨¡æ‹Ÿè¶Šä¸å®¹æ˜“å‡ºé”™ NVIDIAçš„æ–‡ç« æœ‰æåˆ°é€šå¸¸20-50æ¬¡å°±å¤Ÿäº†
+		const unsigned int resolutionFactor = 1;//ç‰©ç†æ¨¡æ‹Ÿåˆ†è¾¨çŽ‡ resolution >> resolutionFactor
 		float bumpScale = 300.f;
 		bool logicRunning = true;
 		bool phongShading = true;

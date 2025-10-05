@@ -1,4 +1,4 @@
-#define M_PI 3.1415926535897932384626433832795
+﻿#define M_PI 3.1415926535897932384626433832795
 
 cbuffer TextureIndices : register(b2)
 {

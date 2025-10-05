@@ -1,4 +1,4 @@
-cbuffer TextureIndices : register(b2)
+﻿cbuffer TextureIndices : register(b2)
 {
     uint pressureTexIndex;
 }

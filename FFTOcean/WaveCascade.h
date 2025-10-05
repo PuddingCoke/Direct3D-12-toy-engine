@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include<Gear/Core/RenderEngine.h>
 

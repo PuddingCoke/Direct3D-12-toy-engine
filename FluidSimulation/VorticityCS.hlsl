@@ -1,4 +1,4 @@
-cbuffer SimulationParam : register(b1)
+﻿cbuffer SimulationParam : register(b1)
 {
     float2 pos;
     float2 posDelta;

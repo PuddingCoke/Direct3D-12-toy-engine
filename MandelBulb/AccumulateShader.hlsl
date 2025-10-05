@@ -1,4 +1,4 @@
-#include"Common.hlsli"
+﻿#include"Common.hlsli"
 
 #define MAXITERATION 100
 #define LEVELOFDETAIL 0.0005

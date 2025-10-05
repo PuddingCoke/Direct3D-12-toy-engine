@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 const std::string assetPath = "E:/Assets/Sponza";
 
