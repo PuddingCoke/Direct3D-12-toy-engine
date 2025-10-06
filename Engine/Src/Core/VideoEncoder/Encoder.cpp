@@ -1,7 +1,7 @@
 ﻿#include<Gear/Core/VideoEncoder/Encoder.h>
 
 Encoder::Encoder(const uint32_t frameToEncode, const OutputVideoFormat format) :
-	frameToEncode(frameToEncode), frameEncoded(0), isStartTimePoint(true), encodeTime(0.f), streamIndex(0), sampleDuration(10000000u / frameRate), sampleTime(0)
+	frameToEncode(frameToEncode), frameEncoded(0), encodeTime(0.f), streamIndex(0), sampleDuration(10000000u / frameRate), sampleTime(0)
 {
 	CHECKERROR(MFStartup(MF_VERSION));
 
@@ -54,6 +54,37 @@ Encoder::~Encoder()
 	MFShutdown();
 }
 
+void Encoder::updateStartTimePoint()
+{
+	startPoint = std::chrono::steady_clock::now();
+}
+
+void Encoder::updateEncodeTime()
+{
+	endPoint = std::chrono::steady_clock::now();
+
+	encodeTime += std::chrono::duration<float>(endPoint - startPoint).count();
+}
+
+void Encoder::displayProgress() const
+{
+	if ((frameEncoded % (frameRate / 4)) == 0)
+	{
+		const uint32_t num = progressBarWidth * frameEncoded / frameToEncode;
+
+		const uint32_t buffLength = 12 + 2 + progressBarWidth + 1 + 6 + 1 + 6;
+
+		wchar_t str[buffLength] = {};
+
+		swprintf_s(str, buffLength, L"Encoding... [%.*s%.*s] %.2f%%",
+			num, L"****************************************************************",
+			progressBarWidth - num, L"////////////////////////////////////////////////////////////////",
+			100.f * static_cast<float>(frameEncoded) / static_cast<float>(frameToEncode));
+
+		LOGENGINE(str);
+	}
+}
+
 void Encoder::displayResult() const
 {
 	LOGENGINE(L"encode complete");
@@ -100,23 +131,7 @@ bool Encoder::writeFrame(const void* const bitstreamPtr, const uint32_t bitstrea
 
 	sinkWriter->WriteSample(streamIndex, sample.Get());
 
+	displayProgress();
+
 	return !(frameEncoded == frameToEncode);
-}
-
-void Encoder::tick()
-{
-	if (isStartTimePoint)
-	{
-		timeStart = std::chrono::steady_clock::now();
-	}
-	else
-	{
-		timeEnd = std::chrono::steady_clock::now();
-
-		const float frameTime = std::chrono::duration<float>(timeEnd - timeStart).count();
-
-		encodeTime += frameTime;
-	}
-
-	isStartTimePoint = !isStartTimePoint;
 }

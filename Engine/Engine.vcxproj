@@ -188,7 +188,7 @@
     <ClInclude Include="Inc\ImGUI\imstb_truetype.h" />
     <ClInclude Include="External\stb_image\stb_image_write.h" />
     <ClInclude Include="Inc\Gear\Camera\FPSCamera.h" />
-    <ClInclude Include="Inc\Gear\Configuration.h" />
+    <ClInclude Include="Inc\Gear\InitializationParam.h" />
     <ClInclude Include="Inc\Gear\Core\Camera.h" />
     <ClInclude Include="Inc\Gear\Core\CommandList.h" />
     <ClInclude Include="Inc\Gear\Core\CommandAllocator.h" />
@@ -269,7 +269,7 @@
     <ClCompile Include="Src\Core\Graphics.cpp" />
     <ClCompile Include="Src\Core\Resource\D3D12Resource\Buffer.cpp" />
     <ClCompile Include="Src\Core\CommandAllocator.cpp" />
-    <ClCompile Include="Src\Configuration.cpp" />
+    <ClCompile Include="Src\InitializationParam.cpp" />
     <ClCompile Include="Src\Core\CommandList.cpp" />
     <ClCompile Include="Src\Core\Resource\D3D12Resource\Resource.cpp" />
     <ClCompile Include="Src\Core\Resource\D3D12Resource\UploadHeap.cpp" />

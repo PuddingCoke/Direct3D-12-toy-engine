@@ -17,8 +17,6 @@
 
 #include<Gear/Core/Resource/EngineResource.h>
 
-#include<unordered_set>
-
 template<typename T>
 using IsCorrectType = std::enable_if_t<
 	std::is_same<T, std::vector<ShaderResourceDesc>>::value ||

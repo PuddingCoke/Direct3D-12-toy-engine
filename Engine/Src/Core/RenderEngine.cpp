@@ -340,7 +340,7 @@ RenderEngine::RenderEngine(const uint32_t width, const uint32_t height, const HW
 	ComPtr<IDXGIFactory7> factory;
 
 #ifdef _DEBUG
-	LOGENGINE(LogColor::green, L"enable", LogColor::defaultColor, L"debug layer");
+	LOGENGINE(LogColor::brightGreen, L"enable", LogColor::defaultColor, L"debug layer");
 
 	ComPtr<ID3D12Debug> debugController;
 
@@ -350,7 +350,7 @@ RenderEngine::RenderEngine(const uint32_t width, const uint32_t height, const HW
 
 	CreateDXGIFactory2(DXGI_CREATE_FACTORY_DEBUG, IID_PPV_ARGS(&factory));
 #else
-	LOGENGINE(LogColor::red, L"disable", LogColor::defaultColor, L"debug layer");
+	LOGENGINE(LogColor::brightRed, L"disable", LogColor::defaultColor, L"debug layer");
 
 	CreateDXGIFactory2(0, IID_PPV_ARGS(&factory));
 #endif // _DEBUG

@@ -124,9 +124,9 @@ NvidiaEncoder::~NvidiaEncoder()
 
 bool NvidiaEncoder::encode(Texture* const inputTexture)
 {
-	bool encoding = true;
+	updateStartTimePoint();
 
-	tick();
+	bool encoding = true;
 
 	NV_ENC_REGISTER_RESOURCE registerInputResource = { NV_ENC_REGISTER_RESOURCE_VER };
 	registerInputResource.bufferFormat = bufferFormat;
@@ -205,7 +205,7 @@ bool NvidiaEncoder::encode(Texture* const inputTexture)
 
 		registeredInputResourcePtrs.pop();
 
-		tick();
+		updateEncodeTime();
 
 		if (!encoding)
 		{
@@ -218,11 +218,7 @@ bool NvidiaEncoder::encode(Texture* const inputTexture)
 			displayResult();
 		}
 	}
-	else if (status == NV_ENC_ERR_NEED_MORE_INPUT)
-	{
-		tick();
-	}
-	else
+	else if(status != NV_ENC_ERR_NEED_MORE_INPUT)
 	{
 		const char* error = nvencAPI.nvEncGetLastErrorString(encoder);
 

@@ -129,7 +129,7 @@
     <ClInclude Include="Inc\Gear\Gear.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="Inc\Gear\Configuration.h">
+    <ClInclude Include="Inc\Gear\InitializationParam.h">
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="Inc\Gear\Game.h">
@@ -407,7 +407,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Src\Configuration.cpp">
+    <ClCompile Include="Src\InitializationParam.cpp">
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="Src\Gear.cpp">

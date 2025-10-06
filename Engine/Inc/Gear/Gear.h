@@ -9,7 +9,7 @@
 
 #include<Gear/Utils/DeltaTimeEstimator.h>
 
-#include<Gear/Configuration.h>
+#include<Gear/InitializationParam.h>
 
 #include<Gear/Game.h>
 
@@ -25,7 +25,7 @@ public:
 
 	static Gear* get();
 
-	int iniEngine(const Configuration& config, const int argc, const wchar_t* argv[]);
+	int iniEngine(const InitializationParam& param, const int argc, const wchar_t* argv[]);
 
 	void iniGame(Game* const gamePtr);
 
@@ -37,9 +37,9 @@ private:
 
 	static Gear* instance;
 
-	void runGame();
+	void runRealTimeRender();
 
-	void runEncode();
+	void runVideoRender();
 
 	void reportLiveObjects() const;
 
@@ -51,11 +51,16 @@ private:
 
 	Game* game;
 
-	Configuration::EngineUsage usage;
+	InitializationParam::EngineUsage usage;
+
+	union
+	{
+		InitializationParam::RealTimeRenderParam realTimeRender;
+
+		InitializationParam::VideoRenderParam videoRender;
+	};
 
 	DeltaTimeEstimator dtEstimator;
-
-	void iniWindow(const std::wstring& title, const uint32_t width, const uint32_t height);
 
 	static constexpr DWORD normalWndStyle = WS_CAPTION | WS_SYSMENU;
 

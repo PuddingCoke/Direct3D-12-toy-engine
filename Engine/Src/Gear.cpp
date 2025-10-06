@@ -15,7 +15,7 @@ Gear* Gear::get()
 	return instance;
 }
 
-int Gear::iniEngine(const Configuration& config, const int argc, const wchar_t* argv[])
+int Gear::iniEngine(const InitializationParam& param, const int argc, const wchar_t* argv[])
 {
 	Logger::instance = new Logger();
 
@@ -23,30 +23,33 @@ int Gear::iniEngine(const Configuration& config, const int argc, const wchar_t* 
 
 	LOGENGINE(L"executable path", LogColor::brightBlue, Utils::getRootFolder());
 
-	usage = config.usage;
+	usage = param.usage;
 
-	iniWindow(config.title, config.width, config.height);
-
-	if (config.usage == Configuration::EngineUsage::VIDEOPLAYBACK)
+	switch (usage)
 	{
-		ShowWindow(winform->getHandle(), SW_HIDE);
-	}
+	case InitializationParam::EngineUsage::REALTIMERENDER:
 
-	switch (config.usage)
-	{
-	case Configuration::EngineUsage::NORMAL:
+		realTimeRender = param.realTimeRender;
 
-		RenderEngine::instance = new RenderEngine(config.width, config.height, winform->getHandle(), true, config.enableImGuiSurface);
+		winform = new Win32Form(param.title, realTimeRender.width, realTimeRender.height, normalWndStyle, Gear::windowCallback);
 
-		LOGENGINE(L"engine usage normal");
+		RenderEngine::instance = new RenderEngine(realTimeRender.width, realTimeRender.height, winform->getHandle(), true, realTimeRender.enableImGuiSurface);
+
+		LOGENGINE(L"engine usage real time render");
 
 		break;
 
-	case Configuration::EngineUsage::VIDEOPLAYBACK:
+	case InitializationParam::EngineUsage::VIDEORENDER:
 
-		RenderEngine::instance = new RenderEngine(config.width, config.height, winform->getHandle(), false, false);
+		videoRender = param.videoRender;
 
-		LOGENGINE(L"engine usage video playback");
+		winform = new Win32Form(param.title, 100, 100, normalWndStyle, Gear::encodeCallback);
+
+		ShowWindow(winform->getHandle(), SW_HIDE);
+
+		RenderEngine::instance = new RenderEngine(videoRender.width, videoRender.height, winform->getHandle(), false, false);
+
+		LOGENGINE(L"engine usage video render");
 
 		break;
 
@@ -71,12 +74,19 @@ void Gear::iniGame(Game* const gamePtr)
 
 	switch (usage)
 	{
-	default:
-	case Configuration::EngineUsage::NORMAL:
-		runGame();
+	case InitializationParam::EngineUsage::REALTIMERENDER:
+
+		runRealTimeRender();
+
 		break;
-	case Configuration::EngineUsage::VIDEOPLAYBACK:
-		runEncode();
+
+	case InitializationParam::EngineUsage::VIDEORENDER:
+
+		runVideoRender();
+
+		break;
+
+	default:
 		break;
 	}
 }
@@ -91,7 +101,7 @@ void Gear::release()
 	delete Gear::instance;
 }
 
-void Gear::runGame()
+void Gear::runRealTimeRender()
 {
 	RenderEngine::get()->setDeltaTime(0.0001f);
 
@@ -129,16 +139,18 @@ void Gear::runGame()
 	}
 }
 
-void Gear::runEncode()
+void Gear::runVideoRender()
 {
-	GPUVendor vendor = RenderEngine::get()->getVendor();
+	const GPUVendor vendor = RenderEngine::get()->getVendor();
 
 	Encoder* encoder = nullptr;
+
+	const uint32_t frameToEncode = videoRender.second * Encoder::frameRate;
 
 	switch (vendor)
 	{
 	case GPUVendor::NVIDIA:
-		encoder = new NvidiaEncoder(3600);
+		encoder = new NvidiaEncoder(frameToEncode);
 		break;
 	case GPUVendor::AMD:
 	case GPUVendor::INTEL:
@@ -236,7 +248,7 @@ void Gear::reportLiveObjects() const
 }
 
 Gear::Gear() :
-	game(nullptr), winform(nullptr), usage(Configuration::EngineUsage::NORMAL)
+	game(nullptr), winform(nullptr)
 {
 
 }
@@ -273,23 +285,6 @@ Gear::~Gear()
 	reportLiveObjects();
 
 #endif // _DEBUG
-}
-
-void Gear::iniWindow(const std::wstring& title, const uint32_t width, const uint32_t height)
-{
-	switch (usage)
-	{
-	case Configuration::EngineUsage::NORMAL:
-		winform = new Win32Form(title, width, height, normalWndStyle, Gear::windowCallback);
-		break;
-
-	case Configuration::EngineUsage::VIDEOPLAYBACK:
-		winform = new Win32Form(title, 100, 100, normalWndStyle, Gear::encodeCallback);
-		break;
-
-	default:
-		break;
-	}
 }
 
 LRESULT Gear::windowCallback(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam)

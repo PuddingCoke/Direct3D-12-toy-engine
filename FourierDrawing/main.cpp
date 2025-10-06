@@ -2,15 +2,13 @@
 
 #include"MyGame.h"
 
-using EngineUsage = Configuration::EngineUsage;
-
 int wmain(int argc, const wchar_t* argv[])
 {
-	Configuration config(1000, 1000, L"Fourier Drawing", EngineUsage::NORMAL);
+	const InitializationParam param = InitializationParam::RealTime(1000, 1000, L"Fourier Drawing");
 
 	Gear::initialize();
 
-	if (!Gear::get()->iniEngine(config, argc, argv))
+	if (!Gear::get()->iniEngine(param, argc, argv))
 	{
 		Gear::get()->iniGame(new MyGame());
 	}

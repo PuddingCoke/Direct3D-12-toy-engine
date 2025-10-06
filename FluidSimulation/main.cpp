@@ -4,11 +4,11 @@
 
 int wmain(int argc, const wchar_t* argv[])
 {
-	Configuration config(1920, 1080, L"Fluid Simulation", Configuration::EngineUsage::NORMAL, true);
+	const InitializationParam param = InitializationParam::RealTime(1920, 1080, L"Fluid Simulation", true);
 
 	Gear::initialize();
 
-	if (!Gear::get()->iniEngine(config, argc, argv))
+	if (!Gear::get()->iniEngine(param, argc, argv))
 	{
 		Gear::get()->iniGame(new MyGame());
 	}

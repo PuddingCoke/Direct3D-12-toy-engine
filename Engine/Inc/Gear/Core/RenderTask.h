@@ -27,12 +27,6 @@
 
 #include<future>
 
-#include<thread>
-
-#include<condition_variable>
-
-#include<mutex>
-
 class RenderTask
 {
 public:
