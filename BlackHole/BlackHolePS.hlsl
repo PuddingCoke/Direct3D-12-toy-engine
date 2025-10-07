@@ -46,64 +46,79 @@ void Haze(inout float3 color, float3 pos, float alpha)
     color += col * bloomDisc * (2.9 / float(ITERATIONS)) * (1.0 - alpha * 1.0);
 }
 
-float3 hash(float3 p, float scale) // replace this by something better
-{
-    p = fmod(p, scale);
-    
-    p = float3(dot(p, float3(127.1, 311.7, 74.7)),
-			  dot(p, float3(269.5, 183.3, 246.1)),
-			  dot(p, float3(113.5, 271.9, 124.6)));
+#define UI0 1597334673U
+#define UI1 3812015801U
+#define UI2 uint2(UI0, UI1)
+#define UI3 uint3(UI0, UI1, 2798796415U)
+#define UIF (1.0 / float(0xffffffffU))
 
-    return -1.0 + 2.0 * frac(sin(p) * 43758.5453123);
+float3 hash33(float3 p)
+{
+    uint3 q = uint3(int3(p)) * UI3;
+    q = (q.x ^ q.y ^ q.z) * UI3;
+    return -1. + 2. * float3(q) * UIF;
 }
 
-// return value noise (in x) and its derivatives (in yzw)
-float4 noised(in float3 x, in float scale)
+// Gradient noise by iq (modified to be tileable)
+float gradientNoise(float3 x, float freq)
 {
-    x *= scale;
-
     // grid
-    float3 i = floor(x);
+    float3 p = floor(x);
     float3 w = frac(x);
     
-#if 1
     // quintic interpolant
-    float3 u = w * w * w * (w * (w * 6.0 - 15.0) + 10.0);
-    float3 du = 30.0 * w * w * (w * (w - 2.0) + 1.0);
-#else
-    // cubic interpolant
-    float3 u = w*w*(3.0-2.0*w);
-    float3 du = 6.0*w*(1.0-w);
-#endif    
+    float3 u = w * w * w * (w * (w * 6. - 15.) + 10.);
+
     
     // gradients
-    float3 ga = hash(i + float3(0.0, 0.0, 0.0), scale);
-    float3 gb = hash(i + float3(1.0, 0.0, 0.0), scale);
-    float3 gc = hash(i + float3(0.0, 1.0, 0.0), scale);
-    float3 gd = hash(i + float3(1.0, 1.0, 0.0), scale);
-    float3 ge = hash(i + float3(0.0, 0.0, 1.0), scale);
-    float3 gf = hash(i + float3(1.0, 0.0, 1.0), scale);
-    float3 gg = hash(i + float3(0.0, 1.0, 1.0), scale);
-    float3 gh = hash(i + float3(1.0, 1.0, 1.0), scale);
+    float3 ga = hash33(fmod(p + float3(0., 0., 0.), freq));
+    float3 gb = hash33(fmod(p + float3(1., 0., 0.), freq));
+    float3 gc = hash33(fmod(p + float3(0., 1., 0.), freq));
+    float3 gd = hash33(fmod(p + float3(1., 1., 0.), freq));
+    float3 ge = hash33(fmod(p + float3(0., 0., 1.), freq));
+    float3 gf = hash33(fmod(p + float3(1., 0., 1.), freq));
+    float3 gg = hash33(fmod(p + float3(0., 1., 1.), freq));
+    float3 gh = hash33(fmod(p + float3(1., 1., 1.), freq));
     
     // projections
-    float va = dot(ga, w - float3(0.0, 0.0, 0.0));
-    float vb = dot(gb, w - float3(1.0, 0.0, 0.0));
-    float vc = dot(gc, w - float3(0.0, 1.0, 0.0));
-    float vd = dot(gd, w - float3(1.0, 1.0, 0.0));
-    float ve = dot(ge, w - float3(0.0, 0.0, 1.0));
-    float vf = dot(gf, w - float3(1.0, 0.0, 1.0));
-    float vg = dot(gg, w - float3(0.0, 1.0, 1.0));
-    float vh = dot(gh, w - float3(1.0, 1.0, 1.0));
+    float va = dot(ga, w - float3(0., 0., 0.));
+    float vb = dot(gb, w - float3(1., 0., 0.));
+    float vc = dot(gc, w - float3(0., 1., 0.));
+    float vd = dot(gd, w - float3(1., 1., 0.));
+    float ve = dot(ge, w - float3(0., 0., 1.));
+    float vf = dot(gf, w - float3(1., 0., 1.));
+    float vg = dot(gg, w - float3(0., 1., 1.));
+    float vh = dot(gh, w - float3(1., 1., 1.));
 	
-    // interpolations
-    return float4(va + u.x * (vb - va) + u.y * (vc - va) + u.z * (ve - va) + u.x * u.y * (va - vb - vc + vd) + u.y * u.z * (va - vc - ve + vg) + u.z * u.x * (va - vb - ve + vf) + (-va + vb + vc - vd + ve - vf - vg + vh) * u.x * u.y * u.z, // value
-                 ga + u.x * (gb - ga) + u.y * (gc - ga) + u.z * (ge - ga) + u.x * u.y * (ga - gb - gc + gd) + u.y * u.z * (ga - gc - ge + gg) + u.z * u.x * (ga - gb - ge + gf) + (-ga + gb + gc - gd + ge - gf - gg + gh) * u.x * u.y * u.z + // derivatives
-                 du * (float3(vb, vc, ve) - va + u.yzx * float3(va - vb - vc + vd, va - vc - ve + vg, va - vb - ve + vf) + u.zxy * float3(va - vb - ve + vf, va - vb - vc + vd, va - vc - ve + vg) + u.yzx * u.zxy * (-va + vb + vc - vd + ve - vf - vg + vh)));
+    // interpolation
+    return va +
+           u.x * (vb - va) +
+           u.y * (vc - va) +
+           u.z * (ve - va) +
+           u.x * u.y * (va - vb - vc + vd) +
+           u.y * u.z * (va - vc - ve + vg) +
+           u.z * u.x * (va - vb - ve + vf) +
+           u.x * u.y * u.z * (-va + vb + vc - vd + ve - vf - vg + vh);
+}
+
+// Fbm for Perlin noise based on iq's blog
+float perlinfbm(float3 p, float freq, int octaves)
+{
+    float G = exp2(-.85);
+    float amp = 1.;
+    float noise = 0.;
+    for (int i = 0; i < octaves; ++i)
+    {
+        noise += amp * gradientNoise(p * freq, freq);
+        freq *= 2.;
+        amp *= G;
+    }
+    
+    return noise;
 }
 
 //noise code by iq
-float noise(in float3 x)
+float noiseiq(in float3 x)
 {
     float3 p = floor(x);
     float3 f = frac(x);
@@ -164,36 +179,63 @@ void GasDisc(inout float3 color, inout float alpha, float3 pos)
     radialCoords.z = distFromDisc * 1.5;
 
     radialCoords *= 0.95;
+    
     //speed = 1.0 / (period * 0.5 * 0.15)
     //float speed = 0.06;
-    
     float speed = 1.0 / (period * 0.5 * 0.15);
+    
+    //float noise1 = 1.0;
+    //float3 rc = radialCoords + 0.0;
+    //rc.y += iTime * speed;
+    //noise1 *= perlinfbm(rc, 3.0, 1) * 0.5 + 0.5;
+    //rc.y -= iTime * speed;
+    //noise1 *= perlinfbm(rc, 6.0, 1) * 0.5 + 0.5;
+    //rc.y += iTime * speed;
+    //noise1 *= perlinfbm(rc, 12.0, 1) * 0.5 + 0.5;
+    //rc.y -= iTime * speed;
+    //noise1 *= perlinfbm(rc, 24.0, 1) * 0.5 + 0.5;
+    //rc.y += iTime * speed;
+
+    //float noise2 = 2.0;
+    //rc = radialCoords + 30.0;
+    //noise2 *= perlinfbm(rc, 3.0, 1) * 0.5 + 0.5;
+    //rc.y += iTime * speed;
+    //noise2 *= perlinfbm(rc, 6.0, 1) * 0.5 + 0.5;
+    //rc.y -= iTime * speed;
+    //noise2 *= perlinfbm(rc, 12.0, 1) * 0.5 + 0.5;
+    //rc.y += iTime * speed;
+    //noise2 *= perlinfbm(rc, 24.0, 1) * 0.5 + 0.5;
+    //rc.y -= iTime * speed;
+    //noise2 *= perlinfbm(rc, 48.0, 1) * 0.5 + 0.5;
+    //rc.y += iTime * speed;
+    //noise2 *= perlinfbm(rc, 92.0, 1) * 0.5 + 0.5;
+    //rc.y -= iTime * speed;
     
     float noise1 = 1.0;
     float3 rc = radialCoords + 0.0;
     rc.y += iTime * speed;
-    noise1 *= noised(rc * 3.0, 32.0) * 0.5 + 0.5;
+    noise1 *= noiseiq(rc * 3.0) * 0.5 + 0.5;
     rc.y -= iTime * speed;
-    noise1 *= noised(rc * 6.0, 32.0) * 0.5 + 0.5;
+    noise1 *= noiseiq(rc * 6.0) * 0.5 + 0.5;
     rc.y += iTime * speed;
-    noise1 *= noised(rc * 12.0, 32.0) * 0.5 + 0.5;
+    noise1 *= noiseiq(rc * 12.0) * 0.5 + 0.5;
     rc.y -= iTime * speed;
-    noise1 *= noised(rc * 24.0, 32.0) * 0.5 + 0.5;
+    noise1 *= noiseiq(rc * 24.0) * 0.5 + 0.5;
     rc.y += iTime * speed;
 
     float noise2 = 2.0;
     rc = radialCoords + 30.0;
-    noise2 *= noised(rc * 3.0, 32.0) * 0.5 + 0.5;
+    noise2 *= noiseiq(rc * 3.0) * 0.5 + 0.5;
     rc.y += iTime * speed;
-    noise2 *= noised(rc * 6.0, 32.0) * 0.5 + 0.5;
+    noise2 *= noiseiq(rc * 6.0) * 0.5 + 0.5;
     rc.y -= iTime * speed;
-    noise2 *= noised(rc * 12.0, 32.0) * 0.5 + 0.5;
+    noise2 *= noiseiq(rc * 12.0) * 0.5 + 0.5;
     rc.y += iTime * speed;
-    noise2 *= noised(rc * 24.0, 32.0) * 0.5 + 0.5;
+    noise2 *= noiseiq(rc * 24.0) * 0.5 + 0.5;
     rc.y -= iTime * speed;
-    noise2 *= noised(rc * 48.0, 32.0) * 0.5 + 0.5;
+    noise2 *= noiseiq(rc * 48.0) * 0.5 + 0.5;
     rc.y += iTime * speed;
-    noise2 *= noised(rc * 92.0, 32.0) * 0.5 + 0.5;
+    noise2 *= noiseiq(rc * 92.0) * 0.5 + 0.5;
     rc.y -= iTime * speed;
 
     dustColor *= noise1 * 0.998 + 0.002;
