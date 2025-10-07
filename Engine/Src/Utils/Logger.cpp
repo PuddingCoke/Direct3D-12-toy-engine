@@ -96,9 +96,19 @@ void Logger::workerLoop()
 
 			lock.unlock();
 
-			std::wcout << message.str << L"\n";
+			temp = message.slot.str;
 
-			file << message.str << L"\n";
+			{
+				std::unique_lock<std::mutex> inUseLock(message.inUseMutex);
+
+				message.slot.inUse = false;
+			}
+
+			message.inUseCV.notify_one();
+
+			std::wcout << temp << L"\n";
+
+			file << temp << L"\n";
 
 			lock.lock();
 

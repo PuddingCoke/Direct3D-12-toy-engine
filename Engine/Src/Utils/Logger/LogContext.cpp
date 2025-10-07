@@ -1,11 +1,8 @@
 ﻿#include<Gear/Utils/Logger/LogContext.h>
 
-//#include<iostream>
-
-LogMessage::LogMessage(std::wstring str, LogType type) :
-	str(std::move(str)), type(type)
+BufferSlot::BufferSlot() :
+	inUse(false)
 {
-	/*std::wcout << "Create ";*/
 }
 
 LogContext::FloatPrecision::FloatPrecision(const int precision) :
@@ -15,13 +12,30 @@ LogContext::FloatPrecision::FloatPrecision(const int precision) :
 
 LogContext::LogContext() :
 	textColor{ L"" },
-	displayColor{ L"" }
+	displayColor{ L"" },
+	slots(new BufferSlot[slotNum]),
+	writeIndex(0),
+	messageStr(nullptr)
 {
 	resetState();
 }
 
 LogContext::~LogContext()
 {
+	for (uint32_t i = 0; i < slotNum; i++)
+	{
+		if (slots[i].inUse)
+		{
+			std::unique_lock<std::mutex> inUseLock(inUseMutex);
+
+			inUseCV.wait(inUseLock, [this, i]() {return !slots[i].inUse; });
+		}
+	}
+
+	if (slots)
+	{
+		delete[] slots;
+	}
 }
 
 void LogContext::packRestArgument()
@@ -32,16 +46,16 @@ void LogContext::packArgument(const std::wstring& arg)
 {
 	setDisplayColor(textColor);
 
-	messageStr += arg + L" ";
+	*messageStr += arg + L" ";
 }
 
 void LogContext::packArgument(const wchar_t* arg)
 {
 	setDisplayColor(textColor);
 
-	messageStr += arg;
+	*messageStr += arg;
 
-	messageStr += L" ";
+	*messageStr += L" ";
 }
 
 void LogContext::packArgument(const int32_t& arg)
@@ -61,7 +75,7 @@ void LogContext::packArgument(const int32_t& arg)
 
 		buff[1] = L'x';
 
-		messageStr += buff;
+		*messageStr += buff;
 	}
 	else
 	{
@@ -72,10 +86,10 @@ void LogContext::packArgument(const int32_t& arg)
 
 		_itow_s(arg, buff, decMaxLength, 10);
 
-		messageStr += buff;
+		*messageStr += buff;
 	}
 
-	messageStr += L" ";
+	*messageStr += L" ";
 }
 
 void LogContext::packArgument(const int64_t& arg)
@@ -95,7 +109,7 @@ void LogContext::packArgument(const int64_t& arg)
 
 		buff[1] = L'x';
 
-		messageStr += buff;
+		*messageStr += buff;
 	}
 	else
 	{
@@ -106,10 +120,10 @@ void LogContext::packArgument(const int64_t& arg)
 
 		_i64tow_s(arg, buff, decMaxLength, 10);
 
-		messageStr += buff;
+		*messageStr += buff;
 	}
 
-	messageStr += L" ";
+	*messageStr += L" ";
 }
 
 void LogContext::packArgument(const uint32_t& arg)
@@ -129,7 +143,7 @@ void LogContext::packArgument(const uint32_t& arg)
 
 		buff[1] = L'x';
 
-		messageStr += buff;
+		*messageStr += buff;
 	}
 	else
 	{
@@ -140,10 +154,10 @@ void LogContext::packArgument(const uint32_t& arg)
 
 		_ultow_s(arg, buff, decMaxLength, 10);
 
-		messageStr += buff;
+		*messageStr += buff;
 	}
 
-	messageStr += L" ";
+	*messageStr += L" ";
 }
 
 void LogContext::packArgument(const uint64_t& arg)
@@ -163,7 +177,7 @@ void LogContext::packArgument(const uint64_t& arg)
 
 		buff[1] = L'x';
 
-		messageStr += buff;
+		*messageStr += buff;
 	}
 	else
 	{
@@ -174,10 +188,10 @@ void LogContext::packArgument(const uint64_t& arg)
 
 		_ui64tow_s(arg, buff, decMaxLength, 10);
 
-		messageStr += buff;
+		*messageStr += buff;
 	}
 
-	messageStr += L" ";
+	*messageStr += L" ";
 }
 
 void LogContext::packArgument(const float_t& arg)
@@ -214,14 +228,12 @@ void LogContext::setDisplayColor(const LogColor& color)
 	{
 		displayColor = color;
 
-		messageStr += displayColor.code;
+		*messageStr += displayColor.code;
 	}
 }
 
 void LogContext::resetState()
 {
-	messageStr.clear();
-
 	integerMode = IntegerMode::DEC;
 
 	floatPrecision = 5;

@@ -9,10 +9,6 @@
 
 #include<queue>
 
-#include<mutex>
-
-#include<condition_variable>
-
 #include"Logger/LogContext.h"
 
 //output (class name)
@@ -78,6 +74,8 @@ private:
 	std::condition_variable cv;
 
 	std::thread worker;
+
+	std::wstring temp;
 
 };
 

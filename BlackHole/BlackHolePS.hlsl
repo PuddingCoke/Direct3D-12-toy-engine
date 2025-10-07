@@ -46,6 +46,62 @@ void Haze(inout float3 color, float3 pos, float alpha)
     color += col * bloomDisc * (2.9 / float(ITERATIONS)) * (1.0 - alpha * 1.0);
 }
 
+float3 hash(float3 p, float scale) // replace this by something better
+{
+    p = fmod(p, scale);
+    
+    p = float3(dot(p, float3(127.1, 311.7, 74.7)),
+			  dot(p, float3(269.5, 183.3, 246.1)),
+			  dot(p, float3(113.5, 271.9, 124.6)));
+
+    return -1.0 + 2.0 * frac(sin(p) * 43758.5453123);
+}
+
+// return value noise (in x) and its derivatives (in yzw)
+float4 noised(in float3 x, in float scale)
+{
+    x *= scale;
+
+    // grid
+    float3 i = floor(x);
+    float3 w = frac(x);
+    
+#if 1
+    // quintic interpolant
+    float3 u = w * w * w * (w * (w * 6.0 - 15.0) + 10.0);
+    float3 du = 30.0 * w * w * (w * (w - 2.0) + 1.0);
+#else
+    // cubic interpolant
+    float3 u = w*w*(3.0-2.0*w);
+    float3 du = 6.0*w*(1.0-w);
+#endif    
+    
+    // gradients
+    float3 ga = hash(i + float3(0.0, 0.0, 0.0), scale);
+    float3 gb = hash(i + float3(1.0, 0.0, 0.0), scale);
+    float3 gc = hash(i + float3(0.0, 1.0, 0.0), scale);
+    float3 gd = hash(i + float3(1.0, 1.0, 0.0), scale);
+    float3 ge = hash(i + float3(0.0, 0.0, 1.0), scale);
+    float3 gf = hash(i + float3(1.0, 0.0, 1.0), scale);
+    float3 gg = hash(i + float3(0.0, 1.0, 1.0), scale);
+    float3 gh = hash(i + float3(1.0, 1.0, 1.0), scale);
+    
+    // projections
+    float va = dot(ga, w - float3(0.0, 0.0, 0.0));
+    float vb = dot(gb, w - float3(1.0, 0.0, 0.0));
+    float vc = dot(gc, w - float3(0.0, 1.0, 0.0));
+    float vd = dot(gd, w - float3(1.0, 1.0, 0.0));
+    float ve = dot(ge, w - float3(0.0, 0.0, 1.0));
+    float vf = dot(gf, w - float3(1.0, 0.0, 1.0));
+    float vg = dot(gg, w - float3(0.0, 1.0, 1.0));
+    float vh = dot(gh, w - float3(1.0, 1.0, 1.0));
+	
+    // interpolations
+    return float4(va + u.x * (vb - va) + u.y * (vc - va) + u.z * (ve - va) + u.x * u.y * (va - vb - vc + vd) + u.y * u.z * (va - vc - ve + vg) + u.z * u.x * (va - vb - ve + vf) + (-va + vb + vc - vd + ve - vf - vg + vh) * u.x * u.y * u.z, // value
+                 ga + u.x * (gb - ga) + u.y * (gc - ga) + u.z * (ge - ga) + u.x * u.y * (ga - gb - gc + gd) + u.y * u.z * (ga - gc - ge + gg) + u.z * u.x * (ga - gb - ge + gf) + (-ga + gb + gc - gd + ge - gf - gg + gh) * u.x * u.y * u.z + // derivatives
+                 du * (float3(vb, vc, ve) - va + u.yzx * float3(va - vb - vc + vd, va - vc - ve + vg, va - vb - ve + vf) + u.zxy * float3(va - vb - ve + vf, va - vb - vc + vd, va - vc - ve + vg) + u.yzx * u.zxy * (-va + vb + vc - vd + ve - vf - vg + vh)));
+}
+
 //noise code by iq
 float noise(in float3 x)
 {
@@ -108,8 +164,6 @@ void GasDisc(inout float3 color, inout float alpha, float3 pos)
     radialCoords.z = distFromDisc * 1.5;
 
     radialCoords *= 0.95;
-    
-    //period = 1.0 / (speed * 0.5 * 0.15)
     //speed = 1.0 / (period * 0.5 * 0.15)
     //float speed = 0.06;
     
@@ -118,28 +172,28 @@ void GasDisc(inout float3 color, inout float alpha, float3 pos)
     float noise1 = 1.0;
     float3 rc = radialCoords + 0.0;
     rc.y += iTime * speed;
-    noise1 *= noise(rc * 3.0) * 0.5 + 0.5;
+    noise1 *= noised(rc * 3.0, 32.0) * 0.5 + 0.5;
     rc.y -= iTime * speed;
-    noise1 *= noise(rc * 6.0) * 0.5 + 0.5;
+    noise1 *= noised(rc * 6.0, 32.0) * 0.5 + 0.5;
     rc.y += iTime * speed;
-    noise1 *= noise(rc * 12.0) * 0.5 + 0.5;
+    noise1 *= noised(rc * 12.0, 32.0) * 0.5 + 0.5;
     rc.y -= iTime * speed;
-    noise1 *= noise(rc * 24.0) * 0.5 + 0.5;
+    noise1 *= noised(rc * 24.0, 32.0) * 0.5 + 0.5;
     rc.y += iTime * speed;
 
     float noise2 = 2.0;
     rc = radialCoords + 30.0;
-    noise2 *= noise(rc * 3.0) * 0.5 + 0.5;
+    noise2 *= noised(rc * 3.0, 32.0) * 0.5 + 0.5;
     rc.y += iTime * speed;
-    noise2 *= noise(rc * 6.0) * 0.5 + 0.5;
+    noise2 *= noised(rc * 6.0, 32.0) * 0.5 + 0.5;
     rc.y -= iTime * speed;
-    noise2 *= noise(rc * 12.0) * 0.5 + 0.5;
+    noise2 *= noised(rc * 12.0, 32.0) * 0.5 + 0.5;
     rc.y += iTime * speed;
-    noise2 *= noise(rc * 24.0) * 0.5 + 0.5;
+    noise2 *= noised(rc * 24.0, 32.0) * 0.5 + 0.5;
     rc.y -= iTime * speed;
-    noise2 *= noise(rc * 48.0) * 0.5 + 0.5;
+    noise2 *= noised(rc * 48.0, 32.0) * 0.5 + 0.5;
     rc.y += iTime * speed;
-    noise2 *= noise(rc * 92.0) * 0.5 + 0.5;
+    noise2 *= noised(rc * 92.0, 32.0) * 0.5 + 0.5;
     rc.y -= iTime * speed;
 
     dustColor *= noise1 * 0.998 + 0.002;

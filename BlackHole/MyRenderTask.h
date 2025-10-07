@@ -45,7 +45,7 @@ public:
 		effect->imGUICall();
 
 		ImGui::Begin("Black Hole Parameters");
-		ImGui::SliderFloat("Period", &perframeData.period, 60.f, 180.f);
+		ImGui::SliderFloat("Period", &perframeData.period, 10.f, 180.f);
 		ImGui::End();
 	}
 

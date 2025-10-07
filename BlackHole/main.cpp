@@ -4,9 +4,9 @@
 
 int wmain(int argc, const wchar_t* argv[])
 {
-	//const InitializationParam param = InitializationParam::RealTime(1920, 1080, L"Black Hole", false);
+	const InitializationParam param = InitializationParam::RealTime(1920, 1080, L"Black Hole", true);
 
-	const InitializationParam param = InitializationParam::VideoRender(1920, 1080, 30);
+	//const InitializationParam param = InitializationParam::VideoRender(1920, 1080, 30);
 
 	Gear::initialize();
 

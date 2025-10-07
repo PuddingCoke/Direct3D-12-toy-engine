@@ -7,6 +7,8 @@
 
 #include<thread>
 
+#include<condition_variable>
+
 enum class LogType
 {
 	LOG_SUCCESS,
@@ -15,11 +17,22 @@ enum class LogType
 	LOG_USER
 };
 
+struct BufferSlot
+{
+	BufferSlot();
+
+	std::wstring str;
+
+	bool inUse;
+};
+
 struct LogMessage
 {
-	LogMessage(std::wstring str, LogType type);
+	BufferSlot& slot;
 
-	const std::wstring str;
+	std::mutex& inUseMutex;
+
+	std::condition_variable& inUseCV;
 
 	const LogType type;
 };
@@ -129,7 +142,18 @@ private:
 
 	LogColor displayColor;
 
-	std::wstring messageStr;
+	static constexpr size_t slotNum = 128;
+
+	BufferSlot* const slots;
+
+	uint32_t writeIndex;
+
+	std::wstring* messageStr;
+
+	std::mutex inUseMutex;
+
+	std::condition_variable inUseCV;
+
 };
 
 template<typename ...Args>
@@ -145,6 +169,23 @@ inline LogMessage LogContext::createLogMessage(const std::wstring& className, co
 template<typename ...Args>
 inline LogMessage LogContext::getLogMessage(const std::wstring& className, const LogType& type, const Args & ...args)
 {
+	if (slots[writeIndex].inUse)
+	{
+		std::unique_lock<std::mutex> inUseLock(inUseMutex);
+
+		inUseCV.wait(inUseLock, [this]() {return !slots[writeIndex].inUse; });
+	}
+
+	messageStr = &slots[writeIndex].str;
+
+	slots[writeIndex].inUse = true;
+
+	const LogMessage message = { slots[writeIndex],inUseMutex,inUseCV,type };
+
+	writeIndex = (writeIndex + 1u) % slotNum;
+
+	messageStr->clear();
+
 	{
 		const time_t currentTime = time(nullptr);
 
@@ -165,7 +206,7 @@ inline LogMessage LogContext::getLogMessage(const std::wstring& className, const
 		swprintf_s(headerStr, headerStrLen, L"%s[%d:%d:%d] %s{T%u} ", LogColor::timeStampColor.code, localTime.tm_hour, localTime.tm_min, localTime.tm_sec,
 			LogColor::threadIdColor.code, threadId);
 
-		messageStr += headerStr;
+		*messageStr += headerStr;
 	}
 
 	if (type != LogType::LOG_ERROR)
@@ -207,7 +248,7 @@ inline LogMessage LogContext::getLogMessage(const std::wstring& className, const
 
 	packRestArgument(args...);
 
-	return LogMessage(messageStr, type);
+	return message;
 }
 
 template<typename First, typename ...Rest>
@@ -244,7 +285,7 @@ inline void LogContext::packFloatPoint(const Arg& arg)
 
 	swprintf_s(buff, _CVTBUFSIZE, L"%.*f ", floatPrecision.precision, arg);
 
-	messageStr += buff;
+	*messageStr += buff;
 }
 
 #endif // !_LOGCONTEXT_H_
