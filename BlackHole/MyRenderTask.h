@@ -25,6 +25,8 @@ public:
 		desc.PS = blackHoleShader->getByteCode();
 
 		GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&pipelineState));
+
+		Keyboard::addKeyDownEvent(Keyboard::K, [this]() {perframeData.useOriginalVer = ~perframeData.useOriginalVer; });
 	}
 
 	~MyRenderTask()
@@ -46,6 +48,17 @@ public:
 
 		ImGui::Begin("Black Hole Parameters");
 		ImGui::SliderFloat("Period", &perframeData.period, 10.f, 180.f);
+		ImGui::Checkbox("moveP", (bool*)&perframeData.moveP);
+		ImGui::SliderFloat("GEXP", &perframeData.G, -1.f, 0.05f);
+		ImGui::Checkbox("Use Original Ver", (bool*)&perframeData.useOriginalVer);
+		ImGui::SliderFloat("Exponent1", &perframeData.exponent1, 0.0f, 2.0f);
+		ImGui::SliderFloat("Scale1", &perframeData.scale1, 0, 2.f);
+		ImGui::SliderFloat("Bias1", &perframeData.bias1, -1.f, 1.f);
+		ImGui::SliderFloat("Exponent2", &perframeData.exponent2, 0.0f, 2.0f);
+		ImGui::SliderFloat("Scale2", &perframeData.scale2, 0, 2.f);
+		ImGui::SliderFloat("Bias2", &perframeData.bias2, -1.f, 1.f);
+		ImGui::SliderFloat("BaseNoise2ScaleFactor", &perframeData.baseNoise2ScaleFactor, 0.f, 1.f);
+		ImGui::SliderFloat("Noise2LerpFactor", &perframeData.noise2LerpFactor, 0.f, 1.f);
 		ImGui::End();
 	}
 
@@ -98,6 +111,17 @@ private:
 		float height;
 		float timeElapsed;
 		float period = 120.f;
+		uint32_t moveP = true;
+		float G = 0.f;
+		uint32_t useOriginalVer = false;
+		float exponent1 = 0.6f;
+		float scale1 = 1.3f;
+		float bias1 = 0.15f;
+		float exponent2 = 0.7f;
+		float scale2 = 1.2f;
+		float bias2 = 0.1f;
+		float baseNoise2ScaleFactor = 1.f;
+		float noise2LerpFactor = 0.7f;
 	} perframeData;
 
 };
