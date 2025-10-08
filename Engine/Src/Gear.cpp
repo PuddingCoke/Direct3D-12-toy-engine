@@ -229,8 +229,6 @@ void Gear::runVideoRender()
 	{
 		delete encoder;
 	}
-
-	std::cin.get();
 }
 
 void Gear::reportLiveObjects() const

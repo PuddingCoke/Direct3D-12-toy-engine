@@ -38,13 +38,7 @@ public:
 
 protected:
 
-	void updateStartTimePoint();
-
-	void updateEncodeTime();
-
 	void displayProgress() const;
-
-	void displayResult() const;
 
 	//封装比特流
 	bool writeFrame(const void* const bitstreamPtr, const uint32_t bitstreamSize, const bool cleanPoint);

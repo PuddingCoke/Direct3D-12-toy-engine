@@ -54,18 +54,6 @@ Encoder::~Encoder()
 	MFShutdown();
 }
 
-void Encoder::updateStartTimePoint()
-{
-	startPoint = std::chrono::steady_clock::now();
-}
-
-void Encoder::updateEncodeTime()
-{
-	endPoint = std::chrono::steady_clock::now();
-
-	encodeTime += std::chrono::duration<float>(endPoint - startPoint).count();
-}
-
 void Encoder::displayProgress() const
 {
 	if ((frameEncoded % (frameRate / 4)) == 0)
@@ -83,15 +71,6 @@ void Encoder::displayProgress() const
 
 		LOGENGINE(str);
 	}
-}
-
-void Encoder::displayResult() const
-{
-	LOGENGINE(L"encode complete");
-
-	LOGENGINE(L"encode average speed", frameToEncode / encodeTime);
-
-	LOGENGINE(L"enter any key to quit");
 }
 
 bool Encoder::writeFrame(const void* const bitstreamPtr, const uint32_t bitstreamSize, const bool cleanPoint)

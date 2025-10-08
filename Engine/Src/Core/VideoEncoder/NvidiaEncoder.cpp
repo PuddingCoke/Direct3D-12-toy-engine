@@ -124,8 +124,6 @@ NvidiaEncoder::~NvidiaEncoder()
 
 bool NvidiaEncoder::encode(Texture* const inputTexture)
 {
-	updateStartTimePoint();
-
 	bool encoding = true;
 
 	NV_ENC_REGISTER_RESOURCE registerInputResource = { NV_ENC_REGISTER_RESOURCE_VER };
@@ -205,8 +203,6 @@ bool NvidiaEncoder::encode(Texture* const inputTexture)
 
 		registeredInputResourcePtrs.pop();
 
-		updateEncodeTime();
-
 		if (!encoding)
 		{
 			NV_ENC_PIC_PARAMS eosParams = { NV_ENC_PIC_PARAMS_VER };
@@ -214,8 +210,6 @@ bool NvidiaEncoder::encode(Texture* const inputTexture)
 			eosParams.encodePicFlags = NV_ENC_PIC_FLAG_EOS;
 
 			NVENCCALL(nvencAPI.nvEncEncodePicture(encoder, &eosParams));
-
-			displayResult();
 		}
 	}
 	else if(status != NV_ENC_ERR_NEED_MORE_INPUT)
