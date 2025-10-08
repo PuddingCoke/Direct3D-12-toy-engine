@@ -72,13 +72,13 @@ void Encoder::displayProgress() const
 	{
 		const uint32_t num = progressBarWidth * frameEncoded / frameToEncode;
 
-		const uint32_t buffLength = 12 + 2 + progressBarWidth + 1 + 6 + 1 + 6;
+		const uint32_t buffLength = 12 + 2 + progressBarWidth + 1 + 6 + 1 + 1;
 
 		wchar_t str[buffLength] = {};
 
 		swprintf_s(str, buffLength, L"Encoding... [%.*s%.*s] %.2f%%",
-			num, L"****************************************************************",
-			progressBarWidth - num, L"////////////////////////////////////////////////////////////////",
+			num, L"********************************",
+			progressBarWidth - num, L"////////////////////////////////",
 			100.f * static_cast<float>(frameEncoded) / static_cast<float>(frameToEncode));
 
 		LOGENGINE(str);

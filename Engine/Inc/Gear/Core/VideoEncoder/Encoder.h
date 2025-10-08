@@ -51,6 +51,7 @@ protected:
 
 private:
 
+	//不要修改这个值
 	static constexpr uint32_t progressBarWidth = 32;
 
 	uint32_t frameEncoded;

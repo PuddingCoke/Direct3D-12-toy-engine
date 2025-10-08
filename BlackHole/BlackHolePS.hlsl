@@ -1,5 +1,7 @@
 ﻿//修改自https://www.shadertoy.com/view/lstSRS 作者：sonicether
 
+//可平铺噪声来自https://www.shadertoy.com/view/3dVXDc 作者：piyushslayer
+
 #include"Common.hlsli"
 
 #define ITERATIONS 256
@@ -9,9 +11,8 @@ cbuffer RenderParameters : register(b2)
     uint noiseTextureIndex;
     uint diskTextureIndex;
     float2 iResolution;
-    float iTime;
-    float period;
-    uint moveP;
+    float timeElapsed;
+    float texturePeriod;
     float GEXP;
     uint useOriginalVer;
     float exponent1;
@@ -57,6 +58,11 @@ void Haze(inout float3 color, float3 pos, float alpha)
     color += col * bloomDisc * (2.9 / float(ITERATIONS)) * (1.0 - alpha * 1.0);
 }
 
+float3 mod(float3 a, float3 b)
+{
+    return a - b * floor(a / b);
+}
+
 #define UI0 1597334673U
 #define UI1 3812015801U
 #define UI2 uint2(UI0, UI1)
@@ -80,14 +86,14 @@ float gradientNoise(float3 x, float freq)
     float3 u = w * w * w * (w * (w * 6. - 15.) + 10.);
     
     // gradients
-    float3 ga = hash33(fmod(p + float3(0., 0., 0.), freq));
-    float3 gb = hash33(fmod(p + float3(1., 0., 0.), freq));
-    float3 gc = hash33(fmod(p + float3(0., 1., 0.), freq));
-    float3 gd = hash33(fmod(p + float3(1., 1., 0.), freq));
-    float3 ge = hash33(fmod(p + float3(0., 0., 1.), freq));
-    float3 gf = hash33(fmod(p + float3(1., 0., 1.), freq));
-    float3 gg = hash33(fmod(p + float3(0., 1., 1.), freq));
-    float3 gh = hash33(fmod(p + float3(1., 1., 1.), freq));
+    float3 ga = hash33(mod(p + float3(0., 0., 0.), freq));
+    float3 gb = hash33(mod(p + float3(1., 0., 0.), freq));
+    float3 gc = hash33(mod(p + float3(0., 1., 0.), freq));
+    float3 gd = hash33(mod(p + float3(1., 1., 0.), freq));
+    float3 ge = hash33(mod(p + float3(0., 0., 1.), freq));
+    float3 gf = hash33(mod(p + float3(1., 0., 1.), freq));
+    float3 gg = hash33(mod(p + float3(0., 1., 1.), freq));
+    float3 gh = hash33(mod(p + float3(1., 1., 1.), freq));
     
     // projections
     float va = dot(ga, w - float3(0., 0., 0.));
@@ -120,21 +126,18 @@ float perlin(float3 p, float freq, int octaves, float k)
     
     for (int i = 0; i < octaves; ++i)
     {
-        if (moveP)
+        if (i % 2 == 0)
         {
-            if (i % 2 == 0)
-            {
-                p.y += k;
-            }
-            else
-            {
-                p.y -= k;
-            }
+            p.y += k;
+        }
+        else
+        {
+            p.y -= k;
         }
         
         noise *= amp * (gradientNoise(p * freq, freq) * 0.5 + 0.5);
         
-        freq *= 2.;
+        freq *= 2.0;
         
         amp *= G;
     }
@@ -205,31 +208,31 @@ void GasDisc(inout float3 color, inout float alpha, float3 pos)
 
     radialCoords *= 0.95;
     
-    //speed = 1.0 / (period * 0.5 * 0.15)
-    //float speed = 0.06;
-    float speed = 1.0 / (period * 0.5 * 0.15);
+    //periodTexture = 1.0 / (speed * 0.5 * 0.15)
+    //periodNoise = 1.0 / speed
+    //pTex/pNoise= 40/3
+    
+    float speed = 1.0 / (texturePeriod * 0.5 * 0.15);
+    
+    float renderPeriod = texturePeriod * 3.0;
     
     float noise1 = 1.0;
     
     float noise2 = 2.0;
     
-    if(!useOriginalVer)
+    if (!useOriginalVer)
     {
         noise1 = 1.0;
+        
         float3 rc = radialCoords + 0.0;
-        if (!moveP)
-        {
-            rc.y += iTime * speed;
-        }
-        noise1 *= perlin(rc, 3.0, 4, iTime * speed);
+        
+        noise1 *= perlin(rc, 3.0, 4, fmod(timeElapsed, renderPeriod) * speed);
 
         noise2 = 2.0;
+        
         rc = radialCoords + 30.0;
-        if (!moveP)
-        {
-            rc.y += iTime * speed;
-        }
-        noise2 *= perlin(rc, 3.0, 6, iTime * speed);
+        
+        noise2 *= perlin(rc, 3.0, 6, fmod(timeElapsed, renderPeriod) * speed);
         
         //对比度调节
         noise1 = pow(noise1, exponent1);
@@ -248,36 +251,36 @@ void GasDisc(inout float3 color, inout float alpha, float3 pos)
     {
         noise1 = 1.0;
         float3 rc = radialCoords + 0.0;
-        rc.y += iTime * speed;
+        rc.y += timeElapsed * speed;
         noise1 *= noiseiq(rc * 3.0) * 0.5 + 0.5;
-        rc.y -= iTime * speed;
+        rc.y -= timeElapsed * speed;
         noise1 *= noiseiq(rc * 6.0) * 0.5 + 0.5;
-        rc.y += iTime * speed;
+        rc.y += timeElapsed * speed;
         noise1 *= noiseiq(rc * 12.0) * 0.5 + 0.5;
-        rc.y -= iTime * speed;
+        rc.y -= timeElapsed * speed;
         noise1 *= noiseiq(rc * 24.0) * 0.5 + 0.5;
-        rc.y += iTime * speed;
+        rc.y += timeElapsed * speed;
 
         noise2 = 2.0;
         rc = radialCoords + 30.0;
         noise2 *= noiseiq(rc * 3.0) * 0.5 + 0.5;
-        rc.y += iTime * speed;
+        rc.y += timeElapsed * speed;
         noise2 *= noiseiq(rc * 6.0) * 0.5 + 0.5;
-        rc.y -= iTime * speed;
+        rc.y -= timeElapsed * speed;
         noise2 *= noiseiq(rc * 12.0) * 0.5 + 0.5;
-        rc.y += iTime * speed;
+        rc.y += timeElapsed * speed;
         noise2 *= noiseiq(rc * 24.0) * 0.5 + 0.5;
-        rc.y -= iTime * speed;
+        rc.y -= timeElapsed * speed;
         noise2 *= noiseiq(rc * 48.0) * 0.5 + 0.5;
-        rc.y += iTime * speed;
+        rc.y += timeElapsed * speed;
         noise2 *= noiseiq(rc * 92.0) * 0.5 + 0.5;
-        rc.y -= iTime * speed;
+        rc.y -= timeElapsed * speed;
     }
 
     dustColor *= noise1 * 0.998 + 0.002;
     coverage *= noise2;
     
-    radialCoords.y += iTime * speed * 0.5;
+    radialCoords.y += fmod(timeElapsed, renderPeriod) * speed * 0.5;
     
     dustColor *= pow(diskTexture.Sample(linearWrapSampler, radialCoords.yx * float2(0.15, 0.27)).rgb, float3(2.0, 2.0, 2.0)) * 4.0;
     
@@ -344,60 +347,53 @@ float rand(float2 coord)
 
 float4 main(float2 uv : TEXCOORD) : SV_TARGET
 {
-    if (moveP && length(uv) < 0.1)
+    float aspect = iResolution.x / iResolution.y;
+
+    float2 uveye = uv;
+    
+    float3 eyevec = normalize(float3((uveye * 2.0 - 1.0) * float2(aspect, 1.0), 6.0));
+    float3 eyepos = float3(0.0, -0.0, -10.0);
+    
+    float2 mousepos = iMouse.xy / iResolution.xy;
+    if (mousepos.x == 0.0)
     {
-        return float4(1.0, 0.0, 0.0, 1.0);
+        mousepos.x = 0.35;
     }
-    else
+    eyepos.x += mousepos.x * 3.0 - 1.5;
+    
+    const float far = 15.0;
+
+    RotateCamera(eyevec, eyepos);
+
+    float3 color = float3(0.0, 0.0, 0.0);
+    
+    float dither = rand(uv) * 2.0;
+
+    float alpha = 0.0;
+    float3 raypos = eyepos + eyevec * dither * far / float(ITERATIONS);
+    
+    [loop]
+    for (int i = 0; i < ITERATIONS; i++)
     {
-        float aspect = iResolution.x / iResolution.y;
-
-        float2 uveye = uv;
-    
-        float3 eyevec = normalize(float3((uveye * 2.0 - 1.0) * float2(aspect, 1.0), 6.0));
-        float3 eyepos = float3(0.0, -0.0, -10.0);
-    
-        float2 mousepos = iMouse.xy / iResolution.xy;
-        if (mousepos.x == 0.0)
-        {
-            mousepos.x = 0.35;
-        }
-        eyepos.x += mousepos.x * 3.0 - 1.5;
-    
-        const float far = 15.0;
-
-        RotateCamera(eyevec, eyepos);
-
-        float3 color = float3(0.0, 0.0, 0.0);
-    
-        float dither = rand(uv) * 2.0;
-
-        float alpha = 0.0;
-        float3 raypos = eyepos + eyevec * dither * far / float(ITERATIONS);
-    
-        [loop]
-        for (int i = 0; i < ITERATIONS; i++)
-        {
-            WarpSpace(eyevec, raypos);
-            raypos += eyevec * far / float(ITERATIONS);
-            GasDisc(color, alpha, raypos);
-            Haze(color, raypos, alpha);
-        }
-    
-        color *= 0.02;
-    
-        color = pow(color, float3(1.5, 1.5, 1.5));
-        color = color / (1.0 + color);
-        color = pow(color, float3(1.0 / 1.5, 1.0 / 1.5, 1.0 / 1.5));
-
-    
-        color = lerp(color, color * color * (3.0 - 2.0 * color), float3(1.0, 1.0, 1.0));
-        color = pow(color, float3(1.3, 1.20, 1.0));
-
-        color = saturate(color * 1.01);
-    
-        color = pow(color, float3(0.7 / 2.2, 0.7 / 2.2, 0.7 / 2.2));
-    
-        return float4(saturate(color), 1.0);
+        WarpSpace(eyevec, raypos);
+        raypos += eyevec * far / float(ITERATIONS);
+        GasDisc(color, alpha, raypos);
+        Haze(color, raypos, alpha);
     }
+    
+    color *= 0.02;
+    
+    color = pow(color, float3(1.5, 1.5, 1.5));
+    color = color / (1.0 + color);
+    color = pow(color, float3(1.0 / 1.5, 1.0 / 1.5, 1.0 / 1.5));
+
+    
+    color = lerp(color, color * color * (3.0 - 2.0 * color), float3(1.0, 1.0, 1.0));
+    color = pow(color, float3(1.3, 1.20, 1.0));
+
+    color = saturate(color * 1.01);
+    
+    color = pow(color, float3(0.7 / 2.2, 0.7 / 2.2, 0.7 / 2.2));
+    
+    return float4(saturate(color), 1.0);
 }
