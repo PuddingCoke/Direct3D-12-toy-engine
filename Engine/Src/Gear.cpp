@@ -8,6 +8,10 @@
 
 #include<dxgidebug.h>
 
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+
+#include<stb_image_write.h>
+
 Gear* Gear::instance = nullptr;
 
 Gear* Gear::get()
@@ -34,6 +38,8 @@ int Gear::iniEngine(const InitializationParam& param, const int argc, const wcha
 		winform = new Win32Form(param.title, realTimeRender.width, realTimeRender.height, normalWndStyle, Gear::windowCallback);
 
 		RenderEngine::instance = new RenderEngine(realTimeRender.width, realTimeRender.height, winform->getHandle(), true, realTimeRender.enableImGuiSurface);
+
+		backBufferHeap = new ReadbackHeap(FMT::getByteSize(Graphics::backBufferFormat) * realTimeRender.width * realTimeRender.height);
 
 		LOGENGINE(L"engine usage real time render");
 
@@ -117,9 +123,21 @@ void Gear::runRealTimeRender()
 
 		game->render();
 
+		const bool needScreenGrab = Keyboard::onKeyDown(screenGrabKey);
+
+		if (needScreenGrab)
+		{
+			RenderEngine::get()->saveBackBuffer(backBufferHeap);
+		}
+
 		RenderEngine::get()->end();
 
 		RenderEngine::get()->present();
+
+		if (needScreenGrab)
+		{
+			RenderEngine::get()->waitForCurrentFrame();
+		}
 
 		RenderEngine::get()->waitForNextFrame();
 
@@ -136,6 +154,36 @@ void Gear::runRealTimeRender()
 		RenderEngine::get()->setDeltaTime(lerpDeltaTime);
 
 		RenderEngine::get()->updateTimeElapsed();
+
+		if (needScreenGrab)
+		{
+			const uint8_t* const dataPtr = reinterpret_cast<uint8_t*>(backBufferHeap->map(CD3DX12_RANGE(0ull,
+				FMT::getByteSize(Graphics::backBufferFormat) * realTimeRender.width * realTimeRender.height)));
+
+			uint8_t* const colors = new uint8_t[FMT::getByteSize(Graphics::backBufferFormat) * realTimeRender.width * realTimeRender.height];
+
+			for (uint32_t i = 0; i < realTimeRender.width * realTimeRender.height; i++)
+			{
+				const uint32_t pixel = 4 * i;
+
+				//RGBA <- BGRA
+				colors[pixel] = dataPtr[pixel + 2];
+
+				colors[pixel + 1] = dataPtr[pixel + 1];
+
+				colors[pixel + 2] = dataPtr[pixel];
+
+				colors[pixel + 3] = dataPtr[pixel + 3];
+			}
+
+			backBufferHeap->unmap();
+
+			stbi_write_png("output.png", realTimeRender.width, realTimeRender.height, 4, colors, FMT::getByteSize(Graphics::backBufferFormat) * realTimeRender.width);
+
+			delete[] colors;
+
+			LOGSUCCESS(L"screenshot save to output.png succeeded");
+		}
 	}
 }
 
@@ -246,7 +294,7 @@ void Gear::reportLiveObjects() const
 }
 
 Gear::Gear() :
-	game(nullptr), winform(nullptr)
+	game(nullptr), winform(nullptr), backBufferHeap(nullptr)
 {
 
 }
@@ -256,6 +304,11 @@ Gear::~Gear()
 	if (RenderEngine::instance)
 	{
 		RenderEngine::get()->waitForCurrentFrame();
+	}
+
+	if (backBufferHeap)
+	{
+		delete backBufferHeap;
 	}
 
 	if (game)

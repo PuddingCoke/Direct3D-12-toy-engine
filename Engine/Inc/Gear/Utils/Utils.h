@@ -11,8 +11,6 @@
 
 #include<vector>
 
-#include<dxgiformat.h>
-
 class Utils
 {
 public:
@@ -22,8 +20,6 @@ public:
 	Utils(const Utils&) = delete;
 
 	static std::wstring getRootFolder();
-	
-	static uint32_t getPixelSize(const DXGI_FORMAT format);
 
 	class File
 	{

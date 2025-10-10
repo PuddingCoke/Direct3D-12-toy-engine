@@ -9,6 +9,8 @@
 
 #include<Gear/Core/Resource/ConstantBuffer.h>
 
+#include<Gear/Core/Resource/D3D12Resource/ReadbackHeap.h>
+
 #include<ImGUI/imgui.h>
 
 #include<ImGUI/imgui_impl_win32.h>
@@ -80,6 +82,8 @@ private:
 	void setDeltaTime(const float deltaTime) const;
 
 	void updateTimeElapsed() const;
+
+	void saveBackBuffer(ReadbackHeap* const readbackHeap);
 
 	RenderEngine(const uint32_t width, const uint32_t height, const HWND hwnd, const bool useSwapChainBuffer, const bool initializeImGuiSurface);
 

@@ -175,6 +175,7 @@
     <ClInclude Include="Inc\Gear\Utils\DeltaTimeEstimator.h" />
     <ClInclude Include="Inc\Gear\Core\Resource\BufferView.h" />
     <ClInclude Include="Inc\Gear\Core\Resource\CounterBufferView.h" />
+    <ClInclude Include="Inc\Gear\Utils\FMT.h" />
     <ClInclude Include="Inc\Gear\Utils\Logger\LogColor.h" />
     <ClInclude Include="Inc\Gear\Utils\Logger\LogContext.h" />
     <ClInclude Include="Inc\Gear\Utils\Logger.h" />
@@ -231,6 +232,7 @@
     <ClInclude Include="Inc\Gear\Utils\Utils.h" />
     <ClInclude Include="Inc\Gear\Window\Win32Form.h" />
     <ClInclude Include="Inc\DirectXTex\WICTextureLoader12.h" />
+    <ClInclude Include="Inc\stb_image_write.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Inc\DirectXTex\DDSTextureLoader12.cpp" />
@@ -293,6 +295,7 @@
     <ClCompile Include="Src\Input\Keyboard.cpp" />
     <ClCompile Include="Src\Input\Mouse.cpp" />
     <ClCompile Include="Src\Utils\Color.cpp" />
+    <ClCompile Include="Src\Utils\FMT.cpp" />
     <ClCompile Include="Src\Utils\Logger\LogColor.cpp" />
     <ClCompile Include="Src\Utils\Logger\LogContext.cpp" />
     <ClCompile Include="Src\Utils\Logger.cpp" />

@@ -12,9 +12,9 @@ cbuffer RenderParameters : register(b2)
     uint diskTextureIndex;
     float2 iResolution;
     float timeElapsed;
+    uint useOriginalVer;
     float texturePeriod;
     float GEXP;
-    uint useOriginalVer;
     float exponent1;
     float scale1;
     float bias1;

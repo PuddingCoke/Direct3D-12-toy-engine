@@ -51,6 +51,9 @@ private:
 
 	Game* game;
 
+	//screenshot
+	ReadbackHeap* backBufferHeap;
+
 	InitializationParam::EngineUsage usage;
 
 	union
@@ -61,6 +64,8 @@ private:
 	};
 
 	DeltaTimeEstimator dtEstimator;
+
+	static constexpr Keyboard::Key screenGrabKey = Keyboard::F11;
 
 	static constexpr DWORD normalWndStyle = WS_CAPTION | WS_SYSMENU;
 

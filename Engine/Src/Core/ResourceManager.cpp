@@ -708,7 +708,7 @@ TextureRenderView* ResourceManager::createTextureCube(const std::wstring& filePa
 
 	DXGI_FORMAT resFormat = DXGI_FORMAT_UNKNOWN;
 
-	switch (Utils::getPixelSize(equirectangularMap->getTexture()->getFormat()))
+	switch (FMT::getByteSize(equirectangularMap->getTexture()->getFormat()))
 	{
 	case 4:
 		resFormat = DXGI_FORMAT_R8G8B8A8_UNORM;

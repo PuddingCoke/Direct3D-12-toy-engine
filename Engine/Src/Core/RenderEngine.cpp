@@ -14,6 +14,8 @@
 
 #include<Gear/Utils/Random.h>
 
+#include<Gear/Utils/Utils.h>
+
 RenderEngine* RenderEngine::instance = nullptr;
 
 RenderEngine* RenderEngine::get()
@@ -324,6 +326,43 @@ void RenderEngine::setDeltaTime(const float deltaTime) const
 void RenderEngine::updateTimeElapsed() const
 {
 	Graphics::timeElapsed += Graphics::getDeltaTime();
+}
+
+void RenderEngine::saveBackBuffer(ReadbackHeap* const readbackHeap)
+{
+	D3D12_PLACED_SUBRESOURCE_FOOTPRINT bufferFootprint = {};
+
+	bufferFootprint.Footprint.Width = getRenderTexture()->getWidth();
+
+	bufferFootprint.Footprint.Height = getRenderTexture()->getHeight();
+
+	bufferFootprint.Footprint.Depth = 1;
+
+	bufferFootprint.Footprint.RowPitch = FMT::getByteSize(Graphics::backBufferFormat) * getRenderTexture()->getWidth();
+
+	bufferFootprint.Footprint.Format = Graphics::backBufferFormat;
+
+	const CD3DX12_TEXTURE_COPY_LOCATION copyDest(readbackHeap->getResource(), bufferFootprint);
+
+	const CD3DX12_TEXTURE_COPY_LOCATION copySrc(getRenderTexture()->getResource(), 0);
+
+	ID3D12GraphicsCommandList6* const lastCommandList = recordCommandLists.back()->get();
+
+	D3D12_RESOURCE_BARRIER barrier = {};
+	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+	barrier.Transition.pResource = getRenderTexture()->getResource();
+	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_COPY_SOURCE;
+
+	lastCommandList->ResourceBarrier(1, &barrier);
+
+	lastCommandList->CopyTextureRegion(&copyDest, 0, 0, 0, &copySrc, nullptr);
+
+	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_COPY_SOURCE;
+	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+
+	lastCommandList->ResourceBarrier(1, &barrier);
 }
 
 RenderEngine::RenderEngine(const uint32_t width, const uint32_t height, const HWND hwnd, const bool useSwapChainBuffer, const bool initializeImGuiSurface) :

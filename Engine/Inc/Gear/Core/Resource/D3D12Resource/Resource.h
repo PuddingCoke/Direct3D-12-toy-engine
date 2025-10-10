@@ -5,6 +5,8 @@
 
 #include<Gear/Core/GraphicsDevice.h>
 
+#include<Gear/Utils/FMT.h>
+
 #include<memory>
 
 //used for internal state,transition state,global state

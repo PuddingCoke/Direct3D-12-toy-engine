@@ -15,8 +15,8 @@ public:
 		blackHoleShader(new Shader(Utils::getRootFolder() + L"BlackHolePS.cso")),
 		noiseTexture(resManager->createTextureRenderView(L"Noise.png", true)),
 		diskTexture(resManager->createTextureRenderView(L"Disk.jpg", true)),
-		originTexture(ResourceManager::createTextureRenderView(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R16G16B16A16_FLOAT, 1, 1, false, true,
-			DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_R16G16B16A16_FLOAT)),
+		originTexture(ResourceManager::createTextureRenderView(Graphics::getWidth(), Graphics::getHeight(), FMT::RGBA16F, 1, 1, false, true,
+			FMT::RGBA16F, FMT::UNKNOWN, FMT::RGBA16F)),
 		effect(new BloomEffect(context, Graphics::getWidth(), Graphics::getHeight(), resManager))
 	{
 		auto desc = PipelineState::getDefaultFullScreenState();
@@ -48,10 +48,9 @@ public:
 
 		ImGui::Begin("Black Hole Parameters");
 		ImGui::Text("Time Elapsed %f", perframeData.timeElapsed);
-		ImGui::SliderFloat("T var", &tVar, -1.f, 1.f);
+		ImGui::Checkbox("Use Original Ver", (bool*)&perframeData.useOriginalVer);
 		ImGui::SliderFloat("TexturePeriod", &perframeData.texturePeriod, 10.f, 180.f);
 		ImGui::SliderFloat("GEXP", &perframeData.GEXP, -1.f, 0.05f);
-		ImGui::Checkbox("Use Original Ver", (bool*)&perframeData.useOriginalVer);
 		ImGui::SliderFloat("Exponent1", &perframeData.exponent1, 0.0f, 2.0f);
 		ImGui::SliderFloat("Scale1", &perframeData.scale1, 0.8f, 2.f);
 		ImGui::SliderFloat("Bias1", &perframeData.bias1, -0.5f, 2.f);
@@ -77,12 +76,13 @@ protected:
 
 		context->setPSConstants({ noiseTexture->getAllSRVIndex(),diskTexture->getAllSRVIndex() }, 0);
 
-		perframeData.width = static_cast<float>(Graphics::getWidth());
-		perframeData.height = static_cast<float>(Graphics::getHeight());
+		perframeData.resolution = { static_cast<float>(Graphics::getWidth()) ,static_cast<float>(Graphics::getHeight()) };
 
-		//perframeData.timeElapsed = perframeData.texturePeriod * 3.f + tVar;
+		//perframeData.timeElapsed = perframeData.texturePeriod * 3.f + sinf(Graphics::getTimeElapsed()) * 1.f;
 
 		perframeData.timeElapsed = Graphics::getTimeElapsed();
+
+		//perframeData.timeElapsed = 0.f;
 
 		context->setPSConstants(sizeof(PerframeData) / 4ull, &perframeData, 2);
 
@@ -93,8 +93,6 @@ protected:
 		auto outputTexture = effect->process(originTexture);
 
 		blit(outputTexture);
-
-		//blit(originTexture);
 	}
 
 private:
@@ -111,16 +109,13 @@ private:
 
 	BloomEffect* effect;
 
-	float tVar = 0.f;
-
 	struct PerframeData
 	{
-		float width;
-		float height;
+		DirectX::XMFLOAT2 resolution;
 		float timeElapsed;
+		uint32_t useOriginalVer = false;
 		float texturePeriod = 120.f;
 		float GEXP = 0.03f;
-		uint32_t useOriginalVer = false;
 		float exponent1 = 0.6f;
 		float scale1 = 1.0f;
 		float bias1 = 0.15f;

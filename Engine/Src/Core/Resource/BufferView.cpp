@@ -45,7 +45,7 @@ BufferView::BufferView(Buffer* const buffer, const uint32_t structureByteStride,
 			if (isTypedBuffer)
 			{
 				desc.Format = format;
-				desc.Buffer.NumElements = static_cast<uint32_t>(size) / Utils::getPixelSize(format);
+				desc.Buffer.NumElements = static_cast<uint32_t>(size) / FMT::getByteSize(format);
 			}
 			else if (isStructuredBuffer)
 			{
@@ -74,7 +74,7 @@ BufferView::BufferView(Buffer* const buffer, const uint32_t structureByteStride,
 			if (isTypedBuffer)
 			{
 				desc.Format = format;
-				desc.Buffer.NumElements = static_cast<uint32_t>(size) / Utils::getPixelSize(format);
+				desc.Buffer.NumElements = static_cast<uint32_t>(size) / FMT::getByteSize(format);
 			}
 			else if (isStructuredBuffer)
 			{
@@ -131,7 +131,7 @@ BufferView::BufferView(Buffer* const buffer, const uint32_t structureByteStride,
 	{
 		vbv.BufferLocation = buffer->getGPUAddress();
 		vbv.SizeInBytes = static_cast<uint32_t>(size);
-		vbv.StrideInBytes = (isStructuredBuffer ? structureByteStride : Utils::getPixelSize(format));
+		vbv.StrideInBytes = (isStructuredBuffer ? structureByteStride : FMT::getByteSize(format));
 	}
 
 	if (createIBV)
