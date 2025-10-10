@@ -57,12 +57,33 @@ void Logger::shutdown()
 	{
 		worker.join();
 	}
+
+	while (!messages.empty())
+	{
+		LogMessage message = std::move(messages.front());
+
+		messages.pop();
+
+		temp = message.slot.str;
+
+		{
+			std::lock_guard<std::mutex> inUseLock(message.inUseMutex);
+
+			message.slot.inUse = false;
+		}
+
+		message.inUseCV.notify_one();
+
+		std::wcout << temp << L"\n";
+
+		file << temp << L"\n";
+	}
 }
 
 void Logger::submitMessage(const LogMessage& msg)
 {
 	{
-		std::unique_lock<std::mutex> lock(queueLock);
+		std::lock_guard<std::mutex> lockGuard(queueLock);
 
 		if (!isRunning)
 		{
@@ -99,7 +120,7 @@ void Logger::workerLoop()
 			temp = message.slot.str;
 
 			{
-				std::unique_lock<std::mutex> inUseLock(message.inUseMutex);
+				std::lock_guard<std::mutex> inUseLock(message.inUseMutex);
 
 				message.slot.inUse = false;
 			}
@@ -115,10 +136,6 @@ void Logger::workerLoop()
 			if (message.type == LogType::LOG_ERROR)
 			{
 				isRunning = false;
-
-				file.flush();
-
-				file.close();
 
 				break;
 			}

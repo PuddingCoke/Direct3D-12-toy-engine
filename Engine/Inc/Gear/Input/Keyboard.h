@@ -141,7 +141,7 @@ public:
 
 private:
 
-	friend class Gear;
+	friend class Win32Form;
 
 	static void resetOnKeyDownMap();
 

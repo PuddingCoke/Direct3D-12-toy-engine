@@ -90,7 +90,7 @@ namespace FMT
 	constexpr DXGI_FORMAT D16UN = DXGI_FORMAT_D16_UNORM;
 	constexpr DXGI_FORMAT D32F = DXGI_FORMAT_D32_FLOAT;
 
-	//Unkndown
+	//Unknown
 	constexpr DXGI_FORMAT UNKNOWN = DXGI_FORMAT_UNKNOWN;
 
 	uint32_t getByteSize(const DXGI_FORMAT format);

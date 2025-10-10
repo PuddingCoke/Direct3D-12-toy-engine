@@ -35,9 +35,9 @@ int Gear::iniEngine(const InitializationParam& param, const int argc, const wcha
 
 		realTimeRender = param.realTimeRender;
 
-		winform = new Win32Form(param.title, realTimeRender.width, realTimeRender.height, normalWndStyle, Gear::windowCallback);
+		Win32Form::instance = new Win32Form(param.title, realTimeRender.width, realTimeRender.height, Win32Form::normalWindowStyle, Win32Form::windowCallback);
 
-		RenderEngine::instance = new RenderEngine(realTimeRender.width, realTimeRender.height, winform->getHandle(), true, realTimeRender.enableImGuiSurface);
+		RenderEngine::instance = new RenderEngine(realTimeRender.width, realTimeRender.height, Win32Form::get()->getHandle(), true, realTimeRender.enableImGuiSurface);
 
 		backBufferHeap = new ReadbackHeap(FMT::getByteSize(Graphics::backBufferFormat) * realTimeRender.width * realTimeRender.height);
 
@@ -49,11 +49,11 @@ int Gear::iniEngine(const InitializationParam& param, const int argc, const wcha
 
 		videoRender = param.videoRender;
 
-		winform = new Win32Form(param.title, 100, 100, normalWndStyle, Gear::encodeCallback);
+		Win32Form::instance = new Win32Form(param.title, 100, 100, Win32Form::normalWindowStyle, Win32Form::encodeCallback);
 
-		ShowWindow(winform->getHandle(), SW_HIDE);
+		ShowWindow(Win32Form::get()->getHandle(), SW_HIDE);
 
-		RenderEngine::instance = new RenderEngine(videoRender.width, videoRender.height, winform->getHandle(), false, false);
+		RenderEngine::instance = new RenderEngine(videoRender.width, videoRender.height, Win32Form::get()->getHandle(), false, false);
 
 		LOGENGINE(L"engine usage video render");
 
@@ -111,7 +111,7 @@ void Gear::runRealTimeRender()
 {
 	RenderEngine::get()->setDeltaTime(0.0001f);
 
-	while (winform->pollEvents())
+	while (Win32Form::get()->pollEvents())
 	{
 		const std::chrono::high_resolution_clock::time_point startPoint = std::chrono::high_resolution_clock::now();
 
@@ -140,10 +140,6 @@ void Gear::runRealTimeRender()
 		}
 
 		RenderEngine::get()->waitForNextFrame();
-
-		Mouse::resetDeltaInfo();
-
-		Keyboard::resetOnKeyDownMap();
 
 		const std::chrono::high_resolution_clock::time_point endPoint = std::chrono::high_resolution_clock::now();
 
@@ -294,13 +290,15 @@ void Gear::reportLiveObjects() const
 }
 
 Gear::Gear() :
-	game(nullptr), winform(nullptr), backBufferHeap(nullptr)
+	game(nullptr), backBufferHeap(nullptr)
 {
 
 }
 
 Gear::~Gear()
 {
+	LOGENGINE(L"engine destroy");
+
 	if (RenderEngine::instance)
 	{
 		RenderEngine::get()->waitForCurrentFrame();
@@ -316,15 +314,17 @@ Gear::~Gear()
 		delete game;
 	}
 
-	if (winform)
+	if (Win32Form::instance)
 	{
-		delete winform;
+		delete Win32Form::instance;
 	}
 
 	if (RenderEngine::instance)
 	{
 		delete RenderEngine::instance;
 	}
+
+	LOGSUCCESS(L"engine exit");
 
 	if (Logger::instance)
 	{
@@ -336,92 +336,5 @@ Gear::~Gear()
 	reportLiveObjects();
 
 #endif // _DEBUG
-}
 
-LRESULT Gear::windowCallback(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam)
-{
-	if (ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam))
-		return true;
-
-	switch (uMsg)
-	{
-	case WM_PAINT:
-	{
-		PAINTSTRUCT ps;
-
-		BeginPaint(hWnd, &ps);
-
-		EndPaint(hWnd, &ps);
-	}
-	break;
-
-	case WM_MOUSEMOVE:
-		Mouse::move(static_cast<float>(LOWORD(lParam)), static_cast<float>(Graphics::getHeight()) - static_cast<float>(HIWORD(lParam)));
-		break;
-
-	case WM_LBUTTONDOWN:
-		Mouse::pressLeft();
-		break;
-
-	case WM_RBUTTONDOWN:
-		Mouse::pressRight();
-		break;
-
-	case WM_LBUTTONUP:
-		Mouse::releaseLeft();
-		break;
-
-	case WM_RBUTTONUP:
-		Mouse::releaseRight();
-		break;
-
-	case WM_MOUSEWHEEL:
-		Mouse::scroll(GET_WHEEL_DELTA_WPARAM(wParam) / 120.f);
-		break;
-
-	case WM_KEYDOWN:
-		if ((HIWORD(lParam) & KF_REPEAT) == 0)
-		{
-			Keyboard::pressKey(static_cast<Keyboard::Key>(wParam));
-		}
-		break;
-
-	case WM_KEYUP:
-		Keyboard::releaseKey(static_cast<Keyboard::Key>(wParam));
-		break;
-
-	case WM_DESTROY:
-		PostQuitMessage(0);
-		break;
-
-	default:
-		return DefWindowProc(hWnd, uMsg, wParam, lParam);
-	}
-
-	return 0;
-}
-
-LRESULT Gear::encodeCallback(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam)
-{
-	switch (uMsg)
-	{
-	case WM_PAINT:
-	{
-		PAINTSTRUCT ps;
-
-		BeginPaint(hWnd, &ps);
-
-		EndPaint(hWnd, &ps);
-	}
-	break;
-
-	case WM_DESTROY:
-		PostQuitMessage(0);
-		break;
-
-	default:
-		return DefWindowProc(hWnd, uMsg, wParam, lParam);
-	}
-
-	return 0;
 }

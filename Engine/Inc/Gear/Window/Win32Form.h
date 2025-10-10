@@ -4,6 +4,7 @@
 #define _WIN32FORM_H_
 
 #include<Windows.h>
+
 #include<string>
 
 class Win32Form
@@ -23,11 +24,29 @@ public:
 
 	HWND getHandle() const;
 
+	static Win32Form* get();
+
+	static constexpr DWORD normalWindowStyle = WS_CAPTION | WS_SYSMENU;
+
+	static LRESULT CALLBACK windowCallback(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam);
+
+	static LRESULT CALLBACK encodeCallback(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam);
+
 private:
 
-	HWND hwnd;
+	LRESULT CALLBACK windowProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam);
+
+	LRESULT CALLBACK encodeProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam);
+
+	friend class Gear;
+
+	static Win32Form* instance;
+
+	HWND hWnd;
 
 	MSG msg;
+
+	HMENU hMenu;
 
 };
 

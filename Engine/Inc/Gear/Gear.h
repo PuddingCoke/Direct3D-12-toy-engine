@@ -13,8 +13,6 @@
 
 #include<Gear/Game.h>
 
-extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, uint32_t msg, WPARAM wParam, LPARAM lParam);
-
 class Gear
 {
 public:
@@ -47,8 +45,6 @@ private:
 
 	~Gear();
 
-	Win32Form* winform;
-
 	Game* game;
 
 	//screenshot
@@ -67,11 +63,6 @@ private:
 
 	static constexpr Keyboard::Key screenGrabKey = Keyboard::F11;
 
-	static constexpr DWORD normalWndStyle = WS_CAPTION | WS_SYSMENU;
-
-	static LRESULT CALLBACK windowCallback(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam);
-
-	static LRESULT CALLBACK encodeCallback(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam);
 };
 
 #endif // !_GEAR_H_
