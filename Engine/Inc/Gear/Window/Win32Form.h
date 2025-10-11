@@ -3,6 +3,8 @@
 #ifndef _WIN32FORM_H_
 #define _WIN32FORM_H_
 
+#define NOMINMAX
+
 #include<Windows.h>
 
 #include<string>
@@ -17,8 +19,10 @@ public:
 
 	void operator=(const Win32Form&) = delete;
 
-	Win32Form(const std::wstring& title, const uint32_t width, const uint32_t height, const DWORD windowStyle,
+	Win32Form(const std::wstring& title, const uint32_t startX, const uint32_t startY, const uint32_t width, const uint32_t height, const DWORD windowStyle,
 		LRESULT(*windowCallback)(HWND hwnd, uint32_t msg, WPARAM wParam, LPARAM lParam));
+
+	~Win32Form();
 
 	bool pollEvents();
 
@@ -28,15 +32,25 @@ public:
 
 	static constexpr DWORD normalWindowStyle = WS_CAPTION | WS_SYSMENU;
 
+	static constexpr DWORD wallpaperWindowStyle = WS_POPUP;
+
 	static LRESULT CALLBACK windowCallback(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam);
 
 	static LRESULT CALLBACK encodeCallback(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam);
 
+	static LRESULT CALLBACK wallpaperCallBack(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam);
+
 private:
 
-	LRESULT CALLBACK windowProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam);
+	static LRESULT CALLBACK mouseHookCallback(int nCode, WPARAM wParam, LPARAM lParam);
 
-	LRESULT CALLBACK encodeProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam);
+	LRESULT CALLBACK windowProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam) const;
+
+	LRESULT CALLBACK encodeProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam) const;
+
+	LRESULT CALLBACK wallpaperProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam) const;
+
+	LRESULT CALLBACK mouseHookProc(int nCode, WPARAM wParam, LPARAM lParam) const;
 
 	friend class Gear;
 
@@ -44,9 +58,13 @@ private:
 
 	HWND hWnd;
 
-	MSG msg;
+	const bool iniTrayIcon;
 
 	HMENU hMenu;
+
+	NOTIFYICONDATA nid;
+
+	HHOOK mouseHook;
 
 };
 

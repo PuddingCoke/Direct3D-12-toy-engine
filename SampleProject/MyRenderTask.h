@@ -46,9 +46,7 @@ protected:
 
 		context->setPipelineState(pipelineState.Get());
 
-		context->setViewport(1920u, 1080u);
-
-		context->setScissorRect(0.f, 0.f, 1920.f, 1080.f);
+		context->setViewportSimple(Graphics::getWidth(), Graphics::getHeight());
 
 		context->setTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 

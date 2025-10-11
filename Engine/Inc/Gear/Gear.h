@@ -3,10 +3,6 @@
 #ifndef _GEAR_H_
 #define _GEAR_H_
 
-#include<Gear/Core/RenderEngine.h>
-
-#include<Gear/Window/Win32Form.h>
-
 #include<Gear/Utils/DeltaTimeEstimator.h>
 
 #include<Gear/InitializationParam.h>
@@ -38,6 +34,8 @@ private:
 	void runRealTimeRender();
 
 	void runVideoRender();
+
+	void runWallpaper();
 
 	void reportLiveObjects() const;
 

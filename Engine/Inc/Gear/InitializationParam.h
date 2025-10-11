@@ -13,10 +13,13 @@ struct InitializationParam
 
 	static InitializationParam VideoRender(const uint32_t width, const uint32_t height, const uint32_t second = 60u);
 
+	static InitializationParam Wallpaper();
+
 	enum class EngineUsage
 	{
 		REALTIMERENDER,
-		VIDEORENDER
+		VIDEORENDER,
+		WALLPAPER
 	}usage;
 
 	std::wstring title;

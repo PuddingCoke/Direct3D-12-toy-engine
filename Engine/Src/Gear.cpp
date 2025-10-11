@@ -1,5 +1,11 @@
 ﻿#include<Gear/Gear.h>
 
+#include<Gear/Core/RenderEngine.h>
+
+#include<Gear/Window/Win32Form.h>
+
+#include<Gear/Utils/WallpaperHelper.h>
+
 #include<Gear/Core/Graphics.h>
 
 #include<Gear/Core/VideoEncoder/NvidiaEncoder.h>
@@ -29,13 +35,18 @@ int Gear::iniEngine(const InitializationParam& param, const int argc, const wcha
 
 	usage = param.usage;
 
+	DirectX::XMUINT2 systemResolution = {};
+
+	WallpaperHelper::getSystemResolution(systemResolution.x, systemResolution.y);
+
 	switch (usage)
 	{
 	case InitializationParam::EngineUsage::REALTIMERENDER:
 
 		realTimeRender = param.realTimeRender;
 
-		Win32Form::instance = new Win32Form(param.title, realTimeRender.width, realTimeRender.height, Win32Form::normalWindowStyle, Win32Form::windowCallback);
+		Win32Form::instance = new Win32Form(param.title, (systemResolution.x - realTimeRender.width) / 2, (systemResolution.y - realTimeRender.height) / 2,
+			realTimeRender.width, realTimeRender.height, Win32Form::normalWindowStyle, Win32Form::windowCallback);
 
 		RenderEngine::instance = new RenderEngine(realTimeRender.width, realTimeRender.height, Win32Form::get()->getHandle(), true, realTimeRender.enableImGuiSurface);
 
@@ -49,13 +60,29 @@ int Gear::iniEngine(const InitializationParam& param, const int argc, const wcha
 
 		videoRender = param.videoRender;
 
-		Win32Form::instance = new Win32Form(param.title, 100, 100, Win32Form::normalWindowStyle, Win32Form::encodeCallback);
+		Win32Form::instance = new Win32Form(param.title, 100, 100, 100, 100, Win32Form::normalWindowStyle, Win32Form::encodeCallback);
 
 		ShowWindow(Win32Form::get()->getHandle(), SW_HIDE);
 
 		RenderEngine::instance = new RenderEngine(videoRender.width, videoRender.height, Win32Form::get()->getHandle(), false, false);
 
 		LOGENGINE(L"engine usage video render");
+
+		break;
+
+	case InitializationParam::EngineUsage::WALLPAPER:
+
+		Win32Form::instance = new Win32Form(param.title, 0, 0, systemResolution.x, systemResolution.y, Win32Form::wallpaperWindowStyle, Win32Form::wallpaperCallBack);
+
+		{
+			const HWND parentHWND = WallpaperHelper::getWallpaperHWND();
+
+			SetParent(Win32Form::get()->getHandle(), parentHWND);
+		}
+
+		RenderEngine::instance = new RenderEngine(systemResolution.x, systemResolution.y, Win32Form::get()->getHandle(), true, false);
+
+		LOGENGINE(L"engine usage wallpaper");
 
 		break;
 
@@ -81,16 +108,15 @@ void Gear::iniGame(Game* const gamePtr)
 	switch (usage)
 	{
 	case InitializationParam::EngineUsage::REALTIMERENDER:
-
 		runRealTimeRender();
-
 		break;
 
 	case InitializationParam::EngineUsage::VIDEORENDER:
-
 		runVideoRender();
-
 		break;
+
+	case InitializationParam::EngineUsage::WALLPAPER:
+		runWallpaper();
 
 	default:
 		break;
@@ -272,6 +298,40 @@ void Gear::runVideoRender()
 	if (encoder)
 	{
 		delete encoder;
+	}
+}
+
+void Gear::runWallpaper()
+{
+	RenderEngine::get()->setDeltaTime(0.0001f);
+
+	while (Win32Form::get()->pollEvents())
+	{
+		const std::chrono::high_resolution_clock::time_point startPoint = std::chrono::high_resolution_clock::now();
+
+		RenderEngine::get()->setDefRenderTexture();
+
+		RenderEngine::get()->begin();
+
+		game->update(Graphics::getDeltaTime());
+
+		game->render();
+
+		RenderEngine::get()->end();
+
+		RenderEngine::get()->present();
+
+		RenderEngine::get()->waitForNextFrame();
+
+		const std::chrono::high_resolution_clock::time_point endPoint = std::chrono::high_resolution_clock::now();
+
+		const float deltaTime = std::chrono::duration<float>(endPoint - startPoint).count();
+
+		const float lerpDeltaTime = dtEstimator.getDeltaTime(deltaTime);
+
+		RenderEngine::get()->setDeltaTime(lerpDeltaTime);
+
+		RenderEngine::get()->updateTimeElapsed();
 	}
 }
 

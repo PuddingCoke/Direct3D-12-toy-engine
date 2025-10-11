@@ -179,6 +179,7 @@
     <ClInclude Include="Inc\Gear\Utils\Logger\LogColor.h" />
     <ClInclude Include="Inc\Gear\Utils\Logger\LogContext.h" />
     <ClInclude Include="Inc\Gear\Utils\Logger.h" />
+    <ClInclude Include="Inc\Gear\Utils\WallpaperHelper.h" />
     <ClInclude Include="Inc\ImGUI\imconfig.h" />
     <ClInclude Include="Inc\ImGUI\imgui.h" />
     <ClInclude Include="Inc\ImGUI\imgui_impl_dx12.h" />
@@ -303,6 +304,7 @@
     <ClCompile Include="Src\Utils\Random.cpp" />
     <ClCompile Include="Src\Utils\Timer.cpp" />
     <ClCompile Include="Src\Utils\Utils.cpp" />
+    <ClCompile Include="Src\Utils\WallpaperHelper.cpp" />
     <ClCompile Include="Src\Window\Win32Form.cpp" />
   </ItemGroup>
   <ItemGroup>

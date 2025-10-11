@@ -411,6 +411,9 @@
     <ClInclude Include="Inc\Gear\Utils\FMT.h">
       <Filter>Header</Filter>
     </ClInclude>
+    <ClInclude Include="Inc\Gear\Utils\WallpaperHelper.h">
+      <Filter>Header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\InitializationParam.cpp">
@@ -618,6 +621,9 @@
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="Src\Utils\FMT.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Utils\WallpaperHelper.cpp">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>

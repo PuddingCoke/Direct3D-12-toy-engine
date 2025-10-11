@@ -35,3 +35,14 @@ InitializationParam InitializationParam::VideoRender(const uint32_t width, const
 
 	return param;
 }
+
+InitializationParam InitializationParam::Wallpaper()
+{
+	InitializationParam param = {};
+
+	param.usage = EngineUsage::WALLPAPER;
+
+	param.title = L"Wallpaper";
+
+	return param;
+}
