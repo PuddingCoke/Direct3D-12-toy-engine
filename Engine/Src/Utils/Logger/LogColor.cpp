@@ -45,7 +45,7 @@ const LogColor LogColor::timeStampColor = LogColor::brightBlack;
 
 const LogColor LogColor::threadIdColor = LogColor::cyan;
 
-const LogColor LogColor::classNameColor = LogColor::yellow;
+const LogColor LogColor::functionNameColor = LogColor::yellow;
 
 const LogColor LogColor::successColor = LogColor::brightGreen;
 

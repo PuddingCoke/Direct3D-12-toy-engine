@@ -1,5 +1,20 @@
 ﻿#include<Gear/Core/VideoEncoder/NvidiaEncoder.h>
 
+#include<iostream>
+
+#define NVENCCALL(func) \
+{\
+const NVENCSTATUS status = func;\
+if(status != NV_ENC_SUCCESS && status != NV_ENC_ERR_NEED_MORE_INPUT)\
+{\
+std::cout<<"error occured at function "<<#func<<"\n";\
+const char* error = nvencAPI.nvEncGetLastErrorString(encoder);\
+std::cout << "status " << status << "\n";\
+std::cout << error << "\n";\
+__debugbreak();\
+}\
+}\
+
 NvidiaEncoder::NvidiaEncoder(const uint32_t frameToEncode) :
 	Encoder(frameToEncode, outputVideoFormat), encoder(nullptr),
 	readbackHeap(new ReadbackHeap(2 * 4 * Graphics::getWidth() * Graphics::getHeight())),

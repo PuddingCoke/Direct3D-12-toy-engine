@@ -357,7 +357,7 @@ Gear::Gear() :
 
 Gear::~Gear()
 {
-	LOGENGINE(L"engine destroy");
+	LOGENGINE(L"destroy resources");
 
 	if (RenderEngine::instance)
 	{

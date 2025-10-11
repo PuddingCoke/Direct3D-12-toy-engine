@@ -1,13 +1,8 @@
 ﻿#include<Gear/Utils/Logger.h>
 
+#include<iostream>
+
 #include<Windows.h>
-
-std::wstring wrapClassName(const char* const className)
-{
-	const size_t len = strnlen_s(className, UINT64_MAX);
-
-	return L"(" + std::wstring(className, className + len) + L")";
-}
 
 Logger* Logger::instance = nullptr;
 
@@ -74,9 +69,12 @@ void Logger::shutdown()
 
 		message.inUseCV.notify_one();
 
-		std::wcout << temp << L"\n";
+		if (file.is_open())
+		{
+			std::wcout << temp << L"\n";
 
-		file << temp << L"\n";
+			file << temp << L"\n";
+		}
 	}
 }
 
@@ -84,11 +82,6 @@ void Logger::submitMessage(const LogMessage& msg)
 {
 	{
 		std::lock_guard<std::mutex> lockGuard(queueLock);
-
-		if (!isRunning)
-		{
-			return;
-		}
 
 		messages.push(msg);
 	}
@@ -136,6 +129,10 @@ void Logger::workerLoop()
 			if (message.type == LogType::LOG_ERROR)
 			{
 				isRunning = false;
+
+				file.flush();
+
+				file.close();
 
 				break;
 			}

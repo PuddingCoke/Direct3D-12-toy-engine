@@ -35,7 +35,7 @@ public:
 
 		for (size_t i = 0; i < threadCount; ++i)
 		{
-			workers.emplace_back([i, this]()
+			workers.emplace_back([i]()
 				{
 					for (int j = 0; j < 11; j++)
 					{
@@ -45,7 +45,12 @@ public:
 		}
 
 		for (auto& t : workers)
-			t.join();
+		{
+			if (t.joinable())
+			{
+				t.join();
+			}
+		}
 	}
 
 	~MyRenderTask()

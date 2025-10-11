@@ -3,8 +3,6 @@
 #ifndef _LOGCOLOR_H_
 #define _LOGCOLOR_H_
 
-#include<string>
-
 struct LogColor
 {
 	const wchar_t* code;
@@ -52,7 +50,7 @@ struct LogColor
 
 	static const LogColor threadIdColor;
 
-	static const LogColor classNameColor;
+	static const LogColor functionNameColor;
 
 	static const LogColor successColor;
 

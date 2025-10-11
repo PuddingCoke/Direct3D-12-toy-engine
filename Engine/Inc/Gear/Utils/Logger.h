@@ -3,16 +3,11 @@
 #ifndef _LOGGER_H_
 #define _LOGGER_H_
 
-#include<iostream>
-
 #include<fstream>
 
 #include<queue>
 
 #include"Logger/LogContext.h"
-
-//output (class name)
-std::wstring wrapClassName(const char* const className);
 
 using IntegerMode = LogContext::IntegerMode;
 
@@ -21,7 +16,7 @@ using FloatPrecision = LogContext::FloatPrecision;
 /// <summary>
 /// a simple logger that output text with colors depend on different situations
 /// numeric value like int32_t,uint32_t,float_t have special color
-/// since i want to use utf-8 encoding so std::string and native string are not supported
+/// due to implementation of LogContext std::string and native narrow string are not supported
 /// and do not use logger in loop although there is optimization
 /// 
 /// following are supported format
@@ -79,13 +74,13 @@ private:
 
 };
 
-#define LOGSUCCESS(...) Logger::submitLogMessage(LogContext::createLogMessage(wrapClassName(typeid(*this).name()),LogType::LOG_SUCCESS,__VA_ARGS__))
+#define LOGSUCCESS(...) Logger::submitLogMessage(LogContext::createLogMessage(__FUNCTIONW__,LogType::LOG_SUCCESS,__VA_ARGS__))
 
-#define LOGENGINE(...) Logger::submitLogMessage(LogContext::createLogMessage(wrapClassName(typeid(*this).name()),LogType::LOG_ENGINE,__VA_ARGS__))
+#define LOGENGINE(...) Logger::submitLogMessage(LogContext::createLogMessage(__FUNCTIONW__,LogType::LOG_ENGINE,__VA_ARGS__))
 
-#define LOGUSER(...) Logger::submitLogMessage(LogContext::createLogMessage(wrapClassName(typeid(*this).name()),LogType::LOG_USER,__VA_ARGS__))
+#define LOGUSER(...) Logger::submitLogMessage(LogContext::createLogMessage(__FUNCTIONW__,LogType::LOG_USER,__VA_ARGS__))
 
-#define LOGERROR(...) Logger::submitLogMessage(LogContext::createLogMessage(L"",LogType::LOG_ERROR,__FILEW__,__FUNCTIONW__,L"LINE",(int32_t)__LINE__,__VA_ARGS__)); \
+#define LOGERROR(...) Logger::submitLogMessage(LogContext::createLogMessage(__FUNCTIONW__,LogType::LOG_ERROR,__FILEW__,L"LINE",(int32_t)__LINE__,__VA_ARGS__)); \
 throw std::runtime_error("check log.txt or console output for detailed information") \
 
 #endif // !_LOGGER_H_

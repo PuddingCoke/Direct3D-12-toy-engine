@@ -6,7 +6,7 @@ BufferSlot::BufferSlot() :
 }
 
 LogContext::FloatPrecision::FloatPrecision(const int precision) :
-	precision(precision)
+	precision(std::min(precision, 16))
 {
 }
 
@@ -46,7 +46,9 @@ void LogContext::packArgument(const std::wstring& arg)
 {
 	setDisplayColor(textColor);
 
-	*messageStr += arg + L" ";
+	*messageStr += arg;
+
+	*messageStr += L" ";
 }
 
 void LogContext::packArgument(const wchar_t* arg)
@@ -237,4 +239,6 @@ void LogContext::resetState()
 	integerMode = IntegerMode::DEC;
 
 	floatPrecision = 5;
+
+	displayColor = LogColor::functionNameColor;
 }

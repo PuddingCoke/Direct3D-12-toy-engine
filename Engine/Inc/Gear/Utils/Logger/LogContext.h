@@ -62,12 +62,12 @@ public:
 	~LogContext();
 
 	template<typename... Args>
-	static LogMessage createLogMessage(const std::wstring& className, const LogType& type, const Args&... args);
+	static LogMessage createLogMessage(const wchar_t* const functionName, const LogType& type, const Args&... args);
 
 private:
 
 	template<typename... Args>
-	LogMessage getLogMessage(const std::wstring& className, const LogType& type, const Args&... args);
+	LogMessage getLogMessage(const wchar_t* const functionName, const LogType& type, const Args&... args);
 
 	template<typename T>
 	struct isNativeString :std::false_type {};
@@ -157,17 +157,17 @@ private:
 };
 
 template<typename ...Args>
-inline LogMessage LogContext::createLogMessage(const std::wstring& className, const LogType& type, const Args & ...args)
+inline LogMessage LogContext::createLogMessage(const wchar_t* const functionName, const LogType& type, const Args & ...args)
 {
 	thread_local LogContext context;
 
 	context.resetState();
 
-	return context.getLogMessage(className, type, args...);
+	return context.getLogMessage(functionName, type, args...);
 }
 
 template<typename ...Args>
-inline LogMessage LogContext::getLogMessage(const std::wstring& className, const LogType& type, const Args & ...args)
+inline LogMessage LogContext::getLogMessage(const wchar_t* const functionName, const LogType& type, const Args & ...args)
 {
 	if (slots[writeIndex].inUse)
 	{
@@ -193,9 +193,9 @@ inline LogMessage LogContext::getLogMessage(const std::wstring& className, const
 
 		localtime_s(&localTime, &currentTime);
 
-		/*5[8] 5{T10} */
-		//conservative length = 5+2+8+1+5+2+1+10+1+1 = 36
-		const size_t headerStrLen = 36ull;
+		//headerStrLen = 5+2+8+1+5+2+1+10+1+5+2+length(functionName)+1+1
+		//			   = 44+length(functionName)
+		const size_t headerStrLen = 128ull;
 
 		wchar_t headerStr[headerStrLen] = {};
 
@@ -203,40 +203,37 @@ inline LogMessage LogContext::getLogMessage(const std::wstring& className, const
 
 		const uint32_t threadId = *(uint32_t*)&id;
 
-		swprintf_s(headerStr, headerStrLen, L"%s[%d:%d:%d] %s{T%u} ", LogColor::timeStampColor.code, localTime.tm_hour, localTime.tm_min, localTime.tm_sec,
-			LogColor::threadIdColor.code, threadId);
+		swprintf_s(headerStr, headerStrLen, L"%s[%d:%d:%d] %s{T%u} %s(%s) ", LogColor::timeStampColor.code, localTime.tm_hour, localTime.tm_min, localTime.tm_sec,
+			LogColor::threadIdColor.code, threadId, LogColor::functionNameColor.code, functionName);
 
 		*messageStr += headerStr;
-	}
-
-	if (type != LogType::LOG_ERROR)
-	{
-		packArgument(LogColor::classNameColor);
-
-		packArgument(className);
 	}
 
 	switch (type)
 	{
 	case LogType::LOG_SUCCESS:
+
 		packArgument(LogColor::successColor);
 
 		packArgument(L"<SUCCESS>");
 
 		break;
 	case LogType::LOG_ERROR:
+
 		packArgument(LogColor::errorColor);
 
 		packArgument(L"<ERROR>");
 
 		break;
 	case LogType::LOG_ENGINE:
+
 		packArgument(LogColor::engineColor);
 
 		packArgument(L"<ENGINE>");
 
 		break;
 	case LogType::LOG_USER:
+
 		packArgument(LogColor::userColor);
 
 		packArgument(L"<USER>");
