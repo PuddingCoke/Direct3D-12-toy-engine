@@ -35,6 +35,7 @@ public:
 	~MyRenderTask()
 	{
 		delete vertexShader;
+
 		delete pixelShader;
 	}
 
@@ -60,4 +61,5 @@ private:
 	Shader* vertexShader;
 
 	Shader* pixelShader;
+
 };

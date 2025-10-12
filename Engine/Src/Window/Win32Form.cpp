@@ -19,7 +19,7 @@
 Win32Form* Win32Form::instance = nullptr;
 
 Win32Form::Win32Form(const std::wstring& title, const uint32_t startX, const uint32_t startY, const uint32_t width, const uint32_t height, const DWORD windowStyle, LRESULT(*windowCallback)(HWND hwnd, uint32_t msg, WPARAM wParam, LPARAM lParam)) :
-	hWnd(nullptr), iniTrayIcon(windowCallback == wallpaperCallBack), hMenu(nullptr), nid{}, mouseHook(nullptr)
+	hWnd(nullptr), iniTrayIcon(windowCallback == wallpaperCallBack), hMenu(nullptr), nid{}
 {
 	SetProcessDPIAware();
 
@@ -44,7 +44,7 @@ Win32Form::Win32Form(const std::wstring& title, const uint32_t startX, const uin
 
 	hWnd = CreateWindow(L"MyWindowClass", title.c_str(), windowStyle, startX, startY,
 		rect.right - rect.left, rect.bottom - rect.top, nullptr, nullptr, hInstance, nullptr);
-
+	
 	if (!hWnd)
 	{
 		LOGERROR(L"create window failed");
@@ -67,8 +67,6 @@ Win32Form::Win32Form(const std::wstring& title, const uint32_t startX, const uin
 		hMenu = CreatePopupMenu();
 
 		AppendMenu(hMenu, MF_STRING, EXITUID, L"退出程序");
-
-		mouseHook = SetWindowsHookEx(WH_MOUSE_LL, mouseHookCallback, nullptr, 0);
 	}
 }
 
@@ -76,11 +74,9 @@ Win32Form::~Win32Form()
 {
 	if (iniTrayIcon)
 	{
-		UnhookWindowsHookEx(mouseHook);
+		DestroyMenu(hMenu);
 
 		Shell_NotifyIcon(NIM_DELETE, &nid);
-
-		DestroyMenu(hMenu);
 	}
 
 	DestroyWindow(hWnd);
@@ -127,11 +123,6 @@ LRESULT Win32Form::encodeCallback(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARA
 LRESULT Win32Form::wallpaperCallBack(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam)
 {
 	return instance->wallpaperProc(hWnd, uMsg, wParam, lParam);
-}
-
-LRESULT Win32Form::mouseHookCallback(int nCode, WPARAM wParam, LPARAM lParam)
-{
-	return instance->mouseHookProc(nCode, wParam, lParam);
 }
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam);
@@ -265,38 +256,4 @@ LRESULT Win32Form::wallpaperProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM
 	}
 
 	return 0;
-}
-
-LRESULT Win32Form::mouseHookProc(int nCode, WPARAM wParam, LPARAM lParam) const
-{
-	if (nCode == HC_ACTION)
-	{
-		MSLLHOOKSTRUCT* pMouseStruct = (MSLLHOOKSTRUCT*)lParam;
-
-		switch (wParam)
-		{
-		case WM_MOUSEMOVE:
-			Mouse::move(static_cast<float>(pMouseStruct->pt.x), static_cast<float>(Graphics::getHeight()) - static_cast<float>(pMouseStruct->pt.y));
-			break;
-
-		case WM_LBUTTONDOWN:
-			Mouse::pressLeft();
-			break;
-
-		case WM_RBUTTONDOWN:
-			Mouse::pressRight();
-			break;
-
-		case WM_LBUTTONUP:
-			Mouse::releaseLeft();
-			break;
-
-		case WM_RBUTTONUP:
-			Mouse::releaseRight();
-			break;
-		}
-
-	}
-
-	return CallNextHookEx(mouseHook, nCode, wParam, lParam);
 }

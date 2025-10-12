@@ -68,9 +68,9 @@ private:
 
 	std::condition_variable cv;
 
-	std::thread worker;
-
 	std::wstring temp;
+
+	std::thread worker;
 
 };
 

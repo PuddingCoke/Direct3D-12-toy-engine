@@ -42,15 +42,11 @@ public:
 
 private:
 
-	static LRESULT CALLBACK mouseHookCallback(int nCode, WPARAM wParam, LPARAM lParam);
-
 	LRESULT CALLBACK windowProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam) const;
 
 	LRESULT CALLBACK encodeProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam) const;
 
 	LRESULT CALLBACK wallpaperProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam) const;
-
-	LRESULT CALLBACK mouseHookProc(int nCode, WPARAM wParam, LPARAM lParam) const;
 
 	friend class Gear;
 
@@ -63,8 +59,6 @@ private:
 	HMENU hMenu;
 
 	NOTIFYICONDATA nid;
-
-	HHOOK mouseHook;
 
 };
 
