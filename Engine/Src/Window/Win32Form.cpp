@@ -88,9 +88,9 @@ Win32Form::~Win32Form()
 
 bool Win32Form::pollEvents()
 {
-	Mouse::resetDeltaInfo();
+	Mouse::resetDeltaValue();
 
-	Keyboard::resetOnKeyDownMap();
+	Keyboard::resetDeltaValue();
 
 	MSG msg = {};
 
@@ -293,10 +293,6 @@ LRESULT Win32Form::mouseHookProc(int nCode, WPARAM wParam, LPARAM lParam) const
 
 		case WM_RBUTTONUP:
 			Mouse::releaseRight();
-			break;
-
-		case WM_MOUSEWHEEL:
-			Mouse::scroll(GET_WHEEL_DELTA_WPARAM(wParam) / 120.f);
 			break;
 		}
 

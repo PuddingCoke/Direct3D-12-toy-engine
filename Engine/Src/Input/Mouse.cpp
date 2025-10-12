@@ -138,7 +138,7 @@ void Mouse::removeScrollEvent(const uint64_t id)
 	scrollEvent -= id;
 }
 
-void Mouse::resetDeltaInfo()
+void Mouse::resetDeltaValue()
 {
 	dx = 0;
 

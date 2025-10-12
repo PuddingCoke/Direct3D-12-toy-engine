@@ -71,7 +71,7 @@ private:
 
 	friend class Win32Form;
 
-	static void resetDeltaInfo();
+	static void resetDeltaValue();
 
 	static void pressLeft();
 

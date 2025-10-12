@@ -130,10 +130,10 @@ public:
 	static bool onKeyDown(const Key key);
 
 	//do not record command here
-	static uint64_t addKeyDownEvent(const Key key,const std::function<void(void)>& func);
+	static uint64_t addKeyDownEvent(const Key key, const std::function<void(void)>& func);
 
 	//do not record command here
-	static uint64_t addKeyUpEvent(const Key key,const std::function<void(void)>& func);
+	static uint64_t addKeyUpEvent(const Key key, const std::function<void(void)>& func);
 
 	static void removeKeyDownEvent(const Key key, const uint64_t id);
 
@@ -143,19 +143,23 @@ private:
 
 	friend class Win32Form;
 
-	static void resetOnKeyDownMap();
+	static void resetDeltaValue();
 
 	static void pressKey(const Key key);
 
 	static void releaseKey(const Key key);
 
-	static std::map<Key, Event> keyDownEvents;
+	static constexpr size_t maxKey = 512;
 
-	static std::map<Key, Event> keyUpEvents;
+	static Event keyDownEvents[maxKey];
 
-	static std::unordered_map<Key, bool> keyDownMap;
+	static Event keyUpEvents[maxKey];
 
-	static std::unordered_map<Key, bool> onKeyDownMap;
+	static bool keyDownStates[maxKey];
+
+	static bool onKeyDownStates[maxKey];
+
+	static std::vector<uint32_t> onKeyDownClearList;
 
 };
 
