@@ -177,13 +177,10 @@
     <ClInclude Include="Inc\Gear\Core\Resource\CounterBufferView.h">
       <Filter>Header\Core\Resource</Filter>
     </ClInclude>
-    <ClInclude Include="Inc\Gear\Core\Resource\ConstantBuffer.h">
+    <ClInclude Include="Inc\Gear\Core\Resource\ImmutableCBuffer.h">
       <Filter>Header\Core\Resource</Filter>
     </ClInclude>
     <ClInclude Include="Inc\Gear\Core\Resource\EngineResource.h">
-      <Filter>Header\Core\Resource</Filter>
-    </ClInclude>
-    <ClInclude Include="Inc\Gear\Core\Resource\IndexConstantBuffer.h">
       <Filter>Header\Core\Resource</Filter>
     </ClInclude>
     <ClInclude Include="Inc\Gear\Core\Resource\SwapTexture.h">
@@ -306,7 +303,7 @@
     <ClInclude Include="External\stb_image\stb_image_write.h">
       <Filter>Header\ExternalHeader\stbi</Filter>
     </ClInclude>
-    <ClInclude Include="Inc\Gear\Core\ConstantBufferManager.h">
+    <ClInclude Include="Inc\Gear\Core\DynamicCBufferManager.h">
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="Inc\Gear\Core\RenderTask.h">
@@ -414,6 +411,15 @@
     <ClInclude Include="Inc\Gear\Utils\WallpaperHelper.h">
       <Filter>Header</Filter>
     </ClInclude>
+    <ClInclude Include="Inc\Gear\Core\DynamicCBufferRegion.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Gear\Core\Resource\DynamicCBuffer.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Gear\Core\Resource\StaticCBuffer.h">
+      <Filter>Header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\InitializationParam.cpp">
@@ -467,16 +473,13 @@
     <ClCompile Include="Src\Core\Resource\BufferView.cpp">
       <Filter>Source\Core\Resource</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Core\Resource\ConstantBuffer.cpp">
+    <ClCompile Include="Src\Core\Resource\ImmutableCBuffer.cpp">
       <Filter>Source\Core\Resource</Filter>
     </ClCompile>
     <ClCompile Include="Src\Core\Resource\CounterBufferView.cpp">
       <Filter>Source\Core\Resource</Filter>
     </ClCompile>
     <ClCompile Include="Src\Core\Resource\EngineResource.cpp">
-      <Filter>Source\Core\Resource</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Core\Resource\IndexConstantBuffer.cpp">
       <Filter>Source\Core\Resource</Filter>
     </ClCompile>
     <ClCompile Include="Src\Core\Resource\SwapTexture.cpp">
@@ -590,7 +593,7 @@
     <ClCompile Include="Inc\ImGUI\imgui_widgets.cpp">
       <Filter>Source\ExternalSource\ImGUi</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Core\ConstantBufferManager.cpp">
+    <ClCompile Include="Src\Core\DynamicCBufferManager.cpp">
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="Src\Core\RenderTask.cpp">
@@ -624,6 +627,15 @@
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="Src\Utils\WallpaperHelper.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Core\DynamicCBufferRegion.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Core\Resource\DynamicCBuffer.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Core\Resource\StatiCBuffer.cpp">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>

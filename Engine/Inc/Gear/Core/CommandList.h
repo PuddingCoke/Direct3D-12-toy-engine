@@ -35,7 +35,7 @@ public:
 	void operator=(const CommandList&) = delete;
 
 	CommandList(const D3D12_COMMAND_LIST_TYPE type);
-	
+
 	~CommandList();
 
 	void resourceBarrier(const uint32_t numBarriers, const D3D12_RESOURCE_BARRIER* const pBarriers) const;
@@ -79,7 +79,7 @@ public:
 	void setVertexBuffers(const uint32_t startSlot, const std::initializer_list<VertexBufferDesc>& vertexBuffers);
 
 	void setIndexBuffer(const IndexBufferDesc& indexBuffer);
-	
+
 	void copyBufferRegion(Buffer* const dstBuffer, const uint64_t dstOffset, UploadHeap* srcBuffer, const uint64_t srcOffset, const uint64_t numBytes);
 
 	void copyBufferRegion(Buffer* const dstBuffer, const uint64_t dstOffset, Buffer* srcBuffer, const uint64_t srcOffset, const uint64_t numBytes);
@@ -142,31 +142,32 @@ inline IsCorrectType<T> CommandList::setPipelineResources(const T& descs, const 
 	{
 		if (desc.type == ShaderResourceDesc::BUFFER)
 		{
-			if (desc.state != ShaderResourceDesc::CBV) 
+			Buffer* const buffer = desc.bufferDesc.buffer;
+
+			if (buffer && buffer->getStateTracking())
 			{
-				Buffer* const buffer = desc.bufferDesc.buffer;
+				pushResourceTrackList(buffer);
 
-				if (buffer->getStateTracking())
+				if (desc.state == ShaderResourceDesc::SRV)
 				{
-					pushResourceTrackList(buffer);
+					buffer->setState(targetSRVState);
+				}
+				else if (desc.state == ShaderResourceDesc::UAV)
+				{
+					buffer->setState(D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
 
-					if (desc.state == ShaderResourceDesc::SRV)
+					Buffer* const counterBuffer = desc.bufferDesc.counterBuffer;
+
+					if (counterBuffer)
 					{
-						buffer->setState(targetSRVState);
+						pushResourceTrackList(counterBuffer);
+
+						counterBuffer->setState(D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
 					}
-					else if (desc.state == ShaderResourceDesc::UAV)
-					{
-						buffer->setState(D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
-
-						Buffer* const counterBuffer = desc.bufferDesc.counterBuffer;
-
-						if (counterBuffer)
-						{
-							pushResourceTrackList(counterBuffer);
-
-							counterBuffer->setState(D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
-						}
-					}
+				}
+				else
+				{
+					buffer->setState(D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
 				}
 			}
 		}

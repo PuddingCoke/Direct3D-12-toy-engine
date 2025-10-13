@@ -6,7 +6,7 @@
 
 #include<Gear/Core/PipelineState.h>
 
-#include<Gear/Core/ConstantBufferManager.h>
+#include<Gear/Core/DynamicCBufferManager.h>
 
 #include<Gear/Core/GlobalRootSignature.h>
 
@@ -38,7 +38,7 @@ void RenderEngine::submitCommandList(CommandList* const commandList)
 		helperCommandList->resourceBarrier(static_cast<uint32_t>(barriers.size()), barriers.data());
 	}
 
-	//we should not close prepareCommandList 
+	//should not close prepareCommandList 
 	if (helperCommandList != prepareCommandList)
 	{
 		helperCommandList->close();
@@ -140,7 +140,7 @@ void RenderEngine::end()
 
 		perFrameResource.screenTexelSize = DirectX::XMFLOAT2(1.f / Graphics::getWidth(), 1.f / Graphics::getHeight());
 
-		reservedGlobalConstantBuffer->update(&perFrameResource, sizeof(PerFrameResource));
+		reservedGlobalCBuffer->update(&perFrameResource);
 
 		updateConstantBuffer();
 	}
@@ -170,7 +170,7 @@ void RenderEngine::present() const
 
 void RenderEngine::updateConstantBuffer() const
 {
-	ConstantBufferManager::get()->recordCommands(prepareCommandList);
+	DynamicCBufferManager::get()->recordCommands(prepareCommandList);
 }
 
 GPUVendor RenderEngine::getVendor() const
@@ -419,7 +419,7 @@ RenderEngine::RenderEngine(const uint32_t width, const uint32_t height, const HW
 
 	GlobalRootSignature::instance = new GlobalRootSignature();
 
-	ConstantBufferManager::instance = new ConstantBufferManager();
+	DynamicCBufferManager::instance = new DynamicCBufferManager();
 
 	{
 		DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
@@ -454,9 +454,9 @@ RenderEngine::RenderEngine(const uint32_t width, const uint32_t height, const HW
 
 	prepareCommandList = new CommandList(D3D12_COMMAND_LIST_TYPE_DIRECT);
 
-	reservedGlobalConstantBuffer = ResourceManager::createConstantBuffer(sizeof(PerFrameResource), true);
+	reservedGlobalCBuffer = ResourceManager::createDynamicCBuffer(sizeof(PerFrameResource));
 
-	GraphicsContext::setReservedGlobalConstantBuffer(reservedGlobalConstantBuffer);
+	GraphicsContext::reservedGlobalCBuffer = reservedGlobalCBuffer;
 
 	//make sure beginCommandList is always the first element of recordCommandLists
 	begin();
@@ -545,9 +545,9 @@ RenderEngine::~RenderEngine()
 		delete[] backBufferHandles;
 	}
 
-	if (reservedGlobalConstantBuffer)
+	if (reservedGlobalCBuffer)
 	{
-		delete reservedGlobalConstantBuffer;
+		delete reservedGlobalCBuffer;
 	}
 
 	if (prepareCommandList)
@@ -564,9 +564,9 @@ RenderEngine::~RenderEngine()
 
 	swapChain = nullptr;
 
-	if (ConstantBufferManager::instance)
+	if (DynamicCBufferManager::instance)
 	{
-		delete ConstantBufferManager::instance;
+		delete DynamicCBufferManager::instance;
 	}
 
 	if (GlobalRootSignature::instance)

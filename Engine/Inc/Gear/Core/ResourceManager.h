@@ -7,9 +7,11 @@
 
 #include<Gear/Core/Resource/SwapTexture.h>
 
-#include<Gear/Core/Resource/ConstantBuffer.h>
+#include<Gear/Core/Resource/ImmutableCBuffer.h>
 
-#include<Gear/Core/Resource/IndexConstantBuffer.h>
+#include<Gear/Core/Resource/StaticCBuffer.h>
+
+#include<Gear/Core/Resource/DynamicCbuffer.h>
 
 #include<Gear/Core/Resource/BufferView.h>
 
@@ -60,9 +62,17 @@ public:
 
 	//create high level resource
 
-	ConstantBuffer* createConstantBuffer(const uint32_t size, const bool cpuWritable, const void* const data, const bool persistent);
+	//create immutable constant buffer
+	ImmutableCBuffer* createImmutableCBuffer(const uint32_t size, const void* const data, const bool persistent);
 
-	static ConstantBuffer* createConstantBuffer(const uint32_t size, const bool persistent);
+	//create static constant buffer with data
+	StaticCBuffer* createStaticCBuffer(const uint32_t size, const void* const data, const bool persistent);
+
+	//create static constant buffer without data
+	static StaticCBuffer* createStaticCBuffer(const uint32_t size, const bool persistent);
+
+	//create dynamic constant buffer
+	static DynamicCBuffer* createDynamicCBuffer(const uint32_t size, const void* const data = nullptr);
 
 	BufferView* createTypedBufferView(const DXGI_FORMAT format, const uint64_t size, const bool createSRV, const bool createUAV, const bool createVBV, const bool createIBV, const bool cpuWritable, const bool persistent, const void* const data);
 
@@ -75,10 +85,6 @@ public:
 	BufferView* createByteAddressBufferView(const uint64_t size, const bool createSRV, const bool createUAV, const bool cpuWritable, const bool persistent, const void* const data);
 
 	static BufferView* createByteAddressBufferView(const uint64_t size, const bool createSRV, const bool createUAV, const bool cpuWritable, const bool persistent);
-
-	IndexConstantBuffer* createIndexConstantBuffer(const std::initializer_list<ShaderResourceDesc>& descs, const bool cpuWritable, const bool persistent);
-
-	static IndexConstantBuffer* createIndexConstantBuffer(const uint32_t indicesNum, const bool persistent);
 
 	static TextureDepthView* createTextureDepthView(const uint32_t width, const uint32_t height, const DXGI_FORMAT resFormat, const uint32_t arraySize, const uint32_t mipLevels, const bool isTextureCube, const bool persistent);
 

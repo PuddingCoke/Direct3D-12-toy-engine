@@ -16,17 +16,10 @@ public:
 		pixelShader = new Shader(Utils::getRootFolder() + L"PixelShader.cso");
 
 		{
-			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = PipelineState::getDefaultGraphicsDesc();
-			desc.InputLayout = {};
-			desc.VS = vertexShader->getByteCode();
-			desc.PS = pixelShader->getByteCode();
-			desc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
-			desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
-			desc.DepthStencilState.DepthEnable = FALSE;
-			desc.DepthStencilState.StencilEnable = FALSE;
-			desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = PipelineState::getDefaultFullScreenState();
 			desc.NumRenderTargets = 1;
 			desc.RTVFormats[0] = Graphics::backBufferFormat;
+			desc.PS = pixelShader->getByteCode();
 
 			GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&pipelineState));
 		}

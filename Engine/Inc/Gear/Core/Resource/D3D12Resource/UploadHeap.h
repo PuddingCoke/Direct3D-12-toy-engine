@@ -21,6 +21,10 @@ public:
 
 	virtual ~UploadHeap();
 
+	void* map() const;
+
+	void unmap() const;
+
 	void update(const void* const data, const uint64_t size) const;
 
 	void updateGlobalStates() override;

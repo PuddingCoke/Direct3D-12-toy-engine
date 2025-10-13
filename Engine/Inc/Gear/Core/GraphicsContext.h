@@ -7,9 +7,7 @@
 
 #include<Gear/Core/Resource/BufferView.h>
 
-#include<Gear/Core/Resource/ConstantBuffer.h>
-
-#include<Gear/Core/Resource/IndexConstantBuffer.h>
+#include<Gear/Core/Resource/StaticCBuffer.h>
 
 class GraphicsContext
 {
@@ -18,17 +16,14 @@ public:
 	GraphicsContext(const GraphicsContext&) = delete;
 
 	void operator=(const GraphicsContext&) = delete;
-	
+
 	GraphicsContext();
 
 	~GraphicsContext();
 
 	void updateBuffer(BufferView* const bufferView, const void* const data, const uint32_t size) const;
 
-	//per frame global resources transition immediate
-	void setGlobalConstantBuffer(const IndexConstantBuffer* const indexBuffer) const;
-
-	void setGlobalConstantBuffer(const ConstantBuffer* const constantBuffer) const;
+	void updateBuffer(StaticCBuffer* const staticCBuffer, const void* const data, const uint32_t size) const;
 
 	//4 values availiable
 	void setVSConstants(const std::initializer_list<ShaderResourceDesc>& descs, const uint32_t offset);
@@ -66,32 +61,22 @@ public:
 	//32 values availiable
 	void setCSConstants(const uint32_t numValues, const void* const data, const uint32_t offset) const;
 
-	void setVSConstantBuffer(const IndexConstantBuffer* const constantBuffer);
+	void setGlobalConstantBuffer(const ImmutableCBuffer* const immutableCBuffer);
 
-	void setVSConstantBuffer(const ConstantBuffer* const constantBuffer) const;
+	void setVSConstantBuffer(const ImmutableCBuffer* const immutableCBuffer);
 
-	void setHSConstantBuffer(const IndexConstantBuffer* const constantBuffer);
+	void setHSConstantBuffer(const ImmutableCBuffer* const immutableCBuffer);
 
-	void setHSConstantBuffer(const ConstantBuffer* const constantBuffer) const;
+	void setDSConstantBuffer(const ImmutableCBuffer* const immutableCBuffer);
 
-	void setDSConstantBuffer(const IndexConstantBuffer* const constantBuffer);
+	void setGSConstantBuffer(const ImmutableCBuffer* const immutableCBuffer);
 
-	void setDSConstantBuffer(const ConstantBuffer* const constantBuffer) const;
+	void setPSConstantBuffer(const ImmutableCBuffer* const immutableCBuffer);
 
-	void setGSConstantBuffer(const IndexConstantBuffer* const constantBuffer);
-
-	void setGSConstantBuffer(const ConstantBuffer* const constantBuffer) const;
-
-	void setPSConstantBuffer(const IndexConstantBuffer* const constantBuffer);
-
-	void setPSConstantBuffer(const ConstantBuffer* const constantBuffer) const;
-
-	void setCSConstantBuffer(const IndexConstantBuffer* const constantBuffer);
-
-	void setCSConstantBuffer(const ConstantBuffer* const constantBuffer) const;
+	void setCSConstantBuffer(const ImmutableCBuffer* const immutableCBuffer);
 
 	//must call this method after all resource binding methods
-	void transitionResources() const;
+	void transitionResources();
 
 	void setRenderTargets(const std::initializer_list<RenderTargetDesc>& renderTargets, const DepthStencilDesc* const depthStencils = nullptr) const;
 
@@ -139,13 +124,27 @@ public:
 
 	CommandList* getCommandList() const;
 
-	static void setReservedGlobalConstantBuffer(ConstantBuffer* const buffer);
-
 private:
 
-	static ConstantBuffer* reservedGlobalConstantBuffer;
+	friend class RenderEngine;
+
+	static ImmutableCBuffer* reservedGlobalCBuffer;
+	
+	struct RootConstantBufferDesc
+	{
+		enum Type
+		{
+			GRAPHICS, COMPUTE
+		} type;
+
+		uint32_t rootParameterIndex;
+
+		D3D12_GPU_VIRTUAL_ADDRESS gpuAddress;
+	};
 
 	void getResourceIndicesFromDescs(const std::initializer_list<ShaderResourceDesc>& descs);
+
+	void pushRootConstantBufferDesc(const RootConstantBufferDesc& desc);
 
 	D3D12_VIEWPORT vp;
 
@@ -154,6 +153,8 @@ private:
 	CommandList* const commandList;
 
 	uint32_t resourceIndices[32];
+
+	std::vector<RootConstantBufferDesc> rootConstantBufferDescs;
 
 };
 

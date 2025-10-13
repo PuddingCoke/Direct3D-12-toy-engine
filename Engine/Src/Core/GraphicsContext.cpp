@@ -2,7 +2,7 @@
 
 #include<Gear/Core/GlobalRootSignature.h>
 
-ConstantBuffer* GraphicsContext::reservedGlobalConstantBuffer = nullptr;
+ImmutableCBuffer* GraphicsContext::reservedGlobalCBuffer = nullptr;
 
 GraphicsContext::GraphicsContext() :
 	commandList(new CommandList(D3D12_COMMAND_LIST_TYPE_DIRECT)),
@@ -22,27 +22,16 @@ GraphicsContext::~GraphicsContext()
 
 void GraphicsContext::updateBuffer(BufferView* const bufferView, const void* const data, const uint32_t size) const
 {
-	const BufferView::UpdateStruct updateStruct = bufferView->update(data, size);
+	const BufferView::UpdateStruct updateStruct = bufferView->getUpdateStruct(data, size);
 
 	commandList->copyBufferRegion(updateStruct.buffer, 0, updateStruct.uploadHeap, 0, size);
 }
 
-void GraphicsContext::setGlobalConstantBuffer(const IndexConstantBuffer* const indexBuffer) const
+void GraphicsContext::updateBuffer(StaticCBuffer* const staticCBuffer, const void* const data, const uint32_t size) const
 {
-	commandList->setAllPipelineResources(indexBuffer->getDescs());
+	const StaticCBuffer::UpdateStruct updateStruct = staticCBuffer->getUpdateStruct(data, size);
 
-	transitionResources();
-
-	commandList->get()->SetGraphicsRootConstantBufferView(1, indexBuffer->getGPUAddress());
-
-	commandList->get()->SetComputeRootConstantBufferView(1, indexBuffer->getGPUAddress());
-}
-
-void GraphicsContext::setGlobalConstantBuffer(const ConstantBuffer* const constantBuffer) const
-{
-	commandList->get()->SetGraphicsRootConstantBufferView(1, constantBuffer->getGPUAddress());
-
-	commandList->get()->SetComputeRootConstantBufferView(1, constantBuffer->getGPUAddress());
+	commandList->copyBufferRegion(updateStruct.buffer, 0, updateStruct.uploadHeap, 0, size);
 }
 
 void GraphicsContext::setVSConstants(const std::initializer_list<ShaderResourceDesc>& descs, const uint32_t offset)
@@ -129,82 +118,134 @@ void GraphicsContext::setCSConstants(const uint32_t numValues, const void* const
 	commandList->get()->SetComputeRoot32BitConstants(2, numValues, data, offset);
 }
 
-void GraphicsContext::setVSConstantBuffer(const IndexConstantBuffer* const constantBuffer)
+void GraphicsContext::setGlobalConstantBuffer(const ImmutableCBuffer* const immutableCBuffer)
 {
-	commandList->setGraphicsPipelineResources(constantBuffer->getDescs(), D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
+	Buffer* const buffer = immutableCBuffer->getBuffer();
 
-	setVSConstantBuffer(constantBuffer->getConstantBuffer());
+	if (buffer && buffer->getStateTracking())
+	{
+		commandList->pushResourceTrackList(buffer);
+
+		buffer->setState(D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
+	}
+
+	pushRootConstantBufferDesc({ RootConstantBufferDesc::GRAPHICS,1,immutableCBuffer->getGPUAddress() });
+
+	pushRootConstantBufferDesc({ RootConstantBufferDesc::COMPUTE,1,immutableCBuffer->getGPUAddress() });
 }
 
-void GraphicsContext::setVSConstantBuffer(const ConstantBuffer* const constantBuffer) const
+void GraphicsContext::setVSConstantBuffer(const ImmutableCBuffer* const immutableCBuffer)
 {
-	commandList->get()->SetGraphicsRootConstantBufferView(7, constantBuffer->getGPUAddress());
+	Buffer* const buffer = immutableCBuffer->getBuffer();
+
+	if (buffer && buffer->getStateTracking())
+	{
+		commandList->pushResourceTrackList(buffer);
+
+		buffer->setState(D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
+	}
+
+	pushRootConstantBufferDesc({ RootConstantBufferDesc::GRAPHICS,7,immutableCBuffer->getGPUAddress() });
 }
 
-void GraphicsContext::setHSConstantBuffer(const IndexConstantBuffer* const constantBuffer)
+void GraphicsContext::setHSConstantBuffer(const ImmutableCBuffer* const immutableCBuffer)
 {
-	commandList->setGraphicsPipelineResources(constantBuffer->getDescs(), D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
+	Buffer* const buffer = immutableCBuffer->getBuffer();
 
-	setHSConstantBuffer(constantBuffer->getConstantBuffer());
+	if (buffer && buffer->getStateTracking())
+	{
+		commandList->pushResourceTrackList(buffer);
+
+		buffer->setState(D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
+	}
+
+	pushRootConstantBufferDesc({ RootConstantBufferDesc::GRAPHICS,8,immutableCBuffer->getGPUAddress() });
 }
 
-void GraphicsContext::setHSConstantBuffer(const ConstantBuffer* const constantBuffer) const
+void GraphicsContext::setDSConstantBuffer(const ImmutableCBuffer* const immutableCBuffer)
 {
-	commandList->get()->SetGraphicsRootConstantBufferView(8, constantBuffer->getGPUAddress());
+	Buffer* const buffer = immutableCBuffer->getBuffer();
+
+	if (buffer && buffer->getStateTracking())
+	{
+		commandList->pushResourceTrackList(buffer);
+
+		buffer->setState(D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
+	}
+
+	pushRootConstantBufferDesc({ RootConstantBufferDesc::GRAPHICS,9,immutableCBuffer->getGPUAddress() });
 }
 
-void GraphicsContext::setDSConstantBuffer(const IndexConstantBuffer* const constantBuffer)
+void GraphicsContext::setGSConstantBuffer(const ImmutableCBuffer* const immutableCBuffer)
 {
-	commandList->setGraphicsPipelineResources(constantBuffer->getDescs(), D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
+	Buffer* const buffer = immutableCBuffer->getBuffer();
 
-	setDSConstantBuffer(constantBuffer->getConstantBuffer());
+	if (buffer && buffer->getStateTracking())
+	{
+		commandList->pushResourceTrackList(buffer);
+
+		buffer->setState(D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
+	}
+
+	pushRootConstantBufferDesc({ RootConstantBufferDesc::GRAPHICS,10,immutableCBuffer->getGPUAddress() });
 }
 
-void GraphicsContext::setDSConstantBuffer(const ConstantBuffer* const constantBuffer) const
+void GraphicsContext::setPSConstantBuffer(const ImmutableCBuffer* const immutableCBuffer)
 {
-	commandList->get()->SetGraphicsRootConstantBufferView(9, constantBuffer->getGPUAddress());
+	Buffer* const buffer = immutableCBuffer->getBuffer();
+
+	if (buffer && buffer->getStateTracking())
+	{
+		commandList->pushResourceTrackList(buffer);
+
+		buffer->setState(D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
+	}
+
+	pushRootConstantBufferDesc({ RootConstantBufferDesc::GRAPHICS,11,immutableCBuffer->getGPUAddress() });
 }
 
-void GraphicsContext::setGSConstantBuffer(const IndexConstantBuffer* const constantBuffer)
+void GraphicsContext::setCSConstantBuffer(const ImmutableCBuffer* const immutableCBuffer)
 {
-	commandList->setGraphicsPipelineResources(constantBuffer->getDescs(), D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
+	Buffer* const buffer = immutableCBuffer->getBuffer();
 
-	setGSConstantBuffer(constantBuffer->getConstantBuffer());
+	if (buffer && buffer->getStateTracking())
+	{
+		commandList->pushResourceTrackList(buffer);
+
+		buffer->setState(D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
+	}
+
+	pushRootConstantBufferDesc({ RootConstantBufferDesc::COMPUTE,3,immutableCBuffer->getGPUAddress() });
 }
 
-void GraphicsContext::setGSConstantBuffer(const ConstantBuffer* const constantBuffer) const
-{
-	commandList->get()->SetGraphicsRootConstantBufferView(10, constantBuffer->getGPUAddress());
-}
-
-void GraphicsContext::setPSConstantBuffer(const IndexConstantBuffer* const constantBuffer)
-{
-	commandList->setGraphicsPipelineResources(constantBuffer->getDescs(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
-
-	setPSConstantBuffer(constantBuffer->getConstantBuffer());
-}
-
-void GraphicsContext::setPSConstantBuffer(const ConstantBuffer* const constantBuffer) const
-{
-	commandList->get()->SetGraphicsRootConstantBufferView(11, constantBuffer->getGPUAddress());
-}
-
-void GraphicsContext::setCSConstantBuffer(const IndexConstantBuffer* const constantBuffer)
-{
-	commandList->setComputePipelineResources(constantBuffer->getDescs());
-
-	setCSConstantBuffer(constantBuffer->getConstantBuffer());
-}
-
-void GraphicsContext::setCSConstantBuffer(const ConstantBuffer* const constantBuffer) const
-{
-	commandList->get()->SetComputeRootConstantBufferView(3, constantBuffer->getGPUAddress());
-}
-
-
-void GraphicsContext::transitionResources() const
+void GraphicsContext::transitionResources()
 {
 	commandList->transitionResources();
+
+	if (rootConstantBufferDescs.size())
+	{
+		for (uint32_t i = 0; i < rootConstantBufferDescs.size(); i++)
+		{
+			if (rootConstantBufferDescs[i].type == RootConstantBufferDesc::GRAPHICS)
+			{
+				const uint32_t rootParameterIndex = rootConstantBufferDescs[i].rootParameterIndex;
+
+				const D3D12_GPU_VIRTUAL_ADDRESS gpuAddress = rootConstantBufferDescs[i].gpuAddress;
+
+				commandList->get()->SetGraphicsRootConstantBufferView(rootParameterIndex, gpuAddress);
+			}
+			else
+			{
+				const uint32_t rootParameterIndex = rootConstantBufferDescs[i].rootParameterIndex;
+
+				const D3D12_GPU_VIRTUAL_ADDRESS gpuAddress = rootConstantBufferDescs[i].gpuAddress;
+
+				commandList->get()->SetComputeRootConstantBufferView(rootParameterIndex, gpuAddress);
+			}
+		}
+
+		rootConstantBufferDescs.clear();
+	}
 }
 
 void GraphicsContext::setRenderTargets(const std::initializer_list<RenderTargetDesc>& renderTargets, const DepthStencilDesc* const depthStencils) const
@@ -332,19 +373,14 @@ void GraphicsContext::begin() const
 
 	commandList->setComputeRootSignature(GlobalRootSignature::getComputeRootSignature());
 
-	commandList->get()->SetGraphicsRootConstantBufferView(0, reservedGlobalConstantBuffer->getGPUAddress());
+	commandList->get()->SetGraphicsRootConstantBufferView(0, reservedGlobalCBuffer->getGPUAddress());
 
-	commandList->get()->SetComputeRootConstantBufferView(0, reservedGlobalConstantBuffer->getGPUAddress());
+	commandList->get()->SetComputeRootConstantBufferView(0, reservedGlobalCBuffer->getGPUAddress());
 }
 
 CommandList* GraphicsContext::getCommandList() const
 {
 	return commandList;
-}
-
-void GraphicsContext::setReservedGlobalConstantBuffer(ConstantBuffer* const buffer)
-{
-	reservedGlobalConstantBuffer = buffer;
 }
 
 void GraphicsContext::getResourceIndicesFromDescs(const std::initializer_list<ShaderResourceDesc>& descs)
@@ -354,4 +390,9 @@ void GraphicsContext::getResourceIndicesFromDescs(const std::initializer_list<Sh
 		{
 			return desc.resourceIndex;
 		});
+}
+
+void GraphicsContext::pushRootConstantBufferDesc(const RootConstantBufferDesc& desc)
+{
+	rootConstantBufferDescs.emplace_back(desc);
 }

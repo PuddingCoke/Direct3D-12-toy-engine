@@ -43,7 +43,7 @@ public:
 
 private:
 
-	void updateCurve(const uint32_t index);
+	void updateCurve(GraphicsContext* const context, const uint32_t index);
 
 	Shader* bloomFilter;
 
@@ -79,7 +79,7 @@ private:
 
 	TextureRenderView* filteredTexture;
 
-	ConstantBuffer* blurParamBuffer[blurSteps];
+	StaticCBuffer* blurParamBuffer[blurSteps];
 
 	struct BloomParam
 	{

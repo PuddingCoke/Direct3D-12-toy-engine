@@ -94,7 +94,7 @@ public:
 			inputTexture->getTexture() });
 	}
 
-	void calculateInitialSpectrum(ConstantBuffer* const spectrumParamBuffer)
+	void calculateInitialSpectrum(ImmutableCBuffer* const spectrumParamBuffer)
 	{
 		context->setPipelineState(spectrumState);
 

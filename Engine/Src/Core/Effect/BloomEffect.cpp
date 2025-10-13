@@ -47,9 +47,13 @@ BloomEffect::BloomEffect(GraphicsContext* const context, const uint32_t width, c
 			blurParam[i].iteration = iteration[i];
 			blurParam[i].sigma = sigma[i];
 
-			blurParamBuffer[i] = ResourceManager::createConstantBuffer(sizeof(BlurParam), true);
+			blurParamBuffer[i] = ResourceManager::createStaticCBuffer(sizeof(BlurParam), true);
 
-			updateCurve(i);
+			const std::wstring name = L"Blur Param Buffer ";
+
+			blurParamBuffer[i]->getBuffer()->setName((name + std::to_wstring(i)).c_str());
+
+			updateCurve(resManager->getGraphicsContext(), i);
 		}
 	}
 
@@ -288,7 +292,7 @@ float BloomEffect::getGamma() const
 	return bloomParam.gamma;
 }
 
-void BloomEffect::updateCurve(const uint32_t index)
+void BloomEffect::updateCurve(GraphicsContext* const context, const uint32_t index)
 {
 	blurParam[index].weight[0] = Math::gauss(blurParam[index].sigma, 0.f);
 
@@ -300,5 +304,5 @@ void BloomEffect::updateCurve(const uint32_t index)
 		blurParam[index].offset[(i + 1) / 2] = (g1 * i + g2 * (i + 1)) / (g1 + g2);
 	}
 
-	blurParamBuffer[index]->update(&blurParam[index], sizeof(BlurParam));
+	context->updateBuffer(blurParamBuffer[index], &blurParam[index], sizeof(BlurParam));
 }

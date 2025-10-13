@@ -38,7 +38,7 @@ public:
 	{
 		Buffer* const buffer;
 		UploadHeap* const uploadHeap;
-	}update(const void* const data, const uint64_t size);
+	}getUpdateStruct(const void* const data, const uint64_t size);
 
 	const bool hasSRV;
 

@@ -135,8 +135,6 @@ void Gear::release()
 
 void Gear::runRealTimeRender()
 {
-	RenderEngine::get()->setDeltaTime(0.0001f);
-
 	while (Win32Form::get()->pollEvents())
 	{
 		const std::chrono::high_resolution_clock::time_point startPoint = std::chrono::high_resolution_clock::now();
@@ -303,8 +301,6 @@ void Gear::runVideoRender()
 
 void Gear::runWallpaper()
 {
-	RenderEngine::get()->setDeltaTime(0.0001f);
-
 	while (Win32Form::get()->pollEvents())
 	{
 		const std::chrono::high_resolution_clock::time_point startPoint = std::chrono::high_resolution_clock::now();

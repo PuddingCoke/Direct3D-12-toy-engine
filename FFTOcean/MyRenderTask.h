@@ -19,8 +19,8 @@ public:
 	MyRenderTask(FPSCamera* const camera) :
 		vertices((gridSize + 1)* (gridSize + 1)),
 		camera(camera),
-		renderParamBuffer(ResourceManager::createConstantBuffer(sizeof(RenderParam), true)),
-		spectrumParamBuffer{ ResourceManager::createConstantBuffer(sizeof(SpectrumParam), true),ResourceManager::createConstantBuffer(sizeof(SpectrumParam), true),ResourceManager::createConstantBuffer(sizeof(SpectrumParam), true) },
+		renderParamBuffer(ResourceManager::createDynamicCBuffer(sizeof(RenderParam))),
+		spectrumParamBuffer{ ResourceManager::createStaticCBuffer(sizeof(SpectrumParam), true),ResourceManager::createStaticCBuffer(sizeof(SpectrumParam), true),ResourceManager::createStaticCBuffer(sizeof(SpectrumParam), true) },
 		cascade{ new WaveCascade(textureResolution,context),new WaveCascade(textureResolution,context),new WaveCascade(textureResolution,context) },
 		textureCubePS(new Shader(Utils::getRootFolder() + L"TextureCubePS.cso")),
 		gridDebugVS(new Shader(Utils::getRootFolder() + L"GridDebugVS.cso")),
@@ -179,6 +179,8 @@ public:
 
 		enviromentCube = resManager->createTextureCube(L"E:/Assets/Ocean/autumn_field_puresky_4k.exr", 1024, true);
 
+		enviromentCube->getTexture()->setName(L"Enviroment Cube");
+
 		calculateInitialSpectrum();
 
 		tempTexture->getTexture()->setName(L"tempTexture");
@@ -333,7 +335,7 @@ private:
 
 		for (UINT i = 0; i < cascadeNum; i++)
 		{
-			spectrumParamBuffer[i]->update(&spectrumParam[i], sizeof(SpectrumParam));
+			context->updateBuffer(spectrumParamBuffer[i], &spectrumParam[i], sizeof(SpectrumParam));
 
 			cascade[i]->calculateInitialSpectrum(spectrumParamBuffer[i]);
 		}
@@ -371,7 +373,7 @@ private:
 
 		context->drawIndexed(indices.size(), 1, 0, 0, 0);*/
 
-		renderParamBuffer->update(&renderParam, sizeof(RenderParam));
+		renderParamBuffer->update(&renderParam);
 
 		context->setPipelineState(textureCubeState.Get());
 
@@ -781,9 +783,9 @@ private:
 
 	BloomEffect* effect;
 
-	ConstantBuffer* renderParamBuffer;
+	DynamicCBuffer* renderParamBuffer;
 
-	ConstantBuffer* spectrumParamBuffer[cascadeNum];
+	StaticCBuffer* spectrumParamBuffer[cascadeNum];
 
 	WaveCascade* cascade[cascadeNum];
 

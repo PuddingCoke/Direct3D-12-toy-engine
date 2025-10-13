@@ -284,40 +284,45 @@ Texture* ResourceManager::createTexture(const uint32_t width, const uint32_t hei
 	return texture;
 }
 
-ConstantBuffer* ResourceManager::createConstantBuffer(const uint32_t size, const bool cpuWritable, const void* const data, const bool persistent)
+ImmutableCBuffer* ResourceManager::createImmutableCBuffer(const uint32_t size, const void* const data, const bool persistent)
 {
-	ConstantBuffer* constantBuffer = nullptr;
+	Buffer* const buffer = createBuffer(data, size, D3D12_RESOURCE_FLAG_NONE);
 
-	if (!cpuWritable)
-	{
-		Buffer* buffer = createBuffer(data, size, D3D12_RESOURCE_FLAG_NONE);
+	commandList->pushResourceTrackList(buffer);
 
-		commandList->pushResourceTrackList(buffer);
+	buffer->setState(D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
 
-		buffer->setState(D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
+	commandList->transitionResources();
 
-		commandList->transitionResources();
+	buffer->setStateTracking(false);
 
-		buffer->setStateTracking(false);
-
-		constantBuffer = new ConstantBuffer(buffer, size, persistent);
-	}
-	else
-	{
-		constantBuffer = new ConstantBuffer(nullptr, size, persistent);
-
-		if (data)
-		{
-			constantBuffer->update(data, size);
-		}
-	}
-
-	return constantBuffer;
+	return new ImmutableCBuffer(buffer, size, persistent);
 }
 
-ConstantBuffer* ResourceManager::createConstantBuffer(const uint32_t size, const bool persistent)
+StaticCBuffer* ResourceManager::createStaticCBuffer(const uint32_t size, const void* const data, const bool persistent)
 {
-	return new ConstantBuffer(nullptr, size, persistent);
+	Buffer* const buffer = createBuffer(data, size, D3D12_RESOURCE_FLAG_NONE);
+
+	return new StaticCBuffer(buffer, size, persistent);
+}
+
+StaticCBuffer* ResourceManager::createStaticCBuffer(const uint32_t size, const bool persistent)
+{
+	Buffer* const buffer = new Buffer(size, true, D3D12_RESOURCE_FLAG_NONE, D3D12_RESOURCE_STATE_COPY_DEST);
+
+	return new StaticCBuffer(buffer, size, persistent);
+}
+
+DynamicCBuffer* ResourceManager::createDynamicCBuffer(const uint32_t size, const void* const data)
+{
+	DynamicCBuffer* const buffer = new DynamicCBuffer(size);
+
+	if (data)
+	{
+		buffer->update(data);
+	}
+
+	return buffer;
 }
 
 BufferView* ResourceManager::createTypedBufferView(const DXGI_FORMAT format, const uint64_t size, const bool createSRV, const bool createUAV, const bool createVBV, const bool createIBV, const bool cpuWritable, const bool persistent, const void* const data)
@@ -481,37 +486,6 @@ BufferView* ResourceManager::createByteAddressBufferView(const uint64_t size, co
 	Buffer* const buffer = new Buffer(size, true, resFlags);
 
 	return new BufferView(buffer, 0, DXGI_FORMAT_UNKNOWN, size, createSRV, createUAV, false, false, cpuWritable, persistent);
-}
-
-IndexConstantBuffer* ResourceManager::createIndexConstantBuffer(const std::initializer_list<ShaderResourceDesc>& descs, const bool cpuWritable, const bool persistent)
-{
-	const uint32_t alignedIndicesNum = ((descs.size() + 63) & ~63);
-
-	std::vector<uint32_t> indices = std::vector<uint32_t>(alignedIndicesNum);
-
-	{
-		uint32_t index = 0;
-
-		for (const ShaderResourceDesc& desc : descs)
-		{
-			indices[index] = desc.resourceIndex;
-
-			index++;
-		}
-	}
-
-	ConstantBuffer* constantBuffer = createConstantBuffer(sizeof(uint32_t) * alignedIndicesNum, cpuWritable, indices.data(), persistent);
-
-	return new IndexConstantBuffer(constantBuffer, descs);
-}
-
-IndexConstantBuffer* ResourceManager::createIndexConstantBuffer(const uint32_t indicesNum, const bool persistent)
-{
-	const uint32_t alignedIndicesNum = ((indicesNum + 63) & ~63);
-
-	ConstantBuffer* constantBuffer = createConstantBuffer(alignedIndicesNum * sizeof(uint32_t), persistent);
-
-	return new IndexConstantBuffer(constantBuffer);
 }
 
 TextureDepthView* ResourceManager::createTextureDepthView(const uint32_t width, const uint32_t height, const DXGI_FORMAT resFormat, const uint32_t arraySize, const uint32_t mipLevels, const bool isTextureCube, const bool persistent)
