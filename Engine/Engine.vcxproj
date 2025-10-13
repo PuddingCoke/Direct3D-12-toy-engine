@@ -162,11 +162,14 @@
     <ClInclude Include="Inc\D3D12Headers\dxgiformat.h" />
     <ClInclude Include="Inc\DirectXTex\DDSTextureLoader12.h" />
     <ClInclude Include="Inc\Gear\Camera\OrbitCamera.h" />
-    <ClInclude Include="Inc\Gear\Core\ConstantBufferManager.h" />
+    <ClInclude Include="Inc\Gear\Core\DynamicCBufferManager.h" />
+    <ClInclude Include="Inc\Gear\Core\DynamicCBufferRegion.h" />
     <ClInclude Include="Inc\Gear\Core\Effect\FXAAEffect.h" />
     <ClInclude Include="Inc\Gear\Core\Raytracing\BottomLevelAS.h" />
     <ClInclude Include="Inc\Gear\Core\Raytracing\TopLevelAS.h" />
     <ClInclude Include="Inc\Gear\Core\RenderTask.h" />
+    <ClInclude Include="Inc\Gear\Core\Resource\DynamicCBuffer.h" />
+    <ClInclude Include="Inc\Gear\Core\Resource\StaticCBuffer.h" />
     <ClInclude Include="Inc\Gear\Core\StaticEffect\BackBufferBlitEffect.h" />
     <ClInclude Include="Inc\Gear\Core\StaticEffect\HDRClampEffect.h" />
     <ClInclude Include="Inc\Gear\Core\StaticEffect\LatLongMapToCubeMapEffect.h" />
@@ -211,9 +214,8 @@
     <ClInclude Include="Inc\Gear\Core\PipelineState.h" />
     <ClInclude Include="Inc\Gear\Core\RenderEngine.h" />
     <ClInclude Include="Inc\Gear\Core\ResourceManager.h" />
-    <ClInclude Include="Inc\Gear\Core\Resource\ConstantBuffer.h" />
+    <ClInclude Include="Inc\Gear\Core\Resource\ImmutableCBuffer.h" />
     <ClInclude Include="Inc\Gear\Core\Resource\EngineResource.h" />
-    <ClInclude Include="Inc\Gear\Core\Resource\IndexConstantBuffer.h" />
     <ClInclude Include="Inc\Gear\Core\Resource\TextureDepthView.h" />
     <ClInclude Include="Inc\Gear\Core\Resource\TextureRenderView.h" />
     <ClInclude Include="Inc\Gear\Core\RootSignature.h" />
@@ -237,6 +239,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Inc\DirectXTex\DDSTextureLoader12.cpp" />
+    <ClCompile Include="Src\Core\DynamicCBufferRegion.cpp" />
+    <ClCompile Include="Src\Core\Resource\DynamicCBuffer.cpp" />
+    <ClCompile Include="Src\Core\Resource\StatiCBuffer.cpp" />
     <ClCompile Include="Src\Core\StaticEffect\BackBufferBlitEffect.cpp" />
     <ClCompile Include="Src\Core\StaticEffect\LatLongMapToCubeMapEffect.cpp" />
     <ClCompile Include="Inc\ImGUI\imgui.cpp" />
@@ -250,7 +255,7 @@
     <ClCompile Include="Src\Camera\FPSCamera.cpp" />
     <ClCompile Include="Src\Camera\OrbitCamera.cpp" />
     <ClCompile Include="Src\Core\Camera.cpp" />
-    <ClCompile Include="Src\Core\ConstantBufferManager.cpp" />
+    <ClCompile Include="Src\Core\DynamicCBufferManager.cpp" />
     <ClCompile Include="Src\Core\Effect\FXAAEffect.cpp" />
     <ClCompile Include="Src\Core\Raytracing\BottomLevelAS.cpp" />
     <ClCompile Include="Src\Core\Raytracing\TopLevelAS.cpp" />
@@ -279,10 +284,9 @@
     <ClCompile Include="Src\Core\GraphicsDevice.cpp" />
     <ClCompile Include="Src\Core\ResourceManager.cpp" />
     <ClCompile Include="Src\Core\Resource\BufferView.cpp" />
-    <ClCompile Include="Src\Core\Resource\ConstantBuffer.cpp" />
+    <ClCompile Include="Src\Core\Resource\ImmutableCBuffer.cpp" />
     <ClCompile Include="Src\Core\Resource\CounterBufferView.cpp" />
     <ClCompile Include="Src\Core\Resource\EngineResource.cpp" />
-    <ClCompile Include="Src\Core\Resource\IndexConstantBuffer.cpp" />
     <ClCompile Include="Src\Core\Resource\SwapTexture.cpp" />
     <ClCompile Include="Src\Core\Resource\TextureDepthView.cpp" />
     <ClCompile Include="Src\Core\Resource\TextureRenderView.cpp" />

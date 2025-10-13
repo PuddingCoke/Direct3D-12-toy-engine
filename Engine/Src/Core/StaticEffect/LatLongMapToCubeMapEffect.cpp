@@ -109,7 +109,9 @@ LatLongMapToCubeMapEffect::LatLongMapToCubeMapEffect(ResourceManager* const resM
 			}
 		}
 
-		matricesBuffer = resManager->createConstantBuffer(sizeof(Matrices), false, &matrices, false);
+		matricesBuffer = resManager->createImmutableCBuffer(sizeof(Matrices), &matrices, false);
+
+		matricesBuffer->getBuffer()->setName(L"LatLongMap To Cubemap Matrices");
 	}
 
 	LOGSUCCESS(L"create", LogColor::brightMagenta, L"LatLongMapToCubeMapEffect", LogColor::defaultColor, L"succeeded");

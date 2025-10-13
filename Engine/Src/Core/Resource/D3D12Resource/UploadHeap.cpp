@@ -14,13 +14,24 @@ UploadHeap::~UploadHeap()
 {
 }
 
-void UploadHeap::update(const void* const data, const uint64_t size) const
+void* UploadHeap::map() const
 {
 	const CD3DX12_RANGE readRange(0, 0);
 	void* dataPtr = nullptr;
 	getResource()->Map(0, &readRange, &dataPtr);
-	memcpy(dataPtr, data, size);
+	return dataPtr;
+}
+
+void UploadHeap::unmap() const
+{
 	getResource()->Unmap(0, nullptr);
+}
+
+void UploadHeap::update(const void* const data, const uint64_t size) const
+{
+	void* const dataPtr = map();
+	memcpy(dataPtr, data, size);
+	unmap();
 }
 
 void UploadHeap::updateGlobalStates()

@@ -261,7 +261,7 @@ void BufferView::copyDescriptors()
 	}
 }
 
-BufferView::UpdateStruct BufferView::update(const void* const data, const uint64_t size)
+BufferView::UpdateStruct BufferView::getUpdateStruct(const void* const data, const uint64_t size)
 {
 	uploadHeaps[Graphics::getFrameIndex()]->update(data, size);
 

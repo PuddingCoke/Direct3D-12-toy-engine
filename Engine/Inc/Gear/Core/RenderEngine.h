@@ -7,9 +7,9 @@
 
 #include<Gear/Core/Camera.h>
 
-#include<Gear/Core/Resource/ConstantBuffer.h>
-
 #include<Gear/Core/Resource/D3D12Resource/ReadbackHeap.h>
+
+#include<Gear/Core/ResourceManager.h>
 
 #include<ImGUI/imgui.h>
 
@@ -119,7 +119,7 @@ private:
 
 	int32_t syncInterval;
 
-	ConstantBuffer* reservedGlobalConstantBuffer;
+	DynamicCBuffer* reservedGlobalCBuffer;
 
 	struct PerFrameResource
 	{

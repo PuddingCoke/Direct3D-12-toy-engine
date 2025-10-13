@@ -38,7 +38,7 @@ private:
 
 	ComPtr<ID3D12PipelineState> equirectangularR32State;
 
-	ConstantBuffer* matricesBuffer;
+	ImmutableCBuffer* matricesBuffer;
 
 };
 

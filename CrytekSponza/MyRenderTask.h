@@ -30,7 +30,7 @@ public:
 		distanceCube(ResourceManager::createTextureRenderView(probeCaptureResolution, probeCaptureResolution, DXGI_FORMAT_R32_FLOAT, 6, 1, true, true,
 			DXGI_FORMAT_R32_FLOAT, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_R32_FLOAT, distanceCubeClearColor)),
 		depthCube(ResourceManager::createTextureDepthView(probeCaptureResolution, probeCaptureResolution, DXGI_FORMAT_D32_FLOAT, 6, 1, true, true)),
-		irradianceVolumeBuffer(ResourceManager::createConstantBuffer(sizeof(IrradianceVolume), true)),
+		irradianceVolumeBuffer(ResourceManager::createStaticCBuffer(sizeof(IrradianceVolume), true)),
 		shadowVS(new Shader(Utils::getRootFolder() + L"ShadowVS.cso")),
 		deferredVShader(new Shader(Utils::getRootFolder() + L"DeferredVShader.cso")),
 		deferredPShader(new Shader(Utils::getRootFolder() + L"DeferredPShader.cso")),
@@ -209,7 +209,7 @@ public:
 						cubeRenderParam.probeLocation = location;
 						cubeRenderParam.probeIndex = probeIndex;
 
-						cubeRenderParamBuffer[probeIndex] = resManager->createConstantBuffer(sizeof(CubeRenderParam), false, &cubeRenderParam, true);
+						cubeRenderParamBuffer[probeIndex] = resManager->createImmutableCBuffer(sizeof(CubeRenderParam), &cubeRenderParam, true);
 					}
 				}
 			}
@@ -290,15 +290,6 @@ protected:
 
 	void updateLightField()
 	{
-		updateShadow();
-
-		irradianceVolumeBuffer->update(&irradianceVolume, sizeof(IrradianceVolume));
-
-		updateLightProbe();
-	}
-
-	void updateShadow()
-	{
 		const float xSize = 183;
 		const float ySize = 130;
 		const float distance = 260.f;
@@ -317,6 +308,15 @@ protected:
 
 		irradianceVolume.lightViewProj = lightMat;
 
+		context->updateBuffer(irradianceVolumeBuffer, &irradianceVolume, sizeof(IrradianceVolume));
+
+		updateShadow();
+
+		updateLightProbe();
+	}
+
+	void updateShadow()
+	{
 		const DepthStencilDesc dsDesc = shadowTexture->getDSVMipHandle(0);
 
 		context->setRenderTargets({}, &dsDesc);
@@ -347,7 +347,7 @@ protected:
 		}
 	}
 
-	void renderCubeAt(const ConstantBuffer* const cubeRenderBuffer)
+	void renderCubeAt(const ImmutableCBuffer* const cubeRenderBuffer)
 	{
 		context->setViewport(probeCaptureResolution, probeCaptureResolution);
 
@@ -407,7 +407,7 @@ protected:
 		context->uavBarrier({ depthOctahedralMap->getTexture() });
 	}
 
-	void renderCubeBounceAt(const ConstantBuffer* const cubeRenderBuffer)
+	void renderCubeBounceAt(const ImmutableCBuffer* const cubeRenderBuffer)
 	{
 		context->setViewport(probeCaptureResolution, probeCaptureResolution);
 
@@ -567,9 +567,9 @@ protected:
 		DirectX::XMFLOAT4 padding1[7];
 	} irradianceVolume;
 
-	ConstantBuffer* irradianceVolumeBuffer;
+	StaticCBuffer* irradianceVolumeBuffer;
 
-	ConstantBuffer* cubeRenderParamBuffer[probeCount];
+	ImmutableCBuffer* cubeRenderParamBuffer[probeCount];
 
 	float sunAngle;
 

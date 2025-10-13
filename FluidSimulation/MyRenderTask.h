@@ -68,7 +68,7 @@ public:
 		edgeHighlightTexture = ResourceManager::createTextureRenderView(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R8G8B8A8_UNORM, 1, 1, false, true,
 			DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_UNKNOWN);
 
-		simulationParamBuffer = ResourceManager::createConstantBuffer(sizeof(SimulationParam), true);
+		simulationParamBuffer = ResourceManager::createDynamicCBuffer(sizeof(SimulationParam));
 
 		simulationParam.colorTexelSize = DirectX::XMFLOAT2(1.f / Graphics::getWidth(), 1.f / Graphics::getHeight());
 
@@ -341,7 +341,7 @@ public:
 
 		simulationParam.bumpScale = 1.f / config.bumpScale;
 
-		simulationParamBuffer->update(&simulationParam, sizeof(SimulationParam));
+		simulationParamBuffer->update(&simulationParam);
 
 		context->setGlobalConstantBuffer(simulationParamBuffer);
 
@@ -446,7 +446,7 @@ private:
 
 	int kDownEventID;
 
-	ConstantBuffer* simulationParamBuffer;
+	DynamicCBuffer* simulationParamBuffer;
 
 	Timer colorUpdateTimer;
 
