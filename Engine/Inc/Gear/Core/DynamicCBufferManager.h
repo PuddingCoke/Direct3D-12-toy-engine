@@ -9,9 +9,6 @@
 
 #include"DynamicCBufferRegion.h"
 
-//create a large buffer and divide it into 256bytes 512bytes 1024bytes ...... aligned regions
-//1024bytes can hold 16 matrices or 64 float4 this is enough for most case(maybe?)
-//and also for each frame we need to allocate an uploadheap
 class DynamicCBufferManager
 {
 public:
@@ -24,11 +21,11 @@ public:
 
 	~DynamicCBufferManager();
 
-	//256bytes 512bytes 1024bytes ......
-	static constexpr uint32_t numRegion = 3;
-
 	//define number of each region's subregion
-	static constexpr uint32_t numSubRegion[numRegion] = { 1024,512,512 };
+	//256bytes 512bytes 1024bytes .....
+	static constexpr uint32_t numSubRegion[] = { 2048,1024 };
+
+	static constexpr uint32_t numRegion = sizeof(numSubRegion) / sizeof(uint32_t);
 
 	struct AvailableDescriptor
 	{
@@ -52,8 +49,10 @@ private:
 
 	DynamicCBufferRegion** bufferRegions;
 
-	//constantBufferAddress = bufferGPULocation + baseAddressOffsets[regionIndex] + (256 << regionIndex) * subregionIndex
-	uint32_t baseAddressOffsets[numRegion];
+	uint64_t dstOffset[numRegion];
+
+	//constantBufferAddress = baseAddressOffsets[regionIndex] + (256 << regionIndex) * subregionIndex
+	uint64_t baseAddressOffsets[numRegion];
 
 	//descriptorIndex = baseDescriptorIndices[regionIndex] + subregionIndex 
 	uint32_t baseDescriptorIndices[numRegion];

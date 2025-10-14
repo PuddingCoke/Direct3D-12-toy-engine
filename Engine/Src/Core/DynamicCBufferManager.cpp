@@ -14,7 +14,9 @@ DynamicCBufferManager::DynamicCBufferManager()
 
 		for (uint32_t regionIndex = 0; regionIndex < numRegion; regionIndex++)
 		{
-			requiredSize += (256 << regionIndex) * numSubRegion[regionIndex];
+			dstOffset[regionIndex] = requiredSize;
+
+			requiredSize += (256u << regionIndex) * numSubRegion[regionIndex];
 		}
 
 		buffer = new Buffer(requiredSize, true, D3D12_RESOURCE_FLAG_NONE);
@@ -30,7 +32,7 @@ DynamicCBufferManager::DynamicCBufferManager()
 
 		for (uint32_t regionIndex = 0; regionIndex < numRegion; regionIndex++)
 		{
-			bufferRegions[regionIndex] = new DynamicCBufferRegion(256 << regionIndex, numSubRegion[regionIndex]);
+			bufferRegions[regionIndex] = new DynamicCBufferRegion(256u << regionIndex, numSubRegion[regionIndex]);
 		}
 	}
 
@@ -38,16 +40,14 @@ DynamicCBufferManager::DynamicCBufferManager()
 	{
 		uint32_t requiredDescriptorNum = 0;
 
+		for (uint32_t regionIndex = 0; regionIndex < numRegion; regionIndex++)
 		{
-			for (uint32_t regionIndex = 0; regionIndex < numRegion; regionIndex++)
-			{
-				requiredDescriptorNum += numSubRegion[regionIndex];
-			}
+			requiredDescriptorNum += numSubRegion[regionIndex];
 		}
 
 		DescriptorHandle descriptorHandle = GlobalDescriptorHeap::getResourceHeap()->allocStaticDescriptor(requiredDescriptorNum);
 
-		uint32_t bufferLocationOffset = 0;
+		uint64_t bufferLocationOffset = buffer->getGPUAddress();
 
 		for (uint32_t regionIndex = 0; regionIndex < numRegion; regionIndex++)
 		{
@@ -58,10 +58,10 @@ DynamicCBufferManager::DynamicCBufferManager()
 			for (uint32_t subregionIndex = 0; subregionIndex < numSubRegion[regionIndex]; subregionIndex++)
 			{
 				D3D12_CONSTANT_BUFFER_VIEW_DESC desc = {};
-				desc.BufferLocation = buffer->getGPUAddress() + bufferLocationOffset;
-				desc.SizeInBytes = (256 << regionIndex);
+				desc.BufferLocation = bufferLocationOffset;
+				desc.SizeInBytes = (256u << regionIndex);
 
-				bufferLocationOffset += (256 << regionIndex);
+				bufferLocationOffset += (256u << regionIndex);
 
 				GraphicsDevice::get()->CreateConstantBufferView(&desc, descriptorHandle.getCPUHandle());
 
@@ -97,7 +97,7 @@ DynamicCBufferManager::AvailableDescriptor DynamicCBufferManager::requestDescrip
 	const uint32_t subregionIndex = bufferRegions[regionIndex]->update(data);
 
 	const DynamicCBufferManager::AvailableDescriptor descriptor = {
-		buffer->getGPUAddress() + baseAddressOffsets[regionIndex] + (256 << regionIndex) * subregionIndex,
+		baseAddressOffsets[regionIndex] + (256u << regionIndex) * subregionIndex,
 		baseDescriptorIndices[regionIndex] + subregionIndex
 	};
 
@@ -121,9 +121,7 @@ void DynamicCBufferManager::recordCommands(CommandList* const commandList)
 	{
 		if (bufferRegions[regionIndex]->getUpdateSize())
 		{
-			const uint64_t dstOffset = baseAddressOffsets[regionIndex];
-
-			commandList->get()->CopyBufferRegion(buffer->getResource(), baseAddressOffsets[regionIndex],
+			commandList->get()->CopyBufferRegion(buffer->getResource(), dstOffset[regionIndex],
 				bufferRegions[regionIndex]->getResource(), 0,
 				bufferRegions[regionIndex]->getUpdateSize());
 

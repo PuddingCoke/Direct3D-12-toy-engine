@@ -130,7 +130,7 @@ private:
 		Camera::CameraMatrices matrices;
 		DirectX::XMFLOAT2 screenSize;
 		DirectX::XMFLOAT2 screenTexelSize;
-		DirectX::XMFLOAT4 padding[41];
+		DirectX::XMFLOAT4 padding[9];
 	} perFrameResource;
 
 };
