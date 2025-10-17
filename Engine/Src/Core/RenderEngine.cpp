@@ -103,6 +103,8 @@ void RenderEngine::begin()
 	prepareCommandList->open();
 
 	recordCommandLists.push_back(prepareCommandList);
+
+	Graphics::renderedFrameCountInc();
 }
 
 void RenderEngine::end()

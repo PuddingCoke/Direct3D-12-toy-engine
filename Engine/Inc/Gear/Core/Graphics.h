@@ -3,7 +3,7 @@
 #ifndef _GRAPHICS_H_
 #define _GRAPHICS_H_
 
-#include<Gear/Core/GraphicsDevice.h>
+#include<Gear/Utils/FMT.h>
 
 class Graphics
 {
@@ -29,13 +29,17 @@ public:
 
 	static float getAspectRatio();
 
-	static constexpr DXGI_FORMAT backBufferFormat = DXGI_FORMAT_B8G8R8A8_UNORM;
+	static uint64_t getRenderedFrameCount();
+
+	static constexpr DXGI_FORMAT backBufferFormat = FMT::BGRA8UN;
 
 private:
 
 	friend class RenderEngine;
 
 	static void initialize(const uint32_t frameBufferCount, const uint32_t width, const uint32_t height);
+
+	static void renderedFrameCountInc();
 
 	static uint32_t frameBufferCount;
 
@@ -44,6 +48,8 @@ private:
 	static uint32_t width;
 
 	static uint32_t height;
+
+	static uint64_t renderedFrameCount;
 
 	static float aspectRatio;
 

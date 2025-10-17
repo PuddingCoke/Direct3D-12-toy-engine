@@ -2,10 +2,12 @@
 
 #include<Gear/Core/DynamicCBufferManager.h>
 
+#include<Gear/Core/Graphics.h>
+
 #include<Gear/Utils/Logger.h>
 
 DynamicCBuffer::DynamicCBuffer(const uint32_t size) :
-	ImmutableCBuffer(nullptr, 0u, true)
+	ImmutableCBuffer(nullptr, 0u, true), updateFrameIndex(UINT64_MAX)
 {
 	switch (size)
 	{
@@ -23,6 +25,15 @@ DynamicCBuffer::DynamicCBuffer(const uint32_t size) :
 
 void DynamicCBuffer::update(const void* const data)
 {
+#ifdef _DEBUG
+	if (updateFrameIndex == Graphics::getRenderedFrameCount())
+	{
+		LOGERROR(L"cannot update dynamic constant buffer multiple time during one frame");
+	}
+#endif // _DEBUG
+
+	updateFrameIndex = Graphics::getRenderedFrameCount();
+
 	const DynamicCBufferManager::AvailableDescriptor& descriptor = DynamicCBufferManager::get()->requestDescriptor(regionIndex, data);
 
 	gpuAddress = descriptor.gpuAddress;

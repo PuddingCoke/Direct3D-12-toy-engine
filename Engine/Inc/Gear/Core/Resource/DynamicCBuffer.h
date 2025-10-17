@@ -20,6 +20,8 @@ private:
 
 	uint32_t regionIndex;
 
+	uint64_t updateFrameIndex;
+
 };
 
 #endif // !_DYNAMICCBUFFER_H_
