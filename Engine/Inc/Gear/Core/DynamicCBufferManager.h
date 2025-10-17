@@ -23,7 +23,7 @@ public:
 
 	//define number of each region's subregion
 	//256bytes 512bytes 1024bytes .....
-	static constexpr uint32_t numSubRegion[] = { 2048,1024 };
+	static constexpr uint32_t numSubRegion[] = { 4096,2048 };
 
 	static constexpr uint32_t numRegion = sizeof(numSubRegion) / sizeof(uint32_t);
 

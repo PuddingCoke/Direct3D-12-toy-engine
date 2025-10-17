@@ -23,7 +23,7 @@ DynamicCBufferManager::DynamicCBufferManager()
 
 		buffer->setName(L"Large Constant Buffer");
 
-		LOGSUCCESS(L"create", requiredSize / 1024.f, L"kbytes constant buffer succeeded");
+		LOGSUCCESS(L"create", FloatPrecision(0), requiredSize / 1024.f, L"kbytes constant buffer succeeded");
 	}
 
 	//create large upload heap for each region

@@ -80,7 +80,7 @@ private:
 
 #define LOGUSER(...) Logger::submitLogMessage(LogContext::createLogMessage(__FUNCTIONW__,LogType::LOG_USER,__VA_ARGS__))
 
-#define LOGERROR(...) Logger::submitLogMessage(LogContext::createLogMessage(__FUNCTIONW__,LogType::LOG_ERROR,__FILEW__,L"LINE",(int32_t)__LINE__,__VA_ARGS__)); \
+#define LOGERROR(...) Logger::submitLogMessage(LogContext::createLogMessage(__FUNCTIONW__,LogType::LOG_ERROR,__FILEW__,L"LINE",static_cast<int32_t>(__LINE__),__VA_ARGS__)); \
 throw std::runtime_error("check log.txt or console output for detailed information") \
 
 #endif // !_LOGGER_H_
