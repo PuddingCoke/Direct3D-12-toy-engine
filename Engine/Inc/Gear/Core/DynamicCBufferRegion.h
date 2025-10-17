@@ -5,7 +5,7 @@
 
 #include<Gear/Core/Resource/D3D12Resource/UploadHeap.h>
 
-#include<mutex>
+#include<atomic>
 
 class DynamicCBufferRegion
 {
@@ -19,21 +19,19 @@ public:
 
 	void reset();
 
-	ID3D12Resource* getResource() const;
-
 	uint64_t getUpdateSize() const;
+
+	ID3D12Resource* getResource() const;
 
 private:
 
 	const uint64_t subRegionSize;
 
-	UploadHeap** uploadHeap;
+	UploadHeap** const uploadHeap;
 
-	uint8_t** dataPtr;
+	uint8_t** const dataPtr;
 
-	std::mutex offsetMutex;
-
-	uint64_t currentOffset;
+	std::atomic<uint64_t> currentOffset;
 
 };
 
