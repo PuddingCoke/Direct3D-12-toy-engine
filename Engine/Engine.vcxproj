@@ -64,6 +64,15 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <FxCompile>
+      <VariableName>g_%(Filename)Bytes</VariableName>
+    </FxCompile>
+    <FxCompile>
+      <ObjectFileOutput />
+      <HeaderFileOutput>Inc/Gear/CompiledShaders/%(Filename).h</HeaderFileOutput>
+      <ShaderModel>6.6</ShaderModel>
+      <AdditionalIncludeDirectories>$(SolutionDir)Engine\Shaders;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </FxCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -81,6 +90,15 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <FxCompile>
+      <VariableName>g_%(Filename)Bytes</VariableName>
+    </FxCompile>
+    <FxCompile>
+      <ObjectFileOutput />
+      <HeaderFileOutput>Inc/Gear/CompiledShaders/%(Filename).h</HeaderFileOutput>
+      <ShaderModel>6.6</ShaderModel>
+      <AdditionalIncludeDirectories>$(SolutionDir)Engine\Shaders;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Inc\D3D12Headers\d3d12.h" />
