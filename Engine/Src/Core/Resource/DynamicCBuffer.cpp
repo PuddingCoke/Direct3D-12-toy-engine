@@ -18,7 +18,7 @@ DynamicCBuffer::DynamicCBuffer(const uint32_t size) :
 		regionIndex = 1;
 		break;
 	default:
-		LOGERROR(L"size should be one of 256 512");
+		LOGERROR(L"size should be one of 256bytes 512bytes");
 		break;
 	}
 }

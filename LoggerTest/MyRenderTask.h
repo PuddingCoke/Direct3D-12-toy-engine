@@ -23,7 +23,9 @@ public:
 
 		LOGUSER(L"64位无符号整数测试", IntegerMode::HEX, 13579ull, UINT64_MAX, IntegerMode::DEC, 13579ull, UINT64_MAX);
 
-		LOGUSER(L"浮点测试", FloatPrecision(4), 125.6f, FLT_MAX, FloatPrecision(2), 125.7, FLT_MAX);
+		LOGUSER(L"32位浮点测试", FloatPrecision(4), 125.6f, FLT_MAX, FloatPrecision(2), 125.6f, FLT_MAX);
+
+		LOGUSER(L"64位浮点测试", FloatPrecision(6), 200.123, DBL_MAX, FloatPrecision(5), 200.123, DBL_MAX);
 
 		LOGUSER(L"多线程测试");
 

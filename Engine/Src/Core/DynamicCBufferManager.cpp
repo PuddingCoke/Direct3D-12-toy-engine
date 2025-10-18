@@ -96,12 +96,7 @@ DynamicCBufferManager::AvailableDescriptor DynamicCBufferManager::requestDescrip
 {
 	const uint32_t subregionIndex = bufferRegions[regionIndex]->update(data);
 
-	const DynamicCBufferManager::AvailableDescriptor descriptor = {
-		baseAddressOffsets[regionIndex] + (256u << regionIndex) * subregionIndex,
-		baseDescriptorIndices[regionIndex] + subregionIndex
-	};
-
-	return descriptor;
+	return { baseAddressOffsets[regionIndex] + (256u << regionIndex) * subregionIndex,baseDescriptorIndices[regionIndex] + subregionIndex };
 }
 
 DynamicCBufferManager* DynamicCBufferManager::get()

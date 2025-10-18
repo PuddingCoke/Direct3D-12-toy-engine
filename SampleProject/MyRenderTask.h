@@ -11,8 +11,6 @@ public:
 
 	MyRenderTask()
 	{
-		vertexShader = new Shader(Utils::getRootFolder() + L"VertexShader.cso");
-
 		pixelShader = new Shader(Utils::getRootFolder() + L"PixelShader.cso");
 
 		{
@@ -27,8 +25,6 @@ public:
 
 	~MyRenderTask()
 	{
-		delete vertexShader;
-
 		delete pixelShader;
 	}
 
@@ -50,8 +46,6 @@ protected:
 private:
 
 	ComPtr<ID3D12PipelineState> pipelineState;
-
-	Shader* vertexShader;
 
 	Shader* pixelShader;
 
