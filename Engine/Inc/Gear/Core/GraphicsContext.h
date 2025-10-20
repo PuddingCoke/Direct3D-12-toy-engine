@@ -75,7 +75,7 @@ public:
 
 	void setCSConstantBuffer(const ImmutableCBuffer* const immutableCBuffer);
 
-	//must call this method after all resource binding methods
+	//绑定资源后必须调用这个方法！！
 	void transitionResources();
 
 	void setRenderTargets(const std::initializer_list<RenderTargetDesc>& renderTargets, const DepthStencilDesc* const depthStencils = nullptr) const;
@@ -116,7 +116,7 @@ public:
 
 	void draw(const uint32_t vertexCountPerInstance, const uint32_t instanceCount, const uint32_t startVertexLocation, const uint32_t startInstanceLocation) const;
 
-	void drawIndexed(const uint32_t indexCountPerInstance, const uint32_t instanceCount, const uint32_t startIndexLocation, const int baseVertexLocation, const uint32_t startInstanceLocation) const;
+	void drawIndexed(const uint32_t indexCountPerInstance, const uint32_t instanceCount, const uint32_t startIndexLocation, const int32_t baseVertexLocation, const uint32_t startInstanceLocation) const;
 
 	void dispatch(const uint32_t threadGroupCountX, const uint32_t threadGroupCountY, const uint32_t threadGroupCountZ) const;
 

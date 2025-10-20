@@ -25,7 +25,7 @@ Gear* Gear::get()
 	return instance;
 }
 
-int Gear::iniEngine(const InitializationParam& param, const int argc, const wchar_t* argv[])
+int32_t Gear::iniEngine(const InitializationParam& param, const int32_t argc, const wchar_t* argv[])
 {
 	Logger::instance = new Logger();
 
@@ -117,6 +117,7 @@ void Gear::iniGame(Game* const gamePtr)
 
 	case InitializationParam::EngineUsage::WALLPAPER:
 		runWallpaper();
+		break;
 
 	default:
 		break;

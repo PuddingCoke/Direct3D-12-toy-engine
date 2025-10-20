@@ -5,8 +5,8 @@ BufferSlot::BufferSlot() :
 {
 }
 
-LogContext::FloatPrecision::FloatPrecision(const int precision) :
-	precision(std::min(precision, 16))
+LogContext::FloatPrecision::FloatPrecision(const int32_t precision) :
+	precision(std::max(std::min(precision, 16), 0))
 {
 }
 

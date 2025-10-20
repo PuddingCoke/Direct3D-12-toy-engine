@@ -80,9 +80,9 @@ private:
 
 		float* vertices;
 
-		int idx;
+		int32_t idx;
 
-		static constexpr int maxLineNum = 150000;
+		static constexpr int32_t maxLineNum = 150000;
 
 	} lineRenderer;
 
@@ -104,11 +104,11 @@ private:
 
 		float* vertices;
 
-		static constexpr int maxCircleNum = 50000;
+		int32_t idx;
 
-		int idx;
+		static constexpr int32_t maxCircleNum = 50000;
 
-	}circleRenderer;
+	} circleRenderer;
 
 	class RCLineRenderer
 	{
@@ -128,9 +128,9 @@ private:
 
 		float* vertices;
 
-		int idx;
+		int32_t idx;
 
-		static constexpr int maxLineNum = 150000;
+		static constexpr int32_t maxLineNum = 150000;
 
 	} roundCapLineRenderer;
 

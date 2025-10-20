@@ -18,7 +18,7 @@ struct Color
 
 	float a;
 
-	int toInt() const;
+	int32_t toInt() const;
 
 	bool operator==(const Color& color) const;
 

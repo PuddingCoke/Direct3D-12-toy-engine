@@ -1,8 +1,8 @@
 ﻿#include<Gear/Utils/Color.h>
 
-int Color::toInt() const
+int32_t Color::toInt() const
 {
-	return (static_cast<int>(255 * a) << 24) | (static_cast<int>(255 * b) << 16) | (static_cast<int>(255 * g) << 8) | (static_cast<int>(255 * r));
+	return (static_cast<int32_t>(255 * a) << 24) | (static_cast<int32_t>(255 * b) << 16) | (static_cast<int32_t>(255 * g) << 8) | (static_cast<int32_t>(255 * r));
 }
 
 Color Color::random()
@@ -14,7 +14,7 @@ Color Color::hsvToRgb(const Color& c)
 {
 	float r, g, b, f, p, q, t;
 
-	const int i = static_cast<int>(floorf(c.r * 6.f));
+	const int32_t i = static_cast<int32_t>(floorf(c.r * 6.f));
 
 	f = c.r * 6 - i;
 

@@ -19,7 +19,7 @@ public:
 
 	static Gear* get();
 
-	int iniEngine(const InitializationParam& param, const int argc, const wchar_t* argv[]);
+	int32_t iniEngine(const InitializationParam& param, const int32_t argc, const wchar_t* argv[]);
 
 	void iniGame(Game* const gamePtr);
 

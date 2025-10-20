@@ -48,9 +48,9 @@ public:
 
 	struct FloatPrecision
 	{
-		FloatPrecision(const int precision = 5);
+		FloatPrecision(const int32_t precision = 5);
 
-		int precision;
+		int32_t precision;
 	};
 
 	LogContext(const LogContext&) = delete;
