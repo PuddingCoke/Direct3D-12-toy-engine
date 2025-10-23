@@ -5,58 +5,27 @@
 
 #include<Gear/Utils/FMT.h>
 
-class Graphics
+namespace Graphics
 {
-public:
 
-	Graphics() = delete;
+	uint32_t getFrameBufferCount();
 
-	Graphics(const Graphics&) = delete;
+	uint32_t getFrameIndex();
 
-	void operator=(const Graphics&) = delete;
+	float getDeltaTime();
 
-	static uint32_t getFrameBufferCount();
+	float getTimeElapsed();
 
-	static uint32_t getFrameIndex();
+	uint32_t getWidth();
 
-	static float getDeltaTime();
+	uint32_t getHeight();
 
-	static float getTimeElapsed();
+	float getAspectRatio();
 
-	static uint32_t getWidth();
+	uint64_t getRenderedFrameCount();
 
-	static uint32_t getHeight();
+	constexpr DXGI_FORMAT backBufferFormat = FMT::BGRA8UN;
 
-	static float getAspectRatio();
-
-	static uint64_t getRenderedFrameCount();
-
-	static constexpr DXGI_FORMAT backBufferFormat = FMT::BGRA8UN;
-
-private:
-
-	friend class RenderEngine;
-
-	static void initialize(const uint32_t frameBufferCount, const uint32_t width, const uint32_t height);
-
-	static void renderedFrameCountInc();
-
-	static uint32_t frameBufferCount;
-
-	static uint32_t frameIndex;
-
-	static uint32_t width;
-
-	static uint32_t height;
-
-	static uint64_t renderedFrameCount;
-
-	static float aspectRatio;
-
-	static float deltaTime;
-
-	static float timeElapsed;
-
-};
+}
 
 #endif // !_GRAPHICS_H_

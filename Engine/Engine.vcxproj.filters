@@ -420,6 +420,9 @@
     <ClInclude Include="Inc\Gear\Core\Resource\StaticCBuffer.h">
       <Filter>Header</Filter>
     </ClInclude>
+    <ClInclude Include="Inc\Gear\Core\GraphicsInternal.h">
+      <Filter>Header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\InitializationParam.cpp">

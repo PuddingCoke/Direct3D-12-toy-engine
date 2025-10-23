@@ -4,11 +4,14 @@
 #define _MATH_H_
 
 #include<cmath>
+
 #include<DirectXMath.h>
+
 #include<DirectXPackedVector.h>
 
 namespace Math
 {
+
 	constexpr float half_pi = DirectX::XM_PIDIV2;
 
 	constexpr float pi = DirectX::XM_PI;

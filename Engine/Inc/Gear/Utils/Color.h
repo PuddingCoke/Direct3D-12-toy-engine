@@ -10,6 +10,7 @@
 
 struct Color
 {
+
 	float r;
 
 	float g;
@@ -18,7 +19,7 @@ struct Color
 
 	float a;
 
-	int32_t toInt() const;
+	uint32_t toUint() const;
 
 	bool operator==(const Color& color) const;
 

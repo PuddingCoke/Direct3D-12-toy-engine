@@ -2,6 +2,8 @@
 
 #include<Gear/Core/Graphics.h>
 
+#include<Gear/Core/GraphicsInternal.h>
+
 #include<Gear/Core/Shader.h>
 
 #include<Gear/Core/PipelineState.h>
@@ -84,7 +86,7 @@ void RenderEngine::waitForNextFrame()
 
 	commandQueue->Signal(fence.Get(), currentFenceValue);
 
-	Graphics::frameIndex = swapChain->GetCurrentBackBufferIndex();
+	Graphics::Internal::setFrameIndex(swapChain->GetCurrentBackBufferIndex());
 
 	if (fence->GetCompletedValue() < fenceValues[Graphics::getFrameIndex()])
 	{
@@ -104,7 +106,7 @@ void RenderEngine::begin()
 
 	recordCommandLists.push_back(prepareCommandList);
 
-	Graphics::renderedFrameCountInc();
+	Graphics::Internal::renderedFrameCountInc();
 }
 
 void RenderEngine::end()
@@ -322,12 +324,12 @@ void RenderEngine::setRenderTexture(Texture* const renderTexture, const D3D12_CP
 
 void RenderEngine::setDeltaTime(const float deltaTime) const
 {
-	Graphics::deltaTime = deltaTime;
+	Graphics::Internal::setDeltaTime(deltaTime);
 }
 
 void RenderEngine::updateTimeElapsed() const
 {
-	Graphics::timeElapsed += Graphics::getDeltaTime();
+	Graphics::Internal::updateTimeElapsed();
 }
 
 void RenderEngine::saveBackBuffer(ReadbackHeap* const readbackHeap)
@@ -376,7 +378,7 @@ RenderEngine::RenderEngine(const uint32_t width, const uint32_t height, const HW
 	displayImGUISurface(false),
 	syncInterval(1)
 {
-	Graphics::initialize(useSwapChainBuffer ? 3 : 1, width, height);
+	Graphics::Internal::initialize(useSwapChainBuffer ? 3 : 1, width, height);
 
 	ComPtr<IDXGIFactory7> factory;
 

@@ -1,8 +1,8 @@
 ﻿#include<Gear/Utils/Color.h>
 
-int32_t Color::toInt() const
+uint32_t Color::toUint() const
 {
-	return (static_cast<int32_t>(255 * a) << 24) | (static_cast<int32_t>(255 * b) << 16) | (static_cast<int32_t>(255 * g) << 8) | (static_cast<int32_t>(255 * r));
+	return (static_cast<uint32_t>(255 * a) << 24) | (static_cast<uint32_t>(255 * b) << 16) | (static_cast<uint32_t>(255 * g) << 8) | (static_cast<uint32_t>(255 * r));
 }
 
 Color Color::random()
@@ -40,12 +40,12 @@ Color Color::hsvToRgb(const Color& c)
 
 bool Color::operator==(const Color& color) const
 {
-	return toInt() == color.toInt();
+	return toUint() == color.toUint();
 }
 
 bool Color::operator!=(const Color& color) const
 {
-	return toInt() != color.toInt();
+	return toUint() != color.toUint();
 }
 
 Color::operator const float* () const

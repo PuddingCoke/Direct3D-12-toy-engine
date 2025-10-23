@@ -1,73 +1,95 @@
 ﻿#include<Gear/Core/Graphics.h>
 
-uint32_t Graphics::frameBufferCount = 0;
+#include<Gear/Core/GraphicsInternal.h>
 
-uint32_t Graphics::frameIndex = 0;
+namespace
+{
 
-uint32_t Graphics::width = 0;
+	uint32_t g_frameBufferCount = 0;
 
-uint32_t Graphics::height = 0;
+	uint32_t g_frameIndex = 0;
 
-uint64_t Graphics::renderedFrameCount = 0;
+	uint32_t g_width = 0;
 
-float Graphics::aspectRatio = 0.f;
+	uint32_t g_height = 0;
 
-float Graphics::deltaTime = 0.f;
+	uint64_t g_renderedFrameCount = 0;
 
-float Graphics::timeElapsed = 0.f;
+	float g_aspectRatio = 0.f;
+
+	float g_deltaTime = 0.f;
+
+	float g_timeElapsed = 0.f;
+
+}
 
 uint32_t Graphics::getFrameBufferCount()
 {
-	return frameBufferCount;
+	return g_frameBufferCount;
 }
 
 uint32_t Graphics::getFrameIndex()
 {
-	return frameIndex;
+	return g_frameIndex;
 }
 
 float Graphics::getDeltaTime()
 {
-	return deltaTime;
+	return g_deltaTime;
 }
 
 float Graphics::getTimeElapsed()
 {
-	return timeElapsed;
+	return g_timeElapsed;
 }
 
 uint32_t Graphics::getWidth()
 {
-	return width;
+	return g_width;
 }
 
 uint32_t Graphics::getHeight()
 {
-	return height;
+	return g_height;
 }
 
 float Graphics::getAspectRatio()
 {
-	return aspectRatio;
+	return g_aspectRatio;
 }
 
 uint64_t Graphics::getRenderedFrameCount()
 {
-	return renderedFrameCount;
+	return g_renderedFrameCount;
 }
 
-void Graphics::initialize(const uint32_t frameBufferCount, const uint32_t width, const uint32_t height)
+void Graphics::Internal::initialize(const uint32_t frameBufferCount, const uint32_t width, const uint32_t height)
 {
-	Graphics::frameBufferCount = frameBufferCount;
+	g_frameBufferCount = frameBufferCount;
 
-	Graphics::width = width;
+	g_width = width;
 
-	Graphics::height = height;
+	g_height = height;
 
-	Graphics::aspectRatio = static_cast<float>(width) / static_cast<float>(height);
+	g_aspectRatio = static_cast<float>(width) / static_cast<float>(height);
 }
 
-void Graphics::renderedFrameCountInc()
+void Graphics::Internal::renderedFrameCountInc()
 {
-	Graphics::renderedFrameCount++;
+	g_renderedFrameCount++;
+}
+
+void Graphics::Internal::setFrameIndex(const uint32_t frameIndex)
+{
+	g_frameIndex = frameIndex;
+}
+
+void Graphics::Internal::setDeltaTime(const float deltaTime)
+{
+	g_deltaTime = deltaTime;
+}
+
+void Graphics::Internal::updateTimeElapsed()
+{
+	g_timeElapsed += g_deltaTime;
 }
