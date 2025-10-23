@@ -4,92 +4,95 @@
 
 namespace
 {
+	struct GraphicsPrivate
+	{
 
-	uint32_t g_frameBufferCount = 0;
+		uint32_t frameBufferCount = 0;
 
-	uint32_t g_frameIndex = 0;
+		uint32_t frameIndex = 0;
 
-	uint32_t g_width = 0;
+		uint32_t width = 0;
 
-	uint32_t g_height = 0;
+		uint32_t height = 0;
 
-	uint64_t g_renderedFrameCount = 0;
+		uint64_t renderedFrameCount = 0;
 
-	float g_aspectRatio = 0.f;
+		float aspectRatio = 0.f;
 
-	float g_deltaTime = 0.f;
+		float deltaTime = 0.f;
 
-	float g_timeElapsed = 0.f;
+		float timeElapsed = 0.f;
 
+	}pvt;
 }
 
 uint32_t Graphics::getFrameBufferCount()
 {
-	return g_frameBufferCount;
+	return pvt.frameBufferCount;
 }
 
 uint32_t Graphics::getFrameIndex()
 {
-	return g_frameIndex;
+	return pvt.frameIndex;
 }
 
 float Graphics::getDeltaTime()
 {
-	return g_deltaTime;
+	return pvt.deltaTime;
 }
 
 float Graphics::getTimeElapsed()
 {
-	return g_timeElapsed;
+	return pvt.timeElapsed;
 }
 
 uint32_t Graphics::getWidth()
 {
-	return g_width;
+	return pvt.width;
 }
 
 uint32_t Graphics::getHeight()
 {
-	return g_height;
+	return pvt.height;
 }
 
 float Graphics::getAspectRatio()
 {
-	return g_aspectRatio;
+	return pvt.aspectRatio;
 }
 
 uint64_t Graphics::getRenderedFrameCount()
 {
-	return g_renderedFrameCount;
+	return pvt.renderedFrameCount;
 }
 
 void Graphics::Internal::initialize(const uint32_t frameBufferCount, const uint32_t width, const uint32_t height)
 {
-	g_frameBufferCount = frameBufferCount;
+	pvt.frameBufferCount = frameBufferCount;
 
-	g_width = width;
+	pvt.width = width;
 
-	g_height = height;
+	pvt.height = height;
 
-	g_aspectRatio = static_cast<float>(width) / static_cast<float>(height);
+	pvt.aspectRatio = static_cast<float>(width) / static_cast<float>(height);
 }
 
 void Graphics::Internal::renderedFrameCountInc()
 {
-	g_renderedFrameCount++;
+	pvt.renderedFrameCount++;
 }
 
 void Graphics::Internal::setFrameIndex(const uint32_t frameIndex)
 {
-	g_frameIndex = frameIndex;
+	pvt.frameIndex = frameIndex;
 }
 
 void Graphics::Internal::setDeltaTime(const float deltaTime)
 {
-	g_deltaTime = deltaTime;
+	pvt.deltaTime = deltaTime;
 }
 
 void Graphics::Internal::updateTimeElapsed()
 {
-	g_timeElapsed += g_deltaTime;
+	pvt.timeElapsed += pvt.deltaTime;
 }
