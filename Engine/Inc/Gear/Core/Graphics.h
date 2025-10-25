@@ -3,7 +3,7 @@
 #ifndef _GRAPHICS_H_
 #define _GRAPHICS_H_
 
-#include<Gear/Utils/FMT.h>
+#include<Gear/Core/FMT.h>
 
 namespace Graphics
 {

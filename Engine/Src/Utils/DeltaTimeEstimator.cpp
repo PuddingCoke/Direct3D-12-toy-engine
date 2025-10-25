@@ -2,16 +2,16 @@
 
 #include<algorithm>
 
-DeltaTimeEstimator::DeltaTimeEstimator() :
+Utils::DeltaTimeEstimator::DeltaTimeEstimator() :
 	historyDeltatime{}, sortedDeltaTime{}, historyDeltaTimeIndex(0), populated(false)
 {
 }
 
-DeltaTimeEstimator::~DeltaTimeEstimator()
+Utils::DeltaTimeEstimator::~DeltaTimeEstimator()
 {
 }
 
-float DeltaTimeEstimator::getDeltaTime(const float lastDeltaTime)
+float Utils::DeltaTimeEstimator::getDeltaTime(const float lastDeltaTime)
 {
 	historyDeltatime[historyDeltaTimeIndex] = lastDeltaTime;
 

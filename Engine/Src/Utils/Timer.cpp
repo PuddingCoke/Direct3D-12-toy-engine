@@ -1,18 +1,18 @@
 ﻿#include<Gear/Utils/Timer.h>
 
-Timer::Timer() :
+Utils::Timer::Timer() :
 	curTime(0), timeLimit(0)
 {
 
 }
 
-Timer::Timer(const float timeLimit) :
+Utils::Timer::Timer(const float timeLimit) :
 	timeLimit(timeLimit), curTime(0)
 {
 
 }
 
-bool Timer::update(const float dt)
+bool Utils::Timer::update(const float dt)
 {
 	if (curTime >= timeLimit)
 	{
@@ -26,17 +26,17 @@ bool Timer::update(const float dt)
 	return false;
 }
 
-void Timer::restart()
+void Utils::Timer::restart()
 {
 	curTime = 0;
 }
 
-void Timer::setTimeLimit(const float timeLimit)
+void Utils::Timer::setTimeLimit(const float timeLimit)
 {
 	this->timeLimit = timeLimit;
 }
 
-float Timer::getTimeLimit() const
+float Utils::Timer::getTimeLimit() const
 {
 	return timeLimit;
 }

@@ -29,9 +29,9 @@ FPSCamera::FPSCamera(const DirectX::XMVECTOR& eye, const DirectX::XMVECTOR& look
 
 				float rotAngle = -Mouse::getDY() / 120.f;
 
-				if (destAngle > Math::pi - Camera::epsilon)
+				if (destAngle > Utils::Math::pi - Camera::epsilon)
 				{
-					rotAngle = Math::pi - Camera::epsilon - lookUpAngle;
+					rotAngle = Utils::Math::pi - Camera::epsilon - lookUpAngle;
 				}
 				else if (destAngle < Camera::epsilon)
 				{

@@ -10,7 +10,7 @@
 
 #include<Gear/Utils/Random.h>
 
-#include<Gear/Utils/Utils.h>
+#include<Gear/Utils/File.h>
 
 #include<DirectXTex/DDSTextureLoader12.h>
 
@@ -223,10 +223,10 @@ Texture* ResourceManager::createTexture(const uint32_t width, const uint32_t hei
 		{
 			colors[i] =
 			{
-				static_cast<uint8_t>(Random::genUint() % 256u),
-				static_cast<uint8_t>(Random::genUint() % 256u),
-				static_cast<uint8_t>(Random::genUint() % 256u),
-				static_cast<uint8_t>(Random::genUint() % 256u)
+				static_cast<uint8_t>(Utils::Random::genUint() % 256u),
+				static_cast<uint8_t>(Utils::Random::genUint() % 256u),
+				static_cast<uint8_t>(Utils::Random::genUint() % 256u),
+				static_cast<uint8_t>(Utils::Random::genUint() % 256u)
 			};
 		}
 
@@ -247,21 +247,21 @@ Texture* ResourceManager::createTexture(const uint32_t width, const uint32_t hei
 	}
 	else
 	{
-		struct Col
+		struct HaflColor
 		{
 			DirectX::PackedVector::HALF r, g, b, a;
 		};
 
-		std::vector<Col> colors(width * height);
+		std::vector<HaflColor> colors(width * height);
 
 		for (uint32_t i = 0; i < width * height; i++)
 		{
 			colors[i] =
 			{
-				DirectX::PackedVector::XMConvertFloatToHalf(Random::genGauss()),
-				DirectX::PackedVector::XMConvertFloatToHalf(Random::genGauss()),
-				DirectX::PackedVector::XMConvertFloatToHalf(Random::genGauss()),
-				DirectX::PackedVector::XMConvertFloatToHalf(Random::genGauss())
+				DirectX::PackedVector::XMConvertFloatToHalf(Utils::Random::genGauss()),
+				DirectX::PackedVector::XMConvertFloatToHalf(Utils::Random::genGauss()),
+				DirectX::PackedVector::XMConvertFloatToHalf(Utils::Random::genGauss()),
+				DirectX::PackedVector::XMConvertFloatToHalf(Utils::Random::genGauss())
 			};
 		}
 

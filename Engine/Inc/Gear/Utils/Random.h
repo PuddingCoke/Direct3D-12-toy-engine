@@ -1,24 +1,26 @@
 ﻿#pragma once
 
-#ifndef _RANDOM_H_
-#define _RANDOM_H_
+#ifndef _UTILS_RANDOM_H_
+#define _UTILS_RANDOM_H_
 
 #include<cstdint>
 
-namespace Random
+namespace Utils
 {
+	namespace Random
+	{
+		//均值 0 标准差 1
+		float genGauss();
 
-	//mean 0 sd(sigma) 1
-	float genGauss();
+		float genFloat();
 
-	float genFloat();
+		double genDouble();
 
-	double genDouble();
+		int32_t genInt();
 
-	int32_t genInt();
+		uint32_t genUint();
 
-	uint32_t genUint();
-
+	}
 }
 
-#endif // !_RANDOM_H_
+#endif // !_UTILS_RANDOM_H_

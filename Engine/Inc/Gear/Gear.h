@@ -57,8 +57,6 @@ private:
 		InitializationParam::VideoRenderParam videoRender;
 	};
 
-	DeltaTimeEstimator dtEstimator;
-
 	static constexpr Keyboard::Key screenGrabKey = Keyboard::F11;
 
 };

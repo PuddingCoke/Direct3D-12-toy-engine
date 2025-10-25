@@ -14,11 +14,11 @@ class MyRenderTask :public RenderTask
 public:
 
 	MyRenderTask() :
-		accumulateShader(new Shader(Utils::getRootFolder() + L"AccumulateShader.cso")),
-		displayShader(new Shader(Utils::getRootFolder() + L"DisplayShader.cso")),
+		accumulateShader(new Shader(Utils::File::getRootFolder() + L"AccumulateShader.cso")),
+		displayShader(new Shader(Utils::File::getRootFolder() + L"DisplayShader.cso")),
 		accumulatedTexture(ResourceManager::createTextureRenderView(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R16G16B16A16_UNORM, 1, 1, false, false,
 			DXGI_FORMAT_R16G16B16A16_UNORM, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_R16G16B16A16_UNORM)),
-		cameraParam{ Math::pi / 4.f + 0.4f,0.f,3.0f,8.f },
+		cameraParam{ Utils::Math::pi / 4.f + 0.4f,0.f,3.0f,8.f },
 		accumulateParam{ 0,0.f }
 	{
 		{
@@ -27,7 +27,7 @@ public:
 			desc.VS = Shader::fullScreenVS->getByteCode();
 			desc.PS = accumulateShader->getByteCode();
 			desc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
-			desc.BlendState = PipelineState::defBlendDesc;
+			desc.BlendState = PipelineState::blendDefault;
 			desc.DepthStencilState.DepthEnable = FALSE;
 			desc.DepthStencilState.StencilEnable = FALSE;
 			desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
@@ -59,7 +59,7 @@ public:
 				{
 					cameraParam.phi -= Mouse::getDY() * Graphics::getDeltaTime();
 					cameraParam.theta += Mouse::getDX() * Graphics::getDeltaTime();
-					cameraParam.phi = Math::clamp(cameraParam.phi, -Math::half_pi + 0.01f, Math::half_pi - 0.01f);
+					cameraParam.phi = Utils::Math::clamp(cameraParam.phi, -Utils::Math::halfPi + 0.01f, Utils::Math::halfPi - 0.01f);
 
 					accumulateParam.frameIndex = 0;
 				}

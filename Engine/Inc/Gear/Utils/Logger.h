@@ -1,17 +1,15 @@
 ﻿#pragma once
 
-#ifndef _LOGGER_H_
-#define _LOGGER_H_
-
-#include<fstream>
-
-#include<queue>
+#ifndef _UTILS_LOGGER_H_
+#define _UTILS_LOGGER_H_
 
 #include"Logger/LogContext.h"
 
-using IntegerMode = LogContext::IntegerMode;
+using IntegerMode = Utils::Logger::LogContext::IntegerMode;
 
-using FloatPrecision = LogContext::FloatPrecision;
+using FloatPrecision = Utils::Logger::LogContext::FloatPrecision;
+
+using LogColor = Utils::Logger::LogColor;
 
 /// <summary>
 /// a simple logger that output text with colors depend on different situations
@@ -32,55 +30,21 @@ using FloatPrecision = LogContext::FloatPrecision;
 /// 
 /// there are many available colors in LogColor class
 /// </summary>
-class Logger
+namespace Utils
 {
-public:
+	namespace Logger
+	{
+		void submitLogMessage(const LogMessage& msg);
+	}
+}
 
-	Logger(const Logger&) = delete;
+#define LOGSUCCESS(...) Utils::Logger::submitLogMessage(Utils::Logger::LogContext::createLogMessage(__FUNCTIONW__,Utils::Logger::LogType::LOG_SUCCESS,__VA_ARGS__))
 
-	void operator=(const Logger&) = delete;
+#define LOGENGINE(...) Utils::Logger::submitLogMessage(Utils::Logger::LogContext::createLogMessage(__FUNCTIONW__,Utils::Logger::LogType::LOG_ENGINE,__VA_ARGS__))
 
-	static void submitLogMessage(const LogMessage& msg);
+#define LOGUSER(...) Utils::Logger::submitLogMessage(Utils::Logger::LogContext::createLogMessage(__FUNCTIONW__,Utils::Logger::LogType::LOG_USER,__VA_ARGS__))
 
-private:
-
-	friend class Gear;
-
-	Logger();
-
-	~Logger();
-
-	static Logger* instance;
-
-	void shutdown();
-
-	void submitMessage(const LogMessage& msg);
-
-	void workerLoop();
-
-	std::wofstream file;
-
-	std::queue<LogMessage> messages;
-
-	bool isRunning;
-
-	std::mutex queueLock;
-
-	std::condition_variable cv;
-
-	std::wstring temp;
-
-	std::thread worker;
-
-};
-
-#define LOGSUCCESS(...) Logger::submitLogMessage(LogContext::createLogMessage(__FUNCTIONW__,LogType::LOG_SUCCESS,__VA_ARGS__))
-
-#define LOGENGINE(...) Logger::submitLogMessage(LogContext::createLogMessage(__FUNCTIONW__,LogType::LOG_ENGINE,__VA_ARGS__))
-
-#define LOGUSER(...) Logger::submitLogMessage(LogContext::createLogMessage(__FUNCTIONW__,LogType::LOG_USER,__VA_ARGS__))
-
-#define LOGERROR(...) Logger::submitLogMessage(LogContext::createLogMessage(__FUNCTIONW__,LogType::LOG_ERROR,__FILEW__,L"LINE",static_cast<int32_t>(__LINE__),__VA_ARGS__)); \
+#define LOGERROR(...) Utils::Logger::submitLogMessage(Utils::Logger::LogContext::createLogMessage(__FUNCTIONW__,Utils::Logger::LogType::LOG_ERROR,__FILEW__,L"LINE",static_cast<int32_t>(__LINE__),__VA_ARGS__)); \
 throw std::runtime_error("check log.txt or console output for detailed information") \
 
-#endif // !_LOGGER_H_
+#endif // !_UTILS_LOGGER_H_

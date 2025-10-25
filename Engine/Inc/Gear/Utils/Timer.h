@@ -1,30 +1,33 @@
 ﻿#pragma once
 
-#ifndef _TIMER_H_
-#define _TIMER_H_
+#ifndef _UTILS_TIMER_H_
+#define _UTILS_TIMER_H_
 
-class Timer
+namespace Utils
 {
-public:
+	class Timer
+	{
+	public:
 
-	Timer();
+		Timer();
 
-	Timer(const float timeLimit);
+		Timer(const float timeLimit);
 
-	bool update(const float dt);
+		bool update(const float dt);
 
-	void restart();
+		void restart();
 
-	void setTimeLimit(const float timeLimit);
+		void setTimeLimit(const float timeLimit);
 
-	float getTimeLimit() const;
+		float getTimeLimit() const;
 
-private:
+	private:
 
-	float timeLimit;
+		float timeLimit;
 
-	float curTime;
+		float curTime;
 
-};
+	};
+}
 
-#endif // !_TIMER_H_
+#endif // !_UTILS_TIMER_H_

@@ -22,19 +22,19 @@ public:
 		renderParamBuffer(ResourceManager::createDynamicCBuffer(sizeof(RenderParam))),
 		spectrumParamBuffer{ ResourceManager::createStaticCBuffer(sizeof(SpectrumParam), true),ResourceManager::createStaticCBuffer(sizeof(SpectrumParam), true),ResourceManager::createStaticCBuffer(sizeof(SpectrumParam), true) },
 		cascade{ new WaveCascade(textureResolution,context),new WaveCascade(textureResolution,context),new WaveCascade(textureResolution,context) },
-		textureCubePS(new Shader(Utils::getRootFolder() + L"TextureCubePS.cso")),
-		gridDebugVS(new Shader(Utils::getRootFolder() + L"GridDebugVS.cso")),
-		gridDebugPS(new Shader(Utils::getRootFolder() + L"GridDebugPS.cso")),
-		oceanVS(new Shader(Utils::getRootFolder() + L"OceanVS.cso")),
-		oceanHS(new Shader(Utils::getRootFolder() + L"OceanHS.cso")),
-		oceanDS(new Shader(Utils::getRootFolder() + L"OceanDS.cso")),
-		oceanPS(new Shader(Utils::getRootFolder() + L"OceanPS.cso")),
-		spectrumCS(new Shader(Utils::getRootFolder() + L"SpectrumCS.cso")),
-		conjugateCS(new Shader(Utils::getRootFolder() + L"ConjugateCS.cso")),
-		displacementSpectrumCS(new Shader(Utils::getRootFolder() + L"DisplacementSpectrumCS.cso")),
-		ifftCS(new Shader(Utils::getRootFolder() + L"IFFTCS.cso")),
-		permutationCS(new Shader(Utils::getRootFolder() + L"PermutationCS.cso")),
-		waveMergeCS(new Shader(Utils::getRootFolder() + L"WaveMergeCS.cso"))
+		textureCubePS(new Shader(Utils::File::getRootFolder() + L"TextureCubePS.cso")),
+		gridDebugVS(new Shader(Utils::File::getRootFolder() + L"GridDebugVS.cso")),
+		gridDebugPS(new Shader(Utils::File::getRootFolder() + L"GridDebugPS.cso")),
+		oceanVS(new Shader(Utils::File::getRootFolder() + L"OceanVS.cso")),
+		oceanHS(new Shader(Utils::File::getRootFolder() + L"OceanHS.cso")),
+		oceanDS(new Shader(Utils::File::getRootFolder() + L"OceanDS.cso")),
+		oceanPS(new Shader(Utils::File::getRootFolder() + L"OceanPS.cso")),
+		spectrumCS(new Shader(Utils::File::getRootFolder() + L"SpectrumCS.cso")),
+		conjugateCS(new Shader(Utils::File::getRootFolder() + L"ConjugateCS.cso")),
+		displacementSpectrumCS(new Shader(Utils::File::getRootFolder() + L"DisplacementSpectrumCS.cso")),
+		ifftCS(new Shader(Utils::File::getRootFolder() + L"IFFTCS.cso")),
+		permutationCS(new Shader(Utils::File::getRootFolder() + L"PermutationCS.cso")),
+		waveMergeCS(new Shader(Utils::File::getRootFolder() + L"WaveMergeCS.cso"))
 	{
 		spectrumParam[0].mapLength = lengthScale0;
 
@@ -265,11 +265,11 @@ public:
 		ImGui::Begin("RenderParam");
 		ImGui::SliderFloat("Lod Scale", &renderParam.lodScale, 1.0f, 10.f);
 		ImGui::SliderFloat("Sun Strength", &renderParam.sunStrength, 0.f, 100.f);
-		ImGui::SliderFloat("Sun Theta", &renderParam.sunTheta, 0.f, Math::pi / 2.f);
+		ImGui::SliderFloat("Sun Theta", &renderParam.sunTheta, 0.f, Utils::Math::pi / 2.f);
 		ImGui::SliderFloat("Specular Pow", &renderParam.specularPower, 0.f, 4096.f);
 		ImGui::SliderFloat("Foam Bias", &renderParam.foamBias, 0.f, 5.f);
 		ImGui::SliderFloat("Foam Scale", &renderParam.foamScale, 0.f, 1.f);
-		ImGui::SliderFloat("Sun Direction", &renderParam.sunDirection, 0.f, Math::two_pi);
+		ImGui::SliderFloat("Sun Direction", &renderParam.sunDirection, 0.f, Utils::Math::twoPi);
 		ImGui::End();
 	}
 
@@ -311,9 +311,9 @@ private:
 
 	void calculateInitialSpectrum()
 	{
-		const float boundary1 = 2.f * Math::pi / lengthScale1 * 12.f;
+		const float boundary1 = 2.f * Utils::Math::pi / lengthScale1 * 12.f;
 
-		const float boundary2 = 2.f * Math::pi / lengthScale2 * 12.f;
+		const float boundary2 = 2.f * Utils::Math::pi / lengthScale2 * 12.f;
 
 		{
 			spectrumParam[0].cutoffLow = 0.0001f;
@@ -690,7 +690,7 @@ private:
 	{
 		const UINT mapResolution = textureResolution;
 		float mapLength;
-		const DirectX::XMFLOAT2 wind = { 12.f * cosf(0.93f + Math::half_pi),12.f * sinf(0.93f + Math::half_pi) };
+		const DirectX::XMFLOAT2 wind = { 12.f * cosf(0.93f + Utils::Math::halfPi),12.f * sinf(0.93f + Utils::Math::halfPi) };
 		const float amplitude = 0.000002f;
 		const float gravity = 9.81f;
 		float cutoffLow;

@@ -1,7 +1,7 @@
 ﻿#pragma once
 
-#ifndef _WALLPAPERHELPER_H_
-#define _WALLPAPERHELPER_H_
+#ifndef _UTILS_WALLPAPERHELPER_H_
+#define _UTILS_WALLPAPERHELPER_H_
 
 #include<cstdint>
 
@@ -9,13 +9,16 @@
 
 #include<Windows.h>
 
-namespace WallpaperHelper
+namespace Utils
 {
+	namespace WallpaperHelper
+	{
 
-	void getSystemResolution(uint32_t& width, uint32_t& height);
+		void getSystemResolution(uint32_t& width, uint32_t& height);
 
-	HWND getWallpaperHWND();
+		HWND getWallpaperHWND();
 
+	}
 }
 
-#endif // !_WALLPAPERHELPER_H_
+#endif // !_UTILS_WALLPAPERHELPER_H_

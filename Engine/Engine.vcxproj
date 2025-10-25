@@ -128,7 +128,7 @@
     <ClInclude Include="Inc\Gear\Core\DynamicCBufferManager.h" />
     <ClInclude Include="Inc\Gear\Core\DynamicCBufferRegion.h" />
     <ClInclude Include="Inc\Gear\Core\Effect\FXAAEffect.h" />
-    <ClInclude Include="Inc\Gear\Core\GraphicsInternal.h" />
+    <ClInclude Include="Inc\Gear\Core\Internal\GraphicsInternal.h" />
     <ClInclude Include="Inc\Gear\Core\Raytracing\BottomLevelAS.h" />
     <ClInclude Include="Inc\Gear\Core\Raytracing\TopLevelAS.h" />
     <ClInclude Include="Inc\Gear\Core\RenderTask.h" />
@@ -142,10 +142,12 @@
     <ClInclude Include="Inc\Gear\Utils\DeltaTimeEstimator.h" />
     <ClInclude Include="Inc\Gear\Core\Resource\BufferView.h" />
     <ClInclude Include="Inc\Gear\Core\Resource\CounterBufferView.h" />
-    <ClInclude Include="Inc\Gear\Utils\FMT.h" />
+    <ClInclude Include="Inc\Gear\Core\FMT.h" />
+    <ClInclude Include="Inc\Gear\Utils\Logger.h" />
+    <ClInclude Include="Inc\Gear\Utils\Internal\LoggerInternal.h" />
     <ClInclude Include="Inc\Gear\Utils\Logger\LogColor.h" />
     <ClInclude Include="Inc\Gear\Utils\Logger\LogContext.h" />
-    <ClInclude Include="Inc\Gear\Utils\Logger.h" />
+    <ClInclude Include="Inc\Gear\Utils\Internal\FileInternal.h" />
     <ClInclude Include="Inc\Gear\Utils\WallpaperHelper.h" />
     <ClInclude Include="Inc\ImGUI\imconfig.h" />
     <ClInclude Include="Inc\ImGUI\imgui.h" />
@@ -196,7 +198,7 @@
     <ClInclude Include="Inc\Gear\Utils\Math.h" />
     <ClInclude Include="Inc\Gear\Utils\Random.h" />
     <ClInclude Include="Inc\Gear\Utils\Timer.h" />
-    <ClInclude Include="Inc\Gear\Utils\Utils.h" />
+    <ClInclude Include="Inc\Gear\Utils\File.h" />
     <ClInclude Include="Inc\Gear\Window\Win32Form.h" />
     <ClInclude Include="Inc\DirectXTex\WICTextureLoader12.h" />
     <ClInclude Include="Inc\stb_image_write.h" />
@@ -264,14 +266,14 @@
     <ClCompile Include="Src\Input\Keyboard.cpp" />
     <ClCompile Include="Src\Input\Mouse.cpp" />
     <ClCompile Include="Src\Utils\Color.cpp" />
-    <ClCompile Include="Src\Utils\FMT.cpp" />
+    <ClCompile Include="Src\Core\FMT.cpp" />
+    <ClCompile Include="Src\Utils\Logger.cpp" />
     <ClCompile Include="Src\Utils\Logger\LogColor.cpp" />
     <ClCompile Include="Src\Utils\Logger\LogContext.cpp" />
-    <ClCompile Include="Src\Utils\Logger.cpp" />
     <ClCompile Include="Src\Utils\Math.cpp" />
     <ClCompile Include="Src\Utils\Random.cpp" />
     <ClCompile Include="Src\Utils\Timer.cpp" />
-    <ClCompile Include="Src\Utils\Utils.cpp" />
+    <ClCompile Include="Src\Utils\File.cpp" />
     <ClCompile Include="Src\Utils\WallpaperHelper.cpp" />
     <ClCompile Include="Src\Window\Win32Form.cpp" />
   </ItemGroup>

@@ -1,141 +1,190 @@
 ﻿#include<Gear/Utils/Logger.h>
 
+#include<Gear/Utils/Internal/LoggerInternal.h>
+
 #include<iostream>
+
+#include<fstream>
+
+#include<queue>
+
+#define NOMINMAX
 
 #include<Windows.h>
 
-Logger* Logger::instance = nullptr;
-
-void Logger::submitLogMessage(const LogMessage& msg)
+namespace
 {
-	instance->submitMessage(msg);
-}
-
-Logger::Logger() :
-	isRunning(true)
-{
-	//to support multiple language first set global locale to .UTF-8
-	//and then set console output code page to CP_UTF8
-	//steps above will make sure console and log.txt have correct content
-	std::locale::global(std::locale(".UTF-8"));
-
-	SetConsoleOutputCP(CP_UTF8);
-
-	file = std::wofstream(L"log.txt", std::ios_base::out | std::ios_base::trunc);
-
-	worker = std::thread(&Logger::workerLoop, this);
-}
-
-Logger::~Logger()
-{
-	shutdown();
-
-	if (file.is_open())
+	class LoggerPrivate
 	{
-		file.flush();
+	public:
 
-		file.close();
-	}
-}
+		LoggerPrivate(const LoggerPrivate&) = delete;
 
-void Logger::shutdown()
-{
-	{
-		std::lock_guard<std::mutex> lockGuard(queueLock);
+		void operator=(const LoggerPrivate&) = delete;
 
-		isRunning = false;
-	}
-
-	cv.notify_one();
-
-	if (worker.joinable())
-	{
-		worker.join();
-	}
-
-	while (!messages.empty())
-	{
-		LogMessage message = std::move(messages.front());
-
-		messages.pop();
-
-		temp = message.slot.str;
-
+		LoggerPrivate() :
+			isRunning(true)
 		{
-			std::lock_guard<std::mutex> inUseLock(message.inUseMutex);
+			//为了支持多语言
+			//首先设置locale为.UTF-8
+			//接着设置控制台输出代码页为CP_UTF8
+			std::locale::global(std::locale(".UTF-8"));
 
-			message.slot.inUse = false;
+			SetConsoleOutputCP(CP_UTF8);
+
+			file = std::wofstream(L"log.txt", std::ios_base::out | std::ios_base::trunc);
+
+			worker = std::thread(&LoggerPrivate::workerLoop, this);
 		}
 
-		message.inUseCV.notify_one();
-
-		if (file.is_open())
+		~LoggerPrivate()
 		{
-			std::wcout << temp << L"\n";
+			shutdown();
 
-			file << temp << L"\n";
-		}
-	}
-}
-
-void Logger::submitMessage(const LogMessage& msg)
-{
-	{
-		std::lock_guard<std::mutex> lockGuard(queueLock);
-
-		messages.push(msg);
-	}
-
-	cv.notify_one();
-}
-
-void Logger::workerLoop()
-{
-	while (true)
-	{
-		std::unique_lock<std::mutex> lock(queueLock);
-
-		cv.wait(lock, [this]() {return !messages.empty() || !isRunning; });
-
-		if (!isRunning)
-		{
-			break;
-		}
-
-		while (!messages.empty())
-		{
-			LogMessage message = std::move(messages.front());
-
-			messages.pop();
-
-			lock.unlock();
-
-			temp = message.slot.str;
-
+			if (file.is_open())
 			{
-				std::lock_guard<std::mutex> inUseLock(message.inUseMutex);
-
-				message.slot.inUse = false;
-			}
-
-			message.inUseCV.notify_one();
-
-			std::wcout << temp << L"\n";
-
-			file << temp << L"\n";
-
-			lock.lock();
-
-			if (message.type == LogType::LOG_ERROR)
-			{
-				isRunning = false;
-
 				file.flush();
 
 				file.close();
-
-				break;
 			}
 		}
+
+		void submitLogMessage(const Utils::Logger::LogMessage& msg)
+		{
+			{
+				std::lock_guard<std::mutex> lockGuard(queueLock);
+
+				messages.push(msg);
+			}
+
+			cv.notify_one();
+		}
+
+	private:
+
+		std::wofstream file;
+
+		std::queue<Utils::Logger::LogMessage> messages;
+
+		bool isRunning;
+
+		std::mutex queueLock;
+
+		std::condition_variable cv;
+
+		std::wstring temp;
+
+		std::thread worker;
+
+		void shutdown()
+		{
+			{
+				std::lock_guard<std::mutex> lockGuard(queueLock);
+
+				isRunning = false;
+			}
+
+			cv.notify_one();
+
+			if (worker.joinable())
+			{
+				worker.join();
+			}
+
+			while (!messages.empty())
+			{
+				Utils::Logger::LogMessage message = std::move(messages.front());
+
+				messages.pop();
+
+				temp = message.slot.str;
+
+				{
+					std::lock_guard<std::mutex> inUseLock(message.inUseMutex);
+
+					message.slot.inUse = false;
+				}
+
+				message.inUseCV.notify_one();
+
+				if (file.is_open())
+				{
+					std::wcout << temp << L"\n";
+
+					file << temp << L"\n";
+				}
+			}
+		}
+
+		void workerLoop()
+		{
+			while (true)
+			{
+				std::unique_lock<std::mutex> lock(queueLock);
+
+				cv.wait(lock, [this]() {return !messages.empty() || !isRunning; });
+
+				if (!isRunning)
+				{
+					break;
+				}
+
+				while (!messages.empty())
+				{
+					Utils::Logger::LogMessage message = std::move(messages.front());
+
+					messages.pop();
+
+					lock.unlock();
+
+					temp = message.slot.str;
+
+					{
+						std::lock_guard<std::mutex> inUseLock(message.inUseMutex);
+
+						message.slot.inUse = false;
+					}
+
+					message.inUseCV.notify_one();
+
+					std::wcout << temp << L"\n";
+
+					file << temp << L"\n";
+
+					lock.lock();
+
+					if (message.type == Utils::Logger::LogType::LOG_ERROR)
+					{
+						isRunning = false;
+
+						file.flush();
+
+						file.close();
+
+						break;
+					}
+				}
+			}
+		}
+
+	}*pvt = nullptr;
+
+}
+
+void Utils::Logger::submitLogMessage(const LogMessage& msg)
+{
+	pvt->submitLogMessage(msg);
+}
+
+void Utils::Logger::Internal::initialize()
+{
+	pvt = new LoggerPrivate();
+}
+
+void Utils::Logger::Internal::shutdown()
+{
+	if (pvt)
+	{
+		delete pvt;
 	}
 }

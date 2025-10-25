@@ -1,4 +1,8 @@
-﻿#include<Gear/Utils/Utils.h>
+﻿#include<Gear/Utils/File.h>
+
+#include<Gear/Utils/Internal/FileInternal.h>
+
+#include<Gear/Utils/Logger.h>
 
 #include<fstream>
 
@@ -8,7 +12,18 @@
 
 #include<vector>
 
-std::wstring Utils::exeRootPath;
+namespace
+{
+    struct FilePrivate
+    {
+        std::wstring rootFolder;
+    }pvt;
+}
+
+std::wstring Utils::File::getRootFolder()
+{
+    return pvt.rootFolder;
+}
 
 std::wstring Utils::File::backslashToSlash(const std::wstring& filePath)
 {
@@ -86,7 +101,7 @@ std::vector<uint8_t> Utils::File::readAllBinary(const std::wstring& filePath)
     return bytes;
 }
 
-std::wstring Utils::getRootFolder()
+void Utils::File::Internal::setRootFolder(const std::wstring& rootFolder)
 {
-	return exeRootPath;
+    pvt.rootFolder = rootFolder;
 }

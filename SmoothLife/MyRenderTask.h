@@ -11,9 +11,9 @@ public:
 
 	MyRenderTask() :
 		timer(1.f / 60.f),
-		whiteNoiseCS(new Shader(Utils::getRootFolder() + L"WhiteNoiseCS.cso")),
-		evolveCS(new Shader(Utils::getRootFolder() + L"EvolveCS.cso")),
-		visualizeCS(new Shader(Utils::getRootFolder() + L"VisualizeCS.cso")),
+		whiteNoiseCS(new Shader(Utils::File::getRootFolder() + L"WhiteNoiseCS.cso")),
+		evolveCS(new Shader(Utils::File::getRootFolder() + L"EvolveCS.cso")),
+		visualizeCS(new Shader(Utils::File::getRootFolder() + L"VisualizeCS.cso")),
 		originTexture(ResourceManager::createTextureRenderView(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R8G8B8A8_UNORM, 1, 1, false, true,
 			DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_UNKNOWN))
 	{
@@ -68,7 +68,7 @@ protected:
 
 		context->setCSConstants({ swapTexture->write()->getUAVMipIndex(0) }, 0);
 
-		UINT uintSeed = Random::genUint();
+		UINT uintSeed = Utils::Random::genUint();
 
 		context->setCSConstants(1, &uintSeed, 1);
 
@@ -172,6 +172,6 @@ private:
 
 	TextureRenderView* originTexture;
 
-	Timer timer;
+	Utils::Timer timer;
 
 };

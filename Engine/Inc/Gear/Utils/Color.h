@@ -1,36 +1,38 @@
 ﻿#pragma once
 
-#ifndef _COLOR_H_
-#define _COLOR_H_
+#ifndef _UTILS_COLOR_H_
+#define _UTILS_COLOR_H_
 
-#include"Random.h"
-#include"Math.h"
+#include<cstdint>
 
 #include<DirectXColors.h>
 
-struct Color
+namespace Utils
 {
+	struct Color
+	{
 
-	float r;
+		float r;
 
-	float g;
+		float g;
 
-	float b;
+		float b;
 
-	float a;
+		float a;
 
-	uint32_t toUint() const;
+		uint32_t toUint() const;
 
-	bool operator==(const Color& color) const;
+		bool operator==(const Color& color) const;
 
-	bool operator!=(const Color& color) const;
+		bool operator!=(const Color& color) const;
 
-	operator const float* () const;
+		operator const float* () const;
 
-	static Color random();
+		static Color random();
 
-	static Color hsvToRgb(const Color& c);
+		static Color hsvToRgb(const Color& c);
 
-};
+	};
+}
 
-#endif // !_COLOR_H_
+#endif // !_UTILS_COLOR_H_

@@ -31,17 +31,17 @@ public:
 			DXGI_FORMAT_R32_FLOAT, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_R32_FLOAT, distanceCubeClearColor)),
 		depthCube(ResourceManager::createTextureDepthView(probeCaptureResolution, probeCaptureResolution, DXGI_FORMAT_D32_FLOAT, 6, 1, true, true)),
 		irradianceVolumeBuffer(ResourceManager::createStaticCBuffer(sizeof(IrradianceVolume), true)),
-		shadowVS(new Shader(Utils::getRootFolder() + L"ShadowVS.cso")),
-		deferredVShader(new Shader(Utils::getRootFolder() + L"DeferredVShader.cso")),
-		deferredPShader(new Shader(Utils::getRootFolder() + L"DeferredPShader.cso")),
-		deferredFinal(new Shader(Utils::getRootFolder() + L"DeferredFinal.cso")),
-		cubeRenderVS(new Shader(Utils::getRootFolder() + L"CubeRenderVS.cso")),
-		cubeRenderPS(new Shader(Utils::getRootFolder() + L"CubeRenderPS.cso")),
-		cubeRenderBouncePS(new Shader(Utils::getRootFolder() + L"CubeRenderBouncePS.cso")),
-		irradianceOctahedralEncode(new Shader(Utils::getRootFolder() + L"IrradianceOctahedralEncode.cso")),
-		depthOctahedralEncode(new Shader(Utils::getRootFolder() + L"DepthOctahedralEncode.cso")),
-		skyboxPShader(new Shader(Utils::getRootFolder() + L"SkybosPShader.cso")),
-		sunAngle(Math::half_pi - 0.01f)
+		shadowVS(new Shader(Utils::File::getRootFolder() + L"ShadowVS.cso")),
+		deferredVShader(new Shader(Utils::File::getRootFolder() + L"DeferredVShader.cso")),
+		deferredPShader(new Shader(Utils::File::getRootFolder() + L"DeferredPShader.cso")),
+		deferredFinal(new Shader(Utils::File::getRootFolder() + L"DeferredFinal.cso")),
+		cubeRenderVS(new Shader(Utils::File::getRootFolder() + L"CubeRenderVS.cso")),
+		cubeRenderPS(new Shader(Utils::File::getRootFolder() + L"CubeRenderPS.cso")),
+		cubeRenderBouncePS(new Shader(Utils::File::getRootFolder() + L"CubeRenderBouncePS.cso")),
+		irradianceOctahedralEncode(new Shader(Utils::File::getRootFolder() + L"IrradianceOctahedralEncode.cso")),
+		depthOctahedralEncode(new Shader(Utils::File::getRootFolder() + L"DepthOctahedralEncode.cso")),
+		skyboxPShader(new Shader(Utils::File::getRootFolder() + L"SkybosPShader.cso")),
+		sunAngle(Utils::Math::halfPi - 0.01f)
 	{
 		irradianceOctahedralMap = ResourceManager::createTextureRenderView(6, 6, DXGI_FORMAT_R11G11B10_FLOAT, probeCount, 1, false, true,
 			DXGI_FORMAT_R11G11B10_FLOAT, DXGI_FORMAT_R11G11B10_FLOAT, DXGI_FORMAT_UNKNOWN);
@@ -198,7 +198,7 @@ public:
 							{0.0f, 1.0f,  0.0f}
 						};
 
-						const DirectX::XMMATRIX projMatrix = DirectX::XMMatrixPerspectiveFovLH(Math::pi / 2.f, 1.f, 1.f, 512.f);
+						const DirectX::XMMATRIX projMatrix = DirectX::XMMatrixPerspectiveFovLH(Utils::Math::pi / 2.f, 1.f, 1.f, 512.f);
 
 						for (int i = 0; i < 6; i++)
 						{

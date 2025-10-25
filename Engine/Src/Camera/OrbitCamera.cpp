@@ -29,9 +29,9 @@ OrbitCamera::OrbitCamera(const DirectX::XMVECTOR& eye, const DirectX::XMVECTOR& 
 
 				float rotAngle = Mouse::getDY() / 120.f;
 
-				if (destAngle > Math::pi - Camera::epsilon)
+				if (destAngle > Utils::Math::pi - Camera::epsilon)
 				{
-					rotAngle = Math::pi - Camera::epsilon - eyeUpAngle;
+					rotAngle = Utils::Math::pi - Camera::epsilon - eyeUpAngle;
 				}
 				else if (destAngle < Camera::epsilon)
 				{
@@ -66,7 +66,7 @@ OrbitCamera::~OrbitCamera()
 
 void OrbitCamera::applyInput(const float dt)
 {
-	currentRadius = Math::lerp(currentRadius, targetRadius, Math::clamp(dt * 20.f, 0.f, 1.f));
+	currentRadius = Utils::Math::lerp(currentRadius, targetRadius, Utils::Math::clamp(dt * 20.f, 0.f, 1.f));
 
 	Camera::setView(DirectX::XMVectorScale(eye, currentRadius), { 0,0,0 }, up);
 }
@@ -88,9 +88,9 @@ void OrbitCamera::rotateY(const float dTheta)
 
 	float rotAngle = dTheta;
 
-	if (destAngle > Math::pi - Camera::epsilon)
+	if (destAngle > Utils::Math::pi - Camera::epsilon)
 	{
-		rotAngle = Math::pi - Camera::epsilon - eyeUpAngle;
+		rotAngle = Utils::Math::pi - Camera::epsilon - eyeUpAngle;
 	}
 	else if (destAngle < Camera::epsilon)
 	{

@@ -11,7 +11,7 @@ public:
 
 	MyRenderTask()
 	{
-		pixelShader = new Shader(Utils::getRootFolder() + L"PixelShader.cso");
+		pixelShader = new Shader(Utils::File::getRootFolder() + L"PixelShader.cso");
 
 		{
 			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = PipelineState::getDefaultFullScreenState();

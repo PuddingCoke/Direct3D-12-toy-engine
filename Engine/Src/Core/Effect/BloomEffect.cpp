@@ -1,6 +1,6 @@
 ﻿#include<Gear/Core/Effect/BloomEffect.h>
 
-#include<Gear/Utils/Utils.h>
+#include<Gear/Utils/File.h>
 
 #include<Gear/CompiledShaders/BloomFilterPS.h>
 
@@ -16,7 +16,7 @@
 
 BloomEffect::BloomEffect(GraphicsContext* const context, const uint32_t width, const uint32_t height, ResourceManager* const resManager) :
 	Effect(context, width, height, DXGI_FORMAT_R16G16B16A16_FLOAT),
-	lensDirtTexture(resManager->createTextureRenderView(Utils::getRootFolder() + L"bloom_dirt_mask.png", true)),
+	lensDirtTexture(resManager->createTextureRenderView(Utils::File::getRootFolder() + L"bloom_dirt_mask.png", true)),
 	filteredTexture(ResourceManager::createTextureRenderView(width, height, DXGI_FORMAT_R16G16B16A16_FLOAT, 1, 1, false, true,
 		DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_R16G16B16A16_FLOAT))
 {
@@ -105,7 +105,7 @@ BloomEffect::BloomEffect(GraphicsContext* const context, const uint32_t width, c
 	{
 		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = getDefaultPipelineState();
 		desc.PS = Shader::fullScreenPS->getByteCode();
-		desc.BlendState = PipelineState::addtiveBlendDesc;
+		desc.BlendState = PipelineState::blendAddtive;
 
 		GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&bloomUpSampleState));
 	}
@@ -294,12 +294,12 @@ float BloomEffect::getGamma() const
 
 void BloomEffect::updateCurve(GraphicsContext* const context, const uint32_t index)
 {
-	blurParam[index].weight[0] = Math::gauss(blurParam[index].sigma, 0.f);
+	blurParam[index].weight[0] = Utils::Math::gauss(blurParam[index].sigma, 0.f);
 
 	for (uint32_t i = 1; i < (iteration[index] - 1) * 2 + 1; i += 2)
 	{
-		const float g1 = Math::gauss(blurParam[index].sigma, (float)i);
-		const float g2 = Math::gauss(blurParam[index].sigma, (float)(i + 1));
+		const float g1 = Utils::Math::gauss(blurParam[index].sigma, (float)i);
+		const float g2 = Utils::Math::gauss(blurParam[index].sigma, (float)(i + 1));
 		blurParam[index].weight[(i + 1) / 2] = g1 + g2;
 		blurParam[index].offset[(i + 1) / 2] = (g1 * i + g2 * (i + 1)) / (g1 + g2);
 	}

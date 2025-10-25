@@ -13,6 +13,8 @@
 
 #include<DirectXColors.h>
 
+#include<fstream>
+
 #include"Epicycle.h"
 
 #include"json.hpp"
@@ -83,7 +85,7 @@ public:
 			desc.VS = Shader::fullScreenVS->getByteCode();
 			desc.PS = Shader::fullScreenPS->getByteCode();
 			desc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
-			desc.BlendState = PipelineState::defBlendDesc;
+			desc.BlendState = PipelineState::blendDefault;
 			desc.DepthStencilState.DepthEnable = FALSE;
 			desc.DepthStencilState.StencilEnable = FALSE;
 			desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;

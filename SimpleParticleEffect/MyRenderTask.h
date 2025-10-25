@@ -38,7 +38,7 @@ public:
 			desc.VS = particleVS->getByteCode();
 			desc.GS = particleGS->getByteCode();
 			desc.PS = particlePS->getByteCode();
-			desc.BlendState = PipelineState::addtiveBlendDesc;
+			desc.BlendState = PipelineState::blendAddtive;
 			desc.RasterizerState = PipelineState::rasterCullBack;
 			desc.DepthStencilState = PipelineState::depthLess;
 			desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_POINT;
@@ -65,11 +65,11 @@ public:
 
 			for (UINT i = 0; i < numParticles; i++)
 			{
-				const float radius = 0.3f * Random::genFloat() + 0.3f;
+				const float radius = 0.3f * Utils::Random::genFloat() + 0.3f;
 
-				const float theta = Random::genFloat() * Math::two_pi;
+				const float theta = Utils::Random::genFloat() * Utils::Math::twoPi;
 
-				const float phi = Random::genFloat() * Math::two_pi;
+				const float phi = Utils::Random::genFloat() * Utils::Math::twoPi;
 
 				positions[i] = DirectX::XMFLOAT4(radius * cosf(theta) * sinf(phi), radius * cosf(theta) * cosf(phi), radius * sinf(theta), 1.f);
 

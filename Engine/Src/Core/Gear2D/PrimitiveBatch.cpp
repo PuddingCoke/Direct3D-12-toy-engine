@@ -42,7 +42,7 @@ PrimitiveBatch::PrimitiveBatch(const DXGI_FORMAT format, GraphicsContext* const 
 		desc.GS = lineGS->getByteCode();
 		desc.PS = primitivePS->getByteCode();
 		desc.RasterizerState = PipelineState::rasterCullBack;
-		desc.BlendState = PipelineState::defBlendDesc;
+		desc.BlendState = PipelineState::blendDefault;
 		desc.DepthStencilState.DepthEnable = FALSE;
 		desc.DepthStencilState.StencilEnable = FALSE;
 		desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE;
@@ -66,7 +66,7 @@ PrimitiveBatch::PrimitiveBatch(const DXGI_FORMAT format, GraphicsContext* const 
 		desc.GS = lineGS->getByteCode();
 		desc.PS = primitivePS->getByteCode();
 		desc.RasterizerState = PipelineState::rasterCullBack;
-		desc.BlendState = PipelineState::defBlendDesc;
+		desc.BlendState = PipelineState::blendDefault;
 		desc.DepthStencilState.DepthEnable = FALSE;
 		desc.DepthStencilState.StencilEnable = FALSE;
 		desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE;
@@ -90,7 +90,7 @@ PrimitiveBatch::PrimitiveBatch(const DXGI_FORMAT format, GraphicsContext* const 
 		desc.GS = rcLineGS->getByteCode();
 		desc.PS = primitivePS->getByteCode();
 		desc.RasterizerState = PipelineState::rasterCullBack;
-		desc.BlendState = PipelineState::defBlendDesc;
+		desc.BlendState = PipelineState::blendDefault;
 		desc.DepthStencilState.DepthEnable = FALSE;
 		desc.DepthStencilState.StencilEnable = FALSE;
 		desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE;

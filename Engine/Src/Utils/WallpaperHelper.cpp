@@ -1,6 +1,6 @@
 ﻿#include<Gear/Utils/WallpaperHelper.h>
 
-void WallpaperHelper::getSystemResolution(uint32_t& width, uint32_t& height)
+void Utils::WallpaperHelper::getSystemResolution(uint32_t& width, uint32_t& height)
 {
 	HMONITOR monitor = MonitorFromWindow(GetDesktopWindow(), MONITOR_DEFAULTTONEAREST);
 
@@ -20,7 +20,7 @@ void WallpaperHelper::getSystemResolution(uint32_t& width, uint32_t& height)
 	height = devMode.dmPelsHeight;
 }
 
-HWND WallpaperHelper::getWallpaperHWND()
+HWND Utils::WallpaperHelper::getWallpaperHWND()
 {
 	const HWND progman = FindWindow(L"ProgMan", nullptr);
 

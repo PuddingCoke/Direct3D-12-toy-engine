@@ -1,4 +1,4 @@
-﻿#include<Gear/Utils/FMT.h>
+﻿#include<Gear/Core/FMT.h>
 
 uint32_t FMT::getByteSize(const DXGI_FORMAT format)
 {

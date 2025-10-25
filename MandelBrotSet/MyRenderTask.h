@@ -13,7 +13,7 @@ public:
 
 	MyRenderTask() :
 		effect(context, Graphics::getWidth(), Graphics::getHeight(), resManager),
-		computeCS(new Shader(Utils::getRootFolder() + L"ComputeCS.cso")),
+		computeCS(new Shader(Utils::File::getRootFolder() + L"ComputeCS.cso")),
 		originTexture(ResourceManager::createTextureRenderView(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R16G16B16A16_UNORM, 1, 1, false, true,
 			DXGI_FORMAT_R16G16B16A16_UNORM, DXGI_FORMAT_R16G16B16A16_UNORM, DXGI_FORMAT_UNKNOWN))
 	{

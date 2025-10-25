@@ -2,7 +2,7 @@
 
 #include<Gear/Core/Graphics.h>
 
-#include<Gear/Core/GraphicsInternal.h>
+#include<Gear/Core/Internal/GraphicsInternal.h>
 
 #include<Gear/Core/Shader.h>
 
@@ -15,8 +15,6 @@
 #include<Gear/Core/StaticResourceManager.h>
 
 #include<Gear/Utils/Random.h>
-
-#include<Gear/Utils/Utils.h>
 
 RenderEngine* RenderEngine::instance = nullptr;
 
@@ -40,7 +38,7 @@ void RenderEngine::submitCommandList(CommandList* const commandList)
 		helperCommandList->resourceBarrier(static_cast<uint32_t>(barriers.size()), barriers.data());
 	}
 
-	//should not close prepareCommandList 
+	//不应该关闭准备命令列表，因为要用它来转变后备缓冲的状态，此外还要用它来记录动态常量缓冲更新指令。
 	if (helperCommandList != prepareCommandList)
 	{
 		helperCommandList->close();
@@ -121,8 +119,7 @@ void RenderEngine::end()
 		ImGui::End();
 	}
 
-	//transition back buffer to STATE_RENDER_TARGET
-	//update all constant buffers
+	//把后备缓冲转变到STATE_RENDER_TARGET，并更新动态常量缓冲
 	{
 		{
 			prepareCommandList->pushResourceTrackList(getRenderTexture());
@@ -134,9 +131,9 @@ void RenderEngine::end()
 
 		perFrameResource.timeElapsed = Graphics::getTimeElapsed();
 
-		perFrameResource.uintSeed = Random::genUint();
+		perFrameResource.uintSeed = Utils::Random::genUint();
 
-		perFrameResource.floatSeed = Random::genFloat();
+		perFrameResource.floatSeed = Utils::Random::genFloat();
 
 		perFrameResource.matrices = Camera::matrices;
 
@@ -149,9 +146,9 @@ void RenderEngine::end()
 		updateConstantBuffer();
 	}
 
-	//we rely on the last commandList to do some finishing works
-	//draw ImGui frame 
-	//transition back buffer to STATE_PRESENT
+	//使用最后一个命令列表做些收尾工作
+	//如有需要绘制ImGui帧
+	//把后备缓冲转变到STATE_PRESENT
 	{
 		CommandList* const finishCommandList = recordCommandLists.back();
 
@@ -259,19 +256,18 @@ ComPtr<IDXGIAdapter4> RenderEngine::getBestAdapterAndVendor(IDXGIFactory7* const
 
 void RenderEngine::initializeResources()
 {
-	//turn on ImGui surface if it is needed
+	//如果有需要那么开启ImGui
 	toggleImGuiSurface();
 
-	//update all constant buffers since resource creation might need these buffers
+	//更新动态常量缓冲，因为资源创建可能会需要动态常量缓冲
 	updateConstantBuffer();
 
 	processCommandLists();
 
-	//wait little seconds here
+	//等待准备工作完成
 	waitForCurrentFrame();
 
-	//the creation of static resources like constant buffers and read-only textures will create uploadheap
-	//so we need to release transient resources here
+	//清理静态资源管理器创建的临时资源
 	StaticResourceManager::get()->cleanTransientResources();
 }
 
@@ -299,7 +295,7 @@ void RenderEngine::drawImGuiFrame(CommandList* const targetCommandList)
 	{
 		ImGui::Render();
 
-		//we take an assumption here that global descriptor heap and global sampler heap are bound on target command list by default
+		//这里假设了全局描述堆和全局采样器堆已经进行了绑定
 		//targetCommandList->setDescriptorHeap(GlobalDescriptorHeap::getResourceHeap(), GlobalDescriptorHeap::getSamplerHeap());
 
 		targetCommandList->setDefRenderTarget();
@@ -315,10 +311,10 @@ void RenderEngine::setDefRenderTexture()
 
 void RenderEngine::setRenderTexture(Texture* const renderTexture, const D3D12_CPU_DESCRIPTOR_HANDLE handle)
 {
-	//state transition
+	//状态转变
 	this->renderTexture = renderTexture;
 
-	//set render target
+	//渲染目标
 	CommandList::setBackBufferHandle(handle);
 }
 
@@ -417,8 +413,6 @@ RenderEngine::RenderEngine(const uint32_t width, const uint32_t height, const HW
 
 	Shader::createGlobalShaders();
 
-	PipelineState::initialize();
-
 	GlobalDescriptorHeap::instance = new GlobalDescriptorHeap();
 
 	GlobalRootSignature::instance = new GlobalRootSignature();
@@ -462,7 +456,7 @@ RenderEngine::RenderEngine(const uint32_t width, const uint32_t height, const HW
 
 	GraphicsContext::reservedGlobalCBuffer = reservedGlobalCBuffer;
 
-	//make sure beginCommandList is always the first element of recordCommandLists
+	//确保准备命令列表总是处于容器第一个位置
 	begin();
 
 	if (useSwapChainBuffer)

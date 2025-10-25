@@ -1,13 +1,12 @@
 ﻿#pragma once
 
-#ifndef _GRAPHICSINTERNAL_H_
-#define _GRAPHICSINTERNAL_H_
+#ifndef _GRAPHICS_INTERNAL_H_
+#define _GRAPHICS_INTERNAL_H_
 
 #include<cstdint>
 
 namespace Graphics
 {
-
 	namespace Internal
 	{
 
@@ -22,7 +21,6 @@ namespace Graphics
 		void updateTimeElapsed();
 
 	}
-
 }
 
-#endif // !_GRAPHICSINTERNAL_H_
+#endif // !_GRAPHICS_INTERNAL_H_

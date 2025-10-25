@@ -12,7 +12,7 @@ class MyRenderTask :public RenderTask
 public:
 
 	MyRenderTask() :
-		blackHoleShader(new Shader(Utils::getRootFolder() + L"BlackHolePS.cso")),
+		blackHoleShader(new Shader(Utils::File::getRootFolder() + L"BlackHolePS.cso")),
 		noiseTexture(resManager->createTextureRenderView(L"Noise.png", true)),
 		diskTexture(resManager->createTextureRenderView(L"Disk.jpg", true)),
 		originTexture(ResourceManager::createTextureRenderView(Graphics::getWidth(), Graphics::getHeight(), FMT::RGBA16F, 1, 1, false, true,

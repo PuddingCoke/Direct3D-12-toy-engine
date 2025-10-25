@@ -19,27 +19,27 @@ namespace
 	thread_local std::uniform_int_distribution<uint32_t> uintDistribution = std::uniform_int_distribution<uint32_t>(0u, UINT32_MAX);
 }
 
-float Random::genGauss()
+float Utils::Random::genGauss()
 {
 	return normalDistribution(randomEngine);
 }
 
-float Random::genFloat()
+float Utils::Random::genFloat()
 {
 	return floatDistribution(randomEngine);
 }
 
-double Random::genDouble()
+double Utils::Random::genDouble()
 {
 	return doubleDistribution(randomEngine);
 }
 
-int32_t Random::genInt()
+int32_t Utils::Random::genInt()
 {
 	return intDistribution(randomEngine);
 }
 
-uint32_t Random::genUint()
+uint32_t Utils::Random::genUint()
 {
 	return uintDistribution(randomEngine);
 }

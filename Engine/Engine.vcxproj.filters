@@ -228,7 +228,7 @@
     <ClInclude Include="Inc\Gear\Utils\Timer.h">
       <Filter>Header\Utils</Filter>
     </ClInclude>
-    <ClInclude Include="Inc\Gear\Utils\Utils.h">
+    <ClInclude Include="Inc\Gear\Utils\File.h">
       <Filter>Header\Utils</Filter>
     </ClInclude>
     <ClInclude Include="Inc\Gear\Core\Camera.h">
@@ -307,9 +307,6 @@
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="Inc\Gear\Core\RenderTask.h">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="Inc\Gear\Utils\Logger.h">
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="Inc\DirectXTex\WICTextureLoader12.h">
@@ -405,7 +402,7 @@
     <ClInclude Include="Inc\stb_image_write.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="Inc\Gear\Utils\FMT.h">
+    <ClInclude Include="Inc\Gear\Core\FMT.h">
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="Inc\Gear\Utils\WallpaperHelper.h">
@@ -420,7 +417,16 @@
     <ClInclude Include="Inc\Gear\Core\Resource\StaticCBuffer.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="Inc\Gear\Core\GraphicsInternal.h">
+    <ClInclude Include="Inc\Gear\Core\Internal\GraphicsInternal.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Gear\Utils\Internal\FileInternal.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Gear\Utils\Internal\LoggerInternal.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Gear\Utils\Logger.h">
       <Filter>Header</Filter>
     </ClInclude>
   </ItemGroup>
@@ -524,7 +530,7 @@
     <ClCompile Include="Src\Utils\Timer.cpp">
       <Filter>Source\Utils</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Utils\Utils.cpp">
+    <ClCompile Include="Src\Utils\File.cpp">
       <Filter>Source\Utils</Filter>
     </ClCompile>
     <ClCompile Include="Src\Window\Win32Form.cpp">
@@ -602,9 +608,6 @@
     <ClCompile Include="Src\Core\RenderTask.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Utils\Logger.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
     <ClCompile Include="Inc\DirectXTex\WICTextureLoader12.cpp">
       <Filter>Source</Filter>
     </ClCompile>
@@ -626,7 +629,7 @@
     <ClCompile Include="Src\Utils\Logger\LogContext.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Utils\FMT.cpp">
+    <ClCompile Include="Src\Core\FMT.cpp">
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="Src\Utils\WallpaperHelper.cpp">
@@ -639,6 +642,9 @@
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="Src\Core\Resource\StatiCBuffer.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Utils\Logger.cpp">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>

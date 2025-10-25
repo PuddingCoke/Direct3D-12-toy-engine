@@ -12,6 +12,10 @@
 
 #include<Gear/Utils/Logger.h>
 
+#include<Gear/Utils/Internal/LoggerInternal.h>
+
+#include<Gear/Utils/Internal/FileInternal.h>
+
 #include<dxgidebug.h>
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
@@ -27,17 +31,17 @@ Gear* Gear::get()
 
 int32_t Gear::iniEngine(const InitializationParam& param, const int32_t argc, const wchar_t* argv[])
 {
-	Logger::instance = new Logger();
+	Utils::Logger::Internal::initialize();
 
-	Utils::exeRootPath = Utils::File::backslashToSlash(Utils::File::getParentFolder(argv[0]));
+	Utils::File::Internal::setRootFolder(Utils::File::backslashToSlash(Utils::File::getParentFolder(argv[0])));
 
-	LOGENGINE(L"executable path", LogColor::brightBlue, Utils::getRootFolder());
+	LOGENGINE(L"root folder", LogColor::brightBlue, Utils::File::getRootFolder());
 
 	usage = param.usage;
 
 	DirectX::XMUINT2 systemResolution = {};
 
-	WallpaperHelper::getSystemResolution(systemResolution.x, systemResolution.y);
+	Utils::WallpaperHelper::getSystemResolution(systemResolution.x, systemResolution.y);
 
 	switch (usage)
 	{
@@ -75,7 +79,7 @@ int32_t Gear::iniEngine(const InitializationParam& param, const int32_t argc, co
 		Win32Form::instance = new Win32Form(param.title, 0, 0, systemResolution.x, systemResolution.y, Win32Form::wallpaperWindowStyle, Win32Form::wallpaperCallBack);
 
 		{
-			const HWND parentHWND = WallpaperHelper::getWallpaperHWND();
+			const HWND parentHWND = Utils::WallpaperHelper::getWallpaperHWND();
 
 			SetParent(Win32Form::get()->getHandle(), parentHWND);
 		}
@@ -136,6 +140,8 @@ void Gear::release()
 
 void Gear::runRealTimeRender()
 {
+	Utils::DeltaTimeEstimator dtEstimator;
+
 	while (Win32Form::get()->pollEvents())
 	{
 		const std::chrono::high_resolution_clock::time_point startPoint = std::chrono::high_resolution_clock::now();
@@ -194,7 +200,7 @@ void Gear::runRealTimeRender()
 
 				colors[pixel + 2] = dataPtr[pixel];
 
-				colors[pixel + 3] = dataPtr[pixel + 3];
+				colors[pixel + 3] = 0xFFu;
 			}
 
 			backBufferHeap->unmap();
@@ -203,7 +209,7 @@ void Gear::runRealTimeRender()
 
 			delete[] colors;
 
-			LOGSUCCESS(L"screenshot save to output.png succeeded");
+			LOGSUCCESS(L"screenshot saved to output.png");
 		}
 	}
 }
@@ -302,6 +308,8 @@ void Gear::runVideoRender()
 
 void Gear::runWallpaper()
 {
+	Utils::DeltaTimeEstimator dtEstimator;
+
 	while (Win32Form::get()->pollEvents())
 	{
 		const std::chrono::high_resolution_clock::time_point startPoint = std::chrono::high_resolution_clock::now();
@@ -383,10 +391,7 @@ Gear::~Gear()
 
 	LOGSUCCESS(L"engine exit");
 
-	if (Logger::instance)
-	{
-		delete Logger::instance;
-	}
+	Utils::Logger::Internal::shutdown();
 
 #ifdef _DEBUG
 

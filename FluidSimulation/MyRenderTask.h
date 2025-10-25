@@ -14,20 +14,20 @@ public:
 
 	MyRenderTask() :
 		colorUpdateTimer(1.f),
-		splatVelocityCS(new Shader(Utils::getRootFolder() + L"SplatVelocityCS.cso")),
-		splatColorCS(new Shader(Utils::getRootFolder() + L"SplatColorCS.cso")),
-		vorticityCS(new Shader(Utils::getRootFolder() + L"VorticityCS.cso")),
-		vorticityConfinementCS(new Shader(Utils::getRootFolder() + L"VorticityConfinementCS.cso")),
-		divergenceCS(new Shader(Utils::getRootFolder() + L"DivergenceCS.cso")),
-		pressureResetCS(new Shader(Utils::getRootFolder() + L"PressureResetCS.cso")),
-		pressureCS(new Shader(Utils::getRootFolder() + L"PressureCS.cso")),
-		gradientSubtractCS(new Shader(Utils::getRootFolder() + L"GradientSubtractCS.cso")),
-		velocityAdvectionCS(new Shader(Utils::getRootFolder() + L"VelocityAdvectionCS.cso")),
-		colorAdvectionCS(new Shader(Utils::getRootFolder() + L"ColorAdvectionCS.cso")),
-		velocityBoundaryCS(new Shader(Utils::getRootFolder() + L"VelocityBoundaryCS.cso")),
-		pressureBoundaryCS(new Shader(Utils::getRootFolder() + L"PressureBoundaryCS.cso")),
-		phongShadeCS(new Shader(Utils::getRootFolder() + L"PhongShadeCS.cso")),
-		edgeHighlightCS(new Shader(Utils::getRootFolder() + L"EdgeHighlightCS.cso"))
+		splatVelocityCS(new Shader(Utils::File::getRootFolder() + L"SplatVelocityCS.cso")),
+		splatColorCS(new Shader(Utils::File::getRootFolder() + L"SplatColorCS.cso")),
+		vorticityCS(new Shader(Utils::File::getRootFolder() + L"VorticityCS.cso")),
+		vorticityConfinementCS(new Shader(Utils::File::getRootFolder() + L"VorticityConfinementCS.cso")),
+		divergenceCS(new Shader(Utils::File::getRootFolder() + L"DivergenceCS.cso")),
+		pressureResetCS(new Shader(Utils::File::getRootFolder() + L"PressureResetCS.cso")),
+		pressureCS(new Shader(Utils::File::getRootFolder() + L"PressureCS.cso")),
+		gradientSubtractCS(new Shader(Utils::File::getRootFolder() + L"GradientSubtractCS.cso")),
+		velocityAdvectionCS(new Shader(Utils::File::getRootFolder() + L"VelocityAdvectionCS.cso")),
+		colorAdvectionCS(new Shader(Utils::File::getRootFolder() + L"ColorAdvectionCS.cso")),
+		velocityBoundaryCS(new Shader(Utils::File::getRootFolder() + L"VelocityBoundaryCS.cso")),
+		pressureBoundaryCS(new Shader(Utils::File::getRootFolder() + L"PressureBoundaryCS.cso")),
+		phongShadeCS(new Shader(Utils::File::getRootFolder() + L"PhongShadeCS.cso")),
+		edgeHighlightCS(new Shader(Utils::File::getRootFolder() + L"EdgeHighlightCS.cso"))
 	{
 		const DirectX::XMUINT2 simRes = { Graphics::getWidth() >> config.resolutionFactor,Graphics::getHeight() >> config.resolutionFactor };
 
@@ -332,7 +332,7 @@ public:
 
 		if (colorUpdateTimer.update(Graphics::getDeltaTime() * config.colorChangeSpeed))
 		{
-			Color c = Color::hsvToRgb({ Random::genFloat(),1.f,1.f });
+			Utils::Color c = Utils::Color::hsvToRgb({ Utils::Random::genFloat(),1.f,1.f });
 
 			simulationParam.splatColor = { c.r,c.g,c.b,1.f };
 		}
@@ -448,7 +448,7 @@ private:
 
 	DynamicCBuffer* simulationParamBuffer;
 
-	Timer colorUpdateTimer;
+	Utils::Timer colorUpdateTimer;
 
 	Shader* splatVelocityCS;
 
