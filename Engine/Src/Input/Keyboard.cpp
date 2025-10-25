@@ -1,74 +1,86 @@
 ﻿#include<Gear/Input/Keyboard.h>
 
-Event Keyboard::keyDownEvents[Keyboard::maxKey] = {};
+#include<Gear/Input/Internal/KeyboardInternal.h>
 
-Event Keyboard::keyUpEvents[Keyboard::maxKey] = {};
-
-bool Keyboard::keyDownStates[Keyboard::maxKey] = {};
-
-bool Keyboard::onKeyDownStates[Keyboard::maxKey] = {};
-
-std::vector<uint32_t> Keyboard::onKeyDownClearList = std::vector<uint32_t>();
-
-bool Keyboard::getKeyDown(const Key key)
+namespace
 {
-	return keyDownStates[key];
-}
-
-bool Keyboard::onKeyDown(const Key key)
-{
-	return onKeyDownStates[key];
-}
-
-uint64_t Keyboard::addKeyDownEvent(const Key key, const std::function<void(void)>& func)
-{
-	return keyDownEvents[key] += func;
-}
-
-uint64_t Keyboard::addKeyUpEvent(const Key key, const std::function<void(void)>& func)
-{
-	return keyUpEvents[key] += func;
-}
-
-void Keyboard::removeKeyDownEvent(const Key key, const uint64_t id)
-{
-	keyDownEvents[key] -= id;
-}
-
-void Keyboard::removeKeyUpEvent(const Key key, const uint64_t id)
-{
-	keyUpEvents[key] -= id;
-}
-
-void Keyboard::resetDeltaValue()
-{
-	if (onKeyDownClearList.size())
+	struct KeyboardPrivate
 	{
-		for (uint32_t i = 0; i < onKeyDownClearList.size(); i++)
-		{
-			const uint32_t idx = onKeyDownClearList[i];
 
-			onKeyDownStates[idx] = false;
+		static constexpr size_t maxKey = 512;
+
+		Input::Event keyDownEvents[maxKey] = {};
+
+		Input::Event keyUpEvents[maxKey] = {};
+
+		bool keyDownStates[maxKey] = {};
+
+		bool onKeyDownStates[maxKey] = {};
+
+		std::vector<uint32_t> onKeyDownClearList = std::vector<uint32_t>();
+
+	} pvt;
+}
+
+bool Input::Keyboard::getKeyDown(const Key key)
+{
+	return pvt.keyDownStates[key];
+}
+
+bool Input::Keyboard::onKeyDown(const Key key)
+{
+	return pvt.onKeyDownStates[key];
+}
+
+uint64_t Input::Keyboard::addKeyDownEvent(const Key key, const std::function<void(void)>& func)
+{
+	return pvt.keyDownEvents[key] += func;
+}
+
+uint64_t Input::Keyboard::addKeyUpEvent(const Key key, const std::function<void(void)>& func)
+{
+	return pvt.keyUpEvents[key] += func;
+}
+
+void Input::Keyboard::removeKeyDownEvent(const Key key, const uint64_t id)
+{
+	pvt.keyDownEvents[key] -= id;
+}
+
+void Input::Keyboard::removeKeyUpEvent(const Key key, const uint64_t id)
+{
+	pvt.keyUpEvents[key] -= id;
+}
+
+void Input::Keyboard::Internal::resetDeltaValue()
+{
+	if (pvt.onKeyDownClearList.size())
+	{
+		for (uint32_t i = 0; i < pvt.onKeyDownClearList.size(); i++)
+		{
+			const uint32_t idx = pvt.onKeyDownClearList[i];
+
+			pvt.onKeyDownStates[idx] = false;
 		}
 
-		onKeyDownClearList.clear();
+		pvt.onKeyDownClearList.clear();
 	}
 }
 
-void Keyboard::pressKey(const Key key)
+void Input::Keyboard::Internal::pressKey(const Key key)
 {
-	keyDownStates[key] = true;
+	pvt.keyDownStates[key] = true;
 
-	onKeyDownStates[key] = true;
+	pvt.onKeyDownStates[key] = true;
 
-	onKeyDownClearList.emplace_back(key);
+	pvt.onKeyDownClearList.emplace_back(key);
 
-	keyDownEvents[key]();
+	pvt.keyDownEvents[key]();
 }
 
-void Keyboard::releaseKey(const Key key)
+void Input::Keyboard::Internal::releaseKey(const Key key)
 {
-	keyDownStates[key] = false;
+	pvt.keyDownStates[key] = false;
 
-	keyUpEvents[key]();
+	pvt.keyUpEvents[key]();
 }

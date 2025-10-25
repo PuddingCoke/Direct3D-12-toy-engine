@@ -181,7 +181,7 @@ void Utils::Logger::Internal::initialize()
 	pvt = new LoggerPrivate();
 }
 
-void Utils::Logger::Internal::shutdown()
+void Utils::Logger::Internal::release()
 {
 	if (pvt)
 	{

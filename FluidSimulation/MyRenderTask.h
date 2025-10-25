@@ -116,7 +116,7 @@ public:
 
 		effect->setThreshold(0.f);
 
-		kDownEventID = Keyboard::addKeyDownEvent(Keyboard::K, [this]()
+		kDownEventID = Input::Keyboard::addKeyDownEvent(Input::Keyboard::K, [this]()
 			{
 				config.logicRunning = !config.logicRunning;
 			});
@@ -125,7 +125,7 @@ public:
 
 	~MyRenderTask()
 	{
-		Keyboard::removeKeyDownEvent(Keyboard::K, kDownEventID);
+		Input::Keyboard::removeKeyDownEvent(Input::Keyboard::K, kDownEventID);
 
 
 		delete effect;
@@ -181,7 +181,7 @@ public:
 
 	void splatVelocityAndColor()
 	{
-		if (config.vortex || (Mouse::onMove() && Mouse::getLeftDown()))
+		if (config.vortex || (Input::Mouse::onMove() && Input::Mouse::getLeftDown()))
 		{
 			context->setPipelineState(splatVelocityState.Get());
 			context->setCSConstants({ velocityTex->read()->getAllSRVIndex(),velocityTex->write()->getUAVMipIndex(0) }, 0);
@@ -307,7 +307,7 @@ public:
 
 	void recordCommand() override
 	{
-		const DirectX::XMFLOAT2 pos = { (float)Mouse::getX(),(float)(Graphics::getHeight() - Mouse::getY()) };
+		const DirectX::XMFLOAT2 pos = { (float)Input::Mouse::getX(),(float)(Graphics::getHeight() - Input::Mouse::getY()) };
 
 		const DirectX::XMFLOAT2 posDelta = { (pos.x - simulationParam.pos.x) * config.force,(pos.y - simulationParam.pos.y) * config.force };
 

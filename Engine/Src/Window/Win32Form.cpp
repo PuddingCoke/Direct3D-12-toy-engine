@@ -6,7 +6,11 @@
 
 #include<Gear/Input/Keyboard.h>
 
+#include<Gear/Input/Internal/KeyboardInternal.h>
+
 #include<Gear/Input/Mouse.h>
+
+#include<Gear/Input/Internal/MouseInternal.h>
 
 #include<ImGUI/imgui.h>
 
@@ -84,9 +88,9 @@ Win32Form::~Win32Form()
 
 bool Win32Form::pollEvents()
 {
-	Mouse::resetDeltaValue();
+	Input::Mouse::Internal::resetDeltaValue();
 
-	Keyboard::resetDeltaValue();
+	Input::Keyboard::Internal::resetDeltaValue();
 
 	MSG msg = {};
 
@@ -145,38 +149,38 @@ LRESULT Win32Form::windowProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lP
 	break;
 
 	case WM_MOUSEMOVE:
-		Mouse::move(static_cast<float>(LOWORD(lParam)), static_cast<float>(Graphics::getHeight()) - static_cast<float>(HIWORD(lParam)));
+		Input::Mouse::Internal::move(static_cast<float>(LOWORD(lParam)), static_cast<float>(Graphics::getHeight()) - static_cast<float>(HIWORD(lParam)));
 		break;
 
 	case WM_LBUTTONDOWN:
-		Mouse::pressLeft();
+		Input::Mouse::Internal::pressLeft();
 		break;
 
 	case WM_RBUTTONDOWN:
-		Mouse::pressRight();
+		Input::Mouse::Internal::pressRight();
 		break;
 
 	case WM_LBUTTONUP:
-		Mouse::releaseLeft();
+		Input::Mouse::Internal::releaseLeft();
 		break;
 
 	case WM_RBUTTONUP:
-		Mouse::releaseRight();
+		Input::Mouse::Internal::releaseRight();
 		break;
 
 	case WM_MOUSEWHEEL:
-		Mouse::scroll(GET_WHEEL_DELTA_WPARAM(wParam) / 120.f);
+		Input::Mouse::Internal::scroll(GET_WHEEL_DELTA_WPARAM(wParam) / 120.f);
 		break;
 
 	case WM_KEYDOWN:
 		if ((HIWORD(lParam) & KF_REPEAT) == 0)
 		{
-			Keyboard::pressKey(static_cast<Keyboard::Key>(wParam));
+			Input::Keyboard::Internal::pressKey(static_cast<Input::Keyboard::Key>(wParam));
 		}
 		break;
 
 	case WM_KEYUP:
-		Keyboard::releaseKey(static_cast<Keyboard::Key>(wParam));
+		Input::Keyboard::Internal::releaseKey(static_cast<Input::Keyboard::Key>(wParam));
 		break;
 
 	case WM_DESTROY:

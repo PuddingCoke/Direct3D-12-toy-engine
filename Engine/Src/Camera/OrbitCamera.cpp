@@ -13,11 +13,11 @@ OrbitCamera::OrbitCamera(const DirectX::XMVECTOR& eye, const DirectX::XMVECTOR& 
 
 	currentRadius = targetRadius;
 
-	moveEventID = Mouse::addMoveEvent([this]()
+	moveEventID = Input::Mouse::addMoveEvent([this]()
 		{
-			if (Mouse::getLeftDown())
+			if (Input::Mouse::getLeftDown())
 			{
-				const DirectX::XMMATRIX rotMat = DirectX::XMMatrixRotationAxis(this->up, Mouse::getDX() / 120.f);
+				const DirectX::XMMATRIX rotMat = DirectX::XMMatrixRotationAxis(this->up, Input::Mouse::getDX() / 120.f);
 
 				this->eye = DirectX::XMVector3Transform(this->eye, rotMat);
 
@@ -25,9 +25,9 @@ OrbitCamera::OrbitCamera(const DirectX::XMVECTOR& eye, const DirectX::XMVECTOR& 
 
 				DirectX::XMStoreFloat(&eyeUpAngle, DirectX::XMVector3AngleBetweenNormals(this->eye, this->up));
 
-				const float destAngle = eyeUpAngle + Mouse::getDY() / 120.f;
+				const float destAngle = eyeUpAngle + Input::Mouse::getDY() / 120.f;
 
-				float rotAngle = Mouse::getDY() / 120.f;
+				float rotAngle = Input::Mouse::getDY() / 120.f;
 
 				if (destAngle > Utils::Math::pi - Camera::epsilon)
 				{
@@ -46,9 +46,9 @@ OrbitCamera::OrbitCamera(const DirectX::XMVECTOR& eye, const DirectX::XMVECTOR& 
 			}
 		});
 
-	scrollEventID = Mouse::addScrollEvent([this]()
+	scrollEventID = Input::Mouse::addScrollEvent([this]()
 		{
-			targetRadius -= 0.5f * this->zoomSpeed * Mouse::getWheelDelta();
+			targetRadius -= 0.5f * this->zoomSpeed * Input::Mouse::getWheelDelta();
 
 			if (targetRadius < 0.1f)
 			{
@@ -59,9 +59,9 @@ OrbitCamera::OrbitCamera(const DirectX::XMVECTOR& eye, const DirectX::XMVECTOR& 
 
 OrbitCamera::~OrbitCamera()
 {
-	Mouse::removeMoveEvent(moveEventID);
+	Input::Mouse::removeMoveEvent(moveEventID);
 
-	Mouse::removeScrollEvent(scrollEventID);
+	Input::Mouse::removeScrollEvent(scrollEventID);
 }
 
 void OrbitCamera::applyInput(const float dt)

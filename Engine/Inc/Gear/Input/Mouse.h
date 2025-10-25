@@ -1,124 +1,68 @@
 ﻿#pragma once
 
-#ifndef _MOUSE_H_
-#define _MOUSE_H_
+#ifndef _INPUT_MOUSE_H_
+#define _INPUT_MOUSE_H_
 
 #include"Event.h"
 
-class Mouse
+namespace Input
 {
-public:
+	namespace Mouse
+	{
 
-	Mouse() = delete;
+		float getX();
 
-	Mouse(const Mouse&) = delete;
+		float getY();
 
-	void operator=(const Mouse&) = delete;
+		float getDX();
 
-	static float getX();
+		float getDY();
 
-	static float getY();
+		float getWheelDelta();
 
-	static float getDX();
+		bool getLeftDown();
 
-	static float getDY();
+		bool getRightDown();
 
-	static float getWheelDelta();
+		bool onMove();
 
-	static bool getLeftDown();
+		bool onLeftDown();
 
-	static bool getRightDown();
+		bool onRightDown();
 
-	static bool onMove();
+		bool onScroll();
 
-	static bool onLeftDown();
+		//do not record command here
+		uint64_t addMoveEvent(const std::function<void(void)>& func);
 
-	static bool onRightDown();
+		//do not record command here
+		uint64_t addLeftDownEvent(const std::function<void(void)>& func);
 
-	static bool onScroll();
+		//do not record command here
+		uint64_t addRightDownEvent(const std::function<void(void)>& func);
 
-	//do not record command here
-	static uint64_t addMoveEvent(const std::function<void(void)>& func);
+		//do not record command here
+		uint64_t addLeftUpEvent(const std::function<void(void)>& func);
 
-	//do not record command here
-	static uint64_t addLeftDownEvent(const std::function<void(void)>& func);
+		//do not record command here
+		uint64_t addRightUpEvent(const std::function<void(void)>& func);
 
-	//do not record command here
-	static uint64_t addRightDownEvent(const std::function<void(void)>& func);
+		//do not record command here
+		uint64_t addScrollEvent(const std::function<void(void)>& func);
 
-	//do not record command here
-	static uint64_t addLeftUpEvent(const std::function<void(void)>& func);
+		void removeMoveEvent(const uint64_t id);
 
-	//do not record command here
-	static uint64_t addRightUpEvent(const std::function<void(void)>& func);
+		void removeLeftDownEvent(const uint64_t id);
 
-	//do not record command here
-	static uint64_t addScrollEvent(const std::function<void(void)>& func);
+		void removeRightDownEvent(const uint64_t id);
 
-	static void removeMoveEvent(const uint64_t id);
+		void removeLeftUpEvent(const uint64_t id);
 
-	static void removeLeftDownEvent(const uint64_t id);
+		void removeRightUpEvent(const uint64_t id);
 
-	static void removeRightDownEvent(const uint64_t id);
+		void removeScrollEvent(const uint64_t id);
 
-	static void removeLeftUpEvent(const uint64_t id);
+	};
+}
 
-	static void removeRightUpEvent(const uint64_t id);
-
-	static void removeScrollEvent(const uint64_t id);
-
-private:
-
-	friend class Win32Form;
-
-	static void resetDeltaValue();
-
-	static void pressLeft();
-
-	static void pressRight();
-
-	static void releaseLeft();
-
-	static void releaseRight();
-
-	static void scroll(const float delta);
-
-	static void move(const float curX, const float curY);
-
-	static float x;
-	
-	static float y;
-
-	static float dx;
-
-	static float dy;
-
-	static float wheelDelta;
-
-	static bool leftDown;
-
-	static bool rightDown;
-
-	static bool onMoved;
-
-	static bool onLeftDowned;
-
-	static bool onRightDowned;
-
-	static bool onScrolled;
-
-	static Event moveEvent;
-
-	static Event leftDownEvent;
-
-	static Event rightDownEvent;
-
-	static Event leftUpEvent;
-
-	static Event rightUpEvent;
-
-	static Event scrollEvent;
-
-};
-
-#endif // !_MOUSE_H_
+#endif // !_INPUT_MOUSE_H_

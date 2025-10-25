@@ -56,9 +56,9 @@ protected:
 
 	void recordCommand() override
 	{
-		if (Mouse::onScroll())
+		if (Input::Mouse::onScroll())
 		{
-			if (Mouse::getWheelDelta() > 0.f)
+			if (Input::Mouse::getWheelDelta() > 0.f)
 			{
 				param.scale *= 0.85f;
 			}
@@ -70,11 +70,11 @@ protected:
 			accParam.frameIndex = 0;
 		}
 
-		if (Mouse::getLeftDown() && Mouse::onMove())
+		if (Input::Mouse::getLeftDown() && Input::Mouse::onMove())
 		{
-			param.location.x -= Graphics::getDeltaTime() * Mouse::getDX() * param.scale;
+			param.location.x -= Graphics::getDeltaTime() * Input::Mouse::getDX() * param.scale;
 
-			param.location.y += Graphics::getDeltaTime() * Mouse::getDY() * param.scale;
+			param.location.y += Graphics::getDeltaTime() * Input::Mouse::getDY() * param.scale;
 
 			accParam.frameIndex = 0;
 		}

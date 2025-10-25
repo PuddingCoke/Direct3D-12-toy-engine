@@ -11,7 +11,7 @@ namespace Utils
 		{
 			void initialize();
 
-			void shutdown();
+			void release();
 		}
 	}
 }

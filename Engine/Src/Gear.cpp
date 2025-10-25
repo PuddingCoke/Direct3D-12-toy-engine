@@ -154,7 +154,7 @@ void Gear::runRealTimeRender()
 
 		game->render();
 
-		const bool needScreenGrab = Keyboard::onKeyDown(screenGrabKey);
+		const bool needScreenGrab = Input::Keyboard::onKeyDown(screenGrabKey);
 
 		if (needScreenGrab)
 		{
@@ -391,7 +391,7 @@ Gear::~Gear()
 
 	LOGSUCCESS(L"engine exit");
 
-	Utils::Logger::Internal::shutdown();
+	Utils::Logger::Internal::release();
 
 #ifdef _DEBUG
 

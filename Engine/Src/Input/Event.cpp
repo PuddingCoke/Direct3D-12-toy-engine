@@ -1,16 +1,16 @@
 ﻿#include<Gear/Input/Event.h>
 
-Event::Event() :
+Input::Event::Event() :
 	idx(0)
 {
 }
 
-void Event::operator-=(const uint64_t id)
+void Input::Event::operator-=(const uint64_t id)
 {
 	functions.erase(id);
 }
 
-uint64_t Event::operator+=(const std::function<void(void)>& func)
+uint64_t Input::Event::operator+=(const std::function<void(void)>& func)
 {
 	const uint64_t retIdx = idx++;
 
@@ -19,7 +19,7 @@ uint64_t Event::operator+=(const std::function<void(void)>& func)
 	return retIdx;
 }
 
-void Event::operator()()
+void Input::Event::operator()()
 {
 	for (auto& i : functions)
 	{

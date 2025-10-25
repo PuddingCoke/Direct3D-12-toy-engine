@@ -132,7 +132,7 @@ protected:
 	{
 		simulationParam.ri = simulationParam.ra / 3.f;
 
-		if (Keyboard::onKeyDown(Keyboard::K))
+		if (Input::Keyboard::onKeyDown(Input::Keyboard::K))
 		{
 			whiteNoise(swapTexture);
 		}

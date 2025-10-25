@@ -26,7 +26,7 @@ public:
 
 		GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&pipelineState));
 
-		Keyboard::addKeyDownEvent(Keyboard::K, [this]() {perframeData.useOriginalVer = ~perframeData.useOriginalVer; });
+		Input::Keyboard::addKeyDownEvent(Input::Keyboard::K, [this]() {perframeData.useOriginalVer = ~perframeData.useOriginalVer; });
 	}
 
 	~MyRenderTask()

@@ -11,11 +11,11 @@ FPSCamera::FPSCamera(const DirectX::XMVECTOR& eye, const DirectX::XMVECTOR& look
 {
 	this->lookDir = DirectX::XMVector3Normalize(this->lookDir);
 
-	moveEventID = Mouse::addMoveEvent([this]()
+	moveEventID = Input::Mouse::addMoveEvent([this]()
 		{
-			if (Mouse::getLeftDown())
+			if (Input::Mouse::getLeftDown())
 			{
-				const DirectX::XMMATRIX rotMat = DirectX::XMMatrixRotationAxis(this->up, Mouse::getDX() / 120.f);
+				const DirectX::XMMATRIX rotMat = DirectX::XMMatrixRotationAxis(this->up, Input::Mouse::getDX() / 120.f);
 
 				this->lookDir = DirectX::XMVector3Transform(this->lookDir, rotMat);
 
@@ -25,9 +25,9 @@ FPSCamera::FPSCamera(const DirectX::XMVECTOR& eye, const DirectX::XMVECTOR& look
 
 				DirectX::XMStoreFloat(&lookUpAngle, DirectX::XMVector3AngleBetweenNormals(this->lookDir, this->up));
 
-				const float destAngle = lookUpAngle - Mouse::getDY() / 120.f;
+				const float destAngle = lookUpAngle - Input::Mouse::getDY() / 120.f;
 
-				float rotAngle = -Mouse::getDY() / 120.f;
+				float rotAngle = -Input::Mouse::getDY() / 120.f;
 
 				if (destAngle > Utils::Math::pi - Camera::epsilon)
 				{
@@ -47,28 +47,28 @@ FPSCamera::FPSCamera(const DirectX::XMVECTOR& eye, const DirectX::XMVECTOR& look
 
 FPSCamera::~FPSCamera()
 {
-	Mouse::removeMoveEvent(moveEventID);
+	Input::Mouse::removeMoveEvent(moveEventID);
 }
 
 void FPSCamera::applyInput(const float dt)
 {
-	if (Keyboard::getKeyDown(Keyboard::W))
+	if (Input::Keyboard::getKeyDown(Input::Keyboard::W))
 	{
 		eye = DirectX::XMVectorAdd(eye, DirectX::XMVectorScale(lookDir, dt * moveSpeed));
 	}
 
-	if (Keyboard::getKeyDown(Keyboard::S))
+	if (Input::Keyboard::getKeyDown(Input::Keyboard::S))
 	{
 		eye = DirectX::XMVectorAdd(eye, DirectX::XMVectorScale(lookDir, -dt * moveSpeed));
 	}
 
-	if (Keyboard::getKeyDown(Keyboard::A))
+	if (Input::Keyboard::getKeyDown(Input::Keyboard::A))
 	{
 		const DirectX::XMVECTOR upCrossLookDir = DirectX::XMVector3Normalize(DirectX::XMVector3Cross(up, lookDir));
 		eye = DirectX::XMVectorAdd(eye, DirectX::XMVectorScale(upCrossLookDir, -dt * moveSpeed));
 	}
 
-	if (Keyboard::getKeyDown(Keyboard::D))
+	if (Input::Keyboard::getKeyDown(Input::Keyboard::D))
 	{
 		const DirectX::XMVECTOR upCrossLookDir = DirectX::XMVector3Normalize(DirectX::XMVector3Cross(up, lookDir));
 		eye = DirectX::XMVectorAdd(eye, DirectX::XMVectorScale(upCrossLookDir, dt * moveSpeed));

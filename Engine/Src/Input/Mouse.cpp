@@ -1,211 +1,232 @@
 ﻿#include<Gear/Input/Mouse.h>
 
-float Mouse::x = 0;
-float Mouse::y = 0;
+#include<Gear/Input/Internal/MouseInternal.h>
 
-float Mouse::dx = 0;
-float Mouse::dy = 0;
-
-float Mouse::wheelDelta = 0;
-
-Event Mouse::moveEvent;
-Event Mouse::leftDownEvent;
-Event Mouse::rightDownEvent;
-Event Mouse::leftUpEvent;
-Event Mouse::rightUpEvent;
-Event Mouse::scrollEvent;
-
-bool Mouse::leftDown = false;
-bool Mouse::rightDown = false;
-
-bool Mouse::onMoved = false;
-bool Mouse::onLeftDowned = false;
-bool Mouse::onRightDowned = false;
-bool Mouse::onScrolled = false;
-
-float Mouse::getX()
+namespace
 {
-	return x;
+	struct MousePrivate
+	{
+
+		float x = 0.f;
+
+		float y = 0.f;
+
+		float dx = 0.f;
+
+		float dy = 0.f;
+
+		float wheelDelta = 0.f;
+
+		bool leftDown = false;
+
+		bool rightDown = false;
+
+		bool onMoved = false;
+
+		bool onLeftDowned = false;
+
+		bool onRightDowned = false;
+
+		bool onScrolled = false;
+
+		Input::Event moveEvent;
+
+		Input::Event leftDownEvent;
+
+		Input::Event rightDownEvent;
+
+		Input::Event leftUpEvent;
+
+		Input::Event rightUpEvent;
+
+		Input::Event scrollEvent;
+
+	}pvt;
 }
 
-float Mouse::getY()
+float Input::Mouse::getX()
 {
-	return y;
+	return pvt.x;
 }
 
-float Mouse::getDX()
+float Input::Mouse::getY()
 {
-	return dx;
+	return pvt.y;
 }
 
-float Mouse::getDY()
+float Input::Mouse::getDX()
 {
-	return dy;
+	return pvt.dx;
 }
 
-float Mouse::getWheelDelta()
+float Input::Mouse::getDY()
 {
-	return wheelDelta;
+	return pvt.dy;
 }
 
-bool Mouse::getLeftDown()
+float Input::Mouse::getWheelDelta()
 {
-	return leftDown;
+	return pvt.wheelDelta;
 }
 
-bool Mouse::getRightDown()
+bool Input::Mouse::getLeftDown()
 {
-	return rightDown;
+	return pvt.leftDown;
 }
 
-bool Mouse::onMove()
+bool Input::Mouse::getRightDown()
 {
-	return onMoved;
+	return pvt.rightDown;
 }
 
-bool Mouse::onLeftDown()
+bool Input::Mouse::onMove()
 {
-	return onLeftDowned;
+	return pvt.onMoved;
 }
 
-bool Mouse::onRightDown()
+bool Input::Mouse::onLeftDown()
 {
-	return onRightDowned;
+	return pvt.onLeftDowned;
 }
 
-bool Mouse::onScroll()
+bool Input::Mouse::onRightDown()
 {
-	return onScrolled;
+	return pvt.onRightDowned;
 }
 
-uint64_t Mouse::addMoveEvent(const std::function<void(void)>& func)
+bool Input::Mouse::onScroll()
 {
-	return moveEvent += func;
+	return pvt.onScrolled;
 }
 
-uint64_t Mouse::addLeftDownEvent(const std::function<void(void)>& func)
+uint64_t Input::Mouse::addMoveEvent(const std::function<void(void)>& func)
 {
-	return leftDownEvent += func;
+	return pvt.moveEvent += func;
 }
 
-uint64_t Mouse::addRightDownEvent(const std::function<void(void)>& func)
+uint64_t Input::Mouse::addLeftDownEvent(const std::function<void(void)>& func)
 {
-	return rightDownEvent += func;
+	return pvt.leftDownEvent += func;
 }
 
-uint64_t Mouse::addLeftUpEvent(const std::function<void(void)>& func)
+uint64_t Input::Mouse::addRightDownEvent(const std::function<void(void)>& func)
 {
-	return leftUpEvent += func;
+	return pvt.rightDownEvent += func;
 }
 
-uint64_t Mouse::addRightUpEvent(const std::function<void(void)>& func)
+uint64_t Input::Mouse::addLeftUpEvent(const std::function<void(void)>& func)
 {
-	return rightUpEvent += func;
+	return pvt.leftUpEvent += func;
 }
 
-uint64_t Mouse::addScrollEvent(const std::function<void(void)>& func)
+uint64_t Input::Mouse::addRightUpEvent(const std::function<void(void)>& func)
 {
-	return scrollEvent += func;
+	return pvt.rightUpEvent += func;
 }
 
-void Mouse::removeMoveEvent(const uint64_t id)
+uint64_t Input::Mouse::addScrollEvent(const std::function<void(void)>& func)
 {
-	moveEvent -= id;
+	return pvt.scrollEvent += func;
 }
 
-void Mouse::removeLeftDownEvent(const uint64_t id)
+void Input::Mouse::removeMoveEvent(const uint64_t id)
 {
-	leftDownEvent -= id;
+	pvt.moveEvent -= id;
 }
 
-void Mouse::removeRightDownEvent(const uint64_t id)
+void Input::Mouse::removeLeftDownEvent(const uint64_t id)
 {
-	rightDownEvent -= id;
+	pvt.leftDownEvent -= id;
 }
 
-void Mouse::removeLeftUpEvent(const uint64_t id)
+void Input::Mouse::removeRightDownEvent(const uint64_t id)
 {
-	leftUpEvent -= id;
+	pvt.rightDownEvent -= id;
 }
 
-void Mouse::removeRightUpEvent(const uint64_t id)
+void Input::Mouse::removeLeftUpEvent(const uint64_t id)
 {
-	rightUpEvent -= id;
+	pvt.leftUpEvent -= id;
 }
 
-void Mouse::removeScrollEvent(const uint64_t id)
+void Input::Mouse::removeRightUpEvent(const uint64_t id)
 {
-	scrollEvent -= id;
+	pvt.rightUpEvent -= id;
 }
 
-void Mouse::resetDeltaValue()
+void Input::Mouse::removeScrollEvent(const uint64_t id)
 {
-	dx = 0;
-
-	dy = 0;
-
-	onMoved = false;
-
-	onLeftDowned = false;
-
-	onRightDowned = false;
-
-	onScrolled = false;
+	pvt.scrollEvent -= id;
 }
 
-void Mouse::pressLeft()
+void Input::Mouse::Internal::resetDeltaValue()
 {
-	leftDown = true;
+	pvt.dx = 0;
 
-	onLeftDowned = true;
+	pvt.dy = 0;
 
-	leftDownEvent();
+	pvt.onMoved = false;
+
+	pvt.onLeftDowned = false;
+
+	pvt.onRightDowned = false;
+
+	pvt.onScrolled = false;
 }
 
-void Mouse::pressRight()
+void Input::Mouse::Internal::pressLeft()
 {
-	rightDown = true;
+	pvt.leftDown = true;
 
-	onRightDowned = true;
+	pvt.onLeftDowned = true;
 
-	rightDownEvent();
+	pvt.leftDownEvent();
 }
 
-void Mouse::releaseLeft()
+void Input::Mouse::Internal::pressRight()
 {
-	leftDown = false;
+	pvt.rightDown = true;
 
-	leftUpEvent();
+	pvt.onRightDowned = true;
+
+	pvt.rightDownEvent();
 }
 
-void Mouse::releaseRight()
+void Input::Mouse::Internal::releaseLeft()
 {
-	rightDown = false;
+	pvt.leftDown = false;
 
-	rightUpEvent();
+	pvt.leftUpEvent();
 }
 
-void Mouse::scroll(const float delta)
+void Input::Mouse::Internal::releaseRight()
 {
-	wheelDelta = delta;
+	pvt.rightDown = false;
 
-	onScrolled = true;
-
-	scrollEvent();
+	pvt.rightUpEvent();
 }
 
-void Mouse::move(const float curX, const float curY)
+void Input::Mouse::Internal::scroll(const float delta)
 {
-	dx = curX - Mouse::x;
+	pvt.wheelDelta = delta;
 
-	dy = curY - Mouse::y;
+	pvt.onScrolled = true;
 
-	x = curX;
+	pvt.scrollEvent();
+}
 
-	y = curY;
+void Input::Mouse::Internal::move(const float curX, const float curY)
+{
+	pvt.dx = curX - pvt.x;
 
-	onMoved = true;
+	pvt.dy = curY - pvt.y;
 
-	moveEvent();
+	pvt.x = curX;
+
+	pvt.y = curY;
+
+	pvt.onMoved = true;
+
+	pvt.moveEvent();
 }
 

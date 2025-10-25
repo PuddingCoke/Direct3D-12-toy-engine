@@ -53,21 +53,21 @@ public:
 			GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&displayState));
 		}
 
-		Mouse::addMoveEvent([this]()
+		Input::Mouse::addMoveEvent([this]()
 			{
-				if (Mouse::getLeftDown())
+				if (Input::Mouse::getLeftDown())
 				{
-					cameraParam.phi -= Mouse::getDY() * Graphics::getDeltaTime();
-					cameraParam.theta += Mouse::getDX() * Graphics::getDeltaTime();
+					cameraParam.phi -= Input::Mouse::getDY() * Graphics::getDeltaTime();
+					cameraParam.theta += Input::Mouse::getDX() * Graphics::getDeltaTime();
 					cameraParam.phi = Utils::Math::clamp(cameraParam.phi, -Utils::Math::halfPi + 0.01f, Utils::Math::halfPi - 0.01f);
 
 					accumulateParam.frameIndex = 0;
 				}
 			});
 
-		Mouse::addScrollEvent([this]()
+		Input::Mouse::addScrollEvent([this]()
 			{
-				cameraParam.radius -= Mouse::getWheelDelta() * 1.f;
+				cameraParam.radius -= Input::Mouse::getWheelDelta() * 1.f;
 
 				accumulateParam.frameIndex = 0;
 			});

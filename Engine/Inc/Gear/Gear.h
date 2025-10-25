@@ -57,7 +57,7 @@ private:
 		InitializationParam::VideoRenderParam videoRender;
 	};
 
-	static constexpr Keyboard::Key screenGrabKey = Keyboard::F11;
+	static constexpr Input::Keyboard::Key screenGrabKey = Input::Keyboard::F11;
 
 };
 
