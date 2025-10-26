@@ -1,5 +1,7 @@
 ﻿#include<Gear/Core/Shader.h>
 
+#include<Gear/Core/Internal/GlobalShaderInternal.h>
+
 #include<Gear/Utils/File.h>
 
 #include<Gear/CompiledShaders/FullScreenVS.h>
@@ -8,94 +10,49 @@
 
 #include<Gear/CompiledShaders/TextureCubeVS.h>
 
-Shader* Shader::fullScreenVS = nullptr;
-
-Shader* Shader::fullScreenPS = nullptr;
-
-Shader* Shader::textureCubeVS = nullptr;
-
-DXCCompiler* Shader::dxcCompiler = nullptr;
-
-Shader::Shader(const uint8_t* const bytes, const size_t byteSize)
+namespace
 {
-	shaderByteCode.pShaderBytecode = bytes;
-
-	shaderByteCode.BytecodeLength = byteSize;
-}
-
-Shader::Shader(const std::wstring& filePath)
-{
-	if (Utils::File::getExtension(filePath) == L"cso")
+	class DXCCompiler
 	{
-		shaderBlob = dxcCompiler->read(filePath);
+	public:
 
-		shaderByteCode.pShaderBytecode = shaderBlob->GetBufferPointer();
+		DXCCompiler(const DXCCompiler&) = delete;
 
-		shaderByteCode.BytecodeLength = shaderBlob->GetBufferSize();
+		void operator=(const DXCCompiler&) = delete;
 
-		LOGSUCCESS(L"read byte code at", LogColor::brightBlue, filePath, LogColor::defaultColor, L"succeeded");
-	}
-	else
+		DXCCompiler();
+
+		~DXCCompiler();
+
+		//hlsl
+		ComPtr<IDxcBlob> compile(const std::wstring& filePath, const Core::ShaderProfile profile) const;
+
+		//cso
+		ComPtr<IDxcBlob> read(const std::wstring& filePath) const;
+
+	private:
+
+		static constexpr uint32_t codePage = CP_UTF8;
+
+		ComPtr<IDxcCompiler3> dxcCompiler;
+
+		ComPtr<IDxcUtils> dxcUtils;
+
+		ComPtr<IDxcIncludeHandler> dxcIncludeHanlder;
+
+	}*dxcCompiler = nullptr;
+
+	struct GlobalShaderPrivate
 	{
-		LOGERROR(L"input file's extension must be cso");
-	}
-}
 
-Shader::Shader(const std::wstring& filePath, const ShaderProfile profile)
-{
-	if (Utils::File::getExtension(filePath) == L"hlsl")
-	{
-		shaderBlob = dxcCompiler->compile(filePath, profile);
+		Core::Shader* fullScreenVS = nullptr;
 
-		shaderByteCode.pShaderBytecode = shaderBlob->GetBufferPointer();
+		Core::Shader* fullScreenPS = nullptr;
 
-		shaderByteCode.BytecodeLength = shaderBlob->GetBufferSize();
+		Core::Shader* textureCubeVS = nullptr;
 
-		LOGSUCCESS(L"compile shader at", LogColor::brightBlue, filePath, LogColor::defaultColor, L"succeeded");
-	}
-	else
-	{
-		LOGERROR(L"input file's extension must be hlsl");
-	}
-}
+	}pvt;
 
-D3D12_SHADER_BYTECODE Shader::getByteCode() const
-{
-	return shaderByteCode;
-}
-
-void Shader::createGlobalShaders()
-{
-	dxcCompiler = new DXCCompiler();
-
-	fullScreenVS = new Shader(g_FullScreenVSBytes, sizeof(g_FullScreenVSBytes));
-
-	fullScreenPS = new Shader(g_FullScreenPSBytes, sizeof(g_FullScreenPSBytes));
-
-	textureCubeVS = new Shader(g_TextureCubeVSBytes, sizeof(g_TextureCubeVSBytes));
-}
-
-void Shader::releaseGlobalShaders()
-{
-	if (dxcCompiler)
-	{
-		delete dxcCompiler;
-	}
-
-	if (fullScreenVS)
-	{
-		delete fullScreenVS;
-	}
-
-	if (fullScreenPS)
-	{
-		delete fullScreenPS;
-	}
-
-	if (textureCubeVS)
-	{
-		delete textureCubeVS;
-	}
 }
 
 DXCCompiler::DXCCompiler()
@@ -112,7 +69,7 @@ DXCCompiler::~DXCCompiler()
 
 }
 
-ComPtr<IDxcBlob> DXCCompiler::compile(const std::wstring& filePath, const ShaderProfile profile) const
+ComPtr<IDxcBlob> DXCCompiler::compile(const std::wstring& filePath, const Core::ShaderProfile profile) const
 {
 	const std::vector<uint8_t> bytes = Utils::File::readAllBinary(filePath);
 
@@ -129,31 +86,31 @@ ComPtr<IDxcBlob> DXCCompiler::compile(const std::wstring& filePath, const Shader
 
 	switch (profile)
 	{
-	case VERTEX:
+	case Core::ShaderProfile::VERTEX:
 		dxcUtils->BuildArguments(filePath.c_str(), L"main", L"vs_6_6", nullptr, 0, nullptr, 0, &args);
 		break;
-	case HULL:
+	case Core::ShaderProfile::HULL:
 		dxcUtils->BuildArguments(filePath.c_str(), L"main", L"hs_6_6", nullptr, 0, nullptr, 0, &args);
 		break;
-	case DOMAIN:
+	case Core::ShaderProfile::DOMAIN:
 		dxcUtils->BuildArguments(filePath.c_str(), L"main", L"ds_6_6", nullptr, 0, nullptr, 0, &args);
 		break;
-	case GEOMETRY:
+	case Core::ShaderProfile::GEOMETRY:
 		dxcUtils->BuildArguments(filePath.c_str(), L"main", L"gs_6_6", nullptr, 0, nullptr, 0, &args);
 		break;
-	case PIXEL:
+	case Core::ShaderProfile::PIXEL:
 		dxcUtils->BuildArguments(filePath.c_str(), L"main", L"ps_6_6", nullptr, 0, nullptr, 0, &args);
 		break;
-	case AMPLIFICATION:
+	case Core::ShaderProfile::AMPLIFICATION:
 		dxcUtils->BuildArguments(filePath.c_str(), L"main", L"as_6_6", nullptr, 0, nullptr, 0, &args);
 		break;
-	case MESH:
+	case Core::ShaderProfile::MESH:
 		dxcUtils->BuildArguments(filePath.c_str(), L"main", L"ms_6_6", nullptr, 0, nullptr, 0, &args);
 		break;
-	case COMPUTE:
+	case Core::ShaderProfile::COMPUTE:
 		dxcUtils->BuildArguments(filePath.c_str(), L"main", L"cs_6_6", nullptr, 0, nullptr, 0, &args);
 		break;
-	case LIBRARY:
+	case Core::ShaderProfile::LIBRARY:
 		dxcUtils->BuildArguments(filePath.c_str(), L"", L"lib_6_6", nullptr, 0, nullptr, 0, &args);
 		break;
 	default:
@@ -183,4 +140,101 @@ ComPtr<IDxcBlob> DXCCompiler::read(const std::wstring& filePath) const
 	ComPtr<IDxcBlob> shaderBlob = textBlob;
 
 	return shaderBlob;
+}
+
+Core::Shader::Shader(const uint8_t* const bytes, const size_t byteSize)
+{
+	shaderByteCode.pShaderBytecode = bytes;
+
+	shaderByteCode.BytecodeLength = byteSize;
+}
+
+Core::Shader::Shader(const std::wstring& filePath)
+{
+	if (Utils::File::getExtension(filePath) == L"cso")
+	{
+		shaderBlob = dxcCompiler->read(filePath);
+
+		shaderByteCode.pShaderBytecode = shaderBlob->GetBufferPointer();
+
+		shaderByteCode.BytecodeLength = shaderBlob->GetBufferSize();
+
+		LOGSUCCESS(L"read byte code at", LogColor::brightBlue, filePath, LogColor::defaultColor, L"succeeded");
+	}
+	else
+	{
+		LOGERROR(L"input file's extension must be cso");
+	}
+}
+
+Core::Shader::Shader(const std::wstring& filePath, const ShaderProfile profile)
+{
+	if (Utils::File::getExtension(filePath) == L"hlsl")
+	{
+		shaderBlob = dxcCompiler->compile(filePath, profile);
+
+		shaderByteCode.pShaderBytecode = shaderBlob->GetBufferPointer();
+
+		shaderByteCode.BytecodeLength = shaderBlob->GetBufferSize();
+
+		LOGSUCCESS(L"compile shader at", LogColor::brightBlue, filePath, LogColor::defaultColor, L"succeeded");
+	}
+	else
+	{
+		LOGERROR(L"input file's extension must be hlsl");
+	}
+}
+
+D3D12_SHADER_BYTECODE Core::Shader::getByteCode() const
+{
+	return shaderByteCode;
+}
+
+Core::Shader* Core::GlobalShader::getFullScreenVS()
+{
+	return pvt.fullScreenVS;
+}
+
+Core::Shader* Core::GlobalShader::getFullScreenPS()
+{
+	return pvt.fullScreenPS;
+}
+
+Core::Shader* Core::GlobalShader::getTextureCubeVS()
+{
+	return pvt.textureCubeVS;
+}
+
+void Core::GlobalShader::Internal::initialize()
+{
+	dxcCompiler = new DXCCompiler();
+
+	pvt.fullScreenVS = new Shader(g_FullScreenVSBytes, sizeof(g_FullScreenVSBytes));
+
+	pvt.fullScreenPS = new Shader(g_FullScreenPSBytes, sizeof(g_FullScreenPSBytes));
+
+	pvt.textureCubeVS = new Shader(g_TextureCubeVSBytes, sizeof(g_TextureCubeVSBytes));
+}
+
+void Core::GlobalShader::Internal::release()
+{
+	if (dxcCompiler)
+	{
+		delete dxcCompiler;
+	}
+
+	if (pvt.fullScreenVS)
+	{
+		delete pvt.fullScreenVS;
+	}
+
+	if (pvt.fullScreenPS)
+	{
+		delete pvt.fullScreenPS;
+	}
+
+	if (pvt.textureCubeVS)
+	{
+		delete pvt.textureCubeVS;
+	}
 }

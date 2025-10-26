@@ -11,15 +11,15 @@ public:
 
 	MyRenderTask()
 	{
-		pixelShader = new Shader(Utils::File::getRootFolder() + L"PixelShader.cso");
+		pixelShader = new Core::Shader(Utils::File::getRootFolder() + L"PixelShader.cso");
 
 		{
-			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = PipelineState::getDefaultFullScreenState();
+			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = Core::PipelineState::getDefaultFullScreenState();
 			desc.NumRenderTargets = 1;
-			desc.RTVFormats[0] = Graphics::backBufferFormat;
+			desc.RTVFormats[0] = Core::Graphics::backBufferFormat;
 			desc.PS = pixelShader->getByteCode();
 
-			GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&pipelineState));
+			Core::GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&pipelineState));
 		}
 	}
 
@@ -36,7 +36,7 @@ protected:
 
 		context->setPipelineState(pipelineState.Get());
 
-		context->setViewportSimple(Graphics::getWidth(), Graphics::getHeight());
+		context->setViewportSimple(Core::Graphics::getWidth(), Core::Graphics::getHeight());
 
 		context->setTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
@@ -47,6 +47,6 @@ private:
 
 	ComPtr<ID3D12PipelineState> pipelineState;
 
-	Shader* pixelShader;
+	Core::Shader* pixelShader;
 
 };

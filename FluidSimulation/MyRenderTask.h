@@ -29,7 +29,7 @@ public:
 		phongShadeCS(new Shader(Utils::File::getRootFolder() + L"PhongShadeCS.cso")),
 		edgeHighlightCS(new Shader(Utils::File::getRootFolder() + L"EdgeHighlightCS.cso"))
 	{
-		const DirectX::XMUINT2 simRes = { Graphics::getWidth() >> config.resolutionFactor,Graphics::getHeight() >> config.resolutionFactor };
+		const DirectX::XMUINT2 simRes = { Core::Graphics::getWidth() >> config.resolutionFactor,Core::Graphics::getHeight() >> config.resolutionFactor };
 
 		velocityTex = new SwapTexture([=] {return ResourceManager::createTextureRenderView(simRes.x, simRes.y, DXGI_FORMAT_R32G32_FLOAT, 1, 1, false, true,
 			DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_R32G32_FLOAT, DXGI_FORMAT_UNKNOWN); });
@@ -38,7 +38,7 @@ public:
 
 		velocityTex->write()->getTexture()->getResource()->SetName(L"Velocity Texture (1)");
 
-		colorTex = new SwapTexture([=] {return ResourceManager::createTextureRenderView(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R16G16B16A16_FLOAT, 1, 1, false, true,
+		colorTex = new SwapTexture([=] {return ResourceManager::createTextureRenderView(Core::Graphics::getWidth(), Core::Graphics::getHeight(), DXGI_FORMAT_R16G16B16A16_FLOAT, 1, 1, false, true,
 			DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_UNKNOWN); });
 
 		colorTex->read()->getTexture()->getResource()->SetName(L"Color Texture (0)");
@@ -62,19 +62,19 @@ public:
 
 		vorticityTex->getTexture()->getResource()->SetName(L"Vorticity Texture");
 
-		phongShadeTexture = ResourceManager::createTextureRenderView(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R16G16B16A16_FLOAT, 1, 1, false, true,
+		phongShadeTexture = ResourceManager::createTextureRenderView(Core::Graphics::getWidth(), Core::Graphics::getHeight(), DXGI_FORMAT_R16G16B16A16_FLOAT, 1, 1, false, true,
 			DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_UNKNOWN);
 
-		edgeHighlightTexture = ResourceManager::createTextureRenderView(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R8G8B8A8_UNORM, 1, 1, false, true,
+		edgeHighlightTexture = ResourceManager::createTextureRenderView(Core::Graphics::getWidth(), Core::Graphics::getHeight(), DXGI_FORMAT_R8G8B8A8_UNORM, 1, 1, false, true,
 			DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_UNKNOWN);
 
 		simulationParamBuffer = ResourceManager::createDynamicCBuffer(sizeof(SimulationParam));
 
-		simulationParam.colorTexelSize = DirectX::XMFLOAT2(1.f / Graphics::getWidth(), 1.f / Graphics::getHeight());
+		simulationParam.colorTexelSize = DirectX::XMFLOAT2(1.f / Core::Graphics::getWidth(), 1.f / Core::Graphics::getHeight());
 
 		simulationParam.simTexelSize = DirectX::XMFLOAT2(1.f / simRes.x, 1.f / simRes.y);
 
-		simulationParam.colorTextureSize = DirectX::XMUINT2(Graphics::getWidth(), Graphics::getHeight());
+		simulationParam.colorTextureSize = DirectX::XMUINT2(Core::Graphics::getWidth(), Core::Graphics::getHeight());
 
 		simulationParam.simTextureSize = DirectX::XMUINT2(simRes.x, simRes.y);
 
@@ -84,35 +84,35 @@ public:
 
 		simulationParam.vorticityIntensity = config.vorticityIntensity;
 
-		PipelineState::createComputeState(&splatVelocityState, splatVelocityCS);
+		Core::PipelineState::createComputeState(&splatVelocityState, splatVelocityCS);
 
-		PipelineState::createComputeState(&splatColorState, splatColorCS);
+		Core::PipelineState::createComputeState(&splatColorState, splatColorCS);
 
-		PipelineState::createComputeState(&vorticityState, vorticityCS);
+		Core::PipelineState::createComputeState(&vorticityState, vorticityCS);
 
-		PipelineState::createComputeState(&vorticityConfinementState, vorticityConfinementCS);
+		Core::PipelineState::createComputeState(&vorticityConfinementState, vorticityConfinementCS);
 
-		PipelineState::createComputeState(&divergenceState, divergenceCS);
+		Core::PipelineState::createComputeState(&divergenceState, divergenceCS);
 
-		PipelineState::createComputeState(&pressureResetState, pressureResetCS);
+		Core::PipelineState::createComputeState(&pressureResetState, pressureResetCS);
 
-		PipelineState::createComputeState(&pressureState, pressureCS);
+		Core::PipelineState::createComputeState(&pressureState, pressureCS);
 
-		PipelineState::createComputeState(&gradientSubtractState, gradientSubtractCS);
+		Core::PipelineState::createComputeState(&gradientSubtractState, gradientSubtractCS);
 
-		PipelineState::createComputeState(&velocityAdvectionState, velocityAdvectionCS);
+		Core::PipelineState::createComputeState(&velocityAdvectionState, velocityAdvectionCS);
 
-		PipelineState::createComputeState(&colorAdvectionState, colorAdvectionCS);
+		Core::PipelineState::createComputeState(&colorAdvectionState, colorAdvectionCS);
 
-		PipelineState::createComputeState(&velocityBoundaryState, velocityBoundaryCS);
+		Core::PipelineState::createComputeState(&velocityBoundaryState, velocityBoundaryCS);
 
-		PipelineState::createComputeState(&pressureBoundaryState, pressureBoundaryCS);
+		Core::PipelineState::createComputeState(&pressureBoundaryState, pressureBoundaryCS);
 
-		PipelineState::createComputeState(&phongShadeState, phongShadeCS);
+		Core::PipelineState::createComputeState(&phongShadeState, phongShadeCS);
 
-		PipelineState::createComputeState(&edgeHighlightState, edgeHighlightCS);
+		Core::PipelineState::createComputeState(&edgeHighlightState, edgeHighlightCS);
 
-		effect = new BloomEffect(context, Graphics::getWidth(), Graphics::getHeight(), resManager);
+		effect = new BloomEffect(context, Core::Graphics::getWidth(), Core::Graphics::getHeight(), resManager);
 
 		effect->setThreshold(0.f);
 
@@ -307,21 +307,21 @@ public:
 
 	void recordCommand() override
 	{
-		const DirectX::XMFLOAT2 pos = { (float)Input::Mouse::getX(),(float)(Graphics::getHeight() - Input::Mouse::getY()) };
+		const DirectX::XMFLOAT2 pos = { (float)Input::Mouse::getX(),(float)(Core::Graphics::getHeight() - Input::Mouse::getY()) };
 
 		const DirectX::XMFLOAT2 posDelta = { (pos.x - simulationParam.pos.x) * config.force,(pos.y - simulationParam.pos.y) * config.force };
 
 		if (config.vortex)
 		{
-			simulationParam.pos = DirectX::XMFLOAT2(200.f, Graphics::getHeight() / 2.f);
+			simulationParam.pos = DirectX::XMFLOAT2(200.f, Core::Graphics::getHeight() / 2.f);
 
-			simulationParam.splatColor.x *= Graphics::getDeltaTime() * 144.f;
+			simulationParam.splatColor.x *= Core::Graphics::getDeltaTime() * 144.f;
 
-			simulationParam.splatColor.y *= Graphics::getDeltaTime() * 144.f;
+			simulationParam.splatColor.y *= Core::Graphics::getDeltaTime() * 144.f;
 
-			simulationParam.splatColor.z *= Graphics::getDeltaTime() * 144.f;
+			simulationParam.splatColor.z *= Core::Graphics::getDeltaTime() * 144.f;
 
-			simulationParam.posDelta = DirectX::XMFLOAT2(7200.0f * Graphics::getDeltaTime(), 0.0f);
+			simulationParam.posDelta = DirectX::XMFLOAT2(7200.0f * Core::Graphics::getDeltaTime(), 0.0f);
 		}
 		else
 		{
@@ -330,7 +330,7 @@ public:
 			simulationParam.posDelta = posDelta;
 		}
 
-		if (colorUpdateTimer.update(Graphics::getDeltaTime() * config.colorChangeSpeed))
+		if (colorUpdateTimer.update(Core::Graphics::getDeltaTime() * config.colorChangeSpeed))
 		{
 			Utils::Color c = Utils::Color::hsvToRgb({ Utils::Random::genFloat(),1.f,1.f });
 

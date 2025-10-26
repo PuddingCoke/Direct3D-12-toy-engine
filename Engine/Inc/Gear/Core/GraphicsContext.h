@@ -125,10 +125,6 @@ public:
 	CommandList* getCommandList() const;
 
 private:
-
-	friend class RenderEngine;
-
-	static ImmutableCBuffer* reservedGlobalCBuffer;
 	
 	struct RootConstantBufferDesc
 	{

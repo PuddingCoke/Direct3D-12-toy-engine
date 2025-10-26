@@ -201,7 +201,7 @@ inline Utils::Logger::LogMessage Utils::Logger::LogContext::getLogMessage(const 
 
 		//headerStrLen = 5+2+8+1+5+2+1+10+1+5+2+length(functionName)+1+1
 		//			   = 44+length(functionName)
-		const size_t headerStrLen = 128ull;
+		const size_t headerStrLen = 256ull;
 
 		wchar_t headerStr[headerStrLen] = {};
 

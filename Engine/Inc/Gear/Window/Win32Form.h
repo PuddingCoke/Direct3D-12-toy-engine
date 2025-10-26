@@ -1,7 +1,7 @@
 ﻿#pragma once
 
-#ifndef _WIN32FORM_H_
-#define _WIN32FORM_H_
+#ifndef _WINDOW_WIN32FORM_H_
+#define _WINDOW_WIN32FORM_H_
 
 #define NOMINMAX
 
@@ -9,57 +9,31 @@
 
 #include<string>
 
-class Win32Form
+namespace Window
 {
-public:
+	namespace Win32Form
+	{
 
-	Win32Form() = delete;
+		void initialize(const std::wstring& title, const uint32_t startX, const uint32_t startY, const uint32_t width, const uint32_t height, const DWORD windowStyle,
+			LRESULT(*windowCallback)(HWND hwnd, uint32_t msg, WPARAM wParam, LPARAM lParam));
 
-	Win32Form(const Win32Form&) = delete;
+		void release();
 
-	void operator=(const Win32Form&) = delete;
+		bool pollEvents();
 
-	Win32Form(const std::wstring& title, const uint32_t startX, const uint32_t startY, const uint32_t width, const uint32_t height, const DWORD windowStyle,
-		LRESULT(*windowCallback)(HWND hwnd, uint32_t msg, WPARAM wParam, LPARAM lParam));
+		HWND getHandle();
 
-	~Win32Form();
+		constexpr DWORD normalWindowStyle = WS_CAPTION | WS_SYSMENU;
 
-	bool pollEvents();
+		constexpr DWORD wallpaperWindowStyle = WS_POPUP;
 
-	HWND getHandle() const;
+		LRESULT CALLBACK windowCallback(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam);
 
-	static Win32Form* get();
+		LRESULT CALLBACK encodeCallback(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam);
 
-	static constexpr DWORD normalWindowStyle = WS_CAPTION | WS_SYSMENU;
+		LRESULT CALLBACK wallpaperCallBack(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam);
 
-	static constexpr DWORD wallpaperWindowStyle = WS_POPUP;
+	}
+}
 
-	static LRESULT CALLBACK windowCallback(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam);
-
-	static LRESULT CALLBACK encodeCallback(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam);
-
-	static LRESULT CALLBACK wallpaperCallBack(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam);
-
-private:
-
-	LRESULT CALLBACK windowProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam) const;
-
-	LRESULT CALLBACK encodeProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam) const;
-
-	LRESULT CALLBACK wallpaperProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam) const;
-
-	friend class Gear;
-
-	static Win32Form* instance;
-
-	HWND hWnd;
-
-	const bool iniTrayIcon;
-
-	HMENU hMenu;
-
-	NOTIFYICONDATA nid;
-
-};
-
-#endif // !_WIN32FORM_H_
+#endif // !_WINDOW_WIN32FORM_H_

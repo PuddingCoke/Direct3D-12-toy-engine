@@ -45,27 +45,27 @@ private:
 
 	void updateCurve(GraphicsContext* const context, const uint32_t index);
 
-	Shader* bloomFilter;
+	Core::Shader* bloomFilter;
 
 	ComPtr<ID3D12PipelineState> bloomFilterState;
 
-	Shader* bloomHBlur;
+	Core::Shader* bloomHBlur;
 
 	ComPtr<ID3D12PipelineState> bloomHBlurState;
 
-	Shader* bloomVBlur;
+	Core::Shader* bloomVBlur;
 
 	ComPtr<ID3D12PipelineState> bloomVBlurState;
 
-	Shader* bloomFinal;
+	Core::Shader* bloomFinal;
 
 	ComPtr<ID3D12PipelineState> bloomFinalState;
 
-	Shader* bloomDownSample;
+	Core::Shader* bloomDownSample;
 
 	ComPtr<ID3D12PipelineState> bloomDownSampleState;
 
-	Shader* bloomKarisAverage;
+	Core::Shader* bloomKarisAverage;
 
 	ComPtr<ID3D12PipelineState> bloomKarisAverageState;
 

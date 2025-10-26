@@ -26,15 +26,15 @@ DynamicCBuffer::DynamicCBuffer(const uint32_t size) :
 void DynamicCBuffer::update(const void* const data)
 {
 #ifdef _DEBUG
-	if (updateFrameIndex == Graphics::getRenderedFrameCount())
+	if (updateFrameIndex == Core::Graphics::getRenderedFrameCount())
 	{
 		LOGERROR(L"cannot update dynamic constant buffer multiple time during one frame");
 	}
 #endif // _DEBUG
 
-	updateFrameIndex = Graphics::getRenderedFrameCount();
+	updateFrameIndex = Core::Graphics::getRenderedFrameCount();
 
-	const DynamicCBufferManager::AvailableDescriptor& descriptor = DynamicCBufferManager::get()->requestDescriptor(regionIndex, data);
+	const Core::DynamicCBufferManager::AvailableDescriptor& descriptor = Core::DynamicCBufferManager::requestDescriptor(regionIndex, data);
 
 	gpuAddress = descriptor.gpuAddress;
 

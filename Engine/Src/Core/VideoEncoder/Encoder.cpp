@@ -36,7 +36,7 @@ Encoder::Encoder(const uint32_t frameToEncode, const OutputVideoFormat format) :
 
 	LOGENGINE(L"frame to encode", frameToEncode);
 
-	MFSetAttributeSize(mediaType.Get(), MF_MT_FRAME_SIZE, Graphics::getWidth(), Graphics::getHeight());
+	MFSetAttributeSize(mediaType.Get(), MF_MT_FRAME_SIZE, Core::Graphics::getWidth(), Core::Graphics::getHeight());
 
 	MFSetAttributeRatio(mediaType.Get(), MF_MT_FRAME_RATE, frameRate, 1);
 

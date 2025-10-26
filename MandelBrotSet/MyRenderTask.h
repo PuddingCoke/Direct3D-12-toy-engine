@@ -12,12 +12,12 @@ class MyRenderTask :public RenderTask
 public:
 
 	MyRenderTask() :
-		effect(context, Graphics::getWidth(), Graphics::getHeight(), resManager),
+		effect(context, Core::Graphics::getWidth(), Core::Graphics::getHeight(), resManager),
 		computeCS(new Shader(Utils::File::getRootFolder() + L"ComputeCS.cso")),
-		originTexture(ResourceManager::createTextureRenderView(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R16G16B16A16_UNORM, 1, 1, false, true,
+		originTexture(ResourceManager::createTextureRenderView(Core::Graphics::getWidth(), Core::Graphics::getHeight(), DXGI_FORMAT_R16G16B16A16_UNORM, 1, 1, false, true,
 			DXGI_FORMAT_R16G16B16A16_UNORM, DXGI_FORMAT_R16G16B16A16_UNORM, DXGI_FORMAT_UNKNOWN))
 	{
-		PipelineState::createComputeState(&computeState, computeCS);
+		Core::PipelineState::createComputeState(&computeState, computeCS);
 
 		effect.setExposure(1.9f);
 
@@ -72,16 +72,16 @@ protected:
 
 		if (Input::Mouse::getLeftDown() && Input::Mouse::onMove())
 		{
-			param.location.x -= Graphics::getDeltaTime() * Input::Mouse::getDX() * param.scale;
+			param.location.x -= Core::Graphics::getDeltaTime() * Input::Mouse::getDX() * param.scale;
 
-			param.location.y += Graphics::getDeltaTime() * Input::Mouse::getDY() * param.scale;
+			param.location.y += Core::Graphics::getDeltaTime() * Input::Mouse::getDY() * param.scale;
 
 			accParam.frameIndex = 0;
 		}
 
 		accParam.frameIndex++;
 
-		accParam.floatSeed = Graphics::getTimeElapsed();
+		accParam.floatSeed = Core::Graphics::getTimeElapsed();
 
 		context->setPipelineState(computeState.Get());
 
@@ -93,7 +93,7 @@ protected:
 
 		context->transitionResources();
 
-		context->dispatch(Graphics::getWidth() / 16, Graphics::getHeight() / 9, 1);
+		context->dispatch(Core::Graphics::getWidth() / 16, Core::Graphics::getHeight() / 9, 1);
 
 		context->uavBarrier({ originTexture->getTexture() });
 
@@ -114,7 +114,7 @@ private:
 	{
 		DirectX::XMFLOAT2 location = { 0.f,0.f };
 		float scale = { 1.f };
-		const DirectX::XMFLOAT2 texelSize = { 1.f / static_cast<float>(Graphics::getWidth()),1.f / static_cast<float>(Graphics::getHeight()) };
+		const DirectX::XMFLOAT2 texelSize = { 1.f / static_cast<float>(Core::Graphics::getWidth()),1.f / static_cast<float>(Core::Graphics::getHeight()) };
 		float lerpFactor = 0.f;
 		float lerpFactor2 = 0.f;
 	} param;

@@ -42,7 +42,7 @@ void TopLevelAS::generateTLAS(CommandList* const commandList)
 
 		D3D12_RAYTRACING_ACCELERATION_STRUCTURE_PREBUILD_INFO info = {};
 
-		GraphicsDevice::get()->GetRaytracingAccelerationStructurePrebuildInfo(&inputs, &info);
+		Core::GraphicsDevice::get()->GetRaytracingAccelerationStructurePrebuildInfo(&inputs, &info);
 
 		scratchBufferSize = ROUND_UP(info.ScratchDataSizeInBytes, D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT);
 
@@ -103,9 +103,9 @@ void TopLevelAS::generateTLAS(CommandList* const commandList)
 		desc.ViewDimension = D3D12_SRV_DIMENSION_RAYTRACING_ACCELERATION_STRUCTURE;
 		desc.RaytracingAccelerationStructure.Location = tlasBuffer->getGPUAddress();
 
-		DescriptorHandle descriptorHandle = GlobalDescriptorHeap::getResourceHeap()->allocStaticDescriptor(1);
+		DescriptorHandle descriptorHandle = Core::GlobalDescriptorHeap::getResourceHeap()->allocStaticDescriptor(1);
 
-		GraphicsDevice::get()->CreateShaderResourceView(nullptr, &desc, descriptorHandle.getCPUHandle());
+		Core::GraphicsDevice::get()->CreateShaderResourceView(nullptr, &desc, descriptorHandle.getCPUHandle());
 
 		srvIndex = descriptorHandle.getCurrentIndex();
 	}

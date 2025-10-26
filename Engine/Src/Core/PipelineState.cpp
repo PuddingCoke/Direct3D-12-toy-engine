@@ -2,21 +2,21 @@
 
 #include<Gear/Core/GlobalRootSignature.h>
 
-D3D12_GRAPHICS_PIPELINE_STATE_DESC PipelineState::getDefaultGraphicsDesc()
+D3D12_GRAPHICS_PIPELINE_STATE_DESC Core::PipelineState::getDefaultGraphicsDesc()
 {
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = {};
-	desc.pRootSignature = GlobalRootSignature::getGraphicsRootSignature()->get();
+	desc.pRootSignature = Core::GlobalRootSignature::getGraphicsRootSignature()->get();
 	desc.SampleMask = UINT_MAX;
 	desc.SampleDesc.Count = 1;
 
 	return desc;
 }
 
-D3D12_GRAPHICS_PIPELINE_STATE_DESC PipelineState::getDefaultFullScreenState()
+D3D12_GRAPHICS_PIPELINE_STATE_DESC Core::PipelineState::getDefaultFullScreenState()
 {
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = {};
 	desc.InputLayout = {};
-	desc.pRootSignature = GlobalRootSignature::getGraphicsRootSignature()->get();
+	desc.pRootSignature = Core::GlobalRootSignature::getGraphicsRootSignature()->get();
 	desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
 	desc.RasterizerState = rasterCullNone;
 	desc.DepthStencilState.DepthEnable = false;
@@ -24,16 +24,16 @@ D3D12_GRAPHICS_PIPELINE_STATE_DESC PipelineState::getDefaultFullScreenState()
 	desc.SampleMask = UINT_MAX;
 	desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 	desc.SampleDesc.Count = 1;
-	desc.VS = Shader::fullScreenVS->getByteCode();
+	desc.VS = Core::GlobalShader::getFullScreenVS()->getByteCode();
 
 	return desc;
 }
 
-void PipelineState::createComputeState(ID3D12PipelineState** const pipelineState, const Shader* const shader)
+void Core::PipelineState::createComputeState(ID3D12PipelineState** const pipelineState, const Shader* const shader)
 {
 	D3D12_COMPUTE_PIPELINE_STATE_DESC desc = {};
-	desc.pRootSignature = GlobalRootSignature::getComputeRootSignature()->get();
+	desc.pRootSignature = Core::GlobalRootSignature::getComputeRootSignature()->get();
 	desc.CS = shader->getByteCode();
 
-	GraphicsDevice::get()->CreateComputePipelineState(&desc, IID_PPV_ARGS(pipelineState));
+	Core::GraphicsDevice::get()->CreateComputePipelineState(&desc, IID_PPV_ARGS(pipelineState));
 }

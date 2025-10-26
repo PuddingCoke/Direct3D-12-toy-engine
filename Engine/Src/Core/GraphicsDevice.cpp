@@ -1,15 +1,23 @@
 ﻿#include<Gear/Core/GraphicsDevice.h>
 
-GraphicsDevice* GraphicsDevice::instance = nullptr;
+#include<Gear/Core/Internal/GraphicsDeviceInternal.h>
 
-ID3D12Device9* GraphicsDevice::get()
+namespace
 {
-	return instance->device.Get();
+	struct GraphicsDevicePrivate
+	{
+		ComPtr<ID3D12Device9> device;
+	}pvt;
 }
 
-GraphicsDevice::GraphicsDevice(IUnknown* const adapter)
+ID3D12Device9* Core::GraphicsDevice::get()
 {
-	if (SUCCEEDED(D3D12CreateDevice(adapter, D3D_FEATURE_LEVEL_12_2, IID_PPV_ARGS(&device))))
+	return pvt.device.Get();
+}
+
+void Core::GraphicsDevice::Internal::initialize(IUnknown* const adapter)
+{
+	if (SUCCEEDED(D3D12CreateDevice(adapter, D3D_FEATURE_LEVEL_12_2, IID_PPV_ARGS(&pvt.device))))
 	{
 		LOGSUCCESS(L"create d3d12 device with feature level", LogColor::brightMagenta, L"D3D_FEATURE_LEVEL_12_2", LogColor::defaultColor, L"succeeded");
 	}
@@ -19,13 +27,18 @@ GraphicsDevice::GraphicsDevice(IUnknown* const adapter)
 	}
 }
 
-void GraphicsDevice::checkFeatureSupport() const
+void Core::GraphicsDevice::Internal::release()
+{
+	pvt.device = nullptr;
+}
+
+void Core::GraphicsDevice::Internal::checkFeatureSupport()
 {
 	LOGENGINE(L"following are feature support data");
 
 	CD3DX12FeatureSupport features;
 
-	features.Init(device.Get());
+	features.Init(pvt.device.Get());
 
 	{
 		const D3D12_RESOURCE_BINDING_TIER resourceBindingTier = features.ResourceBindingTier();
@@ -129,5 +142,4 @@ void GraphicsDevice::checkFeatureSupport() const
 
 		LOGENGINE(L"raytracing tier", LogColor::brightMagenta, raytracingTierString);
 	}
-
 }

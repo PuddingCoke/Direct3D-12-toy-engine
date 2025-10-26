@@ -1,7 +1,7 @@
 ﻿#pragma once
 
-#ifndef _GRAPHICSDEVICE_H_
-#define _GRAPHICSDEVICE_H_
+#ifndef _CORE_GRAPHICSDEVICE_H_
+#define _CORE_GRAPHICSDEVICE_H_
 
 static_assert(sizeof(int) == 4, "size of int must be 4");
 
@@ -34,30 +34,12 @@ LOGERROR(L"Failed with",IntegerMode::HEX,static_cast<uint32_t>(hr),L"Failed reas
 //only works for power of 2
 #define ROUND_UP(x,y) ((x + (y-1)) & ~(y-1))
 
-class GraphicsDevice
+namespace Core
 {
-public:
+	namespace GraphicsDevice
+	{
+		ID3D12Device9* get();
+	};
+}
 
-	GraphicsDevice() = delete;
-
-	GraphicsDevice(const GraphicsDevice&) = delete;
-
-	void operator=(const GraphicsDevice&) = delete;
-
-	static ID3D12Device9* get();
-
-private:
-
-	friend class RenderEngine;
-
-	GraphicsDevice(IUnknown* const adapter);
-
-	void checkFeatureSupport() const;
-
-	static GraphicsDevice* instance;
-
-	ComPtr<ID3D12Device9> device;
-
-};
-
-#endif // !_GRAPHICSDEVICE_H_
+#endif // !_CORE_GRAPHICSDEVICE_H_

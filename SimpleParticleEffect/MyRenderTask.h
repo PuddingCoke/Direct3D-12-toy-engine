@@ -24,7 +24,7 @@ public:
 
 		particleCS = new Shader(L"ParticleCS.hlsl", ShaderProfile::COMPUTE);
 
-		PipelineState::createComputeState(&particleComputeState, particleCS);
+		Core::PipelineState::createComputeState(&particleComputeState, particleCS);
 
 		{
 			D3D12_INPUT_ELEMENT_DESC inputDesc[2] =
@@ -33,30 +33,30 @@ public:
 				{"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
 			};
 
-			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = PipelineState::getDefaultGraphicsDesc();
+			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = Core::PipelineState::getDefaultGraphicsDesc();
 			desc.InputLayout = { inputDesc,_countof(inputDesc) };
 			desc.VS = particleVS->getByteCode();
 			desc.GS = particleGS->getByteCode();
 			desc.PS = particlePS->getByteCode();
-			desc.BlendState = PipelineState::blendAddtive;
-			desc.RasterizerState = PipelineState::rasterCullBack;
-			desc.DepthStencilState = PipelineState::depthLess;
+			desc.BlendState = Core::PipelineState::blendAddtive;
+			desc.RasterizerState = Core::PipelineState::rasterCullBack;
+			desc.DepthStencilState = Core::PipelineState::depthLess;
 			desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_POINT;
 			desc.NumRenderTargets = 1;
 			desc.RTVFormats[0] = DXGI_FORMAT_R16G16B16A16_FLOAT;
 			desc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
 
-			GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&particleRenderState));
+			Core::GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&particleRenderState));
 		}
 
-		bloomEffect = new BloomEffect(context, Graphics::getWidth(), Graphics::getHeight(), resManager);
+		bloomEffect = new BloomEffect(context, Core::Graphics::getWidth(), Core::Graphics::getHeight(), resManager);
 
-		fxaaEffect = new FXAAEffect(context, Graphics::getWidth(), Graphics::getHeight());
+		fxaaEffect = new FXAAEffect(context, Core::Graphics::getWidth(), Core::Graphics::getHeight());
 
-		originTexture = ResourceManager::createTextureRenderView(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R16G16B16A16_FLOAT, 1, 1, false, true,
+		originTexture = ResourceManager::createTextureRenderView(Core::Graphics::getWidth(), Core::Graphics::getHeight(), DXGI_FORMAT_R16G16B16A16_FLOAT, 1, 1, false, true,
 			DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_R16G16B16A16_FLOAT, DirectX::Colors::Black);
 
-		depthTexture = ResourceManager::createTextureDepthView(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_D32_FLOAT, 1, 1, false, true);
+		depthTexture = ResourceManager::createTextureDepthView(Core::Graphics::getWidth(), Core::Graphics::getHeight(), DXGI_FORMAT_D32_FLOAT, 1, 1, false, true);
 
 		{
 			DirectX::XMFLOAT4* const positions = new DirectX::XMFLOAT4[numParticles];
@@ -151,7 +151,7 @@ protected:
 
 		context->setRenderTargets({ originTexture->getRTVMipHandle(0) }, &dsDesc);
 
-		context->setViewportSimple(Graphics::getWidth(), Graphics::getHeight());
+		context->setViewportSimple(Core::Graphics::getWidth(), Core::Graphics::getHeight());
 
 		context->setTopology(D3D_PRIMITIVE_TOPOLOGY_POINTLIST);
 

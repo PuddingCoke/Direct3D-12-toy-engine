@@ -126,9 +126,15 @@
     <ClInclude Include="Inc\DirectXTex\DDSTextureLoader12.h" />
     <ClInclude Include="Inc\Gear\Camera\OrbitCamera.h" />
     <ClInclude Include="Inc\Gear\Core\DynamicCBufferManager.h" />
-    <ClInclude Include="Inc\Gear\Core\DynamicCBufferRegion.h" />
     <ClInclude Include="Inc\Gear\Core\Effect\FXAAEffect.h" />
+    <ClInclude Include="Inc\Gear\Core\Internal\DynamicCBufferManagerInternal.h" />
+    <ClInclude Include="Inc\Gear\Core\Internal\GlobalDescriptorHeapInternal.h" />
+    <ClInclude Include="Inc\Gear\Core\Internal\GlobalRootSignatureInternal.h" />
+    <ClInclude Include="Inc\Gear\Core\Internal\GlobalShaderInternal.h" />
+    <ClInclude Include="Inc\Gear\Core\Internal\GraphicsDeviceInternal.h" />
     <ClInclude Include="Inc\Gear\Core\Internal\GraphicsInternal.h" />
+    <ClInclude Include="Inc\Gear\Core\Internal\MainCameraInternal.h" />
+    <ClInclude Include="Inc\Gear\Core\Internal\RenderEngineInternal.h" />
     <ClInclude Include="Inc\Gear\Core\Raytracing\BottomLevelAS.h" />
     <ClInclude Include="Inc\Gear\Core\Raytracing\TopLevelAS.h" />
     <ClInclude Include="Inc\Gear\Core\RenderTask.h" />
@@ -136,9 +142,11 @@
     <ClInclude Include="Inc\Gear\Core\Resource\StaticCBuffer.h" />
     <ClInclude Include="Inc\Gear\Core\StaticEffect\BackBufferBlitEffect.h" />
     <ClInclude Include="Inc\Gear\Core\StaticEffect\HDRClampEffect.h" />
+    <ClInclude Include="Inc\Gear\Core\StaticEffect\Internal\BackBufferBlitEffectInternal.h" />
+    <ClInclude Include="Inc\Gear\Core\StaticEffect\Internal\HDRClampEffectInternal.h" />
+    <ClInclude Include="Inc\Gear\Core\StaticEffect\Internal\LatLongMapToCubeMapEffectInternal.h" />
     <ClInclude Include="Inc\Gear\Core\StaticEffect\LatLongMapToCubeMapEffect.h" />
     <ClInclude Include="Inc\Gear\Core\StaticEffect\StaticEffectHeader.h" />
-    <ClInclude Include="Inc\Gear\Core\StaticResourceManager.h" />
     <ClInclude Include="Inc\Gear\Input\Internal\KeyboardInternal.h" />
     <ClInclude Include="Inc\Gear\Input\Internal\MouseInternal.h" />
     <ClInclude Include="Inc\Gear\Utils\DeltaTimeEstimator.h" />
@@ -162,7 +170,7 @@
     <ClInclude Include="External\stb_image\stb_image_write.h" />
     <ClInclude Include="Inc\Gear\Camera\FPSCamera.h" />
     <ClInclude Include="Inc\Gear\InitializationParam.h" />
-    <ClInclude Include="Inc\Gear\Core\Camera.h" />
+    <ClInclude Include="Inc\Gear\Core\MainCamera.h" />
     <ClInclude Include="Inc\Gear\Core\CommandList.h" />
     <ClInclude Include="Inc\Gear\Core\CommandAllocator.h" />
     <ClInclude Include="Inc\Gear\Core\DescriptorHeap.h" />
@@ -207,7 +215,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Inc\DirectXTex\DDSTextureLoader12.cpp" />
-    <ClCompile Include="Src\Core\DynamicCBufferRegion.cpp" />
     <ClCompile Include="Src\Core\Resource\DynamicCBuffer.cpp" />
     <ClCompile Include="Src\Core\Resource\StatiCBuffer.cpp" />
     <ClCompile Include="Src\Core\StaticEffect\BackBufferBlitEffect.cpp" />
@@ -222,14 +229,13 @@
     <ClCompile Include="Inc\DirectXTex\WICTextureLoader12.cpp" />
     <ClCompile Include="Src\Camera\FPSCamera.cpp" />
     <ClCompile Include="Src\Camera\OrbitCamera.cpp" />
-    <ClCompile Include="Src\Core\Camera.cpp" />
+    <ClCompile Include="Src\Core\MainCamera.cpp" />
     <ClCompile Include="Src\Core\DynamicCBufferManager.cpp" />
     <ClCompile Include="Src\Core\Effect\FXAAEffect.cpp" />
     <ClCompile Include="Src\Core\Raytracing\BottomLevelAS.cpp" />
     <ClCompile Include="Src\Core\Raytracing\TopLevelAS.cpp" />
     <ClCompile Include="Src\Core\RenderTask.cpp" />
     <ClCompile Include="Src\Core\StaticEffect\HDRClampEffect.cpp" />
-    <ClCompile Include="Src\Core\StaticResourceManager.cpp" />
     <ClCompile Include="Src\Utils\DeltaTimeEstimator.cpp" />
     <ClCompile Include="Src\Core\DescriptorHeap.cpp" />
     <ClCompile Include="Src\Core\Resource\D3D12Resource\ReadbackHeap.cpp" />

@@ -130,40 +130,6 @@ public:
 		}
 
 		modelBuffer = resManager->createStructuredBufferView(sizeof(Vertex), sizeof(Vertex) * vertices.size(), true, false, true, false, true, vertices.data());
-
-		{
-			blas = new BottomLevelAS(false);
-
-			for (Model* const model : models)
-			{
-				GeometryObject object = {};
-				object.vertexBuffer = modelBuffer->getBuffer();
-				object.vertexByteOffset = model->startVertexLocation * sizeof(Vertex);
-				object.vertexCount = model->vertexCount;
-				object.vertexSize = sizeof(Vertex);
-				object.opaque = true;
-
-				blas->addGeometryObject(object);
-			}
-
-			blas->generateBLAS(resManager->getCommandList());
-		}
-
-		{
-			tlas = new TopLevelAS(false, true);
-
-			{
-				GeometryInstance instance = {};
-				instance.blas = blas;
-				instance.transform = DirectX::XMMatrixIdentity();
-				instance.instanceID = 0;
-				instance.hitGroupIndex = 0;
-
-				tlas->addGeometryInstance(instance);
-			}
-
-			tlas->generateTLAS(resManager->getCommandList());
-		}
 	}
 
 	~Scene()
@@ -178,16 +144,6 @@ public:
 		for (UINT i = 0; i < models.size(); i++)
 		{
 			delete models[i];
-		}
-
-		if (blas)
-		{
-			delete blas;
-		}
-
-		if (tlas)
-		{
-			delete tlas;
 		}
 	}
 
@@ -225,9 +181,5 @@ private:
 	std::vector<Model*> models;
 
 	BufferView* modelBuffer;
-
-	BottomLevelAS* blas = nullptr;
-
-	TopLevelAS* tlas = nullptr;
 
 };

@@ -20,10 +20,48 @@
 
 #define EXITUID 0
 
-Win32Form* Win32Form::instance = nullptr;
+namespace
+{
+	class Win32FormPrivate
+	{
+	public:
 
-Win32Form::Win32Form(const std::wstring& title, const uint32_t startX, const uint32_t startY, const uint32_t width, const uint32_t height, const DWORD windowStyle, LRESULT(*windowCallback)(HWND hwnd, uint32_t msg, WPARAM wParam, LPARAM lParam)) :
-	hWnd(nullptr), iniTrayIcon(windowCallback == wallpaperCallBack), hMenu(nullptr), nid{}
+		Win32FormPrivate() = delete;
+
+		Win32FormPrivate(const Win32FormPrivate&) = delete;
+
+		void operator=(const Win32FormPrivate&) = delete;
+
+		Win32FormPrivate(const std::wstring& title, const uint32_t startX, const uint32_t startY, const uint32_t width, const uint32_t height, const DWORD windowStyle,
+			LRESULT(*windowCallback)(HWND hwnd, uint32_t msg, WPARAM wParam, LPARAM lParam));
+
+		~Win32FormPrivate();
+
+		bool pollEvents();
+
+		HWND getHandle() const;
+
+		LRESULT CALLBACK windowProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam) const;
+
+		LRESULT CALLBACK encodeProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam) const;
+
+		LRESULT CALLBACK wallpaperProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam) const;
+
+	private:
+
+		HWND hWnd;
+
+		const bool iniTrayIcon;
+
+		HMENU hMenu;
+
+		NOTIFYICONDATA nid;
+
+	}*pvt = nullptr;
+}
+
+Win32FormPrivate::Win32FormPrivate(const std::wstring& title, const uint32_t startX, const uint32_t startY, const uint32_t width, const uint32_t height, const DWORD windowStyle, LRESULT(*windowCallback)(HWND hwnd, uint32_t msg, WPARAM wParam, LPARAM lParam)) :
+	hWnd(nullptr), iniTrayIcon(windowCallback == Window::Win32Form::wallpaperCallBack), hMenu(nullptr), nid{}
 {
 	SetProcessDPIAware();
 
@@ -48,7 +86,7 @@ Win32Form::Win32Form(const std::wstring& title, const uint32_t startX, const uin
 
 	hWnd = CreateWindow(L"MyWindowClass", title.c_str(), windowStyle, startX, startY,
 		rect.right - rect.left, rect.bottom - rect.top, nullptr, nullptr, hInstance, nullptr);
-	
+
 	if (!hWnd)
 	{
 		LOGERROR(L"create window failed");
@@ -74,7 +112,7 @@ Win32Form::Win32Form(const std::wstring& title, const uint32_t startX, const uin
 	}
 }
 
-Win32Form::~Win32Form()
+Win32FormPrivate::~Win32FormPrivate()
 {
 	if (iniTrayIcon)
 	{
@@ -86,7 +124,7 @@ Win32Form::~Win32Form()
 	DestroyWindow(hWnd);
 }
 
-bool Win32Form::pollEvents()
+bool Win32FormPrivate::pollEvents()
 {
 	Input::Mouse::Internal::resetDeltaValue();
 
@@ -104,34 +142,14 @@ bool Win32Form::pollEvents()
 	return msg.message != WM_QUIT;
 }
 
-HWND Win32Form::getHandle() const
+HWND Win32FormPrivate::getHandle() const
 {
 	return hWnd;
 }
 
-Win32Form* Win32Form::get()
-{
-	return instance;
-}
-
-LRESULT Win32Form::windowCallback(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam)
-{
-	return instance->windowProc(hWnd, uMsg, wParam, lParam);
-}
-
-LRESULT Win32Form::encodeCallback(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam)
-{
-	return instance->encodeProc(hWnd, uMsg, wParam, lParam);
-}
-
-LRESULT Win32Form::wallpaperCallBack(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam)
-{
-	return instance->wallpaperProc(hWnd, uMsg, wParam, lParam);
-}
-
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam);
 
-LRESULT Win32Form::windowProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam) const
+LRESULT Win32FormPrivate::windowProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam) const
 {
 	if (ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam))
 		return true;
@@ -149,7 +167,7 @@ LRESULT Win32Form::windowProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lP
 	break;
 
 	case WM_MOUSEMOVE:
-		Input::Mouse::Internal::move(static_cast<float>(LOWORD(lParam)), static_cast<float>(Graphics::getHeight()) - static_cast<float>(HIWORD(lParam)));
+		Input::Mouse::Internal::move(static_cast<float>(LOWORD(lParam)), static_cast<float>(Core::Graphics::getHeight()) - static_cast<float>(HIWORD(lParam)));
 		break;
 
 	case WM_LBUTTONDOWN:
@@ -194,7 +212,7 @@ LRESULT Win32Form::windowProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lP
 	return 0;
 }
 
-LRESULT Win32Form::encodeProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam) const
+LRESULT Win32FormPrivate::encodeProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam) const
 {
 	switch (uMsg)
 	{
@@ -219,7 +237,7 @@ LRESULT Win32Form::encodeProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lP
 	return 0;
 }
 
-LRESULT Win32Form::wallpaperProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam) const
+LRESULT Win32FormPrivate::wallpaperProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam) const
 {
 	switch (uMsg)
 	{
@@ -260,4 +278,42 @@ LRESULT Win32Form::wallpaperProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM
 	}
 
 	return 0;
+}
+
+LRESULT Window::Win32Form::windowCallback(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam)
+{
+	return pvt->windowProc(hWnd, uMsg, wParam, lParam);
+}
+
+LRESULT Window::Win32Form::encodeCallback(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam)
+{
+	return pvt->encodeProc(hWnd, uMsg, wParam, lParam);
+}
+
+LRESULT Window::Win32Form::wallpaperCallBack(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam)
+{
+	return pvt->wallpaperProc(hWnd, uMsg, wParam, lParam);
+}
+
+void Window::Win32Form::initialize(const std::wstring& title, const uint32_t startX, const uint32_t startY, const uint32_t width, const uint32_t height, const DWORD windowStyle, LRESULT(*windowCallback)(HWND hwnd, uint32_t msg, WPARAM wParam, LPARAM lParam))
+{
+	pvt = new Win32FormPrivate(title, startX, startY, width, height, windowStyle, windowCallback);
+}
+
+void Window::Win32Form::release()
+{
+	if (pvt)
+	{
+		delete pvt;
+	}
+}
+
+bool Window::Win32Form::pollEvents()
+{
+	return pvt->pollEvents();
+}
+
+HWND Window::Win32Form::getHandle()
+{
+	return pvt->getHandle();
 }

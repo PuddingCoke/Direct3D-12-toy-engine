@@ -91,7 +91,7 @@ void BottomLevelAS::generateBLAS(CommandList* const commandList)
 
 		D3D12_RAYTRACING_ACCELERATION_STRUCTURE_PREBUILD_INFO info = {};
 
-		GraphicsDevice::get()->GetRaytracingAccelerationStructurePrebuildInfo(&inputs, &info);
+		Core::GraphicsDevice::get()->GetRaytracingAccelerationStructurePrebuildInfo(&inputs, &info);
 
 		scratchBufferSize = ROUND_UP(info.ScratchDataSizeInBytes, D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT);
 

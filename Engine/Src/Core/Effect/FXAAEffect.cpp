@@ -9,26 +9,26 @@ FXAAEffect::FXAAEffect(GraphicsContext* const context, const uint32_t width, con
 	colorLumaTexture(ResourceManager::createTextureRenderView(width, height, DXGI_FORMAT_R8G8B8A8_UNORM, 1, 1, false, true,
 		DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_R8G8B8A8_UNORM))
 {
-	colorToColorLumaPS = new Shader(g_ColorToColorLumaBytes, sizeof(g_ColorToColorLumaBytes));
+	colorToColorLumaPS = new Core::Shader(g_ColorToColorLumaBytes, sizeof(g_ColorToColorLumaBytes));
 
-	fxaaPS = new Shader(g_FXAABytes, sizeof(g_FXAABytes));
+	fxaaPS = new Core::Shader(g_FXAABytes, sizeof(g_FXAABytes));
 
 	{
-		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = PipelineState::getDefaultFullScreenState();
+		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = Core::PipelineState::getDefaultFullScreenState();
 		desc.PS = colorToColorLumaPS->getByteCode();
 		desc.NumRenderTargets = 1;
 		desc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
 
-		GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&colorToColorLumaState));
+		Core::GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&colorToColorLumaState));
 	}
 
 	{
-		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = PipelineState::getDefaultFullScreenState();
+		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = Core::PipelineState::getDefaultFullScreenState();
 		desc.PS = fxaaPS->getByteCode();
 		desc.NumRenderTargets = 1;
 		desc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
 
-		GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&fxaaState));
+		Core::GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&fxaaState));
 	}
 }
 

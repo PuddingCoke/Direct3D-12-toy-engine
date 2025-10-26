@@ -10,9 +10,9 @@ int wmain(int argc, const wchar_t* argv[])
 
 	Gear::initialize();
 
-	if (!Gear::get()->iniEngine(param, argc, argv))
+	if (!Gear::iniEngine(param, argc, argv))
 	{
-		Gear::get()->iniGame(new MyGame());
+		Gear::iniGame(new MyGame());
 	}
 
 	Gear::release();

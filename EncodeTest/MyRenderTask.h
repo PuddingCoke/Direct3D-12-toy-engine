@@ -11,8 +11,8 @@ public:
 		context->setDefRenderTarget();
 
 		const float clearValue[4] = {
-			cosf(Graphics::getTimeElapsed()) * 0.5f + 0.5f,
-			sinf(Graphics::getTimeElapsed()) * 0.5f + 0.5f,
+			cosf(Core::Graphics::getTimeElapsed()) * 0.5f + 0.5f,
+			sinf(Core::Graphics::getTimeElapsed()) * 0.5f + 0.5f,
 			1.0f,
 			1.0f
 		};

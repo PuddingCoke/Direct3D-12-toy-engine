@@ -2,6 +2,8 @@
 
 #include<Gear/Camera/FPSCamera.h>
 
+#include<Gear/Core/MainCamera.h>
+
 #include<Gear/Game.h>
 
 #include"MyRenderTask.h"
@@ -15,7 +17,7 @@ public:
 	MyGame():
 		camera({ 0.f,20.f,0.f }, { 1.0f,0.f,0.f }, { 0.f,1.f,0.f }, 100.f)
 	{
-		Camera::setProj(Utils::Math::pi / 4.f, Graphics::getAspectRatio(), 1.f, 512.f);
+		Core::MainCamera::setProj(Utils::Math::pi / 4.f, Core::Graphics::getAspectRatio(), 1.f, 512.f);
 
 		pushCreateFuture(createRenderTaskAsync(&renderTask));
 

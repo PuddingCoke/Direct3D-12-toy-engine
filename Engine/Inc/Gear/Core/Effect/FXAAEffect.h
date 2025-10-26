@@ -35,11 +35,11 @@ private:
 		float fxaaQualityEdgeThresholdMin;
 	} fxaaParam;
 
-	Shader* colorToColorLumaPS;
+	Core::Shader* colorToColorLumaPS;
 
 	ComPtr<ID3D12PipelineState> colorToColorLumaState;
 
-	Shader* fxaaPS;
+	Core::Shader* fxaaPS;
 
 	ComPtr<ID3D12PipelineState> fxaaState;
 

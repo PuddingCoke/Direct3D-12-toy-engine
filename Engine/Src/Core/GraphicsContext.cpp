@@ -1,8 +1,8 @@
 ﻿#include<Gear/Core/GraphicsContext.h>
 
-#include<Gear/Core/GlobalRootSignature.h>
+#include<Gear/Core/Graphics.h>
 
-ImmutableCBuffer* GraphicsContext::reservedGlobalCBuffer = nullptr;
+#include<Gear/Core/GlobalRootSignature.h>
 
 GraphicsContext::GraphicsContext() :
 	commandList(new CommandList(D3D12_COMMAND_LIST_TYPE_DIRECT)),
@@ -367,15 +367,15 @@ void GraphicsContext::begin() const
 {
 	commandList->open();
 
-	commandList->setDescriptorHeap(GlobalDescriptorHeap::getResourceHeap(), GlobalDescriptorHeap::getSamplerHeap());
+	commandList->setDescriptorHeap(Core::GlobalDescriptorHeap::getResourceHeap(), Core::GlobalDescriptorHeap::getSamplerHeap());
 
-	commandList->setGraphicsRootSignature(GlobalRootSignature::getGraphicsRootSignature());
+	commandList->setGraphicsRootSignature(Core::GlobalRootSignature::getGraphicsRootSignature());
 
-	commandList->setComputeRootSignature(GlobalRootSignature::getComputeRootSignature());
+	commandList->setComputeRootSignature(Core::GlobalRootSignature::getComputeRootSignature());
 
-	commandList->get()->SetGraphicsRootConstantBufferView(0, reservedGlobalCBuffer->getGPUAddress());
+	commandList->get()->SetGraphicsRootConstantBufferView(0, Core::Graphics::getReservedGlobalCBuffer()->getGPUAddress());
 
-	commandList->get()->SetComputeRootConstantBufferView(0, reservedGlobalCBuffer->getGPUAddress());
+	commandList->get()->SetComputeRootConstantBufferView(0, Core::Graphics::getReservedGlobalCBuffer()->getGPUAddress());
 }
 
 CommandList* GraphicsContext::getCommandList() const

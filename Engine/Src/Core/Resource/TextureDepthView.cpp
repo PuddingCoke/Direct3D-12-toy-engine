@@ -54,11 +54,11 @@ TextureDepthView::TextureDepthView(Texture* const texture, const bool isTextureC
 
 		if (persistent)
 		{
-			descriptorHandle = GlobalDescriptorHeap::getDepthStencilHeap()->allocStaticDescriptor(mipLevels);
+			descriptorHandle = Core::GlobalDescriptorHeap::getDepthStencilHeap()->allocStaticDescriptor(mipLevels);
 		}
 		else
 		{
-			descriptorHandle = GlobalDescriptorHeap::getDepthStencilHeap()->allocDynamicDescriptor(mipLevels);
+			descriptorHandle = Core::GlobalDescriptorHeap::getDepthStencilHeap()->allocDynamicDescriptor(mipLevels);
 		}
 
 		dsvMipHandleStart = descriptorHandle.getCPUHandle();
@@ -74,7 +74,7 @@ TextureDepthView::TextureDepthView(Texture* const texture, const bool isTextureC
 				desc.Texture2DArray.FirstArraySlice = 0;
 				desc.Texture2DArray.MipSlice = i;
 
-				GraphicsDevice::get()->CreateDepthStencilView(texture->getResource(), &desc, descriptorHandle.getCPUHandle());
+				Core::GraphicsDevice::get()->CreateDepthStencilView(texture->getResource(), &desc, descriptorHandle.getCPUHandle());
 
 				descriptorHandle.move();
 			}
@@ -85,7 +85,7 @@ TextureDepthView::TextureDepthView(Texture* const texture, const bool isTextureC
 				desc.Format = dsvFormat;
 				desc.Texture2D.MipSlice = i;
 
-				GraphicsDevice::get()->CreateDepthStencilView(texture->getResource(), &desc, descriptorHandle.getCPUHandle());
+				Core::GraphicsDevice::get()->CreateDepthStencilView(texture->getResource(), &desc, descriptorHandle.getCPUHandle());
 
 				descriptorHandle.move();
 			}
@@ -100,11 +100,11 @@ TextureDepthView::TextureDepthView(Texture* const texture, const bool isTextureC
 
 		if (persistent)
 		{
-			descriptorHandle = GlobalDescriptorHeap::getResourceHeap()->allocStaticDescriptor(numSRVUAVCBVDescriptors);
+			descriptorHandle = Core::GlobalDescriptorHeap::getResourceHeap()->allocStaticDescriptor(numSRVUAVCBVDescriptors);
 		}
 		else
 		{
-			descriptorHandle = GlobalDescriptorHeap::getNonShaderVisibleResourceHeap()->allocDynamicDescriptor(numSRVUAVCBVDescriptors);
+			descriptorHandle = Core::GlobalDescriptorHeap::getNonShaderVisibleResourceHeap()->allocDynamicDescriptor(numSRVUAVCBVDescriptors);
 		}
 
 		srvUAVCBVHandleStart = descriptorHandle.getCPUHandle();
@@ -137,7 +137,7 @@ TextureDepthView::TextureDepthView(Texture* const texture, const bool isTextureC
 						desc.TextureCubeArray.NumCubes = numCube;
 						desc.TextureCubeArray.ResourceMinLODClamp = 0.f;
 
-						GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCPUHandle());
+						Core::GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCPUHandle());
 
 						descriptorHandle.move();
 					}
@@ -154,7 +154,7 @@ TextureDepthView::TextureDepthView(Texture* const texture, const bool isTextureC
 						desc.TextureCubeArray.NumCubes = numCube;
 						desc.TextureCubeArray.ResourceMinLODClamp = 0.f;
 
-						GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCPUHandle());
+						Core::GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCPUHandle());
 
 						descriptorHandle.move();
 					}
@@ -170,7 +170,7 @@ TextureDepthView::TextureDepthView(Texture* const texture, const bool isTextureC
 						desc.TextureCube.MostDetailedMip = 0;
 						desc.TextureCube.ResourceMinLODClamp = 0.f;
 
-						GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCPUHandle());
+						Core::GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCPUHandle());
 
 						descriptorHandle.move();
 					}
@@ -185,7 +185,7 @@ TextureDepthView::TextureDepthView(Texture* const texture, const bool isTextureC
 						desc.TextureCube.MostDetailedMip = i;
 						desc.TextureCube.ResourceMinLODClamp = 0.f;
 
-						GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCPUHandle());
+						Core::GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCPUHandle());
 
 						descriptorHandle.move();
 					}
@@ -207,7 +207,7 @@ TextureDepthView::TextureDepthView(Texture* const texture, const bool isTextureC
 						desc.Texture2DArray.PlaneSlice = 0;
 						desc.Texture2DArray.ResourceMinLODClamp = 0.f;
 
-						GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCPUHandle());
+						Core::GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCPUHandle());
 
 						descriptorHandle.move();
 					}
@@ -225,7 +225,7 @@ TextureDepthView::TextureDepthView(Texture* const texture, const bool isTextureC
 						desc.Texture2DArray.PlaneSlice = 0;
 						desc.Texture2DArray.ResourceMinLODClamp = 0.f;
 
-						GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCPUHandle());
+						Core::GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCPUHandle());
 
 						descriptorHandle.move();
 					}
@@ -241,7 +241,7 @@ TextureDepthView::TextureDepthView(Texture* const texture, const bool isTextureC
 						desc.Texture2D.MostDetailedMip = 0;
 						desc.Texture2D.PlaneSlice = 0;
 						desc.Texture2D.ResourceMinLODClamp = 0.f;
-						GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCPUHandle());
+						Core::GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCPUHandle());
 
 						descriptorHandle.move();
 					}
@@ -257,7 +257,7 @@ TextureDepthView::TextureDepthView(Texture* const texture, const bool isTextureC
 						desc.Texture2D.PlaneSlice = 0;
 						desc.Texture2D.ResourceMinLODClamp = 0.f;
 
-						GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCPUHandle());
+						Core::GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCPUHandle());
 
 						descriptorHandle.move();
 					}
@@ -285,7 +285,7 @@ TextureDepthView::TextureDepthView(Texture* const texture, const bool isTextureC
 						desc.TextureCubeArray.NumCubes = numCube;
 						desc.TextureCubeArray.ResourceMinLODClamp = 0.f;
 
-						GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCPUHandle());
+						Core::GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCPUHandle());
 
 						descriptorHandle.move();
 					}
@@ -302,7 +302,7 @@ TextureDepthView::TextureDepthView(Texture* const texture, const bool isTextureC
 						desc.TextureCubeArray.NumCubes = numCube;
 						desc.TextureCubeArray.ResourceMinLODClamp = 0.f;
 
-						GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCPUHandle());
+						Core::GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCPUHandle());
 
 						descriptorHandle.move();
 					}
@@ -318,7 +318,7 @@ TextureDepthView::TextureDepthView(Texture* const texture, const bool isTextureC
 						desc.TextureCube.MostDetailedMip = 0;
 						desc.TextureCube.ResourceMinLODClamp = 0.f;
 
-						GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCPUHandle());
+						Core::GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCPUHandle());
 
 						descriptorHandle.move();
 					}
@@ -333,7 +333,7 @@ TextureDepthView::TextureDepthView(Texture* const texture, const bool isTextureC
 						desc.TextureCube.MostDetailedMip = i;
 						desc.TextureCube.ResourceMinLODClamp = 0.f;
 
-						GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCPUHandle());
+						Core::GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCPUHandle());
 
 						descriptorHandle.move();
 					}
@@ -355,7 +355,7 @@ TextureDepthView::TextureDepthView(Texture* const texture, const bool isTextureC
 						desc.Texture2DArray.PlaneSlice = 0;
 						desc.Texture2DArray.ResourceMinLODClamp = 0.f;
 
-						GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCPUHandle());
+						Core::GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCPUHandle());
 
 						descriptorHandle.move();
 					}
@@ -373,7 +373,7 @@ TextureDepthView::TextureDepthView(Texture* const texture, const bool isTextureC
 						desc.Texture2DArray.PlaneSlice = 0;
 						desc.Texture2DArray.ResourceMinLODClamp = 0.f;
 
-						GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCPUHandle());
+						Core::GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCPUHandle());
 
 						descriptorHandle.move();
 					}
@@ -389,7 +389,7 @@ TextureDepthView::TextureDepthView(Texture* const texture, const bool isTextureC
 						desc.Texture2D.MostDetailedMip = 0;
 						desc.Texture2D.PlaneSlice = 0;
 						desc.Texture2D.ResourceMinLODClamp = 0.f;
-						GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCPUHandle());
+						Core::GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCPUHandle());
 
 						descriptorHandle.move();
 					}
@@ -405,7 +405,7 @@ TextureDepthView::TextureDepthView(Texture* const texture, const bool isTextureC
 						desc.Texture2D.PlaneSlice = 0;
 						desc.Texture2D.ResourceMinLODClamp = 0.f;
 
-						GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCPUHandle());
+						Core::GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCPUHandle());
 
 						descriptorHandle.move();
 					}
@@ -487,7 +487,7 @@ DepthStencilDesc TextureDepthView::getDSVMipHandle(const uint32_t mipSlice) cons
 	DepthStencilDesc desc = {};
 	desc.texture = texture;
 	desc.mipSlice = mipSlice;
-	desc.dsvHandle = CD3DX12_CPU_DESCRIPTOR_HANDLE(dsvMipHandleStart, mipSlice, GlobalDescriptorHeap::getDepthStencilIncrementSize());
+	desc.dsvHandle = CD3DX12_CPU_DESCRIPTOR_HANDLE(dsvMipHandleStart, mipSlice, Core::GlobalDescriptorHeap::getDepthStencilIncrementSize());
 
 	return desc;
 }

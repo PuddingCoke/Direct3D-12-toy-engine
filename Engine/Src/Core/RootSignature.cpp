@@ -8,7 +8,7 @@ RootSignature::RootSignature(const CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC& desc)
 
 	D3DX12SerializeVersionedRootSignature(&desc, D3D_ROOT_SIGNATURE_VERSION_1_1, &signature, &error);
 
-	CHECKERROR(GraphicsDevice::get()->CreateRootSignature(0, signature->GetBufferPointer(), signature->GetBufferSize(), IID_PPV_ARGS(&rootSignature)));
+	CHECKERROR(Core::GraphicsDevice::get()->CreateRootSignature(0, signature->GetBufferPointer(), signature->GetBufferSize(), IID_PPV_ARGS(&rootSignature)));
 }
 
 RootSignature::~RootSignature()

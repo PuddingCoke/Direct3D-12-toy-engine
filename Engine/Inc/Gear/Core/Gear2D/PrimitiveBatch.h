@@ -42,17 +42,17 @@ private:
 
 	float lineWidth;
 
-	Shader* lineVS;
+	Core::Shader* lineVS;
 
-	Shader* circleVS;
+	Core::Shader* circleVS;
 
-	Shader* rcLineVS;
+	Core::Shader* rcLineVS;
 
-	Shader* lineGS;
+	Core::Shader* lineGS;
 
-	Shader* rcLineGS;
+	Core::Shader* rcLineGS;
 
-	Shader* primitivePS;
+	Core::Shader* primitivePS;
 
 	ComPtr<ID3D12PipelineState> lineState;
 

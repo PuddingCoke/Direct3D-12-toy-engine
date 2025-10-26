@@ -9,11 +9,11 @@ CounterBufferView::CounterBufferView(const bool persistent) :
 
 	if (persistent)
 	{
-		descriptorHandle = GlobalDescriptorHeap::getResourceHeap()->allocStaticDescriptor(numSRVUAVCBVDescriptors);
+		descriptorHandle = Core::GlobalDescriptorHeap::getResourceHeap()->allocStaticDescriptor(numSRVUAVCBVDescriptors);
 	}
 	else
 	{
-		descriptorHandle = GlobalDescriptorHeap::getNonShaderVisibleResourceHeap()->allocDynamicDescriptor(numSRVUAVCBVDescriptors);
+		descriptorHandle = Core::GlobalDescriptorHeap::getNonShaderVisibleResourceHeap()->allocDynamicDescriptor(numSRVUAVCBVDescriptors);
 	}
 
 	srvUAVCBVHandleStart = descriptorHandle.getCPUHandle();
@@ -27,7 +27,7 @@ CounterBufferView::CounterBufferView(const bool persistent) :
 		desc.Buffer.NumElements = 1;
 		desc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_RAW;
 
-		GraphicsDevice::get()->CreateShaderResourceView(buffer->getResource(), &desc, descriptorHandle.getCPUHandle());
+		Core::GraphicsDevice::get()->CreateShaderResourceView(buffer->getResource(), &desc, descriptorHandle.getCPUHandle());
 
 		srvIndex = descriptorHandle.getCurrentIndex();
 
@@ -42,7 +42,7 @@ CounterBufferView::CounterBufferView(const bool persistent) :
 		desc.Buffer.NumElements = 1;
 		desc.Buffer.Flags = D3D12_BUFFER_UAV_FLAG_RAW;
 
-		GraphicsDevice::get()->CreateUnorderedAccessView(buffer->getResource(), nullptr, &desc, descriptorHandle.getCPUHandle());
+		Core::GraphicsDevice::get()->CreateUnorderedAccessView(buffer->getResource(), nullptr, &desc, descriptorHandle.getCPUHandle());
 
 		uavIndex = descriptorHandle.getCurrentIndex();
 
@@ -50,9 +50,9 @@ CounterBufferView::CounterBufferView(const bool persistent) :
 		{
 			viewGPUHandle = descriptorHandle.getGPUHandle();
 
-			const DescriptorHandle nonShaderVisibleHandle = GlobalDescriptorHeap::getNonShaderVisibleResourceHeap()->allocStaticDescriptor(1);
+			const DescriptorHandle nonShaderVisibleHandle = Core::GlobalDescriptorHeap::getNonShaderVisibleResourceHeap()->allocStaticDescriptor(1);
 
-			GraphicsDevice::get()->CreateUnorderedAccessView(buffer->getResource(), nullptr, &desc, nonShaderVisibleHandle.getCPUHandle());
+			Core::GraphicsDevice::get()->CreateUnorderedAccessView(buffer->getResource(), nullptr, &desc, nonShaderVisibleHandle.getCPUHandle());
 
 			viewCPUHandle = nonShaderVisibleHandle.getCPUHandle();
 		}

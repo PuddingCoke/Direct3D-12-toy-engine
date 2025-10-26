@@ -13,7 +13,7 @@ public:
 	MyGame():
 		camera({ 4,4,-11 }, { -1,-1,-2 }, 2.f)
 	{
-		Camera::setProj(Utils::Math::pi / 4.f, Graphics::getAspectRatio(), 0.01f, 512.f);
+		Core::MainCamera::setProj(Utils::Math::pi / 4.f, Core::Graphics::getAspectRatio(), 0.01f, 512.f);
 
 		pushCreateFuture(createRenderTaskAsync(&renderTask));
 

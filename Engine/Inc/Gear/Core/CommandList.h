@@ -96,18 +96,14 @@ public:
 
 	void clearUnorderedAccessView(const ClearUAVDesc& desc, const uint32_t values[4]);
 
-	void solvePendingBarriers(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers);
+	void solvePendingBarriers(std::vector<D3D12_RESOURCE_BARRIER>& barriers);
 
 	void updateReferredSharedResourceStates();
-
-	void static setBackBufferHandle(const D3D12_CPU_DESCRIPTOR_HANDLE handle);
 
 private:
 
 	template<typename T>
 	IsCorrectType<T> setPipelineResources(const T& descs, const uint32_t targetSRVState);
-
-	static D3D12_CPU_DESCRIPTOR_HANDLE backBufferHandle;
 
 	CommandAllocator** allocators;
 

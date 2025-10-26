@@ -14,16 +14,16 @@ public:
 		whiteNoiseCS(new Shader(Utils::File::getRootFolder() + L"WhiteNoiseCS.cso")),
 		evolveCS(new Shader(Utils::File::getRootFolder() + L"EvolveCS.cso")),
 		visualizeCS(new Shader(Utils::File::getRootFolder() + L"VisualizeCS.cso")),
-		originTexture(ResourceManager::createTextureRenderView(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R8G8B8A8_UNORM, 1, 1, false, true,
+		originTexture(ResourceManager::createTextureRenderView(Core::Graphics::getWidth(), Core::Graphics::getHeight(), DXGI_FORMAT_R8G8B8A8_UNORM, 1, 1, false, true,
 			DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_UNKNOWN))
 	{
-		PipelineState::createComputeState(&whiteNoiseState, whiteNoiseCS);
+		Core::PipelineState::createComputeState(&whiteNoiseState, whiteNoiseCS);
 
-		PipelineState::createComputeState(&evolveState, evolveCS);
+		Core::PipelineState::createComputeState(&evolveState, evolveCS);
 
-		PipelineState::createComputeState(&visualizeState, visualizeCS);
+		Core::PipelineState::createComputeState(&visualizeState, visualizeCS);
 
-		swapTexture = new SwapTexture([] {return ResourceManager::createTextureRenderView(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R32_FLOAT, 1, 1, false, true,
+		swapTexture = new SwapTexture([] {return ResourceManager::createTextureRenderView(Core::Graphics::getWidth(), Core::Graphics::getHeight(), DXGI_FORMAT_R32_FLOAT, 1, 1, false, true,
 			DXGI_FORMAT_R32_FLOAT, DXGI_FORMAT_R32_FLOAT, DXGI_FORMAT_UNKNOWN); });
 
 		initialize();
@@ -106,7 +106,7 @@ protected:
 
 	void step()
 	{
-		while (timer.update(Graphics::getDeltaTime()))
+		while (timer.update(Core::Graphics::getDeltaTime()))
 		{
 			evolve(swapTexture);
 		}

@@ -22,12 +22,12 @@ BloomEffect::BloomEffect(GraphicsContext* const context, const uint32_t width, c
 {
 	filteredTexture->getTexture()->setName(L"Bloom Effect Filtered Texture");
 
-	bloomFilter = new Shader(g_BloomFilterPSBytes, sizeof(g_BloomFilterPSBytes));
-	bloomFinal = new Shader(g_BloomFinalPSBytes, sizeof(g_BloomFinalPSBytes));
-	bloomVBlur = new Shader(g_BloomVBlurCSBytes, sizeof(g_BloomVBlurCSBytes));
-	bloomHBlur = new Shader(g_BloomHBlurCSBytes, sizeof(g_BloomHBlurCSBytes));
-	bloomDownSample = new Shader(g_BloomDownSamplePSBytes, sizeof(g_BloomDownSamplePSBytes));
-	bloomKarisAverage = new Shader(g_BloomKarisAveragePSBytes, sizeof(g_BloomKarisAveragePSBytes));
+	bloomFilter = new Core::Shader(g_BloomFilterPSBytes, sizeof(g_BloomFilterPSBytes));
+	bloomFinal = new Core::Shader(g_BloomFinalPSBytes, sizeof(g_BloomFinalPSBytes));
+	bloomVBlur = new Core::Shader(g_BloomVBlurCSBytes, sizeof(g_BloomVBlurCSBytes));
+	bloomHBlur = new Core::Shader(g_BloomHBlurCSBytes, sizeof(g_BloomHBlurCSBytes));
+	bloomDownSample = new Core::Shader(g_BloomDownSamplePSBytes, sizeof(g_BloomDownSamplePSBytes));
+	bloomKarisAverage = new Core::Shader(g_BloomKarisAveragePSBytes, sizeof(g_BloomKarisAveragePSBytes));
 
 	{
 		const float sigma[blurSteps] = { 0.44f,0.57f,0.8f,1.32f,3.3f };
@@ -66,10 +66,10 @@ BloomEffect::BloomEffect(GraphicsContext* const context, const uint32_t width, c
 	//PS BlendState
 	auto getDefaultPipelineState =
 		[] {
-		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = PipelineState::getDefaultGraphicsDesc();
+		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = Core::PipelineState::getDefaultGraphicsDesc();
 		desc.InputLayout = {};
-		desc.VS = Shader::fullScreenVS->getByteCode();
-		desc.RasterizerState = PipelineState::rasterCullBack;
+		desc.VS = Core::GlobalShader::getFullScreenVS()->getByteCode();
+		desc.RasterizerState = Core::PipelineState::rasterCullBack;
 		desc.DepthStencilState.DepthEnable = FALSE;
 		desc.DepthStencilState.StencilEnable = FALSE;
 		desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
@@ -83,7 +83,7 @@ BloomEffect::BloomEffect(GraphicsContext* const context, const uint32_t width, c
 		desc.PS = bloomFilter->getByteCode();
 		desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
 
-		GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&bloomFilterState));
+		Core::GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&bloomFilterState));
 	}
 
 	{
@@ -91,7 +91,7 @@ BloomEffect::BloomEffect(GraphicsContext* const context, const uint32_t width, c
 		desc.PS = bloomKarisAverage->getByteCode();
 		desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
 
-		GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&bloomKarisAverageState));
+		Core::GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&bloomKarisAverageState));
 	}
 
 	{
@@ -99,15 +99,15 @@ BloomEffect::BloomEffect(GraphicsContext* const context, const uint32_t width, c
 		desc.PS = bloomDownSample->getByteCode();
 		desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
 
-		GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&bloomDownSampleState));
+		Core::GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&bloomDownSampleState));
 	}
 
 	{
 		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = getDefaultPipelineState();
-		desc.PS = Shader::fullScreenPS->getByteCode();
-		desc.BlendState = PipelineState::blendAddtive;
+		desc.PS = Core::GlobalShader::getFullScreenPS()->getByteCode();
+		desc.BlendState = Core::PipelineState::blendAddtive;
 
-		GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&bloomUpSampleState));
+		Core::GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&bloomUpSampleState));
 	}
 
 	{
@@ -115,12 +115,12 @@ BloomEffect::BloomEffect(GraphicsContext* const context, const uint32_t width, c
 		desc.PS = bloomFinal->getByteCode();
 		desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
 
-		GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&bloomFinalState));
+		Core::GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&bloomFinalState));
 	}
 
-	PipelineState::createComputeState(&bloomHBlurState, bloomHBlur);
+	Core::PipelineState::createComputeState(&bloomHBlurState, bloomHBlur);
 
-	PipelineState::createComputeState(&bloomVBlurState, bloomVBlur);
+	Core::PipelineState::createComputeState(&bloomVBlurState, bloomVBlur);
 
 }
 

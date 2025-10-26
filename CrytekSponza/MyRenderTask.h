@@ -10,20 +10,22 @@
 
 #include"Scene.h"
 
+using namespace Core;
+
 class MyRenderTask :public RenderTask
 {
 public:
 
 	MyRenderTask() :
-		gPosition(ResourceManager::createTextureRenderView(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 1, false, true,
+		gPosition(ResourceManager::createTextureRenderView(Core::Graphics::getWidth(), Core::Graphics::getHeight(), DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 1, false, true,
 			DXGI_FORMAT_R32G32B32A32_FLOAT, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_R32G32B32A32_FLOAT, DirectX::Colors::Transparent)),
-		gNormalSpecular(ResourceManager::createTextureRenderView(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 1, false, true,
+		gNormalSpecular(ResourceManager::createTextureRenderView(Core::Graphics::getWidth(), Core::Graphics::getHeight(), DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 1, false, true,
 			DXGI_FORMAT_R32G32B32A32_FLOAT, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_R32G32B32A32_FLOAT, DirectX::Colors::Transparent)),
-		gBaseColor(ResourceManager::createTextureRenderView(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R8G8B8A8_UNORM, 1, 1, false, true,
+		gBaseColor(ResourceManager::createTextureRenderView(Core::Graphics::getWidth(), Core::Graphics::getHeight(), DXGI_FORMAT_R8G8B8A8_UNORM, 1, 1, false, true,
 			DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_R8G8B8A8_UNORM, DirectX::Colors::Transparent)),
-		depthTexture(ResourceManager::createTextureDepthView(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R32_TYPELESS, 1, 1, false, true)),
+		depthTexture(ResourceManager::createTextureDepthView(Core::Graphics::getWidth(), Core::Graphics::getHeight(), DXGI_FORMAT_R32_TYPELESS, 1, 1, false, true)),
 		shadowTexture(ResourceManager::createTextureDepthView(shadowTextureResolution, shadowTextureResolution, DXGI_FORMAT_R32_TYPELESS, 1, 1, false, true)),
-		originTexture(ResourceManager::createTextureRenderView(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R16G16B16A16_FLOAT, 1, 1, false, true,
+		originTexture(ResourceManager::createTextureRenderView(Core::Graphics::getWidth(), Core::Graphics::getHeight(), DXGI_FORMAT_R16G16B16A16_FLOAT, 1, 1, false, true,
 			DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_R16G16B16A16_FLOAT, DirectX::Colors::Black)),
 		radianceCube(ResourceManager::createTextureRenderView(probeCaptureResolution, probeCaptureResolution, DXGI_FORMAT_R16G16B16A16_FLOAT, 6, 1, true, true,
 			DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_R16G16B16A16_FLOAT, radianceCubeClearColor)),
@@ -65,26 +67,26 @@ public:
 		distanceCube->getTexture()->setName(L"Distance Cube");
 
 		{
-			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = PipelineState::getDefaultGraphicsDesc();
+			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = Core::PipelineState::getDefaultGraphicsDesc();
 			desc.InputLayout = { inputDesc,_countof(inputDesc) };
 			desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
 			desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-			desc.RasterizerState = PipelineState::rasterShadow;
-			desc.DepthStencilState = PipelineState::depthLess;
+			desc.RasterizerState = Core::PipelineState::rasterShadow;
+			desc.DepthStencilState = Core::PipelineState::depthLess;
 			desc.NumRenderTargets = 0;
 			desc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
 			desc.VS = shadowVS->getByteCode();
 
-			GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&shadowPipelineState));
+			Core::GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&shadowPipelineState));
 		}
 
 		{
-			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = PipelineState::getDefaultGraphicsDesc();
+			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = Core::PipelineState::getDefaultGraphicsDesc();
 			desc.InputLayout = { inputDesc,_countof(inputDesc) };
 			desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
 			desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-			desc.RasterizerState = PipelineState::rasterCullBack;
-			desc.DepthStencilState = PipelineState::depthLess;
+			desc.RasterizerState = Core::PipelineState::rasterCullBack;
+			desc.DepthStencilState = Core::PipelineState::depthLess;
 			desc.NumRenderTargets = 3;
 			desc.RTVFormats[0] = DXGI_FORMAT_R32G32B32A32_FLOAT;
 			desc.RTVFormats[1] = DXGI_FORMAT_R32G32B32A32_FLOAT;
@@ -93,25 +95,25 @@ public:
 			desc.VS = deferredVShader->getByteCode();
 			desc.PS = deferredPShader->getByteCode();
 
-			GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&deferredPipelineState));
+			Core::GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&deferredPipelineState));
 		}
 
 		{
-			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = PipelineState::getDefaultFullScreenState();
+			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = Core::PipelineState::getDefaultFullScreenState();
 			desc.NumRenderTargets = 1;
 			desc.RTVFormats[0] = DXGI_FORMAT_R16G16B16A16_FLOAT;
 			desc.PS = deferredFinal->getByteCode();
 
-			GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&deferredFinalPipelineState));
+			Core::GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&deferredFinalPipelineState));
 		}
 
 		{
-			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = PipelineState::getDefaultGraphicsDesc();
+			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = Core::PipelineState::getDefaultGraphicsDesc();
 			desc.InputLayout = { inputDesc,_countof(inputDesc) };
 			desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
 			desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-			desc.RasterizerState = PipelineState::rasterCullBack;
-			desc.DepthStencilState = PipelineState::depthLess;
+			desc.RasterizerState = Core::PipelineState::rasterCullBack;
+			desc.DepthStencilState = Core::PipelineState::depthLess;
 			desc.NumRenderTargets = 2;
 			desc.RTVFormats[0] = DXGI_FORMAT_R16G16B16A16_FLOAT;
 			desc.RTVFormats[1] = DXGI_FORMAT_R32_FLOAT;
@@ -119,44 +121,44 @@ public:
 			desc.VS = cubeRenderVS->getByteCode();
 			desc.PS = cubeRenderPS->getByteCode();
 
-			GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&probeCapturePipelineState));
+			Core::GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&probeCapturePipelineState));
 		}
 
 		{
-			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = PipelineState::getDefaultGraphicsDesc();
+			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = Core::PipelineState::getDefaultGraphicsDesc();
 			desc.InputLayout = { inputDesc,_countof(inputDesc) };
 			desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
 			desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-			desc.RasterizerState = PipelineState::rasterCullBack;
-			desc.DepthStencilState = PipelineState::depthLess;
+			desc.RasterizerState = Core::PipelineState::rasterCullBack;
+			desc.DepthStencilState = Core::PipelineState::depthLess;
 			desc.NumRenderTargets = 1;
 			desc.RTVFormats[0] = DXGI_FORMAT_R16G16B16A16_FLOAT;
 			desc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
 			desc.VS = cubeRenderVS->getByteCode();
 			desc.PS = cubeRenderBouncePS->getByteCode();
 
-			GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&probeCaptureBouncePipelineState));
+			Core::GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&probeCaptureBouncePipelineState));
 		}
 
 		{
-			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = PipelineState::getDefaultGraphicsDesc();
+			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = Core::PipelineState::getDefaultGraphicsDesc();
 			desc.InputLayout = {};
 			desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
-			desc.RasterizerState = PipelineState::rasterCullBack;
-			desc.DepthStencilState = PipelineState::depthLessEqual;
+			desc.RasterizerState = Core::PipelineState::rasterCullBack;
+			desc.DepthStencilState = Core::PipelineState::depthLessEqual;
 			desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 			desc.NumRenderTargets = 1;
 			desc.RTVFormats[0] = DXGI_FORMAT_R16G16B16A16_FLOAT;
 			desc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
-			desc.VS = Shader::textureCubeVS->getByteCode();
+			desc.VS = Core::GlobalShader::getTextureCubeVS()->getByteCode();
 			desc.PS = skyboxPShader->getByteCode();
 
-			GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&skyboxState));
+			Core::GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&skyboxState));
 		}
 
-		PipelineState::createComputeState(&irradianceOctahedralEncodeState, irradianceOctahedralEncode);
+		Core::PipelineState::createComputeState(&irradianceOctahedralEncodeState, irradianceOctahedralEncode);
 
-		PipelineState::createComputeState(&depthOctahedralEncodeState, depthOctahedralEncode);
+		Core::PipelineState::createComputeState(&depthOctahedralEncodeState, depthOctahedralEncode);
 
 		skybox = resManager->createTextureCube(wAssetPath + L"/sky/kloppenheim_05_4k.hdr", 1024, true);
 
@@ -215,7 +217,7 @@ public:
 			}
 		}
 
-		bloomEffect = new BloomEffect(context, Graphics::getWidth(), Graphics::getHeight(), resManager);
+		bloomEffect = new BloomEffect(context, Core::Graphics::getWidth(), Core::Graphics::getHeight(), resManager);
 
 		bloomEffect->setIntensity(0.5f);
 
@@ -223,7 +225,7 @@ public:
 
 		bloomEffect->setGamma(1.578f);
 
-		fxaaEffect = new FXAAEffect(context, Graphics::getWidth(), Graphics::getHeight());
+		fxaaEffect = new FXAAEffect(context, Core::Graphics::getWidth(), Core::Graphics::getHeight());
 
 		scene = new Scene(assetPath + "/sponza.dae", resManager);
 
@@ -454,9 +456,9 @@ protected:
 
 	void recordCommand() override
 	{
-		context->setViewport(Graphics::getWidth(), Graphics::getHeight());
+		context->setViewport(Core::Graphics::getWidth(), Core::Graphics::getHeight());
 
-		context->setScissorRect(0, 0, Graphics::getWidth(), Graphics::getHeight());
+		context->setScissorRect(0, 0, Core::Graphics::getWidth(), Core::Graphics::getHeight());
 
 		const DepthStencilDesc dsDesc = depthTexture->getDSVMipHandle(0);
 
@@ -480,9 +482,9 @@ protected:
 
 		context->setPipelineState(deferredFinalPipelineState.Get());
 
-		context->setViewport(Graphics::getWidth(), Graphics::getHeight());
+		context->setViewport(Core::Graphics::getWidth(), Core::Graphics::getHeight());
 
-		context->setScissorRect(0, 0, Graphics::getWidth(), Graphics::getHeight());
+		context->setScissorRect(0, 0, Core::Graphics::getWidth(), Core::Graphics::getHeight());
 
 		context->setTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
@@ -507,9 +509,9 @@ protected:
 
 		context->setPipelineState(skyboxState.Get());
 
-		context->setViewport(Graphics::getWidth(), Graphics::getHeight());
+		context->setViewport(Core::Graphics::getWidth(), Core::Graphics::getHeight());
 
-		context->setScissorRect(0, 0, Graphics::getWidth(), Graphics::getHeight());
+		context->setScissorRect(0, 0, Core::Graphics::getWidth(), Core::Graphics::getHeight());
 
 		context->setTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 

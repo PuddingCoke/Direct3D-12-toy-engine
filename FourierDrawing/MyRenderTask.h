@@ -11,6 +11,8 @@
 
 #include<Gear/Core/Gear2D/PrimitiveBatch.h>
 
+#include<Gear/Core/MainCamera.h>
+
 #include<DirectXColors.h>
 
 #include<fstream>
@@ -67,8 +69,8 @@ public:
 	bool connected;
 
 	MyRenderTask() :
-		pBatch{ new PrimitiveBatch(Graphics::backBufferFormat,context),new PrimitiveBatch(DXGI_FORMAT_R8G8B8A8_UNORM,context) },
-		renderTexture(ResourceManager::createTextureRenderView(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R8G8B8A8_UNORM, 1, 1, false, true,
+		pBatch{ new PrimitiveBatch(Core::Graphics::backBufferFormat,context),new PrimitiveBatch(DXGI_FORMAT_R8G8B8A8_UNORM,context) },
+		renderTexture(ResourceManager::createTextureRenderView(Core::Graphics::getWidth(), Core::Graphics::getHeight(), DXGI_FORMAT_R8G8B8A8_UNORM, 1, 1, false, true,
 			DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_R8G8B8A8_UNORM)),
 		curFrame(0),
 		connected(false)
@@ -80,19 +82,19 @@ public:
 		context->clearRenderTarget(renderTexture->getRTVMipHandle(0), DirectX::Colors::Transparent);
 
 		{
-			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = PipelineState::getDefaultGraphicsDesc();
+			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = Core::PipelineState::getDefaultGraphicsDesc();
 			desc.InputLayout = {};
-			desc.VS = Shader::fullScreenVS->getByteCode();
-			desc.PS = Shader::fullScreenPS->getByteCode();
+			desc.VS = Core::GlobalShader::getFullScreenVS()->getByteCode();
+			desc.PS = Core::GlobalShader::getFullScreenPS()->getByteCode();
 			desc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
-			desc.BlendState = PipelineState::blendDefault;
+			desc.BlendState = Core::PipelineState::blendDefault;
 			desc.DepthStencilState.DepthEnable = FALSE;
 			desc.DepthStencilState.StencilEnable = FALSE;
 			desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 			desc.NumRenderTargets = 1;
-			desc.RTVFormats[0] = Graphics::backBufferFormat;
+			desc.RTVFormats[0] = Core::Graphics::backBufferFormat;
 
-			GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&fullScreenPipelineState));
+			Core::GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&fullScreenPipelineState));
 		}
 
 		pBatch[0]->setLineWidth(1.5f);
@@ -158,7 +160,7 @@ public:
 			connected = true;
 		}
 
-		Camera::setProj(DirectX::XMMatrixOrthographicOffCenterLH(0.f, (float)Graphics::getWidth(), 0, (float)Graphics::getHeight(), -1.f, 1.f));
+		Core::MainCamera::setProj(DirectX::XMMatrixOrthographicOffCenterLH(0.f, (float)Core::Graphics::getWidth(), 0, (float)Core::Graphics::getHeight(), -1.f, 1.f));
 	}
 
 	~MyRenderTask()
@@ -175,9 +177,9 @@ protected:
 	{
 		context->setDefRenderTarget();
 		context->clearDefRenderTarget(DirectX::Colors::White);
-		context->setViewport(Graphics::getWidth(), Graphics::getHeight());
-		context->setScissorRect(0, 0, Graphics::getWidth(), Graphics::getHeight());
-
+		context->setViewport(Core::Graphics::getWidth(), Core::Graphics::getHeight());
+		context->setScissorRect(0, 0, Core::Graphics::getWidth(), Core::Graphics::getHeight());
+		
 		x = startX;
 		y = startY;
 

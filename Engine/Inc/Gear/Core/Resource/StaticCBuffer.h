@@ -25,6 +25,8 @@ private:
 
 	UploadHeap** uploadHeaps;
 
+	void** dataPtrs;
+
 };
 
 #endif // !_STATICCBUFFER_H_

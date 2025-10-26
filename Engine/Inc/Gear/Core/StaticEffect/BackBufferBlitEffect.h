@@ -1,35 +1,19 @@
 ﻿#pragma once
 
-#ifndef _BACKBUFFERBLITEFFECT_H_
-#define _BACKBUFFERBLITEFFECT_H_
+#ifndef _CORE_STATICEFFECT_BACKBUFFERBLITEFFECT_H_
+#define _CORE_STATICEFFECT_BACKBUFFERBLITEFFECT_H_
 
 #include"StaticEffectHeader.h"
 
-//draw texture to back buffer
-class BackBufferBlitEffect
+namespace Core
 {
-public:
+	namespace StaticEffect
+	{
+		namespace BackBufferBlitEffect
+		{
+			void process(GraphicsContext* const context, TextureRenderView* const inputTexture);
+		}
+	}
+}
 
-	BackBufferBlitEffect(const BackBufferBlitEffect&) = delete;
-
-	void operator=(const BackBufferBlitEffect&) = delete;
-
-	static BackBufferBlitEffect* get();
-
-	void process(GraphicsContext* const context, TextureRenderView* const inputTexture) const;
-
-private:
-
-	static friend class StaticResourceManager;
-
-	static BackBufferBlitEffect* instance;
-
-	BackBufferBlitEffect();
-
-	~BackBufferBlitEffect();
-
-	ComPtr<ID3D12PipelineState> backBufferBlitState;
-
-};
-
-#endif // !_BACKBUFFERBLITEFFECT_H_
+#endif // !_CORE_STATICEFFECT_BACKBUFFERBLITEFFECT_H_

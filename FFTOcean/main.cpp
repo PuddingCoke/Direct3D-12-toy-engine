@@ -4,13 +4,13 @@
 
 int wmain(int argc, const wchar_t* argv[])
 {
-	const InitializationParam param = InitializationParam::RealTime(1920, 1080, L"FFTOcean", true);
+	const InitializationParam param = InitializationParam::RealTime(1920, 1080, L"FFTOcean", false);
 
 	Gear::initialize();
 
-	if (!Gear::get()->iniEngine(param, argc, argv))
+	if (!Gear::iniEngine(param, argc, argv))
 	{
-		Gear::get()->iniGame(new MyGame());
+		Gear::iniGame(new MyGame());
 	}
 
 	Gear::release();

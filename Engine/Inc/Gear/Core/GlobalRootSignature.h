@@ -1,36 +1,20 @@
 ﻿#pragma once
 
-#ifndef _GLOBALROOTSIGNATURE_H_
-#define _GLOBALROOTSIGNATURE_H_
+#ifndef _CORE_GLOBALROOTSIGNATURE_H_
+#define _CORE_GLOBALROOTSIGNATURE_H_
 
 #include<Gear/Core/RootSignature.h>
 
-class GlobalRootSignature
+namespace Core
 {
-public:
+	namespace GlobalRootSignature
+	{
 
-	GlobalRootSignature(const GlobalRootSignature&) = delete;
+		RootSignature* getGraphicsRootSignature();
 
-	void operator=(const GlobalRootSignature&) = delete;
+		RootSignature* getComputeRootSignature();
 
-	static RootSignature* getGraphicsRootSignature();
+	}
+}
 
-	static RootSignature* getComputeRootSignature();
-
-private:
-
-	friend class RenderEngine;
-
-	static GlobalRootSignature* instance;
-
-	GlobalRootSignature();
-
-	~GlobalRootSignature();
-
-	RootSignature* graphicsRootSignature;
-
-	RootSignature* computeRootSignature;
-
-};
-
-#endif // !_GLOBALROOTSIGNATURE_H_
+#endif // !_CORE_GLOBALROOTSIGNATURE_H_

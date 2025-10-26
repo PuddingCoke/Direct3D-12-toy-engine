@@ -1,7 +1,7 @@
 ﻿#pragma once
 
-#ifndef _SHADER_H_
-#define _SHADER_H_
+#ifndef _CORE_SHADER_H_
+#define _CORE_SHADER_H_
 
 #include<Gear/Core/GraphicsDevice.h>
 
@@ -9,92 +9,59 @@
 
 #undef DOMAIN
 
-enum ShaderProfile
+namespace Core
 {
-	VERTEX,
-	HULL,
-	DOMAIN,
-	GEOMETRY,
-	PIXEL,
-	AMPLIFICATION,
-	MESH,
-	COMPUTE,
-	LIBRARY
-};
+	enum class ShaderProfile
+	{
+		VERTEX,
+		HULL,
+		DOMAIN,
+		GEOMETRY,
+		PIXEL,
+		AMPLIFICATION,
+		MESH,
+		COMPUTE,
+		LIBRARY
+	};
 
-class DXCCompiler
-{
-public:
+	class Shader
+	{
+	public:
 
-	DXCCompiler(const DXCCompiler&) = delete;
+		Shader() = delete;
 
-	void operator=(const DXCCompiler&) = delete;
+		Shader(const Shader&) = delete;
 
-	DXCCompiler();
+		void operator=(const Shader&) = delete;
 
-	~DXCCompiler();
+		//byte code
+		Shader(const uint8_t* const bytes, const size_t byteSize);
 
-	//hlsl
-	ComPtr<IDxcBlob> compile(const std::wstring& filePath, const ShaderProfile profile) const;
+		//cso
+		Shader(const std::wstring& filePath);
 
-	//cso
-	ComPtr<IDxcBlob> read(const std::wstring& filePath) const;
+		//hlsl
+		//note:should copy Common.hlsl under Engine/Shaders to project directory if you want to use Common.hlsl
+		Shader(const std::wstring& filePath, const ShaderProfile profile);
 
-private:
+		D3D12_SHADER_BYTECODE getByteCode() const;
 
-	static constexpr uint32_t codePage = CP_UTF8;
+	private:
 
-	ComPtr<IDxcCompiler3> dxcCompiler;
+		D3D12_SHADER_BYTECODE shaderByteCode;
 
-	ComPtr<IDxcUtils> dxcUtils;
+		ComPtr<IDxcBlob> shaderBlob;
 
-	ComPtr<IDxcIncludeHandler> dxcIncludeHanlder;
-	
-};
+	};
 
-class Shader
-{
-public:
+	namespace GlobalShader
+	{
+		Shader* getFullScreenVS();
 
-	Shader() = delete;
+		Shader* getFullScreenPS();
 
-	Shader(const Shader&) = delete;
+		Shader* getTextureCubeVS();
+	}
+}
 
-	void operator=(const Shader&) = delete;
-
-	//byte code
-	Shader(const uint8_t* const bytes, const size_t byteSize);
-
-	//cso
-	Shader(const std::wstring& filePath);
-
-	//hlsl
-	//note:should copy Common.hlsl under Engine/Shaders to project directory if you want to use Common.hlsl
-	Shader(const std::wstring& filePath, const ShaderProfile profile);
-
-	D3D12_SHADER_BYTECODE getByteCode() const;
-
-	static Shader* fullScreenVS;
-
-	//context->setPSConstants({ resource }, 0);
-	static Shader* fullScreenPS;
-
-	static Shader* textureCubeVS;
-
-private:
-
-	friend class RenderEngine;
-
-	D3D12_SHADER_BYTECODE shaderByteCode;
-
-	ComPtr<IDxcBlob> shaderBlob;
-
-	static void createGlobalShaders();
-
-	static void releaseGlobalShaders();
-
-	static DXCCompiler* dxcCompiler;
-	
-};
-
-#endif // !_SHADER_H_
+#endif // !_CORE_SHADER_H_

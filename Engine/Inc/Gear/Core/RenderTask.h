@@ -27,6 +27,8 @@
 
 #include<future>
 
+using namespace Core;
+
 class RenderTask
 {
 public:
@@ -83,7 +85,7 @@ std::future<void> createRenderTaskAsync(const First& first, const Rest&... args)
 		{
 			*first = new RenderTaskType(args...);
 
-			RenderEngine::get()->submitCommandList((*first)->getCommandList());
+			Core::RenderEngine::submitCommandList((*first)->getCommandList());
 		});
 }
 

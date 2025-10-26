@@ -25,11 +25,11 @@ BufferView::BufferView(Buffer* const buffer, const uint32_t structureByteStride,
 
 		if (persistent)
 		{
-			descriptorHandle = GlobalDescriptorHeap::getResourceHeap()->allocStaticDescriptor(numSRVUAVCBVDescriptors);
+			descriptorHandle = Core::GlobalDescriptorHeap::getResourceHeap()->allocStaticDescriptor(numSRVUAVCBVDescriptors);
 		}
 		else
 		{
-			descriptorHandle = GlobalDescriptorHeap::getNonShaderVisibleResourceHeap()->allocDynamicDescriptor(numSRVUAVCBVDescriptors);
+			descriptorHandle = Core::GlobalDescriptorHeap::getNonShaderVisibleResourceHeap()->allocDynamicDescriptor(numSRVUAVCBVDescriptors);
 		}
 
 		srvUAVCBVHandleStart = descriptorHandle.getCPUHandle();
@@ -43,7 +43,7 @@ BufferView::BufferView(Buffer* const buffer, const uint32_t structureByteStride,
 			if (isTypedBuffer)
 			{
 				desc.Format = format;
-				desc.Buffer.NumElements = static_cast<uint32_t>(size) / FMT::getByteSize(format);
+				desc.Buffer.NumElements = static_cast<uint32_t>(size) / Core::FMT::getByteSize(format);
 			}
 			else if (isStructuredBuffer)
 			{
@@ -57,7 +57,7 @@ BufferView::BufferView(Buffer* const buffer, const uint32_t structureByteStride,
 				desc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_RAW;
 			}
 
-			GraphicsDevice::get()->CreateShaderResourceView(buffer->getResource(), &desc, descriptorHandle.getCPUHandle());
+			Core::GraphicsDevice::get()->CreateShaderResourceView(buffer->getResource(), &desc, descriptorHandle.getCPUHandle());
 
 			srvIndex = descriptorHandle.getCurrentIndex();
 
@@ -72,7 +72,7 @@ BufferView::BufferView(Buffer* const buffer, const uint32_t structureByteStride,
 			if (isTypedBuffer)
 			{
 				desc.Format = format;
-				desc.Buffer.NumElements = static_cast<uint32_t>(size) / FMT::getByteSize(format);
+				desc.Buffer.NumElements = static_cast<uint32_t>(size) / Core::FMT::getByteSize(format);
 			}
 			else if (isStructuredBuffer)
 			{
@@ -88,11 +88,11 @@ BufferView::BufferView(Buffer* const buffer, const uint32_t structureByteStride,
 
 			if (isStructuredBuffer)
 			{
-				GraphicsDevice::get()->CreateUnorderedAccessView(buffer->getResource(), counterBuffer->getBuffer()->getResource(), &desc, descriptorHandle.getCPUHandle());
+				Core::GraphicsDevice::get()->CreateUnorderedAccessView(buffer->getResource(), counterBuffer->getBuffer()->getResource(), &desc, descriptorHandle.getCPUHandle());
 			}
 			else
 			{
-				GraphicsDevice::get()->CreateUnorderedAccessView(buffer->getResource(), nullptr, &desc, descriptorHandle.getCPUHandle());
+				Core::GraphicsDevice::get()->CreateUnorderedAccessView(buffer->getResource(), nullptr, &desc, descriptorHandle.getCPUHandle());
 			}
 
 			uavIndex = descriptorHandle.getCurrentIndex();
@@ -103,15 +103,15 @@ BufferView::BufferView(Buffer* const buffer, const uint32_t structureByteStride,
 			{
 				viewGPUHandle = descriptorHandle.getGPUHandle();
 
-				const DescriptorHandle nonShaderVisibleHandle = GlobalDescriptorHeap::getNonShaderVisibleResourceHeap()->allocStaticDescriptor(1);
+				const DescriptorHandle nonShaderVisibleHandle = Core::GlobalDescriptorHeap::getNonShaderVisibleResourceHeap()->allocStaticDescriptor(1);
 
 				if (isStructuredBuffer)
 				{
-					GraphicsDevice::get()->CreateUnorderedAccessView(buffer->getResource(), counterBuffer->getBuffer()->getResource(), &desc, nonShaderVisibleHandle.getCPUHandle());
+					Core::GraphicsDevice::get()->CreateUnorderedAccessView(buffer->getResource(), counterBuffer->getBuffer()->getResource(), &desc, nonShaderVisibleHandle.getCPUHandle());
 				}
 				else
 				{
-					GraphicsDevice::get()->CreateUnorderedAccessView(buffer->getResource(), nullptr, &desc, nonShaderVisibleHandle.getCPUHandle());
+					Core::GraphicsDevice::get()->CreateUnorderedAccessView(buffer->getResource(), nullptr, &desc, nonShaderVisibleHandle.getCPUHandle());
 				}
 
 				viewCPUHandle = nonShaderVisibleHandle.getCPUHandle();
@@ -129,7 +129,7 @@ BufferView::BufferView(Buffer* const buffer, const uint32_t structureByteStride,
 	{
 		vbv.BufferLocation = buffer->getGPUAddress();
 		vbv.SizeInBytes = static_cast<uint32_t>(size);
-		vbv.StrideInBytes = (isStructuredBuffer ? structureByteStride : FMT::getByteSize(format));
+		vbv.StrideInBytes = (isStructuredBuffer ? structureByteStride : Core::FMT::getByteSize(format));
 	}
 
 	if (createIBV)
@@ -141,9 +141,9 @@ BufferView::BufferView(Buffer* const buffer, const uint32_t structureByteStride,
 
 	if (cpuWritable)
 	{
-		uploadHeaps = new UploadHeap * [Graphics::getFrameBufferCount()];
+		uploadHeaps = new UploadHeap * [Core::Graphics::getFrameBufferCount()];
 
-		for (uint32_t i = 0; i < Graphics::getFrameBufferCount(); i++)
+		for (uint32_t i = 0; i < Core::Graphics::getFrameBufferCount(); i++)
 		{
 			uploadHeaps[i] = new UploadHeap(size);
 		}
@@ -164,7 +164,7 @@ BufferView::~BufferView()
 
 	if (uploadHeaps)
 	{
-		for (uint32_t i = 0; i < Graphics::getFrameBufferCount(); i++)
+		for (uint32_t i = 0; i < Core::Graphics::getFrameBufferCount(); i++)
 		{
 			delete uploadHeaps[i];
 		}
@@ -261,9 +261,9 @@ void BufferView::copyDescriptors()
 
 BufferView::UpdateStruct BufferView::getUpdateStruct(const void* const data, const uint64_t size)
 {
-	uploadHeaps[Graphics::getFrameIndex()]->update(data, size);
+	uploadHeaps[Core::Graphics::getFrameIndex()]->update(data, size);
 
-	const UpdateStruct updateStruct = { buffer,uploadHeaps[Graphics::getFrameIndex()] };
+	const UpdateStruct updateStruct = { buffer,uploadHeaps[Core::Graphics::getFrameIndex()] };
 
 	return updateStruct;
 }

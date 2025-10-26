@@ -18,7 +18,7 @@ void Game::beginRenderTask(RenderTask* const renderTask)
 
 	recordQueue.push(renderTask);
 
-	if (RenderEngine::get()->getDisplayImGuiSurface())
+	if (Core::RenderEngine::getDisplayImGuiSurface())
 	{
 		renderTask->imGUICall();
 	}
@@ -35,7 +35,7 @@ void Game::scheduleAllTasks()
 	{
 		recordQueue.front()->waitTask();
 
-		RenderEngine::get()->submitCommandList(recordQueue.front()->getCommandList());
+		Core::RenderEngine::submitCommandList(recordQueue.front()->getCommandList());
 
 		recordQueue.pop();
 	}

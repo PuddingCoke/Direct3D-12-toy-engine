@@ -23,50 +23,64 @@ namespace
 
 		float timeElapsed = 0.f;
 
+		D3D12_CPU_DESCRIPTOR_HANDLE backBufferHandle;
+
+		ImmutableCBuffer* reservedGlobalCBuffer;
+
 	}pvt;
 }
 
-uint32_t Graphics::getFrameBufferCount()
+uint32_t Core::Graphics::getFrameBufferCount()
 {
 	return pvt.frameBufferCount;
 }
 
-uint32_t Graphics::getFrameIndex()
+uint32_t Core::Graphics::getFrameIndex()
 {
 	return pvt.frameIndex;
 }
 
-float Graphics::getDeltaTime()
+float Core::Graphics::getDeltaTime()
 {
 	return pvt.deltaTime;
 }
 
-float Graphics::getTimeElapsed()
+float Core::Graphics::getTimeElapsed()
 {
 	return pvt.timeElapsed;
 }
 
-uint32_t Graphics::getWidth()
+uint32_t Core::Graphics::getWidth()
 {
 	return pvt.width;
 }
 
-uint32_t Graphics::getHeight()
+uint32_t Core::Graphics::getHeight()
 {
 	return pvt.height;
 }
 
-float Graphics::getAspectRatio()
+float Core::Graphics::getAspectRatio()
 {
 	return pvt.aspectRatio;
 }
 
-uint64_t Graphics::getRenderedFrameCount()
+uint64_t Core::Graphics::getRenderedFrameCount()
 {
 	return pvt.renderedFrameCount;
 }
 
-void Graphics::Internal::initialize(const uint32_t frameBufferCount, const uint32_t width, const uint32_t height)
+D3D12_CPU_DESCRIPTOR_HANDLE Core::Graphics::getBackBufferHandle()
+{
+	return pvt.backBufferHandle;
+}
+
+ImmutableCBuffer* Core::Graphics::getReservedGlobalCBuffer()
+{
+	return pvt.reservedGlobalCBuffer;
+}
+
+void Core::Graphics::Internal::initialize(const uint32_t frameBufferCount, const uint32_t width, const uint32_t height)
 {
 	pvt.frameBufferCount = frameBufferCount;
 
@@ -77,22 +91,32 @@ void Graphics::Internal::initialize(const uint32_t frameBufferCount, const uint3
 	pvt.aspectRatio = static_cast<float>(width) / static_cast<float>(height);
 }
 
-void Graphics::Internal::renderedFrameCountInc()
+void Core::Graphics::Internal::renderedFrameCountInc()
 {
 	pvt.renderedFrameCount++;
 }
 
-void Graphics::Internal::setFrameIndex(const uint32_t frameIndex)
+void Core::Graphics::Internal::setFrameIndex(const uint32_t frameIndex)
 {
 	pvt.frameIndex = frameIndex;
 }
 
-void Graphics::Internal::setDeltaTime(const float deltaTime)
+void Core::Graphics::Internal::setDeltaTime(const float deltaTime)
 {
 	pvt.deltaTime = deltaTime;
 }
 
-void Graphics::Internal::updateTimeElapsed()
+void Core::Graphics::Internal::updateTimeElapsed()
 {
 	pvt.timeElapsed += pvt.deltaTime;
+}
+
+void Core::Graphics::Internal::setBackBufferHandle(const D3D12_CPU_DESCRIPTOR_HANDLE backBufferHandle)
+{
+	pvt.backBufferHandle = backBufferHandle;
+}
+
+void Core::Graphics::Internal::setReservedGlobalCBuffer(ImmutableCBuffer* const reservedGlobalCBuffer)
+{
+	pvt.reservedGlobalCBuffer = reservedGlobalCBuffer;
 }

@@ -231,7 +231,7 @@
     <ClInclude Include="Inc\Gear\Utils\File.h">
       <Filter>Header\Utils</Filter>
     </ClInclude>
-    <ClInclude Include="Inc\Gear\Core\Camera.h">
+    <ClInclude Include="Inc\Gear\Core\MainCamera.h">
       <Filter>Header\Core</Filter>
     </ClInclude>
     <ClInclude Include="Inc\Gear\Core\CommandAllocator.h">
@@ -316,9 +316,6 @@
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="Inc\Gear\Core\StaticEffect\LatLongMapToCubeMapEffect.h">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="Inc\Gear\Core\StaticResourceManager.h">
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="Inc\Gear\Core\StaticEffect\BackBufferBlitEffect.h">
@@ -408,9 +405,6 @@
     <ClInclude Include="Inc\Gear\Utils\WallpaperHelper.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="Inc\Gear\Core\DynamicCBufferRegion.h">
-      <Filter>Header</Filter>
-    </ClInclude>
     <ClInclude Include="Inc\Gear\Core\Resource\DynamicCBuffer.h">
       <Filter>Header</Filter>
     </ClInclude>
@@ -433,6 +427,36 @@
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="Inc\Gear\Input\Internal\MouseInternal.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Gear\Core\Internal\GraphicsDeviceInternal.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Gear\Core\Internal\GlobalDescriptorHeapInternal.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Gear\Core\Internal\GlobalRootSignatureInternal.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Gear\Core\Internal\MainCameraInternal.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Gear\Core\Internal\GlobalShaderInternal.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Gear\Core\Internal\DynamicCBufferManagerInternal.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Gear\Core\StaticEffect\Internal\BackBufferBlitEffectInternal.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Gear\Core\StaticEffect\Internal\HDRClampEffectInternal.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Gear\Core\StaticEffect\Internal\LatLongMapToCubeMapEffectInternal.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Gear\Core\Internal\RenderEngineInternal.h">
       <Filter>Header</Filter>
     </ClInclude>
   </ItemGroup>
@@ -542,7 +566,7 @@
     <ClCompile Include="Src\Window\Win32Form.cpp">
       <Filter>Source\Window</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Core\Camera.cpp">
+    <ClCompile Include="Src\Core\MainCamera.cpp">
       <Filter>Source\Core</Filter>
     </ClCompile>
     <ClCompile Include="Src\Core\CommandAllocator.cpp">
@@ -623,9 +647,6 @@
     <ClCompile Include="Src\Core\StaticEffect\LatLongMapToCubeMapEffect.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Core\StaticResourceManager.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
     <ClCompile Include="Src\Core\StaticEffect\BackBufferBlitEffect.cpp">
       <Filter>Source</Filter>
     </ClCompile>
@@ -639,9 +660,6 @@
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="Src\Utils\WallpaperHelper.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Core\DynamicCBufferRegion.cpp">
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="Src\Core\Resource\DynamicCBuffer.cpp">

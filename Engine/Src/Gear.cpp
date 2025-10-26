@@ -1,8 +1,10 @@
 ﻿#include<Gear/Gear.h>
 
+#include<Gear/Window/Win32Form.h>
+
 #include<Gear/Core/RenderEngine.h>
 
-#include<Gear/Window/Win32Form.h>
+#include<Gear/Core/Internal/RenderEngineInternal.h>
 
 #include<Gear/Utils/WallpaperHelper.h>
 
@@ -22,14 +24,91 @@
 
 #include<stb_image_write.h>
 
-Gear* Gear::instance = nullptr;
-
-Gear* Gear::get()
+namespace
 {
-	return instance;
+	class GearPrivate
+	{
+	public:
+
+		GearPrivate(const GearPrivate&) = delete;
+
+		void operator=(const GearPrivate&) = delete;
+
+		GearPrivate();
+
+		~GearPrivate();
+
+		int32_t iniEngine(const InitializationParam& param, const int32_t argc, const wchar_t* argv[]);
+
+		void iniGame(Game* const gamePtr);
+
+	private:
+
+		void runRealTimeRender();
+
+		void runVideoRender();
+
+		void runWallpaper();
+
+		void reportLiveObjects() const;
+
+		Game* game;
+
+		//screenshot
+		ReadbackHeap* backBufferHeap;
+
+		InitializationParam::EngineUsage usage;
+
+		union
+		{
+			InitializationParam::RealTimeRenderParam realTimeRender;
+
+			InitializationParam::VideoRenderParam videoRender;
+		};
+
+		static constexpr Input::Keyboard::Key screenGrabKey = Input::Keyboard::F11;
+
+	}*pvt = nullptr;
 }
 
-int32_t Gear::iniEngine(const InitializationParam& param, const int32_t argc, const wchar_t* argv[])
+GearPrivate::GearPrivate() :
+	game(nullptr), backBufferHeap(nullptr)
+{
+
+}
+
+GearPrivate::~GearPrivate()
+{
+	LOGENGINE(L"destroy resources");
+
+	Core::RenderEngine::Internal::waitForCurrentFrame();
+
+	if (backBufferHeap)
+	{
+		delete backBufferHeap;
+	}
+
+	if (game)
+	{
+		delete game;
+	}
+
+	Core::RenderEngine::Internal::release();
+
+	Window::Win32Form::release();
+
+	LOGSUCCESS(L"engine exit");
+
+	Utils::Logger::Internal::release();
+
+#ifdef _DEBUG
+
+	reportLiveObjects();
+
+#endif // _DEBUG
+}
+
+int32_t GearPrivate::iniEngine(const InitializationParam& param, const int32_t argc, const wchar_t* argv[])
 {
 	Utils::Logger::Internal::initialize();
 
@@ -49,12 +128,12 @@ int32_t Gear::iniEngine(const InitializationParam& param, const int32_t argc, co
 
 		realTimeRender = param.realTimeRender;
 
-		Win32Form::instance = new Win32Form(param.title, (systemResolution.x - realTimeRender.width) / 2, (systemResolution.y - realTimeRender.height) / 2,
-			realTimeRender.width, realTimeRender.height, Win32Form::normalWindowStyle, Win32Form::windowCallback);
+		Window::Win32Form::initialize(param.title, (systemResolution.x - realTimeRender.width) / 2, (systemResolution.y - realTimeRender.height) / 2,
+			realTimeRender.width, realTimeRender.height, Window::Win32Form::normalWindowStyle, Window::Win32Form::windowCallback);
 
-		RenderEngine::instance = new RenderEngine(realTimeRender.width, realTimeRender.height, Win32Form::get()->getHandle(), true, realTimeRender.enableImGuiSurface);
+		Core::RenderEngine::Internal::initialize(realTimeRender.width, realTimeRender.height, Window::Win32Form::getHandle(), true, realTimeRender.enableImGuiSurface);
 
-		backBufferHeap = new ReadbackHeap(FMT::getByteSize(Graphics::backBufferFormat) * realTimeRender.width * realTimeRender.height);
+		backBufferHeap = new ReadbackHeap(Core::FMT::getByteSize(Core::Graphics::backBufferFormat) * realTimeRender.width * realTimeRender.height);
 
 		LOGENGINE(L"engine usage real time render");
 
@@ -64,11 +143,11 @@ int32_t Gear::iniEngine(const InitializationParam& param, const int32_t argc, co
 
 		videoRender = param.videoRender;
 
-		Win32Form::instance = new Win32Form(param.title, 100, 100, 100, 100, Win32Form::normalWindowStyle, Win32Form::encodeCallback);
+		Window::Win32Form::initialize(param.title, 100, 100, 100, 100, Window::Win32Form::normalWindowStyle, Window::Win32Form::encodeCallback);
 
-		ShowWindow(Win32Form::get()->getHandle(), SW_HIDE);
+		ShowWindow(Window::Win32Form::getHandle(), SW_HIDE);
 
-		RenderEngine::instance = new RenderEngine(videoRender.width, videoRender.height, Win32Form::get()->getHandle(), false, false);
+		Core::RenderEngine::Internal::initialize(videoRender.width, videoRender.height, Window::Win32Form::getHandle(), false, false);
 
 		LOGENGINE(L"engine usage video render");
 
@@ -76,15 +155,15 @@ int32_t Gear::iniEngine(const InitializationParam& param, const int32_t argc, co
 
 	case InitializationParam::EngineUsage::WALLPAPER:
 
-		Win32Form::instance = new Win32Form(param.title, 0, 0, systemResolution.x, systemResolution.y, Win32Form::wallpaperWindowStyle, Win32Form::wallpaperCallBack);
+		Window::Win32Form::initialize(param.title, 0, 0, systemResolution.x, systemResolution.y, Window::Win32Form::wallpaperWindowStyle, Window::Win32Form::wallpaperCallBack);
 
 		{
 			const HWND parentHWND = Utils::WallpaperHelper::getWallpaperHWND();
 
-			SetParent(Win32Form::get()->getHandle(), parentHWND);
+			SetParent(Window::Win32Form::getHandle(), parentHWND);
 		}
 
-		RenderEngine::instance = new RenderEngine(systemResolution.x, systemResolution.y, Win32Form::get()->getHandle(), true, false);
+		Core::RenderEngine::Internal::initialize(systemResolution.x, systemResolution.y, Window::Win32Form::getHandle(), true, false);
 
 		LOGENGINE(L"engine usage wallpaper");
 
@@ -94,20 +173,20 @@ int32_t Gear::iniEngine(const InitializationParam& param, const int32_t argc, co
 		break;
 	}
 
-	LOGENGINE(L"resolution", Graphics::getWidth(), L"x", Graphics::getHeight());
+	LOGENGINE(L"resolution", Core::Graphics::getWidth(), L"x", Core::Graphics::getHeight());
 
-	LOGENGINE(L"aspect ratio", Graphics::getAspectRatio());
+	LOGENGINE(L"aspect ratio", Core::Graphics::getAspectRatio());
 
-	LOGENGINE(L"back buffer count", Graphics::getFrameBufferCount());
+	LOGENGINE(L"back buffer count", Core::Graphics::getFrameBufferCount());
 
 	return 0;
 }
 
-void Gear::iniGame(Game* const gamePtr)
+void GearPrivate::iniGame(Game* const gamePtr)
 {
 	game = gamePtr;
 
-	RenderEngine::get()->initializeResources();
+	Core::RenderEngine::Internal::initializeResources();
 
 	switch (usage)
 	{
@@ -128,29 +207,19 @@ void Gear::iniGame(Game* const gamePtr)
 	}
 }
 
-void Gear::initialize()
-{
-	Gear::instance = new Gear();
-}
-
-void Gear::release()
-{
-	delete Gear::instance;
-}
-
-void Gear::runRealTimeRender()
+void GearPrivate::runRealTimeRender()
 {
 	Utils::DeltaTimeEstimator dtEstimator;
 
-	while (Win32Form::get()->pollEvents())
+	while (Window::Win32Form::pollEvents())
 	{
 		const std::chrono::high_resolution_clock::time_point startPoint = std::chrono::high_resolution_clock::now();
 
-		RenderEngine::get()->setDefRenderTexture();
+		Core::RenderEngine::Internal::setDefRenderTexture();
 
-		RenderEngine::get()->begin();
+		Core::RenderEngine::Internal::begin();
 
-		game->update(Graphics::getDeltaTime());
+		game->update(Core::Graphics::getDeltaTime());
 
 		game->render();
 
@@ -158,19 +227,19 @@ void Gear::runRealTimeRender()
 
 		if (needScreenGrab)
 		{
-			RenderEngine::get()->saveBackBuffer(backBufferHeap);
+			Core::RenderEngine::Internal::saveBackBuffer(backBufferHeap);
 		}
 
-		RenderEngine::get()->end();
+		Core::RenderEngine::Internal::end();
 
-		RenderEngine::get()->present();
+		Core::RenderEngine::Internal::present();
 
 		if (needScreenGrab)
 		{
-			RenderEngine::get()->waitForCurrentFrame();
+			Core::RenderEngine::Internal::waitForCurrentFrame();
 		}
 
-		RenderEngine::get()->waitForNextFrame();
+		Core::RenderEngine::Internal::waitForNextFrame();
 
 		const std::chrono::high_resolution_clock::time_point endPoint = std::chrono::high_resolution_clock::now();
 
@@ -178,16 +247,16 @@ void Gear::runRealTimeRender()
 
 		const float lerpDeltaTime = dtEstimator.getDeltaTime(deltaTime);
 
-		RenderEngine::get()->setDeltaTime(lerpDeltaTime);
+		Core::RenderEngine::Internal::setDeltaTime(lerpDeltaTime);
 
-		RenderEngine::get()->updateTimeElapsed();
+		Core::RenderEngine::Internal::updateTimeElapsed();
 
 		if (needScreenGrab)
 		{
 			const uint8_t* const dataPtr = reinterpret_cast<uint8_t*>(backBufferHeap->map(CD3DX12_RANGE(0ull,
-				FMT::getByteSize(Graphics::backBufferFormat) * realTimeRender.width * realTimeRender.height)));
+				Core::FMT::getByteSize(Core::Graphics::backBufferFormat) * realTimeRender.width * realTimeRender.height)));
 
-			uint8_t* const colors = new uint8_t[FMT::getByteSize(Graphics::backBufferFormat) * realTimeRender.width * realTimeRender.height];
+			uint8_t* const colors = new uint8_t[Core::FMT::getByteSize(Core::Graphics::backBufferFormat) * realTimeRender.width * realTimeRender.height];
 
 			for (uint32_t i = 0; i < realTimeRender.width * realTimeRender.height; i++)
 			{
@@ -205,7 +274,7 @@ void Gear::runRealTimeRender()
 
 			backBufferHeap->unmap();
 
-			stbi_write_png("output.png", realTimeRender.width, realTimeRender.height, 4, colors, FMT::getByteSize(Graphics::backBufferFormat) * realTimeRender.width);
+			stbi_write_png("output.png", realTimeRender.width, realTimeRender.height, 4, colors, Core::FMT::getByteSize(Core::Graphics::backBufferFormat) * realTimeRender.width);
 
 			delete[] colors;
 
@@ -214,9 +283,9 @@ void Gear::runRealTimeRender()
 	}
 }
 
-void Gear::runVideoRender()
+void GearPrivate::runVideoRender()
 {
-	const GPUVendor vendor = RenderEngine::get()->getVendor();
+	const Core::GPUVendor vendor = Core::RenderEngine::getVendor();
 
 	Encoder* encoder = nullptr;
 
@@ -224,18 +293,18 @@ void Gear::runVideoRender()
 
 	switch (vendor)
 	{
-	case GPUVendor::NVIDIA:
+	case Core::GPUVendor::NVIDIA:
 		encoder = new NvidiaEncoder(frameToEncode);
 		break;
-	case GPUVendor::AMD:
-	case GPUVendor::INTEL:
-	case GPUVendor::UNKNOWN:
+	case Core::GPUVendor::AMD:
+	case Core::GPUVendor::INTEL:
+	case Core::GPUVendor::UNKNOWN:
 		break;
 	default:
 		break;
 	}
 
-	if (vendor == GPUVendor::NVIDIA)
+	if (vendor == Core::GPUVendor::NVIDIA)
 	{
 		const uint32_t numTextures = NvidiaEncoder::lookaheadDepth + 1;
 
@@ -244,21 +313,21 @@ void Gear::runVideoRender()
 		D3D12_CPU_DESCRIPTOR_HANDLE textureHandles[numTextures] = {};
 
 		{
-			DescriptorHandle descriptorHandle = GlobalDescriptorHeap::getRenderTargetHeap()->allocStaticDescriptor(numTextures);
+			DescriptorHandle descriptorHandle = Core::GlobalDescriptorHeap::getRenderTargetHeap()->allocStaticDescriptor(numTextures);
 
 			D3D12_RENDER_TARGET_VIEW_DESC rtvDesc = {};
 			rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
-			rtvDesc.Format = Graphics::backBufferFormat;
+			rtvDesc.Format = Core::Graphics::backBufferFormat;
 			rtvDesc.Texture2D.MipSlice = 0;
 			rtvDesc.Texture2D.PlaneSlice = 0;
 
 			for (uint32_t i = 0; i < numTextures; i++)
 			{
-				const D3D12_CLEAR_VALUE clearValue = { Graphics::backBufferFormat ,{0.f,0.f,0.f,1.f} };
+				const D3D12_CLEAR_VALUE clearValue = { Core::Graphics::backBufferFormat ,{0.f,0.f,0.f,1.f} };
 
-				renderTextures[i] = new Texture(Graphics::getWidth(), Graphics::getHeight(), Graphics::backBufferFormat, 1, 1, true, D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET, &clearValue);
+				renderTextures[i] = new Texture(Core::Graphics::getWidth(), Core::Graphics::getHeight(), Core::Graphics::backBufferFormat, 1, 1, true, D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET, &clearValue);
 
-				GraphicsDevice::get()->CreateRenderTargetView(renderTextures[i]->getResource(), &rtvDesc, descriptorHandle.getCPUHandle());
+				Core::GraphicsDevice::get()->CreateRenderTargetView(renderTextures[i]->getResource(), &rtvDesc, descriptorHandle.getCPUHandle());
 
 				textureHandles[i] = descriptorHandle.getCPUHandle();
 
@@ -268,25 +337,25 @@ void Gear::runVideoRender()
 
 		uint32_t index = 0;
 
-		RenderEngine::get()->setDeltaTime(1.f / static_cast<float>(Encoder::frameRate));
+		Core::RenderEngine::Internal::setDeltaTime(1.f / static_cast<float>(Encoder::frameRate));
 
 		while (true)
 		{
-			RenderEngine::get()->setRenderTexture(renderTextures[index], textureHandles[index]);
+			Core::RenderEngine::Internal::setRenderTexture(renderTextures[index], textureHandles[index]);
 
-			RenderEngine::get()->begin();
+			Core::RenderEngine::Internal::begin();
 
-			game->update(Graphics::getDeltaTime());
+			game->update(Core::Graphics::getDeltaTime());
 
 			game->render();
 
-			RenderEngine::get()->end();
+			Core::RenderEngine::Internal::end();
 
-			RenderEngine::get()->waitForCurrentFrame();
+			Core::RenderEngine::Internal::waitForCurrentFrame();
 
-			RenderEngine::get()->updateTimeElapsed();
+			Core::RenderEngine::Internal::updateTimeElapsed();
 
-			if (!encoder->encode(RenderEngine::get()->getRenderTexture()))
+			if (!encoder->encode(Core::RenderEngine::getRenderTexture()))
 			{
 				break;
 			}
@@ -306,27 +375,27 @@ void Gear::runVideoRender()
 	}
 }
 
-void Gear::runWallpaper()
+void GearPrivate::runWallpaper()
 {
 	Utils::DeltaTimeEstimator dtEstimator;
 
-	while (Win32Form::get()->pollEvents())
+	while (Window::Win32Form::pollEvents())
 	{
 		const std::chrono::high_resolution_clock::time_point startPoint = std::chrono::high_resolution_clock::now();
 
-		RenderEngine::get()->setDefRenderTexture();
+		Core::RenderEngine::Internal::setDefRenderTexture();
 
-		RenderEngine::get()->begin();
+		Core::RenderEngine::Internal::begin();
 
-		game->update(Graphics::getDeltaTime());
+		game->update(Core::Graphics::getDeltaTime());
 
 		game->render();
 
-		RenderEngine::get()->end();
+		Core::RenderEngine::Internal::end();
 
-		RenderEngine::get()->present();
+		Core::RenderEngine::Internal::present();
 
-		RenderEngine::get()->waitForNextFrame();
+		Core::RenderEngine::Internal::waitForNextFrame();
 
 		const std::chrono::high_resolution_clock::time_point endPoint = std::chrono::high_resolution_clock::now();
 
@@ -334,13 +403,13 @@ void Gear::runWallpaper()
 
 		const float lerpDeltaTime = dtEstimator.getDeltaTime(deltaTime);
 
-		RenderEngine::get()->setDeltaTime(lerpDeltaTime);
+		Core::RenderEngine::Internal::setDeltaTime(lerpDeltaTime);
 
-		RenderEngine::get()->updateTimeElapsed();
+		Core::RenderEngine::Internal::updateTimeElapsed();
 	}
 }
 
-void Gear::reportLiveObjects() const
+void GearPrivate::reportLiveObjects() const
 {
 	ComPtr<IDXGIDebug1> dxgiDebug;
 
@@ -354,49 +423,25 @@ void Gear::reportLiveObjects() const
 	OutputDebugStringA("**********Live Object Report**********\n");
 }
 
-Gear::Gear() :
-	game(nullptr), backBufferHeap(nullptr)
+int32_t Gear::iniEngine(const InitializationParam& param, const int32_t argc, const wchar_t* argv[])
 {
-
+	return pvt->iniEngine(param, argc, argv);
 }
 
-Gear::~Gear()
+void Gear::iniGame(Game* const gamePtr)
 {
-	LOGENGINE(L"destroy resources");
+	pvt->iniGame(gamePtr);
+}
 
-	if (RenderEngine::instance)
+void Gear::initialize()
+{
+	pvt = new GearPrivate();
+}
+
+void Gear::release()
+{
+	if (pvt)
 	{
-		RenderEngine::get()->waitForCurrentFrame();
+		delete pvt;
 	}
-
-	if (backBufferHeap)
-	{
-		delete backBufferHeap;
-	}
-
-	if (game)
-	{
-		delete game;
-	}
-
-	if (Win32Form::instance)
-	{
-		delete Win32Form::instance;
-	}
-
-	if (RenderEngine::instance)
-	{
-		delete RenderEngine::instance;
-	}
-
-	LOGSUCCESS(L"engine exit");
-
-	Utils::Logger::Internal::release();
-
-#ifdef _DEBUG
-
-	reportLiveObjects();
-
-#endif // _DEBUG
-
 }

@@ -1,6 +1,6 @@
 ﻿#include<Gear/Camera/OrbitCamera.h>
 
-#include<Gear/Core/Camera.h>
+#include<Gear/Core/MainCamera.h>
 
 #include<Gear/Input/Mouse.h>
 
@@ -29,13 +29,13 @@ OrbitCamera::OrbitCamera(const DirectX::XMVECTOR& eye, const DirectX::XMVECTOR& 
 
 				float rotAngle = Input::Mouse::getDY() / 120.f;
 
-				if (destAngle > Utils::Math::pi - Camera::epsilon)
+				if (destAngle > Utils::Math::pi - Core::MainCamera::epsilon)
 				{
-					rotAngle = Utils::Math::pi - Camera::epsilon - eyeUpAngle;
+					rotAngle = Utils::Math::pi - Core::MainCamera::epsilon - eyeUpAngle;
 				}
-				else if (destAngle < Camera::epsilon)
+				else if (destAngle < Core::MainCamera::epsilon)
 				{
-					rotAngle = Camera::epsilon - eyeUpAngle;
+					rotAngle = Core::MainCamera::epsilon - eyeUpAngle;
 				}
 
 				const DirectX::XMVECTOR upCrossLookDir = DirectX::XMVector3Cross(this->up, this->eye);
@@ -68,7 +68,7 @@ void OrbitCamera::applyInput(const float dt)
 {
 	currentRadius = Utils::Math::lerp(currentRadius, targetRadius, Utils::Math::clamp(dt * 20.f, 0.f, 1.f));
 
-	Camera::setView(DirectX::XMVectorScale(eye, currentRadius), { 0,0,0 }, up);
+	Core::MainCamera::setView(DirectX::XMVectorScale(eye, currentRadius), { 0,0,0 }, up);
 }
 
 void OrbitCamera::rotateX(const float dTheta)
@@ -88,13 +88,13 @@ void OrbitCamera::rotateY(const float dTheta)
 
 	float rotAngle = dTheta;
 
-	if (destAngle > Utils::Math::pi - Camera::epsilon)
+	if (destAngle > Utils::Math::pi - Core::MainCamera::epsilon)
 	{
-		rotAngle = Utils::Math::pi - Camera::epsilon - eyeUpAngle;
+		rotAngle = Utils::Math::pi - Core::MainCamera::epsilon - eyeUpAngle;
 	}
-	else if (destAngle < Camera::epsilon)
+	else if (destAngle < Core::MainCamera::epsilon)
 	{
-		rotAngle = Camera::epsilon - eyeUpAngle;
+		rotAngle = Core::MainCamera::epsilon - eyeUpAngle;
 	}
 
 	const DirectX::XMVECTOR upCrossLookDir = DirectX::XMVector3Cross(up, eye);

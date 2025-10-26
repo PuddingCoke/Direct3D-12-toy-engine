@@ -1,30 +1,45 @@
 ﻿#include<Gear/Core/StaticEffect/LatLongMapToCubeMapEffect.h>
 
+#include<Gear/Core/StaticEffect/Internal/LatLongMapToCubeMapEffectInternal.h>
+
 #include<Gear/Utils/Math.h>
 
 #include<Gear/CompiledShaders/EquirectangularVS.h>
 
 #include<Gear/CompiledShaders/EquirectangularPS.h>
 
-LatLongMapToCubeMapEffect* LatLongMapToCubeMapEffect::instance = nullptr;
-
-LatLongMapToCubeMapEffect* LatLongMapToCubeMapEffect::get()
+namespace
 {
-	return instance;
+	struct LatLongMapToCubeMapEffectPrivate
+	{
+
+		Core::Shader* equirectangularVS;
+
+		Core::Shader* equirectangularPS;
+
+		ComPtr<ID3D12PipelineState> equirectangularR8State;
+
+		ComPtr<ID3D12PipelineState> equirectangularR16State;
+
+		ComPtr<ID3D12PipelineState> equirectangularR32State;
+
+		ImmutableCBuffer* matricesBuffer;
+
+	}pvt;
 }
 
-void LatLongMapToCubeMapEffect::process(GraphicsContext* const context, TextureRenderView* const inputTexture, TextureRenderView* const outputTexture) const
+void Core::StaticEffect::LatLongMapToCubeMapEffect::process(GraphicsContext* const context, TextureRenderView* const inputTexture, TextureRenderView* const outputTexture)
 {
 	switch (outputTexture->getTexture()->getFormat())
 	{
 	case DXGI_FORMAT_R8G8B8A8_UNORM:
-		context->setPipelineState(equirectangularR8State.Get());
+		context->setPipelineState(pvt.equirectangularR8State.Get());
 		break;
 	case DXGI_FORMAT_R16G16B16A16_FLOAT:
-		context->setPipelineState(equirectangularR16State.Get());
+		context->setPipelineState(pvt.equirectangularR16State.Get());
 		break;
 	case DXGI_FORMAT_R32G32B32A32_FLOAT:
-		context->setPipelineState(equirectangularR32State.Get());
+		context->setPipelineState(pvt.equirectangularR32State.Get());
 		break;
 	}
 
@@ -34,7 +49,7 @@ void LatLongMapToCubeMapEffect::process(GraphicsContext* const context, TextureR
 
 	context->setRenderTargets({ outputTexture->getRTVMipHandle(0) }, {});
 
-	context->setVSConstantBuffer(matricesBuffer);
+	context->setVSConstantBuffer(pvt.matricesBuffer);
 
 	context->setPSConstants({ inputTexture->getAllSRVIndex() }, 0);
 
@@ -43,16 +58,18 @@ void LatLongMapToCubeMapEffect::process(GraphicsContext* const context, TextureR
 	context->draw(36, 6, 0, 0);
 }
 
-LatLongMapToCubeMapEffect::LatLongMapToCubeMapEffect(ResourceManager* const resManager) :
-	equirectangularVS(new Shader(g_EquirectangularVSBytes, sizeof(g_EquirectangularVSBytes))),
-	equirectangularPS(new Shader(g_EquirectangularPSBytes, sizeof(g_EquirectangularPSBytes)))
+void Core::StaticEffect::LatLongMapToCubeMapEffect::Internal::initialize(ResourceManager* const resManager)
 {
+	pvt.equirectangularVS = new Core::Shader(g_EquirectangularVSBytes, sizeof(g_EquirectangularVSBytes));
+
+	pvt.equirectangularPS = new Core::Shader(g_EquirectangularPSBytes, sizeof(g_EquirectangularPSBytes));
+
 	{
-		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = PipelineState::getDefaultGraphicsDesc();
+		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = Core::PipelineState::getDefaultGraphicsDesc();
 		desc.InputLayout = {};
-		desc.VS = equirectangularVS->getByteCode();
-		desc.PS = equirectangularPS->getByteCode();
-		desc.RasterizerState = PipelineState::rasterCullNone;
+		desc.VS = pvt.equirectangularVS->getByteCode();
+		desc.PS = pvt.equirectangularPS->getByteCode();
+		desc.RasterizerState = Core::PipelineState::rasterCullNone;
 		desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
 		desc.DepthStencilState.DepthEnable = FALSE;
 		desc.DepthStencilState.StencilEnable = FALSE;
@@ -60,15 +77,15 @@ LatLongMapToCubeMapEffect::LatLongMapToCubeMapEffect(ResourceManager* const resM
 		desc.NumRenderTargets = 1;
 		desc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
 
-		GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&equirectangularR8State));
+		Core::GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&pvt.equirectangularR8State));
 
 		desc.RTVFormats[0] = DXGI_FORMAT_R16G16B16A16_FLOAT;
 
-		GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&equirectangularR16State));
+		Core::GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&pvt.equirectangularR16State));
 
 		desc.RTVFormats[0] = DXGI_FORMAT_R32G32B32A32_FLOAT;
 
-		GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&equirectangularR32State));
+		Core::GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&pvt.equirectangularR32State));
 	}
 
 	{
@@ -109,28 +126,35 @@ LatLongMapToCubeMapEffect::LatLongMapToCubeMapEffect(ResourceManager* const resM
 			}
 		}
 
-		matricesBuffer = resManager->createImmutableCBuffer(sizeof(Matrices), &matrices, false);
+		pvt.matricesBuffer = resManager->createImmutableCBuffer(sizeof(Matrices), &matrices, false);
 
-		matricesBuffer->getBuffer()->setName(L"LatLongMap To Cubemap Matrices");
+		pvt.matricesBuffer->getBuffer()->setName(L"LatLongMap To Cubemap Matrices");
 	}
 
 	LOGSUCCESS(L"create", LogColor::brightMagenta, L"LatLongMapToCubeMapEffect", LogColor::defaultColor, L"succeeded");
 }
 
-LatLongMapToCubeMapEffect::~LatLongMapToCubeMapEffect()
+void Core::StaticEffect::LatLongMapToCubeMapEffect::Internal::release()
 {
-	if (equirectangularVS)
+	if (pvt.equirectangularVS)
 	{
-		delete equirectangularVS;
+		delete pvt.equirectangularVS;
 	}
 
-	if (equirectangularPS)
+	if (pvt.equirectangularPS)
 	{
-		delete equirectangularPS;
+		delete pvt.equirectangularPS;
 	}
 
-	if (matricesBuffer)
+	pvt.equirectangularR8State = nullptr;
+
+	pvt.equirectangularR16State = nullptr;
+
+	pvt.equirectangularR32State = nullptr;
+
+	if (pvt.matricesBuffer)
 	{
-		delete matricesBuffer;
+		delete pvt.matricesBuffer;
 	}
 }
+

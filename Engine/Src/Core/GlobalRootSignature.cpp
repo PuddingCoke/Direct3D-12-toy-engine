@@ -1,18 +1,30 @@
 ﻿#include<Gear/Core/GlobalRootSignature.h>
 
-GlobalRootSignature* GlobalRootSignature::instance = nullptr;
+#include<Gear/Core/Internal/GlobalRootSignatureInternal.h>
 
-RootSignature* GlobalRootSignature::getGraphicsRootSignature()
+namespace
 {
-	return instance->graphicsRootSignature;
+	struct GlobalRootSignaturePrivate
+	{
+
+		RootSignature* graphicsRootSignature = nullptr;
+
+		RootSignature* computeRootSignature = nullptr;
+
+	}pvt;
 }
 
-RootSignature* GlobalRootSignature::getComputeRootSignature()
+RootSignature* Core::GlobalRootSignature::getGraphicsRootSignature()
 {
-	return instance->computeRootSignature;
+	return pvt.graphicsRootSignature;
 }
 
-GlobalRootSignature::GlobalRootSignature()
+RootSignature* Core::GlobalRootSignature::getComputeRootSignature()
+{
+	return pvt.computeRootSignature;
+}
+
+void Core::GlobalRootSignature::Internal::initialize()
 {
 	CD3DX12_STATIC_SAMPLER_DESC samplerDesc[7] = {};
 
@@ -123,7 +135,7 @@ GlobalRootSignature::GlobalRootSignature()
 			D3D12_ROOT_SIGNATURE_FLAG_DENY_AMPLIFICATION_SHADER_ROOT_ACCESS | D3D12_ROOT_SIGNATURE_FLAG_DENY_MESH_SHADER_ROOT_ACCESS |
 			D3D12_ROOT_SIGNATURE_FLAG_CBV_SRV_UAV_HEAP_DIRECTLY_INDEXED | D3D12_ROOT_SIGNATURE_FLAG_SAMPLER_HEAP_DIRECTLY_INDEXED);
 
-		graphicsRootSignature = new RootSignature(rootSignatureDesc);
+		pvt.graphicsRootSignature = new RootSignature(rootSignatureDesc);
 
 		LOGSUCCESS(L"create", LogColor::brightMagenta, L"global graphics root signature", LogColor::defaultColor, L"succeeded");
 	}
@@ -144,21 +156,21 @@ GlobalRootSignature::GlobalRootSignature()
 		rootSignatureDesc.Init_1_1(_countof(rootParameters), rootParameters, _countof(samplerDesc), samplerDesc,
 			D3D12_ROOT_SIGNATURE_FLAG_CBV_SRV_UAV_HEAP_DIRECTLY_INDEXED | D3D12_ROOT_SIGNATURE_FLAG_SAMPLER_HEAP_DIRECTLY_INDEXED);
 
-		computeRootSignature = new RootSignature(rootSignatureDesc);
+		pvt.computeRootSignature = new RootSignature(rootSignatureDesc);
 
 		LOGSUCCESS(L"create", LogColor::brightMagenta, L"global compute root signature", LogColor::defaultColor, L"succeeded");
 	}
 }
 
-GlobalRootSignature::~GlobalRootSignature()
+void Core::GlobalRootSignature::Internal::release()
 {
-	if (graphicsRootSignature)
+	if (pvt.graphicsRootSignature)
 	{
-		delete graphicsRootSignature;
+		delete pvt.graphicsRootSignature;
 	}
 
-	if (computeRootSignature)
+	if (pvt.computeRootSignature)
 	{
-		delete computeRootSignature;
+		delete pvt.computeRootSignature;
 	}
 }

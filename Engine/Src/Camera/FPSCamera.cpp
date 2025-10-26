@@ -1,6 +1,6 @@
 ﻿#include<Gear/Camera/FPSCamera.h>
 
-#include<Gear/Core/Camera.h>
+#include<Gear/Core/MainCamera.h>
 
 #include<Gear/Input/Mouse.h>
 
@@ -29,13 +29,13 @@ FPSCamera::FPSCamera(const DirectX::XMVECTOR& eye, const DirectX::XMVECTOR& look
 
 				float rotAngle = -Input::Mouse::getDY() / 120.f;
 
-				if (destAngle > Utils::Math::pi - Camera::epsilon)
+				if (destAngle > Utils::Math::pi - Core::MainCamera::epsilon)
 				{
-					rotAngle = Utils::Math::pi - Camera::epsilon - lookUpAngle;
+					rotAngle = Utils::Math::pi - Core::MainCamera::epsilon - lookUpAngle;
 				}
-				else if (destAngle < Camera::epsilon)
+				else if (destAngle < Core::MainCamera::epsilon)
 				{
-					rotAngle = Camera::epsilon - lookUpAngle;
+					rotAngle = Core::MainCamera::epsilon - lookUpAngle;
 				}
 
 				const DirectX::XMMATRIX lookDirRotMat = DirectX::XMMatrixRotationAxis(upCrossLookDir, rotAngle);
@@ -74,7 +74,7 @@ void FPSCamera::applyInput(const float dt)
 		eye = DirectX::XMVectorAdd(eye, DirectX::XMVectorScale(upCrossLookDir, dt * moveSpeed));
 	}
 
-	Camera::setView(eye, DirectX::XMVectorAdd(eye, lookDir), up);
+	Core::MainCamera::setView(eye, DirectX::XMVectorAdd(eye, lookDir), up);
 }
 
 DirectX::XMVECTOR FPSCamera::getEyePos() const

@@ -2,25 +2,23 @@
 
 #include<Gear/Core/Graphics.h>
 
-D3D12_CPU_DESCRIPTOR_HANDLE CommandList::backBufferHandle;
-
 CommandList::CommandList(const D3D12_COMMAND_LIST_TYPE type)
 {
-	allocators = new CommandAllocator * [Graphics::getFrameBufferCount()];
+	allocators = new CommandAllocator * [Core::Graphics::getFrameBufferCount()];
 
-	for (uint32_t i = 0; i < Graphics::getFrameBufferCount(); i++)
+	for (uint32_t i = 0; i < Core::Graphics::getFrameBufferCount(); i++)
 	{
 		allocators[i] = new CommandAllocator(type);
 	}
 
-	GraphicsDevice::get()->CreateCommandList(0, type, allocators[Graphics::getFrameIndex()]->get(), nullptr, IID_PPV_ARGS(&commandList));
+	Core::GraphicsDevice::get()->CreateCommandList(0, type, allocators[Core::Graphics::getFrameIndex()]->get(), nullptr, IID_PPV_ARGS(&commandList));
 
 	commandList->Close();
 }
 
 CommandList::~CommandList()
 {
-	for (uint32_t i = 0; i < Graphics::getFrameBufferCount(); i++)
+	for (uint32_t i = 0; i < Core::Graphics::getFrameBufferCount(); i++)
 	{
 		delete allocators[i];
 	}
@@ -40,9 +38,9 @@ ID3D12GraphicsCommandList6* CommandList::get() const
 
 void CommandList::open() const
 {
-	allocators[Graphics::getFrameIndex()]->reset();
+	allocators[Core::Graphics::getFrameIndex()]->reset();
 
-	commandList->Reset(allocators[Graphics::getFrameIndex()]->get(), nullptr);
+	commandList->Reset(allocators[Core::Graphics::getFrameIndex()]->get(), nullptr);
 }
 
 void CommandList::close() const
@@ -109,11 +107,6 @@ void CommandList::updateReferredSharedResourceStates()
 	referredResources.clear();
 }
 
-void CommandList::setBackBufferHandle(const D3D12_CPU_DESCRIPTOR_HANDLE handle)
-{
-	backBufferHandle = handle;
-}
-
 void CommandList::pushResourceTrackList(Texture* const texture)
 {
 	texture->pushToReferredList(referredResources);
@@ -160,12 +153,14 @@ void CommandList::setComputePipelineResources(const std::initializer_list<Shader
 
 void CommandList::setDefRenderTarget() const
 {
+	const D3D12_CPU_DESCRIPTOR_HANDLE backBufferHandle = Core::Graphics::getBackBufferHandle();
+
 	commandList->OMSetRenderTargets(1, &backBufferHandle, FALSE, nullptr);
 }
 
 void CommandList::clearDefRenderTarget(const float clearValue[4]) const
 {
-	commandList->ClearRenderTargetView(backBufferHandle, clearValue, 0, nullptr);
+	commandList->ClearRenderTargetView(Core::Graphics::getBackBufferHandle(), clearValue, 0, nullptr);
 }
 
 void CommandList::setRenderTargets(const std::initializer_list<RenderTargetDesc>& renderTargets, const DepthStencilDesc* const depthStencils)
@@ -395,13 +390,13 @@ void CommandList::clearUnorderedAccessView(const ClearUAVDesc& desc, const uint3
 	commandList->ClearUnorderedAccessViewUint(desc.viewGPUHandle, desc.viewCPUHandle, resource, values, 0, nullptr);
 }
 
-void CommandList::solvePendingBarriers(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers)
+void CommandList::solvePendingBarriers(std::vector<D3D12_RESOURCE_BARRIER>& barriers)
 {
 	if (pendingBufferBarrier.size())
 	{
 		for (const PendingBufferBarrier& pendingBarrier : pendingBufferBarrier)
 		{
-			pendingBarrier.buffer->solvePendingBarrier(transitionBarriers, pendingBarrier.afterState);
+			pendingBarrier.buffer->solvePendingBarrier(barriers, pendingBarrier.afterState);
 		}
 
 		pendingBufferBarrier.clear();
@@ -411,7 +406,7 @@ void CommandList::solvePendingBarriers(std::vector<D3D12_RESOURCE_BARRIER>& tran
 	{
 		for (const PendingTextureBarrier& pendingBarrier : pendingTextureBarrier)
 		{
-			pendingBarrier.texture->solvePendingBarrier(transitionBarriers, pendingBarrier.mipSlice, pendingBarrier.afterState);
+			pendingBarrier.texture->solvePendingBarrier(barriers, pendingBarrier.mipSlice, pendingBarrier.afterState);
 		}
 
 		pendingTextureBarrier.clear();

@@ -1,107 +1,125 @@
 ﻿#include<Gear/Core/GlobalDescriptorHeap.h>
 
-GlobalDescriptorHeap* GlobalDescriptorHeap::instance = nullptr;
+#include<Gear/Core/Internal/GlobalDescriptorHeapInternal.h>
 
-uint32_t GlobalDescriptorHeap::resourceIncrementSize = 0;
-
-uint32_t GlobalDescriptorHeap::renderTargetIncrementSize = 0;
-
-uint32_t GlobalDescriptorHeap::depthStencilIncrementSize = 0;
-
-uint32_t GlobalDescriptorHeap::samplerIncrementSize = 0;
-
-GlobalDescriptorHeap::GlobalDescriptorHeap()
+namespace
 {
-	resourceIncrementSize = GraphicsDevice::get()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	struct GlobalDescriptorHeapPrivate
+	{
 
-	renderTargetIncrementSize = GraphicsDevice::get()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+		uint32_t resourceIncrementSize = 0;
 
-	depthStencilIncrementSize = GraphicsDevice::get()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
+		uint32_t renderTargetIncrementSize = 0;
 
-	samplerIncrementSize = GraphicsDevice::get()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER);
+		uint32_t depthStencilIncrementSize = 0;
 
-	resourceHeap = new DescriptorHeap(1000000, 100000, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE);
+		uint32_t samplerIncrementSize = 0;
 
-	samplerHeap = new DescriptorHeap(2048, 0, D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER, D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE);
+		DescriptorHeap* resourceHeap = nullptr;
 
-	renderTargetHeap = new DescriptorHeap(300000, 30000, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, D3D12_DESCRIPTOR_HEAP_FLAG_NONE);
+		DescriptorHeap* samplerHeap = nullptr;
 
-	depthStencilHeap = new DescriptorHeap(300000, 30000, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, D3D12_DESCRIPTOR_HEAP_FLAG_NONE);
+		DescriptorHeap* renderTargetHeap = nullptr;
 
-	nonShaderVisibleResourceHeap = new DescriptorHeap(1000000, 900000, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, D3D12_DESCRIPTOR_HEAP_FLAG_NONE);
+		DescriptorHeap* depthStencilHeap = nullptr;
+
+		DescriptorHeap* nonShaderVisibleResourceHeap = nullptr;
+
+	}pvt;
+}
+
+void Core::GlobalDescriptorHeap::Internal::initialize()
+{
+	pvt.resourceIncrementSize = Core::GraphicsDevice::get()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
+	pvt.renderTargetIncrementSize = Core::GraphicsDevice::get()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+
+	pvt.depthStencilIncrementSize = Core::GraphicsDevice::get()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
+
+	pvt.samplerIncrementSize = Core::GraphicsDevice::get()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER);
+
+	pvt.resourceHeap = new DescriptorHeap(1000000, 100000, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE);
+
+	pvt.samplerHeap = new DescriptorHeap(2048, 0, D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER, D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE);
+
+	pvt.renderTargetHeap = new DescriptorHeap(300000, 30000, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, D3D12_DESCRIPTOR_HEAP_FLAG_NONE);
+
+	pvt.depthStencilHeap = new DescriptorHeap(300000, 30000, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, D3D12_DESCRIPTOR_HEAP_FLAG_NONE);
+
+	pvt.nonShaderVisibleResourceHeap = new DescriptorHeap(1000000, 900000, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, D3D12_DESCRIPTOR_HEAP_FLAG_NONE);
 
 	LOGSUCCESS(L"create", LogColor::brightMagenta, L"global descriptor heaps", LogColor::defaultColor, L"succeeded");
 }
 
-GlobalDescriptorHeap::~GlobalDescriptorHeap()
+void Core::GlobalDescriptorHeap::Internal::release()
 {
-	if (resourceHeap)
+	if (pvt.resourceHeap)
 	{
-		delete resourceHeap;
+		delete pvt.resourceHeap;
 	}
 
-	if (samplerHeap)
+	if (pvt.samplerHeap)
 	{
-		delete samplerHeap;
+		delete pvt.samplerHeap;
 	}
 
-	if (renderTargetHeap)
+	if (pvt.renderTargetHeap)
 	{
-		delete renderTargetHeap;
+		delete pvt.renderTargetHeap;
 	}
 
-	if (depthStencilHeap)
+	if (pvt.depthStencilHeap)
 	{
-		delete depthStencilHeap;
+		delete pvt.depthStencilHeap;
 	}
 
-	if (nonShaderVisibleResourceHeap)
+	if (pvt.nonShaderVisibleResourceHeap)
 	{
-		delete nonShaderVisibleResourceHeap;
+		delete pvt.nonShaderVisibleResourceHeap;
 	}
 }
 
-DescriptorHeap* GlobalDescriptorHeap::getResourceHeap()
+DescriptorHeap* Core::GlobalDescriptorHeap::getResourceHeap()
 {
-	return instance->resourceHeap;
+	return pvt.resourceHeap;
 }
 
-DescriptorHeap* GlobalDescriptorHeap::getSamplerHeap()
+DescriptorHeap* Core::GlobalDescriptorHeap::getSamplerHeap()
 {
-	return instance->samplerHeap;
+	return pvt.samplerHeap;
 }
 
-DescriptorHeap* GlobalDescriptorHeap::getRenderTargetHeap()
+DescriptorHeap* Core::GlobalDescriptorHeap::getRenderTargetHeap()
 {
-	return instance->renderTargetHeap;
+	return pvt.renderTargetHeap;
 }
 
-DescriptorHeap* GlobalDescriptorHeap::getDepthStencilHeap()
+DescriptorHeap* Core::GlobalDescriptorHeap::getDepthStencilHeap()
 {
-	return instance->depthStencilHeap;
+	return pvt.depthStencilHeap;
 }
 
-DescriptorHeap* GlobalDescriptorHeap::getNonShaderVisibleResourceHeap()
+DescriptorHeap* Core::GlobalDescriptorHeap::getNonShaderVisibleResourceHeap()
 {
-	return instance->nonShaderVisibleResourceHeap;
+	return pvt.nonShaderVisibleResourceHeap;
 }
 
-uint32_t GlobalDescriptorHeap::getResourceIncrementSize()
+uint32_t Core::GlobalDescriptorHeap::getResourceIncrementSize()
 {
-	return resourceIncrementSize;
+	return pvt.resourceIncrementSize;
 }
 
-uint32_t GlobalDescriptorHeap::getRenderTargetIncrementSize()
+uint32_t Core::GlobalDescriptorHeap::getRenderTargetIncrementSize()
 {
-	return renderTargetIncrementSize;
+	return pvt.renderTargetIncrementSize;
 }
 
-uint32_t GlobalDescriptorHeap::getDepthStencilIncrementSize()
+uint32_t Core::GlobalDescriptorHeap::getDepthStencilIncrementSize()
 {
-	return depthStencilIncrementSize;
+	return pvt.depthStencilIncrementSize;
 }
 
-uint32_t GlobalDescriptorHeap::getSamplerIncrementSize()
+uint32_t Core::GlobalDescriptorHeap::getSamplerIncrementSize()
 {
-	return samplerIncrementSize;
+	return pvt.samplerIncrementSize;
 }

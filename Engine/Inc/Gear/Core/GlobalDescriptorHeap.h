@@ -1,64 +1,32 @@
 ﻿#pragma once
 
-#ifndef _GLOBALDESCRIPTORHEAP_H_
-#define _GLOBALDESCRIPTORHEAP_H_
+#ifndef _CORE_GLOBALDESCRIPTORHEAP_H_
+#define _CORE_GLOBALDESCRIPTORHEAP_H_
 
 #include<Gear/Core/DescriptorHeap.h>
 
-class GlobalDescriptorHeap
+namespace Core
 {
-public:
+	namespace GlobalDescriptorHeap
+	{
+		DescriptorHeap* getResourceHeap();
 
-	GlobalDescriptorHeap(const GlobalDescriptorHeap&) = delete;
+		DescriptorHeap* getSamplerHeap();
 
-	void operator=(const GlobalDescriptorHeap&) = delete;
+		DescriptorHeap* getRenderTargetHeap();
 
-	static DescriptorHeap* getResourceHeap();
+		DescriptorHeap* getDepthStencilHeap();
 
-	static DescriptorHeap* getSamplerHeap();
+		DescriptorHeap* getNonShaderVisibleResourceHeap();
 
-	static DescriptorHeap* getRenderTargetHeap();
+		uint32_t getResourceIncrementSize();
 
-	static DescriptorHeap* getDepthStencilHeap();
+		uint32_t getRenderTargetIncrementSize();
 
-	static DescriptorHeap* getNonShaderVisibleResourceHeap();
+		uint32_t getDepthStencilIncrementSize();
 
-	static uint32_t getResourceIncrementSize();
+		uint32_t getSamplerIncrementSize();
+	}
+}
 
-	static uint32_t getRenderTargetIncrementSize();
-
-	static uint32_t getDepthStencilIncrementSize();
-
-	static uint32_t getSamplerIncrementSize();
-
-private:
-
-	friend class RenderEngine;
-
-	static GlobalDescriptorHeap* instance;
-
-	static uint32_t resourceIncrementSize;
-
-	static uint32_t renderTargetIncrementSize;
-
-	static uint32_t depthStencilIncrementSize;
-
-	static uint32_t samplerIncrementSize;
-
-	GlobalDescriptorHeap();
-
-	~GlobalDescriptorHeap();
-
-	DescriptorHeap* resourceHeap;
-
-	DescriptorHeap* samplerHeap;
-
-	DescriptorHeap* renderTargetHeap;
-
-	DescriptorHeap* depthStencilHeap;
-
-	DescriptorHeap* nonShaderVisibleResourceHeap;
-
-};
-
-#endif // !_GLOBALDESCRIPTORHEAP_H_
+#endif // !_CORE_GLOBALDESCRIPTORHEAP_H_

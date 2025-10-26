@@ -1,19 +1,26 @@
 ﻿#include<Gear/Core/StaticEffect/HDRClampEffect.h>
 
+#include<Gear/Core/StaticEffect/Internal/HDRClampEffectInternal.h>
+
 #include<Gear/CompiledShaders/HDRClampCS.h>
 
-HDRClampEffect* HDRClampEffect::instance = nullptr;
-
-HDRClampEffect* HDRClampEffect::get()
+namespace
 {
-	return instance;
+	struct HDRClampEffectPrivate
+	{
+
+		Core::Shader* hdrClampShader;
+
+		ComPtr<ID3D12PipelineState> hdrClampState;
+
+	}pvt;
 }
 
-void HDRClampEffect::process(GraphicsContext* const context, TextureRenderView* const inOutTexture) const
+void Core::StaticEffect::HDRClampEffect::process(GraphicsContext* const context, TextureRenderView* const inOutTexture)
 {
 	if (inOutTexture->getTexture()->getFormat() == DXGI_FORMAT_R16G16B16A16_FLOAT)
 	{
-		context->setPipelineState(hdrClampState.Get());
+		context->setPipelineState(pvt.hdrClampState.Get());
 
 		context->setCSConstants({ inOutTexture->getUAVMipIndex(0) }, 0);
 
@@ -25,18 +32,19 @@ void HDRClampEffect::process(GraphicsContext* const context, TextureRenderView* 
 	}
 }
 
-HDRClampEffect::HDRClampEffect() :
-	hdrClampShader(new Shader(g_HDRClampCSBytes, sizeof(g_HDRClampCSBytes)))
+void Core::StaticEffect::HDRClampEffect::Internal::initialize()
 {
-	PipelineState::createComputeState(&hdrClampState, hdrClampShader);
+	pvt.hdrClampShader = new Core::Shader(g_HDRClampCSBytes, sizeof(g_HDRClampCSBytes));
 
-	LOGSUCCESS(L"create", LogColor::brightMagenta, L"HDRClampEffect", LogColor::defaultColor, L"succeeded");
+	Core::PipelineState::createComputeState(&pvt.hdrClampState, pvt.hdrClampShader);
 }
 
-HDRClampEffect::~HDRClampEffect()
+void Core::StaticEffect::HDRClampEffect::Internal::release()
 {
-	if (hdrClampShader)
+	if (pvt.hdrClampShader)
 	{
-		delete hdrClampShader;
+		delete pvt.hdrClampShader;
 	}
+
+	pvt.hdrClampState = nullptr;
 }

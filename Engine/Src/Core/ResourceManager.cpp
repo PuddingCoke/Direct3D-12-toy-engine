@@ -22,14 +22,14 @@
 
 ResourceManager::ResourceManager() :
 	context(new GraphicsContext()), commandList(context->getCommandList()),
-	resources(new std::vector<Resource*>[Graphics::getFrameBufferCount()]),
-	engineResources(new std::vector<EngineResource*>[Graphics::getFrameBufferCount()])
+	resources(new std::vector<Resource*>[Core::Graphics::getFrameBufferCount()]),
+	engineResources(new std::vector<EngineResource*>[Core::Graphics::getFrameBufferCount()])
 {
 }
 
 ResourceManager::~ResourceManager()
 {
-	for (uint32_t i = 0; i < Graphics::getFrameBufferCount(); i++)
+	for (uint32_t i = 0; i < Core::Graphics::getFrameBufferCount(); i++)
 	{
 		for (const Resource* const resource : resources[i])
 		{
@@ -55,29 +55,29 @@ ResourceManager::~ResourceManager()
 
 void ResourceManager::deferredRelease(Resource* const resource)
 {
-	resources[Graphics::getFrameIndex()].push_back(resource);
+	resources[Core::Graphics::getFrameIndex()].push_back(resource);
 }
 
 void ResourceManager::deferredRelease(EngineResource* const engineResource)
 {
-	engineResources[Graphics::getFrameIndex()].push_back(engineResource);
+	engineResources[Core::Graphics::getFrameIndex()].push_back(engineResource);
 }
 
 void ResourceManager::cleanTransientResources()
 {
-	for (const Resource* const resource : resources[Graphics::getFrameIndex()])
+	for (const Resource* const resource : resources[Core::Graphics::getFrameIndex()])
 	{
 		delete resource;
 	}
 
-	resources[Graphics::getFrameIndex()].clear();
+	resources[Core::Graphics::getFrameIndex()].clear();
 
-	for (const EngineResource* const engineResource : engineResources[Graphics::getFrameIndex()])
+	for (const EngineResource* const engineResource : engineResources[Core::Graphics::getFrameIndex()])
 	{
 		delete engineResource;
 	}
 
-	engineResources[Graphics::getFrameIndex()].clear();
+	engineResources[Core::Graphics::getFrameIndex()].clear();
 }
 
 GraphicsContext* ResourceManager::getGraphicsContext() const
@@ -124,7 +124,7 @@ Texture* ResourceManager::createTexture(const std::wstring& filePath, const D3D1
 
 		ComPtr<ID3D12Resource> tex;
 
-		CHECKERROR(DirectX::LoadWICTextureFromFileEx(GraphicsDevice::get(), filePath.c_str(), 0, resFlags, DirectX::WIC_LOADER_DEFAULT, &tex, decodedData, subresource));
+		CHECKERROR(DirectX::LoadWICTextureFromFileEx(Core::GraphicsDevice::get(), filePath.c_str(), 0, resFlags, DirectX::WIC_LOADER_DEFAULT, &tex, decodedData, subresource));
 
 		texture = new Texture(tex, true, D3D12_RESOURCE_STATE_COPY_DEST);
 
@@ -144,7 +144,7 @@ Texture* ResourceManager::createTexture(const std::wstring& filePath, const D3D1
 
 		ComPtr<ID3D12Resource> tex;
 
-		CHECKERROR(DirectX::LoadDDSTextureFromFileEx(GraphicsDevice::get(), filePath.c_str(), 0, resFlags, DirectX::DDS_LOADER_DEFAULT, &tex, decodedData, subresources, nullptr, isTextureCube));
+		CHECKERROR(DirectX::LoadDDSTextureFromFileEx(Core::GraphicsDevice::get(), filePath.c_str(), 0, resFlags, DirectX::DDS_LOADER_DEFAULT, &tex, decodedData, subresources, nullptr, isTextureCube));
 
 		texture = new Texture(tex, true, D3D12_RESOURCE_STATE_COPY_DEST);
 
@@ -184,7 +184,7 @@ Texture* ResourceManager::createTexture(const std::wstring& filePath, const D3D1
 
 		ComPtr<ID3D12Resource> tex;
 
-		CHECKERROR(DirectX::CreateTextureEx(GraphicsDevice::get(), metadata, resFlags, DirectX::CREATETEX_DEFAULT, &tex));
+		CHECKERROR(DirectX::CreateTextureEx(Core::GraphicsDevice::get(), metadata, resFlags, DirectX::CREATETEX_DEFAULT, &tex));
 
 		texture = new Texture(tex, true, D3D12_RESOURCE_STATE_COPY_DEST);
 
@@ -678,11 +678,11 @@ TextureRenderView* ResourceManager::createTextureCube(const std::wstring& filePa
 
 	deferredRelease(equirectangularMap);
 
-	HDRClampEffect::get()->process(context, equirectangularMap);
+	Core::StaticEffect::HDRClampEffect::process(context, equirectangularMap);
 
 	DXGI_FORMAT resFormat = DXGI_FORMAT_UNKNOWN;
 
-	switch (FMT::getByteSize(equirectangularMap->getTexture()->getFormat()))
+	switch (Core::FMT::getByteSize(equirectangularMap->getTexture()->getFormat()))
 	{
 	case 4:
 		resFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -703,7 +703,7 @@ TextureRenderView* ResourceManager::createTextureCube(const std::wstring& filePa
 
 	deferredRelease(cubeMap);
 
-	LatLongMapToCubeMapEffect::get()->process(context, equirectangularMap, cubeMap);
+	Core::StaticEffect::LatLongMapToCubeMapEffect::process(context, equirectangularMap, cubeMap);
 
 	bool stateTracking = true;
 

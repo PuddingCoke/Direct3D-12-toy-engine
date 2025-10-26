@@ -59,7 +59,7 @@ void RenderTask::imGUICall()
 
 void RenderTask::blit(TextureRenderView* const texture) const
 {
-	BackBufferBlitEffect::get()->process(context, texture);
+	Core::StaticEffect::BackBufferBlitEffect::process(context, texture);
 }
 
 void RenderTask::workerLoop()
