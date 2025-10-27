@@ -65,11 +65,11 @@ void Core::StaticEffect::LatLongMapToCubeMapEffect::Internal::initialize(Resourc
 	pvt.equirectangularPS = new Core::Shader(g_EquirectangularPSBytes, sizeof(g_EquirectangularPSBytes));
 
 	{
-		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = Core::PipelineState::getDefaultGraphicsDesc();
+		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = Core::PipelineStateHelper::getDefaultGraphicsDesc();
 		desc.InputLayout = {};
 		desc.VS = pvt.equirectangularVS->getByteCode();
 		desc.PS = pvt.equirectangularPS->getByteCode();
-		desc.RasterizerState = Core::PipelineState::rasterCullNone;
+		desc.RasterizerState = Core::PipelineStateHelper::rasterCullNone;
 		desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
 		desc.DepthStencilState.DepthEnable = FALSE;
 		desc.DepthStencilState.StencilEnable = FALSE;

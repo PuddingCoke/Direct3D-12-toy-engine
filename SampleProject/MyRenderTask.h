@@ -14,7 +14,7 @@ public:
 		pixelShader = new Core::Shader(Utils::File::getRootFolder() + L"PixelShader.cso");
 
 		{
-			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = Core::PipelineState::getDefaultFullScreenState();
+			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = Core::PipelineStateHelper::getDefaultFullScreenState();
 			desc.NumRenderTargets = 1;
 			desc.RTVFormats[0] = Core::Graphics::backBufferFormat;
 			desc.PS = pixelShader->getByteCode();

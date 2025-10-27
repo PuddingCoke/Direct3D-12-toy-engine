@@ -31,7 +31,7 @@ void Core::StaticEffect::BackBufferBlitEffect::process(GraphicsContext* const co
 
 void Core::StaticEffect::BackBufferBlitEffect::Internal::initialize()
 {
-	D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = Core::PipelineState::getDefaultFullScreenState();
+	D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = Core::PipelineStateHelper::getDefaultFullScreenState();
 	desc.PS = Core::GlobalShader::getFullScreenPS()->getByteCode();
 	desc.NumRenderTargets = 1;
 	desc.RTVFormats[0] = Core::Graphics::backBufferFormat;

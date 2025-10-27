@@ -7,6 +7,6 @@
 
 #include<Gear/Core/Shader.h>
 
-#include<Gear/Core/PipelineState.h>
+#include<Gear/Core/PipelineStateHelper.h>
 
 #endif // !_STATICEFFECTHEADER_H_

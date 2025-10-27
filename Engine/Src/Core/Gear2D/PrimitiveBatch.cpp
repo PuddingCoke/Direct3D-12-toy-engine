@@ -1,6 +1,6 @@
 ﻿#include<Gear/Core/Gear2D/PrimitiveBatch.h>
 
-#include<Gear/Core/PipelineState.h>
+#include<Gear/Core/PipelineStateHelper.h>
 
 #include<Gear/CompiledShaders/PrimitiveBatchLineVS.h>
 
@@ -36,13 +36,13 @@ PrimitiveBatch::PrimitiveBatch(const DXGI_FORMAT format, GraphicsContext* const 
 			{"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 8, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
 		};
 
-		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = Core::PipelineState::getDefaultGraphicsDesc();
+		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = Core::PipelineStateHelper::getDefaultGraphicsDesc();
 		desc.InputLayout = { layout,_countof(layout) };
 		desc.VS = lineVS->getByteCode();
 		desc.GS = lineGS->getByteCode();
 		desc.PS = primitivePS->getByteCode();
-		desc.RasterizerState = Core::PipelineState::rasterCullBack;
-		desc.BlendState = Core::PipelineState::blendDefault;
+		desc.RasterizerState = Core::PipelineStateHelper::rasterCullBack;
+		desc.BlendState = Core::PipelineStateHelper::blendDefault;
 		desc.DepthStencilState.DepthEnable = FALSE;
 		desc.DepthStencilState.StencilEnable = FALSE;
 		desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE;
@@ -60,13 +60,13 @@ PrimitiveBatch::PrimitiveBatch(const DXGI_FORMAT format, GraphicsContext* const 
 			{"COLOR",0,DXGI_FORMAT_R32G32B32A32_FLOAT,0,12,D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA,1}
 		};
 
-		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = Core::PipelineState::getDefaultGraphicsDesc();
+		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = Core::PipelineStateHelper::getDefaultGraphicsDesc();
 		desc.InputLayout = { layout,_countof(layout) };
 		desc.VS = circleVS->getByteCode();
 		desc.GS = lineGS->getByteCode();
 		desc.PS = primitivePS->getByteCode();
-		desc.RasterizerState = Core::PipelineState::rasterCullBack;
-		desc.BlendState = Core::PipelineState::blendDefault;
+		desc.RasterizerState = Core::PipelineStateHelper::rasterCullBack;
+		desc.BlendState = Core::PipelineStateHelper::blendDefault;
 		desc.DepthStencilState.DepthEnable = FALSE;
 		desc.DepthStencilState.StencilEnable = FALSE;
 		desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE;
@@ -84,13 +84,13 @@ PrimitiveBatch::PrimitiveBatch(const DXGI_FORMAT format, GraphicsContext* const 
 			{"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
 		};
 
-		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = Core::PipelineState::getDefaultGraphicsDesc();
+		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = Core::PipelineStateHelper::getDefaultGraphicsDesc();
 		desc.InputLayout = { layout,_countof(layout) };
 		desc.VS = rcLineVS->getByteCode();
 		desc.GS = rcLineGS->getByteCode();
 		desc.PS = primitivePS->getByteCode();
-		desc.RasterizerState = Core::PipelineState::rasterCullBack;
-		desc.BlendState = Core::PipelineState::blendDefault;
+		desc.RasterizerState = Core::PipelineStateHelper::rasterCullBack;
+		desc.BlendState = Core::PipelineStateHelper::blendDefault;
 		desc.DepthStencilState.DepthEnable = FALSE;
 		desc.DepthStencilState.StencilEnable = FALSE;
 		desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE;

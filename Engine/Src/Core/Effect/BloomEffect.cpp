@@ -66,10 +66,10 @@ BloomEffect::BloomEffect(GraphicsContext* const context, const uint32_t width, c
 	//PS BlendState
 	auto getDefaultPipelineState =
 		[] {
-		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = Core::PipelineState::getDefaultGraphicsDesc();
+		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = Core::PipelineStateHelper::getDefaultGraphicsDesc();
 		desc.InputLayout = {};
 		desc.VS = Core::GlobalShader::getFullScreenVS()->getByteCode();
-		desc.RasterizerState = Core::PipelineState::rasterCullBack;
+		desc.RasterizerState = Core::PipelineStateHelper::rasterCullBack;
 		desc.DepthStencilState.DepthEnable = FALSE;
 		desc.DepthStencilState.StencilEnable = FALSE;
 		desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
@@ -105,7 +105,7 @@ BloomEffect::BloomEffect(GraphicsContext* const context, const uint32_t width, c
 	{
 		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = getDefaultPipelineState();
 		desc.PS = Core::GlobalShader::getFullScreenPS()->getByteCode();
-		desc.BlendState = Core::PipelineState::blendAddtive;
+		desc.BlendState = Core::PipelineStateHelper::blendAddtive;
 
 		Core::GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&bloomUpSampleState));
 	}
@@ -118,9 +118,9 @@ BloomEffect::BloomEffect(GraphicsContext* const context, const uint32_t width, c
 		Core::GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&bloomFinalState));
 	}
 
-	Core::PipelineState::createComputeState(&bloomHBlurState, bloomHBlur);
+	Core::PipelineStateHelper::createComputeState(&bloomHBlurState, bloomHBlur);
 
-	Core::PipelineState::createComputeState(&bloomVBlurState, bloomVBlur);
+	Core::PipelineStateHelper::createComputeState(&bloomVBlurState, bloomVBlur);
 
 }
 

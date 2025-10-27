@@ -84,33 +84,33 @@ public:
 
 		simulationParam.vorticityIntensity = config.vorticityIntensity;
 
-		Core::PipelineState::createComputeState(&splatVelocityState, splatVelocityCS);
+		Core::PipelineStateHelper::createComputeState(&splatVelocityState, splatVelocityCS);
 
-		Core::PipelineState::createComputeState(&splatColorState, splatColorCS);
+		Core::PipelineStateHelper::createComputeState(&splatColorState, splatColorCS);
 
-		Core::PipelineState::createComputeState(&vorticityState, vorticityCS);
+		Core::PipelineStateHelper::createComputeState(&vorticityState, vorticityCS);
 
-		Core::PipelineState::createComputeState(&vorticityConfinementState, vorticityConfinementCS);
+		Core::PipelineStateHelper::createComputeState(&vorticityConfinementState, vorticityConfinementCS);
 
-		Core::PipelineState::createComputeState(&divergenceState, divergenceCS);
+		Core::PipelineStateHelper::createComputeState(&divergenceState, divergenceCS);
 
-		Core::PipelineState::createComputeState(&pressureResetState, pressureResetCS);
+		Core::PipelineStateHelper::createComputeState(&pressureResetState, pressureResetCS);
 
-		Core::PipelineState::createComputeState(&pressureState, pressureCS);
+		Core::PipelineStateHelper::createComputeState(&pressureState, pressureCS);
 
-		Core::PipelineState::createComputeState(&gradientSubtractState, gradientSubtractCS);
+		Core::PipelineStateHelper::createComputeState(&gradientSubtractState, gradientSubtractCS);
 
-		Core::PipelineState::createComputeState(&velocityAdvectionState, velocityAdvectionCS);
+		Core::PipelineStateHelper::createComputeState(&velocityAdvectionState, velocityAdvectionCS);
 
-		Core::PipelineState::createComputeState(&colorAdvectionState, colorAdvectionCS);
+		Core::PipelineStateHelper::createComputeState(&colorAdvectionState, colorAdvectionCS);
 
-		Core::PipelineState::createComputeState(&velocityBoundaryState, velocityBoundaryCS);
+		Core::PipelineStateHelper::createComputeState(&velocityBoundaryState, velocityBoundaryCS);
 
-		Core::PipelineState::createComputeState(&pressureBoundaryState, pressureBoundaryCS);
+		Core::PipelineStateHelper::createComputeState(&pressureBoundaryState, pressureBoundaryCS);
 
-		Core::PipelineState::createComputeState(&phongShadeState, phongShadeCS);
+		Core::PipelineStateHelper::createComputeState(&phongShadeState, phongShadeCS);
 
-		Core::PipelineState::createComputeState(&edgeHighlightState, edgeHighlightCS);
+		Core::PipelineStateHelper::createComputeState(&edgeHighlightState, edgeHighlightCS);
 
 		effect = new BloomEffect(context, Core::Graphics::getWidth(), Core::Graphics::getHeight(), resManager);
 

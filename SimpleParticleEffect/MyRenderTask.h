@@ -24,7 +24,7 @@ public:
 
 		particleCS = new Shader(L"ParticleCS.hlsl", ShaderProfile::COMPUTE);
 
-		Core::PipelineState::createComputeState(&particleComputeState, particleCS);
+		Core::PipelineStateHelper::createComputeState(&particleComputeState, particleCS);
 
 		{
 			D3D12_INPUT_ELEMENT_DESC inputDesc[2] =
@@ -33,14 +33,14 @@ public:
 				{"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
 			};
 
-			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = Core::PipelineState::getDefaultGraphicsDesc();
+			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = Core::PipelineStateHelper::getDefaultGraphicsDesc();
 			desc.InputLayout = { inputDesc,_countof(inputDesc) };
 			desc.VS = particleVS->getByteCode();
 			desc.GS = particleGS->getByteCode();
 			desc.PS = particlePS->getByteCode();
-			desc.BlendState = Core::PipelineState::blendAddtive;
-			desc.RasterizerState = Core::PipelineState::rasterCullBack;
-			desc.DepthStencilState = Core::PipelineState::depthLess;
+			desc.BlendState = Core::PipelineStateHelper::blendAddtive;
+			desc.RasterizerState = Core::PipelineStateHelper::rasterCullBack;
+			desc.DepthStencilState = Core::PipelineStateHelper::depthLess;
 			desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_POINT;
 			desc.NumRenderTargets = 1;
 			desc.RTVFormats[0] = DXGI_FORMAT_R16G16B16A16_FLOAT;

@@ -19,7 +19,7 @@ public:
 			Core::FMT::RGBA16F, Core::FMT::UNKNOWN, Core::FMT::RGBA16F)),
 		effect(new BloomEffect(context, Core::Graphics::getWidth(), Core::Graphics::getHeight(), resManager))
 	{
-		auto desc = Core::PipelineState::getDefaultFullScreenState();
+		auto desc = Core::PipelineStateHelper::getDefaultFullScreenState();
 		desc.NumRenderTargets = 1;
 		desc.RTVFormats[0] = originTexture->getTexture()->getFormat();
 		desc.PS = blackHoleShader->getByteCode();

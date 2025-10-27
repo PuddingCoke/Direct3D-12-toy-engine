@@ -45,10 +45,10 @@ public:
 		spectrumParam[2].mapLength = lengthScale2;
 
 		{
-			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = Core::PipelineState::getDefaultGraphicsDesc();
+			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = Core::PipelineStateHelper::getDefaultGraphicsDesc();
 			desc.InputLayout = {};
 			desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
-			desc.RasterizerState = Core::PipelineState::rasterCullBack;
+			desc.RasterizerState = Core::PipelineStateHelper::rasterCullBack;
 			desc.DepthStencilState.DepthEnable = false;
 			desc.DepthStencilState.StencilEnable = false;
 			desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
@@ -66,10 +66,10 @@ public:
 				{"POSITION",0,DXGI_FORMAT_R32G32B32_FLOAT,0,D3D12_APPEND_ALIGNED_ELEMENT,D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0},
 			};
 
-			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = Core::PipelineState::getDefaultGraphicsDesc();
+			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = Core::PipelineStateHelper::getDefaultGraphicsDesc();
 			desc.InputLayout = { inputLayoutDesc,_countof(inputLayoutDesc) };
 			desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
-			desc.RasterizerState = Core::PipelineState::rasterCullBack;
+			desc.RasterizerState = Core::PipelineStateHelper::rasterCullBack;
 			desc.DepthStencilState.DepthEnable = FALSE;
 			desc.DepthStencilState.StencilEnable = FALSE;
 			desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
@@ -87,11 +87,11 @@ public:
 				{"POSITION",0,DXGI_FORMAT_R32G32B32_FLOAT,0,D3D12_APPEND_ALIGNED_ELEMENT,D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0},
 			};
 
-			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = Core::PipelineState::getDefaultGraphicsDesc();
+			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = Core::PipelineStateHelper::getDefaultGraphicsDesc();
 			desc.InputLayout = { inputLayoutDesc,_countof(inputLayoutDesc) };
 			desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
-			desc.RasterizerState = Core::PipelineState::rasterCullBack;
-			desc.DepthStencilState = Core::PipelineState::depthLess;
+			desc.RasterizerState = Core::PipelineStateHelper::rasterCullBack;
+			desc.DepthStencilState = Core::PipelineStateHelper::depthLess;
 			desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_PATCH;
 			desc.NumRenderTargets = 1;
 			desc.RTVFormats[0] = DXGI_FORMAT_R16G16B16A16_FLOAT;
@@ -104,17 +104,17 @@ public:
 			Core::GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&oceanState));
 		}
 
-		Core::PipelineState::createComputeState(&spectrumState, spectrumCS);
+		Core::PipelineStateHelper::createComputeState(&spectrumState, spectrumCS);
 
-		Core::PipelineState::createComputeState(&conjugateState, conjugateCS);
+		Core::PipelineStateHelper::createComputeState(&conjugateState, conjugateCS);
 
-		Core::PipelineState::createComputeState(&displacementSpectrumState, displacementSpectrumCS);
+		Core::PipelineStateHelper::createComputeState(&displacementSpectrumState, displacementSpectrumCS);
 
-		Core::PipelineState::createComputeState(&ifftState, ifftCS);
+		Core::PipelineStateHelper::createComputeState(&ifftState, ifftCS);
 
-		Core::PipelineState::createComputeState(&permutationState, permutationCS);
+		Core::PipelineStateHelper::createComputeState(&permutationState, permutationCS);
 
-		Core::PipelineState::createComputeState(&waveMergeState, waveMergeCS);
+		Core::PipelineStateHelper::createComputeState(&waveMergeState, waveMergeCS);
 
 		tildeh0Texture = createTexture(textureResolution, DXGI_FORMAT_R32G32_FLOAT);
 

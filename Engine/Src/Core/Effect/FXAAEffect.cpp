@@ -14,7 +14,7 @@ FXAAEffect::FXAAEffect(GraphicsContext* const context, const uint32_t width, con
 	fxaaPS = new Core::Shader(g_FXAABytes, sizeof(g_FXAABytes));
 
 	{
-		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = Core::PipelineState::getDefaultFullScreenState();
+		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = Core::PipelineStateHelper::getDefaultFullScreenState();
 		desc.PS = colorToColorLumaPS->getByteCode();
 		desc.NumRenderTargets = 1;
 		desc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -23,7 +23,7 @@ FXAAEffect::FXAAEffect(GraphicsContext* const context, const uint32_t width, con
 	}
 
 	{
-		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = Core::PipelineState::getDefaultFullScreenState();
+		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = Core::PipelineStateHelper::getDefaultFullScreenState();
 		desc.PS = fxaaPS->getByteCode();
 		desc.NumRenderTargets = 1;
 		desc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;

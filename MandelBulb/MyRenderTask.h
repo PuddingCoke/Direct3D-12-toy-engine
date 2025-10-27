@@ -22,12 +22,12 @@ public:
 		accumulateParam{ 0,0.f }
 	{
 		{
-			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = Core::PipelineState::getDefaultGraphicsDesc();
+			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = Core::PipelineStateHelper::getDefaultGraphicsDesc();
 			desc.InputLayout = {};
 			desc.VS = Core::GlobalShader::getFullScreenVS()->getByteCode();
 			desc.PS = accumulateShader->getByteCode();
 			desc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
-			desc.BlendState = Core::PipelineState::blendDefault;
+			desc.BlendState = Core::PipelineStateHelper::blendDefault;
 			desc.DepthStencilState.DepthEnable = FALSE;
 			desc.DepthStencilState.StencilEnable = FALSE;
 			desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
@@ -38,7 +38,7 @@ public:
 		}
 
 		{
-			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = Core::PipelineState::getDefaultGraphicsDesc();
+			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = Core::PipelineStateHelper::getDefaultGraphicsDesc();
 			desc.InputLayout = {};
 			desc.VS = Core::GlobalShader::getFullScreenVS()->getByteCode();
 			desc.PS = displayShader->getByteCode();

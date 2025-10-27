@@ -1,14 +1,14 @@
 ﻿#pragma once
 
-#ifndef _CORE_PIPELINESTATE_H_
-#define _CORE_PIPELINESTATE_H_
+#ifndef _CORE_PIPELINESTATEHELPER_H_
+#define _CORE_PIPELINESTATEHELPER_H_
 
 #include<Gear/Core/Shader.h>
 
 namespace Core
 {
 	//helper namespace
-	namespace PipelineState
+	namespace PipelineStateHelper
 	{
 
 		constexpr D3D12_BLEND_DESC blendDefault = { false,false,
@@ -63,4 +63,4 @@ namespace Core
 	}
 }
 
-#endif // !_CORE_PIPELINESTATE_H_
+#endif // !_CORE_PIPELINESTATEHELPER_H_

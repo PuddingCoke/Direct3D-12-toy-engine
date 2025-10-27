@@ -17,11 +17,11 @@ public:
 		originTexture(ResourceManager::createTextureRenderView(Core::Graphics::getWidth(), Core::Graphics::getHeight(), DXGI_FORMAT_R8G8B8A8_UNORM, 1, 1, false, true,
 			DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_UNKNOWN))
 	{
-		Core::PipelineState::createComputeState(&whiteNoiseState, whiteNoiseCS);
+		Core::PipelineStateHelper::createComputeState(&whiteNoiseState, whiteNoiseCS);
 
-		Core::PipelineState::createComputeState(&evolveState, evolveCS);
+		Core::PipelineStateHelper::createComputeState(&evolveState, evolveCS);
 
-		Core::PipelineState::createComputeState(&visualizeState, visualizeCS);
+		Core::PipelineStateHelper::createComputeState(&visualizeState, visualizeCS);
 
 		swapTexture = new SwapTexture([] {return ResourceManager::createTextureRenderView(Core::Graphics::getWidth(), Core::Graphics::getHeight(), DXGI_FORMAT_R32_FLOAT, 1, 1, false, true,
 			DXGI_FORMAT_R32_FLOAT, DXGI_FORMAT_R32_FLOAT, DXGI_FORMAT_UNKNOWN); });

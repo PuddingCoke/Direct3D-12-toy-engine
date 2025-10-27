@@ -7,7 +7,7 @@
 
 #include<Gear/Core/ResourceManager.h>
 
-#include<Gear/Core/PipelineState.h>
+#include<Gear/Core/PipelineStateHelper.h>
 
 #include<Gear/Core/Graphics.h>
 

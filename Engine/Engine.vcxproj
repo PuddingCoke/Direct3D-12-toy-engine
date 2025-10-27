@@ -185,7 +185,7 @@
     <ClInclude Include="Inc\Gear\Core\GraphicsContext.h" />
     <ClInclude Include="Inc\Gear\Core\GraphicsDevice.h" />
     <ClInclude Include="Inc\Gear\Core\Graphics.h" />
-    <ClInclude Include="Inc\Gear\Core\PipelineState.h" />
+    <ClInclude Include="Inc\Gear\Core\PipelineStateHelper.h" />
     <ClInclude Include="Inc\Gear\Core\RenderEngine.h" />
     <ClInclude Include="Inc\Gear\Core\ResourceManager.h" />
     <ClInclude Include="Inc\Gear\Core\Resource\ImmutableCBuffer.h" />
@@ -241,7 +241,7 @@
     <ClCompile Include="Src\Core\GlobalDescriptorHeap.cpp" />
     <ClCompile Include="Src\Core\GlobalRootSignature.cpp" />
     <ClCompile Include="Src\Core\GraphicsContext.cpp" />
-    <ClCompile Include="Src\Core\PipelineState.cpp" />
+    <ClCompile Include="Src\Core\PipelineStateHelper.cpp" />
     <ClCompile Include="Src\Core\RenderEngine.cpp" />
     <ClCompile Include="Src\Core\Resource\D3D12Resource\Texture.cpp" />
     <ClCompile Include="Src\Core\Graphics.cpp" />

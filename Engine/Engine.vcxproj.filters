@@ -261,7 +261,7 @@
     <ClInclude Include="Inc\Gear\Core\RenderEngine.h">
       <Filter>Header\Core</Filter>
     </ClInclude>
-    <ClInclude Include="Inc\Gear\Core\PipelineState.h">
+    <ClInclude Include="Inc\Gear\Core\PipelineStateHelper.h">
       <Filter>Header\Core</Filter>
     </ClInclude>
     <ClInclude Include="Inc\Gear\Core\DescriptorHeap.h">
@@ -581,7 +581,7 @@
     <ClCompile Include="Src\Core\GraphicsDevice.cpp">
       <Filter>Source\Core</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Core\PipelineState.cpp">
+    <ClCompile Include="Src\Core\PipelineStateHelper.cpp">
       <Filter>Source\Core</Filter>
     </ClCompile>
     <ClCompile Include="Src\Core\RenderEngine.cpp">

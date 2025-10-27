@@ -1,8 +1,8 @@
-﻿#include<Gear/Core/PipelineState.h>
+﻿#include<Gear/Core/PipelineStateHelper.h>
 
 #include<Gear/Core/GlobalRootSignature.h>
 
-D3D12_GRAPHICS_PIPELINE_STATE_DESC Core::PipelineState::getDefaultGraphicsDesc()
+D3D12_GRAPHICS_PIPELINE_STATE_DESC Core::PipelineStateHelper::getDefaultGraphicsDesc()
 {
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = {};
 	desc.pRootSignature = Core::GlobalRootSignature::getGraphicsRootSignature()->get();
@@ -12,7 +12,7 @@ D3D12_GRAPHICS_PIPELINE_STATE_DESC Core::PipelineState::getDefaultGraphicsDesc()
 	return desc;
 }
 
-D3D12_GRAPHICS_PIPELINE_STATE_DESC Core::PipelineState::getDefaultFullScreenState()
+D3D12_GRAPHICS_PIPELINE_STATE_DESC Core::PipelineStateHelper::getDefaultFullScreenState()
 {
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = {};
 	desc.InputLayout = {};
@@ -29,7 +29,7 @@ D3D12_GRAPHICS_PIPELINE_STATE_DESC Core::PipelineState::getDefaultFullScreenStat
 	return desc;
 }
 
-void Core::PipelineState::createComputeState(ID3D12PipelineState** const pipelineState, const Shader* const shader)
+void Core::PipelineStateHelper::createComputeState(ID3D12PipelineState** const pipelineState, const Shader* const shader)
 {
 	D3D12_COMPUTE_PIPELINE_STATE_DESC desc = {};
 	desc.pRootSignature = Core::GlobalRootSignature::getComputeRootSignature()->get();

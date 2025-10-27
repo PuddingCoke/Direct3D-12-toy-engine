@@ -17,7 +17,7 @@ public:
 		originTexture(ResourceManager::createTextureRenderView(Core::Graphics::getWidth(), Core::Graphics::getHeight(), DXGI_FORMAT_R16G16B16A16_UNORM, 1, 1, false, true,
 			DXGI_FORMAT_R16G16B16A16_UNORM, DXGI_FORMAT_R16G16B16A16_UNORM, DXGI_FORMAT_UNKNOWN))
 	{
-		Core::PipelineState::createComputeState(&computeState, computeCS);
+		Core::PipelineStateHelper::createComputeState(&computeState, computeCS);
 
 		effect.setExposure(1.9f);
 
