@@ -195,12 +195,6 @@
     <ClInclude Include="Inc\Gear\Core\VideoEncoder\Encoder.h">
       <Filter>Header\Core\VideoEncoder</Filter>
     </ClInclude>
-    <ClInclude Include="Inc\Gear\Core\Raytracing\BottomLevelAS.h">
-      <Filter>Header\Core\Raytracing</Filter>
-    </ClInclude>
-    <ClInclude Include="Inc\Gear\Core\Raytracing\TopLevelAS.h">
-      <Filter>Header\Core\Raytracing</Filter>
-    </ClInclude>
     <ClInclude Include="Inc\Gear\Input\Event.h">
       <Filter>Header\Input</Filter>
     </ClInclude>
@@ -502,12 +496,6 @@
     </ClCompile>
     <ClCompile Include="Src\Core\Gear2D\PrimitiveBatch.cpp">
       <Filter>Source\Core\Gear2D</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Core\Raytracing\TopLevelAS.cpp">
-      <Filter>Source\Core\Raytracing</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Core\Raytracing\BottomLevelAS.cpp">
-      <Filter>Source\Core\Raytracing</Filter>
     </ClCompile>
     <ClCompile Include="Src\Core\Resource\BufferView.cpp">
       <Filter>Source\Core\Resource</Filter>

@@ -135,8 +135,6 @@
     <ClInclude Include="Inc\Gear\Core\Internal\GraphicsInternal.h" />
     <ClInclude Include="Inc\Gear\Core\Internal\MainCameraInternal.h" />
     <ClInclude Include="Inc\Gear\Core\Internal\RenderEngineInternal.h" />
-    <ClInclude Include="Inc\Gear\Core\Raytracing\BottomLevelAS.h" />
-    <ClInclude Include="Inc\Gear\Core\Raytracing\TopLevelAS.h" />
     <ClInclude Include="Inc\Gear\Core\RenderTask.h" />
     <ClInclude Include="Inc\Gear\Core\Resource\DynamicCBuffer.h" />
     <ClInclude Include="Inc\Gear\Core\Resource\StaticCBuffer.h" />
@@ -232,8 +230,6 @@
     <ClCompile Include="Src\Core\MainCamera.cpp" />
     <ClCompile Include="Src\Core\DynamicCBufferManager.cpp" />
     <ClCompile Include="Src\Core\Effect\FXAAEffect.cpp" />
-    <ClCompile Include="Src\Core\Raytracing\BottomLevelAS.cpp" />
-    <ClCompile Include="Src\Core\Raytracing\TopLevelAS.cpp" />
     <ClCompile Include="Src\Core\RenderTask.cpp" />
     <ClCompile Include="Src\Core\StaticEffect\HDRClampEffect.cpp" />
     <ClCompile Include="Src\Utils\DeltaTimeEstimator.cpp" />

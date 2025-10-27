@@ -11,8 +11,6 @@ const std::wstring wAssetPath = L"E:/Assets/Sponza";
 #include<assimp/scene.h>
 #include<assimp/postprocess.h>
 
-#include<Gear/Core/Raytracing/TopLevelAS.h>
-
 class Scene
 {
 public:
