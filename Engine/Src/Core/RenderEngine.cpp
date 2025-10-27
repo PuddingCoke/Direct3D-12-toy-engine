@@ -124,7 +124,7 @@ namespace
 
 		int32_t syncInterval;
 
-		StaticCBuffer* reservedGlobalCBuffer;
+		DynamicCBuffer* reservedGlobalCBuffer;
 
 		ResourceManager* resManager;
 
@@ -232,22 +232,12 @@ RenderEnginePrivate::RenderEnginePrivate(const uint32_t width, const uint32_t he
 
 	prepareCommandList = new CommandList(D3D12_COMMAND_LIST_TYPE_DIRECT);
 
-	reservedGlobalCBuffer = ResourceManager::createStaticCBuffer(sizeof(PerframeResource), true);
-
-	reservedGlobalCBuffer->getBuffer()->setName(L"Reserved Global CBuffer");
+	reservedGlobalCBuffer = ResourceManager::createDynamicCBuffer(sizeof(PerframeResource));
 
 	Core::Graphics::Internal::setReservedGlobalCBuffer(reservedGlobalCBuffer);
 
 	//确保准备命令列表总是处于容器第一个位置
 	begin();
-
-	{
-		prepareCommandList->pushResourceTrackList(reservedGlobalCBuffer->getBuffer());
-
-		reservedGlobalCBuffer->getBuffer()->setState(D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
-
-		prepareCommandList->transitionResources();
-	}
 
 	if (useSwapChainBuffer)
 	{
@@ -450,6 +440,8 @@ void RenderEnginePrivate::begin()
 	recordCommandLists.push_back(prepareCommandList);
 
 	Core::Graphics::Internal::renderedFrameCountInc();
+
+	reservedGlobalCBuffer->acquireDataPtr();
 }
 
 void RenderEnginePrivate::end()
@@ -474,24 +466,18 @@ void RenderEnginePrivate::end()
 
 		updateConstantBuffer();
 
-		perframeResource = PerframeResource{
+		perframeResource =
+		{
 		Core::Graphics::getDeltaTime(),
 		Core::Graphics::getTimeElapsed(),
 		Utils::Random::genUint(),
 		Utils::Random::genFloat(),
 		Core::MainCamera::Internal::getMatrices(),
 		DirectX::XMFLOAT2(static_cast<float>(Core::Graphics::getWidth()), static_cast<float>(Core::Graphics::getHeight())),
-		DirectX::XMFLOAT2(1.f / Core::Graphics::getWidth(), 1.f / Core::Graphics::getHeight()) };
+		DirectX::XMFLOAT2(1.f / Core::Graphics::getWidth(), 1.f / Core::Graphics::getHeight())
+		};
 
-		const StaticCBuffer::UpdateStruct updateStruct = reservedGlobalCBuffer->getUpdateStruct(&perframeResource, sizeof(PerframeResource));
-
-		prepareCommandList->copyBufferRegion(updateStruct.buffer, 0, updateStruct.uploadHeap, 0, sizeof(PerframeResource));
-
-		prepareCommandList->pushResourceTrackList(updateStruct.buffer);
-
-		updateStruct.buffer->setState(D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
-
-		prepareCommandList->transitionResources();
+		reservedGlobalCBuffer->updateData(&perframeResource);
 	}
 
 	//使用最后一个命令列表做些收尾工作

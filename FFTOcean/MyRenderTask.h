@@ -375,7 +375,7 @@ private:
 
 		context->drawIndexed(indices.size(), 1, 0, 0, 0);*/
 
-		renderParamBuffer->update(&renderParam);
+		renderParamBuffer->simpleUpdate(&renderParam);
 
 		context->setPipelineState(textureCubeState.Get());
 

@@ -9,13 +9,15 @@ namespace Core
 {
 	namespace DynamicCBufferManager
 	{
-		struct AvailableDescriptor
+		struct AvailableLocation
 		{
+			//provide data pointer for later update
+			void* const dataPtr;
 			//provide gpu address to directly bind constant buffer
 			const D3D12_GPU_VIRTUAL_ADDRESS gpuAddress;
 			//provide index to directly access resource in resource descriptor heap
 			const uint32_t descriptorIndex;
-		} requestDescriptor(const uint32_t regionIndex, const void* const data);
+		} requestLocation(const uint32_t regionIndex);
 	}
 }
 

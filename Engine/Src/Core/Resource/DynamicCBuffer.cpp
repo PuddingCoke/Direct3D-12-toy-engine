@@ -6,37 +6,59 @@
 
 #include<Gear/Utils/Logger.h>
 
+#include<Gear/Utils/Math.h>
+
 DynamicCBuffer::DynamicCBuffer(const uint32_t size) :
-	ImmutableCBuffer(nullptr, 0u, true), updateFrameIndex(UINT64_MAX)
+	ImmutableCBuffer(nullptr, 0u, true), regionIndex(Utils::Math::log2(size / 256u)), dataPtr(nullptr), acquireFrameIndex(UINT64_MAX), updateFrameIndex(UINT64_MAX)
 {
-	switch (size)
+	if (regionIndex > 1u)
 	{
-	case 256:
-		regionIndex = 0;
-		break;
-	case 512:
-		regionIndex = 1;
-		break;
-	default:
 		LOGERROR(L"size should be one of 256bytes 512bytes");
-		break;
 	}
 }
 
-void DynamicCBuffer::update(const void* const data)
+void DynamicCBuffer::acquireDataPtr()
 {
 #ifdef _DEBUG
+	if (acquireFrameIndex == Core::Graphics::getRenderedFrameCount())
+	{
+		LOGERROR(L"you can only acquire data pointer for cbuffer once per frame");
+	}
+#endif // _DEBUG
+
+	acquireFrameIndex = Core::Graphics::getRenderedFrameCount();
+
+	const Core::DynamicCBufferManager::AvailableLocation& location = Core::DynamicCBufferManager::requestLocation(regionIndex);
+
+	dataPtr = location.dataPtr;
+
+	gpuAddress = location.gpuAddress;
+
+	bufferIndex = location.descriptorIndex;
+}
+
+void DynamicCBuffer::updateData(const void* const data)
+{
+#ifdef _DEBUG
+	if (acquireFrameIndex != Core::Graphics::getRenderedFrameCount())
+	{
+		LOGERROR(L"you haven't acquire data pointer for this dynamic cbuffer yet");
+	}
+
 	if (updateFrameIndex == Core::Graphics::getRenderedFrameCount())
 	{
-		LOGERROR(L"cannot update dynamic constant buffer multiple time during one frame");
+		LOGERROR(L"you can only update cbuffer once per frame");
 	}
 #endif // _DEBUG
 
 	updateFrameIndex = Core::Graphics::getRenderedFrameCount();
 
-	const Core::DynamicCBufferManager::AvailableDescriptor& descriptor = Core::DynamicCBufferManager::requestDescriptor(regionIndex, data);
+	memcpy(dataPtr, data, 256u << regionIndex);
+}
 
-	gpuAddress = descriptor.gpuAddress;
+void DynamicCBuffer::simpleUpdate(const void* const data)
+{
+	acquireDataPtr();
 
-	bufferIndex = descriptor.descriptorIndex;
+	updateData(data);
 }

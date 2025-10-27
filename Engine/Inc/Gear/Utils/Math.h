@@ -32,6 +32,8 @@ namespace Utils
 
 		float gauss(const float sigma, const float x);
 
+		uint32_t log2(const uint32_t x);
+
 	}
 }
 

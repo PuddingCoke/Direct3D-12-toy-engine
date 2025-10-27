@@ -20,7 +20,7 @@ namespace
 
 		~DynamicCBufferRegion();
 
-		uint32_t update(const void* const data);
+		struct Location { void* const dataPtr; const uint32_t subregionIndex; } acquireLocation();
 
 		void reset();
 
@@ -48,7 +48,7 @@ namespace
 
 		~DynamicCBufferManagerPrivate();
 
-		Core::DynamicCBufferManager::AvailableDescriptor requestDescriptor(const uint32_t regionIndex, const void* const data);
+		Core::DynamicCBufferManager::AvailableLocation requestLocation(const uint32_t regionIndex);
 
 		void recordCommands(CommandList* const commandList);
 
@@ -112,13 +112,11 @@ DynamicCBufferRegion::~DynamicCBufferRegion()
 	}
 }
 
-uint32_t DynamicCBufferRegion::update(const void* const data)
+DynamicCBufferRegion::Location DynamicCBufferRegion::acquireLocation()
 {
 	const uint64_t tempOffset = currentOffset.fetch_add(subRegionSize, std::memory_order_relaxed);
 
-	memcpy(dataPtr[Core::Graphics::getFrameIndex()] + tempOffset, data, subRegionSize);
-
-	return static_cast<uint32_t>(tempOffset / subRegionSize);
+	return { dataPtr[Core::Graphics::getFrameIndex()] + tempOffset,static_cast<uint32_t>(tempOffset / subRegionSize) };
 }
 
 void DynamicCBufferRegion::reset()
@@ -222,11 +220,11 @@ DynamicCBufferManagerPrivate::~DynamicCBufferManagerPrivate()
 	}
 }
 
-Core::DynamicCBufferManager::AvailableDescriptor DynamicCBufferManagerPrivate::requestDescriptor(const uint32_t regionIndex, const void* const data)
+Core::DynamicCBufferManager::AvailableLocation DynamicCBufferManagerPrivate::requestLocation(const uint32_t regionIndex)
 {
-	const uint32_t subregionIndex = bufferRegions[regionIndex]->update(data);
+	const DynamicCBufferRegion::Location location = bufferRegions[regionIndex]->acquireLocation();
 
-	return { baseAddressOffsets[regionIndex] + (256u << regionIndex) * subregionIndex,baseDescriptorIndices[regionIndex] + subregionIndex };
+	return { location.dataPtr,baseAddressOffsets[regionIndex] + (256u << regionIndex) * location.subregionIndex,baseDescriptorIndices[regionIndex] + location.subregionIndex };
 }
 
 void DynamicCBufferManagerPrivate::recordCommands(CommandList* const commandList)
@@ -256,9 +254,9 @@ void DynamicCBufferManagerPrivate::recordCommands(CommandList* const commandList
 	commandList->transitionResources();
 }
 
-Core::DynamicCBufferManager::AvailableDescriptor Core::DynamicCBufferManager::requestDescriptor(const uint32_t regionIndex, const void* const data)
+Core::DynamicCBufferManager::AvailableLocation Core::DynamicCBufferManager::requestLocation(const uint32_t regionIndex)
 {
-	return pvt->requestDescriptor(regionIndex, data);
+	return pvt->requestLocation(regionIndex);
 }
 
 void Core::DynamicCBufferManager::Internal::initialize()

@@ -341,7 +341,7 @@ public:
 
 		simulationParam.bumpScale = 1.f / config.bumpScale;
 
-		simulationParamBuffer->update(&simulationParam);
+		simulationParamBuffer->simpleUpdate(&simulationParam);
 
 		context->setGlobalConstantBuffer(simulationParamBuffer);
 

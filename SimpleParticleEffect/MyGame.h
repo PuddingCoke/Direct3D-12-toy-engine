@@ -4,6 +4,8 @@
 
 #include<Gear/Camera/OrbitCamera.h>
 
+#include<Gear/Core/MainCamera.h>
+
 #include"MyRenderTask.h"
 
 class MyGame :public Game

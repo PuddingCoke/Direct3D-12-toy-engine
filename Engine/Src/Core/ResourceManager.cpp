@@ -319,7 +319,7 @@ DynamicCBuffer* ResourceManager::createDynamicCBuffer(const uint32_t size, const
 
 	if (data)
 	{
-		buffer->update(data);
+		buffer->simpleUpdate(data);
 	}
 
 	return buffer;

@@ -28,3 +28,12 @@ float Utils::Math::gauss(const float sigma, const float x)
 {
 	return 1.f / (sigma * 2.506628274631000502415765284811f) * exp(-0.5f * (x / sigma) * (x / sigma));
 }
+
+uint32_t Utils::Math::log2(const uint32_t x)
+{
+	unsigned long y;
+
+	_BitScanReverse(&y, x);
+
+	return y;
+}
