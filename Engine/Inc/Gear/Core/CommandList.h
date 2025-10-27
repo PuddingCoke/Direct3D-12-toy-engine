@@ -52,6 +52,32 @@ public:
 
 	void setComputeRootSignature(RootSignature* const rootSignature) const;
 
+	void setGraphicsRootConstantBuffer(const uint32_t rootParameterIndex, const D3D12_GPU_VIRTUAL_ADDRESS bufferLocation) const;
+
+	void setComputeRootConstantBuffer(const uint32_t rootParameterIndex, const D3D12_GPU_VIRTUAL_ADDRESS bufferLocation) const;
+
+	void setGraphicsRootConstants(const uint32_t rootParameterIndex, const uint32_t num32BitValuesToSet, const void* const pSrcData, const uint32_t destOffsetIn32BitValues) const;
+
+	void setComputeRootConstants(const uint32_t rootParameterIndex, const uint32_t num32BitValuesToSet, const void* const pSrcData, const uint32_t destOffsetIn32BitValues) const;
+
+	void drawInstanced(const uint32_t vertexCountPerInstance, const uint32_t instanceCount, const uint32_t startVertexLocation, const uint32_t startInstanceLocation) const;
+
+	void drawIndexedInstanced(const uint32_t indexCountPerInstance, const uint32_t instanceCount, const uint32_t startIndexLocation, const int32_t baseVertexLocation, const uint32_t startInstanceLocation) const;
+
+	void dispatch(const uint32_t threadGroupCountX, const uint32_t threadGroupCountY, const uint32_t threadGroupCountZ) const;
+
+	void setPrimitiveTopology(const D3D12_PRIMITIVE_TOPOLOGY primitiveTopology) const;
+
+	void setViewports(const uint32_t numViewports, const D3D12_VIEWPORT* const pViewports) const;
+
+	void setScissorRects(const uint32_t numRects, const D3D12_RECT* const pRects) const;
+
+	void setPipelineState(ID3D12PipelineState* const pipelineState) const;
+
+	void clearRenderTargetView(const D3D12_CPU_DESCRIPTOR_HANDLE renderTargetView, const float colorRGBA[4], const uint32_t numRects, const D3D12_RECT* const pRects) const;
+
+	void clearDepthStencilView(const D3D12_CPU_DESCRIPTOR_HANDLE depthStencilView, const D3D12_CLEAR_FLAGS clearFlags, const float depth, const uint8_t stencil, const uint32_t numRects, const D3D12_RECT* const pRects) const;
+
 	void transitionResources();
 
 	void pushResourceTrackList(Texture* const texture);

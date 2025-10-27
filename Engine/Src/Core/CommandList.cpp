@@ -65,6 +65,71 @@ void CommandList::setComputeRootSignature(RootSignature* const rootSignature) co
 	commandList->SetComputeRootSignature(rootSignature->get());
 }
 
+void CommandList::setGraphicsRootConstantBuffer(const uint32_t rootParameterIndex, const D3D12_GPU_VIRTUAL_ADDRESS bufferLocation) const
+{
+	commandList->SetGraphicsRootConstantBufferView(rootParameterIndex, bufferLocation);
+}
+
+void CommandList::setComputeRootConstantBuffer(const uint32_t rootParameterIndex, const D3D12_GPU_VIRTUAL_ADDRESS bufferLocation) const
+{
+	commandList->SetComputeRootConstantBufferView(rootParameterIndex, bufferLocation);
+}
+
+void CommandList::setGraphicsRootConstants(const uint32_t rootParameterIndex, const uint32_t num32BitValuesToSet, const void* const pSrcData, const uint32_t destOffsetIn32BitValues) const
+{
+	commandList->SetGraphicsRoot32BitConstants(rootParameterIndex, num32BitValuesToSet, pSrcData, destOffsetIn32BitValues);
+}
+
+void CommandList::setComputeRootConstants(const uint32_t rootParameterIndex, const uint32_t num32BitValuesToSet, const void* const pSrcData, const uint32_t destOffsetIn32BitValues) const
+{
+	commandList->SetComputeRoot32BitConstants(rootParameterIndex, num32BitValuesToSet, pSrcData, destOffsetIn32BitValues);
+}
+
+void CommandList::drawInstanced(const uint32_t vertexCountPerInstance, const uint32_t instanceCount, const uint32_t startVertexLocation, const uint32_t startInstanceLocation) const
+{
+	commandList->DrawInstanced(vertexCountPerInstance, instanceCount, startVertexLocation, startInstanceLocation);
+}
+
+void CommandList::drawIndexedInstanced(const uint32_t indexCountPerInstance, const uint32_t instanceCount, const uint32_t startIndexLocation, const int32_t baseVertexLocation, const uint32_t startInstanceLocation) const
+{
+	commandList->DrawIndexedInstanced(indexCountPerInstance, instanceCount, startIndexLocation, baseVertexLocation, startInstanceLocation);
+}
+
+void CommandList::dispatch(const uint32_t threadGroupCountX, const uint32_t threadGroupCountY, const uint32_t threadGroupCountZ) const
+{
+	commandList->Dispatch(threadGroupCountX, threadGroupCountY, threadGroupCountZ);
+}
+
+void CommandList::setPrimitiveTopology(const D3D12_PRIMITIVE_TOPOLOGY primitiveTopology) const
+{
+	commandList->IASetPrimitiveTopology(primitiveTopology);
+}
+
+void CommandList::setViewports(const uint32_t numViewports, const D3D12_VIEWPORT* const pViewports) const
+{
+	commandList->RSSetViewports(numViewports, pViewports);
+}
+
+void CommandList::setScissorRects(const uint32_t numRects, const D3D12_RECT* const pRects) const
+{
+	commandList->RSSetScissorRects(numRects, pRects);
+}
+
+void CommandList::setPipelineState(ID3D12PipelineState* const pipelineState) const
+{
+	commandList->SetPipelineState(pipelineState);
+}
+
+void CommandList::clearRenderTargetView(const D3D12_CPU_DESCRIPTOR_HANDLE renderTargetView, const float colorRGBA[4], const uint32_t numRects, const D3D12_RECT* const pRects) const
+{
+	commandList->ClearRenderTargetView(renderTargetView, colorRGBA, numRects, pRects);
+}
+
+void CommandList::clearDepthStencilView(const D3D12_CPU_DESCRIPTOR_HANDLE depthStencilView, const D3D12_CLEAR_FLAGS clearFlags, const float depth, const uint8_t stencil, const uint32_t numRects, const D3D12_RECT* const pRects) const
+{
+	commandList->ClearDepthStencilView(depthStencilView, clearFlags, depth, stencil, numRects, pRects);
+}
+
 void CommandList::transitionResources()
 {
 	for (Buffer* const buff : transitionBuffers)
