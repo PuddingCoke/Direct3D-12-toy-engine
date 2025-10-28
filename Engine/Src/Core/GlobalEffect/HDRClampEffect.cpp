@@ -1,6 +1,6 @@
-﻿#include<Gear/Core/StaticEffect/HDRClampEffect.h>
+﻿#include<Gear/Core/GlobalEffect/HDRClampEffect.h>
 
-#include<Gear/Core/StaticEffect/Internal/HDRClampEffectInternal.h>
+#include<Gear/Core/GlobalEffect/Internal/HDRClampEffectInternal.h>
 
 #include<Gear/CompiledShaders/HDRClampCS.h>
 
@@ -16,7 +16,7 @@ namespace
 	}pvt;
 }
 
-void Core::StaticEffect::HDRClampEffect::process(GraphicsContext* const context, TextureRenderView* const inOutTexture)
+void Core::GlobalEffect::HDRClampEffect::process(GraphicsContext* const context, TextureRenderView* const inOutTexture)
 {
 	if (inOutTexture->getTexture()->getFormat() == DXGI_FORMAT_R16G16B16A16_FLOAT)
 	{
@@ -32,7 +32,7 @@ void Core::StaticEffect::HDRClampEffect::process(GraphicsContext* const context,
 	}
 }
 
-void Core::StaticEffect::HDRClampEffect::Internal::initialize()
+void Core::GlobalEffect::HDRClampEffect::Internal::initialize()
 {
 	pvt.hdrClampShader = new Core::Shader(g_HDRClampCSBytes, sizeof(g_HDRClampCSBytes));
 
@@ -41,7 +41,7 @@ void Core::StaticEffect::HDRClampEffect::Internal::initialize()
 	LOGSUCCESS(L"create", LogColor::brightMagenta, L"HDRClampEffect", LogColor::defaultColor, L"succeeded");
 }
 
-void Core::StaticEffect::HDRClampEffect::Internal::release()
+void Core::GlobalEffect::HDRClampEffect::Internal::release()
 {
 	if (pvt.hdrClampShader)
 	{

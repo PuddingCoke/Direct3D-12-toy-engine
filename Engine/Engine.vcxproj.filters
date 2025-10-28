@@ -306,13 +306,13 @@
     <ClInclude Include="Inc\DirectXTex\WICTextureLoader12.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="Inc\Gear\Core\StaticEffect\HDRClampEffect.h">
+    <ClInclude Include="Inc\Gear\Core\GlobalEffect\HDRClampEffect.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="Inc\Gear\Core\StaticEffect\LatLongMapToCubeMapEffect.h">
+    <ClInclude Include="Inc\Gear\Core\GlobalEffect\LatLongMapToCubeMapEffect.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="Inc\Gear\Core\StaticEffect\BackBufferBlitEffect.h">
+    <ClInclude Include="Inc\Gear\Core\GlobalEffect\BackBufferBlitEffect.h">
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="Inc\D3D12Headers\d3d12.h">
@@ -381,7 +381,7 @@
     <ClInclude Include="Inc\D3D12Headers\dxgiformat.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="Inc\Gear\Core\StaticEffect\StaticEffectHeader.h">
+    <ClInclude Include="Inc\Gear\Core\GlobalEffect\GlobalEffectHeader.h">
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="Inc\Gear\Utils\Logger\LogColor.h">
@@ -441,13 +441,13 @@
     <ClInclude Include="Inc\Gear\Core\Internal\DynamicCBufferManagerInternal.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="Inc\Gear\Core\StaticEffect\Internal\BackBufferBlitEffectInternal.h">
+    <ClInclude Include="Inc\Gear\Core\GlobalEffect\Internal\BackBufferBlitEffectInternal.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="Inc\Gear\Core\StaticEffect\Internal\HDRClampEffectInternal.h">
+    <ClInclude Include="Inc\Gear\Core\GlobalEffect\Internal\HDRClampEffectInternal.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="Inc\Gear\Core\StaticEffect\Internal\LatLongMapToCubeMapEffectInternal.h">
+    <ClInclude Include="Inc\Gear\Core\GlobalEffect\Internal\LatLongMapToCubeMapEffectInternal.h">
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="Inc\Gear\Core\Internal\RenderEngineInternal.h">
@@ -629,13 +629,13 @@
     <ClCompile Include="Inc\DirectXTex\WICTextureLoader12.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Core\StaticEffect\HDRClampEffect.cpp">
+    <ClCompile Include="Src\Core\GlobalEffect\HDRClampEffect.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Core\StaticEffect\LatLongMapToCubeMapEffect.cpp">
+    <ClCompile Include="Src\Core\GlobalEffect\LatLongMapToCubeMapEffect.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Core\StaticEffect\BackBufferBlitEffect.cpp">
+    <ClCompile Include="Src\Core\GlobalEffect\BackBufferBlitEffect.cpp">
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="Src\Utils\Logger\LogColor.cpp">

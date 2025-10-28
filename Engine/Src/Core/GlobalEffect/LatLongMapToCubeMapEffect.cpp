@@ -1,6 +1,6 @@
-﻿#include<Gear/Core/StaticEffect/LatLongMapToCubeMapEffect.h>
+﻿#include<Gear/Core/GlobalEffect/LatLongMapToCubeMapEffect.h>
 
-#include<Gear/Core/StaticEffect/Internal/LatLongMapToCubeMapEffectInternal.h>
+#include<Gear/Core/GlobalEffect/Internal/LatLongMapToCubeMapEffectInternal.h>
 
 #include<Gear/Utils/Math.h>
 
@@ -28,7 +28,7 @@ namespace
 	}pvt;
 }
 
-void Core::StaticEffect::LatLongMapToCubeMapEffect::process(GraphicsContext* const context, TextureRenderView* const inputTexture, TextureRenderView* const outputTexture)
+void Core::GlobalEffect::LatLongMapToCubeMapEffect::process(GraphicsContext* const context, TextureRenderView* const inputTexture, TextureRenderView* const outputTexture)
 {
 	switch (outputTexture->getTexture()->getFormat())
 	{
@@ -58,7 +58,7 @@ void Core::StaticEffect::LatLongMapToCubeMapEffect::process(GraphicsContext* con
 	context->draw(36, 6, 0, 0);
 }
 
-void Core::StaticEffect::LatLongMapToCubeMapEffect::Internal::initialize(ResourceManager* const resManager)
+void Core::GlobalEffect::LatLongMapToCubeMapEffect::Internal::initialize(ResourceManager* const resManager)
 {
 	pvt.equirectangularVS = new Core::Shader(g_EquirectangularVSBytes, sizeof(g_EquirectangularVSBytes));
 
@@ -134,7 +134,7 @@ void Core::StaticEffect::LatLongMapToCubeMapEffect::Internal::initialize(Resourc
 	LOGSUCCESS(L"create", LogColor::brightMagenta, L"LatLongMapToCubeMapEffect", LogColor::defaultColor, L"succeeded");
 }
 
-void Core::StaticEffect::LatLongMapToCubeMapEffect::Internal::release()
+void Core::GlobalEffect::LatLongMapToCubeMapEffect::Internal::release()
 {
 	if (pvt.equirectangularVS)
 	{

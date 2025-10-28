@@ -6,9 +6,9 @@
 
 #include<Gear/Core/Graphics.h>
 
-#include<atomic>
-
 #include<Gear/Core/GlobalDescriptorHeap.h>
+
+#include<atomic>
 
 namespace
 {
@@ -26,7 +26,7 @@ namespace
 
 		uint64_t getUpdateSize() const;
 
-		ID3D12Resource* getResource() const;
+		UploadHeap* getUploadHeap() const;
 
 	private:
 
@@ -129,9 +129,9 @@ uint64_t DynamicCBufferRegion::getUpdateSize() const
 	return currentOffset.load(std::memory_order_relaxed);
 }
 
-ID3D12Resource* DynamicCBufferRegion::getResource() const
+UploadHeap* DynamicCBufferRegion::getUploadHeap() const
 {
-	return uploadHeap[Core::Graphics::getFrameIndex()]->getResource();
+	return uploadHeap[Core::Graphics::getFrameIndex()];
 }
 
 DynamicCBufferManagerPrivate::DynamicCBufferManagerPrivate()
@@ -229,6 +229,7 @@ Core::DynamicCBufferManager::AvailableLocation DynamicCBufferManagerPrivate::req
 
 void DynamicCBufferManagerPrivate::recordCommands(CommandList* const commandList)
 {
+	//把大常量缓冲转变到STATE_COPY_DEST状态，用于内容更新
 	commandList->pushResourceTrackList(buffer);
 
 	buffer->setState(D3D12_RESOURCE_STATE_COPY_DEST);
@@ -239,14 +240,15 @@ void DynamicCBufferManagerPrivate::recordCommands(CommandList* const commandList
 	{
 		if (bufferRegions[regionIndex]->getUpdateSize())
 		{
-			commandList->get()->CopyBufferRegion(buffer->getResource(), dstOffset[regionIndex],
-				bufferRegions[regionIndex]->getResource(), 0,
+			commandList->copyBufferRegion(buffer, dstOffset[regionIndex],
+				bufferRegions[regionIndex]->getUploadHeap(), 0,
 				bufferRegions[regionIndex]->getUpdateSize());
 
 			bufferRegions[regionIndex]->reset();
 		}
 	}
 
+	//把大常量缓冲转变到STATE_VERTEX_AND_CONSTANT_BUFFER状态，用于后续使用
 	commandList->pushResourceTrackList(buffer);
 
 	buffer->setState(D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);

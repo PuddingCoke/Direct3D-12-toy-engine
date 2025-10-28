@@ -2,9 +2,9 @@
 
 #include<Gear/Core/Graphics.h>
 
-#include<Gear/Core/StaticEffect/HDRClampEffect.h>
+#include<Gear/Core/GlobalEffect/HDRClampEffect.h>
 
-#include<Gear/Core/StaticEffect/LatLongMapToCubeMapEffect.h>
+#include<Gear/Core/GlobalEffect/LatLongMapToCubeMapEffect.h>
 
 #include<Gear/Utils/Math.h>
 
@@ -678,7 +678,7 @@ TextureRenderView* ResourceManager::createTextureCube(const std::wstring& filePa
 
 	deferredRelease(equirectangularMap);
 
-	Core::StaticEffect::HDRClampEffect::process(context, equirectangularMap);
+	Core::GlobalEffect::HDRClampEffect::process(context, equirectangularMap);
 
 	DXGI_FORMAT resFormat = DXGI_FORMAT_UNKNOWN;
 
@@ -703,7 +703,7 @@ TextureRenderView* ResourceManager::createTextureCube(const std::wstring& filePa
 
 	deferredRelease(cubeMap);
 
-	Core::StaticEffect::LatLongMapToCubeMapEffect::process(context, equirectangularMap, cubeMap);
+	Core::GlobalEffect::LatLongMapToCubeMapEffect::process(context, equirectangularMap, cubeMap);
 
 	bool stateTracking = true;
 

@@ -20,10 +20,12 @@ bool EngineResource::getPersistent() const
 
 DescriptorHandle EngineResource::getTransientDescriptorHandle() const
 {
+#ifdef _DEBUG
 	if (persistent)
 	{
 		LOGERROR(L"call getTransientDescriptorHandle for persistent resources is not allowed");
 	}
+#endif // _DEBUG
 
 	DescriptorHandle shaderVisibleHandle = Core::GlobalDescriptorHeap::getResourceHeap()->allocDynamicDescriptor(numSRVUAVCBVDescriptors);
 

@@ -1,6 +1,6 @@
-﻿#include<Gear/Core/StaticEffect/BackBufferBlitEffect.h>
+﻿#include<Gear/Core/GlobalEffect/BackBufferBlitEffect.h>
 
-#include<Gear/Core/StaticEffect/Internal/BackBufferBlitEffectInternal.h>
+#include<Gear/Core/GlobalEffect/Internal/BackBufferBlitEffectInternal.h>
 
 #include<Gear/Core/Graphics.h>
 
@@ -12,7 +12,7 @@ namespace
 	}pvt;
 }
 
-void Core::StaticEffect::BackBufferBlitEffect::process(GraphicsContext* const context, TextureRenderView* const inputTexture)
+void Core::GlobalEffect::BackBufferBlitEffect::process(GraphicsContext* const context, TextureRenderView* const inputTexture)
 {
 	context->setPipelineState(pvt.backBufferBlitState.Get());
 
@@ -29,7 +29,7 @@ void Core::StaticEffect::BackBufferBlitEffect::process(GraphicsContext* const co
 	context->draw(3, 1, 0, 0);
 }
 
-void Core::StaticEffect::BackBufferBlitEffect::Internal::initialize()
+void Core::GlobalEffect::BackBufferBlitEffect::Internal::initialize()
 {
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = Core::PipelineStateHelper::getDefaultFullScreenState();
 	desc.PS = Core::GlobalShader::getFullScreenPS()->getByteCode();
@@ -41,7 +41,7 @@ void Core::StaticEffect::BackBufferBlitEffect::Internal::initialize()
 	LOGSUCCESS(L"create", LogColor::brightMagenta, L"BackBufferBlitEffect", LogColor::defaultColor, L"succeeded");
 }
 
-void Core::StaticEffect::BackBufferBlitEffect::Internal::release()
+void Core::GlobalEffect::BackBufferBlitEffect::Internal::release()
 {
 	pvt.backBufferBlitState = nullptr;
 }

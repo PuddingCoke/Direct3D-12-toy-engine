@@ -1,6 +1,6 @@
 ﻿#include<Gear/Core/RenderTask.h>
 
-#include<Gear/Core/StaticEffect/BackBufferBlitEffect.h>
+#include<Gear/Core/GlobalEffect/BackBufferBlitEffect.h>
 
 RenderTask::RenderTask() :
 	resManager(new ResourceManager()),
@@ -59,7 +59,7 @@ void RenderTask::imGUICall()
 
 void RenderTask::blit(TextureRenderView* const texture) const
 {
-	Core::StaticEffect::BackBufferBlitEffect::process(context, texture);
+	Core::GlobalEffect::BackBufferBlitEffect::process(context, texture);
 }
 
 void RenderTask::workerLoop()

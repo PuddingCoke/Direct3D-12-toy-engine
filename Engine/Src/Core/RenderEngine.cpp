@@ -24,11 +24,11 @@
 
 #include<Gear/Core/Internal/DynamicCBufferManagerInternal.h>
 
-#include<Gear/Core/StaticEffect/Internal/BackBufferBlitEffectInternal.h>
+#include<Gear/Core/GlobalEffect/Internal/BackBufferBlitEffectInternal.h>
 
-#include<Gear/Core/StaticEffect/Internal/HDRClampEffectInternal.h>
+#include<Gear/Core/GlobalEffect/Internal/HDRClampEffectInternal.h>
 
-#include<Gear/Core/StaticEffect/Internal/LatLongMapToCubeMapEffectInternal.h>
+#include<Gear/Core/GlobalEffect/Internal/LatLongMapToCubeMapEffectInternal.h>
 
 namespace
 {
@@ -456,7 +456,7 @@ void RenderEnginePrivate::end()
 		ImGui::End();
 	}
 
-	//把后备缓冲转变到STATE_RENDER_TARGET，并更新动态常量缓冲
+	//把后备缓冲转变到STATE_RENDER_TARGET，并更新所有动态常量缓冲
 	{
 		{
 			prepareCommandList->pushResourceTrackList(getRenderTexture());
@@ -708,20 +708,20 @@ void RenderEnginePrivate::createStaticResources()
 
 	context->begin();
 
-	Core::StaticEffect::BackBufferBlitEffect::Internal::initialize();
+	Core::GlobalEffect::BackBufferBlitEffect::Internal::initialize();
 
-	Core::StaticEffect::HDRClampEffect::Internal::initialize();
+	Core::GlobalEffect::HDRClampEffect::Internal::initialize();
 
-	Core::StaticEffect::LatLongMapToCubeMapEffect::Internal::initialize(resManager);
+	Core::GlobalEffect::LatLongMapToCubeMapEffect::Internal::initialize(resManager);
 }
 
 void RenderEnginePrivate::releaseStaticResources()
 {
-	Core::StaticEffect::BackBufferBlitEffect::Internal::release();
+	Core::GlobalEffect::BackBufferBlitEffect::Internal::release();
 
-	Core::StaticEffect::HDRClampEffect::Internal::release();
+	Core::GlobalEffect::HDRClampEffect::Internal::release();
 
-	Core::StaticEffect::LatLongMapToCubeMapEffect::Internal::release();
+	Core::GlobalEffect::LatLongMapToCubeMapEffect::Internal::release();
 }
 
 void Core::RenderEngine::submitCommandList(CommandList* const commandList)
