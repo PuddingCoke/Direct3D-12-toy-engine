@@ -5,13 +5,13 @@
 
 #include"D3D12Resource/Texture.h"
 
-#include"EngineResource.h"
+#include"ResourceBase.h"
 
 namespace Core
 {
 	namespace Resource
 	{
-		class TextureDepthView :public EngineResource
+		class TextureDepthView :public ResourceBase
 		{
 		public:
 

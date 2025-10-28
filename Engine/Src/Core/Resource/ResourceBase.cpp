@@ -1,24 +1,24 @@
-﻿#include<Gear/Core/Resource/EngineResource.h>
+﻿#include<Gear/Core/Resource/ResourceBase.h>
 
-Core::Resource::EngineResource::EngineResource(const bool persistent) :
+Core::Resource::ResourceBase::ResourceBase(const bool persistent) :
 	persistent(persistent), numSRVUAVCBVDescriptors(0), srvUAVCBVHandleStart()
 {
 }
 
-Core::Resource::EngineResource::~EngineResource()
+Core::Resource::ResourceBase::~ResourceBase()
 {
 }
 
-void Core::Resource::EngineResource::copyDescriptors()
+void Core::Resource::ResourceBase::copyDescriptors()
 {
 }
 
-bool Core::Resource::EngineResource::getPersistent() const
+bool Core::Resource::ResourceBase::getPersistent() const
 {
 	return persistent;
 }
 
-Core::D3D12Core::DescriptorHandle Core::Resource::EngineResource::getTransientDescriptorHandle() const
+Core::D3D12Core::DescriptorHandle Core::Resource::ResourceBase::getTransientDescriptorHandle() const
 {
 #ifdef _DEBUG
 	if (persistent)

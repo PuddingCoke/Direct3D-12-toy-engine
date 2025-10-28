@@ -5,7 +5,7 @@
 
 #include"D3D12Resource/Texture.h"
 
-#include"EngineResource.h"
+#include"ResourceBase.h"
 
 namespace Core
 {
@@ -17,7 +17,7 @@ namespace Core
 //texture2darray
 //texture2d
 //SRV/RTV/UAV
-		class TextureRenderView :public EngineResource
+		class TextureRenderView :public ResourceBase
 		{
 		public:
 

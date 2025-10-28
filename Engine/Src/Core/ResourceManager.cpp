@@ -22,8 +22,8 @@
 
 Core::ResourceManager::ResourceManager() :
 	context(new GraphicsContext()), commandList(context->getCommandList()),
-	resources(new std::vector<Resource::D3D12Resource::D3D12ResourceBase*>[Core::Graphics::getFrameBufferCount()]),
-	engineResources(new std::vector<Resource::EngineResource*>[Core::Graphics::getFrameBufferCount()])
+	d3d12Resources(new std::vector<Resource::D3D12Resource::D3D12ResourceBase*>[Core::Graphics::getFrameBufferCount()]),
+	resources(new std::vector<Resource::ResourceBase*>[Core::Graphics::getFrameBufferCount()])
 {
 }
 
@@ -31,53 +31,53 @@ Core::ResourceManager::~ResourceManager()
 {
 	for (uint32_t i = 0; i < Core::Graphics::getFrameBufferCount(); i++)
 	{
-		for (const Resource::D3D12Resource::D3D12ResourceBase* const resource : resources[i])
+		for (const Resource::D3D12Resource::D3D12ResourceBase* const d3d12Resource : d3d12Resources[i])
+		{
+			delete d3d12Resource;
+		}
+
+		d3d12Resources[i].clear();
+
+		for (const Resource::ResourceBase* const resource : resources[i])
 		{
 			delete resource;
 		}
 
 		resources[i].clear();
-
-		for (const Resource::EngineResource* const engineResource : engineResources[i])
-		{
-			delete engineResource;
-		}
-
-		engineResources[i].clear();
 	}
 
-	delete[] resources;
+	delete[] d3d12Resources;
 
-	delete[] engineResources;
+	delete[] resources;
 
 	delete context;
 }
 
-void Core::ResourceManager::deferredRelease(Resource::D3D12Resource::D3D12ResourceBase* const resource)
+void Core::ResourceManager::deferredRelease(Resource::D3D12Resource::D3D12ResourceBase* const d3d12Resource)
+{
+	d3d12Resources[Core::Graphics::getFrameIndex()].push_back(d3d12Resource);
+}
+
+void Core::ResourceManager::deferredRelease(Resource::ResourceBase* const resource)
 {
 	resources[Core::Graphics::getFrameIndex()].push_back(resource);
 }
 
-void Core::ResourceManager::deferredRelease(Resource::EngineResource* const engineResource)
-{
-	engineResources[Core::Graphics::getFrameIndex()].push_back(engineResource);
-}
-
 void Core::ResourceManager::cleanTransientResources()
 {
-	for (const Resource::D3D12Resource::D3D12ResourceBase* const resource : resources[Core::Graphics::getFrameIndex()])
+	for (const Resource::D3D12Resource::D3D12ResourceBase* const d3d12Resource : d3d12Resources[Core::Graphics::getFrameIndex()])
+	{
+		delete d3d12Resource;
+	}
+
+	d3d12Resources[Core::Graphics::getFrameIndex()].clear();
+
+	for (const Resource::ResourceBase* const resource : resources[Core::Graphics::getFrameIndex()])
 	{
 		delete resource;
 	}
 
 	resources[Core::Graphics::getFrameIndex()].clear();
-
-	for (const Resource::EngineResource* const engineResource : engineResources[Core::Graphics::getFrameIndex()])
-	{
-		delete engineResource;
-	}
-
-	engineResources[Core::Graphics::getFrameIndex()].clear();
 }
 
 Core::GraphicsContext* Core::ResourceManager::getGraphicsContext() const

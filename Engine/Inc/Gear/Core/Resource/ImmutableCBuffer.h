@@ -5,13 +5,13 @@
 
 #include"D3D12Resource/Buffer.h"
 
-#include"EngineResource.h"
+#include"ResourceBase.h"
 
 namespace Core
 {
 	namespace Resource
 	{
-		class ImmutableCBuffer :public EngineResource
+		class ImmutableCBuffer :public ResourceBase
 		{
 		public:
 

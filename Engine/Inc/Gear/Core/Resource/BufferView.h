@@ -12,7 +12,7 @@ namespace Core
 	namespace Resource
 	{
 		//versatile buffer
-		class BufferView :public EngineResource
+		class BufferView :public ResourceBase
 		{
 		public:
 

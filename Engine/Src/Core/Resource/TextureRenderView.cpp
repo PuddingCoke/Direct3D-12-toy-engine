@@ -1,7 +1,7 @@
 ﻿#include<Gear/Core/Resource/TextureRenderView.h>
 
 Core::Resource::TextureRenderView::TextureRenderView(D3D12Resource::Texture* const texture, const bool isTextureCube, const bool persistent, const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat) :
-	EngineResource(persistent), texture(texture), hasRTV((rtvFormat != DXGI_FORMAT_UNKNOWN)), hasUAV((uavFormat != DXGI_FORMAT_UNKNOWN)), rtvMipHandleStart(), viewGPUHandleStart(), viewCPUHandleStart()
+	ResourceBase(persistent), texture(texture), hasRTV((rtvFormat != DXGI_FORMAT_UNKNOWN)), hasUAV((uavFormat != DXGI_FORMAT_UNKNOWN)), rtvMipHandleStart(), viewGPUHandleStart(), viewCPUHandleStart()
 {
 	//create srv uav descriptors
 	{
@@ -302,7 +302,7 @@ Core::Resource::TextureRenderView::TextureRenderView(D3D12Resource::Texture* con
 }
 
 Core::Resource::TextureRenderView::TextureRenderView(const TextureRenderView& trv) :
-	EngineResource(trv.persistent),
+	ResourceBase(trv.persistent),
 	hasRTV(trv.hasRTV),
 	hasUAV(trv.hasUAV),
 	allSRVIndex(trv.allSRVIndex),

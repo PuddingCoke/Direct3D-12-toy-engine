@@ -1,7 +1,7 @@
 ﻿#pragma once
 
-#ifndef _CORE_RESOURCE_ENGINERESOURCE_H_
-#define _CORE_RESOURCE_ENGINERESOURCE_H_
+#ifndef _CORE_RESOURCE_RESOURCEBASE_H_
+#define _CORE_RESOURCE_RESOURCEBASE_H_
 
 #include<Gear/Core/GlobalDescriptorHeap.h>
 
@@ -11,15 +11,15 @@ namespace Core
 {
 	namespace Resource
 	{
-		class EngineResource
+		class ResourceBase
 		{
 		public:
 
-			EngineResource() = delete;
+			ResourceBase() = delete;
 
-			EngineResource(const bool persistent);
+			ResourceBase(const bool persistent);
 
-			virtual ~EngineResource();
+			virtual ~ResourceBase();
 
 			virtual void copyDescriptors();
 
@@ -40,4 +40,4 @@ namespace Core
 	}
 }
 
-#endif // !_CORE_RESOURCE_ENGINERESOURCE_H_
+#endif // !_CORE_RESOURCE_RESOURCEBASE_H_

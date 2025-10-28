@@ -1,7 +1,7 @@
 ﻿#include<Gear/Core/Resource/ImmutableCBuffer.h>
 
 Core::Resource::ImmutableCBuffer::ImmutableCBuffer(D3D12Resource::Buffer* const buffer, const uint32_t size, const bool persistent) :
-	EngineResource(persistent), gpuAddress(), bufferIndex(), buffer(buffer)
+	ResourceBase(persistent), gpuAddress(), bufferIndex(), buffer(buffer)
 {
 	if (size % 256 != 0)
 	{

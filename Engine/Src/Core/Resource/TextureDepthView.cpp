@@ -1,7 +1,7 @@
 ﻿#include<Gear/Core/Resource/TextureDepthView.h>
 
 Core::Resource::TextureDepthView::TextureDepthView(D3D12Resource::Texture* const texture, const bool isTextureCube, const bool persistent) :
-	EngineResource(persistent), texture(texture), dsvMipHandleStart(), allDepthIndex(0), allStencilIndex(0), depthMipIndexStart(0), stencilMipIndexStart(0)
+	ResourceBase(persistent), texture(texture), dsvMipHandleStart(), allDepthIndex(0), allStencilIndex(0), depthMipIndexStart(0), stencilMipIndexStart(0)
 {
 	const uint32_t mipLevels = texture->getMipLevels();
 	const uint32_t arraySize = texture->getArraySize();
@@ -416,7 +416,7 @@ Core::Resource::TextureDepthView::TextureDepthView(D3D12Resource::Texture* const
 }
 
 Core::Resource::TextureDepthView::TextureDepthView(const TextureDepthView& tdv) :
-	EngineResource(tdv.persistent),
+	ResourceBase(tdv.persistent),
 	allDepthIndex(tdv.allDepthIndex),
 	allStencilIndex(tdv.allStencilIndex),
 	depthMipIndexStart(tdv.depthMipIndexStart),

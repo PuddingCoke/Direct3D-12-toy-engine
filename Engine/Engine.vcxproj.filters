@@ -180,7 +180,7 @@
     <ClInclude Include="Inc\Gear\Core\Resource\ImmutableCBuffer.h">
       <Filter>Header\Core\Resource</Filter>
     </ClInclude>
-    <ClInclude Include="Inc\Gear\Core\Resource\EngineResource.h">
+    <ClInclude Include="Inc\Gear\Core\Resource\ResourceBase.h">
       <Filter>Header\Core\Resource</Filter>
     </ClInclude>
     <ClInclude Include="Inc\Gear\Core\Resource\SwapTexture.h">
@@ -518,7 +518,7 @@
     <ClCompile Include="Src\Core\Resource\CounterBufferView.cpp">
       <Filter>Source\Core\Resource</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Core\Resource\EngineResource.cpp">
+    <ClCompile Include="Src\Core\Resource\ResourceBase.cpp">
       <Filter>Source\Core\Resource</Filter>
     </ClCompile>
     <ClCompile Include="Src\Core\Resource\SwapTexture.cpp">

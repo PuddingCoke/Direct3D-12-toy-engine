@@ -1,7 +1,7 @@
 ﻿#include<Gear/Core/Resource/CounterBufferView.h>
 
 Core::Resource::CounterBufferView::CounterBufferView(const bool persistent) :
-	EngineResource(persistent), buffer(new D3D12Resource::Buffer(4, true, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS)), srvIndex(0), uavIndex(0), viewGPUHandle(), viewCPUHandle()
+	ResourceBase(persistent), buffer(new D3D12Resource::Buffer(4, true, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS)), srvIndex(0), uavIndex(0), viewGPUHandle(), viewCPUHandle()
 {
 	numSRVUAVCBVDescriptors = 2;
 

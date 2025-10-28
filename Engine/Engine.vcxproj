@@ -193,7 +193,7 @@
     <ClInclude Include="Inc\Gear\Core\RenderEngine.h" />
     <ClInclude Include="Inc\Gear\Core\ResourceManager.h" />
     <ClInclude Include="Inc\Gear\Core\Resource\ImmutableCBuffer.h" />
-    <ClInclude Include="Inc\Gear\Core\Resource\EngineResource.h" />
+    <ClInclude Include="Inc\Gear\Core\Resource\ResourceBase.h" />
     <ClInclude Include="Inc\Gear\Core\Resource\TextureDepthView.h" />
     <ClInclude Include="Inc\Gear\Core\Resource\TextureRenderView.h" />
     <ClInclude Include="Inc\Gear\Core\D3D12Core\RootSignature.h" />
@@ -261,7 +261,7 @@
     <ClCompile Include="Src\Core\Resource\BufferView.cpp" />
     <ClCompile Include="Src\Core\Resource\ImmutableCBuffer.cpp" />
     <ClCompile Include="Src\Core\Resource\CounterBufferView.cpp" />
-    <ClCompile Include="Src\Core\Resource\EngineResource.cpp" />
+    <ClCompile Include="Src\Core\Resource\ResourceBase.cpp" />
     <ClCompile Include="Src\Core\Resource\SwapTexture.cpp" />
     <ClCompile Include="Src\Core\Resource\TextureDepthView.cpp" />
     <ClCompile Include="Src\Core\Resource\TextureRenderView.cpp" />
