@@ -1,40 +1,43 @@
 ﻿#pragma once
 
-#ifndef _GAME_H_
-#define _GAME_H_
+#ifndef _GEAR_GAME_H_
+#define _GEAR_GAME_H_
 
 #include<Gear/Core/RenderTask.h>
 
 #include<queue>
 
-class Game
+namespace Gear
 {
-public:
+	class Game
+	{
+	public:
 
-	Game();
+		Game();
 
-	virtual ~Game();
+		virtual ~Game();
 
-	virtual void imGUICall();
+		virtual void imGUICall();
 
-	Game(const Game&) = delete;
+		Game(const Game&) = delete;
 
-	void operator=(const Game&) = delete;
+		void operator=(const Game&) = delete;
 
-	virtual void update(const float dt) = 0;
+		virtual void update(const float dt) = 0;
 
-	virtual void render() = 0;
+		virtual void render() = 0;
 
-	void beginRenderTask(RenderTask* const renderTask);
+		void beginRenderTask(Core::RenderTask* const renderTask);
 
-	void pushCreateFuture(std::future<void>&& createFuture);
+		void pushCreateFuture(std::future<void>&& createFuture);
 
-	void scheduleAllTasks();
+		void scheduleAllTasks();
 
-	std::queue<RenderTask*> recordQueue;
+		std::queue<Core::RenderTask*> recordQueue;
 
-	std::queue<std::future<void>> createQueue;
+		std::queue<std::future<void>> createQueue;
 
-};
+	};
+}
 
-#endif // !_GAME_H_
+#endif // !_GEAR_GAME_H_

@@ -2,6 +2,8 @@
 
 #include<Gear/Core/GlobalRootSignature.h>
 
+#include<Gear/Core/GlobalShader.h>
+
 D3D12_GRAPHICS_PIPELINE_STATE_DESC Core::PipelineStateHelper::getDefaultGraphicsDesc()
 {
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = {};
@@ -29,7 +31,7 @@ D3D12_GRAPHICS_PIPELINE_STATE_DESC Core::PipelineStateHelper::getDefaultFullScre
 	return desc;
 }
 
-void Core::PipelineStateHelper::createComputeState(ID3D12PipelineState** const pipelineState, const Shader* const shader)
+void Core::PipelineStateHelper::createComputeState(ID3D12PipelineState** const pipelineState, const D3D12Core::Shader* const shader)
 {
 	D3D12_COMPUTE_PIPELINE_STATE_DESC desc = {};
 	desc.pRootSignature = Core::GlobalRootSignature::getComputeRootSignature()->get();

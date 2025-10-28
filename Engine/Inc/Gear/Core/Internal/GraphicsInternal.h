@@ -24,7 +24,7 @@ namespace Core
 
 			void setBackBufferHandle(const D3D12_CPU_DESCRIPTOR_HANDLE backBufferHandle);
 
-			void setReservedGlobalCBuffer(ImmutableCBuffer* const reservedGlobalCBuffer);
+			void setReservedGlobalCBuffer(Resource::ImmutableCBuffer* const reservedGlobalCBuffer);
 
 		}
 	}

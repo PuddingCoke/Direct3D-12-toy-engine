@@ -15,38 +15,38 @@ namespace
 
 		uint32_t samplerIncrementSize = 0;
 
-		DescriptorHeap* resourceHeap = nullptr;
+		Core::D3D12Core::DescriptorHeap* resourceHeap = nullptr;
 
-		DescriptorHeap* samplerHeap = nullptr;
+		Core::D3D12Core::DescriptorHeap* samplerHeap = nullptr;
 
-		DescriptorHeap* renderTargetHeap = nullptr;
+		Core::D3D12Core::DescriptorHeap* renderTargetHeap = nullptr;
 
-		DescriptorHeap* depthStencilHeap = nullptr;
+		Core::D3D12Core::DescriptorHeap* depthStencilHeap = nullptr;
 
-		DescriptorHeap* nonShaderVisibleResourceHeap = nullptr;
+		Core::D3D12Core::DescriptorHeap* nonShaderVisibleResourceHeap = nullptr;
 
 	}pvt;
 }
 
 void Core::GlobalDescriptorHeap::Internal::initialize()
 {
-	pvt.resourceIncrementSize = Core::GraphicsDevice::get()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	pvt.resourceIncrementSize = GraphicsDevice::get()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
-	pvt.renderTargetIncrementSize = Core::GraphicsDevice::get()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+	pvt.renderTargetIncrementSize = GraphicsDevice::get()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 
-	pvt.depthStencilIncrementSize = Core::GraphicsDevice::get()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
+	pvt.depthStencilIncrementSize = GraphicsDevice::get()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 
-	pvt.samplerIncrementSize = Core::GraphicsDevice::get()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER);
+	pvt.samplerIncrementSize = GraphicsDevice::get()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER);
 
-	pvt.resourceHeap = new DescriptorHeap(1000000, 100000, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE);
+	pvt.resourceHeap = new D3D12Core::DescriptorHeap(1000000, 100000, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE);
 
-	pvt.samplerHeap = new DescriptorHeap(2048, 0, D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER, D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE);
+	pvt.samplerHeap = new D3D12Core::DescriptorHeap(2048, 0, D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER, D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE);
 
-	pvt.renderTargetHeap = new DescriptorHeap(300000, 30000, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, D3D12_DESCRIPTOR_HEAP_FLAG_NONE);
+	pvt.renderTargetHeap = new D3D12Core::DescriptorHeap(300000, 30000, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, D3D12_DESCRIPTOR_HEAP_FLAG_NONE);
 
-	pvt.depthStencilHeap = new DescriptorHeap(300000, 30000, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, D3D12_DESCRIPTOR_HEAP_FLAG_NONE);
+	pvt.depthStencilHeap = new D3D12Core::DescriptorHeap(300000, 30000, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, D3D12_DESCRIPTOR_HEAP_FLAG_NONE);
 
-	pvt.nonShaderVisibleResourceHeap = new DescriptorHeap(1000000, 900000, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, D3D12_DESCRIPTOR_HEAP_FLAG_NONE);
+	pvt.nonShaderVisibleResourceHeap = new D3D12Core::DescriptorHeap(1000000, 900000, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, D3D12_DESCRIPTOR_HEAP_FLAG_NONE);
 
 	LOGSUCCESS(L"create", LogColor::brightMagenta, L"global descriptor heaps", LogColor::defaultColor, L"succeeded");
 }
@@ -79,27 +79,27 @@ void Core::GlobalDescriptorHeap::Internal::release()
 	}
 }
 
-DescriptorHeap* Core::GlobalDescriptorHeap::getResourceHeap()
+Core::D3D12Core::DescriptorHeap* Core::GlobalDescriptorHeap::getResourceHeap()
 {
 	return pvt.resourceHeap;
 }
 
-DescriptorHeap* Core::GlobalDescriptorHeap::getSamplerHeap()
+Core::D3D12Core::DescriptorHeap* Core::GlobalDescriptorHeap::getSamplerHeap()
 {
 	return pvt.samplerHeap;
 }
 
-DescriptorHeap* Core::GlobalDescriptorHeap::getRenderTargetHeap()
+Core::D3D12Core::DescriptorHeap* Core::GlobalDescriptorHeap::getRenderTargetHeap()
 {
 	return pvt.renderTargetHeap;
 }
 
-DescriptorHeap* Core::GlobalDescriptorHeap::getDepthStencilHeap()
+Core::D3D12Core::DescriptorHeap* Core::GlobalDescriptorHeap::getDepthStencilHeap()
 {
 	return pvt.depthStencilHeap;
 }
 
-DescriptorHeap* Core::GlobalDescriptorHeap::getNonShaderVisibleResourceHeap()
+Core::D3D12Core::DescriptorHeap* Core::GlobalDescriptorHeap::getNonShaderVisibleResourceHeap()
 {
 	return pvt.nonShaderVisibleResourceHeap;
 }

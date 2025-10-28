@@ -10,9 +10,15 @@
 
 #include<Gear/Core/Graphics.h>
 
-#include<Gear/Core/VideoEncoder/NvidiaEncoder.h>
+#include<Gear/Input/Keyboard.h>
+
+#include<Gear/Utils/Math.h>
+
+#include<Gear/Utils/File.h>
 
 #include<Gear/Utils/Logger.h>
+
+#include<Gear/Core/VideoEncoder/NvidiaEncoder.h>
 
 #include<Gear/Utils/Internal/LoggerInternal.h>
 
@@ -38,9 +44,9 @@ namespace
 
 		~GearPrivate();
 
-		int32_t iniEngine(const InitializationParam& param, const int32_t argc, const wchar_t* argv[]);
+		int32_t iniEngine(const Gear::InitializationParam& param, const int32_t argc, const wchar_t* argv[]);
 
-		void iniGame(Game* const gamePtr);
+		void iniGame(Gear::Game* const gamePtr);
 
 	private:
 
@@ -52,18 +58,18 @@ namespace
 
 		void reportLiveObjects() const;
 
-		Game* game;
+		Gear::Game* game;
 
 		//screenshot
-		ReadbackHeap* backBufferHeap;
+		Core::Resource::D3D12Resource::ReadbackHeap* backBufferHeap;
 
-		InitializationParam::EngineUsage usage;
+		Gear::InitializationParam::EngineUsage usage;
 
 		union
 		{
-			InitializationParam::RealTimeRenderParam realTimeRender;
+			Gear::InitializationParam::RealTimeRenderParam realTimeRender;
 
-			InitializationParam::VideoRenderParam videoRender;
+			Gear::InitializationParam::VideoRenderParam videoRender;
 		};
 
 		static constexpr Input::Keyboard::Key screenGrabKey = Input::Keyboard::F11;
@@ -108,7 +114,7 @@ GearPrivate::~GearPrivate()
 #endif // _DEBUG
 }
 
-int32_t GearPrivate::iniEngine(const InitializationParam& param, const int32_t argc, const wchar_t* argv[])
+int32_t GearPrivate::iniEngine(const Gear::InitializationParam& param, const int32_t argc, const wchar_t* argv[])
 {
 	Utils::Logger::Internal::initialize();
 
@@ -124,7 +130,7 @@ int32_t GearPrivate::iniEngine(const InitializationParam& param, const int32_t a
 
 	switch (usage)
 	{
-	case InitializationParam::EngineUsage::REALTIMERENDER:
+	case Gear::InitializationParam::EngineUsage::REALTIMERENDER:
 
 		realTimeRender = param.realTimeRender;
 
@@ -133,13 +139,13 @@ int32_t GearPrivate::iniEngine(const InitializationParam& param, const int32_t a
 
 		Core::RenderEngine::Internal::initialize(realTimeRender.width, realTimeRender.height, Window::Win32Form::getHandle(), true, realTimeRender.enableImGuiSurface);
 
-		backBufferHeap = new ReadbackHeap(Core::FMT::getByteSize(Core::Graphics::backBufferFormat) * realTimeRender.width * realTimeRender.height);
+		backBufferHeap = new Core::Resource::D3D12Resource::ReadbackHeap(Core::FMT::getByteSize(Core::Graphics::backBufferFormat) * realTimeRender.width * realTimeRender.height);
 
 		LOGENGINE(L"engine usage real time render");
 
 		break;
 
-	case InitializationParam::EngineUsage::VIDEORENDER:
+	case Gear::InitializationParam::EngineUsage::VIDEORENDER:
 
 		videoRender = param.videoRender;
 
@@ -153,7 +159,7 @@ int32_t GearPrivate::iniEngine(const InitializationParam& param, const int32_t a
 
 		break;
 
-	case InitializationParam::EngineUsage::WALLPAPER:
+	case Gear::InitializationParam::EngineUsage::WALLPAPER:
 
 		Window::Win32Form::initialize(param.title, 0, 0, systemResolution.x, systemResolution.y, Window::Win32Form::wallpaperWindowStyle, Window::Win32Form::wallpaperCallBack);
 
@@ -182,7 +188,7 @@ int32_t GearPrivate::iniEngine(const InitializationParam& param, const int32_t a
 	return 0;
 }
 
-void GearPrivate::iniGame(Game* const gamePtr)
+void GearPrivate::iniGame(Gear::Game* const gamePtr)
 {
 	game = gamePtr;
 
@@ -190,15 +196,15 @@ void GearPrivate::iniGame(Game* const gamePtr)
 
 	switch (usage)
 	{
-	case InitializationParam::EngineUsage::REALTIMERENDER:
+	case Gear::InitializationParam::EngineUsage::REALTIMERENDER:
 		runRealTimeRender();
 		break;
 
-	case InitializationParam::EngineUsage::VIDEORENDER:
+	case Gear::InitializationParam::EngineUsage::VIDEORENDER:
 		runVideoRender();
 		break;
 
-	case InitializationParam::EngineUsage::WALLPAPER:
+	case Gear::InitializationParam::EngineUsage::WALLPAPER:
 		runWallpaper();
 		break;
 
@@ -287,14 +293,14 @@ void GearPrivate::runVideoRender()
 {
 	const Core::GPUVendor vendor = Core::RenderEngine::getVendor();
 
-	Encoder* encoder = nullptr;
+	Core::VideoEncoder::Encoder* encoder = nullptr;
 
-	const uint32_t frameToEncode = videoRender.second * Encoder::frameRate;
+	const uint32_t frameToEncode = videoRender.second * Core::VideoEncoder::Encoder::frameRate;
 
 	switch (vendor)
 	{
 	case Core::GPUVendor::NVIDIA:
-		encoder = new NvidiaEncoder(frameToEncode);
+		encoder = new Core::VideoEncoder::NvidiaEncoder(frameToEncode);
 		break;
 	case Core::GPUVendor::AMD:
 	case Core::GPUVendor::INTEL:
@@ -306,14 +312,14 @@ void GearPrivate::runVideoRender()
 
 	if (vendor == Core::GPUVendor::NVIDIA)
 	{
-		const uint32_t numTextures = NvidiaEncoder::lookaheadDepth + 1;
+		const uint32_t numTextures = Core::VideoEncoder::NvidiaEncoder::lookaheadDepth + 1;
 
-		Texture* renderTextures[numTextures] = {};
+		Core::Resource::D3D12Resource::Texture* renderTextures[numTextures] = {};
 
 		D3D12_CPU_DESCRIPTOR_HANDLE textureHandles[numTextures] = {};
 
 		{
-			DescriptorHandle descriptorHandle = Core::GlobalDescriptorHeap::getRenderTargetHeap()->allocStaticDescriptor(numTextures);
+			Core::D3D12Core::DescriptorHandle descriptorHandle = Core::GlobalDescriptorHeap::getRenderTargetHeap()->allocStaticDescriptor(numTextures);
 
 			D3D12_RENDER_TARGET_VIEW_DESC rtvDesc = {};
 			rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
@@ -325,7 +331,7 @@ void GearPrivate::runVideoRender()
 			{
 				const D3D12_CLEAR_VALUE clearValue = { Core::Graphics::backBufferFormat ,{0.f,0.f,0.f,1.f} };
 
-				renderTextures[i] = new Texture(Core::Graphics::getWidth(), Core::Graphics::getHeight(), Core::Graphics::backBufferFormat, 1, 1, true, D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET, &clearValue);
+				renderTextures[i] = new Core::Resource::D3D12Resource::Texture(Core::Graphics::getWidth(), Core::Graphics::getHeight(), Core::Graphics::backBufferFormat, 1, 1, true, D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET, &clearValue);
 
 				Core::GraphicsDevice::get()->CreateRenderTargetView(renderTextures[i]->getResource(), &rtvDesc, descriptorHandle.getCPUHandle());
 
@@ -337,7 +343,7 @@ void GearPrivate::runVideoRender()
 
 		uint32_t index = 0;
 
-		Core::RenderEngine::Internal::setDeltaTime(1.f / static_cast<float>(Encoder::frameRate));
+		Core::RenderEngine::Internal::setDeltaTime(1.f / static_cast<float>(Core::VideoEncoder::Encoder::frameRate));
 
 		while (true)
 		{

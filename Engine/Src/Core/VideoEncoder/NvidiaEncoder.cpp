@@ -15,9 +15,9 @@ __debugbreak();\
 }\
 }\
 
-NvidiaEncoder::NvidiaEncoder(const uint32_t frameToEncode) :
+Core::VideoEncoder::NvidiaEncoder::NvidiaEncoder(const uint32_t frameToEncode) :
 	Encoder(frameToEncode, outputVideoFormat), encoder(nullptr),
-	readbackHeap(new ReadbackHeap(2 * 4 * Core::Graphics::getWidth() * Core::Graphics::getHeight())),
+	readbackHeap(new Resource::D3D12Resource::ReadbackHeap(2 * 4 * Core::Graphics::getWidth() * Core::Graphics::getHeight())),
 	nvencAPI{ NV_ENCODE_API_FUNCTION_LIST_VER },
 	outputFenceValue(0)
 {
@@ -107,7 +107,7 @@ NvidiaEncoder::NvidiaEncoder(const uint32_t frameToEncode) :
 	mappedOutputResourcePtr = mapOutputResource.mappedResource;
 }
 
-NvidiaEncoder::~NvidiaEncoder()
+Core::VideoEncoder::NvidiaEncoder::~NvidiaEncoder()
 {
 	if (moduleNvEncAPI)
 	{
@@ -137,7 +137,7 @@ NvidiaEncoder::~NvidiaEncoder()
 	}
 }
 
-bool NvidiaEncoder::encode(Texture* const inputTexture)
+bool Core::VideoEncoder::NvidiaEncoder::encode(Resource::D3D12Resource::Texture* const inputTexture)
 {
 	bool encoding = true;
 

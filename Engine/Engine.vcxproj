@@ -125,8 +125,11 @@
     <ClInclude Include="Inc\D3D12Headers\dxgiformat.h" />
     <ClInclude Include="Inc\DirectXTex\DDSTextureLoader12.h" />
     <ClInclude Include="Inc\Gear\Camera\OrbitCamera.h" />
+    <ClInclude Include="Inc\Gear\Core\D3D12Core\DXCCompiler.h" />
+    <ClInclude Include="Inc\Gear\Core\D3D12Core\Internal\DXCCompilerInternal.h" />
     <ClInclude Include="Inc\Gear\Core\DynamicCBufferManager.h" />
     <ClInclude Include="Inc\Gear\Core\Effect\FXAAEffect.h" />
+    <ClInclude Include="Inc\Gear\Core\GlobalShader.h" />
     <ClInclude Include="Inc\Gear\Core\Internal\DynamicCBufferManagerInternal.h" />
     <ClInclude Include="Inc\Gear\Core\Internal\GlobalDescriptorHeapInternal.h" />
     <ClInclude Include="Inc\Gear\Core\Internal\GlobalRootSignatureInternal.h" />
@@ -136,6 +139,7 @@
     <ClInclude Include="Inc\Gear\Core\Internal\MainCameraInternal.h" />
     <ClInclude Include="Inc\Gear\Core\Internal\RenderEngineInternal.h" />
     <ClInclude Include="Inc\Gear\Core\RenderTask.h" />
+    <ClInclude Include="Inc\Gear\Core\Resource\D3D12Resource\D3D12ResourceDesc.h" />
     <ClInclude Include="Inc\Gear\Core\Resource\DynamicCBuffer.h" />
     <ClInclude Include="Inc\Gear\Core\Resource\StaticCBuffer.h" />
     <ClInclude Include="Inc\Gear\Core\GlobalEffect\BackBufferBlitEffect.h" />
@@ -145,6 +149,7 @@
     <ClInclude Include="Inc\Gear\Core\GlobalEffect\Internal\LatLongMapToCubeMapEffectInternal.h" />
     <ClInclude Include="Inc\Gear\Core\GlobalEffect\LatLongMapToCubeMapEffect.h" />
     <ClInclude Include="Inc\Gear\Core\GlobalEffect\GlobalEffectHeader.h" />
+    <ClInclude Include="Inc\Gear\DevEssential.h" />
     <ClInclude Include="Inc\Gear\Input\Internal\KeyboardInternal.h" />
     <ClInclude Include="Inc\Gear\Input\Internal\MouseInternal.h" />
     <ClInclude Include="Inc\Gear\Utils\DeltaTimeEstimator.h" />
@@ -169,16 +174,15 @@
     <ClInclude Include="Inc\Gear\Camera\FPSCamera.h" />
     <ClInclude Include="Inc\Gear\InitializationParam.h" />
     <ClInclude Include="Inc\Gear\Core\MainCamera.h" />
-    <ClInclude Include="Inc\Gear\Core\CommandList.h" />
-    <ClInclude Include="Inc\Gear\Core\CommandAllocator.h" />
-    <ClInclude Include="Inc\Gear\Core\DescriptorHeap.h" />
+    <ClInclude Include="Inc\Gear\Core\D3D12Core\CommandList.h" />
+    <ClInclude Include="Inc\Gear\Core\D3D12Core\DescriptorHeap.h" />
     <ClInclude Include="Inc\Gear\Core\Resource\D3D12Resource\ReadbackHeap.h" />
     <ClInclude Include="Inc\Gear\Core\Resource\D3D12Resource\Texture.h" />
     <ClInclude Include="Inc\Gear\Core\Resource\D3D12Resource\Buffer.h" />
-    <ClInclude Include="Inc\Gear\Core\Resource\D3D12Resource\Resource.h" />
+    <ClInclude Include="Inc\Gear\Core\Resource\D3D12Resource\D3D12ResourceBase.h" />
     <ClInclude Include="Inc\Gear\Core\Resource\D3D12Resource\UploadHeap.h" />
     <ClInclude Include="Inc\Gear\Core\Effect\BloomEffect.h" />
-    <ClInclude Include="Inc\Gear\Core\Effect\Effect.h" />
+    <ClInclude Include="Inc\Gear\Core\Effect\EffectBase.h" />
     <ClInclude Include="Inc\Gear\Core\Gear2D\PrimitiveBatch.h" />
     <ClInclude Include="Inc\Gear\Core\GlobalDescriptorHeap.h" />
     <ClInclude Include="Inc\Gear\Core\GlobalRootSignature.h" />
@@ -192,8 +196,8 @@
     <ClInclude Include="Inc\Gear\Core\Resource\EngineResource.h" />
     <ClInclude Include="Inc\Gear\Core\Resource\TextureDepthView.h" />
     <ClInclude Include="Inc\Gear\Core\Resource\TextureRenderView.h" />
-    <ClInclude Include="Inc\Gear\Core\RootSignature.h" />
-    <ClInclude Include="Inc\Gear\Core\Shader.h" />
+    <ClInclude Include="Inc\Gear\Core\D3D12Core\RootSignature.h" />
+    <ClInclude Include="Inc\Gear\Core\D3D12Core\Shader.h" />
     <ClInclude Include="Inc\Gear\Core\Resource\SwapTexture.h" />
     <ClInclude Include="Inc\Gear\Core\VideoEncoder\Encoder.h" />
     <ClInclude Include="Inc\Gear\Core\VideoEncoder\NvidiaEncoder.h" />
@@ -213,6 +217,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Inc\DirectXTex\DDSTextureLoader12.cpp" />
+    <ClCompile Include="Src\Core\D3D12Core\DXCCompiler.cpp" />
+    <ClCompile Include="Src\Core\GlobalShader.cpp" />
     <ClCompile Include="Src\Core\Resource\DynamicCBuffer.cpp" />
     <ClCompile Include="Src\Core\Resource\StatiCBuffer.cpp" />
     <ClCompile Include="Src\Core\GlobalEffect\BackBufferBlitEffect.cpp" />
@@ -233,10 +239,10 @@
     <ClCompile Include="Src\Core\RenderTask.cpp" />
     <ClCompile Include="Src\Core\GlobalEffect\HDRClampEffect.cpp" />
     <ClCompile Include="Src\Utils\DeltaTimeEstimator.cpp" />
-    <ClCompile Include="Src\Core\DescriptorHeap.cpp" />
+    <ClCompile Include="Src\Core\D3D12Core\DescriptorHeap.cpp" />
     <ClCompile Include="Src\Core\Resource\D3D12Resource\ReadbackHeap.cpp" />
     <ClCompile Include="Src\Core\Effect\BloomEffect.cpp" />
-    <ClCompile Include="Src\Core\Effect\Effect.cpp" />
+    <ClCompile Include="Src\Core\Effect\EffectBase.cpp" />
     <ClCompile Include="Src\Core\Gear2D\PrimitiveBatch.cpp" />
     <ClCompile Include="Src\Core\GlobalDescriptorHeap.cpp" />
     <ClCompile Include="Src\Core\GlobalRootSignature.cpp" />
@@ -246,10 +252,9 @@
     <ClCompile Include="Src\Core\Resource\D3D12Resource\Texture.cpp" />
     <ClCompile Include="Src\Core\Graphics.cpp" />
     <ClCompile Include="Src\Core\Resource\D3D12Resource\Buffer.cpp" />
-    <ClCompile Include="Src\Core\CommandAllocator.cpp" />
     <ClCompile Include="Src\InitializationParam.cpp" />
-    <ClCompile Include="Src\Core\CommandList.cpp" />
-    <ClCompile Include="Src\Core\Resource\D3D12Resource\Resource.cpp" />
+    <ClCompile Include="Src\Core\D3D12Core\CommandList.cpp" />
+    <ClCompile Include="Src\Core\Resource\D3D12Resource\D3D12ResourceBase.cpp" />
     <ClCompile Include="Src\Core\Resource\D3D12Resource\UploadHeap.cpp" />
     <ClCompile Include="Src\Core\GraphicsDevice.cpp" />
     <ClCompile Include="Src\Core\ResourceManager.cpp" />
@@ -260,8 +265,8 @@
     <ClCompile Include="Src\Core\Resource\SwapTexture.cpp" />
     <ClCompile Include="Src\Core\Resource\TextureDepthView.cpp" />
     <ClCompile Include="Src\Core\Resource\TextureRenderView.cpp" />
-    <ClCompile Include="Src\Core\RootSignature.cpp" />
-    <ClCompile Include="Src\Core\Shader.cpp" />
+    <ClCompile Include="Src\Core\D3D12Core\RootSignature.cpp" />
+    <ClCompile Include="Src\Core\D3D12Core\Shader.cpp" />
     <ClCompile Include="Src\Core\VideoEncoder\Encoder.cpp" />
     <ClCompile Include="Src\Core\VideoEncoder\NvidiaEncoder.cpp" />
     <ClCompile Include="Src\Game.cpp" />

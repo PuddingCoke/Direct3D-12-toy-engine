@@ -147,7 +147,7 @@
     <ClInclude Include="Inc\Gear\Core\Resource\D3D12Resource\ReadbackHeap.h">
       <Filter>Header\Core\DX</Filter>
     </ClInclude>
-    <ClInclude Include="Inc\Gear\Core\Resource\D3D12Resource\Resource.h">
+    <ClInclude Include="Inc\Gear\Core\Resource\D3D12Resource\D3D12ResourceBase.h">
       <Filter>Header\Core\DX</Filter>
     </ClInclude>
     <ClInclude Include="Inc\Gear\Core\Resource\D3D12Resource\Texture.h">
@@ -159,7 +159,7 @@
     <ClInclude Include="Inc\Gear\Core\Effect\BloomEffect.h">
       <Filter>Header\Core\Effect</Filter>
     </ClInclude>
-    <ClInclude Include="Inc\Gear\Core\Effect\Effect.h">
+    <ClInclude Include="Inc\Gear\Core\Effect\EffectBase.h">
       <Filter>Header\Core\Effect</Filter>
     </ClInclude>
     <ClInclude Include="Inc\Gear\Core\Effect\FXAAEffect.h">
@@ -228,10 +228,7 @@
     <ClInclude Include="Inc\Gear\Core\MainCamera.h">
       <Filter>Header\Core</Filter>
     </ClInclude>
-    <ClInclude Include="Inc\Gear\Core\CommandAllocator.h">
-      <Filter>Header\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Inc\Gear\Core\CommandList.h">
+    <ClInclude Include="Inc\Gear\Core\D3D12Core\CommandList.h">
       <Filter>Header\Core</Filter>
     </ClInclude>
     <ClInclude Include="Inc\Gear\Core\GlobalDescriptorHeap.h">
@@ -249,10 +246,10 @@
     <ClInclude Include="Inc\Gear\Core\GraphicsDevice.h">
       <Filter>Header\Core</Filter>
     </ClInclude>
-    <ClInclude Include="Inc\Gear\Core\Shader.h">
+    <ClInclude Include="Inc\Gear\Core\D3D12Core\Shader.h">
       <Filter>Header\Core</Filter>
     </ClInclude>
-    <ClInclude Include="Inc\Gear\Core\RootSignature.h">
+    <ClInclude Include="Inc\Gear\Core\D3D12Core\RootSignature.h">
       <Filter>Header\Core</Filter>
     </ClInclude>
     <ClInclude Include="Inc\Gear\Core\ResourceManager.h">
@@ -264,7 +261,7 @@
     <ClInclude Include="Inc\Gear\Core\PipelineStateHelper.h">
       <Filter>Header\Core</Filter>
     </ClInclude>
-    <ClInclude Include="Inc\Gear\Core\DescriptorHeap.h">
+    <ClInclude Include="Inc\Gear\Core\D3D12Core\DescriptorHeap.h">
       <Filter>Header\Core</Filter>
     </ClInclude>
     <ClInclude Include="Inc\DirectXTex\DDSTextureLoader12.h">
@@ -453,6 +450,21 @@
     <ClInclude Include="Inc\Gear\Core\Internal\RenderEngineInternal.h">
       <Filter>Header</Filter>
     </ClInclude>
+    <ClInclude Include="Inc\Gear\Core\GlobalShader.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Gear\Core\D3D12Core\DXCCompiler.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Gear\Core\D3D12Core\Internal\DXCCompilerInternal.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Gear\Core\Resource\D3D12Resource\D3D12ResourceDesc.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Gear\DevEssential.h">
+      <Filter>Header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\InitializationParam.cpp">
@@ -476,7 +488,7 @@
     <ClCompile Include="Src\Core\Resource\D3D12Resource\ReadbackHeap.cpp">
       <Filter>Source\Core\DX</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Core\Resource\D3D12Resource\Resource.cpp">
+    <ClCompile Include="Src\Core\Resource\D3D12Resource\D3D12ResourceBase.cpp">
       <Filter>Source\Core\DX</Filter>
     </ClCompile>
     <ClCompile Include="Src\Core\Resource\D3D12Resource\Texture.cpp">
@@ -488,7 +500,7 @@
     <ClCompile Include="Src\Core\Effect\BloomEffect.cpp">
       <Filter>Source\Core\Effect</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Core\Effect\Effect.cpp">
+    <ClCompile Include="Src\Core\Effect\EffectBase.cpp">
       <Filter>Source\Core\Effect</Filter>
     </ClCompile>
     <ClCompile Include="Src\Core\Effect\FXAAEffect.cpp">
@@ -557,13 +569,10 @@
     <ClCompile Include="Src\Core\MainCamera.cpp">
       <Filter>Source\Core</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Core\CommandAllocator.cpp">
+    <ClCompile Include="Src\Core\D3D12Core\CommandList.cpp">
       <Filter>Source\Core</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Core\CommandList.cpp">
-      <Filter>Source\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Core\DescriptorHeap.cpp">
+    <ClCompile Include="Src\Core\D3D12Core\DescriptorHeap.cpp">
       <Filter>Source\Core</Filter>
     </ClCompile>
     <ClCompile Include="Src\Core\GlobalDescriptorHeap.cpp">
@@ -590,10 +599,10 @@
     <ClCompile Include="Src\Core\ResourceManager.cpp">
       <Filter>Source\Core</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Core\RootSignature.cpp">
+    <ClCompile Include="Src\Core\D3D12Core\RootSignature.cpp">
       <Filter>Source\Core</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Core\Shader.cpp">
+    <ClCompile Include="Src\Core\D3D12Core\Shader.cpp">
       <Filter>Source\Core</Filter>
     </ClCompile>
     <ClCompile Include="Inc\DirectXTex\DDSTextureLoader12.cpp">
@@ -657,6 +666,12 @@
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="Src\Utils\Logger.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Core\GlobalShader.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Core\D3D12Core\DXCCompiler.cpp">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>

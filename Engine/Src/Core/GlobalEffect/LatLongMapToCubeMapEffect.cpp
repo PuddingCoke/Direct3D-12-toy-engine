@@ -13,9 +13,9 @@ namespace
 	struct LatLongMapToCubeMapEffectPrivate
 	{
 
-		Core::Shader* equirectangularVS;
+		Core::D3D12Core::Shader* equirectangularVS;
 
-		Core::Shader* equirectangularPS;
+		Core::D3D12Core::Shader* equirectangularPS;
 
 		ComPtr<ID3D12PipelineState> equirectangularR8State;
 
@@ -23,12 +23,12 @@ namespace
 
 		ComPtr<ID3D12PipelineState> equirectangularR32State;
 
-		ImmutableCBuffer* matricesBuffer;
+		Core::Resource::ImmutableCBuffer* matricesBuffer;
 
 	}pvt;
 }
 
-void Core::GlobalEffect::LatLongMapToCubeMapEffect::process(GraphicsContext* const context, TextureRenderView* const inputTexture, TextureRenderView* const outputTexture)
+void Core::GlobalEffect::LatLongMapToCubeMapEffect::process(GraphicsContext* const context, Resource::TextureRenderView* const inputTexture, Resource::TextureRenderView* const outputTexture)
 {
 	switch (outputTexture->getTexture()->getFormat())
 	{
@@ -60,9 +60,9 @@ void Core::GlobalEffect::LatLongMapToCubeMapEffect::process(GraphicsContext* con
 
 void Core::GlobalEffect::LatLongMapToCubeMapEffect::Internal::initialize(ResourceManager* const resManager)
 {
-	pvt.equirectangularVS = new Core::Shader(g_EquirectangularVSBytes, sizeof(g_EquirectangularVSBytes));
+	pvt.equirectangularVS = new D3D12Core::Shader(g_EquirectangularVSBytes, sizeof(g_EquirectangularVSBytes));
 
-	pvt.equirectangularPS = new Core::Shader(g_EquirectangularPSBytes, sizeof(g_EquirectangularPSBytes));
+	pvt.equirectangularPS = new D3D12Core::Shader(g_EquirectangularPSBytes, sizeof(g_EquirectangularPSBytes));
 
 	{
 		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = Core::PipelineStateHelper::getDefaultGraphicsDesc();

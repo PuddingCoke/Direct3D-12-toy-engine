@@ -3,7 +3,7 @@
 #ifndef _CORE_RENDERENGINE_H_
 #define _CORE_RENDERENGINE_H_
 
-#include<Gear/Core/CommandList.h>
+#include<Gear/Core/D3D12Core/CommandList.h>
 
 #include<Gear/Core/Resource/D3D12Resource/ReadbackHeap.h>
 
@@ -28,15 +28,15 @@ namespace Core
 	namespace RenderEngine
 	{
 
-		void submitCommandList(CommandList* const commandList);
+		void submitCommandList(D3D12Core::CommandList* const commandList);
 
 		GPUVendor getVendor();
 
-		Texture* getRenderTexture();
+		Resource::D3D12Resource::Texture* getRenderTexture();
 
 		bool getDisplayImGuiSurface();
 
 	}
 }
 
-#endif // !_RENDERENGINE_H_
+#endif // !_CORE_RENDERENGINE_H_

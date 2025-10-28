@@ -2,6 +2,8 @@
 
 #include<Gear/Core/RenderTask.h>
 
+#include<Gear/DevEssential.h>
+
 class MyRenderTask :public RenderTask
 {
 public:

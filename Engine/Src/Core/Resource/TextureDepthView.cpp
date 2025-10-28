@@ -1,6 +1,6 @@
 ﻿#include<Gear/Core/Resource/TextureDepthView.h>
 
-TextureDepthView::TextureDepthView(Texture* const texture, const bool isTextureCube, const bool persistent) :
+Core::Resource::TextureDepthView::TextureDepthView(D3D12Resource::Texture* const texture, const bool isTextureCube, const bool persistent) :
 	EngineResource(persistent), texture(texture), dsvMipHandleStart(), allDepthIndex(0), allStencilIndex(0), depthMipIndexStart(0), stencilMipIndexStart(0)
 {
 	const uint32_t mipLevels = texture->getMipLevels();
@@ -50,7 +50,7 @@ TextureDepthView::TextureDepthView(Texture* const texture, const bool isTextureC
 
 	//create dsvs
 	{
-		DescriptorHandle descriptorHandle = DescriptorHandle();
+		D3D12Core::DescriptorHandle descriptorHandle;
 
 		if (persistent)
 		{
@@ -96,7 +96,7 @@ TextureDepthView::TextureDepthView(Texture* const texture, const bool isTextureC
 
 	if (numSRVUAVCBVDescriptors)
 	{
-		DescriptorHandle descriptorHandle = DescriptorHandle();
+		D3D12Core::DescriptorHandle descriptorHandle;
 
 		if (persistent)
 		{
@@ -415,18 +415,18 @@ TextureDepthView::TextureDepthView(Texture* const texture, const bool isTextureC
 	}
 }
 
-TextureDepthView::TextureDepthView(const TextureDepthView& tdv) :
+Core::Resource::TextureDepthView::TextureDepthView(const TextureDepthView& tdv) :
 	EngineResource(tdv.persistent),
 	allDepthIndex(tdv.allDepthIndex),
 	allStencilIndex(tdv.allStencilIndex),
 	depthMipIndexStart(tdv.depthMipIndexStart),
 	stencilMipIndexStart(tdv.stencilMipIndexStart),
 	dsvMipHandleStart(tdv.dsvMipHandleStart),
-	texture(new Texture(tdv.texture))
+	texture(new D3D12Resource::Texture(tdv.texture))
 {
 }
 
-TextureDepthView::~TextureDepthView()
+Core::Resource::TextureDepthView::~TextureDepthView()
 {
 	if (texture)
 	{
@@ -434,35 +434,35 @@ TextureDepthView::~TextureDepthView()
 	}
 }
 
-ShaderResourceDesc TextureDepthView::getAllDepthIndex() const
+Core::Resource::D3D12Resource::ShaderResourceDesc Core::Resource::TextureDepthView::getAllDepthIndex() const
 {
-	ShaderResourceDesc desc = {};
-	desc.type = ShaderResourceDesc::TEXTURE;
-	desc.state = ShaderResourceDesc::SRV;
+	D3D12Resource::ShaderResourceDesc desc = {};
+	desc.type = D3D12Resource::ShaderResourceDesc::TEXTURE;
+	desc.state = D3D12Resource::ShaderResourceDesc::SRV;
 	desc.resourceIndex = allDepthIndex;
 	desc.textureDesc.texture = texture;
-	desc.textureDesc.mipSlice = D3D12_TRANSITION_ALL_MIPLEVELS;
+	desc.textureDesc.mipSlice = D3D12Resource::D3D12_TRANSITION_ALL_MIPLEVELS;
 
 	return desc;
 }
 
-ShaderResourceDesc TextureDepthView::getAllStencilIndex() const
+Core::Resource::D3D12Resource::ShaderResourceDesc Core::Resource::TextureDepthView::getAllStencilIndex() const
 {
-	ShaderResourceDesc desc = {};
-	desc.type = ShaderResourceDesc::TEXTURE;
-	desc.state = ShaderResourceDesc::SRV;
+	D3D12Resource::ShaderResourceDesc desc = {};
+	desc.type = D3D12Resource::ShaderResourceDesc::TEXTURE;
+	desc.state = D3D12Resource::ShaderResourceDesc::SRV;
 	desc.resourceIndex = allStencilIndex;
 	desc.textureDesc.texture = texture;
-	desc.textureDesc.mipSlice = D3D12_TRANSITION_ALL_MIPLEVELS;
+	desc.textureDesc.mipSlice = D3D12Resource::D3D12_TRANSITION_ALL_MIPLEVELS;
 
 	return desc;
 }
 
-ShaderResourceDesc TextureDepthView::getDepthMipIndex(const uint32_t mipSlice) const
+Core::Resource::D3D12Resource::ShaderResourceDesc Core::Resource::TextureDepthView::getDepthMipIndex(const uint32_t mipSlice) const
 {
-	ShaderResourceDesc desc = {};
-	desc.type = ShaderResourceDesc::TEXTURE;
-	desc.state = ShaderResourceDesc::SRV;
+	D3D12Resource::ShaderResourceDesc desc = {};
+	desc.type = D3D12Resource::ShaderResourceDesc::TEXTURE;
+	desc.state = D3D12Resource::ShaderResourceDesc::SRV;
 	desc.resourceIndex = depthMipIndexStart + mipSlice;
 	desc.textureDesc.texture = texture;
 	desc.textureDesc.mipSlice = mipSlice;
@@ -470,11 +470,11 @@ ShaderResourceDesc TextureDepthView::getDepthMipIndex(const uint32_t mipSlice) c
 	return desc;
 }
 
-ShaderResourceDesc TextureDepthView::getStencilMipIndex(const uint32_t mipSlice) const
+Core::Resource::D3D12Resource::ShaderResourceDesc Core::Resource::TextureDepthView::getStencilMipIndex(const uint32_t mipSlice) const
 {
-	ShaderResourceDesc desc = {};
-	desc.type = ShaderResourceDesc::TEXTURE;
-	desc.state = ShaderResourceDesc::SRV;
+	D3D12Resource::ShaderResourceDesc desc = {};
+	desc.type = D3D12Resource::ShaderResourceDesc::TEXTURE;
+	desc.state = D3D12Resource::ShaderResourceDesc::SRV;
 	desc.resourceIndex = stencilMipIndexStart + mipSlice;
 	desc.textureDesc.texture = texture;
 	desc.textureDesc.mipSlice = mipSlice;
@@ -482,9 +482,9 @@ ShaderResourceDesc TextureDepthView::getStencilMipIndex(const uint32_t mipSlice)
 	return desc;
 }
 
-DepthStencilDesc TextureDepthView::getDSVMipHandle(const uint32_t mipSlice) const
+Core::Resource::D3D12Resource::DepthStencilDesc Core::Resource::TextureDepthView::getDSVMipHandle(const uint32_t mipSlice) const
 {
-	DepthStencilDesc desc = {};
+	D3D12Resource::DepthStencilDesc desc = {};
 	desc.texture = texture;
 	desc.mipSlice = mipSlice;
 	desc.dsvHandle = CD3DX12_CPU_DESCRIPTOR_HANDLE(dsvMipHandleStart, mipSlice, Core::GlobalDescriptorHeap::getDepthStencilIncrementSize());
@@ -492,14 +492,14 @@ DepthStencilDesc TextureDepthView::getDSVMipHandle(const uint32_t mipSlice) cons
 	return desc;
 }
 
-Texture* TextureDepthView::getTexture() const
+Core::Resource::D3D12Resource::Texture* Core::Resource::TextureDepthView::getTexture() const
 {
 	return texture;
 }
 
-void TextureDepthView::copyDescriptors()
+void Core::Resource::TextureDepthView::copyDescriptors()
 {
-	const DescriptorHandle handle = getTransientDescriptorHandle();
+	const D3D12Core::DescriptorHandle handle = getTransientDescriptorHandle();
 
 	allDepthIndex = handle.getCurrentIndex();
 

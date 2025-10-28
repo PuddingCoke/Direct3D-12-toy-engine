@@ -1,8 +1,6 @@
 ﻿#include<Gear/InitializationParam.h>
 
-#include<iostream>
-
-InitializationParam InitializationParam::RealTime(const uint32_t width, const uint32_t height, const std::wstring& title, const bool enableImGuiSurface)
+Gear::InitializationParam Gear::InitializationParam::RealTime(const uint32_t width, const uint32_t height, const std::wstring& title, const bool enableImGuiSurface)
 {
 	InitializationParam param = {};
 
@@ -19,7 +17,7 @@ InitializationParam InitializationParam::RealTime(const uint32_t width, const ui
 	return param;
 }
 
-InitializationParam InitializationParam::VideoRender(const uint32_t width, const uint32_t height, const uint32_t second)
+Gear::InitializationParam Gear::InitializationParam::VideoRender(const uint32_t width, const uint32_t height, const uint32_t second)
 {
 	InitializationParam param = {};
 
@@ -36,7 +34,7 @@ InitializationParam InitializationParam::VideoRender(const uint32_t width, const
 	return param;
 }
 
-InitializationParam InitializationParam::Wallpaper()
+Gear::InitializationParam Gear::InitializationParam::Wallpaper()
 {
 	InitializationParam param = {};
 

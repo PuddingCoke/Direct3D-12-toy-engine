@@ -1,32 +1,38 @@
 ﻿#pragma once
 
-#ifndef _STATICCBUFFER_H_
-#define _STATICCBUFFER_H_
+#ifndef _CORE_RESOURCE_STATICCBUFFER_H_
+#define _CORE_RESOURCE_STATICCBUFFER_H_
 
 #include<Gear/Core/Resource/D3D12Resource/UploadHeap.h>
 
 #include"ImmutableCBuffer.h"
 
-class StaticCBuffer :public ImmutableCBuffer
+namespace Core
 {
-public:
-
-	StaticCBuffer(Buffer* const buffer, const uint32_t size, const bool persistent);
-
-	~StaticCBuffer();
-
-	struct UpdateStruct
+	namespace Resource
 	{
-		Buffer* const buffer;
-		UploadHeap* const uploadHeap;
-	}getUpdateStruct(const void* const data, const uint64_t size);
+		class StaticCBuffer :public ImmutableCBuffer
+		{
+		public:
 
-private:
+			StaticCBuffer(D3D12Resource::Buffer* const buffer, const uint32_t size, const bool persistent);
 
-	UploadHeap** uploadHeaps;
+			~StaticCBuffer();
 
-	void** dataPtrs;
+			struct UpdateStruct
+			{
+				D3D12Resource::Buffer* const buffer;
+				D3D12Resource::UploadHeap* const uploadHeap;
+			}getUpdateStruct(const void* const data, const uint64_t size);
 
-};
+		private:
 
-#endif // !_STATICCBUFFER_H_
+			D3D12Resource::UploadHeap** uploadHeaps;
+
+			void** dataPtrs;
+
+		};
+	}
+}
+
+#endif // !_CORE_RESOURCE_STATICCBUFFER_H_

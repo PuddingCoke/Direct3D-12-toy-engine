@@ -2,7 +2,7 @@
 
 #include<Gear/Core/Graphics.h>
 
-BufferView::BufferView(Buffer* const buffer, const uint32_t structureByteStride, const DXGI_FORMAT format, const uint64_t size, const bool createSRV, const bool createUAV, const bool createVBV, const bool createIBV, const bool cpuWritable, const bool persistent) :
+Core::Resource::BufferView::BufferView(D3D12Resource::Buffer* const buffer, const uint32_t structureByteStride, const DXGI_FORMAT format, const uint64_t size, const bool createSRV, const bool createUAV, const bool createVBV, const bool createIBV, const bool cpuWritable, const bool persistent) :
 	EngineResource(persistent), buffer(buffer), counterBuffer(nullptr), vbv{}, srvIndex(0), uavIndex(0), uploadHeaps(nullptr), hasSRV(createSRV), hasUAV(createUAV), viewCPUHandle(), viewGPUHandle()
 {
 	numSRVUAVCBVDescriptors = static_cast<uint32_t>(createSRV) + static_cast<uint32_t>(createUAV);
@@ -21,7 +21,7 @@ BufferView::BufferView(Buffer* const buffer, const uint32_t structureByteStride,
 			counterBuffer = new CounterBufferView(persistent);
 		}
 
-		DescriptorHandle descriptorHandle;
+		D3D12Core::DescriptorHandle descriptorHandle;
 
 		if (persistent)
 		{
@@ -103,7 +103,7 @@ BufferView::BufferView(Buffer* const buffer, const uint32_t structureByteStride,
 			{
 				viewGPUHandle = descriptorHandle.getGPUHandle();
 
-				const DescriptorHandle nonShaderVisibleHandle = Core::GlobalDescriptorHeap::getNonShaderVisibleResourceHeap()->allocStaticDescriptor(1);
+				const D3D12Core::DescriptorHandle nonShaderVisibleHandle = Core::GlobalDescriptorHeap::getNonShaderVisibleResourceHeap()->allocStaticDescriptor(1);
 
 				if (isStructuredBuffer)
 				{
@@ -141,16 +141,16 @@ BufferView::BufferView(Buffer* const buffer, const uint32_t structureByteStride,
 
 	if (cpuWritable)
 	{
-		uploadHeaps = new UploadHeap * [Core::Graphics::getFrameBufferCount()];
+		uploadHeaps = new D3D12Resource::UploadHeap * [Core::Graphics::getFrameBufferCount()];
 
 		for (uint32_t i = 0; i < Core::Graphics::getFrameBufferCount(); i++)
 		{
-			uploadHeaps[i] = new UploadHeap(size);
+			uploadHeaps[i] = new D3D12Resource::UploadHeap(size);
 		}
 	}
 }
 
-BufferView::~BufferView()
+Core::Resource::BufferView::~BufferView()
 {
 	if (counterBuffer)
 	{
@@ -173,18 +173,18 @@ BufferView::~BufferView()
 	}
 }
 
-VertexBufferDesc BufferView::getVertexBuffer() const
+Core::Resource::D3D12Resource::VertexBufferDesc Core::Resource::BufferView::getVertexBuffer() const
 {
-	VertexBufferDesc desc = {};
+	D3D12Resource::VertexBufferDesc desc = {};
 	desc.buffer = buffer;
 	desc.vbv = vbv;
 
 	return desc;
 }
 
-IndexBufferDesc BufferView::getIndexBuffer() const
+Core::Resource::D3D12Resource::IndexBufferDesc Core::Resource::BufferView::getIndexBuffer() const
 {
-	IndexBufferDesc desc = {};
+	D3D12Resource::IndexBufferDesc desc = {};
 	desc.buffer = buffer;
 	desc.ibv = ibv;
 
@@ -192,22 +192,22 @@ IndexBufferDesc BufferView::getIndexBuffer() const
 }
 
 
-ShaderResourceDesc BufferView::getSRVIndex() const
+Core::Resource::D3D12Resource::ShaderResourceDesc Core::Resource::BufferView::getSRVIndex() const
 {
-	ShaderResourceDesc desc = {};
-	desc.type = ShaderResourceDesc::BUFFER;
-	desc.state = ShaderResourceDesc::SRV;
+	D3D12Resource::ShaderResourceDesc desc = {};
+	desc.type = D3D12Resource::ShaderResourceDesc::BUFFER;
+	desc.state = D3D12Resource::ShaderResourceDesc::SRV;
 	desc.resourceIndex = srvIndex;
 	desc.bufferDesc.buffer = buffer;
 
 	return desc;
 }
 
-ShaderResourceDesc BufferView::getUAVIndex() const
+Core::Resource::D3D12Resource::ShaderResourceDesc Core::Resource::BufferView::getUAVIndex() const
 {
-	ShaderResourceDesc desc = {};
-	desc.type = ShaderResourceDesc::BUFFER;
-	desc.state = ShaderResourceDesc::UAV;
+	D3D12Resource::ShaderResourceDesc desc = {};
+	desc.type = D3D12Resource::ShaderResourceDesc::BUFFER;
+	desc.state = D3D12Resource::ShaderResourceDesc::UAV;
 	desc.resourceIndex = uavIndex;
 	desc.bufferDesc.buffer = buffer;
 
@@ -219,10 +219,10 @@ ShaderResourceDesc BufferView::getUAVIndex() const
 	return desc;
 }
 
-ClearUAVDesc BufferView::getClearUAVDesc() const
+Core::Resource::D3D12Resource::ClearUAVDesc Core::Resource::BufferView::getClearUAVDesc() const
 {
-	ClearUAVDesc desc = {};
-	desc.type = ClearUAVDesc::BUFFER;
+	D3D12Resource::ClearUAVDesc desc = {};
+	desc.type = D3D12Resource::ClearUAVDesc::BUFFER;
 	desc.bufferDesc.buffer = buffer;
 	desc.viewGPUHandle = viewGPUHandle;
 	desc.viewCPUHandle = viewCPUHandle;
@@ -230,19 +230,19 @@ ClearUAVDesc BufferView::getClearUAVDesc() const
 	return desc;
 }
 
-CounterBufferView* BufferView::getCounterBuffer() const
+Core::Resource::CounterBufferView* Core::Resource::BufferView::getCounterBuffer() const
 {
 	return counterBuffer;
 }
 
-Buffer* BufferView::getBuffer() const
+Core::Resource::D3D12Resource::Buffer* Core::Resource::BufferView::getBuffer() const
 {
 	return buffer;
 }
 
-void BufferView::copyDescriptors()
+void Core::Resource::BufferView::copyDescriptors()
 {
-	DescriptorHandle shaderVisibleHandle = getTransientDescriptorHandle();
+	D3D12Core::DescriptorHandle shaderVisibleHandle = getTransientDescriptorHandle();
 
 	if (hasSRV)
 	{
@@ -259,7 +259,7 @@ void BufferView::copyDescriptors()
 	}
 }
 
-BufferView::UpdateStruct BufferView::getUpdateStruct(const void* const data, const uint64_t size)
+Core::Resource::BufferView::UpdateStruct Core::Resource::BufferView::getUpdateStruct(const void* const data, const uint64_t size)
 {
 	uploadHeaps[Core::Graphics::getFrameIndex()]->update(data, size);
 

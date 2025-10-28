@@ -1,80 +1,63 @@
 ﻿#pragma once
 
-#ifndef _RENDERTASK_H_
-#define _RENDERTASK_H_
+#ifndef _CORE_RENDERTASK_H_
+#define _CORE_RENDERTASK_H_
 
 #include<Gear/Core/RenderEngine.h>
 
 #include<Gear/Core/ResourceManager.h>
 
-#include<Gear/Core/PipelineStateHelper.h>
-
-#include<Gear/Core/Graphics.h>
-
-#include<Gear/Input/Mouse.h>
-
-#include<Gear/Input/Keyboard.h>
-
-#include<Gear/Utils/Math.h>
-
-#include<Gear/Utils/Random.h>
-
-#include<Gear/Utils/File.h>
-
-#include<Gear/Utils/Timer.h>
-
-#include<Gear/Utils/Color.h>
-
 #include<future>
 
-using namespace Core;
-
-class RenderTask
+namespace Core
 {
-public:
+	class RenderTask
+	{
+	public:
 
-	RenderTask(const RenderTask&) = delete;
+		RenderTask(const RenderTask&) = delete;
 
-	void operator=(const RenderTask&) = delete;
+		void operator=(const RenderTask&) = delete;
 
-	RenderTask();
+		RenderTask();
 
-	virtual ~RenderTask();
+		virtual ~RenderTask();
 
-	void beginTask();
+		void beginTask();
 
-	void waitTask();
+		void waitTask();
 
-	CommandList* getCommandList() const;
+		D3D12Core::CommandList* getCommandList() const;
 
-	virtual void imGUICall();
+		virtual void imGUICall();
 
-protected:
+	protected:
 
-	//draw texture to backbuffer
-	void blit(TextureRenderView* const texture) const;
+		//把纹理绘制到后备缓冲上
+		void blit(Resource::TextureRenderView* const texture) const;
 
-	virtual void recordCommand() = 0;
+		virtual void recordCommand() = 0;
 
-	ResourceManager* const resManager;
+		ResourceManager* const resManager;
 
-	GraphicsContext* const context;
+		GraphicsContext* const context;
 
-private:
+	private:
 
-	void workerLoop();
+		void workerLoop();
 
-	bool taskCompleted;
+		bool taskCompleted;
 
-	bool isRunning;
+		bool isRunning;
 
-	std::mutex taskMutex;
+		std::mutex taskMutex;
 
-	std::condition_variable taskCondition;
+		std::condition_variable taskCondition;
 
-	std::thread workerThread;
+		std::thread workerThread;
 
-};
+	};
+}
 
 template <typename First, typename... Rest>
 std::future<void> createRenderTaskAsync(const First& first, const Rest&... args)
@@ -89,4 +72,4 @@ std::future<void> createRenderTaskAsync(const First& first, const Rest&... args)
 		});
 }
 
-#endif // !_RENDERTASK_H_
+#endif // !_CORE_RENDERTASK_H_

@@ -3,16 +3,16 @@
 #ifndef _CORE_GLOBALROOTSIGNATURE_H_
 #define _CORE_GLOBALROOTSIGNATURE_H_
 
-#include<Gear/Core/RootSignature.h>
+#include<Gear/Core/D3D12Core/RootSignature.h>
 
 namespace Core
 {
 	namespace GlobalRootSignature
 	{
 
-		RootSignature* getGraphicsRootSignature();
+		D3D12Core::RootSignature* getGraphicsRootSignature();
 
-		RootSignature* getComputeRootSignature();
+		D3D12Core::RootSignature* getComputeRootSignature();
 
 	}
 }

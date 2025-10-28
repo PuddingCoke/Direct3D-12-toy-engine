@@ -11,7 +11,7 @@ namespace Core
 	{
 		namespace HDRClampEffect
 		{
-			void process(GraphicsContext* const context, TextureRenderView* const inOutTexture);
+			void process(GraphicsContext* const context, Resource::TextureRenderView* const inOutTexture);
 		}
 	}
 }

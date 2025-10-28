@@ -1,7 +1,7 @@
 ﻿#pragma once
 
-#ifndef _NVIDIAENCODER_H_
-#define _NVIDIAENCODER_H_
+#ifndef _CORE_VIDEOENCODER_NVIDIAENCODER_H_
+#define _CORE_VIDEOENCODER_NVIDIAENCODER_H_
 
 #include<Gear/Core/Resource/D3D12Resource/ReadbackHeap.h>
 
@@ -31,58 +31,64 @@
 //11.unmap output resource
 //12.unregister output resource
 
-class NvidiaEncoder :public Encoder
+namespace Core
 {
-public:
+	namespace VideoEncoder
+	{
+		class NvidiaEncoder :public Encoder
+		{
+		public:
 
-	NvidiaEncoder() = delete;
+			NvidiaEncoder() = delete;
 
-	NvidiaEncoder(const NvidiaEncoder&) = delete;
+			NvidiaEncoder(const NvidiaEncoder&) = delete;
 
-	NvidiaEncoder(const uint32_t frameToEncode);
+			NvidiaEncoder(const uint32_t frameToEncode);
 
-	~NvidiaEncoder();
+			~NvidiaEncoder();
 
-	bool encode(Texture* const inputTexture) override;
+			bool encode(Resource::D3D12Resource::Texture* const inputTexture) override;
 
-	static constexpr uint32_t lookaheadDepth = 31;
+			static constexpr uint32_t lookaheadDepth = 31;
 
-private:
+		private:
 
-	static constexpr NV_ENC_BUFFER_FORMAT bufferFormat = NV_ENC_BUFFER_FORMAT_ARGB;
+			static constexpr NV_ENC_BUFFER_FORMAT bufferFormat = NV_ENC_BUFFER_FORMAT_ARGB;
 
-	static constexpr NV_ENC_TUNING_INFO tuningInfo = NV_ENC_TUNING_INFO_HIGH_QUALITY;
+			static constexpr NV_ENC_TUNING_INFO tuningInfo = NV_ENC_TUNING_INFO_HIGH_QUALITY;
 
-	static constexpr OutputVideoFormat outputVideoFormat = OutputVideoFormat::H264;
+			static constexpr OutputVideoFormat outputVideoFormat = OutputVideoFormat::H264;
 
-	const GUID codec = NV_ENC_CODEC_H264_GUID;
+			const GUID codec = NV_ENC_CODEC_H264_GUID;
 
-	const GUID preset = NV_ENC_PRESET_P7_GUID;
+			const GUID preset = NV_ENC_PRESET_P7_GUID;
 
-	const GUID profile = NV_ENC_H264_PROFILE_HIGH_GUID;
+			const GUID profile = NV_ENC_H264_PROFILE_HIGH_GUID;
 
-	HMODULE moduleNvEncAPI;
+			HMODULE moduleNvEncAPI;
 
-	NV_ENCODE_API_FUNCTION_LIST nvencAPI;
+			NV_ENCODE_API_FUNCTION_LIST nvencAPI;
 
-	void* encoder;
+			void* encoder;
 
-	ReadbackHeap* readbackHeap;
+			Resource::D3D12Resource::ReadbackHeap* readbackHeap;
 
-	ComPtr<ID3D12Fence> outputFence;
+			ComPtr<ID3D12Fence> outputFence;
 
-	uint32_t outputFenceValue;
+			uint32_t outputFenceValue;
 
-	std::queue<NV_ENC_REGISTERED_PTR> registeredInputResourcePtrs;
+			std::queue<NV_ENC_REGISTERED_PTR> registeredInputResourcePtrs;
 
-	std::queue<NV_ENC_INPUT_PTR> mappedInputResourcePtrs;
+			std::queue<NV_ENC_INPUT_PTR> mappedInputResourcePtrs;
 
-	std::queue<NV_ENC_OUTPUT_RESOURCE_D3D12> outputResources;
+			std::queue<NV_ENC_OUTPUT_RESOURCE_D3D12> outputResources;
 
-	NV_ENC_REGISTERED_PTR registeredOutputResourcePtr;
+			NV_ENC_REGISTERED_PTR registeredOutputResourcePtr;
 
-	NV_ENC_INPUT_PTR mappedOutputResourcePtr;
+			NV_ENC_INPUT_PTR mappedOutputResourcePtr;
 
-};
+		};
+	}
+}
 
-#endif // !_NVIDIAENCODER_H_
+#endif // !_CORE_VIDEOENCODER_NVIDIAENCODER_H_

@@ -1,24 +1,24 @@
 ﻿#include<Gear/Core/Resource/EngineResource.h>
 
-EngineResource::EngineResource(const bool persistent) :
+Core::Resource::EngineResource::EngineResource(const bool persistent) :
 	persistent(persistent), numSRVUAVCBVDescriptors(0), srvUAVCBVHandleStart()
 {
 }
 
-EngineResource::~EngineResource()
+Core::Resource::EngineResource::~EngineResource()
 {
 }
 
-void EngineResource::copyDescriptors()
+void Core::Resource::EngineResource::copyDescriptors()
 {
 }
 
-bool EngineResource::getPersistent() const
+bool Core::Resource::EngineResource::getPersistent() const
 {
 	return persistent;
 }
 
-DescriptorHandle EngineResource::getTransientDescriptorHandle() const
+Core::D3D12Core::DescriptorHandle Core::Resource::EngineResource::getTransientDescriptorHandle() const
 {
 #ifdef _DEBUG
 	if (persistent)
@@ -26,8 +26,8 @@ DescriptorHandle EngineResource::getTransientDescriptorHandle() const
 		LOGERROR(L"call getTransientDescriptorHandle for persistent resources is not allowed");
 	}
 #endif // _DEBUG
-
-	DescriptorHandle shaderVisibleHandle = Core::GlobalDescriptorHeap::getResourceHeap()->allocDynamicDescriptor(numSRVUAVCBVDescriptors);
+	
+	D3D12Core::DescriptorHandle shaderVisibleHandle = Core::GlobalDescriptorHeap::getResourceHeap()->allocDynamicDescriptor(numSRVUAVCBVDescriptors);
 
 	Core::GraphicsDevice::get()->CopyDescriptorsSimple(numSRVUAVCBVDescriptors, shaderVisibleHandle.getCPUHandle(), srvUAVCBVHandleStart, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 

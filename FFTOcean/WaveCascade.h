@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include<Gear/Core/RenderEngine.h>
+#include<Gear/DevEssential.h>
 
 class WaveCascade
 {

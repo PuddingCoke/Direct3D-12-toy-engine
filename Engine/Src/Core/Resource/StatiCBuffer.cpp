@@ -2,22 +2,22 @@
 
 #include<Gear/Core/Graphics.h>
 
-StaticCBuffer::StaticCBuffer(Buffer* const buffer, const uint32_t size, const bool persistent) :
+Core::Resource::StaticCBuffer::StaticCBuffer(D3D12Resource::Buffer* const buffer, const uint32_t size, const bool persistent) :
 	ImmutableCBuffer(buffer, size, persistent)
 {
-	uploadHeaps = new UploadHeap * [Core::Graphics::getFrameBufferCount()];
+	uploadHeaps = new D3D12Resource::UploadHeap * [Core::Graphics::getFrameBufferCount()];
 
 	dataPtrs = new void* [Core::Graphics::getFrameBufferCount()];
 
 	for (uint32_t i = 0; i < Core::Graphics::getFrameBufferCount(); i++)
 	{
-		uploadHeaps[i] = new UploadHeap(size);
+		uploadHeaps[i] = new D3D12Resource::UploadHeap(size);
 
 		dataPtrs[i] = uploadHeaps[i]->map();
 	}
 }
 
-StaticCBuffer::~StaticCBuffer()
+Core::Resource::StaticCBuffer::~StaticCBuffer()
 {
 	if (uploadHeaps)
 	{
@@ -40,7 +40,7 @@ StaticCBuffer::~StaticCBuffer()
 	}
 }
 
-StaticCBuffer::UpdateStruct StaticCBuffer::getUpdateStruct(const void* const data, const uint64_t size)
+Core::Resource::StaticCBuffer::UpdateStruct Core::Resource::StaticCBuffer::getUpdateStruct(const void* const data, const uint64_t size)
 {
 	memcpy(dataPtrs[Core::Graphics::getFrameIndex()], data, size);
 

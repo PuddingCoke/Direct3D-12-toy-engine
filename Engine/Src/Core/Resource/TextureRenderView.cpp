@@ -1,6 +1,6 @@
 ﻿#include<Gear/Core/Resource/TextureRenderView.h>
 
-TextureRenderView::TextureRenderView(Texture* const texture, const bool isTextureCube, const bool persistent, const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat) :
+Core::Resource::TextureRenderView::TextureRenderView(D3D12Resource::Texture* const texture, const bool isTextureCube, const bool persistent, const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat) :
 	EngineResource(persistent), texture(texture), hasRTV((rtvFormat != DXGI_FORMAT_UNKNOWN)), hasUAV((uavFormat != DXGI_FORMAT_UNKNOWN)), rtvMipHandleStart(), viewGPUHandleStart(), viewCPUHandleStart()
 {
 	//create srv uav descriptors
@@ -8,7 +8,7 @@ TextureRenderView::TextureRenderView(Texture* const texture, const bool isTextur
 		//plus 1 because there is a additional srv to acess all mipslices
 		numSRVUAVCBVDescriptors = 1 + texture->getMipLevels() + static_cast<uint32_t>(hasUAV) * texture->getMipLevels();
 
-		DescriptorHandle descriptorHandle = DescriptorHandle();
+		D3D12Core::DescriptorHandle descriptorHandle;
 
 		if (persistent)
 		{
@@ -182,7 +182,7 @@ TextureRenderView::TextureRenderView(Texture* const texture, const bool isTextur
 
 		if (hasUAV)
 		{
-			DescriptorHandle nonShaderVisibleHandle;
+			D3D12Core::DescriptorHandle nonShaderVisibleHandle;
 
 			if (persistent)
 			{
@@ -253,7 +253,7 @@ TextureRenderView::TextureRenderView(Texture* const texture, const bool isTextur
 	//create rtv descriptor
 	if (hasRTV)
 	{
-		DescriptorHandle descriptorHandle = DescriptorHandle();
+		D3D12Core::DescriptorHandle descriptorHandle;
 
 		if (persistent)
 		{
@@ -301,7 +301,7 @@ TextureRenderView::TextureRenderView(Texture* const texture, const bool isTextur
 	}
 }
 
-TextureRenderView::TextureRenderView(const TextureRenderView& trv) :
+Core::Resource::TextureRenderView::TextureRenderView(const TextureRenderView& trv) :
 	EngineResource(trv.persistent),
 	hasRTV(trv.hasRTV),
 	hasUAV(trv.hasUAV),
@@ -311,11 +311,11 @@ TextureRenderView::TextureRenderView(const TextureRenderView& trv) :
 	rtvMipHandleStart(trv.rtvMipHandleStart),
 	viewGPUHandleStart(trv.viewGPUHandleStart),
 	viewCPUHandleStart(trv.viewCPUHandleStart),
-	texture(new Texture(trv.texture))
+	texture(new D3D12Resource::Texture(trv.texture))
 {
 }
 
-TextureRenderView::~TextureRenderView()
+Core::Resource::TextureRenderView::~TextureRenderView()
 {
 	if (texture)
 	{
@@ -323,23 +323,23 @@ TextureRenderView::~TextureRenderView()
 	}
 }
 
-ShaderResourceDesc TextureRenderView::getAllSRVIndex() const
+Core::Resource::D3D12Resource::ShaderResourceDesc Core::Resource::TextureRenderView::getAllSRVIndex() const
 {
-	ShaderResourceDesc desc = {};
-	desc.type = ShaderResourceDesc::TEXTURE;
-	desc.state = ShaderResourceDesc::SRV;
+	D3D12Resource::ShaderResourceDesc desc = {};
+	desc.type = D3D12Resource::ShaderResourceDesc::TEXTURE;
+	desc.state = D3D12Resource::ShaderResourceDesc::SRV;
 	desc.resourceIndex = allSRVIndex;
 	desc.textureDesc.texture = texture;
-	desc.textureDesc.mipSlice = D3D12_TRANSITION_ALL_MIPLEVELS;
+	desc.textureDesc.mipSlice = D3D12Resource::D3D12_TRANSITION_ALL_MIPLEVELS;
 
 	return desc;
 }
 
-ShaderResourceDesc TextureRenderView::getSRVMipIndex(const uint32_t mipSlice) const
+Core::Resource::D3D12Resource::ShaderResourceDesc Core::Resource::TextureRenderView::getSRVMipIndex(const uint32_t mipSlice) const
 {
-	ShaderResourceDesc desc = {};
-	desc.type = ShaderResourceDesc::TEXTURE;
-	desc.state = ShaderResourceDesc::SRV;
+	D3D12Resource::ShaderResourceDesc desc = {};
+	desc.type = D3D12Resource::ShaderResourceDesc::TEXTURE;
+	desc.state = D3D12Resource::ShaderResourceDesc::SRV;
 	desc.resourceIndex = srvMipIndexStart + mipSlice;
 	desc.textureDesc.texture = texture;
 	desc.textureDesc.mipSlice = mipSlice;
@@ -347,11 +347,11 @@ ShaderResourceDesc TextureRenderView::getSRVMipIndex(const uint32_t mipSlice) co
 	return desc;
 }
 
-ShaderResourceDesc TextureRenderView::getUAVMipIndex(const uint32_t mipSlice) const
+Core::Resource::D3D12Resource::ShaderResourceDesc Core::Resource::TextureRenderView::getUAVMipIndex(const uint32_t mipSlice) const
 {
-	ShaderResourceDesc desc = {};
-	desc.type = ShaderResourceDesc::TEXTURE;
-	desc.state = ShaderResourceDesc::UAV;
+	D3D12Resource::ShaderResourceDesc desc = {};
+	desc.type = D3D12Resource::ShaderResourceDesc::TEXTURE;
+	desc.state = D3D12Resource::ShaderResourceDesc::UAV;
 	desc.resourceIndex = uavMipIndexStart + mipSlice;
 	desc.textureDesc.texture = texture;
 	desc.textureDesc.mipSlice = mipSlice;
@@ -359,9 +359,9 @@ ShaderResourceDesc TextureRenderView::getUAVMipIndex(const uint32_t mipSlice) co
 	return desc;
 }
 
-RenderTargetDesc TextureRenderView::getRTVMipHandle(const uint32_t mipSlice) const
+Core::Resource::D3D12Resource::RenderTargetDesc Core::Resource::TextureRenderView::getRTVMipHandle(const uint32_t mipSlice) const
 {
-	RenderTargetDesc desc = {};
+	D3D12Resource::RenderTargetDesc desc = {};
 	desc.texture = texture;
 	desc.mipSlice = mipSlice;
 	desc.rtvHandle = CD3DX12_CPU_DESCRIPTOR_HANDLE(rtvMipHandleStart, mipSlice, Core::GlobalDescriptorHeap::getRenderTargetIncrementSize());
@@ -369,10 +369,10 @@ RenderTargetDesc TextureRenderView::getRTVMipHandle(const uint32_t mipSlice) con
 	return desc;
 }
 
-ClearUAVDesc TextureRenderView::getClearUAVDesc(const uint32_t mipSlice) const
+Core::Resource::D3D12Resource::ClearUAVDesc Core::Resource::TextureRenderView::getClearUAVDesc(const uint32_t mipSlice) const
 {
-	ClearUAVDesc desc = {};
-	desc.type = ClearUAVDesc::TEXTURE;
+	D3D12Resource::ClearUAVDesc desc = {};
+	desc.type = D3D12Resource::ClearUAVDesc::TEXTURE;
 	desc.textureDesc.texture = texture;
 	desc.textureDesc.mipSlice = mipSlice;
 	desc.viewGPUHandle = CD3DX12_GPU_DESCRIPTOR_HANDLE(viewGPUHandleStart, mipSlice, Core::GlobalDescriptorHeap::getResourceIncrementSize());
@@ -381,14 +381,14 @@ ClearUAVDesc TextureRenderView::getClearUAVDesc(const uint32_t mipSlice) const
 	return desc;
 }
 
-Texture* TextureRenderView::getTexture() const
+Core::Resource::D3D12Resource::Texture* Core::Resource::TextureRenderView::getTexture() const
 {
 	return texture;
 }
 
-void TextureRenderView::copyDescriptors()
+void Core::Resource::TextureRenderView::copyDescriptors()
 {
-	DescriptorHandle shaderVisibleHandle = getTransientDescriptorHandle();
+	D3D12Core::DescriptorHandle shaderVisibleHandle = getTransientDescriptorHandle();
 
 	allSRVIndex = shaderVisibleHandle.getCurrentIndex();
 

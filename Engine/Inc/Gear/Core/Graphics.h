@@ -30,7 +30,7 @@ namespace Core
 
 		D3D12_CPU_DESCRIPTOR_HANDLE getBackBufferHandle();
 
-		ImmutableCBuffer* getReservedGlobalCBuffer();
+		Resource::ImmutableCBuffer* getReservedGlobalCBuffer();
 
 		constexpr DXGI_FORMAT backBufferFormat = FMT::BGRA8UN;
 

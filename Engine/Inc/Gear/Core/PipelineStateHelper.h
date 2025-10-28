@@ -3,7 +3,7 @@
 #ifndef _CORE_PIPELINESTATEHELPER_H_
 #define _CORE_PIPELINESTATEHELPER_H_
 
-#include<Gear/Core/Shader.h>
+#include<Gear/Core/D3D12Core/Shader.h>
 
 namespace Core
 {
@@ -58,7 +58,7 @@ namespace Core
 		//PS
 		D3D12_GRAPHICS_PIPELINE_STATE_DESC getDefaultFullScreenState();
 
-		void createComputeState(ID3D12PipelineState** const pipelineState, const Shader* const shader);
+		void createComputeState(ID3D12PipelineState** const pipelineState, const D3D12Core::Shader* const shader);
 
 	}
 }

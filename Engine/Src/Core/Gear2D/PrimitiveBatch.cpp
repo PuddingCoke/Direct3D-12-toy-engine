@@ -14,20 +14,20 @@
 
 #include<Gear/CompiledShaders/PrimitiveBatchPS.h>
 
-PrimitiveBatch::PrimitiveBatch(const DXGI_FORMAT format, GraphicsContext* const context) :
+Core::Gear2D::PrimitiveBatch::PrimitiveBatch(const DXGI_FORMAT format, GraphicsContext* const context) :
 	context(context), lineWidth(1.f)
 {
-	lineVS = new Core::Shader(g_PrimitiveBatchLineVSBytes, sizeof(g_PrimitiveBatchLineVSBytes));
+	lineVS = new D3D12Core::Shader(g_PrimitiveBatchLineVSBytes, sizeof(g_PrimitiveBatchLineVSBytes));
 
-	circleVS = new Core::Shader(g_PrimitiveBatchCircleVSBytes, sizeof(g_PrimitiveBatchCircleVSBytes));
+	circleVS = new D3D12Core::Shader(g_PrimitiveBatchCircleVSBytes, sizeof(g_PrimitiveBatchCircleVSBytes));
 
-	rcLineVS = new Core::Shader(g_PrimitiveBatchRCLineVSBytes, sizeof(g_PrimitiveBatchRCLineVSBytes));
+	rcLineVS = new D3D12Core::Shader(g_PrimitiveBatchRCLineVSBytes, sizeof(g_PrimitiveBatchRCLineVSBytes));
 
-	lineGS = new Core::Shader(g_PrimitiveBatchLineGSBytes, sizeof(g_PrimitiveBatchLineGSBytes));
+	lineGS = new D3D12Core::Shader(g_PrimitiveBatchLineGSBytes, sizeof(g_PrimitiveBatchLineGSBytes));
 
-	rcLineGS = new Core::Shader(g_PrimitiveBatchRCLineGSBytes, sizeof(g_PrimitiveBatchRCLineGSBytes));
+	rcLineGS = new D3D12Core::Shader(g_PrimitiveBatchRCLineGSBytes, sizeof(g_PrimitiveBatchRCLineGSBytes));
 
-	primitivePS = new Core::Shader(g_PrimitiveBatchPSBytes, sizeof(g_PrimitiveBatchPSBytes));
+	primitivePS = new D3D12Core::Shader(g_PrimitiveBatchPSBytes, sizeof(g_PrimitiveBatchPSBytes));
 
 	{
 		D3D12_INPUT_ELEMENT_DESC layout[] =
@@ -101,7 +101,7 @@ PrimitiveBatch::PrimitiveBatch(const DXGI_FORMAT format, GraphicsContext* const 
 	}
 }
 
-PrimitiveBatch::~PrimitiveBatch()
+Core::Gear2D::PrimitiveBatch::~PrimitiveBatch()
 {
 	delete lineVS;
 	delete circleVS;
@@ -111,14 +111,14 @@ PrimitiveBatch::~PrimitiveBatch()
 	delete rcLineGS;
 }
 
-void PrimitiveBatch::begin()
+void Core::Gear2D::PrimitiveBatch::begin()
 {
 	lineRenderer.begin();
 	circleRenderer.begin();
 	roundCapLineRenderer.begin();
 }
 
-void PrimitiveBatch::end()
+void Core::Gear2D::PrimitiveBatch::end()
 {
 	context->setGSConstants(1, &lineWidth, 0);
 
@@ -127,44 +127,44 @@ void PrimitiveBatch::end()
 	roundCapLineRenderer.end(context, roundCapLineState.Get());
 }
 
-void PrimitiveBatch::drawLine(const float x1, const float y1, const float x2, const float y2, const float r, const float g, const float b, const float a)
+void Core::Gear2D::PrimitiveBatch::drawLine(const float x1, const float y1, const float x2, const float y2, const float r, const float g, const float b, const float a)
 {
 	lineRenderer.addLine(x1, y1, x2, y2, r, g, b, a);
 }
 
-void PrimitiveBatch::drawCircle(const float x, const float y, const float length, const float r, const float g, const float b, const float a)
+void Core::Gear2D::PrimitiveBatch::drawCircle(const float x, const float y, const float length, const float r, const float g, const float b, const float a)
 {
 	circleRenderer.addCircle(x, y, length, r, g, b, a);
 }
 
-void PrimitiveBatch::drawRoundCapLine(const float x1, const float y1, const float x2, const float y2, const float width, const float r, const float g, const float b, const float a)
+void Core::Gear2D::PrimitiveBatch::drawRoundCapLine(const float x1, const float y1, const float x2, const float y2, const float width, const float r, const float g, const float b, const float a)
 {
 	roundCapLineRenderer.addRoundCapLine(x1, y1, x2, y2, width, r, g, b, a);
 }
 
-void PrimitiveBatch::setLineWidth(const float width)
+void Core::Gear2D::PrimitiveBatch::setLineWidth(const float width)
 {
 	lineWidth = width;
 }
 
-PrimitiveBatch::LineRenderer::LineRenderer() :
+Core::Gear2D::PrimitiveBatch::LineRenderer::LineRenderer() :
 	vertices(new float[2 * 6 * maxLineNum]), idx(0),
 	vertexBuffer(ResourceManager::createStructuredBufferView(sizeof(float) * 6, sizeof(float) * 6 * 2 * maxLineNum, false, false, true, true, true))
 {
 }
 
-PrimitiveBatch::LineRenderer::~LineRenderer()
+Core::Gear2D::PrimitiveBatch::LineRenderer::~LineRenderer()
 {
 	delete[] vertices;
 	delete vertexBuffer;
 }
 
-void PrimitiveBatch::LineRenderer::begin()
+void Core::Gear2D::PrimitiveBatch::LineRenderer::begin()
 {
 	idx = 0;
 }
 
-void PrimitiveBatch::LineRenderer::end(GraphicsContext* const context, ID3D12PipelineState* const pipelineState)
+void Core::Gear2D::PrimitiveBatch::LineRenderer::end(GraphicsContext* const context, ID3D12PipelineState* const pipelineState)
 {
 	if (idx > 0)
 	{
@@ -182,7 +182,7 @@ void PrimitiveBatch::LineRenderer::end(GraphicsContext* const context, ID3D12Pip
 	}
 }
 
-void PrimitiveBatch::LineRenderer::addLine(const float x1, const float y1, const float x2, const float y2, const float r, const float g, const float b, const float a)
+void Core::Gear2D::PrimitiveBatch::LineRenderer::addLine(const float x1, const float y1, const float x2, const float y2, const float r, const float g, const float b, const float a)
 {
 	vertices[idx] = x1;
 	vertices[idx + 1] = y1;
@@ -199,24 +199,24 @@ void PrimitiveBatch::LineRenderer::addLine(const float x1, const float y1, const
 	idx += 12;
 }
 
-PrimitiveBatch::CircleRenderer::CircleRenderer() :
+Core::Gear2D::PrimitiveBatch::CircleRenderer::CircleRenderer() :
 	vertices(new float[7 * maxCircleNum]), idx(0),
 	vertexBuffer(ResourceManager::createStructuredBufferView(sizeof(float) * 7, sizeof(float) * 7 * maxCircleNum, false, false, true, true, true))
 {
 }
 
-PrimitiveBatch::CircleRenderer::~CircleRenderer()
+Core::Gear2D::PrimitiveBatch::CircleRenderer::~CircleRenderer()
 {
 	delete[] vertices;
 	delete vertexBuffer;
 }
 
-void PrimitiveBatch::CircleRenderer::begin()
+void Core::Gear2D::PrimitiveBatch::CircleRenderer::begin()
 {
 	idx = 0;
 }
 
-void PrimitiveBatch::CircleRenderer::end(GraphicsContext* const context, ID3D12PipelineState* const pipelineState)
+void Core::Gear2D::PrimitiveBatch::CircleRenderer::end(GraphicsContext* const context, ID3D12PipelineState* const pipelineState)
 {
 	if (idx > 0)
 	{
@@ -234,7 +234,7 @@ void PrimitiveBatch::CircleRenderer::end(GraphicsContext* const context, ID3D12P
 	}
 }
 
-void PrimitiveBatch::CircleRenderer::addCircle(const float x, const float y, const float length, const float r, const float g, const float b, const float a)
+void Core::Gear2D::PrimitiveBatch::CircleRenderer::addCircle(const float x, const float y, const float length, const float r, const float g, const float b, const float a)
 {
 	if (length < 1.f)
 	{
@@ -251,24 +251,24 @@ void PrimitiveBatch::CircleRenderer::addCircle(const float x, const float y, con
 	idx += 7;
 }
 
-PrimitiveBatch::RCLineRenderer::RCLineRenderer() :
+Core::Gear2D::PrimitiveBatch::RCLineRenderer::RCLineRenderer() :
 	vertices(new float[7 * 2 * maxLineNum]), idx(0),
 	vertexBuffer(ResourceManager::createStructuredBufferView(sizeof(float) * 7, sizeof(float) * 7 * 2 * maxLineNum, false, false, true, true, true))
 {
 }
 
-PrimitiveBatch::RCLineRenderer::~RCLineRenderer()
+Core::Gear2D::PrimitiveBatch::RCLineRenderer::~RCLineRenderer()
 {
 	delete[] vertices;
 	delete vertexBuffer;
 }
 
-void PrimitiveBatch::RCLineRenderer::begin()
+void Core::Gear2D::PrimitiveBatch::RCLineRenderer::begin()
 {
 	idx = 0;
 }
 
-void PrimitiveBatch::RCLineRenderer::end(GraphicsContext* const context, ID3D12PipelineState* const pipelineState)
+void Core::Gear2D::PrimitiveBatch::RCLineRenderer::end(GraphicsContext* const context, ID3D12PipelineState* const pipelineState)
 {
 	if (idx > 0)
 	{
@@ -286,7 +286,7 @@ void PrimitiveBatch::RCLineRenderer::end(GraphicsContext* const context, ID3D12P
 	}
 }
 
-void PrimitiveBatch::RCLineRenderer::addRoundCapLine(const float x1, const float y1, const float x2, const float y2, const float width, const float r, const float g, const float b, const float a)
+void Core::Gear2D::PrimitiveBatch::RCLineRenderer::addRoundCapLine(const float x1, const float y1, const float x2, const float y2, const float width, const float r, const float g, const float b, const float a)
 {
 	vertices[idx] = x1;
 	vertices[idx + 1] = y1;

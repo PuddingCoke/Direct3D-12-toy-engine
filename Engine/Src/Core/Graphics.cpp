@@ -25,7 +25,7 @@ namespace
 
 		D3D12_CPU_DESCRIPTOR_HANDLE backBufferHandle;
 
-		ImmutableCBuffer* reservedGlobalCBuffer;
+		Core::Resource::ImmutableCBuffer* reservedGlobalCBuffer;
 
 	}pvt;
 }
@@ -75,7 +75,7 @@ D3D12_CPU_DESCRIPTOR_HANDLE Core::Graphics::getBackBufferHandle()
 	return pvt.backBufferHandle;
 }
 
-ImmutableCBuffer* Core::Graphics::getReservedGlobalCBuffer()
+Core::Resource::ImmutableCBuffer* Core::Graphics::getReservedGlobalCBuffer()
 {
 	return pvt.reservedGlobalCBuffer;
 }
@@ -116,7 +116,7 @@ void Core::Graphics::Internal::setBackBufferHandle(const D3D12_CPU_DESCRIPTOR_HA
 	pvt.backBufferHandle = backBufferHandle;
 }
 
-void Core::Graphics::Internal::setReservedGlobalCBuffer(ImmutableCBuffer* const reservedGlobalCBuffer)
+void Core::Graphics::Internal::setReservedGlobalCBuffer(Resource::ImmutableCBuffer* const reservedGlobalCBuffer)
 {
 	pvt.reservedGlobalCBuffer = reservedGlobalCBuffer;
 }

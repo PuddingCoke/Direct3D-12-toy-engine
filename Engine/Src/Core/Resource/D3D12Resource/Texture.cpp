@@ -1,7 +1,7 @@
 ﻿#include<Gear/Core/Resource/D3D12Resource/Texture.h>
 
-Texture::Texture(const uint32_t width, const uint32_t height, const DXGI_FORMAT format, const uint32_t arraySize, const uint32_t mipLevels, const bool stateTracking, const D3D12_RESOURCE_FLAGS resFlags, const D3D12_CLEAR_VALUE* const clearValue) :
-	Resource(CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE, CD3DX12_RESOURCE_DESC::Tex2D(format, width, height, arraySize, mipLevels, 1, 0, resFlags), stateTracking, D3D12_RESOURCE_STATE_COPY_DEST, clearValue),
+Core::Resource::D3D12Resource::Texture::Texture(const uint32_t width, const uint32_t height, const DXGI_FORMAT format, const uint32_t arraySize, const uint32_t mipLevels, const bool stateTracking, const D3D12_RESOURCE_FLAGS resFlags, const D3D12_CLEAR_VALUE* const clearValue) :
+	D3D12ResourceBase(CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE, CD3DX12_RESOURCE_DESC::Tex2D(format, width, height, arraySize, mipLevels, 1, 0, resFlags), stateTracking, D3D12_RESOURCE_STATE_COPY_DEST, clearValue),
 	width(width),
 	height(height),
 	arraySize(arraySize),
@@ -14,8 +14,8 @@ Texture::Texture(const uint32_t width, const uint32_t height, const DXGI_FORMAT 
 
 }
 
-Texture::Texture(const ComPtr<ID3D12Resource>& texture, const bool stateTracking, const uint32_t initialState) :
-	Resource(texture, stateTracking)
+Core::Resource::D3D12Resource::Texture::Texture(const ComPtr<ID3D12Resource>& texture, const bool stateTracking, const uint32_t initialState) :
+	D3D12ResourceBase(texture, stateTracking)
 {
 	D3D12_RESOURCE_DESC desc = getResource()->GetDesc();
 	width = static_cast<uint32_t>(desc.Width);
@@ -29,8 +29,8 @@ Texture::Texture(const ComPtr<ID3D12Resource>& texture, const bool stateTracking
 	transitionState = new States(D3D12_RESOURCE_STATE_UNKNOWN, mipLevels);
 }
 
-Texture::Texture(Texture* const tex) :
-	Resource(tex),
+Core::Resource::D3D12Resource::Texture::Texture(Texture* const tex) :
+	D3D12ResourceBase(tex),
 	width(tex->width),
 	height(tex->height),
 	arraySize(tex->arraySize),
@@ -43,7 +43,7 @@ Texture::Texture(Texture* const tex) :
 	tex->resetInternalStates();
 }
 
-Texture::~Texture()
+Core::Resource::D3D12Resource::Texture::~Texture()
 {
 	if (internalState)
 	{
@@ -56,7 +56,7 @@ Texture::~Texture()
 	}
 }
 
-void Texture::updateGlobalStates()
+void Core::Resource::D3D12Resource::Texture::updateGlobalStates()
 {
 	if (internalState->allState != D3D12_RESOURCE_STATE_UNKNOWN)
 	{
@@ -87,17 +87,17 @@ void Texture::updateGlobalStates()
 	}
 }
 
-void Texture::resetInternalStates()
+void Core::Resource::D3D12Resource::Texture::resetInternalStates()
 {
 	internalState->reset();
 }
 
-void Texture::resetTransitionStates()
+void Core::Resource::D3D12Resource::Texture::resetTransitionStates()
 {
 	transitionState->reset();
 }
 
-void Texture::transition(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers, std::vector<PendingTextureBarrier>& pendingBarriers)
+void Core::Resource::D3D12Resource::Texture::transition(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers, std::vector<PendingTextureBarrier>& pendingBarriers)
 {
 	//check each mipslice state of transitionState
 	//if they are the same then we set allState to that state
@@ -319,7 +319,7 @@ void Texture::transition(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers
 	resetTransitionStates();
 }
 
-void Texture::solvePendingBarrier(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers, const uint32_t targetMipSlice, const uint32_t targetState)
+void Core::Resource::D3D12Resource::Texture::solvePendingBarrier(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers, const uint32_t targetMipSlice, const uint32_t targetState)
 {
 	if (targetMipSlice == D3D12_TRANSITION_ALL_MIPLEVELS)
 	{
@@ -405,32 +405,32 @@ void Texture::solvePendingBarrier(std::vector<D3D12_RESOURCE_BARRIER>& transitio
 	}
 }
 
-uint32_t Texture::getWidth() const
+uint32_t Core::Resource::D3D12Resource::Texture::getWidth() const
 {
 	return width;
 }
 
-uint32_t Texture::getHeight() const
+uint32_t Core::Resource::D3D12Resource::Texture::getHeight() const
 {
 	return height;
 }
 
-uint32_t Texture::getArraySize() const
+uint32_t Core::Resource::D3D12Resource::Texture::getArraySize() const
 {
 	return arraySize;
 }
 
-uint32_t Texture::getMipLevels() const
+uint32_t Core::Resource::D3D12Resource::Texture::getMipLevels() const
 {
 	return mipLevels;
 }
 
-DXGI_FORMAT Texture::getFormat() const
+DXGI_FORMAT Core::Resource::D3D12Resource::Texture::getFormat() const
 {
 	return format;
 }
 
-void Texture::setAllState(const uint32_t state)
+void Core::Resource::D3D12Resource::Texture::setAllState(const uint32_t state)
 {
 	if (transitionState->allState == D3D12_RESOURCE_STATE_UNKNOWN)
 	{
@@ -459,7 +459,7 @@ void Texture::setAllState(const uint32_t state)
 	}
 }
 
-void Texture::setMipSliceState(const uint32_t mipSlice, const uint32_t state)
+void Core::Resource::D3D12Resource::Texture::setMipSliceState(const uint32_t mipSlice, const uint32_t state)
 {
 	if (mipLevels > 1)
 	{
@@ -489,33 +489,33 @@ void Texture::setMipSliceState(const uint32_t mipSlice, const uint32_t state)
 	}
 }
 
-uint32_t Texture::getAllState() const
+uint32_t Core::Resource::D3D12Resource::Texture::getAllState() const
 {
 	return internalState->allState;
 }
 
-uint32_t Texture::getMipSliceState(const uint32_t mipSlice) const
+uint32_t Core::Resource::D3D12Resource::Texture::getMipSliceState(const uint32_t mipSlice) const
 {
 	return internalState->mipLevelStates[mipSlice];
 }
 
-void Texture::pushToTrackingList(std::vector<Texture*>& trackingList)
+void Core::Resource::D3D12Resource::Texture::pushToTrackingList(std::vector<Texture*>& trackingList)
 {
 	if (getStateTracking() && !getInTrackingList())
 	{
 		trackingList.push_back(this);
 
-		Resource::pushToTrackingList();
+		D3D12ResourceBase::pushToTrackingList();
 	}
 }
 
-Texture::States::States(const uint32_t initialState, const uint32_t mipLevels) :
+Core::Resource::D3D12Resource::Texture::States::States(const uint32_t initialState, const uint32_t mipLevels) :
 	mipLevels(mipLevels), mipLevelStates(new uint32_t[mipLevels])
 {
 	set(initialState);
 }
 
-Texture::States::~States()
+Core::Resource::D3D12Resource::Texture::States::~States()
 {
 	if (mipLevelStates)
 	{
@@ -523,19 +523,19 @@ Texture::States::~States()
 	}
 }
 
-void Texture::States::set(const uint32_t state)
+void Core::Resource::D3D12Resource::Texture::States::set(const uint32_t state)
 {
 	allState = state;
 
 	std::fill(mipLevelStates, mipLevelStates + mipLevels, state);
 }
 
-void Texture::States::reset()
+void Core::Resource::D3D12Resource::Texture::States::reset()
 {
 	set(D3D12_RESOURCE_STATE_UNKNOWN);
 }
 
-void Texture::States::combine(const uint32_t state)
+void Core::Resource::D3D12Resource::Texture::States::combine(const uint32_t state)
 {
 	allState = (allState | state);
 
@@ -545,7 +545,7 @@ void Texture::States::combine(const uint32_t state)
 		});
 }
 
-bool Texture::States::allOfEqual(const uint32_t state) const
+bool Core::Resource::D3D12Resource::Texture::States::allOfEqual(const uint32_t state) const
 {
 	return std::all_of(mipLevelStates, mipLevelStates + mipLevels,
 		[state](const uint32_t element)

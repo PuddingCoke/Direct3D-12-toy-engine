@@ -1,129 +1,138 @@
 ﻿#pragma once
 
-#ifndef _TEXTURE_H_
-#define _TEXTURE_H_
+#ifndef _CORE_RESOURCE_D3D12RESOURCE_TEXTURE_H_
+#define _CORE_RESOURCE_D3D12RESOURCE_TEXTURE_H_
 
-#include"Resource.h"
+#include"D3D12ResourceBase.h"
 
 #include<vector>
 
 #include<algorithm>
 
-class Texture;
-
-struct PendingTextureBarrier
+namespace Core
 {
-	Texture* texture;
-
-	uint32_t mipSlice;
-
-	uint32_t afterState;
-};
-
-class Texture :public Resource
-{
-public:
-
-	Texture() = delete;
-
-	Texture(const Texture&) = delete;
-
-	void operator=(const Texture&) = delete;
-
-	Texture(const uint32_t width, const uint32_t height, const DXGI_FORMAT format, const uint32_t arraySize, const uint32_t mipLevels, const bool stateTracking, const D3D12_RESOURCE_FLAGS resFlags, const D3D12_CLEAR_VALUE* const clearValue = nullptr);
-
-	Texture(const ComPtr<ID3D12Resource>& texture, const bool stateTracking, const uint32_t initialState);
-
-	Texture(Texture* const);
-
-	virtual ~Texture();
-
-	void updateGlobalStates() override;
-
-	void resetInternalStates() override;
-
-	void transition(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers, std::vector<PendingTextureBarrier>& pendingBarriers);
-
-	void solvePendingBarrier(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers, const uint32_t targetMipSlice, const uint32_t targetState);
-
-	uint32_t getWidth() const;
-
-	uint32_t getHeight() const;
-
-	uint32_t getArraySize() const;
-
-	uint32_t getMipLevels() const;
-
-	DXGI_FORMAT getFormat() const;
-
-	void setAllState(const uint32_t state);
-
-	void setMipSliceState(const uint32_t mipSlice, const uint32_t state);
-
-	uint32_t getAllState() const;
-
-	uint32_t getMipSliceState(const uint32_t mipSlice) const;
-
-	void pushToTrackingList(std::vector<Texture*>& trackingList);
-
-protected:
-
-	void resetTransitionStates() override;
-
-private:
-
-	uint32_t width;
-
-	uint32_t height;
-
-	uint32_t arraySize;
-
-	uint32_t mipLevels;
-
-	DXGI_FORMAT format;
-
-	struct States
+	namespace Resource
 	{
-		States() = delete;
+		namespace D3D12Resource
+		{
+			class Texture;
 
-		States(const States&) = delete;
+			struct PendingTextureBarrier
+			{
+				Texture* texture;
 
-		void operator=(const States&) = delete;
+				uint32_t mipSlice;
 
-		explicit States(const uint32_t initialState, const uint32_t mipLevels);
+				uint32_t afterState;
+			};
 
-		~States();
+			class Texture :public D3D12ResourceBase
+			{
+			public:
 
-		void set(const uint32_t state);
+				Texture() = delete;
 
-		void combine(const uint32_t state);
+				Texture(const Texture&) = delete;
 
-		void reset();
+				void operator=(const Texture&) = delete;
 
-		bool allOfEqual(const uint32_t state) const;
+				Texture(const uint32_t width, const uint32_t height, const DXGI_FORMAT format, const uint32_t arraySize, const uint32_t mipLevels, const bool stateTracking, const D3D12_RESOURCE_FLAGS resFlags, const D3D12_CLEAR_VALUE* const clearValue = nullptr);
 
-		template<typename Func>
-		void forEach(const Func& func) const;
+				Texture(const ComPtr<ID3D12Resource>& texture, const bool stateTracking, const uint32_t initialState);
 
-		const uint32_t mipLevels;
+				Texture(Texture* const);
 
-		uint32_t allState;
+				virtual ~Texture();
 
-		uint32_t* mipLevelStates;
-	};
+				void updateGlobalStates() override;
 
-	std::shared_ptr<States> globalState;
+				void resetInternalStates() override;
 
-	States* internalState;
+				void transition(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers, std::vector<PendingTextureBarrier>& pendingBarriers);
 
-	States* transitionState;
+				void solvePendingBarrier(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers, const uint32_t targetMipSlice, const uint32_t targetState);
 
-};
+				uint32_t getWidth() const;
 
-#endif // !_TEXTURE_H_
+				uint32_t getHeight() const;
+
+				uint32_t getArraySize() const;
+
+				uint32_t getMipLevels() const;
+
+				DXGI_FORMAT getFormat() const;
+
+				void setAllState(const uint32_t state);
+
+				void setMipSliceState(const uint32_t mipSlice, const uint32_t state);
+
+				uint32_t getAllState() const;
+
+				uint32_t getMipSliceState(const uint32_t mipSlice) const;
+
+				void pushToTrackingList(std::vector<Texture*>& trackingList);
+
+			protected:
+
+				void resetTransitionStates() override;
+
+			private:
+
+				uint32_t width;
+
+				uint32_t height;
+
+				uint32_t arraySize;
+
+				uint32_t mipLevels;
+
+				DXGI_FORMAT format;
+
+				struct States
+				{
+					States() = delete;
+
+					States(const States&) = delete;
+
+					void operator=(const States&) = delete;
+
+					explicit States(const uint32_t initialState, const uint32_t mipLevels);
+
+					~States();
+
+					void set(const uint32_t state);
+
+					void combine(const uint32_t state);
+
+					void reset();
+
+					bool allOfEqual(const uint32_t state) const;
+
+					template<typename Func>
+					void forEach(const Func& func) const;
+
+					const uint32_t mipLevels;
+
+					uint32_t allState;
+
+					uint32_t* mipLevelStates;
+				};
+
+				std::shared_ptr<States> globalState;
+
+				States* internalState;
+
+				States* transitionState;
+
+			};
+		}
+	}
+}
+
+#endif // !_CORE_RESOURCE_D3D12RESOURCE_TEXTURE_H_
 
 template<typename Func>
-inline void Texture::States::forEach(const Func& func) const
+inline void Core::Resource::D3D12Resource::Texture::States::forEach(const Func& func) const
 {
 	std::for_each(mipLevelStates, mipLevelStates + mipLevels, func);
 }

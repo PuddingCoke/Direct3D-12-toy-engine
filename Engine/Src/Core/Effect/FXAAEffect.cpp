@@ -4,14 +4,14 @@
 
 #include<Gear/CompiledShaders/FXAA.h>
 
-FXAAEffect::FXAAEffect(GraphicsContext* const context, const uint32_t width, const uint32_t height) :
-	Effect(context, width, height, DXGI_FORMAT_R8G8B8A8_UNORM), fxaaParam{ 1.0f,0.75f,0.166f,0.0633f },
+Core::Effect::FXAAEffect::FXAAEffect(GraphicsContext* const context, const uint32_t width, const uint32_t height) :
+	EffectBase(context, width, height, DXGI_FORMAT_R8G8B8A8_UNORM), fxaaParam{ 1.0f,0.75f,0.166f,0.0633f },
 	colorLumaTexture(ResourceManager::createTextureRenderView(width, height, DXGI_FORMAT_R8G8B8A8_UNORM, 1, 1, false, true,
 		DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_R8G8B8A8_UNORM))
 {
-	colorToColorLumaPS = new Core::Shader(g_ColorToColorLumaBytes, sizeof(g_ColorToColorLumaBytes));
+	colorToColorLumaPS = new D3D12Core::Shader(g_ColorToColorLumaBytes, sizeof(g_ColorToColorLumaBytes));
 
-	fxaaPS = new Core::Shader(g_FXAABytes, sizeof(g_FXAABytes));
+	fxaaPS = new D3D12Core::Shader(g_FXAABytes, sizeof(g_FXAABytes));
 
 	{
 		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = Core::PipelineStateHelper::getDefaultFullScreenState();
@@ -32,14 +32,14 @@ FXAAEffect::FXAAEffect(GraphicsContext* const context, const uint32_t width, con
 	}
 }
 
-FXAAEffect::~FXAAEffect()
+Core::Effect::FXAAEffect::~FXAAEffect()
 {
 	delete colorLumaTexture;
 	delete colorToColorLumaPS;
 	delete fxaaPS;
 }
 
-TextureRenderView* FXAAEffect::process(TextureRenderView* const inputTexture) const
+Core::Resource::TextureRenderView* Core::Effect::FXAAEffect::process(Resource::TextureRenderView* const inputTexture) const
 {
 	context->setPipelineState(colorToColorLumaState.Get());
 
@@ -74,7 +74,7 @@ TextureRenderView* FXAAEffect::process(TextureRenderView* const inputTexture) co
 	return outputTexture;
 }
 
-void FXAAEffect::imGUICall()
+void Core::Effect::FXAAEffect::imGUICall()
 {
 	ImGui::Begin("FXAA Effect");
 	ImGui::SliderFloat("FXAAQualitySubpix", &fxaaParam.fxaaQualitySubpix, 0.0f, 1.f);
@@ -83,17 +83,17 @@ void FXAAEffect::imGUICall()
 	ImGui::End();
 }
 
-void FXAAEffect::setFXAAQualitySubpix(const float fxaaQualitySubpix)
+void Core::Effect::FXAAEffect::setFXAAQualitySubpix(const float fxaaQualitySubpix)
 {
 	fxaaParam.fxaaQualitySubpix = fxaaQualitySubpix;
 }
 
-void FXAAEffect::setFXAAQualityEdgeThreshold(const float fxaaQualityEdgeThreshold)
+void Core::Effect::FXAAEffect::setFXAAQualityEdgeThreshold(const float fxaaQualityEdgeThreshold)
 {
 	fxaaParam.fxaaQualityEdgeThreshold = fxaaQualityEdgeThreshold;
 }
 
-void FXAAEffect::setFXAAQualityEdgeThresholdMin(const float fxaaQualityEdgeThresholdMin)
+void Core::Effect::FXAAEffect::setFXAAQualityEdgeThresholdMin(const float fxaaQualityEdgeThresholdMin)
 {
 	fxaaParam.fxaaQualityEdgeThresholdMin = fxaaQualityEdgeThresholdMin;
 }

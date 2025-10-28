@@ -1,48 +1,54 @@
 ﻿#pragma once
 
-#ifndef _FXAAEFFECT_H_
-#define _FXAAEFFECT_H_
+#ifndef _CORE_EFFECT_FXAAEFFECT_H_
+#define _CORE_EFFECT_FXAAEFFECT_H_
 
-#include"Effect.h"
+#include"EffectBase.h"
 
-class FXAAEffect :public Effect
+namespace Core
 {
-public:
-
-	FXAAEffect(GraphicsContext* const context, const uint32_t width, const uint32_t height);
-
-	~FXAAEffect();
-
-	TextureRenderView* process(TextureRenderView* const inputTexture) const;
-
-	void imGUICall() override;
-
-	void setFXAAQualitySubpix(const float fxaaQualitySubpix);
-
-	void setFXAAQualityEdgeThreshold(const float fxaaQualityEdgeThreshold);
-
-	void setFXAAQualityEdgeThresholdMin(const float fxaaQualityEdgeThresholdMin);
-
-private:
-
-	TextureRenderView* colorLumaTexture;
-
-	struct FXAAParam
+	namespace Effect
 	{
-		float fxaaQualityRcpFrame; // unused
-		float fxaaQualitySubpix;
-		float fxaaQualityEdgeThreshold;
-		float fxaaQualityEdgeThresholdMin;
-	} fxaaParam;
+		class FXAAEffect :public EffectBase
+		{
+		public:
 
-	Core::Shader* colorToColorLumaPS;
+			FXAAEffect(GraphicsContext* const context, const uint32_t width, const uint32_t height);
 
-	ComPtr<ID3D12PipelineState> colorToColorLumaState;
+			~FXAAEffect();
 
-	Core::Shader* fxaaPS;
+			Resource::TextureRenderView* process(Resource::TextureRenderView* const inputTexture) const;
 
-	ComPtr<ID3D12PipelineState> fxaaState;
+			void imGUICall() override;
 
-};
+			void setFXAAQualitySubpix(const float fxaaQualitySubpix);
+
+			void setFXAAQualityEdgeThreshold(const float fxaaQualityEdgeThreshold);
+
+			void setFXAAQualityEdgeThresholdMin(const float fxaaQualityEdgeThresholdMin);
+
+		private:
+
+			Resource::TextureRenderView* colorLumaTexture;
+
+			struct FXAAParam
+			{
+				float fxaaQualityRcpFrame; // unused
+				float fxaaQualitySubpix;
+				float fxaaQualityEdgeThreshold;
+				float fxaaQualityEdgeThresholdMin;
+			} fxaaParam;
+
+			D3D12Core::Shader* colorToColorLumaPS;
+
+			ComPtr<ID3D12PipelineState> colorToColorLumaState;
+
+			D3D12Core::Shader* fxaaPS;
+
+			ComPtr<ID3D12PipelineState> fxaaState;
+
+		};
+	}
+}
 
 #endif // !_FXAAEFFECT_H_

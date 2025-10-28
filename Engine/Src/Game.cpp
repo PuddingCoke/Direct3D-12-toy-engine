@@ -1,18 +1,18 @@
 ﻿#include<Gear/Game.h>
 
-Game::Game()
+Gear::Game::Game()
 {
 }
 
-Game::~Game()
+Gear::Game::~Game()
 {
 }
 
-void Game::imGUICall()
+void Gear::Game::imGUICall()
 {
 }
 
-void Game::beginRenderTask(RenderTask* const renderTask)
+void Gear::Game::beginRenderTask(Core::RenderTask* const renderTask)
 {
 	renderTask->beginTask();
 
@@ -24,12 +24,12 @@ void Game::beginRenderTask(RenderTask* const renderTask)
 	}
 }
 
-void Game::pushCreateFuture(std::future<void>&& future)
+void Gear::Game::pushCreateFuture(std::future<void>&& future)
 {
 	createQueue.push(std::move(future));
 }
 
-void Game::scheduleAllTasks()
+void Gear::Game::scheduleAllTasks()
 {
 	while (recordQueue.size())
 	{

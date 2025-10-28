@@ -1,7 +1,7 @@
 ﻿#include<Gear/Core/Resource/ImmutableCBuffer.h>
 
-ImmutableCBuffer::ImmutableCBuffer(Buffer* const buffer, const uint32_t size, const bool persistent) :
-	buffer(buffer), EngineResource(persistent)
+Core::Resource::ImmutableCBuffer::ImmutableCBuffer(D3D12Resource::Buffer* const buffer, const uint32_t size, const bool persistent) :
+	EngineResource(persistent), gpuAddress(), bufferIndex(), buffer(buffer)
 {
 	if (size % 256 != 0)
 	{
@@ -16,7 +16,7 @@ ImmutableCBuffer::ImmutableCBuffer(Buffer* const buffer, const uint32_t size, co
 
 		numSRVUAVCBVDescriptors = 1;
 
-		DescriptorHandle descriptorHandle = DescriptorHandle();
+		D3D12Core::DescriptorHandle descriptorHandle;
 
 		if (persistent)
 		{
@@ -37,7 +37,7 @@ ImmutableCBuffer::ImmutableCBuffer(Buffer* const buffer, const uint32_t size, co
 	}
 }
 
-ImmutableCBuffer::~ImmutableCBuffer()
+Core::Resource::ImmutableCBuffer::~ImmutableCBuffer()
 {
 	if (buffer)
 	{
@@ -45,30 +45,30 @@ ImmutableCBuffer::~ImmutableCBuffer()
 	}
 }
 
-ShaderResourceDesc ImmutableCBuffer::getBufferIndex() const
+Core::Resource::D3D12Resource::ShaderResourceDesc Core::Resource::ImmutableCBuffer::getBufferIndex() const
 {
-	ShaderResourceDesc desc = {};
-	desc.type = ShaderResourceDesc::BUFFER;
-	desc.state = ShaderResourceDesc::CBV;
+	D3D12Resource::ShaderResourceDesc desc = {};
+	desc.type = D3D12Resource::ShaderResourceDesc::BUFFER;
+	desc.state = D3D12Resource::ShaderResourceDesc::CBV;
 	desc.resourceIndex = bufferIndex;
 	desc.bufferDesc.buffer = buffer;
 
 	return desc;
 }
 
-D3D12_GPU_VIRTUAL_ADDRESS ImmutableCBuffer::getGPUAddress() const
+D3D12_GPU_VIRTUAL_ADDRESS Core::Resource::ImmutableCBuffer::getGPUAddress() const
 {
 	return gpuAddress;
 }
 
-Buffer* ImmutableCBuffer::getBuffer() const
+Core::Resource::D3D12Resource::Buffer* Core::Resource::ImmutableCBuffer::getBuffer() const
 {
 	return buffer;
 }
 
-void ImmutableCBuffer::copyDescriptors()
+void Core::Resource::ImmutableCBuffer::copyDescriptors()
 {
-	const DescriptorHandle handle = getTransientDescriptorHandle();
+	const D3D12Core::DescriptorHandle handle = getTransientDescriptorHandle();
 
 	bufferIndex = handle.getCurrentIndex();
 }

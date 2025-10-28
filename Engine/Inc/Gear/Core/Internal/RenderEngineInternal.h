@@ -28,11 +28,11 @@ namespace Core
 
 			void updateTimeElapsed();
 
-			void saveBackBuffer(ReadbackHeap* const readbackHeap);
+			void saveBackBuffer(Resource::D3D12Resource::ReadbackHeap* const readbackHeap);
 
 			void setDefRenderTexture();
 
-			void setRenderTexture(Texture* const renderTexture, const D3D12_CPU_DESCRIPTOR_HANDLE handle);
+			void setRenderTexture(Resource::D3D12Resource::Texture* const renderTexture, const D3D12_CPU_DESCRIPTOR_HANDLE handle);
 
 			void initializeResources();
 

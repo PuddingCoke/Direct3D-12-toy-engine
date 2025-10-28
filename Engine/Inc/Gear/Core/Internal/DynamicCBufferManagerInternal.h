@@ -3,7 +3,7 @@
 #ifndef _CORE_DYNAMICCBUFFERMANAGER_INTERNAL_H_
 #define _CORE_DYNAMICCBUFFERMANAGER_INTERNAL_H_
 
-#include<Gear/Core/CommandList.h>
+#include<Gear/Core/D3D12Core/CommandList.h>
 
 namespace Core
 {
@@ -15,7 +15,7 @@ namespace Core
 
 			void release();
 
-			void recordCommands(CommandList* const commandList);
+			void recordCommands(D3D12Core::CommandList* const commandList);
 		}
 	}
 }

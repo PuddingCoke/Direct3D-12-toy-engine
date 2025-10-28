@@ -1,14 +1,12 @@
 ﻿#pragma once
 
 #include<Gear/Core/RenderTask.h>
-#include<Gear/Core/Shader.h>
 
 #include<Gear/Core/Effect/BloomEffect.h>
+
 #include<Gear/Core/Effect/FXAAEffect.h>
 
-#include<Gear/Utils/Color.h>
-
-#include<Gear/Core/Resource/TextureRenderView.h>
+#include<Gear/DevEssential.h>
 
 class MyRenderTask :public RenderTask
 {
@@ -16,13 +14,13 @@ public:
 
 	MyRenderTask()
 	{
-		particleVS = new Shader(L"ParticleVS.hlsl", ShaderProfile::VERTEX);
+		particleVS = new Shader(L"ParticleVS.hlsl", DXCCompiler::ShaderProfile::VERTEX);
 
-		particleGS = new Shader(L"ParticleGS.hlsl", ShaderProfile::GEOMETRY);
+		particleGS = new Shader(L"ParticleGS.hlsl", DXCCompiler::ShaderProfile::GEOMETRY);
 
-		particlePS = new Shader(L"ParticlePS.hlsl", ShaderProfile::PIXEL);
+		particlePS = new Shader(L"ParticlePS.hlsl", DXCCompiler::ShaderProfile::PIXEL);
 
-		particleCS = new Shader(L"ParticleCS.hlsl", ShaderProfile::COMPUTE);
+		particleCS = new Shader(L"ParticleCS.hlsl", DXCCompiler::ShaderProfile::COMPUTE);
 
 		Core::PipelineStateHelper::createComputeState(&particleComputeState, particleCS);
 
@@ -145,7 +143,7 @@ protected:
 
 		context->uavBarrier({ positionBuffer->getBuffer() });
 
-		const DepthStencilDesc dsDesc = depthTexture->getDSVMipHandle(0);
+		const D3D12Resource::DepthStencilDesc dsDesc = depthTexture->getDSVMipHandle(0);
 
 		context->setPipelineState(particleRenderState.Get());
 

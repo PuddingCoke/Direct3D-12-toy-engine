@@ -1,7 +1,7 @@
 ﻿#pragma once
 
-#ifndef _RESOURCEMANAGER_H_
-#define _RESOURCEMANAGER_H_
+#ifndef _CORE_RESOURCEMANAGER_H_
+#define _CORE_RESOURCEMANAGER_H_
 
 #include<Gear/Core/GraphicsContext.h>
 
@@ -19,107 +19,110 @@
 
 #include<Gear/Core/Resource/TextureDepthView.h>
 
-enum class RandomDataType
+namespace Core
 {
-	NOISE,
-	GAUSS
-};
+	enum class RandomDataType
+	{
+		NOISE,
+		GAUSS
+	};
 
-//a tool for creating both low level resource and high level resource
-//some method is commandList dependent so you need a ResourceManager instance
-class ResourceManager
-{
-public:
+	//a tool for creating both low level resource and high level resource
+	//some method is commandList dependent so you need a ResourceManager instance
+	class ResourceManager
+	{
+	public:
 
-	ResourceManager(const ResourceManager&) = delete;
+		ResourceManager(const ResourceManager&) = delete;
 
-	void operator=(const ResourceManager&) = delete;
+		void operator=(const ResourceManager&) = delete;
 
-	ResourceManager();
+		ResourceManager();
 
-	~ResourceManager();
+		~ResourceManager();
 
-	void deferredRelease(Resource* const resource);
+		void deferredRelease(Resource::D3D12Resource::D3D12ResourceBase* const resource);
 
-	void deferredRelease(EngineResource* const engineResource);
+		void deferredRelease(Resource::EngineResource* const engineResource);
 
-	void cleanTransientResources();
+		void cleanTransientResources();
 
-	GraphicsContext* getGraphicsContext() const;
+		GraphicsContext* getGraphicsContext() const;
 
-	CommandList* getCommandList() const;
+		D3D12Core::CommandList* getCommandList() const;
 
-	//create low level resource
+		//create low level resource
 
-	//create buffer from data
-	Buffer* createBuffer(const void* const data, const uint64_t size, const D3D12_RESOURCE_FLAGS resFlags);
+		//create buffer from data
+		Resource::D3D12Resource::Buffer* createBuffer(const void* const data, const uint64_t size, const D3D12_RESOURCE_FLAGS resFlags);
 
-	//create texture from file
-	Texture* createTexture(const std::wstring& filePath, const D3D12_RESOURCE_FLAGS resFlags, bool* const isTextureCube);
+		//create texture from file
+		Resource::D3D12Resource::Texture* createTexture(const std::wstring& filePath, const D3D12_RESOURCE_FLAGS resFlags, bool* const isTextureCube);
 
-	//create texture from random data
-	Texture* createTexture(const uint32_t width, const uint32_t height, const RandomDataType type, const D3D12_RESOURCE_FLAGS resFlags);
+		//create texture from random data
+		Resource::D3D12Resource::Texture* createTexture(const uint32_t width, const uint32_t height, const RandomDataType type, const D3D12_RESOURCE_FLAGS resFlags);
 
-	//create high level resource
+		//create high level resource
 
-	//create immutable constant buffer
-	ImmutableCBuffer* createImmutableCBuffer(const uint32_t size, const void* const data, const bool persistent);
+		//create immutable constant buffer
+		Resource::ImmutableCBuffer* createImmutableCBuffer(const uint32_t size, const void* const data, const bool persistent);
 
-	//create static constant buffer with data
-	StaticCBuffer* createStaticCBuffer(const uint32_t size, const void* const data, const bool persistent);
+		//create static constant buffer with data
+		Resource::StaticCBuffer* createStaticCBuffer(const uint32_t size, const void* const data, const bool persistent);
 
-	//create static constant buffer without data
-	static StaticCBuffer* createStaticCBuffer(const uint32_t size, const bool persistent);
+		//create static constant buffer without data
+		static Resource::StaticCBuffer* createStaticCBuffer(const uint32_t size, const bool persistent);
 
-	//create dynamic constant buffer
-	static DynamicCBuffer* createDynamicCBuffer(const uint32_t size, const void* const data = nullptr);
+		//create dynamic constant buffer
+		static Resource::DynamicCBuffer* createDynamicCBuffer(const uint32_t size, const void* const data = nullptr);
 
-	BufferView* createTypedBufferView(const DXGI_FORMAT format, const uint64_t size, const bool createSRV, const bool createUAV, const bool createVBV, const bool createIBV, const bool cpuWritable, const bool persistent, const void* const data);
+		Resource::BufferView* createTypedBufferView(const DXGI_FORMAT format, const uint64_t size, const bool createSRV, const bool createUAV, const bool createVBV, const bool createIBV, const bool cpuWritable, const bool persistent, const void* const data);
 
-	static BufferView* createTypedBufferView(const DXGI_FORMAT format, const uint64_t size, const bool createSRV, const bool createUAV, const bool createVBV, const bool createIBV, const bool cpuWritable, const bool persistent);
+		static Resource::BufferView* createTypedBufferView(const DXGI_FORMAT format, const uint64_t size, const bool createSRV, const bool createUAV, const bool createVBV, const bool createIBV, const bool cpuWritable, const bool persistent);
 
-	BufferView* createStructuredBufferView(const uint32_t structureByteStride, const uint64_t size, const bool createSRV, const bool createUAV, const bool createVBV, const bool cpuWritable, const bool persistent, const void* const data);
+		Resource::BufferView* createStructuredBufferView(const uint32_t structureByteStride, const uint64_t size, const bool createSRV, const bool createUAV, const bool createVBV, const bool cpuWritable, const bool persistent, const void* const data);
 
-	static BufferView* createStructuredBufferView(const uint32_t structureByteStride, const uint64_t size, const bool createSRV, const bool createUAV, const bool createVBV, const bool cpuWritable, const bool persistent);
+		static Resource::BufferView* createStructuredBufferView(const uint32_t structureByteStride, const uint64_t size, const bool createSRV, const bool createUAV, const bool createVBV, const bool cpuWritable, const bool persistent);
 
-	BufferView* createByteAddressBufferView(const uint64_t size, const bool createSRV, const bool createUAV, const bool cpuWritable, const bool persistent, const void* const data);
+		Resource::BufferView* createByteAddressBufferView(const uint64_t size, const bool createSRV, const bool createUAV, const bool cpuWritable, const bool persistent, const void* const data);
 
-	static BufferView* createByteAddressBufferView(const uint64_t size, const bool createSRV, const bool createUAV, const bool cpuWritable, const bool persistent);
+		static Resource::BufferView* createByteAddressBufferView(const uint64_t size, const bool createSRV, const bool createUAV, const bool cpuWritable, const bool persistent);
 
-	static TextureDepthView* createTextureDepthView(const uint32_t width, const uint32_t height, const DXGI_FORMAT resFormat, const uint32_t arraySize, const uint32_t mipLevels, const bool isTextureCube, const bool persistent);
+		static Resource::TextureDepthView* createTextureDepthView(const uint32_t width, const uint32_t height, const DXGI_FORMAT resFormat, const uint32_t arraySize, const uint32_t mipLevels, const bool isTextureCube, const bool persistent);
 
-	//load jpg jpeg png hdr dds(auto detect texturecube) textures
-	TextureRenderView* createTextureRenderView(const std::wstring& filePath, const bool persistent, const bool hasUAV = false, const bool hasRTV = false);
+		//load jpg jpeg png hdr dds(auto detect texturecube) textures
+		Resource::TextureRenderView* createTextureRenderView(const std::wstring& filePath, const bool persistent, const bool hasUAV = false, const bool hasRTV = false);
 
-	//create texture render view from random data
-	TextureRenderView* createTextureRenderView(const uint32_t width, const uint32_t height, const RandomDataType type, const bool persistent,
-		const DXGI_FORMAT srvFormat = DXGI_FORMAT_UNKNOWN, const DXGI_FORMAT uavFormat = DXGI_FORMAT_UNKNOWN, const DXGI_FORMAT rtvFormat = DXGI_FORMAT_UNKNOWN);
+		//create texture render view from random data
+		Resource::TextureRenderView* createTextureRenderView(const uint32_t width, const uint32_t height, const RandomDataType type, const bool persistent,
+			const DXGI_FORMAT srvFormat = DXGI_FORMAT_UNKNOWN, const DXGI_FORMAT uavFormat = DXGI_FORMAT_UNKNOWN, const DXGI_FORMAT rtvFormat = DXGI_FORMAT_UNKNOWN);
 
-	//create texture render view from custom parameters
-	static TextureRenderView* createTextureRenderView(const uint32_t width, const uint32_t height, const DXGI_FORMAT resFormat, const uint32_t arraySize, const uint32_t mipLevels, const bool isTextureCube, const bool persistent,
-		const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat, const float* const color = nullptr);
+		//create texture render view from custom parameters
+		static Resource::TextureRenderView* createTextureRenderView(const uint32_t width, const uint32_t height, const DXGI_FORMAT resFormat, const uint32_t arraySize, const uint32_t mipLevels, const bool isTextureCube, const bool persistent,
+			const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat, const float* const color = nullptr);
 
-	//create texture cube from equirectangular map
-	TextureRenderView* createTextureCube(const std::wstring& filePath, const uint32_t texturecubeResolution, const bool persistent, const bool hasUAV = false, const bool hasRTV = false);
+		//create texture cube from equirectangular map
+		Resource::TextureRenderView* createTextureCube(const std::wstring& filePath, const uint32_t texturecubeResolution, const bool persistent, const bool hasUAV = false, const bool hasRTV = false);
 
-	//create texture cube from 6 seperate textures
-	TextureRenderView* createTextureCube(const std::initializer_list<std::wstring>& texturesPath, const bool persistent,
-		const DXGI_FORMAT srvFormat = DXGI_FORMAT_UNKNOWN, const DXGI_FORMAT uavFormat = DXGI_FORMAT_UNKNOWN, const DXGI_FORMAT rtvFormat = DXGI_FORMAT_UNKNOWN);
+		//create texture cube from 6 seperate textures
+		Resource::TextureRenderView* createTextureCube(const std::initializer_list<std::wstring>& texturesPath, const bool persistent,
+			const DXGI_FORMAT srvFormat = DXGI_FORMAT_UNKNOWN, const DXGI_FORMAT uavFormat = DXGI_FORMAT_UNKNOWN, const DXGI_FORMAT rtvFormat = DXGI_FORMAT_UNKNOWN);
 
-protected:
+	protected:
 
-	//high level task such as create texture cube from equirectangular map
-	GraphicsContext* const context;
+		//high level task such as create texture cube from equirectangular map
+		GraphicsContext* const context;
 
-	//low level task such as initalize texture with data
-	CommandList* const commandList;
+		//low level task such as initalize texture with data
+		D3D12Core::CommandList* const commandList;
 
-private:
+	private:
 
-	std::vector<Resource*>* resources;
+		std::vector<Resource::D3D12Resource::D3D12ResourceBase*>* resources;
 
-	std::vector<EngineResource*>* engineResources;
+		std::vector<Resource::EngineResource*>* engineResources;
 
-};
+	};
+}
 
-#endif // !_RESOURCEMANAGER_H_
+#endif // !_CORE_RESOURCEMANAGER_H_

@@ -7,19 +7,19 @@ namespace
 	struct GlobalRootSignaturePrivate
 	{
 
-		RootSignature* graphicsRootSignature = nullptr;
+		Core::D3D12Core::RootSignature* graphicsRootSignature = nullptr;
 
-		RootSignature* computeRootSignature = nullptr;
+		Core::D3D12Core::RootSignature* computeRootSignature = nullptr;
 
 	}pvt;
 }
 
-RootSignature* Core::GlobalRootSignature::getGraphicsRootSignature()
+Core::D3D12Core::RootSignature* Core::GlobalRootSignature::getGraphicsRootSignature()
 {
 	return pvt.graphicsRootSignature;
 }
 
-RootSignature* Core::GlobalRootSignature::getComputeRootSignature()
+Core::D3D12Core::RootSignature* Core::GlobalRootSignature::getComputeRootSignature()
 {
 	return pvt.computeRootSignature;
 }
@@ -135,7 +135,7 @@ void Core::GlobalRootSignature::Internal::initialize()
 			D3D12_ROOT_SIGNATURE_FLAG_DENY_AMPLIFICATION_SHADER_ROOT_ACCESS | D3D12_ROOT_SIGNATURE_FLAG_DENY_MESH_SHADER_ROOT_ACCESS |
 			D3D12_ROOT_SIGNATURE_FLAG_CBV_SRV_UAV_HEAP_DIRECTLY_INDEXED | D3D12_ROOT_SIGNATURE_FLAG_SAMPLER_HEAP_DIRECTLY_INDEXED);
 
-		pvt.graphicsRootSignature = new RootSignature(rootSignatureDesc);
+		pvt.graphicsRootSignature = new D3D12Core::RootSignature(rootSignatureDesc);
 
 		LOGSUCCESS(L"create", LogColor::brightMagenta, L"global graphics root signature", LogColor::defaultColor, L"succeeded");
 	}
@@ -156,7 +156,7 @@ void Core::GlobalRootSignature::Internal::initialize()
 		rootSignatureDesc.Init_1_1(_countof(rootParameters), rootParameters, _countof(samplerDesc), samplerDesc,
 			D3D12_ROOT_SIGNATURE_FLAG_CBV_SRV_UAV_HEAP_DIRECTLY_INDEXED | D3D12_ROOT_SIGNATURE_FLAG_SAMPLER_HEAP_DIRECTLY_INDEXED);
 
-		pvt.computeRootSignature = new RootSignature(rootSignatureDesc);
+		pvt.computeRootSignature = new D3D12Core::RootSignature(rootSignatureDesc);
 
 		LOGSUCCESS(L"create", LogColor::brightMagenta, L"global compute root signature", LogColor::defaultColor, L"succeeded");
 	}

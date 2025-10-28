@@ -1,9 +1,8 @@
 ﻿#pragma once
 
 #include<Gear/Core/RenderTask.h>
-#include<Gear/Core/Shader.h>
 
-#include<Gear/Core/Resource/TextureRenderView.h>
+#include<Gear/DevEssential.h>
 
 class MyRenderTask :public RenderTask
 {
@@ -14,16 +13,16 @@ public:
 		whiteNoiseCS(new Shader(Utils::File::getRootFolder() + L"WhiteNoiseCS.cso")),
 		evolveCS(new Shader(Utils::File::getRootFolder() + L"EvolveCS.cso")),
 		visualizeCS(new Shader(Utils::File::getRootFolder() + L"VisualizeCS.cso")),
-		originTexture(ResourceManager::createTextureRenderView(Core::Graphics::getWidth(), Core::Graphics::getHeight(), DXGI_FORMAT_R8G8B8A8_UNORM, 1, 1, false, true,
+		originTexture(ResourceManager::createTextureRenderView(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R8G8B8A8_UNORM, 1, 1, false, true,
 			DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_UNKNOWN))
 	{
-		Core::PipelineStateHelper::createComputeState(&whiteNoiseState, whiteNoiseCS);
+		PipelineStateHelper::createComputeState(&whiteNoiseState, whiteNoiseCS);
 
-		Core::PipelineStateHelper::createComputeState(&evolveState, evolveCS);
+		PipelineStateHelper::createComputeState(&evolveState, evolveCS);
 
-		Core::PipelineStateHelper::createComputeState(&visualizeState, visualizeCS);
+		PipelineStateHelper::createComputeState(&visualizeState, visualizeCS);
 
-		swapTexture = new SwapTexture([] {return ResourceManager::createTextureRenderView(Core::Graphics::getWidth(), Core::Graphics::getHeight(), DXGI_FORMAT_R32_FLOAT, 1, 1, false, true,
+		swapTexture = new SwapTexture([] {return ResourceManager::createTextureRenderView(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R32_FLOAT, 1, 1, false, true,
 			DXGI_FORMAT_R32_FLOAT, DXGI_FORMAT_R32_FLOAT, DXGI_FORMAT_UNKNOWN); });
 
 		initialize();
@@ -106,7 +105,7 @@ protected:
 
 	void step()
 	{
-		while (timer.update(Core::Graphics::getDeltaTime()))
+		while (timer.update(Graphics::getDeltaTime()))
 		{
 			evolve(swapTexture);
 		}

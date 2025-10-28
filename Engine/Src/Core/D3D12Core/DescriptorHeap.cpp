@@ -1,6 +1,6 @@
-﻿#include<Gear/Core/DescriptorHeap.h>
+﻿#include<Gear/Core/D3D12Core/DescriptorHeap.h>
 
-DescriptorHeap::DescriptorHeap(const uint32_t numDescriptors, const uint32_t subRegionSize, const D3D12_DESCRIPTOR_HEAP_TYPE type, const D3D12_DESCRIPTOR_HEAP_FLAGS flags) :
+Core::D3D12Core::DescriptorHeap::DescriptorHeap(const uint32_t numDescriptors, const uint32_t subRegionSize, const D3D12_DESCRIPTOR_HEAP_TYPE type, const D3D12_DESCRIPTOR_HEAP_FLAGS flags) :
 	numDescriptors(numDescriptors), subRegionSize(subRegionSize), type(type),
 	incrementSize(Core::GraphicsDevice::get()->GetDescriptorHandleIncrementSize(type))
 {
@@ -42,32 +42,32 @@ DescriptorHeap::DescriptorHeap(const uint32_t numDescriptors, const uint32_t sub
 	}
 }
 
-uint32_t DescriptorHeap::getNumDescriptors() const
+uint32_t Core::D3D12Core::DescriptorHeap::getNumDescriptors() const
 {
 	return numDescriptors;
 }
 
-uint32_t DescriptorHeap::getSubRegionSize() const
+uint32_t Core::D3D12Core::DescriptorHeap::getSubRegionSize() const
 {
 	return subRegionSize;
 }
 
-D3D12_DESCRIPTOR_HEAP_TYPE DescriptorHeap::getDescriptorHeapType() const
+D3D12_DESCRIPTOR_HEAP_TYPE Core::D3D12Core::DescriptorHeap::getDescriptorHeapType() const
 {
 	return type;
 }
 
-uint32_t DescriptorHeap::getIncrementSize() const
+uint32_t Core::D3D12Core::DescriptorHeap::getIncrementSize() const
 {
 	return incrementSize;
 }
 
-ID3D12DescriptorHeap* DescriptorHeap::get() const
+ID3D12DescriptorHeap* Core::D3D12Core::DescriptorHeap::get() const
 {
 	return descriptorHeap.Get();
 }
 
-DescriptorHandle DescriptorHeap::allocStaticDescriptor(const uint32_t num)
+Core::D3D12Core::DescriptorHandle Core::D3D12Core::DescriptorHeap::allocStaticDescriptor(const uint32_t num)
 {
 	std::lock_guard<std::mutex> lockGuard(staticPointerLock);
 
@@ -82,7 +82,7 @@ DescriptorHandle DescriptorHeap::allocStaticDescriptor(const uint32_t num)
 	return DescriptorHandle(retCPUHandle, retGPUHandle, this);
 }
 
-DescriptorHandle DescriptorHeap::allocDynamicDescriptor(const uint32_t num)
+Core::D3D12Core::DescriptorHandle Core::D3D12Core::DescriptorHeap::allocDynamicDescriptor(const uint32_t num)
 {
 	std::lock_guard<std::mutex> lockGuard(dynamicPointerLock);
 
@@ -108,39 +108,39 @@ DescriptorHandle DescriptorHeap::allocDynamicDescriptor(const uint32_t num)
 	return DescriptorHandle(retCPUHandle, retGPUHandle, this);
 }
 
-DescriptorHandle::DescriptorHandle() :
+Core::D3D12Core::DescriptorHandle::DescriptorHandle() :
 	cpuHandle{}, gpuHandle{}, descriptorHeap(nullptr)
 {
 }
 
-DescriptorHandle::DescriptorHandle(const CD3DX12_CPU_DESCRIPTOR_HANDLE cpuHandle, const CD3DX12_GPU_DESCRIPTOR_HANDLE gpuHandle, const DescriptorHeap* const descriptorHeap) :
+Core::D3D12Core::DescriptorHandle::DescriptorHandle(const CD3DX12_CPU_DESCRIPTOR_HANDLE cpuHandle, const CD3DX12_GPU_DESCRIPTOR_HANDLE gpuHandle, const DescriptorHeap* const descriptorHeap) :
 	cpuHandle(cpuHandle), gpuHandle(gpuHandle), descriptorHeap(descriptorHeap)
 {
 }
 
-uint32_t DescriptorHandle::getCurrentIndex() const
+uint32_t Core::D3D12Core::DescriptorHandle::getCurrentIndex() const
 {
 	return static_cast<uint32_t>(cpuHandle.ptr - descriptorHeap->staticCPUPointerStart.ptr) / descriptorHeap->incrementSize;
 }
 
-CD3DX12_CPU_DESCRIPTOR_HANDLE DescriptorHandle::getCPUHandle() const
+CD3DX12_CPU_DESCRIPTOR_HANDLE Core::D3D12Core::DescriptorHandle::getCPUHandle() const
 {
 	return cpuHandle;
 }
 
-CD3DX12_GPU_DESCRIPTOR_HANDLE DescriptorHandle::getGPUHandle() const
+CD3DX12_GPU_DESCRIPTOR_HANDLE Core::D3D12Core::DescriptorHandle::getGPUHandle() const
 {
 	return gpuHandle;
 }
 
-void DescriptorHandle::move()
+void Core::D3D12Core::DescriptorHandle::move()
 {
 	cpuHandle.Offset(1, descriptorHeap->incrementSize);
 
 	gpuHandle.Offset(1, descriptorHeap->incrementSize);
 }
 
-void DescriptorHandle::offset(const uint32_t num)
+void Core::D3D12Core::DescriptorHandle::offset(const uint32_t num)
 {
 	cpuHandle.Offset(num, descriptorHeap->incrementSize);
 

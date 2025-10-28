@@ -9,14 +9,14 @@ namespace
 	struct HDRClampEffectPrivate
 	{
 
-		Core::Shader* hdrClampShader;
+		Core::D3D12Core::Shader* hdrClampShader;
 
 		ComPtr<ID3D12PipelineState> hdrClampState;
 
 	}pvt;
 }
 
-void Core::GlobalEffect::HDRClampEffect::process(GraphicsContext* const context, TextureRenderView* const inOutTexture)
+void Core::GlobalEffect::HDRClampEffect::process(GraphicsContext* const context, Resource::TextureRenderView* const inOutTexture)
 {
 	if (inOutTexture->getTexture()->getFormat() == DXGI_FORMAT_R16G16B16A16_FLOAT)
 	{
@@ -34,7 +34,7 @@ void Core::GlobalEffect::HDRClampEffect::process(GraphicsContext* const context,
 
 void Core::GlobalEffect::HDRClampEffect::Internal::initialize()
 {
-	pvt.hdrClampShader = new Core::Shader(g_HDRClampCSBytes, sizeof(g_HDRClampCSBytes));
+	pvt.hdrClampShader = new D3D12Core::Shader(g_HDRClampCSBytes, sizeof(g_HDRClampCSBytes));
 
 	Core::PipelineStateHelper::createComputeState(&pvt.hdrClampState, pvt.hdrClampShader);
 

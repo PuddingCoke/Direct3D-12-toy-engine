@@ -11,7 +11,7 @@ namespace Core
 	{
 		namespace BackBufferBlitEffect
 		{
-			void process(GraphicsContext* const context, TextureRenderView* const inputTexture);
+			void process(GraphicsContext* const context, Resource::TextureRenderView* const inputTexture);
 		}
 	}
 }

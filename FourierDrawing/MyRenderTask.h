@@ -2,18 +2,9 @@
 
 #include<Gear/Core/RenderTask.h>
 
-#include<Gear/Core/Shader.h>
-
-#include<Gear/Core/Resource/TextureRenderView.h>
-
-#include<Gear/Utils/Math.h>
-#include<Gear/Utils/Random.h>
-
 #include<Gear/Core/Gear2D/PrimitiveBatch.h>
 
-#include<Gear/Core/MainCamera.h>
-
-#include<DirectXColors.h>
+#include<Gear/DevEssential.h>
 
 #include<fstream>
 
@@ -53,7 +44,7 @@ public:
 
 	static constexpr int interval = 5;
 
-	PrimitiveBatch* pBatch[2];
+	Gear2D::PrimitiveBatch* pBatch[2];
 
 	TextureRenderView* renderTexture;
 
@@ -69,8 +60,8 @@ public:
 	bool connected;
 
 	MyRenderTask() :
-		pBatch{ new PrimitiveBatch(Core::Graphics::backBufferFormat,context),new PrimitiveBatch(DXGI_FORMAT_R8G8B8A8_UNORM,context) },
-		renderTexture(ResourceManager::createTextureRenderView(Core::Graphics::getWidth(), Core::Graphics::getHeight(), DXGI_FORMAT_R8G8B8A8_UNORM, 1, 1, false, true,
+		pBatch{ new Gear2D::PrimitiveBatch(Graphics::backBufferFormat,context),new Gear2D::PrimitiveBatch(DXGI_FORMAT_R8G8B8A8_UNORM,context) },
+		renderTexture(ResourceManager::createTextureRenderView(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R8G8B8A8_UNORM, 1, 1, false, true,
 			DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_R8G8B8A8_UNORM)),
 		curFrame(0),
 		connected(false)
@@ -82,19 +73,19 @@ public:
 		context->clearRenderTarget(renderTexture->getRTVMipHandle(0), DirectX::Colors::Transparent);
 
 		{
-			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = Core::PipelineStateHelper::getDefaultGraphicsDesc();
+			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = PipelineStateHelper::getDefaultGraphicsDesc();
 			desc.InputLayout = {};
-			desc.VS = Core::GlobalShader::getFullScreenVS()->getByteCode();
-			desc.PS = Core::GlobalShader::getFullScreenPS()->getByteCode();
+			desc.VS = GlobalShader::getFullScreenVS()->getByteCode();
+			desc.PS = GlobalShader::getFullScreenPS()->getByteCode();
 			desc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
-			desc.BlendState = Core::PipelineStateHelper::blendDefault;
+			desc.BlendState = PipelineStateHelper::blendDefault;
 			desc.DepthStencilState.DepthEnable = FALSE;
 			desc.DepthStencilState.StencilEnable = FALSE;
 			desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 			desc.NumRenderTargets = 1;
-			desc.RTVFormats[0] = Core::Graphics::backBufferFormat;
+			desc.RTVFormats[0] = Graphics::backBufferFormat;
 
-			Core::GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&fullScreenPipelineState));
+			GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&fullScreenPipelineState));
 		}
 
 		pBatch[0]->setLineWidth(1.5f);
@@ -160,7 +151,7 @@ public:
 			connected = true;
 		}
 
-		Core::MainCamera::setProj(DirectX::XMMatrixOrthographicOffCenterLH(0.f, (float)Core::Graphics::getWidth(), 0, (float)Core::Graphics::getHeight(), -1.f, 1.f));
+		MainCamera::setProj(DirectX::XMMatrixOrthographicOffCenterLH(0.f, (float)Graphics::getWidth(), 0, (float)Graphics::getHeight(), -1.f, 1.f));
 	}
 
 	~MyRenderTask()
@@ -177,14 +168,14 @@ protected:
 	{
 		context->setDefRenderTarget();
 		context->clearDefRenderTarget(DirectX::Colors::White);
-		context->setViewport(Core::Graphics::getWidth(), Core::Graphics::getHeight());
-		context->setScissorRect(0, 0, Core::Graphics::getWidth(), Core::Graphics::getHeight());
+		context->setViewport(Graphics::getWidth(), Graphics::getHeight());
+		context->setScissorRect(0, 0, Graphics::getWidth(), Graphics::getHeight());
 		
 		x = startX;
 		y = startY;
 
 		{
-			PrimitiveBatch* batch = pBatch[0];
+			Gear2D::PrimitiveBatch* batch = pBatch[0];
 
 			batch->begin();
 
@@ -205,7 +196,7 @@ protected:
 		context->setRenderTargets({ renderTexture->getRTVMipHandle(0) }, {});
 
 		{
-			PrimitiveBatch* batch = pBatch[1];
+			Gear2D::PrimitiveBatch* batch = pBatch[1];
 
 			batch->begin();
 

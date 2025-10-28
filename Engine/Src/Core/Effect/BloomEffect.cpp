@@ -1,5 +1,7 @@
 ﻿#include<Gear/Core/Effect/BloomEffect.h>
 
+#include<Gear/Core/GlobalShader.h>
+
 #include<Gear/Utils/File.h>
 
 #include<Gear/CompiledShaders/BloomFilterPS.h>
@@ -14,20 +16,20 @@
 
 #include<Gear/CompiledShaders/BloomKarisAveragePS.h>
 
-BloomEffect::BloomEffect(GraphicsContext* const context, const uint32_t width, const uint32_t height, ResourceManager* const resManager) :
-	Effect(context, width, height, DXGI_FORMAT_R16G16B16A16_FLOAT),
+Core::Effect::BloomEffect::BloomEffect(GraphicsContext* const context, const uint32_t width, const uint32_t height, ResourceManager* const resManager) :
+	EffectBase(context, width, height, DXGI_FORMAT_R16G16B16A16_FLOAT),
 	lensDirtTexture(resManager->createTextureRenderView(Utils::File::getRootFolder() + L"bloom_dirt_mask.png", true)),
 	filteredTexture(ResourceManager::createTextureRenderView(width, height, DXGI_FORMAT_R16G16B16A16_FLOAT, 1, 1, false, true,
 		DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_R16G16B16A16_FLOAT))
 {
 	filteredTexture->getTexture()->setName(L"Bloom Effect Filtered Texture");
 
-	bloomFilter = new Core::Shader(g_BloomFilterPSBytes, sizeof(g_BloomFilterPSBytes));
-	bloomFinal = new Core::Shader(g_BloomFinalPSBytes, sizeof(g_BloomFinalPSBytes));
-	bloomVBlur = new Core::Shader(g_BloomVBlurCSBytes, sizeof(g_BloomVBlurCSBytes));
-	bloomHBlur = new Core::Shader(g_BloomHBlurCSBytes, sizeof(g_BloomHBlurCSBytes));
-	bloomDownSample = new Core::Shader(g_BloomDownSamplePSBytes, sizeof(g_BloomDownSamplePSBytes));
-	bloomKarisAverage = new Core::Shader(g_BloomKarisAveragePSBytes, sizeof(g_BloomKarisAveragePSBytes));
+	bloomFilter = new D3D12Core::Shader(g_BloomFilterPSBytes, sizeof(g_BloomFilterPSBytes));
+	bloomFinal = new D3D12Core::Shader(g_BloomFinalPSBytes, sizeof(g_BloomFinalPSBytes));
+	bloomVBlur = new D3D12Core::Shader(g_BloomVBlurCSBytes, sizeof(g_BloomVBlurCSBytes));
+	bloomHBlur = new D3D12Core::Shader(g_BloomHBlurCSBytes, sizeof(g_BloomHBlurCSBytes));
+	bloomDownSample = new D3D12Core::Shader(g_BloomDownSamplePSBytes, sizeof(g_BloomDownSamplePSBytes));
+	bloomKarisAverage = new D3D12Core::Shader(g_BloomKarisAveragePSBytes, sizeof(g_BloomKarisAveragePSBytes));
 
 	{
 		const float sigma[blurSteps] = { 0.44f,0.57f,0.8f,1.32f,3.3f };
@@ -36,7 +38,7 @@ BloomEffect::BloomEffect(GraphicsContext* const context, const uint32_t width, c
 		{
 			resolutions[i] = DirectX::XMUINT2(width >> (i + 1), height >> (i + 1));
 
-			swapTexture[i] = new SwapTexture(
+			swapTexture[i] = new Resource::SwapTexture(
 				[=] {
 					return ResourceManager::createTextureRenderView(resolutions[i].x, resolutions[i].y, DXGI_FORMAT_R16G16B16A16_FLOAT, 1, 1, false, true,
 						DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_R16G16B16A16_FLOAT);
@@ -124,7 +126,7 @@ BloomEffect::BloomEffect(GraphicsContext* const context, const uint32_t width, c
 
 }
 
-BloomEffect::~BloomEffect()
+Core::Effect::BloomEffect::~BloomEffect()
 {
 	for (uint32_t i = 0; i < blurSteps; i++)
 	{
@@ -145,7 +147,7 @@ BloomEffect::~BloomEffect()
 	delete bloomKarisAverage;
 }
 
-TextureRenderView* BloomEffect::process(TextureRenderView* const inputTexture) const
+Core::Resource::TextureRenderView* Core::Effect::BloomEffect::process(Core::Resource::TextureRenderView* const inputTexture) const
 {
 	context->setTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
@@ -246,7 +248,7 @@ TextureRenderView* BloomEffect::process(TextureRenderView* const inputTexture) c
 	return outputTexture;
 }
 
-void BloomEffect::imGUICall()
+void Core::Effect::BloomEffect::imGUICall()
 {
 	ImGui::Begin("Bloom Effect");
 	ImGui::SliderFloat("Exposure", &bloomParam.exposure, 0.0f, 4.f);
@@ -257,42 +259,42 @@ void BloomEffect::imGUICall()
 	ImGui::End();
 }
 
-void BloomEffect::setExposure(const float exposure)
+void Core::Effect::BloomEffect::setExposure(const float exposure)
 {
 	bloomParam.exposure = exposure;
 }
 
-void BloomEffect::setGamma(const float gamma)
+void Core::Effect::BloomEffect::setGamma(const float gamma)
 {
 	bloomParam.gamma = gamma;
 }
 
-void BloomEffect::setThreshold(const float threshold)
+void Core::Effect::BloomEffect::setThreshold(const float threshold)
 {
 	bloomParam.threshold = threshold;
 }
 
-void BloomEffect::setIntensity(const float intensity)
+void Core::Effect::BloomEffect::setIntensity(const float intensity)
 {
 	bloomParam.intensity = intensity;
 }
 
-void BloomEffect::setSoftThreshold(const float softThreshold)
+void Core::Effect::BloomEffect::setSoftThreshold(const float softThreshold)
 {
 	bloomParam.softThreshold = softThreshold;
 }
 
-float BloomEffect::getExposure() const
+float Core::Effect::BloomEffect::getExposure() const
 {
 	return bloomParam.exposure;
 }
 
-float BloomEffect::getGamma() const
+float Core::Effect::BloomEffect::getGamma() const
 {
 	return bloomParam.gamma;
 }
 
-void BloomEffect::updateCurve(GraphicsContext* const context, const uint32_t index)
+void Core::Effect::BloomEffect::updateCurve(GraphicsContext* const context, const uint32_t index)
 {
 	blurParam[index].weight[0] = Utils::Math::gauss(blurParam[index].sigma, 0.f);
 

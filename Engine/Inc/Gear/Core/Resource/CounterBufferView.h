@@ -1,43 +1,49 @@
 ﻿#pragma once
 
-#ifndef _COUNTERBUFFERVIEW_H_
-#define _COUNTERBUFFERVIEW_H_
+#ifndef _CORE_RESOURCE_COUNTERBUFFERVIEW_H_
+#define _CORE_RESOURCE_COUNTERBUFFERVIEW_H_
 
 #include"D3D12Resource/Buffer.h"
 
 #include"EngineResource.h"
 
-class CounterBufferView :public EngineResource
+namespace Core
 {
-public:
+	namespace Resource
+	{
+		class CounterBufferView :public EngineResource
+		{
+		public:
 
-	CounterBufferView() = delete;
+			CounterBufferView() = delete;
 
-	CounterBufferView(const bool persistent);
+			CounterBufferView(const bool persistent);
 
-	~CounterBufferView();
+			~CounterBufferView();
 
-	ShaderResourceDesc getSRVIndex() const;
+			D3D12Resource::ShaderResourceDesc getSRVIndex() const;
 
-	ShaderResourceDesc getUAVIndex() const;
+			D3D12Resource::ShaderResourceDesc getUAVIndex() const;
 
-	ClearUAVDesc getClearUAVDesc() const;
+			D3D12Resource::ClearUAVDesc getClearUAVDesc() const;
 
-	void copyDescriptors() override;
+			void copyDescriptors() override;
 
-	Buffer* getBuffer() const;
+			D3D12Resource::Buffer* getBuffer() const;
 
-private:
+		private:
 
-	uint32_t srvIndex;
+			uint32_t srvIndex;
 
-	uint32_t uavIndex;
+			uint32_t uavIndex;
 
-	D3D12_GPU_DESCRIPTOR_HANDLE viewGPUHandle;
+			D3D12_GPU_DESCRIPTOR_HANDLE viewGPUHandle;
 
-	D3D12_CPU_DESCRIPTOR_HANDLE viewCPUHandle;
+			D3D12_CPU_DESCRIPTOR_HANDLE viewCPUHandle;
 
-	Buffer* buffer;
-};
+			D3D12Resource::Buffer* buffer;
+		};
+	}
+}
 
-#endif // !_COUNTERBUFFERVIEW_H_
+#endif // !_CORE_RESOURCE_COUNTERBUFFERVIEW_H_

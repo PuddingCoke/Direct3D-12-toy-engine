@@ -2,15 +2,9 @@
 
 #include<Gear/Core/RenderTask.h>
 
-#include<Gear/Core/Shader.h>
-
-#include<Gear/Core/Resource/TextureRenderView.h>
-
 #include<Gear/Core/Effect/BloomEffect.h>
 
-#include<Gear/Core/MainCamera.h>
-
-#include<DirectXColors.h>
+#include<Gear/DevEssential.h>
 
 #include"WaveCascade.h"
 
@@ -24,19 +18,19 @@ public:
 		renderParamBuffer(ResourceManager::createDynamicCBuffer(sizeof(RenderParam))),
 		spectrumParamBuffer{ ResourceManager::createStaticCBuffer(sizeof(SpectrumParam), true),ResourceManager::createStaticCBuffer(sizeof(SpectrumParam), true),ResourceManager::createStaticCBuffer(sizeof(SpectrumParam), true) },
 		cascade{ new WaveCascade(textureResolution,context),new WaveCascade(textureResolution,context),new WaveCascade(textureResolution,context) },
-		textureCubePS(new Core::Shader(Utils::File::getRootFolder() + L"TextureCubePS.cso")),
-		gridDebugVS(new Core::Shader(Utils::File::getRootFolder() + L"GridDebugVS.cso")),
-		gridDebugPS(new Core::Shader(Utils::File::getRootFolder() + L"GridDebugPS.cso")),
-		oceanVS(new Core::Shader(Utils::File::getRootFolder() + L"OceanVS.cso")),
-		oceanHS(new Core::Shader(Utils::File::getRootFolder() + L"OceanHS.cso")),
-		oceanDS(new Core::Shader(Utils::File::getRootFolder() + L"OceanDS.cso")),
-		oceanPS(new Core::Shader(Utils::File::getRootFolder() + L"OceanPS.cso")),
-		spectrumCS(new Core::Shader(Utils::File::getRootFolder() + L"SpectrumCS.cso")),
-		conjugateCS(new Core::Shader(Utils::File::getRootFolder() + L"ConjugateCS.cso")),
-		displacementSpectrumCS(new Core::Shader(Utils::File::getRootFolder() + L"DisplacementSpectrumCS.cso")),
-		ifftCS(new Core::Shader(Utils::File::getRootFolder() + L"IFFTCS.cso")),
-		permutationCS(new Core::Shader(Utils::File::getRootFolder() + L"PermutationCS.cso")),
-		waveMergeCS(new Core::Shader(Utils::File::getRootFolder() + L"WaveMergeCS.cso"))
+		textureCubePS(new Shader(Utils::File::getRootFolder() + L"TextureCubePS.cso")),
+		gridDebugVS(new Shader(Utils::File::getRootFolder() + L"GridDebugVS.cso")),
+		gridDebugPS(new Shader(Utils::File::getRootFolder() + L"GridDebugPS.cso")),
+		oceanVS(new Shader(Utils::File::getRootFolder() + L"OceanVS.cso")),
+		oceanHS(new Shader(Utils::File::getRootFolder() + L"OceanHS.cso")),
+		oceanDS(new Shader(Utils::File::getRootFolder() + L"OceanDS.cso")),
+		oceanPS(new Shader(Utils::File::getRootFolder() + L"OceanPS.cso")),
+		spectrumCS(new Shader(Utils::File::getRootFolder() + L"SpectrumCS.cso")),
+		conjugateCS(new Shader(Utils::File::getRootFolder() + L"ConjugateCS.cso")),
+		displacementSpectrumCS(new Shader(Utils::File::getRootFolder() + L"DisplacementSpectrumCS.cso")),
+		ifftCS(new Shader(Utils::File::getRootFolder() + L"IFFTCS.cso")),
+		permutationCS(new Shader(Utils::File::getRootFolder() + L"PermutationCS.cso")),
+		waveMergeCS(new Shader(Utils::File::getRootFolder() + L"WaveMergeCS.cso"))
 	{
 		spectrumParam[0].mapLength = lengthScale0;
 
@@ -45,19 +39,19 @@ public:
 		spectrumParam[2].mapLength = lengthScale2;
 
 		{
-			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = Core::PipelineStateHelper::getDefaultGraphicsDesc();
+			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = PipelineStateHelper::getDefaultGraphicsDesc();
 			desc.InputLayout = {};
 			desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
-			desc.RasterizerState = Core::PipelineStateHelper::rasterCullBack;
+			desc.RasterizerState = PipelineStateHelper::rasterCullBack;
 			desc.DepthStencilState.DepthEnable = false;
 			desc.DepthStencilState.StencilEnable = false;
 			desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 			desc.NumRenderTargets = 1;
 			desc.RTVFormats[0] = DXGI_FORMAT_R16G16B16A16_FLOAT;
-			desc.VS = Core::GlobalShader::getTextureCubeVS()->getByteCode();
+			desc.VS = GlobalShader::getTextureCubeVS()->getByteCode();
 			desc.PS = textureCubePS->getByteCode();
 
-			Core::GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&textureCubeState));
+			GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&textureCubeState));
 		}
 		
 		{
@@ -66,19 +60,19 @@ public:
 				{"POSITION",0,DXGI_FORMAT_R32G32B32_FLOAT,0,D3D12_APPEND_ALIGNED_ELEMENT,D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0},
 			};
 
-			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = Core::PipelineStateHelper::getDefaultGraphicsDesc();
+			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = PipelineStateHelper::getDefaultGraphicsDesc();
 			desc.InputLayout = { inputLayoutDesc,_countof(inputLayoutDesc) };
 			desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
-			desc.RasterizerState = Core::PipelineStateHelper::rasterCullBack;
+			desc.RasterizerState = PipelineStateHelper::rasterCullBack;
 			desc.DepthStencilState.DepthEnable = FALSE;
 			desc.DepthStencilState.StencilEnable = FALSE;
 			desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 			desc.NumRenderTargets = 1;
-			desc.RTVFormats[0] = Core::Graphics::backBufferFormat;
+			desc.RTVFormats[0] = Graphics::backBufferFormat;
 			desc.VS = gridDebugVS->getByteCode();
 			desc.PS = gridDebugPS->getByteCode();
 
-			Core::GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&gridDebugState));
+			GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&gridDebugState));
 		}
 
 		{
@@ -87,11 +81,11 @@ public:
 				{"POSITION",0,DXGI_FORMAT_R32G32B32_FLOAT,0,D3D12_APPEND_ALIGNED_ELEMENT,D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0},
 			};
 
-			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = Core::PipelineStateHelper::getDefaultGraphicsDesc();
+			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = PipelineStateHelper::getDefaultGraphicsDesc();
 			desc.InputLayout = { inputLayoutDesc,_countof(inputLayoutDesc) };
 			desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
-			desc.RasterizerState = Core::PipelineStateHelper::rasterCullBack;
-			desc.DepthStencilState = Core::PipelineStateHelper::depthLess;
+			desc.RasterizerState = PipelineStateHelper::rasterCullBack;
+			desc.DepthStencilState = PipelineStateHelper::depthLess;
 			desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_PATCH;
 			desc.NumRenderTargets = 1;
 			desc.RTVFormats[0] = DXGI_FORMAT_R16G16B16A16_FLOAT;
@@ -101,20 +95,20 @@ public:
 			desc.DS = oceanDS->getByteCode();
 			desc.PS = oceanPS->getByteCode();
 
-			Core::GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&oceanState));
+			GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&oceanState));
 		}
 
-		Core::PipelineStateHelper::createComputeState(&spectrumState, spectrumCS);
+		PipelineStateHelper::createComputeState(&spectrumState, spectrumCS);
 
-		Core::PipelineStateHelper::createComputeState(&conjugateState, conjugateCS);
+		PipelineStateHelper::createComputeState(&conjugateState, conjugateCS);
 
-		Core::PipelineStateHelper::createComputeState(&displacementSpectrumState, displacementSpectrumCS);
+		PipelineStateHelper::createComputeState(&displacementSpectrumState, displacementSpectrumCS);
 
-		Core::PipelineStateHelper::createComputeState(&ifftState, ifftCS);
+		PipelineStateHelper::createComputeState(&ifftState, ifftCS);
 
-		Core::PipelineStateHelper::createComputeState(&permutationState, permutationCS);
+		PipelineStateHelper::createComputeState(&permutationState, permutationCS);
 
-		Core::PipelineStateHelper::createComputeState(&waveMergeState, waveMergeCS);
+		PipelineStateHelper::createComputeState(&waveMergeState, waveMergeCS);
 
 		tildeh0Texture = createTexture(textureResolution, DXGI_FORMAT_R32G32_FLOAT);
 
@@ -136,12 +130,12 @@ public:
 
 		WaveCascade::tempTexture = tempTexture;
 
-		originTexture = ResourceManager::createTextureRenderView(Core::Graphics::getWidth(), Core::Graphics::getHeight(), DXGI_FORMAT_R16G16B16A16_FLOAT, 1, 1, false, true,
+		originTexture = ResourceManager::createTextureRenderView(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R16G16B16A16_FLOAT, 1, 1, false, true,
 			DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_R16G16B16A16_FLOAT, DirectX::Colors::Black);
 
-		depthTexture = ResourceManager::createTextureDepthView(Core::Graphics::getWidth(), Core::Graphics::getHeight(), DXGI_FORMAT_R32_TYPELESS, 1, 1, false, true);
+		depthTexture = ResourceManager::createTextureDepthView(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R32_TYPELESS, 1, 1, false, true);
 
-		effect = new BloomEffect(context, Core::Graphics::getWidth(), Core::Graphics::getHeight(), resManager);
+		effect = new BloomEffect(context, Graphics::getWidth(), Graphics::getHeight(), resManager);
 
 		vertexBuffer = resManager->createStructuredBufferView(sizeof(DirectX::XMFLOAT3), static_cast<UINT>(sizeof(DirectX::XMFLOAT3) * vertices.size()), false, false, true, true, true, vertices.data());
 
@@ -357,7 +351,7 @@ private:
 	{
 		/*context->setPipelineState(gridDebugState.Get());
 
-		context->setViewportSimple(Core::Graphics::getWidth(), Core::Graphics::getHeight());
+		context->setViewportSimple(Graphics::getWidth(), Graphics::getHeight());
 
 		context->setDefRenderTarget();
 
@@ -379,7 +373,7 @@ private:
 
 		context->setPipelineState(textureCubeState.Get());
 
-		context->setViewportSimple(Core::Graphics::getWidth(), Core::Graphics::getHeight());
+		context->setViewportSimple(Graphics::getWidth(), Graphics::getHeight());
 
 		context->setTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
@@ -394,7 +388,7 @@ private:
 
 		context->setPipelineState(oceanState.Get());
 
-		context->setViewportSimple(Core::Graphics::getWidth(), Core::Graphics::getHeight());
+		context->setViewportSimple(Graphics::getWidth(), Graphics::getHeight());
 
 		context->setTopology(D3D_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST);
 
@@ -402,7 +396,7 @@ private:
 
 		context->setIndexBuffer(indexBuffer->getIndexBuffer());
 
-		const DepthStencilDesc depthStencilDesc = depthTexture->getDSVMipHandle(0);
+		const D3D12Resource::DepthStencilDesc depthStencilDesc = depthTexture->getDSVMipHandle(0);
 
 		context->setRenderTargets({ originTexture->getRTVMipHandle(0) }, &depthStencilDesc);
 
@@ -458,7 +452,7 @@ private:
 		};
 
 		{
-			const DirectX::XMMATRIX invViewProj = DirectX::XMMatrixInverse(nullptr, Core::MainCamera::getView() * Core::MainCamera::getProj());
+			const DirectX::XMMATRIX invViewProj = DirectX::XMMatrixInverse(nullptr, MainCamera::getView() * MainCamera::getProj());
 
 			//transform corner point to world space
 			for (UINT i = 0; i < 8; i++)
@@ -578,7 +572,7 @@ private:
 		const DirectX::XMMATRIX viewMatrix = DirectX::XMMatrixLookAtLH(camera->getEyePos(), aimPoint0, camera->getUpVector());
 
 		{
-			const DirectX::XMMATRIX viewProj = viewMatrix * Core::MainCamera::getProj();
+			const DirectX::XMMATRIX viewProj = viewMatrix * MainCamera::getProj();
 
 			for (UINT i = 0; i < intersections.size(); i++)
 			{
@@ -613,7 +607,7 @@ private:
 
 		pack = DirectX::XMMatrixTranspose(pack);
 
-		*minMaxMatrix = pack * DirectX::XMMatrixInverse(nullptr, viewMatrix * Core::MainCamera::getProj());
+		*minMaxMatrix = pack * DirectX::XMMatrixInverse(nullptr, viewMatrix * MainCamera::getProj());
 
 		return true;
 	}
@@ -721,48 +715,48 @@ private:
 
 	BufferView* indexBuffer;
 
-	Core::Shader* textureCubePS;
+	Shader* textureCubePS;
 
 	ComPtr<ID3D12PipelineState> textureCubeState;
 
-	Core::Shader* gridDebugVS;
+	Shader* gridDebugVS;
 
-	Core::Shader* gridDebugPS;
+	Shader* gridDebugPS;
 
 	ComPtr<ID3D12PipelineState> gridDebugState;
 
-	Core::Shader* oceanVS;
+	Shader* oceanVS;
 
-	Core::Shader* oceanHS;
+	Shader* oceanHS;
 
-	Core::Shader* oceanDS;
+	Shader* oceanDS;
 
-	Core::Shader* oceanPS;
+	Shader* oceanPS;
 
 	ComPtr<ID3D12PipelineState> oceanState;
 
-	Core::Shader* spectrumCS;
+	Shader* spectrumCS;
 
 	ComPtr<ID3D12PipelineState> spectrumState;
 
-	Core::Shader* conjugateCS;
+	Shader* conjugateCS;
 
 	ComPtr<ID3D12PipelineState> conjugateState;
 
-	Core::Shader* displacementSpectrumCS;
+	Shader* displacementSpectrumCS;
 
 	ComPtr<ID3D12PipelineState> displacementSpectrumState;
 
-	Core::Shader* ifftCS;
+	Shader* ifftCS;
 
 	ComPtr<ID3D12PipelineState> ifftState;
 
 	//sign correction
-	Core::Shader* permutationCS;
+	Shader* permutationCS;
 
 	ComPtr<ID3D12PipelineState> permutationState;
 
-	Core::Shader* waveMergeCS;
+	Shader* waveMergeCS;
 
 	ComPtr<ID3D12PipelineState> waveMergeState;
 

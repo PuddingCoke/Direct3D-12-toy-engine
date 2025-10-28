@@ -5,7 +5,7 @@
 
 #include<Gear/Core/ResourceManager.h>
 
-#include<Gear/Core/Shader.h>
+#include<Gear/Core/D3D12Core/Shader.h>
 
 #include<Gear/Core/PipelineStateHelper.h>
 

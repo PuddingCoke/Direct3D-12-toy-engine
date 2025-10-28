@@ -1,54 +1,56 @@
 ﻿#pragma once
 
-#ifndef _INITIALIZATION_H_
-#define _INITIALIZATION_H_
+#ifndef _GEAR_INITIALIZATIONPARAM_H_
+#define _GEAR_INITIALIZATIONPARAM_H_
 
 #include<string>
 
-struct InitializationParam
+namespace Gear
 {
-
-	//please disable imgui before using nsight otherwise program will crash
-	static InitializationParam RealTime(const uint32_t width, const uint32_t height, const std::wstring& title, const bool enableImGuiSurface = true);
-
-	static InitializationParam VideoRender(const uint32_t width, const uint32_t height, const uint32_t second = 60u);
-
-	static InitializationParam Wallpaper();
-
-	enum class EngineUsage
+	struct InitializationParam
 	{
-		REALTIMERENDER,
-		VIDEORENDER,
-		WALLPAPER
-	}usage;
+		//在使用nsight调试前请关闭ImGui，否则程序会莫名崩溃
+		static InitializationParam RealTime(const uint32_t width, const uint32_t height, const std::wstring& title, const bool enableImGuiSurface = true);
 
-	std::wstring title;
+		static InitializationParam VideoRender(const uint32_t width, const uint32_t height, const uint32_t second = 60u);
 
-	struct RealTimeRenderParam
-	{
-		uint32_t width;
+		static InitializationParam Wallpaper();
 
-		uint32_t height;
+		enum class EngineUsage
+		{
+			REALTIMERENDER,
+			VIDEORENDER,
+			WALLPAPER
+		}usage;
 
-		bool enableImGuiSurface;
+		std::wstring title;
+
+		struct RealTimeRenderParam
+		{
+			uint32_t width;
+
+			uint32_t height;
+
+			bool enableImGuiSurface;
+		};
+
+		struct VideoRenderParam
+		{
+			uint32_t width;
+
+			uint32_t height;
+
+			uint32_t second;
+		};
+
+		union
+		{
+			RealTimeRenderParam realTimeRender;
+
+			VideoRenderParam videoRender;
+		};
+
 	};
+}
 
-	struct VideoRenderParam
-	{
-		uint32_t width;
-
-		uint32_t height;
-
-		uint32_t second;
-	};
-
-	union
-	{
-		RealTimeRenderParam realTimeRender;
-
-		VideoRenderParam videoRender;
-	};
-
-};
-
-#endif // !_INITIALIZATION_H_
+#endif // !_GEAR_INITIALIZATIONPARAM_H_

@@ -2,17 +2,17 @@
 
 #include<Gear/Core/GlobalEffect/BackBufferBlitEffect.h>
 
-RenderTask::RenderTask() :
+Core::RenderTask::RenderTask() :
 	resManager(new ResourceManager()),
 	context(resManager->getGraphicsContext()),
 	taskCompleted(true),
 	isRunning(true),
-	workerThread(std::thread(&RenderTask::workerLoop, this))
+	workerThread(std::thread(&Core::RenderTask::workerLoop, this))
 {
 	context->begin();
 }
 
-RenderTask::~RenderTask()
+Core::RenderTask::~RenderTask()
 {
 	isRunning = false;
 
@@ -29,7 +29,7 @@ RenderTask::~RenderTask()
 	}
 }
 
-void RenderTask::beginTask()
+void Core::RenderTask::beginTask()
 {
 	{
 		std::lock_guard<std::mutex> lockGuard(taskMutex);
@@ -40,29 +40,29 @@ void RenderTask::beginTask()
 	taskCondition.notify_one();
 }
 
-void RenderTask::waitTask()
+void Core::RenderTask::waitTask()
 {
 	std::unique_lock<std::mutex> lock(taskMutex);
 
 	taskCondition.wait(lock, [this]() {return taskCompleted; });
 }
 
-CommandList* RenderTask::getCommandList() const
+Core::D3D12Core::CommandList* Core::RenderTask::getCommandList() const
 {
 	return context->getCommandList();
 }
 
-void RenderTask::imGUICall()
+void Core::RenderTask::imGUICall()
 {
 
 }
 
-void RenderTask::blit(TextureRenderView* const texture) const
+void Core::RenderTask::blit(Resource::TextureRenderView* const texture) const
 {
-	Core::GlobalEffect::BackBufferBlitEffect::process(context, texture);
+	GlobalEffect::BackBufferBlitEffect::process(context, texture);
 }
 
-void RenderTask::workerLoop()
+void Core::RenderTask::workerLoop()
 {
 	while (true)
 	{

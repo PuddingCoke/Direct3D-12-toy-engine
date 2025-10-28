@@ -1,29 +1,29 @@
 ﻿#include<Gear/Core/Resource/SwapTexture.h>
 
-SwapTexture::SwapTexture(const std::function<TextureRenderView* (void)>& factoryFunc) :
+Core::Resource::SwapTexture::SwapTexture(const std::function<TextureRenderView* (void)>& factoryFunc) :
 	texture0(factoryFunc()), texture1(factoryFunc()),
 	width(texture0->getTexture()->getWidth()),
 	height(texture0->getTexture()->getHeight())
 {
 }
 
-SwapTexture::~SwapTexture()
+Core::Resource::SwapTexture::~SwapTexture()
 {
 	delete texture0;
 	delete texture1;
 }
 
-TextureRenderView* SwapTexture::read() const
+Core::Resource::TextureRenderView* Core::Resource::SwapTexture::read() const
 {
 	return texture0;
 }
 
-TextureRenderView* SwapTexture::write() const
+Core::Resource::TextureRenderView* Core::Resource::SwapTexture::write() const
 {
 	return texture1;
 }
 
-void SwapTexture::swap()
+void Core::Resource::SwapTexture::swap()
 {
 	TextureRenderView* const temp = texture0;
 	texture0 = texture1;

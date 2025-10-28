@@ -8,7 +8,7 @@
 
 #include<Gear/Utils/Math.h>
 
-DynamicCBuffer::DynamicCBuffer(const uint32_t size) :
+Core::Resource::DynamicCBuffer::DynamicCBuffer(const uint32_t size) :
 	ImmutableCBuffer(nullptr, 0u, true), regionIndex(Utils::Math::log2(size / 256u)), dataPtr(nullptr), acquireFrameIndex(UINT64_MAX), updateFrameIndex(UINT64_MAX)
 {
 	if (regionIndex > 1u)
@@ -17,7 +17,7 @@ DynamicCBuffer::DynamicCBuffer(const uint32_t size) :
 	}
 }
 
-void DynamicCBuffer::acquireDataPtr()
+void Core::Resource::DynamicCBuffer::acquireDataPtr()
 {
 #ifdef _DEBUG
 	if (acquireFrameIndex == Core::Graphics::getRenderedFrameCount())
@@ -37,7 +37,7 @@ void DynamicCBuffer::acquireDataPtr()
 	bufferIndex = location.descriptorIndex;
 }
 
-void DynamicCBuffer::updateData(const void* const data)
+void Core::Resource::DynamicCBuffer::updateData(const void* const data)
 {
 #ifdef _DEBUG
 	if (acquireFrameIndex != Core::Graphics::getRenderedFrameCount())
@@ -53,10 +53,10 @@ void DynamicCBuffer::updateData(const void* const data)
 
 	updateFrameIndex = Core::Graphics::getRenderedFrameCount();
 
-	memcpy(dataPtr, data, 256u << regionIndex);
+	memcpy(dataPtr, data, 256ull << regionIndex);
 }
 
-void DynamicCBuffer::simpleUpdate(const void* const data)
+void Core::Resource::DynamicCBuffer::simpleUpdate(const void* const data)
 {
 	acquireDataPtr();
 

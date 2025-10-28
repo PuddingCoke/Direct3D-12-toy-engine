@@ -3,21 +3,21 @@
 #ifndef _CORE_GLOBALDESCRIPTORHEAP_H_
 #define _CORE_GLOBALDESCRIPTORHEAP_H_
 
-#include<Gear/Core/DescriptorHeap.h>
+#include<Gear/Core/D3D12Core/DescriptorHeap.h>
 
 namespace Core
 {
 	namespace GlobalDescriptorHeap
 	{
-		DescriptorHeap* getResourceHeap();
+		D3D12Core::DescriptorHeap* getResourceHeap();
 
-		DescriptorHeap* getSamplerHeap();
+		D3D12Core::DescriptorHeap* getSamplerHeap();
 
-		DescriptorHeap* getRenderTargetHeap();
+		D3D12Core::DescriptorHeap* getRenderTargetHeap();
 
-		DescriptorHeap* getDepthStencilHeap();
+		D3D12Core::DescriptorHeap* getDepthStencilHeap();
 
-		DescriptorHeap* getNonShaderVisibleResourceHeap();
+		D3D12Core::DescriptorHeap* getNonShaderVisibleResourceHeap();
 
 		uint32_t getResourceIncrementSize();
 

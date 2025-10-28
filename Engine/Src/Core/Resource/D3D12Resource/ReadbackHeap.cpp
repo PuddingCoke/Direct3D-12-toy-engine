@@ -1,16 +1,16 @@
 ﻿#include<Gear/Core/Resource/D3D12Resource/ReadbackHeap.h>
 
-ReadbackHeap::ReadbackHeap(const uint64_t size, const D3D12_HEAP_FLAGS flags) :
-	Resource(CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_READBACK), flags, CD3DX12_RESOURCE_DESC::Buffer(size), false, D3D12_RESOURCE_STATE_COPY_DEST, nullptr)
+Core::Resource::D3D12Resource::ReadbackHeap::ReadbackHeap(const uint64_t size, const D3D12_HEAP_FLAGS flags) :
+	D3D12ResourceBase(CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_READBACK), flags, CD3DX12_RESOURCE_DESC::Buffer(size), false, D3D12_RESOURCE_STATE_COPY_DEST, nullptr)
 {
 }
 
-ReadbackHeap::ReadbackHeap(ReadbackHeap* const heap) :
-	Resource(heap)
+Core::Resource::D3D12Resource::ReadbackHeap::ReadbackHeap(ReadbackHeap* const heap) :
+	D3D12ResourceBase(heap)
 {
 }
 
-void* ReadbackHeap::map(const D3D12_RANGE readRange) const
+void* Core::Resource::D3D12Resource::ReadbackHeap::map(const D3D12_RANGE readRange) const
 {
 	void* dataPtr = nullptr;
 
@@ -19,23 +19,23 @@ void* ReadbackHeap::map(const D3D12_RANGE readRange) const
 	return dataPtr;
 }
 
-void ReadbackHeap::unmap() const
+void Core::Resource::D3D12Resource::ReadbackHeap::unmap() const
 {
 	getResource()->Unmap(0, nullptr);
 }
 
-void ReadbackHeap::updateGlobalStates()
+void Core::Resource::D3D12Resource::ReadbackHeap::updateGlobalStates()
 {
 }
 
-void ReadbackHeap::resetInternalStates()
+void Core::Resource::D3D12Resource::ReadbackHeap::resetInternalStates()
 {
 }
 
-void ReadbackHeap::resetTransitionStates()
+void Core::Resource::D3D12Resource::ReadbackHeap::resetTransitionStates()
 {
 }
 
-ReadbackHeap::~ReadbackHeap()
+Core::Resource::D3D12Resource::ReadbackHeap::~ReadbackHeap()
 {
 }

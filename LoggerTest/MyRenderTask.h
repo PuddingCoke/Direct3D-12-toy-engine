@@ -1,9 +1,8 @@
 ﻿#pragma once
 
 #include<Gear/Core/RenderTask.h>
-#include<Gear/Core/Shader.h>
 
-#include<Gear/Core/Resource/TextureRenderView.h>
+#include<Gear/DevEssential.h>
 
 class MyRenderTask :public RenderTask
 {

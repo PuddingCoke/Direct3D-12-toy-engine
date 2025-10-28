@@ -2,6 +2,8 @@
 
 #include<Gear/Core/GlobalEffect/Internal/BackBufferBlitEffectInternal.h>
 
+#include<Gear/Core/GlobalShader.h>
+
 #include<Gear/Core/Graphics.h>
 
 namespace
@@ -12,7 +14,7 @@ namespace
 	}pvt;
 }
 
-void Core::GlobalEffect::BackBufferBlitEffect::process(GraphicsContext* const context, TextureRenderView* const inputTexture)
+void Core::GlobalEffect::BackBufferBlitEffect::process(GraphicsContext* const context, Resource::TextureRenderView* const inputTexture)
 {
 	context->setPipelineState(pvt.backBufferBlitState.Get());
 

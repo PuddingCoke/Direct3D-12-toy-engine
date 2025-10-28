@@ -1,131 +1,43 @@
 ﻿#pragma once
 
-#ifndef _ENGINERESOURCE_H_
-#define _ENGINERESOURCE_H_
+#ifndef _CORE_RESOURCE_ENGINERESOURCE_H_
+#define _CORE_RESOURCE_ENGINERESOURCE_H_
 
 #include<Gear/Core/GlobalDescriptorHeap.h>
 
-class Buffer;
+#include"D3D12Resource/D3D12ResourceDesc.h"
 
-class Texture;
-
-struct ShaderResourceDesc
+namespace Core
 {
-	enum ResourceType
+	namespace Resource
 	{
-		BUFFER,
-		TEXTURE
-	} type;
+		class EngineResource
+		{
+		public:
 
-	enum TargetStates
-	{
-		SRV,
-		UAV,
-		CBV
-	} state;
+			EngineResource() = delete;
 
-	uint32_t resourceIndex;
+			EngineResource(const bool persistent);
 
-	struct TextureTransitionDesc
-	{
-		Texture* texture;
-		uint32_t mipSlice;
-	};
+			virtual ~EngineResource();
 
-	struct BufferTransitionDesc
-	{
-		Buffer* buffer;
-		Buffer* counterBuffer;
-	};
+			virtual void copyDescriptors();
 
-	union
-	{
-		TextureTransitionDesc textureDesc;
-		BufferTransitionDesc bufferDesc;
-	};
-};
+			bool getPersistent() const;
 
-struct RenderTargetDesc
-{
-	Texture* texture;
-	uint32_t mipSlice;
-	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle;
-};
+		protected:
 
-struct DepthStencilDesc
-{
-	Texture* texture;
-	uint32_t mipSlice;
-	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle;
-};
+			//copy non shader visible resource heap to shader visible resource heap
+			D3D12Core::DescriptorHandle getTransientDescriptorHandle() const;
 
-struct VertexBufferDesc
-{
-	Buffer* buffer;
-	D3D12_VERTEX_BUFFER_VIEW vbv;
-};
+			const bool persistent;
 
-struct IndexBufferDesc
-{
-	Buffer* buffer;
-	D3D12_INDEX_BUFFER_VIEW ibv;
-};
+			D3D12_CPU_DESCRIPTOR_HANDLE srvUAVCBVHandleStart;
 
-struct ClearUAVDesc
-{
-	enum ResourceType
-	{
-		BUFFER,
-		TEXTURE
-	} type;
+			uint32_t numSRVUAVCBVDescriptors;
 
-	struct TextureClearDesc
-	{
-		Texture* texture;
-		uint32_t mipSlice;
-	};
+		};
+	}
+}
 
-	struct BufferClearDesc
-	{
-		Buffer* buffer;
-	};
-
-	union
-	{
-		TextureClearDesc textureDesc;
-		BufferClearDesc bufferDesc;
-	};
-
-	D3D12_GPU_DESCRIPTOR_HANDLE viewGPUHandle;
-
-	D3D12_CPU_DESCRIPTOR_HANDLE viewCPUHandle;
-};
-
-class EngineResource
-{
-public:
-
-	EngineResource() = delete;
-
-	EngineResource(const bool persistent);
-
-	virtual ~EngineResource();
-
-	virtual void copyDescriptors();
-
-	bool getPersistent() const;
-
-protected:
-
-	//copy non shader visible resource heap to shader visible resource heap
-	DescriptorHandle getTransientDescriptorHandle() const;
-
-	const bool persistent;
-
-	D3D12_CPU_DESCRIPTOR_HANDLE srvUAVCBVHandleStart;
-
-	uint32_t numSRVUAVCBVDescriptors;
-
-};
-
-#endif // !_ENGINERESOURCE_H_
+#endif // !_CORE_RESOURCE_ENGINERESOURCE_H_

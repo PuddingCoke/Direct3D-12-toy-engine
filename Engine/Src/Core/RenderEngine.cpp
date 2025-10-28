@@ -10,6 +10,8 @@
 
 #include<Gear/Utils/Random.h>
 
+#include<Gear/Core/D3D12Core/Internal/DXCCompilerInternal.h>
+
 #include<Gear/Core/Internal/GraphicsInternal.h>
 
 #include<Gear/Core/Internal/GraphicsDeviceInternal.h>
@@ -46,11 +48,11 @@ namespace
 
 		~RenderEnginePrivate();
 
-		void submitCommandList(CommandList* const commandList);
+		void submitCommandList(Core::D3D12Core::CommandList* const commandList);
 
 		Core::GPUVendor getVendor() const;
 
-		Texture* getRenderTexture() const;
+		Core::Resource::D3D12Resource::Texture* getRenderTexture() const;
 
 		bool getDisplayImGuiSurface() const;
 
@@ -70,11 +72,11 @@ namespace
 
 		void setDefRenderTexture();
 
-		void setRenderTexture(Texture* const renderTexture, const D3D12_CPU_DESCRIPTOR_HANDLE handle);
+		void setRenderTexture(Core::Resource::D3D12Resource::Texture* const renderTexture, const D3D12_CPU_DESCRIPTOR_HANDLE handle);
 
 		void initializeResources();
 
-		void saveBackBuffer(ReadbackHeap* const readbackHeap);
+		void saveBackBuffer(Core::Resource::D3D12Resource::ReadbackHeap* const readbackHeap);
 
 	private:
 
@@ -88,7 +90,7 @@ namespace
 
 		void beginImGuiFrame() const;
 
-		void drawImGuiFrame(CommandList* const targetCommandList);
+		void drawImGuiFrame(Core::D3D12Core::CommandList* const targetCommandList);
 
 		void createStaticResources();
 
@@ -104,7 +106,7 @@ namespace
 
 		ComPtr<ID3D12CommandQueue> commandQueue;
 
-		std::vector<CommandList*> recordCommandLists;
+		std::vector<Core::D3D12Core::CommandList*> recordCommandLists;
 
 		ComPtr<ID3D12Fence> fence;
 
@@ -112,21 +114,21 @@ namespace
 
 		HANDLE fenceEvent;
 
-		CommandList* prepareCommandList;
+		Core::D3D12Core::CommandList* prepareCommandList;
 
-		Texture** backBufferTextures;
+		Core::Resource::D3D12Resource::Texture** backBufferTextures;
 
 		D3D12_CPU_DESCRIPTOR_HANDLE* backBufferHandles;
 
-		Texture* renderTexture;
+		Core::Resource::D3D12Resource::Texture* renderTexture;
 
 		std::mutex submitCommandListLock;
 
 		int32_t syncInterval;
 
-		DynamicCBuffer* reservedGlobalCBuffer;
+		Core::Resource::DynamicCBuffer* reservedGlobalCBuffer;
 
-		ResourceManager* resManager;
+		Core::ResourceManager* resManager;
 
 		struct PerframeResource
 		{
@@ -191,6 +193,8 @@ RenderEnginePrivate::RenderEnginePrivate(const uint32_t width, const uint32_t he
 		commandQueue->SetName(L"Graphics Command Queue");
 	}
 
+	Core::D3D12Core::DXCCompiler::Internal::initialize();
+
 	Core::GlobalShader::Internal::initialize();
 
 	Core::GlobalDescriptorHeap::Internal::initialize();
@@ -230,9 +234,9 @@ RenderEnginePrivate::RenderEnginePrivate(const uint32_t width, const uint32_t he
 
 	fenceValues[Core::Graphics::getFrameIndex()]++;
 
-	prepareCommandList = new CommandList(D3D12_COMMAND_LIST_TYPE_DIRECT);
+	prepareCommandList = new Core::D3D12Core::CommandList(D3D12_COMMAND_LIST_TYPE_DIRECT);
 
-	reservedGlobalCBuffer = ResourceManager::createDynamicCBuffer(sizeof(PerframeResource));
+	reservedGlobalCBuffer = Core::ResourceManager::createDynamicCBuffer(sizeof(PerframeResource));
 
 	Core::Graphics::Internal::setReservedGlobalCBuffer(reservedGlobalCBuffer);
 
@@ -241,9 +245,9 @@ RenderEnginePrivate::RenderEnginePrivate(const uint32_t width, const uint32_t he
 
 	if (useSwapChainBuffer)
 	{
-		DescriptorHandle descriptorHandle = Core::GlobalDescriptorHeap::getRenderTargetHeap()->allocStaticDescriptor(Core::Graphics::getFrameBufferCount());
+		Core::D3D12Core::DescriptorHandle descriptorHandle = Core::GlobalDescriptorHeap::getRenderTargetHeap()->allocStaticDescriptor(Core::Graphics::getFrameBufferCount());
 
-		backBufferTextures = new Texture * [Core::Graphics::getFrameBufferCount()];
+		backBufferTextures = new Core::Resource::D3D12Resource::Texture * [Core::Graphics::getFrameBufferCount()];
 
 		backBufferHandles = new D3D12_CPU_DESCRIPTOR_HANDLE[Core::Graphics::getFrameBufferCount()];
 
@@ -259,7 +263,7 @@ RenderEnginePrivate::RenderEnginePrivate(const uint32_t width, const uint32_t he
 
 			descriptorHandle.move();
 
-			backBufferTextures[i] = new Texture(texture, true, D3D12_RESOURCE_STATE_PRESENT);
+			backBufferTextures[i] = new Core::Resource::D3D12Resource::Texture(texture, true, D3D12_RESOURCE_STATE_PRESENT);
 		}
 	}
 
@@ -274,7 +278,7 @@ RenderEnginePrivate::RenderEnginePrivate(const uint32_t width, const uint32_t he
 
 		ImGui::StyleColorsDark();
 
-		const DescriptorHandle handle = Core::GlobalDescriptorHeap::getResourceHeap()->allocStaticDescriptor(1);
+		const Core::D3D12Core::DescriptorHandle handle = Core::GlobalDescriptorHeap::getResourceHeap()->allocStaticDescriptor(1);
 
 		ImGui_ImplWin32_Init(hwnd);
 		ImGui_ImplDX12_Init(Core::GraphicsDevice::get(), Core::Graphics::getFrameBufferCount(), Core::Graphics::backBufferFormat,
@@ -287,7 +291,7 @@ RenderEnginePrivate::RenderEnginePrivate(const uint32_t width, const uint32_t he
 
 	CHECKERROR(CoInitializeEx(0, COINIT_MULTITHREADED));
 
-	resManager = new ResourceManager();
+	resManager = new Core::ResourceManager();
 
 	createStaticResources();
 
@@ -354,6 +358,8 @@ RenderEnginePrivate::~RenderEnginePrivate()
 
 	Core::GlobalShader::Internal::release();
 
+	Core::D3D12Core::DXCCompiler::Internal::release();
+
 	commandQueue = nullptr;
 
 	Core::GraphicsDevice::Internal::release();
@@ -361,7 +367,7 @@ RenderEnginePrivate::~RenderEnginePrivate()
 	CloseHandle(fenceEvent);
 }
 
-void RenderEnginePrivate::submitCommandList(CommandList* const commandList)
+void RenderEnginePrivate::submitCommandList(Core::D3D12Core::CommandList* const commandList)
 {
 	std::lock_guard<std::mutex> lockGuard(submitCommandListLock);
 
@@ -369,7 +375,7 @@ void RenderEnginePrivate::submitCommandList(CommandList* const commandList)
 
 	commandList->solvePendingBarriers(barriers);
 
-	CommandList* const helperCommandList = recordCommandLists.back();
+	Core::D3D12Core::CommandList* const helperCommandList = recordCommandLists.back();
 
 	if (barriers.size() > 0)
 	{
@@ -392,7 +398,7 @@ Core::GPUVendor RenderEnginePrivate::getVendor() const
 	return vendor;
 }
 
-Texture* RenderEnginePrivate::getRenderTexture() const
+Core::Resource::D3D12Resource::Texture* RenderEnginePrivate::getRenderTexture() const
 {
 	return renderTexture;
 }
@@ -484,7 +490,7 @@ void RenderEnginePrivate::end()
 	//如有需要，则绘制ImGui帧
 	//把后备缓冲转变到STATE_PRESENT
 	{
-		CommandList* const finishCommandList = recordCommandLists.back();
+		Core::D3D12Core::CommandList* const finishCommandList = recordCommandLists.back();
 
 		drawImGuiFrame(finishCommandList);
 
@@ -518,7 +524,7 @@ void RenderEnginePrivate::setDefRenderTexture()
 	setRenderTexture(backBufferTextures[Core::Graphics::getFrameIndex()], backBufferHandles[Core::Graphics::getFrameIndex()]);
 }
 
-void RenderEnginePrivate::setRenderTexture(Texture* const renderTexture, const D3D12_CPU_DESCRIPTOR_HANDLE handle)
+void RenderEnginePrivate::setRenderTexture(Core::Resource::D3D12Resource::Texture* const renderTexture, const D3D12_CPU_DESCRIPTOR_HANDLE handle)
 {
 	//状态转变
 	this->renderTexture = renderTexture;
@@ -544,7 +550,7 @@ void RenderEnginePrivate::initializeResources()
 	resManager->cleanTransientResources();
 }
 
-void RenderEnginePrivate::saveBackBuffer(ReadbackHeap* const readbackHeap)
+void RenderEnginePrivate::saveBackBuffer(Core::Resource::D3D12Resource::ReadbackHeap* const readbackHeap)
 {
 	D3D12_PLACED_SUBRESOURCE_FOOTPRINT bufferFootprint = {};
 
@@ -654,7 +660,7 @@ void RenderEnginePrivate::processCommandLists()
 
 	std::vector<ID3D12CommandList*> commandLists;
 
-	for (const CommandList* const commandList : recordCommandLists)
+	for (const Core::D3D12Core::CommandList* const commandList : recordCommandLists)
 	{
 		commandLists.push_back(commandList->get());
 	}
@@ -687,7 +693,7 @@ void RenderEnginePrivate::beginImGuiFrame() const
 	}
 }
 
-void RenderEnginePrivate::drawImGuiFrame(CommandList* const targetCommandList)
+void RenderEnginePrivate::drawImGuiFrame(Core::D3D12Core::CommandList* const targetCommandList)
 {
 	if (displayImGUISurface)
 	{
@@ -704,7 +710,7 @@ void RenderEnginePrivate::drawImGuiFrame(CommandList* const targetCommandList)
 
 void RenderEnginePrivate::createStaticResources()
 {
-	GraphicsContext* const context = resManager->getGraphicsContext();
+	Core::GraphicsContext* const context = resManager->getGraphicsContext();
 
 	context->begin();
 
@@ -724,7 +730,7 @@ void RenderEnginePrivate::releaseStaticResources()
 	Core::GlobalEffect::LatLongMapToCubeMapEffect::Internal::release();
 }
 
-void Core::RenderEngine::submitCommandList(CommandList* const commandList)
+void Core::RenderEngine::submitCommandList(Core::D3D12Core::CommandList* const commandList)
 {
 	pvt->submitCommandList(commandList);
 }
@@ -734,7 +740,7 @@ Core::GPUVendor Core::RenderEngine::getVendor()
 	return pvt->getVendor();
 }
 
-Texture* Core::RenderEngine::getRenderTexture()
+Core::Resource::D3D12Resource::Texture* Core::RenderEngine::getRenderTexture()
 {
 	return pvt->getRenderTexture();
 }
@@ -792,7 +798,7 @@ void Core::RenderEngine::Internal::updateTimeElapsed()
 	pvt->updateTimeElapsed();
 }
 
-void Core::RenderEngine::Internal::saveBackBuffer(ReadbackHeap* const readbackHeap)
+void Core::RenderEngine::Internal::saveBackBuffer(Resource::D3D12Resource::ReadbackHeap* const readbackHeap)
 {
 	pvt->saveBackBuffer(readbackHeap);
 }
@@ -802,7 +808,7 @@ void Core::RenderEngine::Internal::setDefRenderTexture()
 	pvt->setDefRenderTexture();
 }
 
-void Core::RenderEngine::Internal::setRenderTexture(Texture* const renderTexture, const D3D12_CPU_DESCRIPTOR_HANDLE handle)
+void Core::RenderEngine::Internal::setRenderTexture(Resource::D3D12Resource::Texture* const renderTexture, const D3D12_CPU_DESCRIPTOR_HANDLE handle)
 {
 	pvt->setRenderTexture(renderTexture, handle);
 }

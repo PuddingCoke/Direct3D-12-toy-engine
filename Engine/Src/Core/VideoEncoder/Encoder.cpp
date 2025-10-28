@@ -1,6 +1,6 @@
 ﻿#include<Gear/Core/VideoEncoder/Encoder.h>
 
-Encoder::Encoder(const uint32_t frameToEncode, const OutputVideoFormat format) :
+Core::VideoEncoder::Encoder::Encoder(const uint32_t frameToEncode, const OutputVideoFormat format) :
 	frameToEncode(frameToEncode), frameEncoded(0), encodeTime(0.f), streamIndex(0), sampleDuration(10000000u / frameRate), sampleTime(0)
 {
 	CHECKERROR(MFStartup(MF_VERSION));
@@ -45,7 +45,7 @@ Encoder::Encoder(const uint32_t frameToEncode, const OutputVideoFormat format) :
 	sinkWriter->BeginWriting();
 }
 
-Encoder::~Encoder()
+Core::VideoEncoder::Encoder::~Encoder()
 {
 	sinkWriter->Finalize();
 
@@ -54,7 +54,7 @@ Encoder::~Encoder()
 	MFShutdown();
 }
 
-void Encoder::displayProgress() const
+void Core::VideoEncoder::Encoder::displayProgress() const
 {
 	if ((frameEncoded % (frameRate / 4)) == 0)
 	{
@@ -73,7 +73,7 @@ void Encoder::displayProgress() const
 	}
 }
 
-bool Encoder::writeFrame(const void* const bitstreamPtr, const uint32_t bitstreamSize, const bool cleanPoint)
+bool Core::VideoEncoder::Encoder::writeFrame(const void* const bitstreamPtr, const uint32_t bitstreamSize, const bool cleanPoint)
 {
 	frameEncoded++;
 

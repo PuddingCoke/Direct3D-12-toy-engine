@@ -1,6 +1,6 @@
-﻿#include<Gear/Core/RootSignature.h>
+﻿#include<Gear/Core/D3D12Core/RootSignature.h>
 
-RootSignature::RootSignature(const CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC& desc)
+Core::D3D12Core::RootSignature::RootSignature(const CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC& desc)
 {
 	ComPtr<ID3DBlob> signature;
 
@@ -11,11 +11,11 @@ RootSignature::RootSignature(const CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC& desc)
 	CHECKERROR(Core::GraphicsDevice::get()->CreateRootSignature(0, signature->GetBufferPointer(), signature->GetBufferSize(), IID_PPV_ARGS(&rootSignature)));
 }
 
-RootSignature::~RootSignature()
+Core::D3D12Core::RootSignature::~RootSignature()
 {
 }
 
-ID3D12RootSignature* RootSignature::get() const
+ID3D12RootSignature* Core::D3D12Core::RootSignature::get() const
 {
 	return rootSignature.Get();
 }

@@ -1,71 +1,77 @@
 ﻿#pragma once
 
-#ifndef _BUFFERVIEW_H_
-#define _BUFFERVIEW_H_
+#ifndef _CORE_RESOURCE_BUFFERVIEW_H_
+#define _CORE_RESOURCE_BUFFERVIEW_H_
 
 #include"D3D12Resource/UploadHeap.h"
 
 #include"CounterBufferView.h"
 
-//versatile buffer
-class BufferView :public EngineResource
+namespace Core
 {
-public:
-
-	BufferView() = delete;
-
-	BufferView(Buffer* const buffer, const uint32_t structureByteStride, const DXGI_FORMAT format, const uint64_t size, const bool createSRV, const bool createUAV, const bool createVBV, const bool createIBV, const bool cpuWritable, const bool persistent);
-
-	~BufferView();
-
-	VertexBufferDesc getVertexBuffer() const;
-
-	IndexBufferDesc getIndexBuffer() const;
-
-	ShaderResourceDesc getSRVIndex() const;
-
-	ShaderResourceDesc getUAVIndex() const;
-
-	ClearUAVDesc getClearUAVDesc() const;
-
-	CounterBufferView* getCounterBuffer() const;
-
-	Buffer* getBuffer() const;
-
-	void copyDescriptors() override;
-
-	struct UpdateStruct
+	namespace Resource
 	{
-		Buffer* const buffer;
-		UploadHeap* const uploadHeap;
-	}getUpdateStruct(const void* const data, const uint64_t size);
+		//versatile buffer
+		class BufferView :public EngineResource
+		{
+		public:
 
-	const bool hasSRV;
+			BufferView() = delete;
 
-	const bool hasUAV;
+			BufferView(D3D12Resource::Buffer* const buffer, const uint32_t structureByteStride, const DXGI_FORMAT format, const uint64_t size, const bool createSRV, const bool createUAV, const bool createVBV, const bool createIBV, const bool cpuWritable, const bool persistent);
 
-private:
+			~BufferView();
 
-	CounterBufferView* counterBuffer;
+			D3D12Resource::VertexBufferDesc getVertexBuffer() const;
 
-	uint32_t srvIndex;
+			D3D12Resource::IndexBufferDesc getIndexBuffer() const;
 
-	uint32_t uavIndex;
+			D3D12Resource::ShaderResourceDesc getSRVIndex() const;
 
-	D3D12_GPU_DESCRIPTOR_HANDLE viewGPUHandle;
+			D3D12Resource::ShaderResourceDesc getUAVIndex() const;
 
-	D3D12_CPU_DESCRIPTOR_HANDLE viewCPUHandle;
+			D3D12Resource::ClearUAVDesc getClearUAVDesc() const;
 
-	union
-	{
-		D3D12_VERTEX_BUFFER_VIEW vbv;
+			CounterBufferView* getCounterBuffer() const;
 
-		D3D12_INDEX_BUFFER_VIEW ibv;
-	};
+			D3D12Resource::Buffer* getBuffer() const;
 
-	UploadHeap** uploadHeaps;
+			void copyDescriptors() override;
 
-	Buffer* buffer;
-};
+			struct UpdateStruct
+			{
+				D3D12Resource::Buffer* const buffer;
+				D3D12Resource::UploadHeap* const uploadHeap;
+			}getUpdateStruct(const void* const data, const uint64_t size);
 
-#endif // !_BUFFERVIEW_H_
+			const bool hasSRV;
+
+			const bool hasUAV;
+
+		private:
+
+			CounterBufferView* counterBuffer;
+
+			uint32_t srvIndex;
+
+			uint32_t uavIndex;
+
+			D3D12_GPU_DESCRIPTOR_HANDLE viewGPUHandle;
+
+			D3D12_CPU_DESCRIPTOR_HANDLE viewCPUHandle;
+
+			union
+			{
+				D3D12_VERTEX_BUFFER_VIEW vbv;
+
+				D3D12_INDEX_BUFFER_VIEW ibv;
+			};
+
+			D3D12Resource::UploadHeap** uploadHeaps;
+
+			D3D12Resource::Buffer* buffer;
+		};
+	}
+}
+
+#endif // !_CORE_RESOURCE_BUFFERVIEW_H_

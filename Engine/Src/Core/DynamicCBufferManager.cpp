@@ -26,13 +26,13 @@ namespace
 
 		uint64_t getUpdateSize() const;
 
-		UploadHeap* getUploadHeap() const;
+		Core::Resource::D3D12Resource::UploadHeap* getUploadHeap() const;
 
 	private:
 
 		const uint64_t subRegionSize;
 
-		UploadHeap** const uploadHeap;
+		Core::Resource::D3D12Resource::UploadHeap** const uploadHeap;
 
 		uint8_t** const dataPtr;
 
@@ -50,7 +50,7 @@ namespace
 
 		Core::DynamicCBufferManager::AvailableLocation requestLocation(const uint32_t regionIndex);
 
-		void recordCommands(CommandList* const commandList);
+		void recordCommands(Core::D3D12Core::CommandList* const commandList);
 
 	private:
 
@@ -60,7 +60,7 @@ namespace
 
 		static constexpr uint32_t numRegion = sizeof(numSubRegion) / sizeof(uint32_t);
 
-		Buffer* buffer;
+		Core::Resource::D3D12Resource::Buffer* buffer;
 
 		DynamicCBufferRegion** bufferRegions;
 
@@ -77,13 +77,13 @@ namespace
 
 DynamicCBufferRegion::DynamicCBufferRegion(const uint64_t subRegionSize, const uint64_t subRegionNum) :
 	subRegionSize(subRegionSize),
-	uploadHeap(new UploadHeap* [Core::Graphics::getFrameBufferCount()]),
+	uploadHeap(new Core::Resource::D3D12Resource::UploadHeap* [Core::Graphics::getFrameBufferCount()]),
 	dataPtr(new uint8_t* [Core::Graphics::getFrameBufferCount()]),
 	currentOffset(0)
 {
 	for (uint32_t i = 0; i < Core::Graphics::getFrameBufferCount(); i++)
 	{
-		uploadHeap[i] = new UploadHeap(subRegionSize * subRegionNum);
+		uploadHeap[i] = new Core::Resource::D3D12Resource::UploadHeap(subRegionSize * subRegionNum);
 
 		dataPtr[i] = static_cast<uint8_t*>(uploadHeap[i]->map());
 	}
@@ -129,7 +129,7 @@ uint64_t DynamicCBufferRegion::getUpdateSize() const
 	return currentOffset.load(std::memory_order_relaxed);
 }
 
-UploadHeap* DynamicCBufferRegion::getUploadHeap() const
+Core::Resource::D3D12Resource::UploadHeap* DynamicCBufferRegion::getUploadHeap() const
 {
 	return uploadHeap[Core::Graphics::getFrameIndex()];
 }
@@ -147,7 +147,7 @@ DynamicCBufferManagerPrivate::DynamicCBufferManagerPrivate()
 			requiredSize += (256u << regionIndex) * numSubRegion[regionIndex];
 		}
 
-		buffer = new Buffer(requiredSize, true, D3D12_RESOURCE_FLAG_NONE);
+		buffer = new Core::Resource::D3D12Resource::Buffer(requiredSize, true, D3D12_RESOURCE_FLAG_NONE);
 
 		buffer->setName(L"Large Constant Buffer");
 
@@ -160,7 +160,7 @@ DynamicCBufferManagerPrivate::DynamicCBufferManagerPrivate()
 
 		for (uint32_t regionIndex = 0; regionIndex < numRegion; regionIndex++)
 		{
-			bufferRegions[regionIndex] = new DynamicCBufferRegion(256u << regionIndex, numSubRegion[regionIndex]);
+			bufferRegions[regionIndex] = new DynamicCBufferRegion(256ull << regionIndex, numSubRegion[regionIndex]);
 		}
 	}
 
@@ -173,7 +173,7 @@ DynamicCBufferManagerPrivate::DynamicCBufferManagerPrivate()
 			requiredDescriptorNum += numSubRegion[regionIndex];
 		}
 
-		DescriptorHandle descriptorHandle = Core::GlobalDescriptorHeap::getResourceHeap()->allocStaticDescriptor(requiredDescriptorNum);
+		Core::D3D12Core::DescriptorHandle descriptorHandle = Core::GlobalDescriptorHeap::getResourceHeap()->allocStaticDescriptor(requiredDescriptorNum);
 
 		uint64_t bufferLocationOffset = buffer->getGPUAddress();
 
@@ -189,7 +189,7 @@ DynamicCBufferManagerPrivate::DynamicCBufferManagerPrivate()
 				desc.BufferLocation = bufferLocationOffset;
 				desc.SizeInBytes = (256u << regionIndex);
 
-				bufferLocationOffset += (256u << regionIndex);
+				bufferLocationOffset += (256ull << regionIndex);
 
 				Core::GraphicsDevice::get()->CreateConstantBufferView(&desc, descriptorHandle.getCPUHandle());
 
@@ -227,7 +227,7 @@ Core::DynamicCBufferManager::AvailableLocation DynamicCBufferManagerPrivate::req
 	return { location.dataPtr,baseAddressOffsets[regionIndex] + (256u << regionIndex) * location.subregionIndex,baseDescriptorIndices[regionIndex] + location.subregionIndex };
 }
 
-void DynamicCBufferManagerPrivate::recordCommands(CommandList* const commandList)
+void DynamicCBufferManagerPrivate::recordCommands(Core::D3D12Core::CommandList* const commandList)
 {
 	//把大常量缓冲转变到STATE_COPY_DEST状态，用于内容更新
 	commandList->pushResourceTrackList(buffer);
@@ -274,7 +274,7 @@ void Core::DynamicCBufferManager::Internal::release()
 	}
 }
 
-void Core::DynamicCBufferManager::Internal::recordCommands(CommandList* const commandList)
+void Core::DynamicCBufferManager::Internal::recordCommands(Core::D3D12Core::CommandList* const commandList)
 {
 	pvt->recordCommands(commandList);
 }

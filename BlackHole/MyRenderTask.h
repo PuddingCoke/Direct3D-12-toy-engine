@@ -1,11 +1,10 @@
 ﻿#pragma once
 
 #include<Gear/Core/RenderTask.h>
-#include<Gear/Core/Shader.h>
-
-#include<Gear/Core/Resource/TextureRenderView.h>
 
 #include<Gear/Core/Effect/BloomEffect.h>
+
+#include<Gear/DevEssential.h>
 
 class MyRenderTask :public RenderTask
 {
@@ -15,16 +14,16 @@ public:
 		blackHoleShader(new Shader(Utils::File::getRootFolder() + L"BlackHolePS.cso")),
 		noiseTexture(resManager->createTextureRenderView(L"Noise.png", true)),
 		diskTexture(resManager->createTextureRenderView(L"Disk.jpg", true)),
-		originTexture(ResourceManager::createTextureRenderView(Core::Graphics::getWidth(), Core::Graphics::getHeight(), Core::FMT::RGBA16F, 1, 1, false, true,
-			Core::FMT::RGBA16F, Core::FMT::UNKNOWN, Core::FMT::RGBA16F)),
-		effect(new BloomEffect(context, Core::Graphics::getWidth(), Core::Graphics::getHeight(), resManager))
+		originTexture(ResourceManager::createTextureRenderView(Graphics::getWidth(), Graphics::getHeight(), FMT::RGBA16F, 1, 1, false, true,
+			FMT::RGBA16F, FMT::UNKNOWN, FMT::RGBA16F)),
+		effect(new BloomEffect(context, Graphics::getWidth(), Graphics::getHeight(), resManager))
 	{
-		auto desc = Core::PipelineStateHelper::getDefaultFullScreenState();
+		auto desc = PipelineStateHelper::getDefaultFullScreenState();
 		desc.NumRenderTargets = 1;
 		desc.RTVFormats[0] = originTexture->getTexture()->getFormat();
 		desc.PS = blackHoleShader->getByteCode();
 
-		Core::GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&pipelineState));
+		GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&pipelineState));
 
 		Input::Keyboard::addKeyDownEvent(Input::Keyboard::K, [this]() {perframeData.useOriginalVer = ~perframeData.useOriginalVer; });
 	}
@@ -70,17 +69,17 @@ protected:
 
 		context->setPipelineState(pipelineState.Get());
 
-		context->setViewportSimple(Core::Graphics::getWidth(), Core::Graphics::getHeight());
+		context->setViewportSimple(Graphics::getWidth(), Graphics::getHeight());
 
 		context->setTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 		context->setPSConstants({ noiseTexture->getAllSRVIndex(),diskTexture->getAllSRVIndex() }, 0);
 
-		perframeData.resolution = { static_cast<float>(Core::Graphics::getWidth()) ,static_cast<float>(Core::Graphics::getHeight()) };
+		perframeData.resolution = { static_cast<float>(Graphics::getWidth()) ,static_cast<float>(Graphics::getHeight()) };
 
-		//perframeData.timeElapsed = perframeData.texturePeriod * 3.f + sinf(Core::Graphics::getTimeElapsed()) * 1.f;
+		//perframeData.timeElapsed = perframeData.texturePeriod * 3.f + sinf(Graphics::getTimeElapsed()) * 1.f;
 
-		perframeData.timeElapsed = Core::Graphics::getTimeElapsed();
+		perframeData.timeElapsed = Graphics::getTimeElapsed();
 
 		//perframeData.timeElapsed = 0.f;
 

@@ -8,6 +8,8 @@
 
 #include"MyRenderTask.h"
 
+using namespace Gear;
+
 class MyGame :public Game
 {
 public:
@@ -17,7 +19,7 @@ public:
 	MyGame():
 		camera({ 0.f,20.f,0.f }, { 1.0f,0.f,0.f }, { 0.f,1.f,0.f }, 100.f)
 	{
-		Core::MainCamera::setProj(Utils::Math::pi / 4.f, Core::Graphics::getAspectRatio(), 1.f, 512.f);
+		MainCamera::setProj(Utils::Math::pi / 4.f, Graphics::getAspectRatio(), 1.f, 512.f);
 
 		pushCreateFuture(createRenderTaskAsync(&renderTask));
 
