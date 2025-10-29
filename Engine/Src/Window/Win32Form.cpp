@@ -61,7 +61,7 @@ namespace
 }
 
 Win32FormPrivate::Win32FormPrivate(const std::wstring& title, const uint32_t startX, const uint32_t startY, const uint32_t width, const uint32_t height, const DWORD windowStyle, LRESULT(*windowCallback)(HWND hwnd, uint32_t msg, WPARAM wParam, LPARAM lParam)) :
-	hWnd(nullptr), iniTrayIcon(windowCallback == Window::Win32Form::wallpaperCallBack), hMenu(nullptr), nid{}
+	hWnd(nullptr), iniTrayIcon(windowCallback == Gear::Window::Win32Form::wallpaperCallBack), hMenu(nullptr), nid{}
 {
 	SetProcessDPIAware();
 
@@ -126,9 +126,9 @@ Win32FormPrivate::~Win32FormPrivate()
 
 bool Win32FormPrivate::pollEvents()
 {
-	Input::Mouse::Internal::resetDeltaValue();
+	Gear::Input::Mouse::Internal::resetDeltaValue();
 
-	Input::Keyboard::Internal::resetDeltaValue();
+	Gear::Input::Keyboard::Internal::resetDeltaValue();
 
 	MSG msg = {};
 
@@ -167,38 +167,38 @@ LRESULT Win32FormPrivate::windowProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LP
 	break;
 
 	case WM_MOUSEMOVE:
-		Input::Mouse::Internal::move(static_cast<float>(LOWORD(lParam)), static_cast<float>(Core::Graphics::getHeight()) - static_cast<float>(HIWORD(lParam)));
+		Gear::Input::Mouse::Internal::move(static_cast<float>(LOWORD(lParam)), static_cast<float>(Gear::Core::Graphics::getHeight()) - static_cast<float>(HIWORD(lParam)));
 		break;
 
 	case WM_LBUTTONDOWN:
-		Input::Mouse::Internal::pressLeft();
+		Gear::Input::Mouse::Internal::pressLeft();
 		break;
 
 	case WM_RBUTTONDOWN:
-		Input::Mouse::Internal::pressRight();
+		Gear::Input::Mouse::Internal::pressRight();
 		break;
 
 	case WM_LBUTTONUP:
-		Input::Mouse::Internal::releaseLeft();
+		Gear::Input::Mouse::Internal::releaseLeft();
 		break;
 
 	case WM_RBUTTONUP:
-		Input::Mouse::Internal::releaseRight();
+		Gear::Input::Mouse::Internal::releaseRight();
 		break;
 
 	case WM_MOUSEWHEEL:
-		Input::Mouse::Internal::scroll(GET_WHEEL_DELTA_WPARAM(wParam) / 120.f);
+		Gear::Input::Mouse::Internal::scroll(GET_WHEEL_DELTA_WPARAM(wParam) / 120.f);
 		break;
 
 	case WM_KEYDOWN:
 		if ((HIWORD(lParam) & KF_REPEAT) == 0)
 		{
-			Input::Keyboard::Internal::pressKey(static_cast<Input::Keyboard::Key>(wParam));
+			Gear::Input::Keyboard::Internal::pressKey(static_cast<Gear::Input::Keyboard::Key>(wParam));
 		}
 		break;
 
 	case WM_KEYUP:
-		Input::Keyboard::Internal::releaseKey(static_cast<Input::Keyboard::Key>(wParam));
+		Gear::Input::Keyboard::Internal::releaseKey(static_cast<Gear::Input::Keyboard::Key>(wParam));
 		break;
 
 	case WM_DESTROY:
@@ -280,27 +280,27 @@ LRESULT Win32FormPrivate::wallpaperProc(HWND hWnd, uint32_t uMsg, WPARAM wParam,
 	return 0;
 }
 
-LRESULT Window::Win32Form::windowCallback(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT Gear::Window::Win32Form::windowCallback(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam)
 {
 	return pvt->windowProc(hWnd, uMsg, wParam, lParam);
 }
 
-LRESULT Window::Win32Form::encodeCallback(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT Gear::Window::Win32Form::encodeCallback(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam)
 {
 	return pvt->encodeProc(hWnd, uMsg, wParam, lParam);
 }
 
-LRESULT Window::Win32Form::wallpaperCallBack(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT Gear::Window::Win32Form::wallpaperCallBack(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam)
 {
 	return pvt->wallpaperProc(hWnd, uMsg, wParam, lParam);
 }
 
-void Window::Win32Form::initialize(const std::wstring& title, const uint32_t startX, const uint32_t startY, const uint32_t width, const uint32_t height, const DWORD windowStyle, LRESULT(*windowCallback)(HWND hwnd, uint32_t msg, WPARAM wParam, LPARAM lParam))
+void Gear::Window::Win32Form::initialize(const std::wstring& title, const uint32_t startX, const uint32_t startY, const uint32_t width, const uint32_t height, const DWORD windowStyle, LRESULT(*windowCallback)(HWND hwnd, uint32_t msg, WPARAM wParam, LPARAM lParam))
 {
 	pvt = new Win32FormPrivate(title, startX, startY, width, height, windowStyle, windowCallback);
 }
 
-void Window::Win32Form::release()
+void Gear::Window::Win32Form::release()
 {
 	if (pvt)
 	{
@@ -308,12 +308,12 @@ void Window::Win32Form::release()
 	}
 }
 
-bool Window::Win32Form::pollEvents()
+bool Gear::Window::Win32Form::pollEvents()
 {
 	return pvt->pollEvents();
 }
 
-HWND Window::Win32Form::getHandle()
+HWND Gear::Window::Win32Form::getHandle()
 {
 	return pvt->getHandle();
 }

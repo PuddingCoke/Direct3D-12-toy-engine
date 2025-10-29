@@ -49,7 +49,7 @@ namespace
 			}
 		}
 
-		void submitLogMessage(const Utils::Logger::LogMessage& msg)
+		void submitLogMessage(const Gear::Utils::Logger::LogMessage& msg)
 		{
 			{
 				std::lock_guard<std::mutex> lockGuard(queueLock);
@@ -64,7 +64,7 @@ namespace
 
 		std::wofstream file;
 
-		std::queue<Utils::Logger::LogMessage> messages;
+		std::queue<Gear::Utils::Logger::LogMessage> messages;
 
 		bool isRunning;
 
@@ -93,7 +93,7 @@ namespace
 
 			while (!messages.empty())
 			{
-				Utils::Logger::LogMessage message = std::move(messages.front());
+				Gear::Utils::Logger::LogMessage message = std::move(messages.front());
 
 				messages.pop();
 
@@ -131,7 +131,7 @@ namespace
 
 				while (!messages.empty())
 				{
-					Utils::Logger::LogMessage message = std::move(messages.front());
+					Gear::Utils::Logger::LogMessage message = std::move(messages.front());
 
 					messages.pop();
 
@@ -153,7 +153,7 @@ namespace
 
 					lock.lock();
 
-					if (message.type == Utils::Logger::LogType::LOG_ERROR)
+					if (message.type == Gear::Utils::Logger::LogType::LOG_ERROR)
 					{
 						isRunning = false;
 
@@ -171,17 +171,17 @@ namespace
 
 }
 
-void Utils::Logger::submitLogMessage(const LogMessage& msg)
+void Gear::Utils::Logger::submitLogMessage(const LogMessage& msg)
 {
 	pvt->submitLogMessage(msg);
 }
 
-void Utils::Logger::Internal::initialize()
+void Gear::Utils::Logger::Internal::initialize()
 {
 	pvt = new LoggerPrivate();
 }
 
-void Utils::Logger::Internal::release()
+void Gear::Utils::Logger::Internal::release()
 {
 	if (pvt)
 	{

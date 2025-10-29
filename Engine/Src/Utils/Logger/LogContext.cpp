@@ -1,16 +1,16 @@
 ﻿#include<Gear/Utils/Logger/LogContext.h>
 
-Utils::Logger::BufferSlot::BufferSlot() :
+Gear::Utils::Logger::BufferSlot::BufferSlot() :
 	inUse(false)
 {
 }
 
-Utils::Logger::LogContext::FloatPrecision::FloatPrecision(const int32_t precision) :
+Gear::Utils::Logger::LogContext::FloatPrecision::FloatPrecision(const int32_t precision) :
 	precision(std::max(std::min(precision, 16), 0))
 {
 }
 
-Utils::Logger::LogContext::LogContext() :
+Gear::Utils::Logger::LogContext::LogContext() :
 	textColor{ L"" },
 	displayColor{ L"" },
 	slots(new BufferSlot[slotNum]),
@@ -20,7 +20,7 @@ Utils::Logger::LogContext::LogContext() :
 	resetState();
 }
 
-Utils::Logger::LogContext::~LogContext()
+Gear::Utils::Logger::LogContext::~LogContext()
 {
 	for (uint32_t i = 0; i < slotNum; i++)
 	{
@@ -38,20 +38,11 @@ Utils::Logger::LogContext::~LogContext()
 	}
 }
 
-void Utils::Logger::LogContext::packRestArgument()
+void Gear::Utils::Logger::LogContext::packRestArgument()
 {
 }
 
-void Utils::Logger::LogContext::packArgument(const std::wstring& arg)
-{
-	setDisplayColor(textColor);
-
-	*messageStr += arg;
-
-	*messageStr += L" ";
-}
-
-void Utils::Logger::LogContext::packArgument(const wchar_t* arg)
+void Gear::Utils::Logger::LogContext::packArgument(const std::wstring& arg)
 {
 	setDisplayColor(textColor);
 
@@ -60,7 +51,16 @@ void Utils::Logger::LogContext::packArgument(const wchar_t* arg)
 	*messageStr += L" ";
 }
 
-void Utils::Logger::LogContext::packArgument(const int32_t& arg)
+void Gear::Utils::Logger::LogContext::packArgument(const wchar_t* arg)
+{
+	setDisplayColor(textColor);
+
+	*messageStr += arg;
+
+	*messageStr += L" ";
+}
+
+void Gear::Utils::Logger::LogContext::packArgument(const int32_t& arg)
 {
 	setDisplayColor(LogColor::numericColor);
 
@@ -94,7 +94,7 @@ void Utils::Logger::LogContext::packArgument(const int32_t& arg)
 	*messageStr += L" ";
 }
 
-void Utils::Logger::LogContext::packArgument(const int64_t& arg)
+void Gear::Utils::Logger::LogContext::packArgument(const int64_t& arg)
 {
 	setDisplayColor(LogColor::numericColor);
 
@@ -128,7 +128,7 @@ void Utils::Logger::LogContext::packArgument(const int64_t& arg)
 	*messageStr += L" ";
 }
 
-void Utils::Logger::LogContext::packArgument(const uint32_t& arg)
+void Gear::Utils::Logger::LogContext::packArgument(const uint32_t& arg)
 {
 	setDisplayColor(LogColor::numericColor);
 
@@ -162,7 +162,7 @@ void Utils::Logger::LogContext::packArgument(const uint32_t& arg)
 	*messageStr += L" ";
 }
 
-void Utils::Logger::LogContext::packArgument(const uint64_t& arg)
+void Gear::Utils::Logger::LogContext::packArgument(const uint64_t& arg)
 {
 	setDisplayColor(LogColor::numericColor);
 
@@ -196,27 +196,27 @@ void Utils::Logger::LogContext::packArgument(const uint64_t& arg)
 	*messageStr += L" ";
 }
 
-void Utils::Logger::LogContext::packArgument(const float_t& arg)
+void Gear::Utils::Logger::LogContext::packArgument(const float_t& arg)
 {
 	packFloatPoint(arg);
 }
 
-void Utils::Logger::LogContext::packArgument(const double_t& arg)
+void Gear::Utils::Logger::LogContext::packArgument(const double_t& arg)
 {
 	packFloatPoint(arg);
 }
 
-void Utils::Logger::LogContext::packArgument(const IntegerMode& mode)
+void Gear::Utils::Logger::LogContext::packArgument(const IntegerMode& mode)
 {
 	integerMode = mode;
 }
 
-void Utils::Logger::LogContext::packArgument(const FloatPrecision& precision)
+void Gear::Utils::Logger::LogContext::packArgument(const FloatPrecision& precision)
 {
 	floatPrecision = precision;
 }
 
-void Utils::Logger::LogContext::packArgument(const LogColor& arg)
+void Gear::Utils::Logger::LogContext::packArgument(const LogColor& arg)
 {
 	if (textColor != arg)
 	{
@@ -224,7 +224,7 @@ void Utils::Logger::LogContext::packArgument(const LogColor& arg)
 	}
 }
 
-void Utils::Logger::LogContext::setDisplayColor(const LogColor& color)
+void Gear::Utils::Logger::LogContext::setDisplayColor(const LogColor& color)
 {
 	if (displayColor != color)
 	{
@@ -234,7 +234,7 @@ void Utils::Logger::LogContext::setDisplayColor(const LogColor& color)
 	}
 }
 
-void Utils::Logger::LogContext::resetState()
+void Gear::Utils::Logger::LogContext::resetState()
 {
 	integerMode = IntegerMode::DEC;
 

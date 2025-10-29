@@ -19,7 +19,7 @@ namespace
 		~DXCCompilerPrivate();
 
 		//hlsl
-		ComPtr<IDxcBlob> compile(const std::wstring& filePath, const Core::D3D12Core::DXCCompiler::ShaderProfile profile) const;
+		ComPtr<IDxcBlob> compile(const std::wstring& filePath, const Gear::Core::D3D12Core::DXCCompiler::ShaderProfile profile) const;
 
 		//cso
 		ComPtr<IDxcBlob> read(const std::wstring& filePath) const;
@@ -51,9 +51,9 @@ DXCCompilerPrivate::~DXCCompilerPrivate()
 
 }
 
-ComPtr<IDxcBlob> DXCCompilerPrivate::compile(const std::wstring& filePath, const Core::D3D12Core::DXCCompiler::ShaderProfile profile) const
+ComPtr<IDxcBlob> DXCCompilerPrivate::compile(const std::wstring& filePath, const Gear::Core::D3D12Core::DXCCompiler::ShaderProfile profile) const
 {
-	const std::vector<uint8_t> bytes = Utils::File::readAllBinary(filePath);
+	const std::vector<uint8_t> bytes = Gear::Utils::File::readAllBinary(filePath);
 
 	ComPtr<IDxcBlobEncoding> textBlob;
 
@@ -68,31 +68,31 @@ ComPtr<IDxcBlob> DXCCompilerPrivate::compile(const std::wstring& filePath, const
 
 	switch (profile)
 	{
-	case Core::D3D12Core::DXCCompiler::ShaderProfile::VERTEX:
+	case Gear::Core::D3D12Core::DXCCompiler::ShaderProfile::VERTEX:
 		dxcUtils->BuildArguments(filePath.c_str(), L"main", L"vs_6_6", nullptr, 0, nullptr, 0, &args);
 		break;
-	case Core::D3D12Core::DXCCompiler::ShaderProfile::HULL:
+	case Gear::Core::D3D12Core::DXCCompiler::ShaderProfile::HULL:
 		dxcUtils->BuildArguments(filePath.c_str(), L"main", L"hs_6_6", nullptr, 0, nullptr, 0, &args);
 		break;
-	case Core::D3D12Core::DXCCompiler::ShaderProfile::DOMAIN:
+	case Gear::Core::D3D12Core::DXCCompiler::ShaderProfile::DOMAIN:
 		dxcUtils->BuildArguments(filePath.c_str(), L"main", L"ds_6_6", nullptr, 0, nullptr, 0, &args);
 		break;
-	case Core::D3D12Core::DXCCompiler::ShaderProfile::GEOMETRY:
+	case Gear::Core::D3D12Core::DXCCompiler::ShaderProfile::GEOMETRY:
 		dxcUtils->BuildArguments(filePath.c_str(), L"main", L"gs_6_6", nullptr, 0, nullptr, 0, &args);
 		break;
-	case Core::D3D12Core::DXCCompiler::ShaderProfile::PIXEL:
+	case Gear::Core::D3D12Core::DXCCompiler::ShaderProfile::PIXEL:
 		dxcUtils->BuildArguments(filePath.c_str(), L"main", L"ps_6_6", nullptr, 0, nullptr, 0, &args);
 		break;
-	case Core::D3D12Core::DXCCompiler::ShaderProfile::AMPLIFICATION:
+	case Gear::Core::D3D12Core::DXCCompiler::ShaderProfile::AMPLIFICATION:
 		dxcUtils->BuildArguments(filePath.c_str(), L"main", L"as_6_6", nullptr, 0, nullptr, 0, &args);
 		break;
-	case Core::D3D12Core::DXCCompiler::ShaderProfile::MESH:
+	case Gear::Core::D3D12Core::DXCCompiler::ShaderProfile::MESH:
 		dxcUtils->BuildArguments(filePath.c_str(), L"main", L"ms_6_6", nullptr, 0, nullptr, 0, &args);
 		break;
-	case Core::D3D12Core::DXCCompiler::ShaderProfile::COMPUTE:
+	case Gear::Core::D3D12Core::DXCCompiler::ShaderProfile::COMPUTE:
 		dxcUtils->BuildArguments(filePath.c_str(), L"main", L"cs_6_6", nullptr, 0, nullptr, 0, &args);
 		break;
-	case Core::D3D12Core::DXCCompiler::ShaderProfile::LIBRARY:
+	case Gear::Core::D3D12Core::DXCCompiler::ShaderProfile::LIBRARY:
 		dxcUtils->BuildArguments(filePath.c_str(), L"", L"lib_6_6", nullptr, 0, nullptr, 0, &args);
 		break;
 	default:
@@ -113,7 +113,7 @@ ComPtr<IDxcBlob> DXCCompilerPrivate::compile(const std::wstring& filePath, const
 
 ComPtr<IDxcBlob> DXCCompilerPrivate::read(const std::wstring& filePath) const
 {
-	const std::vector<uint8_t> bytes = Utils::File::readAllBinary(filePath);
+	const std::vector<uint8_t> bytes = Gear::Utils::File::readAllBinary(filePath);
 
 	ComPtr<IDxcBlobEncoding> textBlob;
 
@@ -124,22 +124,22 @@ ComPtr<IDxcBlob> DXCCompilerPrivate::read(const std::wstring& filePath) const
 	return shaderBlob;
 }
 
-ComPtr<IDxcBlob> Core::D3D12Core::DXCCompiler::compile(const std::wstring& filePath, const ShaderProfile profile)
+ComPtr<IDxcBlob> Gear::Core::D3D12Core::DXCCompiler::compile(const std::wstring& filePath, const ShaderProfile profile)
 {
 	return pvt->compile(filePath, profile);
 }
 
-ComPtr<IDxcBlob> Core::D3D12Core::DXCCompiler::read(const std::wstring& filePath)
+ComPtr<IDxcBlob> Gear::Core::D3D12Core::DXCCompiler::read(const std::wstring& filePath)
 {
 	return pvt->read(filePath);
 }
 
-void Core::D3D12Core::DXCCompiler::Internal::initialize()
+void Gear::Core::D3D12Core::DXCCompiler::Internal::initialize()
 {
 	pvt = new DXCCompilerPrivate();
 }
 
-void Core::D3D12Core::DXCCompiler::Internal::release()
+void Gear::Core::D3D12Core::DXCCompiler::Internal::release()
 {
 	if (pvt)
 	{

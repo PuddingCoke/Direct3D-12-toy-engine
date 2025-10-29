@@ -20,16 +20,16 @@
 
 #include<DirectXTex/DirectXTex.h>
 
-Core::ResourceManager::ResourceManager() :
+Gear::Core::ResourceManager::ResourceManager() :
 	context(new GraphicsContext()), commandList(context->getCommandList()),
-	d3d12Resources(new std::vector<Resource::D3D12Resource::D3D12ResourceBase*>[Core::Graphics::getFrameBufferCount()]),
-	resources(new std::vector<Resource::ResourceBase*>[Core::Graphics::getFrameBufferCount()])
+	d3d12Resources(new std::vector<Resource::D3D12Resource::D3D12ResourceBase*>[Gear::Core::Graphics::getFrameBufferCount()]),
+	resources(new std::vector<Resource::ResourceBase*>[Gear::Core::Graphics::getFrameBufferCount()])
 {
 }
 
-Core::ResourceManager::~ResourceManager()
+Gear::Core::ResourceManager::~ResourceManager()
 {
-	for (uint32_t i = 0; i < Core::Graphics::getFrameBufferCount(); i++)
+	for (uint32_t i = 0; i < Gear::Core::Graphics::getFrameBufferCount(); i++)
 	{
 		for (const Resource::D3D12Resource::D3D12ResourceBase* const d3d12Resource : d3d12Resources[i])
 		{
@@ -53,44 +53,44 @@ Core::ResourceManager::~ResourceManager()
 	delete context;
 }
 
-void Core::ResourceManager::deferredRelease(Resource::D3D12Resource::D3D12ResourceBase* const d3d12Resource)
+void Gear::Core::ResourceManager::deferredRelease(Resource::D3D12Resource::D3D12ResourceBase* const d3d12Resource)
 {
-	d3d12Resources[Core::Graphics::getFrameIndex()].push_back(d3d12Resource);
+	d3d12Resources[Gear::Core::Graphics::getFrameIndex()].push_back(d3d12Resource);
 }
 
-void Core::ResourceManager::deferredRelease(Resource::ResourceBase* const resource)
+void Gear::Core::ResourceManager::deferredRelease(Resource::ResourceBase* const resource)
 {
-	resources[Core::Graphics::getFrameIndex()].push_back(resource);
+	resources[Gear::Core::Graphics::getFrameIndex()].push_back(resource);
 }
 
-void Core::ResourceManager::cleanTransientResources()
+void Gear::Core::ResourceManager::cleanTransientResources()
 {
-	for (const Resource::D3D12Resource::D3D12ResourceBase* const d3d12Resource : d3d12Resources[Core::Graphics::getFrameIndex()])
+	for (const Resource::D3D12Resource::D3D12ResourceBase* const d3d12Resource : d3d12Resources[Gear::Core::Graphics::getFrameIndex()])
 	{
 		delete d3d12Resource;
 	}
 
-	d3d12Resources[Core::Graphics::getFrameIndex()].clear();
+	d3d12Resources[Gear::Core::Graphics::getFrameIndex()].clear();
 
-	for (const Resource::ResourceBase* const resource : resources[Core::Graphics::getFrameIndex()])
+	for (const Resource::ResourceBase* const resource : resources[Gear::Core::Graphics::getFrameIndex()])
 	{
 		delete resource;
 	}
 
-	resources[Core::Graphics::getFrameIndex()].clear();
+	resources[Gear::Core::Graphics::getFrameIndex()].clear();
 }
 
-Core::GraphicsContext* Core::ResourceManager::getGraphicsContext() const
+Gear::Core::GraphicsContext* Gear::Core::ResourceManager::getGraphicsContext() const
 {
 	return context;
 }
 
-Core::D3D12Core::CommandList* Core::ResourceManager::getCommandList() const
+Gear::Core::D3D12Core::CommandList* Gear::Core::ResourceManager::getCommandList() const
 {
 	return commandList;
 }
 
-Core::Resource::D3D12Resource::Buffer* Core::ResourceManager::createBuffer(const void* const data, const uint64_t size, const D3D12_RESOURCE_FLAGS resFlags)
+Gear::Core::Resource::D3D12Resource::Buffer* Gear::Core::ResourceManager::createBuffer(const void* const data, const uint64_t size, const D3D12_RESOURCE_FLAGS resFlags)
 {
 	Resource::D3D12Resource::Buffer* buffer = new Resource::D3D12Resource::Buffer(size, true, resFlags);
 
@@ -105,11 +105,11 @@ Core::Resource::D3D12Resource::Buffer* Core::ResourceManager::createBuffer(const
 	return buffer;
 }
 
-Core::Resource::D3D12Resource::Texture* Core::ResourceManager::createTexture(const std::wstring& filePath, const D3D12_RESOURCE_FLAGS resFlags, bool* const isTextureCube)
+Gear::Core::Resource::D3D12Resource::Texture* Gear::Core::ResourceManager::createTexture(const std::wstring& filePath, const D3D12_RESOURCE_FLAGS resFlags, bool* const isTextureCube)
 {
 	Resource::D3D12Resource::Texture* texture = nullptr;
 
-	const std::wstring fileExtension = Utils::File::getExtension(filePath);
+	const std::wstring fileExtension = Gear::Utils::File::getExtension(filePath);
 
 	if (isTextureCube)
 	{
@@ -124,7 +124,7 @@ Core::Resource::D3D12Resource::Texture* Core::ResourceManager::createTexture(con
 
 		ComPtr<ID3D12Resource> tex;
 
-		CHECKERROR(DirectX::LoadWICTextureFromFileEx(Core::GraphicsDevice::get(), filePath.c_str(), 0, resFlags, DirectX::WIC_LOADER_DEFAULT, &tex, decodedData, subresource));
+		CHECKERROR(DirectX::LoadWICTextureFromFileEx(Gear::Core::GraphicsDevice::get(), filePath.c_str(), 0, resFlags, DirectX::WIC_LOADER_DEFAULT, &tex, decodedData, subresource));
 
 		texture = new Resource::D3D12Resource::Texture(tex, true, D3D12_RESOURCE_STATE_COPY_DEST);
 
@@ -144,7 +144,7 @@ Core::Resource::D3D12Resource::Texture* Core::ResourceManager::createTexture(con
 
 		ComPtr<ID3D12Resource> tex;
 
-		CHECKERROR(DirectX::LoadDDSTextureFromFileEx(Core::GraphicsDevice::get(), filePath.c_str(), 0, resFlags, DirectX::DDS_LOADER_DEFAULT, &tex, decodedData, subresources, nullptr, isTextureCube));
+		CHECKERROR(DirectX::LoadDDSTextureFromFileEx(Gear::Core::GraphicsDevice::get(), filePath.c_str(), 0, resFlags, DirectX::DDS_LOADER_DEFAULT, &tex, decodedData, subresources, nullptr, isTextureCube));
 
 		texture = new Resource::D3D12Resource::Texture(tex, true, D3D12_RESOURCE_STATE_COPY_DEST);
 
@@ -184,7 +184,7 @@ Core::Resource::D3D12Resource::Texture* Core::ResourceManager::createTexture(con
 
 		ComPtr<ID3D12Resource> tex;
 
-		CHECKERROR(DirectX::CreateTextureEx(Core::GraphicsDevice::get(), metadata, resFlags, DirectX::CREATETEX_DEFAULT, &tex));
+		CHECKERROR(DirectX::CreateTextureEx(Gear::Core::GraphicsDevice::get(), metadata, resFlags, DirectX::CREATETEX_DEFAULT, &tex));
 
 		texture = new Resource::D3D12Resource::Texture(tex, true, D3D12_RESOURCE_STATE_COPY_DEST);
 
@@ -206,7 +206,7 @@ Core::Resource::D3D12Resource::Texture* Core::ResourceManager::createTexture(con
 	return texture;
 }
 
-Core::Resource::D3D12Resource::Texture* Core::ResourceManager::createTexture(const uint32_t width, const uint32_t height, const RandomDataType type, const D3D12_RESOURCE_FLAGS resFlags)
+Gear::Core::Resource::D3D12Resource::Texture* Gear::Core::ResourceManager::createTexture(const uint32_t width, const uint32_t height, const RandomDataType type, const D3D12_RESOURCE_FLAGS resFlags)
 {
 	Resource::D3D12Resource::Texture* texture = nullptr;
 
@@ -223,10 +223,10 @@ Core::Resource::D3D12Resource::Texture* Core::ResourceManager::createTexture(con
 		{
 			colors[i] =
 			{
-				static_cast<uint8_t>(Utils::Random::genUint() % 256u),
-				static_cast<uint8_t>(Utils::Random::genUint() % 256u),
-				static_cast<uint8_t>(Utils::Random::genUint() % 256u),
-				static_cast<uint8_t>(Utils::Random::genUint() % 256u)
+				static_cast<uint8_t>(Gear::Utils::Random::genUint() % 256u),
+				static_cast<uint8_t>(Gear::Utils::Random::genUint() % 256u),
+				static_cast<uint8_t>(Gear::Utils::Random::genUint() % 256u),
+				static_cast<uint8_t>(Gear::Utils::Random::genUint() % 256u)
 			};
 		}
 
@@ -258,10 +258,10 @@ Core::Resource::D3D12Resource::Texture* Core::ResourceManager::createTexture(con
 		{
 			colors[i] =
 			{
-				DirectX::PackedVector::XMConvertFloatToHalf(Utils::Random::genGauss()),
-				DirectX::PackedVector::XMConvertFloatToHalf(Utils::Random::genGauss()),
-				DirectX::PackedVector::XMConvertFloatToHalf(Utils::Random::genGauss()),
-				DirectX::PackedVector::XMConvertFloatToHalf(Utils::Random::genGauss())
+				DirectX::PackedVector::XMConvertFloatToHalf(Gear::Utils::Random::genGauss()),
+				DirectX::PackedVector::XMConvertFloatToHalf(Gear::Utils::Random::genGauss()),
+				DirectX::PackedVector::XMConvertFloatToHalf(Gear::Utils::Random::genGauss()),
+				DirectX::PackedVector::XMConvertFloatToHalf(Gear::Utils::Random::genGauss())
 			};
 		}
 
@@ -284,7 +284,7 @@ Core::Resource::D3D12Resource::Texture* Core::ResourceManager::createTexture(con
 	return texture;
 }
 
-Core::Resource::ImmutableCBuffer* Core::ResourceManager::createImmutableCBuffer(const uint32_t size, const void* const data, const bool persistent)
+Gear::Core::Resource::ImmutableCBuffer* Gear::Core::ResourceManager::createImmutableCBuffer(const uint32_t size, const void* const data, const bool persistent)
 {
 	Resource::D3D12Resource::Buffer* const buffer = createBuffer(data, size, D3D12_RESOURCE_FLAG_NONE);
 
@@ -299,21 +299,21 @@ Core::Resource::ImmutableCBuffer* Core::ResourceManager::createImmutableCBuffer(
 	return new Resource::ImmutableCBuffer(buffer, size, persistent);
 }
 
-Core::Resource::StaticCBuffer* Core::ResourceManager::createStaticCBuffer(const uint32_t size, const void* const data, const bool persistent)
+Gear::Core::Resource::StaticCBuffer* Gear::Core::ResourceManager::createStaticCBuffer(const uint32_t size, const void* const data, const bool persistent)
 {
 	Resource::D3D12Resource::Buffer* const buffer = createBuffer(data, size, D3D12_RESOURCE_FLAG_NONE);
 
 	return new Resource::StaticCBuffer(buffer, size, persistent);
 }
 
-Core::Resource::StaticCBuffer* Core::ResourceManager::createStaticCBuffer(const uint32_t size, const bool persistent)
+Gear::Core::Resource::StaticCBuffer* Gear::Core::ResourceManager::createStaticCBuffer(const uint32_t size, const bool persistent)
 {
 	Resource::D3D12Resource::Buffer* const buffer = new Resource::D3D12Resource::Buffer(size, true, D3D12_RESOURCE_FLAG_NONE, D3D12_RESOURCE_STATE_COPY_DEST);
 
 	return new Resource::StaticCBuffer(buffer, size, persistent);
 }
 
-Core::Resource::DynamicCBuffer* Core::ResourceManager::createDynamicCBuffer(const uint32_t size, const void* const data)
+Gear::Core::Resource::DynamicCBuffer* Gear::Core::ResourceManager::createDynamicCBuffer(const uint32_t size, const void* const data)
 {
 	Resource::DynamicCBuffer* const buffer = new Resource::DynamicCBuffer(size);
 
@@ -325,7 +325,7 @@ Core::Resource::DynamicCBuffer* Core::ResourceManager::createDynamicCBuffer(cons
 	return buffer;
 }
 
-Core::Resource::BufferView* Core::ResourceManager::createTypedBufferView(const DXGI_FORMAT format, const uint64_t size, const bool createSRV, const bool createUAV, const bool createVBV, const bool createIBV, const bool cpuWritable, const bool persistent, const void* const data)
+Gear::Core::Resource::BufferView* Gear::Core::ResourceManager::createTypedBufferView(const DXGI_FORMAT format, const uint64_t size, const bool createSRV, const bool createUAV, const bool createVBV, const bool createIBV, const bool cpuWritable, const bool persistent, const void* const data)
 {
 	if (createVBV && createIBV)
 	{
@@ -372,7 +372,7 @@ Core::Resource::BufferView* Core::ResourceManager::createTypedBufferView(const D
 	return new Resource::BufferView(buffer, 0, format, size, createSRV, createUAV, createVBV, createIBV, cpuWritable, persistent);
 }
 
-Core::Resource::BufferView* Core::ResourceManager::createTypedBufferView(const DXGI_FORMAT format, const uint64_t size, const bool createSRV, const bool createUAV, const bool createVBV, const bool createIBV, const bool cpuWritable, const bool persistent)
+Gear::Core::Resource::BufferView* Gear::Core::ResourceManager::createTypedBufferView(const DXGI_FORMAT format, const uint64_t size, const bool createSRV, const bool createUAV, const bool createVBV, const bool createIBV, const bool cpuWritable, const bool persistent)
 {
 	if (createVBV && createIBV)
 	{
@@ -391,7 +391,7 @@ Core::Resource::BufferView* Core::ResourceManager::createTypedBufferView(const D
 	return new Resource::BufferView(buffer, 0, format, size, createSRV, createUAV, createVBV, createIBV, cpuWritable, persistent);
 }
 
-Core::Resource::BufferView* Core::ResourceManager::createStructuredBufferView(const uint32_t structureByteStride, const uint64_t size, const bool createSRV, const bool createUAV, const bool createVBV, const bool cpuWritable, const bool persistent, const void* const data)
+Gear::Core::Resource::BufferView* Gear::Core::ResourceManager::createStructuredBufferView(const uint32_t structureByteStride, const uint64_t size, const bool createSRV, const bool createUAV, const bool createVBV, const bool cpuWritable, const bool persistent, const void* const data)
 {
 	D3D12_RESOURCE_FLAGS resFlags = D3D12_RESOURCE_FLAG_NONE;
 
@@ -428,7 +428,7 @@ Core::Resource::BufferView* Core::ResourceManager::createStructuredBufferView(co
 	return new Resource::BufferView(buffer, structureByteStride, DXGI_FORMAT_UNKNOWN, size, createSRV, createUAV, createVBV, false, cpuWritable, persistent);
 }
 
-Core::Resource::BufferView* Core::ResourceManager::createStructuredBufferView(const uint32_t structureByteStride, const uint64_t size, const bool createSRV, const bool createUAV, const bool createVBV, const bool cpuWritable, const bool persistent)
+Gear::Core::Resource::BufferView* Gear::Core::ResourceManager::createStructuredBufferView(const uint32_t structureByteStride, const uint64_t size, const bool createSRV, const bool createUAV, const bool createVBV, const bool cpuWritable, const bool persistent)
 {
 	D3D12_RESOURCE_FLAGS resFlags = D3D12_RESOURCE_FLAG_NONE;
 
@@ -442,7 +442,7 @@ Core::Resource::BufferView* Core::ResourceManager::createStructuredBufferView(co
 	return new Resource::BufferView(buffer, structureByteStride, DXGI_FORMAT_UNKNOWN, size, createSRV, createUAV, createVBV, false, cpuWritable, persistent);
 }
 
-Core::Resource::BufferView* Core::ResourceManager::createByteAddressBufferView(const uint64_t size, const bool createSRV, const bool createUAV, const bool cpuWritable, const bool persistent, const void* const data)
+Gear::Core::Resource::BufferView* Gear::Core::ResourceManager::createByteAddressBufferView(const uint64_t size, const bool createSRV, const bool createUAV, const bool cpuWritable, const bool persistent, const void* const data)
 {
 	D3D12_RESOURCE_FLAGS resFlags = D3D12_RESOURCE_FLAG_NONE;
 
@@ -474,7 +474,7 @@ Core::Resource::BufferView* Core::ResourceManager::createByteAddressBufferView(c
 	return new Resource::BufferView(buffer, 0, DXGI_FORMAT_UNKNOWN, size, createSRV, createUAV, false, false, cpuWritable, persistent);
 }
 
-Core::Resource::BufferView* Core::ResourceManager::createByteAddressBufferView(const uint64_t size, const bool createSRV, const bool createUAV, const bool cpuWritable, const bool persistent)
+Gear::Core::Resource::BufferView* Gear::Core::ResourceManager::createByteAddressBufferView(const uint64_t size, const bool createSRV, const bool createUAV, const bool cpuWritable, const bool persistent)
 {
 	D3D12_RESOURCE_FLAGS resFlags = D3D12_RESOURCE_FLAG_NONE;
 
@@ -488,7 +488,7 @@ Core::Resource::BufferView* Core::ResourceManager::createByteAddressBufferView(c
 	return new Resource::BufferView(buffer, 0, DXGI_FORMAT_UNKNOWN, size, createSRV, createUAV, false, false, cpuWritable, persistent);
 }
 
-Core::Resource::TextureDepthView* Core::ResourceManager::createTextureDepthView(const uint32_t width, const uint32_t height, const DXGI_FORMAT resFormat, const uint32_t arraySize, const uint32_t mipLevels, const bool isTextureCube, const bool persistent)
+Gear::Core::Resource::TextureDepthView* Gear::Core::ResourceManager::createTextureDepthView(const uint32_t width, const uint32_t height, const DXGI_FORMAT resFormat, const uint32_t arraySize, const uint32_t mipLevels, const bool isTextureCube, const bool persistent)
 {
 	DXGI_FORMAT clearValueFormat = DXGI_FORMAT_UNKNOWN;
 
@@ -525,7 +525,7 @@ Core::Resource::TextureDepthView* Core::ResourceManager::createTextureDepthView(
 	return new Resource::TextureDepthView(texture, isTextureCube, persistent);
 }
 
-Core::Resource::TextureRenderView* Core::ResourceManager::createTextureRenderView(const std::wstring& filePath, const bool persistent, const bool hasUAV, const bool hasRTV)
+Gear::Core::Resource::TextureRenderView* Gear::Core::ResourceManager::createTextureRenderView(const std::wstring& filePath, const bool persistent, const bool hasUAV, const bool hasRTV)
 {
 	bool stateTracking = true;
 
@@ -575,7 +575,7 @@ Core::Resource::TextureRenderView* Core::ResourceManager::createTextureRenderVie
 	}
 }
 
-Core::Resource::TextureRenderView* Core::ResourceManager::createTextureRenderView(const uint32_t width, const uint32_t height, const RandomDataType type, const bool persistent, const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat)
+Gear::Core::Resource::TextureRenderView* Gear::Core::ResourceManager::createTextureRenderView(const uint32_t width, const uint32_t height, const RandomDataType type, const bool persistent, const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat)
 {
 	const bool hasRTV = (rtvFormat != DXGI_FORMAT_UNKNOWN);
 
@@ -625,7 +625,7 @@ Core::Resource::TextureRenderView* Core::ResourceManager::createTextureRenderVie
 	}
 }
 
-Core::Resource::TextureRenderView* Core::ResourceManager::createTextureRenderView(const uint32_t width, const uint32_t height, const DXGI_FORMAT resFormat, const uint32_t arraySize, const uint32_t mipLevels, const bool isTextureCube, const bool persistent, const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat, const float* const color)
+Gear::Core::Resource::TextureRenderView* Gear::Core::ResourceManager::createTextureRenderView(const uint32_t width, const uint32_t height, const DXGI_FORMAT resFormat, const uint32_t arraySize, const uint32_t mipLevels, const bool isTextureCube, const bool persistent, const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat, const float* const color)
 {
 	const bool hasRTV = (rtvFormat != DXGI_FORMAT_UNKNOWN);
 
@@ -670,7 +670,7 @@ Core::Resource::TextureRenderView* Core::ResourceManager::createTextureRenderVie
 	return new Resource::TextureRenderView(texture, isTextureCube, persistent, srvFormat, uavFormat, rtvFormat);
 }
 
-Core::Resource::TextureRenderView* Core::ResourceManager::createTextureCube(const std::wstring& filePath, const uint32_t texturecubeResolution, const bool persistent, const bool hasUAV, const bool hasRTV)
+Gear::Core::Resource::TextureRenderView* Gear::Core::ResourceManager::createTextureCube(const std::wstring& filePath, const uint32_t texturecubeResolution, const bool persistent, const bool hasUAV, const bool hasRTV)
 {
 	Resource::TextureRenderView* const equirectangularMap = createTextureRenderView(filePath, false, true, false);
 
@@ -678,11 +678,11 @@ Core::Resource::TextureRenderView* Core::ResourceManager::createTextureCube(cons
 
 	deferredRelease(equirectangularMap);
 
-	Core::GlobalEffect::HDRClampEffect::process(context, equirectangularMap);
+	Gear::Core::GlobalEffect::HDRClampEffect::process(context, equirectangularMap);
 
 	DXGI_FORMAT resFormat = DXGI_FORMAT_UNKNOWN;
 
-	switch (Core::FMT::getByteSize(equirectangularMap->getTexture()->getFormat()))
+	switch (Gear::Core::FMT::getByteSize(equirectangularMap->getTexture()->getFormat()))
 	{
 	case 4:
 		resFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -703,7 +703,7 @@ Core::Resource::TextureRenderView* Core::ResourceManager::createTextureCube(cons
 
 	deferredRelease(cubeMap);
 
-	Core::GlobalEffect::LatLongMapToCubeMapEffect::process(context, equirectangularMap, cubeMap);
+	Gear::Core::GlobalEffect::LatLongMapToCubeMapEffect::process(context, equirectangularMap, cubeMap);
 
 	bool stateTracking = true;
 
@@ -762,7 +762,7 @@ Core::Resource::TextureRenderView* Core::ResourceManager::createTextureCube(cons
 	}
 }
 
-Core::Resource::TextureRenderView* Core::ResourceManager::createTextureCube(const std::initializer_list<std::wstring>& texturesPath, const bool persistent, const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat)
+Gear::Core::Resource::TextureRenderView* Gear::Core::ResourceManager::createTextureCube(const std::initializer_list<std::wstring>& texturesPath, const bool persistent, const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat)
 {
 	Resource::D3D12Resource::Texture* srcTextures[6] = {};
 

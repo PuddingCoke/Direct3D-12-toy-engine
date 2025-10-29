@@ -9,9 +9,9 @@ namespace
 
 		static constexpr size_t maxKey = 512;
 
-		Input::Event keyDownEvents[maxKey] = {};
+		Gear::Input::Event keyDownEvents[maxKey] = {};
 
-		Input::Event keyUpEvents[maxKey] = {};
+		Gear::Input::Event keyUpEvents[maxKey] = {};
 
 		bool keyDownStates[maxKey] = {};
 
@@ -22,37 +22,37 @@ namespace
 	} pvt;
 }
 
-bool Input::Keyboard::getKeyDown(const Key key)
+bool Gear::Input::Keyboard::getKeyDown(const Key key)
 {
 	return pvt.keyDownStates[key];
 }
 
-bool Input::Keyboard::onKeyDown(const Key key)
+bool Gear::Input::Keyboard::onKeyDown(const Key key)
 {
 	return pvt.onKeyDownStates[key];
 }
 
-uint64_t Input::Keyboard::addKeyDownEvent(const Key key, const std::function<void(void)>& func)
+uint64_t Gear::Input::Keyboard::addKeyDownEvent(const Key key, const std::function<void(void)>& func)
 {
 	return pvt.keyDownEvents[key] += func;
 }
 
-uint64_t Input::Keyboard::addKeyUpEvent(const Key key, const std::function<void(void)>& func)
+uint64_t Gear::Input::Keyboard::addKeyUpEvent(const Key key, const std::function<void(void)>& func)
 {
 	return pvt.keyUpEvents[key] += func;
 }
 
-void Input::Keyboard::removeKeyDownEvent(const Key key, const uint64_t id)
+void Gear::Input::Keyboard::removeKeyDownEvent(const Key key, const uint64_t id)
 {
 	pvt.keyDownEvents[key] -= id;
 }
 
-void Input::Keyboard::removeKeyUpEvent(const Key key, const uint64_t id)
+void Gear::Input::Keyboard::removeKeyUpEvent(const Key key, const uint64_t id)
 {
 	pvt.keyUpEvents[key] -= id;
 }
 
-void Input::Keyboard::Internal::resetDeltaValue()
+void Gear::Input::Keyboard::Internal::resetDeltaValue()
 {
 	if (pvt.onKeyDownClearList.size())
 	{
@@ -67,7 +67,7 @@ void Input::Keyboard::Internal::resetDeltaValue()
 	}
 }
 
-void Input::Keyboard::Internal::pressKey(const Key key)
+void Gear::Input::Keyboard::Internal::pressKey(const Key key)
 {
 	pvt.keyDownStates[key] = true;
 
@@ -78,7 +78,7 @@ void Input::Keyboard::Internal::pressKey(const Key key)
 	pvt.keyDownEvents[key]();
 }
 
-void Input::Keyboard::Internal::releaseKey(const Key key)
+void Gear::Input::Keyboard::Internal::releaseKey(const Key key)
 {
 	pvt.keyDownStates[key] = false;
 

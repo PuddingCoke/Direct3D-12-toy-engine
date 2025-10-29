@@ -1,8 +1,8 @@
 ﻿#include<Gear/Core/D3D12Core/DescriptorHeap.h>
 
-Core::D3D12Core::DescriptorHeap::DescriptorHeap(const uint32_t numDescriptors, const uint32_t subRegionSize, const D3D12_DESCRIPTOR_HEAP_TYPE type, const D3D12_DESCRIPTOR_HEAP_FLAGS flags) :
+Gear::Core::D3D12Core::DescriptorHeap::DescriptorHeap(const uint32_t numDescriptors, const uint32_t subRegionSize, const D3D12_DESCRIPTOR_HEAP_TYPE type, const D3D12_DESCRIPTOR_HEAP_FLAGS flags) :
 	numDescriptors(numDescriptors), subRegionSize(subRegionSize), type(type),
-	incrementSize(Core::GraphicsDevice::get()->GetDescriptorHandleIncrementSize(type))
+	incrementSize(Gear::Core::GraphicsDevice::get()->GetDescriptorHandleIncrementSize(type))
 {
 	D3D12_DESCRIPTOR_HEAP_DESC desc = {};
 	desc.NodeMask = 0;
@@ -10,7 +10,7 @@ Core::D3D12Core::DescriptorHeap::DescriptorHeap(const uint32_t numDescriptors, c
 	desc.Type = type;
 	desc.Flags = flags;
 
-	Core::GraphicsDevice::get()->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&descriptorHeap));
+	Gear::Core::GraphicsDevice::get()->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&descriptorHeap));
 
 	staticCPUPointerStart = descriptorHeap->GetCPUDescriptorHandleForHeapStart();
 
@@ -42,32 +42,32 @@ Core::D3D12Core::DescriptorHeap::DescriptorHeap(const uint32_t numDescriptors, c
 	}
 }
 
-uint32_t Core::D3D12Core::DescriptorHeap::getNumDescriptors() const
+uint32_t Gear::Core::D3D12Core::DescriptorHeap::getNumDescriptors() const
 {
 	return numDescriptors;
 }
 
-uint32_t Core::D3D12Core::DescriptorHeap::getSubRegionSize() const
+uint32_t Gear::Core::D3D12Core::DescriptorHeap::getSubRegionSize() const
 {
 	return subRegionSize;
 }
 
-D3D12_DESCRIPTOR_HEAP_TYPE Core::D3D12Core::DescriptorHeap::getDescriptorHeapType() const
+D3D12_DESCRIPTOR_HEAP_TYPE Gear::Core::D3D12Core::DescriptorHeap::getDescriptorHeapType() const
 {
 	return type;
 }
 
-uint32_t Core::D3D12Core::DescriptorHeap::getIncrementSize() const
+uint32_t Gear::Core::D3D12Core::DescriptorHeap::getIncrementSize() const
 {
 	return incrementSize;
 }
 
-ID3D12DescriptorHeap* Core::D3D12Core::DescriptorHeap::get() const
+ID3D12DescriptorHeap* Gear::Core::D3D12Core::DescriptorHeap::get() const
 {
 	return descriptorHeap.Get();
 }
 
-Core::D3D12Core::DescriptorHandle Core::D3D12Core::DescriptorHeap::allocStaticDescriptor(const uint32_t num)
+Gear::Core::D3D12Core::DescriptorHandle Gear::Core::D3D12Core::DescriptorHeap::allocStaticDescriptor(const uint32_t num)
 {
 	std::lock_guard<std::mutex> lockGuard(staticPointerLock);
 
@@ -82,7 +82,7 @@ Core::D3D12Core::DescriptorHandle Core::D3D12Core::DescriptorHeap::allocStaticDe
 	return DescriptorHandle(retCPUHandle, retGPUHandle, this);
 }
 
-Core::D3D12Core::DescriptorHandle Core::D3D12Core::DescriptorHeap::allocDynamicDescriptor(const uint32_t num)
+Gear::Core::D3D12Core::DescriptorHandle Gear::Core::D3D12Core::DescriptorHeap::allocDynamicDescriptor(const uint32_t num)
 {
 	std::lock_guard<std::mutex> lockGuard(dynamicPointerLock);
 
@@ -108,39 +108,39 @@ Core::D3D12Core::DescriptorHandle Core::D3D12Core::DescriptorHeap::allocDynamicD
 	return DescriptorHandle(retCPUHandle, retGPUHandle, this);
 }
 
-Core::D3D12Core::DescriptorHandle::DescriptorHandle() :
+Gear::Core::D3D12Core::DescriptorHandle::DescriptorHandle() :
 	cpuHandle{}, gpuHandle{}, descriptorHeap(nullptr)
 {
 }
 
-Core::D3D12Core::DescriptorHandle::DescriptorHandle(const CD3DX12_CPU_DESCRIPTOR_HANDLE cpuHandle, const CD3DX12_GPU_DESCRIPTOR_HANDLE gpuHandle, const DescriptorHeap* const descriptorHeap) :
+Gear::Core::D3D12Core::DescriptorHandle::DescriptorHandle(const CD3DX12_CPU_DESCRIPTOR_HANDLE cpuHandle, const CD3DX12_GPU_DESCRIPTOR_HANDLE gpuHandle, const DescriptorHeap* const descriptorHeap) :
 	cpuHandle(cpuHandle), gpuHandle(gpuHandle), descriptorHeap(descriptorHeap)
 {
 }
 
-uint32_t Core::D3D12Core::DescriptorHandle::getCurrentIndex() const
+uint32_t Gear::Core::D3D12Core::DescriptorHandle::getCurrentIndex() const
 {
 	return static_cast<uint32_t>(cpuHandle.ptr - descriptorHeap->staticCPUPointerStart.ptr) / descriptorHeap->incrementSize;
 }
 
-CD3DX12_CPU_DESCRIPTOR_HANDLE Core::D3D12Core::DescriptorHandle::getCPUHandle() const
+CD3DX12_CPU_DESCRIPTOR_HANDLE Gear::Core::D3D12Core::DescriptorHandle::getCPUHandle() const
 {
 	return cpuHandle;
 }
 
-CD3DX12_GPU_DESCRIPTOR_HANDLE Core::D3D12Core::DescriptorHandle::getGPUHandle() const
+CD3DX12_GPU_DESCRIPTOR_HANDLE Gear::Core::D3D12Core::DescriptorHandle::getGPUHandle() const
 {
 	return gpuHandle;
 }
 
-void Core::D3D12Core::DescriptorHandle::move()
+void Gear::Core::D3D12Core::DescriptorHandle::move()
 {
 	cpuHandle.Offset(1, descriptorHeap->incrementSize);
 
 	gpuHandle.Offset(1, descriptorHeap->incrementSize);
 }
 
-void Core::D3D12Core::DescriptorHandle::offset(const uint32_t num)
+void Gear::Core::D3D12Core::DescriptorHandle::offset(const uint32_t num)
 {
 	cpuHandle.Offset(num, descriptorHeap->incrementSize);
 

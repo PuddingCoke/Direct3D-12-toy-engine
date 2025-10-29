@@ -1,27 +1,30 @@
 ﻿#pragma once
 
-#ifndef _CORE_MAINCAMERA_INTERNAL_H_
-#define _CORE_MAINCAMERA_INTERNAL_H_
+#ifndef _GEAR_CORE_MAINCAMERA_INTERNAL_H_
+#define _GEAR_CORE_MAINCAMERA_INTERNAL_H_
 
 #include<Gear/Utils/Math.h>
 
-namespace Core
+namespace Gear
 {
-	namespace MainCamera
+	namespace Core
 	{
-		namespace Internal
+		namespace MainCamera
 		{
-			struct Matrices
+			namespace Internal
 			{
-				DirectX::XMMATRIX proj;
-				DirectX::XMMATRIX view;
-				DirectX::XMVECTOR eyePos;
-				DirectX::XMMATRIX prevViewProj;
-				DirectX::XMMATRIX viewProj;
-				DirectX::XMMATRIX normalMatrix;
-			} getMatrices();
+				struct Matrices
+				{
+					DirectX::XMMATRIX proj;
+					DirectX::XMMATRIX view;
+					DirectX::XMVECTOR eyePos;
+					DirectX::XMMATRIX prevViewProj;
+					DirectX::XMMATRIX viewProj;
+					DirectX::XMMATRIX normalMatrix;
+				} getMatrices();
+			}
 		}
 	}
 }
 
-#endif // !_CORE_MAINCAMERA_INTERNAL_H_
+#endif // !_GEAR_CORE_MAINCAMERA_INTERNAL_H_

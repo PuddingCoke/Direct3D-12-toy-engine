@@ -1,19 +1,22 @@
 ﻿#pragma once
 
-#ifndef _UTILS_FILE_INTERNAL_H_
-#define _UTILS_FILE_INTERNAL_H_
+#ifndef _GEAR_UTILS_FILE_INTERNAL_H_
+#define _GEAR_UTILS_FILE_INTERNAL_H_
 
 #include<string>
 
-namespace Utils
+namespace Gear
 {
-	namespace File
+	namespace Utils
 	{
-		namespace Internal
+		namespace File
 		{
-			void setRootFolder(const std::wstring& rootFolder);
+			namespace Internal
+			{
+				void setRootFolder(const std::wstring& rootFolder);
+			}
 		}
 	}
 }
 
-#endif // !_UTILS_FILE_INTERNAL_H_
+#endif // !_GEAR_UTILS_FILE_INTERNAL_H_

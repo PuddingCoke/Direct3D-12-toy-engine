@@ -1,7 +1,7 @@
 ﻿#pragma once
 
-#ifndef _CORE_GRAPHICSDEVICE_H_
-#define _CORE_GRAPHICSDEVICE_H_
+#ifndef _GEAR_CORE_GRAPHICSDEVICE_H_
+#define _GEAR_CORE_GRAPHICSDEVICE_H_
 
 static_assert(sizeof(int) == 4, "size of int must be 4");
 
@@ -31,15 +31,15 @@ LOGERROR(L"Failed with",IntegerMode::HEX,static_cast<uint32_t>(hr),L"Failed reas
 }\
 }\
 
-//only works for power of 2
-#define ROUND_UP(x,y) ((x + (y-1)) & ~(y-1))
-
-namespace Core
+namespace Gear
 {
-	namespace GraphicsDevice
+	namespace Core
 	{
-		ID3D12Device9* get();
-	};
+		namespace GraphicsDevice
+		{
+			ID3D12Device9* get();
+		};
+	}
 }
 
-#endif // !_CORE_GRAPHICSDEVICE_H_
+#endif // !_GEAR_CORE_GRAPHICSDEVICE_H_

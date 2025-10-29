@@ -1,32 +1,35 @@
 ﻿#pragma once
 
-#ifndef _CORE_GLOBALDESCRIPTORHEAP_H_
-#define _CORE_GLOBALDESCRIPTORHEAP_H_
+#ifndef _GEAR_CORE_GLOBALDESCRIPTORHEAP_H_
+#define _GEAR_CORE_GLOBALDESCRIPTORHEAP_H_
 
 #include<Gear/Core/D3D12Core/DescriptorHeap.h>
 
-namespace Core
+namespace Gear
 {
-	namespace GlobalDescriptorHeap
+	namespace Core
 	{
-		D3D12Core::DescriptorHeap* getResourceHeap();
+		namespace GlobalDescriptorHeap
+		{
+			D3D12Core::DescriptorHeap* getResourceHeap();
 
-		D3D12Core::DescriptorHeap* getSamplerHeap();
+			D3D12Core::DescriptorHeap* getSamplerHeap();
 
-		D3D12Core::DescriptorHeap* getRenderTargetHeap();
+			D3D12Core::DescriptorHeap* getRenderTargetHeap();
 
-		D3D12Core::DescriptorHeap* getDepthStencilHeap();
+			D3D12Core::DescriptorHeap* getDepthStencilHeap();
 
-		D3D12Core::DescriptorHeap* getNonShaderVisibleResourceHeap();
+			D3D12Core::DescriptorHeap* getNonShaderVisibleResourceHeap();
 
-		uint32_t getResourceIncrementSize();
+			uint32_t getResourceIncrementSize();
 
-		uint32_t getRenderTargetIncrementSize();
+			uint32_t getRenderTargetIncrementSize();
 
-		uint32_t getDepthStencilIncrementSize();
+			uint32_t getDepthStencilIncrementSize();
 
-		uint32_t getSamplerIncrementSize();
+			uint32_t getSamplerIncrementSize();
+		}
 	}
 }
 
-#endif // !_CORE_GLOBALDESCRIPTORHEAP_H_
+#endif // !_GEAR_CORE_GLOBALDESCRIPTORHEAP_H_

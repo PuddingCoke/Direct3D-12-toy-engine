@@ -1,7 +1,7 @@
 ﻿#pragma once
 
-#ifndef _CORE_RENDERTASK_H_
-#define _CORE_RENDERTASK_H_
+#ifndef _GEAR_CORE_RENDERTASK_H_
+#define _GEAR_CORE_RENDERTASK_H_
 
 #include<Gear/Core/RenderEngine.h>
 
@@ -9,54 +9,57 @@
 
 #include<future>
 
-namespace Core
+namespace Gear
 {
-	class RenderTask
+	namespace Core
 	{
-	public:
+		class RenderTask
+		{
+		public:
 
-		RenderTask(const RenderTask&) = delete;
+			RenderTask(const RenderTask&) = delete;
 
-		void operator=(const RenderTask&) = delete;
+			void operator=(const RenderTask&) = delete;
 
-		RenderTask();
+			RenderTask();
 
-		virtual ~RenderTask();
+			virtual ~RenderTask();
 
-		void beginTask();
+			void beginTask();
 
-		void waitTask();
+			void waitTask();
 
-		D3D12Core::CommandList* getCommandList() const;
+			D3D12Core::CommandList* getCommandList() const;
 
-		virtual void imGUICall();
+			virtual void imGUICall();
 
-	protected:
+		protected:
 
-		//把纹理绘制到后备缓冲上
-		void blit(Resource::TextureRenderView* const texture) const;
+			//把纹理绘制到后备缓冲上
+			void blit(Resource::TextureRenderView* const texture) const;
 
-		virtual void recordCommand() = 0;
+			virtual void recordCommand() = 0;
 
-		ResourceManager* const resManager;
+			ResourceManager* const resManager;
 
-		GraphicsContext* const context;
+			GraphicsContext* const context;
 
-	private:
+		private:
 
-		void workerLoop();
+			void workerLoop();
 
-		bool taskCompleted;
+			bool taskCompleted;
 
-		bool isRunning;
+			bool isRunning;
 
-		std::mutex taskMutex;
+			std::mutex taskMutex;
 
-		std::condition_variable taskCondition;
+			std::condition_variable taskCondition;
 
-		std::thread workerThread;
+			std::thread workerThread;
 
-	};
+		};
+	}
 }
 
 template <typename First, typename... Rest>
@@ -68,8 +71,8 @@ std::future<void> createRenderTaskAsync(const First& first, const Rest&... args)
 		{
 			*first = new RenderTaskType(args...);
 
-			Core::RenderEngine::submitCommandList((*first)->getCommandList());
+			Gear::Core::RenderEngine::submitCommandList((*first)->getCommandList());
 		});
 }
 
-#endif // !_CORE_RENDERTASK_H_
+#endif // !_GEAR_CORE_RENDERTASK_H_

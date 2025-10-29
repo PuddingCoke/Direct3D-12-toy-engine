@@ -15,9 +15,9 @@ __debugbreak();\
 }\
 }\
 
-Core::VideoEncoder::NvidiaEncoder::NvidiaEncoder(const uint32_t frameToEncode) :
+Gear::Core::VideoEncoder::NvidiaEncoder::NvidiaEncoder(const uint32_t frameToEncode) :
 	Encoder(frameToEncode, outputVideoFormat), encoder(nullptr),
-	readbackHeap(new Resource::D3D12Resource::ReadbackHeap(2 * 4 * Core::Graphics::getWidth() * Core::Graphics::getHeight())),
+	readbackHeap(new Resource::D3D12Resource::ReadbackHeap(2 * 4 * Gear::Core::Graphics::getWidth() * Gear::Core::Graphics::getHeight())),
 	nvencAPI{ NV_ENCODE_API_FUNCTION_LIST_VER },
 	outputFenceValue(0)
 {
@@ -33,7 +33,7 @@ Core::VideoEncoder::NvidiaEncoder::NvidiaEncoder(const uint32_t frameToEncode) :
 	LOGENGINE(L"api create instance status", static_cast<uint32_t>(NVENCAPICreateInstance(&nvencAPI)));
 
 	NV_ENC_OPEN_ENCODE_SESSION_EX_PARAMS sessionParams = { NV_ENC_OPEN_ENCODE_SESSION_EX_PARAMS_VER };
-	sessionParams.device = Core::GraphicsDevice::get();
+	sessionParams.device = Gear::Core::GraphicsDevice::get();
 	sessionParams.deviceType = NV_ENC_DEVICE_TYPE_DIRECTX;
 	sessionParams.apiVersion = NVENCAPI_VERSION;
 
@@ -66,12 +66,12 @@ Core::VideoEncoder::NvidiaEncoder::NvidiaEncoder(const uint32_t frameToEncode) :
 	encoderParams.encodeGUID = codec;
 	encoderParams.presetGUID = preset;
 	encoderParams.tuningInfo = tuningInfo;
-	encoderParams.encodeWidth = Core::Graphics::getWidth();
-	encoderParams.encodeHeight = Core::Graphics::getHeight();
-	encoderParams.darWidth = Core::Graphics::getWidth();
-	encoderParams.darHeight = Core::Graphics::getHeight();
-	encoderParams.maxEncodeWidth = Core::Graphics::getWidth();
-	encoderParams.maxEncodeHeight = Core::Graphics::getHeight();
+	encoderParams.encodeWidth = Gear::Core::Graphics::getWidth();
+	encoderParams.encodeHeight = Gear::Core::Graphics::getHeight();
+	encoderParams.darWidth = Gear::Core::Graphics::getWidth();
+	encoderParams.darHeight = Gear::Core::Graphics::getHeight();
+	encoderParams.maxEncodeWidth = Gear::Core::Graphics::getWidth();
+	encoderParams.maxEncodeHeight = Gear::Core::Graphics::getHeight();
 	encoderParams.frameRateNum = frameRate;
 	encoderParams.frameRateDen = 1;
 	encoderParams.enablePTD = 1;
@@ -80,7 +80,7 @@ Core::VideoEncoder::NvidiaEncoder::NvidiaEncoder(const uint32_t frameToEncode) :
 
 	NVENCCALL(nvencAPI.nvEncInitializeEncoder(encoder, &encoderParams));
 
-	Core::GraphicsDevice::get()->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&outputFence));
+	Gear::Core::GraphicsDevice::get()->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&outputFence));
 
 	LOGENGINE(L"start encoding");
 
@@ -90,7 +90,7 @@ Core::VideoEncoder::NvidiaEncoder::NvidiaEncoder(const uint32_t frameToEncode) :
 	registerOutputResource.resourceType = NV_ENC_INPUT_RESOURCE_TYPE_DIRECTX;
 	registerOutputResource.resourceToRegister = readbackHeap->getResource();
 	registerOutputResource.subResourceIndex = 0;
-	registerOutputResource.width = 2 * 4 * Core::Graphics::getWidth() * Core::Graphics::getHeight();
+	registerOutputResource.width = 2 * 4 * Gear::Core::Graphics::getWidth() * Gear::Core::Graphics::getHeight();
 	registerOutputResource.height = 1;
 	registerOutputResource.pitch = 0;
 	registerOutputResource.pInputFencePoint = nullptr;
@@ -107,7 +107,7 @@ Core::VideoEncoder::NvidiaEncoder::NvidiaEncoder(const uint32_t frameToEncode) :
 	mappedOutputResourcePtr = mapOutputResource.mappedResource;
 }
 
-Core::VideoEncoder::NvidiaEncoder::~NvidiaEncoder()
+Gear::Core::VideoEncoder::NvidiaEncoder::~NvidiaEncoder()
 {
 	if (moduleNvEncAPI)
 	{
@@ -137,7 +137,7 @@ Core::VideoEncoder::NvidiaEncoder::~NvidiaEncoder()
 	}
 }
 
-bool Core::VideoEncoder::NvidiaEncoder::encode(Resource::D3D12Resource::Texture* const inputTexture)
+bool Gear::Core::VideoEncoder::NvidiaEncoder::encode(Resource::D3D12Resource::Texture* const inputTexture)
 {
 	bool encoding = true;
 
@@ -147,8 +147,8 @@ bool Core::VideoEncoder::NvidiaEncoder::encode(Resource::D3D12Resource::Texture*
 	registerInputResource.resourceType = NV_ENC_INPUT_RESOURCE_TYPE_DIRECTX;
 	registerInputResource.resourceToRegister = inputTexture->getResource();
 	registerInputResource.subResourceIndex = 0;
-	registerInputResource.width = Core::Graphics::getWidth();
-	registerInputResource.height = Core::Graphics::getHeight();
+	registerInputResource.width = Gear::Core::Graphics::getWidth();
+	registerInputResource.height = Gear::Core::Graphics::getHeight();
 	registerInputResource.pitch = 0;
 	registerInputResource.pInputFencePoint = nullptr;
 
@@ -186,9 +186,9 @@ bool Core::VideoEncoder::NvidiaEncoder::encode(Resource::D3D12Resource::Texture*
 
 	picParams.bufferFmt = bufferFormat;
 
-	picParams.inputWidth = Core::Graphics::getWidth();
+	picParams.inputWidth = Gear::Core::Graphics::getWidth();
 
-	picParams.inputHeight = Core::Graphics::getHeight();
+	picParams.inputHeight = Gear::Core::Graphics::getHeight();
 
 	picParams.completionEvent = nullptr;
 

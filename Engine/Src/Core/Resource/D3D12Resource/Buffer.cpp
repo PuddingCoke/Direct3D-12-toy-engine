@@ -1,6 +1,6 @@
 ﻿#include<Gear/Core/Resource/D3D12Resource/Buffer.h>
 
-Core::Resource::D3D12Resource::Buffer::Buffer(const uint64_t size, const bool stateTracking, const D3D12_RESOURCE_FLAGS resFlags, const uint32_t initialState) :
+Gear::Core::Resource::D3D12Resource::Buffer::Buffer(const uint64_t size, const bool stateTracking, const D3D12_RESOURCE_FLAGS resFlags, const uint32_t initialState) :
 	D3D12ResourceBase(CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE, CD3DX12_RESOURCE_DESC::Buffer(size, resFlags), stateTracking, static_cast<D3D12_RESOURCE_STATES>(initialState), nullptr),
 	globalState(std::make_shared<uint32_t>(initialState)),
 	internalState(initialState),
@@ -8,7 +8,7 @@ Core::Resource::D3D12Resource::Buffer::Buffer(const uint64_t size, const bool st
 {
 }
 
-Core::Resource::D3D12Resource::Buffer::Buffer(const ComPtr<ID3D12Resource>& buffer, const bool stateTracking, const uint32_t initialState) :
+Gear::Core::Resource::D3D12Resource::Buffer::Buffer(const ComPtr<ID3D12Resource>& buffer, const bool stateTracking, const uint32_t initialState) :
 	D3D12ResourceBase(buffer, stateTracking),
 	globalState(std::make_shared<uint32_t>(initialState)),
 	internalState(initialState),
@@ -16,7 +16,7 @@ Core::Resource::D3D12Resource::Buffer::Buffer(const ComPtr<ID3D12Resource>& buff
 {
 }
 
-Core::Resource::D3D12Resource::Buffer::Buffer(Buffer* const buff) :
+Gear::Core::Resource::D3D12Resource::Buffer::Buffer(Buffer* const buff) :
 	D3D12ResourceBase(buff),
 	globalState(buff->globalState),
 	internalState(D3D12_RESOURCE_STATE_UNKNOWN),
@@ -25,11 +25,11 @@ Core::Resource::D3D12Resource::Buffer::Buffer(Buffer* const buff) :
 	buff->resetInternalStates();
 }
 
-Core::Resource::D3D12Resource::Buffer::~Buffer()
+Gear::Core::Resource::D3D12Resource::Buffer::~Buffer()
 {
 }
 
-void Core::Resource::D3D12Resource::Buffer::updateGlobalStates()
+void Gear::Core::Resource::D3D12Resource::Buffer::updateGlobalStates()
 {
 	if (internalState != D3D12_RESOURCE_STATE_UNKNOWN)
 	{
@@ -37,17 +37,17 @@ void Core::Resource::D3D12Resource::Buffer::updateGlobalStates()
 	}
 }
 
-void Core::Resource::D3D12Resource::Buffer::resetInternalStates()
+void Gear::Core::Resource::D3D12Resource::Buffer::resetInternalStates()
 {
 	internalState = D3D12_RESOURCE_STATE_UNKNOWN;
 }
 
-void Core::Resource::D3D12Resource::Buffer::resetTransitionStates()
+void Gear::Core::Resource::D3D12Resource::Buffer::resetTransitionStates()
 {
 	transitionState = D3D12_RESOURCE_STATE_UNKNOWN;
 }
 
-void Core::Resource::D3D12Resource::Buffer::transition(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers, std::vector<PendingBufferBarrier>& pendingBarriers)
+void Gear::Core::Resource::D3D12Resource::Buffer::transition(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers, std::vector<PendingBufferBarrier>& pendingBarriers)
 {
 	if (internalState == D3D12_RESOURCE_STATE_UNKNOWN)
 	{
@@ -77,7 +77,7 @@ void Core::Resource::D3D12Resource::Buffer::transition(std::vector<D3D12_RESOURC
 	resetTransitionStates();
 }
 
-void Core::Resource::D3D12Resource::Buffer::solvePendingBarrier(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers, const uint32_t targetState)
+void Gear::Core::Resource::D3D12Resource::Buffer::solvePendingBarrier(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers, const uint32_t targetState)
 {
 	if (*globalState != targetState)
 	{
@@ -93,7 +93,7 @@ void Core::Resource::D3D12Resource::Buffer::solvePendingBarrier(std::vector<D3D1
 	}
 }
 
-void Core::Resource::D3D12Resource::Buffer::setState(const uint32_t state)
+void Gear::Core::Resource::D3D12Resource::Buffer::setState(const uint32_t state)
 {
 	if (transitionState == D3D12_RESOURCE_STATE_UNKNOWN)
 	{
@@ -105,12 +105,12 @@ void Core::Resource::D3D12Resource::Buffer::setState(const uint32_t state)
 	}
 }
 
-uint32_t Core::Resource::D3D12Resource::Buffer::getState() const
+uint32_t Gear::Core::Resource::D3D12Resource::Buffer::getState() const
 {
 	return internalState;
 }
 
-void Core::Resource::D3D12Resource::Buffer::pushToTrackingList(std::vector<Buffer*>& trackingList)
+void Gear::Core::Resource::D3D12Resource::Buffer::pushToTrackingList(std::vector<Buffer*>& trackingList)
 {
 	if (getStateTracking() && !getInTrackingList())
 	{

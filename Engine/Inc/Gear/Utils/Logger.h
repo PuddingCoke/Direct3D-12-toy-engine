@@ -1,15 +1,15 @@
 ﻿#pragma once
 
-#ifndef _UTILS_LOGGER_H_
-#define _UTILS_LOGGER_H_
+#ifndef _GEAR_UTILS_LOGGER_H_
+#define _GEAR_UTILS_LOGGER_H_
 
 #include"Logger/LogContext.h"
 
-using IntegerMode = Utils::Logger::LogContext::IntegerMode;
+using IntegerMode = Gear::Utils::Logger::LogContext::IntegerMode;
 
-using FloatPrecision = Utils::Logger::LogContext::FloatPrecision;
+using FloatPrecision = Gear::Utils::Logger::LogContext::FloatPrecision;
 
-using LogColor = Utils::Logger::LogColor;
+using LogColor = Gear::Utils::Logger::LogColor;
 
 /// <summary>
 /// a simple logger that output text with colors depend on different situations
@@ -30,21 +30,24 @@ using LogColor = Utils::Logger::LogColor;
 /// 
 /// there are many available colors in LogColor class
 /// </summary>
-namespace Utils
+namespace Gear
 {
-	namespace Logger
+	namespace Utils
 	{
-		void submitLogMessage(const LogMessage& msg);
+		namespace Logger
+		{
+			void submitLogMessage(const LogMessage& msg);
+		}
 	}
 }
 
-#define LOGSUCCESS(...) Utils::Logger::submitLogMessage(Utils::Logger::LogContext::createLogMessage(__FUNCTIONW__,Utils::Logger::LogType::LOG_SUCCESS,__VA_ARGS__))
+#define LOGSUCCESS(...) Gear::Utils::Logger::submitLogMessage(Gear::Utils::Logger::LogContext::createLogMessage(__FUNCTIONW__,Gear::Utils::Logger::LogType::LOG_SUCCESS,__VA_ARGS__))
 
-#define LOGENGINE(...) Utils::Logger::submitLogMessage(Utils::Logger::LogContext::createLogMessage(__FUNCTIONW__,Utils::Logger::LogType::LOG_ENGINE,__VA_ARGS__))
+#define LOGENGINE(...) Gear::Utils::Logger::submitLogMessage(Gear::Utils::Logger::LogContext::createLogMessage(__FUNCTIONW__,Gear::Utils::Logger::LogType::LOG_ENGINE,__VA_ARGS__))
 
-#define LOGUSER(...) Utils::Logger::submitLogMessage(Utils::Logger::LogContext::createLogMessage(__FUNCTIONW__,Utils::Logger::LogType::LOG_USER,__VA_ARGS__))
+#define LOGUSER(...) Gear::Utils::Logger::submitLogMessage(Gear::Utils::Logger::LogContext::createLogMessage(__FUNCTIONW__,Gear::Utils::Logger::LogType::LOG_USER,__VA_ARGS__))
 
-#define LOGERROR(...) Utils::Logger::submitLogMessage(Utils::Logger::LogContext::createLogMessage(__FUNCTIONW__,Utils::Logger::LogType::LOG_ERROR,__FILEW__,L"LINE",static_cast<int32_t>(__LINE__),__VA_ARGS__)); \
+#define LOGERROR(...) Gear::Utils::Logger::submitLogMessage(Gear::Utils::Logger::LogContext::createLogMessage(__FUNCTIONW__,Gear::Utils::Logger::LogType::LOG_ERROR,__FILEW__,L"LINE",static_cast<int32_t>(__LINE__),__VA_ARGS__)); \
 throw std::runtime_error("check log.txt or console output for detailed information") \
 
-#endif // !_UTILS_LOGGER_H_
+#endif // !_GEAR_UTILS_LOGGER_H_

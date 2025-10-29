@@ -1,26 +1,29 @@
 ﻿#pragma once
 
-#ifndef _UTILS_RANDOM_H_
-#define _UTILS_RANDOM_H_
+#ifndef _GEAR_UTILS_RANDOM_H_
+#define _GEAR_UTILS_RANDOM_H_
 
 #include<cstdint>
 
-namespace Utils
+namespace Gear
 {
-	namespace Random
+	namespace Utils
 	{
-		//均值 0 标准差 1
-		float genGauss();
+		namespace Random
+		{
+			//均值 0 标准差 1
+			float genGauss();
 
-		float genFloat();
+			float genFloat();
 
-		double genDouble();
+			double genDouble();
 
-		int32_t genInt();
+			int32_t genInt();
 
-		uint32_t genUint();
+			uint32_t genUint();
 
+		}
 	}
 }
 
-#endif // !_UTILS_RANDOM_H_
+#endif // !_GEAR_UTILS_RANDOM_H_

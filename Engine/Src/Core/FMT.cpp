@@ -1,6 +1,6 @@
 ﻿#include<Gear/Core/FMT.h>
 
-uint32_t Core::FMT::getByteSize(const DXGI_FORMAT format)
+uint32_t Gear::Core::FMT::getByteSize(const DXGI_FORMAT format)
 {
     switch (format)
     {

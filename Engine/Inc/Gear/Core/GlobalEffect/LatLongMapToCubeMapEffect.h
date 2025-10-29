@@ -1,19 +1,22 @@
 ﻿#pragma once
 
-#ifndef _CORE_GLOBALEFFECT_LATLONGMAPTOCUBEMAPEFFECT_H_
-#define _CORE_GLOBALEFFECT_LATLONGMAPTOCUBEMAPEFFECT_H_
+#ifndef _GEAR_CORE_GLOBALEFFECT_LATLONGMAPTOCUBEMAPEFFECT_H_
+#define _GEAR_CORE_GLOBALEFFECT_LATLONGMAPTOCUBEMAPEFFECT_H_
 
 #include"GlobalEffectHeader.h"
 
-namespace Core
+namespace Gear
 {
-	namespace GlobalEffect
+	namespace Core
 	{
-		namespace LatLongMapToCubeMapEffect
+		namespace GlobalEffect
 		{
-			void process(GraphicsContext* const context, Resource::TextureRenderView* const inputTexture, Resource::TextureRenderView* const outputTexture);
+			namespace LatLongMapToCubeMapEffect
+			{
+				void process(GraphicsContext* const context, Resource::TextureRenderView* const inputTexture, Resource::TextureRenderView* const outputTexture);
+			}
 		}
 	}
 }
 
-#endif // !_CORE_GLOBALEFFECT_LATLONGMAPTOCUBEMAPEFFECT_H_
+#endif // !_GEAR_CORE_GLOBALEFFECT_LATLONGMAPTOCUBEMAPEFFECT_H_

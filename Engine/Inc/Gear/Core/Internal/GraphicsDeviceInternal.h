@@ -1,23 +1,26 @@
 ﻿#pragma once
 
-#ifndef _CORE_GRAPHICSDEVICE_INTERNAL_H_
-#define _CORE_GRAPHICSDEVICE_INTERNAL_H_
+#ifndef _GEAR_CORE_GRAPHICSDEVICE_INTERNAL_H_
+#define _GEAR_CORE_GRAPHICSDEVICE_INTERNAL_H_
 
 #include<D3D12Headers/d3dx12.h>
 
-namespace Core
+namespace Gear
 {
-	namespace GraphicsDevice
+	namespace Core
 	{
-		namespace Internal
+		namespace GraphicsDevice
 		{
-			void initialize(IUnknown* const adapter);
+			namespace Internal
+			{
+				void initialize(IUnknown* const adapter);
 
-			void release();
+				void release();
 
-			void checkFeatureSupport();
+				void checkFeatureSupport();
+			}
 		}
 	}
 }
 
-#endif // !_CORE_GRAPHICSDEVICE_INTERNAL_H_
+#endif // !_GEAR_CORE_GRAPHICSDEVICE_INTERNAL_H_

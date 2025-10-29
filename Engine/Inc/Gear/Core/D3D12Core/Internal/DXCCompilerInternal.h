@@ -1,22 +1,25 @@
 ﻿#pragma once
 
-#ifndef _CORE_D3D12CORE_DXCCOMPILER_INTERNAL_H_
-#define _CORE_D3D12CORE_DXCCOMPILER_INTERNAL_H_
+#ifndef _GEAR_CORE_D3D12CORE_DXCCOMPILER_INTERNAL_H_
+#define _GEAR_CORE_D3D12CORE_DXCCOMPILER_INTERNAL_H_
 
-namespace Core
+namespace Gear
 {
-	namespace D3D12Core
+	namespace Core
 	{
-		namespace DXCCompiler
+		namespace D3D12Core
 		{
-			namespace Internal
+			namespace DXCCompiler
 			{
-				void initialize();
+				namespace Internal
+				{
+					void initialize();
 
-				void release();
+					void release();
+				}
 			}
 		}
 	}
 }
 
-#endif // !_CORE_D3D12CORE_DXCCOMPILER_INTERNAL_H_
+#endif // !_GEAR_CORE_D3D12CORE_DXCCOMPILER_INTERNAL_H_

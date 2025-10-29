@@ -12,13 +12,13 @@ void Gear::Game::imGUICall()
 {
 }
 
-void Gear::Game::beginRenderTask(Core::RenderTask* const renderTask)
+void Gear::Game::beginRenderTask(Gear::Core::RenderTask* const renderTask)
 {
 	renderTask->beginTask();
 
 	recordQueue.push(renderTask);
 
-	if (Core::RenderEngine::getDisplayImGuiSurface())
+	if (Gear::Core::RenderEngine::getDisplayImGuiSurface())
 	{
 		renderTask->imGUICall();
 	}
@@ -35,7 +35,7 @@ void Gear::Game::scheduleAllTasks()
 	{
 		recordQueue.front()->waitTask();
 
-		Core::RenderEngine::submitCommandList(recordQueue.front()->getCommandList());
+		Gear::Core::RenderEngine::submitCommandList(recordQueue.front()->getCommandList());
 
 		recordQueue.pop();
 	}

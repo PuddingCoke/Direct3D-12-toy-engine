@@ -2,16 +2,16 @@
 
 #include<Gear/Utils/File.h>
 
-Core::D3D12Core::Shader::Shader(const uint8_t* const bytes, const size_t byteSize)
+Gear::Core::D3D12Core::Shader::Shader(const uint8_t* const bytes, const size_t byteSize)
 {
 	shaderByteCode.pShaderBytecode = bytes;
 
 	shaderByteCode.BytecodeLength = byteSize;
 }
 
-Core::D3D12Core::Shader::Shader(const std::wstring& filePath)
+Gear::Core::D3D12Core::Shader::Shader(const std::wstring& filePath)
 {
-	if (Utils::File::getExtension(filePath) == L"cso")
+	if (Gear::Utils::File::getExtension(filePath) == L"cso")
 	{
 		shaderBlob = DXCCompiler::read(filePath);
 
@@ -27,9 +27,9 @@ Core::D3D12Core::Shader::Shader(const std::wstring& filePath)
 	}
 }
 
-Core::D3D12Core::Shader::Shader(const std::wstring& filePath, const DXCCompiler::ShaderProfile profile)
+Gear::Core::D3D12Core::Shader::Shader(const std::wstring& filePath, const DXCCompiler::ShaderProfile profile)
 {
-	if (Utils::File::getExtension(filePath) == L"hlsl")
+	if (Gear::Utils::File::getExtension(filePath) == L"hlsl")
 	{
 		shaderBlob = DXCCompiler::compile(filePath, profile);
 
@@ -45,7 +45,7 @@ Core::D3D12Core::Shader::Shader(const std::wstring& filePath, const DXCCompiler:
 	}
 }
 
-D3D12_SHADER_BYTECODE Core::D3D12Core::Shader::getByteCode() const
+D3D12_SHADER_BYTECODE Gear::Core::D3D12Core::Shader::getByteCode() const
 {
 	return shaderByteCode;
 }

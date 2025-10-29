@@ -4,7 +4,7 @@
 
 #include<Gear/CompiledShaders/FXAA.h>
 
-Core::Effect::FXAAEffect::FXAAEffect(GraphicsContext* const context, const uint32_t width, const uint32_t height) :
+Gear::Core::Effect::FXAAEffect::FXAAEffect(GraphicsContext* const context, const uint32_t width, const uint32_t height) :
 	EffectBase(context, width, height, DXGI_FORMAT_R8G8B8A8_UNORM), fxaaParam{ 1.0f,0.75f,0.166f,0.0633f },
 	colorLumaTexture(ResourceManager::createTextureRenderView(width, height, DXGI_FORMAT_R8G8B8A8_UNORM, 1, 1, false, true,
 		DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_R8G8B8A8_UNORM))
@@ -14,32 +14,32 @@ Core::Effect::FXAAEffect::FXAAEffect(GraphicsContext* const context, const uint3
 	fxaaPS = new D3D12Core::Shader(g_FXAABytes, sizeof(g_FXAABytes));
 
 	{
-		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = Core::PipelineStateHelper::getDefaultFullScreenState();
+		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = Gear::Core::PipelineStateHelper::getDefaultFullScreenState();
 		desc.PS = colorToColorLumaPS->getByteCode();
 		desc.NumRenderTargets = 1;
 		desc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
 
-		Core::GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&colorToColorLumaState));
+		Gear::Core::GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&colorToColorLumaState));
 	}
 
 	{
-		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = Core::PipelineStateHelper::getDefaultFullScreenState();
+		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = Gear::Core::PipelineStateHelper::getDefaultFullScreenState();
 		desc.PS = fxaaPS->getByteCode();
 		desc.NumRenderTargets = 1;
 		desc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
 
-		Core::GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&fxaaState));
+		Gear::Core::GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&fxaaState));
 	}
 }
 
-Core::Effect::FXAAEffect::~FXAAEffect()
+Gear::Core::Effect::FXAAEffect::~FXAAEffect()
 {
 	delete colorLumaTexture;
 	delete colorToColorLumaPS;
 	delete fxaaPS;
 }
 
-Core::Resource::TextureRenderView* Core::Effect::FXAAEffect::process(Resource::TextureRenderView* const inputTexture) const
+Gear::Core::Resource::TextureRenderView* Gear::Core::Effect::FXAAEffect::process(Resource::TextureRenderView* const inputTexture) const
 {
 	context->setPipelineState(colorToColorLumaState.Get());
 
@@ -74,7 +74,7 @@ Core::Resource::TextureRenderView* Core::Effect::FXAAEffect::process(Resource::T
 	return outputTexture;
 }
 
-void Core::Effect::FXAAEffect::imGUICall()
+void Gear::Core::Effect::FXAAEffect::imGUICall()
 {
 	ImGui::Begin("FXAA Effect");
 	ImGui::SliderFloat("FXAAQualitySubpix", &fxaaParam.fxaaQualitySubpix, 0.0f, 1.f);
@@ -83,17 +83,17 @@ void Core::Effect::FXAAEffect::imGUICall()
 	ImGui::End();
 }
 
-void Core::Effect::FXAAEffect::setFXAAQualitySubpix(const float fxaaQualitySubpix)
+void Gear::Core::Effect::FXAAEffect::setFXAAQualitySubpix(const float fxaaQualitySubpix)
 {
 	fxaaParam.fxaaQualitySubpix = fxaaQualitySubpix;
 }
 
-void Core::Effect::FXAAEffect::setFXAAQualityEdgeThreshold(const float fxaaQualityEdgeThreshold)
+void Gear::Core::Effect::FXAAEffect::setFXAAQualityEdgeThreshold(const float fxaaQualityEdgeThreshold)
 {
 	fxaaParam.fxaaQualityEdgeThreshold = fxaaQualityEdgeThreshold;
 }
 
-void Core::Effect::FXAAEffect::setFXAAQualityEdgeThresholdMin(const float fxaaQualityEdgeThresholdMin)
+void Gear::Core::Effect::FXAAEffect::setFXAAQualityEdgeThresholdMin(const float fxaaQualityEdgeThresholdMin)
 {
 	fxaaParam.fxaaQualityEdgeThresholdMin = fxaaQualityEdgeThresholdMin;
 }

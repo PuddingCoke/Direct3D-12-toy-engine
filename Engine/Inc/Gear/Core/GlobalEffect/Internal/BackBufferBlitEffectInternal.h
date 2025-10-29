@@ -1,22 +1,25 @@
 ﻿#pragma once
 
-#ifndef _CORE_GLOBALEFFECT_BACKBUFFERBLITEFFECT_INTERNAL_H_
-#define _CORE_GLOBALEFFECT_BACKBUFFERBLITEFFECT_INTERNAL_H_
+#ifndef _GEAR_CORE_GLOBALEFFECT_BACKBUFFERBLITEFFECT_INTERNAL_H_
+#define _GEAR_CORE_GLOBALEFFECT_BACKBUFFERBLITEFFECT_INTERNAL_H_
 
-namespace Core
+namespace Gear
 {
-	namespace GlobalEffect
+	namespace Core
 	{
-		namespace BackBufferBlitEffect
+		namespace GlobalEffect
 		{
-			namespace Internal
+			namespace BackBufferBlitEffect
 			{
-				void initialize();
+				namespace Internal
+				{
+					void initialize();
 
-				void release();
+					void release();
+				}
 			}
 		}
 	}
 }
 
-#endif // !_CORE_GLOBALEFFECT_BACKBUFFERBLITEFFECT_INTERNAL_H_
+#endif // !_GEAR_CORE_GLOBALEFFECT_BACKBUFFERBLITEFFECT_INTERNAL_H_

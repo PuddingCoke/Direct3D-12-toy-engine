@@ -1,6 +1,6 @@
 ﻿#include<Gear/Core/VideoEncoder/Encoder.h>
 
-Core::VideoEncoder::Encoder::Encoder(const uint32_t frameToEncode, const OutputVideoFormat format) :
+Gear::Core::VideoEncoder::Encoder::Encoder(const uint32_t frameToEncode, const OutputVideoFormat format) :
 	frameToEncode(frameToEncode), frameEncoded(0), encodeTime(0.f), streamIndex(0), sampleDuration(10000000u / frameRate), sampleTime(0)
 {
 	CHECKERROR(MFStartup(MF_VERSION));
@@ -36,7 +36,7 @@ Core::VideoEncoder::Encoder::Encoder(const uint32_t frameToEncode, const OutputV
 
 	LOGENGINE(L"frame to encode", frameToEncode);
 
-	MFSetAttributeSize(mediaType.Get(), MF_MT_FRAME_SIZE, Core::Graphics::getWidth(), Core::Graphics::getHeight());
+	MFSetAttributeSize(mediaType.Get(), MF_MT_FRAME_SIZE, Gear::Core::Graphics::getWidth(), Gear::Core::Graphics::getHeight());
 
 	MFSetAttributeRatio(mediaType.Get(), MF_MT_FRAME_RATE, frameRate, 1);
 
@@ -45,7 +45,7 @@ Core::VideoEncoder::Encoder::Encoder(const uint32_t frameToEncode, const OutputV
 	sinkWriter->BeginWriting();
 }
 
-Core::VideoEncoder::Encoder::~Encoder()
+Gear::Core::VideoEncoder::Encoder::~Encoder()
 {
 	sinkWriter->Finalize();
 
@@ -54,7 +54,7 @@ Core::VideoEncoder::Encoder::~Encoder()
 	MFShutdown();
 }
 
-void Core::VideoEncoder::Encoder::displayProgress() const
+void Gear::Core::VideoEncoder::Encoder::displayProgress() const
 {
 	if ((frameEncoded % (frameRate / 4)) == 0)
 	{
@@ -73,7 +73,7 @@ void Core::VideoEncoder::Encoder::displayProgress() const
 	}
 }
 
-bool Core::VideoEncoder::Encoder::writeFrame(const void* const bitstreamPtr, const uint32_t bitstreamSize, const bool cleanPoint)
+bool Gear::Core::VideoEncoder::Encoder::writeFrame(const void* const bitstreamPtr, const uint32_t bitstreamSize, const bool cleanPoint)
 {
 	frameEncoded++;
 

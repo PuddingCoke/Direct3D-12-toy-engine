@@ -1,7 +1,7 @@
 ﻿#pragma once
 
-#ifndef _UTILS_LOGGER_LOGCONTEXT_H_
-#define _UTILS_LOGGER_LOGCONTEXT_H_
+#ifndef _GEAR_UTILS_LOGGER_LOGCONTEXT_H_
+#define _GEAR_UTILS_LOGGER_LOGCONTEXT_H_
 
 #include"LogColor.h"
 
@@ -9,161 +9,164 @@
 
 #include<condition_variable>
 
-namespace Utils
+namespace Gear
 {
-	namespace Logger
+	namespace Utils
 	{
-		enum class LogType
+		namespace Logger
 		{
-			LOG_SUCCESS,
-			LOG_ERROR,
-			LOG_ENGINE,
-			LOG_USER
-		};
-
-		struct BufferSlot
-		{
-			BufferSlot();
-
-			std::wstring str;
-
-			bool inUse;
-		};
-
-		struct LogMessage
-		{
-			BufferSlot& slot;
-
-			std::mutex& inUseMutex;
-
-			std::condition_variable& inUseCV;
-
-			const LogType type;
-		};
-
-		class LogContext
-		{
-		public:
-
-			enum class IntegerMode
+			enum class LogType
 			{
-				DEC, HEX
+				LOG_SUCCESS,
+				LOG_ERROR,
+				LOG_ENGINE,
+				LOG_USER
 			};
 
-			struct FloatPrecision
+			struct BufferSlot
 			{
-				FloatPrecision(const int32_t precision = 5);
+				BufferSlot();
 
-				int32_t precision;
+				std::wstring str;
+
+				bool inUse;
 			};
 
-			LogContext(const LogContext&) = delete;
+			struct LogMessage
+			{
+				BufferSlot& slot;
 
-			void operator=(const LogContext&) = delete;
+				std::mutex& inUseMutex;
 
-			LogContext();
+				std::condition_variable& inUseCV;
 
-			~LogContext();
+				const LogType type;
+			};
 
-			template<typename... Args>
-			static LogMessage createLogMessage(const wchar_t* const functionName, const LogType& type, const Args&... args);
+			class LogContext
+			{
+			public:
 
-		private:
+				enum class IntegerMode
+				{
+					DEC, HEX
+				};
 
-			template<typename... Args>
-			LogMessage getLogMessage(const wchar_t* const functionName, const LogType& type, const Args&... args);
+				struct FloatPrecision
+				{
+					FloatPrecision(const int32_t precision = 5);
 
-			template<typename T>
-			struct isNativeString :std::false_type {};
+					int32_t precision;
+				};
 
-			template<size_t N>
-			struct isNativeString<const char[N]> : std::true_type {};
+				LogContext(const LogContext&) = delete;
 
-			template<size_t N>
-			struct isNativeString<char[N]> : std::true_type {};
+				void operator=(const LogContext&) = delete;
 
-			template<>
-			struct isNativeString<const char*> : std::true_type {};
+				LogContext();
 
-			template<>
-			struct isNativeString<char*> : std::true_type {};
+				~LogContext();
 
-			template<typename First, typename... Rest>
-			void packRestArgument(const First& first, const Rest&... rest);
+				template<typename... Args>
+				static LogMessage createLogMessage(const wchar_t* const functionName, const LogType& type, const Args&... args);
 
-			void packRestArgument();
+			private:
 
-			//forbidden default case
-			template<typename Arg>
-			void packArgument(const Arg& arg);
+				template<typename... Args>
+				LogMessage getLogMessage(const wchar_t* const functionName, const LogType& type, const Args&... args);
 
-			//wstring
-			void packArgument(const std::wstring& arg);
+				template<typename T>
+				struct isNativeString :std::false_type {};
 
-			//const wchar*
-			void packArgument(const wchar_t* arg);
+				template<size_t N>
+				struct isNativeString<const char[N]> : std::true_type {};
 
-			//singed 32bit integer
-			void packArgument(const int32_t& arg);
+				template<size_t N>
+				struct isNativeString<char[N]> : std::true_type {};
 
-			//signed 64bit integer
-			void packArgument(const int64_t& arg);
+				template<>
+				struct isNativeString<const char*> : std::true_type {};
 
-			//unsigned 32bit integer
-			void packArgument(const uint32_t& arg);
+				template<>
+				struct isNativeString<char*> : std::true_type {};
 
-			//unsigned 64bit integer
-			void packArgument(const uint64_t& arg);
+				template<typename First, typename... Rest>
+				void packRestArgument(const First& first, const Rest&... rest);
 
-			template<typename Arg>
-			void packFloatPoint(const Arg& arg);
+				void packRestArgument();
 
-			//float
-			void packArgument(const float_t& arg);
+				//forbidden default case
+				template<typename Arg>
+				void packArgument(const Arg& arg);
 
-			//double
-			void packArgument(const double_t& arg);
+				//wstring
+				void packArgument(const std::wstring& arg);
 
-			//change integer mode
-			void packArgument(const IntegerMode& mode);
+				//const wchar*
+				void packArgument(const wchar_t* arg);
 
-			//change float precision
-			void packArgument(const FloatPrecision& precision);
+				//singed 32bit integer
+				void packArgument(const int32_t& arg);
 
-			//change text color
-			void packArgument(const LogColor& arg);
+				//signed 64bit integer
+				void packArgument(const int64_t& arg);
 
-			//change display color
-			void setDisplayColor(const LogColor& color);
+				//unsigned 32bit integer
+				void packArgument(const uint32_t& arg);
 
-			void resetState();
+				//unsigned 64bit integer
+				void packArgument(const uint64_t& arg);
 
-			IntegerMode integerMode;
+				template<typename Arg>
+				void packFloatPoint(const Arg& arg);
 
-			FloatPrecision floatPrecision;
+				//float
+				void packArgument(const float_t& arg);
 
-			LogColor textColor;
+				//double
+				void packArgument(const double_t& arg);
 
-			LogColor displayColor;
+				//change integer mode
+				void packArgument(const IntegerMode& mode);
 
-			static constexpr size_t slotNum = 128;
+				//change float precision
+				void packArgument(const FloatPrecision& precision);
 
-			BufferSlot* const slots;
+				//change text color
+				void packArgument(const LogColor& arg);
 
-			uint32_t writeIndex;
+				//change display color
+				void setDisplayColor(const LogColor& color);
 
-			std::wstring* messageStr;
+				void resetState();
 
-			std::mutex inUseMutex;
+				IntegerMode integerMode;
 
-			std::condition_variable inUseCV;
+				FloatPrecision floatPrecision;
 
-		};
+				LogColor textColor;
+
+				LogColor displayColor;
+
+				static constexpr size_t slotNum = 128;
+
+				BufferSlot* const slots;
+
+				uint32_t writeIndex;
+
+				std::wstring* messageStr;
+
+				std::mutex inUseMutex;
+
+				std::condition_variable inUseCV;
+
+			};
+		}
 	}
 }
 
 template<typename ...Args>
-inline Utils::Logger::LogMessage Utils::Logger::LogContext::createLogMessage(const wchar_t* const functionName, const LogType& type, const Args & ...args)
+inline Gear::Utils::Logger::LogMessage Gear::Utils::Logger::LogContext::createLogMessage(const wchar_t* const functionName, const LogType& type, const Args & ...args)
 {
 	thread_local LogContext context;
 
@@ -173,7 +176,7 @@ inline Utils::Logger::LogMessage Utils::Logger::LogContext::createLogMessage(con
 }
 
 template<typename ...Args>
-inline Utils::Logger::LogMessage Utils::Logger::LogContext::getLogMessage(const wchar_t* const functionName, const LogType& type, const Args & ...args)
+inline Gear::Utils::Logger::LogMessage Gear::Utils::Logger::LogContext::getLogMessage(const wchar_t* const functionName, const LogType& type, const Args & ...args)
 {
 	if (slots[writeIndex].inUse)
 	{
@@ -255,7 +258,7 @@ inline Utils::Logger::LogMessage Utils::Logger::LogContext::getLogMessage(const 
 }
 
 template<typename First, typename ...Rest>
-inline void Utils::Logger::LogContext::packRestArgument(const First& first, const Rest& ...rest)
+inline void Gear::Utils::Logger::LogContext::packRestArgument(const First& first, const Rest& ...rest)
 {
 	static_assert(!std::is_same<std::string, First>::value, "error input type is std::string");
 
@@ -267,7 +270,7 @@ inline void Utils::Logger::LogContext::packRestArgument(const First& first, cons
 }
 
 template<typename Arg>
-inline void Utils::Logger::LogContext::packArgument(const Arg& arg)
+inline void Gear::Utils::Logger::LogContext::packArgument(const Arg& arg)
 {
 	static_assert(0, "not supported type");
 
@@ -280,7 +283,7 @@ inline void Utils::Logger::LogContext::packArgument(const Arg& arg)
 }
 
 template<typename Arg>
-inline void Utils::Logger::LogContext::packFloatPoint(const Arg& arg)
+inline void Gear::Utils::Logger::LogContext::packFloatPoint(const Arg& arg)
 {
 	setDisplayColor(LogColor::numericColor);
 
@@ -291,4 +294,4 @@ inline void Utils::Logger::LogContext::packFloatPoint(const Arg& arg)
 	*messageStr += buff;
 }
 
-#endif // !_UTILS_LOGGER_LOGCONTEXT_H_
+#endif // !_GEAR_UTILS_LOGGER_LOGCONTEXT_H_

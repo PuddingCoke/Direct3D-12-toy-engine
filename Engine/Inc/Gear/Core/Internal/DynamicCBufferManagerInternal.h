@@ -1,23 +1,26 @@
 ﻿#pragma once
 
-#ifndef _CORE_DYNAMICCBUFFERMANAGER_INTERNAL_H_
-#define _CORE_DYNAMICCBUFFERMANAGER_INTERNAL_H_
+#ifndef _GEAR_CORE_DYNAMICCBUFFERMANAGER_INTERNAL_H_
+#define _GEAR_CORE_DYNAMICCBUFFERMANAGER_INTERNAL_H_
 
 #include<Gear/Core/D3D12Core/CommandList.h>
 
-namespace Core
+namespace Gear
 {
-	namespace DynamicCBufferManager
+	namespace Core
 	{
-		namespace Internal
+		namespace DynamicCBufferManager
 		{
-			void initialize();
+			namespace Internal
+			{
+				void initialize();
 
-			void release();
+				void release();
 
-			void recordCommands(D3D12Core::CommandList* const commandList);
+				void recordCommands(D3D12Core::CommandList* const commandList);
+			}
 		}
 	}
 }
 
-#endif // !_CORE_DYNAMICCBUFFERMANAGER_INTERNAL_H_
+#endif // !_GEAR_CORE_DYNAMICCBUFFERMANAGER_INTERNAL_H_

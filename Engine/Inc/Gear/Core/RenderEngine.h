@@ -1,7 +1,7 @@
 ﻿#pragma once
 
-#ifndef _CORE_RENDERENGINE_H_
-#define _CORE_RENDERENGINE_H_
+#ifndef _GEAR_CORE_RENDERENGINE_H_
+#define _GEAR_CORE_RENDERENGINE_H_
 
 #include<Gear/Core/D3D12Core/CommandList.h>
 
@@ -15,28 +15,31 @@
 
 #include<ImGUI/imgui_impl_dx12.h>
 
-namespace Core
+namespace Gear
 {
-	enum class GPUVendor
+	namespace Core
 	{
-		NVIDIA,
-		AMD,
-		INTEL,
-		UNKNOWN
-	};
+		enum class GPUVendor
+		{
+			NVIDIA,
+			AMD,
+			INTEL,
+			UNKNOWN
+		};
 
-	namespace RenderEngine
-	{
+		namespace RenderEngine
+		{
 
-		void submitCommandList(D3D12Core::CommandList* const commandList);
+			void submitCommandList(D3D12Core::CommandList* const commandList);
 
-		GPUVendor getVendor();
+			GPUVendor getVendor();
 
-		Resource::D3D12Resource::Texture* getRenderTexture();
+			Resource::D3D12Resource::Texture* getRenderTexture();
 
-		bool getDisplayImGuiSurface();
+			bool getDisplayImGuiSurface();
 
+		}
 	}
 }
 
-#endif // !_CORE_RENDERENGINE_H_
+#endif // !_GEAR_CORE_RENDERENGINE_H_

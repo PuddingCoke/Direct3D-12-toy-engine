@@ -1,31 +1,34 @@
 ﻿#pragma once
 
-#ifndef _INPUT_MOUSE_INTERNAL_H_
-#define _INPUT_MOUSE_INTERNAL_H_
+#ifndef _GEAR_INPUT_MOUSE_INTERNAL_H_
+#define _GEAR_INPUT_MOUSE_INTERNAL_H_
 
-namespace Input
+namespace Gear
 {
-	namespace Mouse
+	namespace Input
 	{
-		namespace Internal
+		namespace Mouse
 		{
+			namespace Internal
+			{
 
-			void resetDeltaValue();
+				void resetDeltaValue();
 
-			void pressLeft();
+				void pressLeft();
 
-			void pressRight();
+				void pressRight();
 
-			void releaseLeft();
+				void releaseLeft();
 
-			void releaseRight();
+				void releaseRight();
 
-			void scroll(const float delta);
+				void scroll(const float delta);
 
-			void move(const float curX, const float curY);
+				void move(const float curX, const float curY);
 
+			}
 		}
 	}
 }
 
-#endif // !_INPUT_MOUSE_INTERNAL_H_
+#endif // !_GEAR_INPUT_MOUSE_INTERNAL_H_

@@ -25,62 +25,62 @@ namespace
 
 		D3D12_CPU_DESCRIPTOR_HANDLE backBufferHandle;
 
-		Core::Resource::ImmutableCBuffer* reservedGlobalCBuffer;
+		Gear::Core::Resource::ImmutableCBuffer* reservedGlobalCBuffer;
 
 	}pvt;
 }
 
-uint32_t Core::Graphics::getFrameBufferCount()
+uint32_t Gear::Core::Graphics::getFrameBufferCount()
 {
 	return pvt.frameBufferCount;
 }
 
-uint32_t Core::Graphics::getFrameIndex()
+uint32_t Gear::Core::Graphics::getFrameIndex()
 {
 	return pvt.frameIndex;
 }
 
-float Core::Graphics::getDeltaTime()
+float Gear::Core::Graphics::getDeltaTime()
 {
 	return pvt.deltaTime;
 }
 
-float Core::Graphics::getTimeElapsed()
+float Gear::Core::Graphics::getTimeElapsed()
 {
 	return pvt.timeElapsed;
 }
 
-uint32_t Core::Graphics::getWidth()
+uint32_t Gear::Core::Graphics::getWidth()
 {
 	return pvt.width;
 }
 
-uint32_t Core::Graphics::getHeight()
+uint32_t Gear::Core::Graphics::getHeight()
 {
 	return pvt.height;
 }
 
-float Core::Graphics::getAspectRatio()
+float Gear::Core::Graphics::getAspectRatio()
 {
 	return pvt.aspectRatio;
 }
 
-uint64_t Core::Graphics::getRenderedFrameCount()
+uint64_t Gear::Core::Graphics::getRenderedFrameCount()
 {
 	return pvt.renderedFrameCount;
 }
 
-D3D12_CPU_DESCRIPTOR_HANDLE Core::Graphics::getBackBufferHandle()
+D3D12_CPU_DESCRIPTOR_HANDLE Gear::Core::Graphics::getBackBufferHandle()
 {
 	return pvt.backBufferHandle;
 }
 
-Core::Resource::ImmutableCBuffer* Core::Graphics::getReservedGlobalCBuffer()
+Gear::Core::Resource::ImmutableCBuffer* Gear::Core::Graphics::getReservedGlobalCBuffer()
 {
 	return pvt.reservedGlobalCBuffer;
 }
 
-void Core::Graphics::Internal::initialize(const uint32_t frameBufferCount, const uint32_t width, const uint32_t height)
+void Gear::Core::Graphics::Internal::initialize(const uint32_t frameBufferCount, const uint32_t width, const uint32_t height)
 {
 	pvt.frameBufferCount = frameBufferCount;
 
@@ -91,32 +91,32 @@ void Core::Graphics::Internal::initialize(const uint32_t frameBufferCount, const
 	pvt.aspectRatio = static_cast<float>(width) / static_cast<float>(height);
 }
 
-void Core::Graphics::Internal::renderedFrameCountInc()
+void Gear::Core::Graphics::Internal::renderedFrameCountInc()
 {
 	pvt.renderedFrameCount++;
 }
 
-void Core::Graphics::Internal::setFrameIndex(const uint32_t frameIndex)
+void Gear::Core::Graphics::Internal::setFrameIndex(const uint32_t frameIndex)
 {
 	pvt.frameIndex = frameIndex;
 }
 
-void Core::Graphics::Internal::setDeltaTime(const float deltaTime)
+void Gear::Core::Graphics::Internal::setDeltaTime(const float deltaTime)
 {
 	pvt.deltaTime = deltaTime;
 }
 
-void Core::Graphics::Internal::updateTimeElapsed()
+void Gear::Core::Graphics::Internal::updateTimeElapsed()
 {
 	pvt.timeElapsed += pvt.deltaTime;
 }
 
-void Core::Graphics::Internal::setBackBufferHandle(const D3D12_CPU_DESCRIPTOR_HANDLE backBufferHandle)
+void Gear::Core::Graphics::Internal::setBackBufferHandle(const D3D12_CPU_DESCRIPTOR_HANDLE backBufferHandle)
 {
 	pvt.backBufferHandle = backBufferHandle;
 }
 
-void Core::Graphics::Internal::setReservedGlobalCBuffer(Resource::ImmutableCBuffer* const reservedGlobalCBuffer)
+void Gear::Core::Graphics::Internal::setReservedGlobalCBuffer(Resource::ImmutableCBuffer* const reservedGlobalCBuffer)
 {
 	pvt.reservedGlobalCBuffer = reservedGlobalCBuffer;
 }

@@ -1,47 +1,50 @@
 ﻿#pragma once
 
-#ifndef _CORE_RESOURCE_D3D12RESOURCE_READBACKHEAP_H_
-#define _CORE_RESOURCE_D3D12RESOURCE_READBACKHEAP_H_
+#ifndef _GEAR_CORE_RESOURCE_D3D12RESOURCE_READBACKHEAP_H_
+#define _GEAR_CORE_RESOURCE_D3D12RESOURCE_READBACKHEAP_H_
 
 #include"D3D12ResourceBase.h"
 
-namespace Core
+namespace Gear
 {
-	namespace Resource
+	namespace Core
 	{
-		namespace D3D12Resource
+		namespace Resource
 		{
-			class ReadbackHeap :public D3D12ResourceBase
+			namespace D3D12Resource
 			{
-			public:
+				class ReadbackHeap :public D3D12ResourceBase
+				{
+				public:
 
-				ReadbackHeap() = delete;
+					ReadbackHeap() = delete;
 
-				ReadbackHeap(const ReadbackHeap&) = delete;
+					ReadbackHeap(const ReadbackHeap&) = delete;
 
-				void operator=(const ReadbackHeap&) = delete;
+					void operator=(const ReadbackHeap&) = delete;
 
-				ReadbackHeap(const uint64_t size, const D3D12_HEAP_FLAGS flags = D3D12_HEAP_FLAG_NONE);
+					ReadbackHeap(const uint64_t size, const D3D12_HEAP_FLAGS flags = D3D12_HEAP_FLAG_NONE);
 
-				ReadbackHeap(ReadbackHeap* const);
+					ReadbackHeap(ReadbackHeap* const);
 
-				virtual ~ReadbackHeap();
+					virtual ~ReadbackHeap();
 
-				void* map(const D3D12_RANGE readRange) const;
+					void* map(const D3D12_RANGE readRange) const;
 
-				void unmap() const;
+					void unmap() const;
 
-				void updateGlobalStates() override;
+					void updateGlobalStates() override;
 
-				void resetInternalStates() override;
+					void resetInternalStates() override;
 
-			protected:
+				protected:
 
-				void resetTransitionStates() override;
+					void resetTransitionStates() override;
 
-			};
+				};
+			}
 		}
 	}
 }
 
-#endif // !_CORE_RESOURCE_D3D12RESOURCE_READBACKHEAP_H_
+#endif // !_GEAR_CORE_RESOURCE_D3D12RESOURCE_READBACKHEAP_H_

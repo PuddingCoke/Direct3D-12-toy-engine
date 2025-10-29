@@ -2,17 +2,17 @@
 
 #include<Gear/Utils/Random.h>
 
-uint32_t Utils::Color::toUint() const
+uint32_t Gear::Utils::Color::toUint() const
 {
 	return (static_cast<uint32_t>(255 * a) << 24) | (static_cast<uint32_t>(255 * b) << 16) | (static_cast<uint32_t>(255 * g) << 8) | (static_cast<uint32_t>(255 * r));
 }
 
-Utils::Color Utils::Color::random()
+Gear::Utils::Color Gear::Utils::Color::random()
 {
 	return { Random::genFloat(),Random::genFloat() ,Random::genFloat(),1.f };
 }
 
-Utils::Color Utils::Color::hsvToRgb(const Utils::Color& c)
+Gear::Utils::Color Gear::Utils::Color::hsvToRgb(const Gear::Utils::Color& c)
 {
 	float r, g, b, f, p, q, t;
 
@@ -40,17 +40,17 @@ Utils::Color Utils::Color::hsvToRgb(const Utils::Color& c)
 	return { r,g,b,1.f };
 }
 
-bool Utils::Color::operator==(const Utils::Color& color) const
+bool Gear::Utils::Color::operator==(const Gear::Utils::Color& color) const
 {
 	return toUint() == color.toUint();
 }
 
-bool Utils::Color::operator!=(const Utils::Color& color) const
+bool Gear::Utils::Color::operator!=(const Gear::Utils::Color& color) const
 {
 	return toUint() != color.toUint();
 }
 
-Utils::Color::operator const float* () const
+Gear::Utils::Color::operator const float* () const
 {
 	return reinterpret_cast<const float*>(this);
 }

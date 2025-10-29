@@ -11,39 +11,39 @@ namespace
 
 		DirectX::XMMATRIX viewMatrix = {};
 
-		Core::MainCamera::Internal::Matrices matrices = {};
+		Gear::Core::MainCamera::Internal::Matrices matrices = {};
 
 	}pvt;
 }
 
-DirectX::XMMATRIX Core::MainCamera::getProj()
+DirectX::XMMATRIX Gear::Core::MainCamera::getProj()
 {
 	return pvt.projMatrix;
 }
 
-DirectX::XMMATRIX Core::MainCamera::getView()
+DirectX::XMMATRIX Gear::Core::MainCamera::getView()
 {
 	return pvt.viewMatrix;
 }
 
-DirectX::XMVECTOR Core::MainCamera::getEyePos()
+DirectX::XMVECTOR Gear::Core::MainCamera::getEyePos()
 {
 	return pvt.matrices.eyePos;
 }
 
-void Core::MainCamera::setProj(const float fov, const float aspectRatio, const float zNear, const float zFar)
+void Gear::Core::MainCamera::setProj(const float fov, const float aspectRatio, const float zNear, const float zFar)
 {
 	setProj(DirectX::XMMatrixPerspectiveFovLH(fov, aspectRatio, zNear, zFar));
 }
 
-void Core::MainCamera::setView(const DirectX::XMVECTOR& eyePos, const DirectX::XMVECTOR& focus, const DirectX::XMVECTOR& up)
+void Gear::Core::MainCamera::setView(const DirectX::XMVECTOR& eyePos, const DirectX::XMVECTOR& focus, const DirectX::XMVECTOR& up)
 {
 	pvt.matrices.eyePos = eyePos;
 
 	setView(DirectX::XMMatrixLookAtLH(eyePos, focus, up));
 }
 
-void Core::MainCamera::setProj(const DirectX::XMMATRIX& proj)
+void Gear::Core::MainCamera::setProj(const DirectX::XMMATRIX& proj)
 {
 	pvt.matrices.prevViewProj = DirectX::XMMatrixTranspose(pvt.viewMatrix * pvt.projMatrix);
 
@@ -54,7 +54,7 @@ void Core::MainCamera::setProj(const DirectX::XMMATRIX& proj)
 	pvt.matrices.viewProj = DirectX::XMMatrixTranspose(pvt.viewMatrix * pvt.projMatrix);
 }
 
-void Core::MainCamera::setView(const DirectX::XMMATRIX& view)
+void Gear::Core::MainCamera::setView(const DirectX::XMMATRIX& view)
 {
 	pvt.matrices.prevViewProj = DirectX::XMMatrixTranspose(pvt.viewMatrix * pvt.projMatrix);
 
@@ -67,7 +67,7 @@ void Core::MainCamera::setView(const DirectX::XMMATRIX& view)
 	pvt.matrices.normalMatrix = DirectX::XMMatrixInverse(nullptr, pvt.viewMatrix);
 }
 
-Core::MainCamera::Internal::Matrices Core::MainCamera::Internal::getMatrices()
+Gear::Core::MainCamera::Internal::Matrices Gear::Core::MainCamera::Internal::getMatrices()
 {
 	return pvt.matrices;
 }

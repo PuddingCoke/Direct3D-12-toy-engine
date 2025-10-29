@@ -1,36 +1,39 @@
 ﻿#pragma once
 
-#ifndef _CORE_D3D12CORE_ROOTSIGNATURE_H_
-#define _CORE_D3D12CORE_ROOTSIGNATURE_H_
+#ifndef _GEAR_CORE_D3D12CORE_ROOTSIGNATURE_H_
+#define _GEAR_CORE_D3D12CORE_ROOTSIGNATURE_H_
 
 #include<Gear/Core/GraphicsDevice.h>
 
-namespace Core
+namespace Gear
 {
-	namespace D3D12Core
+	namespace Core
 	{
-		class RootSignature
+		namespace D3D12Core
 		{
-		public:
+			class RootSignature
+			{
+			public:
 
-			RootSignature() = delete;
+				RootSignature() = delete;
 
-			RootSignature(const RootSignature&) = delete;
+				RootSignature(const RootSignature&) = delete;
 
-			void operator=(const RootSignature&) = delete;
+				void operator=(const RootSignature&) = delete;
 
-			RootSignature(const CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC& desc);
+				RootSignature(const CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC& desc);
 
-			virtual ~RootSignature();
+				virtual ~RootSignature();
 
-			ID3D12RootSignature* get() const;
+				ID3D12RootSignature* get() const;
 
-		private:
+			private:
 
-			ComPtr<ID3D12RootSignature> rootSignature;
+				ComPtr<ID3D12RootSignature> rootSignature;
 
-		};
+			};
+		}
 	}
 }
 
-#endif // !_CORE_D3D12CORE_ROOTSIGNATURE_H_
+#endif // !_GEAR_CORE_D3D12CORE_ROOTSIGNATURE_H_

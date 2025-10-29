@@ -1,53 +1,56 @@
 ﻿#pragma once
 
-#ifndef _CORE_EFFECT_FXAAEFFECT_H_
-#define _CORE_EFFECT_FXAAEFFECT_H_
+#ifndef _GEAR_CORE_EFFECT_FXAAEFFECT_H_
+#define _GEAR_CORE_EFFECT_FXAAEFFECT_H_
 
 #include"EffectBase.h"
 
-namespace Core
+namespace Gear
 {
-	namespace Effect
+	namespace Core
 	{
-		class FXAAEffect :public EffectBase
+		namespace Effect
 		{
-		public:
-
-			FXAAEffect(GraphicsContext* const context, const uint32_t width, const uint32_t height);
-
-			~FXAAEffect();
-
-			Resource::TextureRenderView* process(Resource::TextureRenderView* const inputTexture) const;
-
-			void imGUICall() override;
-
-			void setFXAAQualitySubpix(const float fxaaQualitySubpix);
-
-			void setFXAAQualityEdgeThreshold(const float fxaaQualityEdgeThreshold);
-
-			void setFXAAQualityEdgeThresholdMin(const float fxaaQualityEdgeThresholdMin);
-
-		private:
-
-			Resource::TextureRenderView* colorLumaTexture;
-
-			struct FXAAParam
+			class FXAAEffect :public EffectBase
 			{
-				float fxaaQualityRcpFrame; // unused
-				float fxaaQualitySubpix;
-				float fxaaQualityEdgeThreshold;
-				float fxaaQualityEdgeThresholdMin;
-			} fxaaParam;
+			public:
 
-			D3D12Core::Shader* colorToColorLumaPS;
+				FXAAEffect(GraphicsContext* const context, const uint32_t width, const uint32_t height);
 
-			ComPtr<ID3D12PipelineState> colorToColorLumaState;
+				~FXAAEffect();
 
-			D3D12Core::Shader* fxaaPS;
+				Resource::TextureRenderView* process(Resource::TextureRenderView* const inputTexture) const;
 
-			ComPtr<ID3D12PipelineState> fxaaState;
+				void imGUICall() override;
 
-		};
+				void setFXAAQualitySubpix(const float fxaaQualitySubpix);
+
+				void setFXAAQualityEdgeThreshold(const float fxaaQualityEdgeThreshold);
+
+				void setFXAAQualityEdgeThresholdMin(const float fxaaQualityEdgeThresholdMin);
+
+			private:
+
+				Resource::TextureRenderView* colorLumaTexture;
+
+				struct FXAAParam
+				{
+					float fxaaQualityRcpFrame; // unused
+					float fxaaQualitySubpix;
+					float fxaaQualityEdgeThreshold;
+					float fxaaQualityEdgeThresholdMin;
+				} fxaaParam;
+
+				D3D12Core::Shader* colorToColorLumaPS;
+
+				ComPtr<ID3D12PipelineState> colorToColorLumaState;
+
+				D3D12Core::Shader* fxaaPS;
+
+				ComPtr<ID3D12PipelineState> fxaaState;
+
+			};
+		}
 	}
 }
 

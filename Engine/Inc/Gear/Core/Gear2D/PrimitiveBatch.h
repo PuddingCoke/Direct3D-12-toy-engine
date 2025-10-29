@@ -1,7 +1,7 @@
 ﻿#pragma once
 
-#ifndef _CORE_GEAR2D_PRIMITIVEBATCH_H_
-#define _CORE_GEAR2D_PRIMITIVEBATCH_H_
+#ifndef _GEAR_CORE_GEAR2D_PRIMITIVEBATCH_H_
+#define _GEAR_CORE_GEAR2D_PRIMITIVEBATCH_H_
 
 #include<Gear/Core/ResourceManager.h>
 
@@ -9,137 +9,140 @@
 
 //due to limitations
 //create multiple instances for multiple render targets
-namespace Core
+namespace Gear
 {
-	namespace Gear2D
+	namespace Core
 	{
-		class PrimitiveBatch
+		namespace Gear2D
 		{
-		public:
-
-			PrimitiveBatch() = delete;
-
-			PrimitiveBatch(const PrimitiveBatch&) = delete;
-
-			void operator=(const PrimitiveBatch&) = delete;
-
-			//render target format
-			PrimitiveBatch(const DXGI_FORMAT format, GraphicsContext* const context);
-
-			~PrimitiveBatch();
-
-			//call this once frame
-			void begin();
-
-			//call this once frame
-			void end();
-
-			void drawLine(const float x1, const float y1, const float x2, const float y2, const float r, const float g, const float b, const float a = 1.f);
-
-			void drawCircle(const float x, const float y, const float length, const float r, const float g, const float b, const float a = 1.f);
-
-			void drawRoundCapLine(const float x1, const float y1, const float x2, const float y2, const float width, const float r, const float g, const float b, const float a = 1.f);
-
-			void setLineWidth(const float width);
-
-		private:
-
-			float lineWidth;
-
-			D3D12Core::Shader* lineVS;
-
-			D3D12Core::Shader* circleVS;
-
-			D3D12Core::Shader* rcLineVS;
-
-			D3D12Core::Shader* lineGS;
-
-			D3D12Core::Shader* rcLineGS;
-
-			D3D12Core::Shader* primitivePS;
-
-			ComPtr<ID3D12PipelineState> lineState;
-
-			ComPtr<ID3D12PipelineState> circleState;
-
-			ComPtr<ID3D12PipelineState> roundCapLineState;
-
-			GraphicsContext* context;
-
-			class LineRenderer
+			class PrimitiveBatch
 			{
 			public:
 
-				LineRenderer();
+				PrimitiveBatch() = delete;
 
-				~LineRenderer();
+				PrimitiveBatch(const PrimitiveBatch&) = delete;
 
+				void operator=(const PrimitiveBatch&) = delete;
+
+				//render target format
+				PrimitiveBatch(const DXGI_FORMAT format, GraphicsContext* const context);
+
+				~PrimitiveBatch();
+
+				//call this once frame
 				void begin();
 
-				void end(GraphicsContext* const context, ID3D12PipelineState* const pipelineState);
+				//call this once frame
+				void end();
 
-				void addLine(const float x1, const float y1, const float x2, const float y2, const float r, const float g, const float b, const float a);
+				void drawLine(const float x1, const float y1, const float x2, const float y2, const float r, const float g, const float b, const float a = 1.f);
 
-				Resource::BufferView* vertexBuffer;
+				void drawCircle(const float x, const float y, const float length, const float r, const float g, const float b, const float a = 1.f);
 
-				float* vertices;
+				void drawRoundCapLine(const float x1, const float y1, const float x2, const float y2, const float width, const float r, const float g, const float b, const float a = 1.f);
 
-				int32_t idx;
+				void setLineWidth(const float width);
 
-				static constexpr int32_t maxLineNum = 150000;
+			private:
 
-			} lineRenderer;
+				float lineWidth;
 
-			class CircleRenderer
-			{
-			public:
+				D3D12Core::Shader* lineVS;
 
-				CircleRenderer();
+				D3D12Core::Shader* circleVS;
 
-				~CircleRenderer();
+				D3D12Core::Shader* rcLineVS;
 
-				void begin();
+				D3D12Core::Shader* lineGS;
 
-				void end(GraphicsContext* const context, ID3D12PipelineState* const pipelineState);
+				D3D12Core::Shader* rcLineGS;
 
-				void addCircle(const float x, const float y, const float length, const float r, const float g, const float b, const float a);
+				D3D12Core::Shader* primitivePS;
 
-				Resource::BufferView* vertexBuffer;
+				ComPtr<ID3D12PipelineState> lineState;
 
-				float* vertices;
+				ComPtr<ID3D12PipelineState> circleState;
 
-				int32_t idx;
+				ComPtr<ID3D12PipelineState> roundCapLineState;
 
-				static constexpr int32_t maxCircleNum = 50000;
+				GraphicsContext* context;
 
-			} circleRenderer;
+				class LineRenderer
+				{
+				public:
 
-			class RCLineRenderer
-			{
-			public:
+					LineRenderer();
 
-				RCLineRenderer();
+					~LineRenderer();
 
-				~RCLineRenderer();
+					void begin();
 
-				void begin();
+					void end(GraphicsContext* const context, ID3D12PipelineState* const pipelineState);
 
-				void end(GraphicsContext* const context, ID3D12PipelineState* const pipelineState);
+					void addLine(const float x1, const float y1, const float x2, const float y2, const float r, const float g, const float b, const float a);
 
-				void addRoundCapLine(const float x1, const float y1, const float x2, const float y2, const float width, const float r, const float g, const float b, const float a);
+					Resource::BufferView* vertexBuffer;
 
-				Resource::BufferView* vertexBuffer;
+					float* vertices;
 
-				float* vertices;
+					int32_t idx;
 
-				int32_t idx;
+					static constexpr int32_t maxLineNum = 150000;
 
-				static constexpr int32_t maxLineNum = 150000;
+				} lineRenderer;
 
-			} roundCapLineRenderer;
+				class CircleRenderer
+				{
+				public:
 
-		};
+					CircleRenderer();
+
+					~CircleRenderer();
+
+					void begin();
+
+					void end(GraphicsContext* const context, ID3D12PipelineState* const pipelineState);
+
+					void addCircle(const float x, const float y, const float length, const float r, const float g, const float b, const float a);
+
+					Resource::BufferView* vertexBuffer;
+
+					float* vertices;
+
+					int32_t idx;
+
+					static constexpr int32_t maxCircleNum = 50000;
+
+				} circleRenderer;
+
+				class RCLineRenderer
+				{
+				public:
+
+					RCLineRenderer();
+
+					~RCLineRenderer();
+
+					void begin();
+
+					void end(GraphicsContext* const context, ID3D12PipelineState* const pipelineState);
+
+					void addRoundCapLine(const float x1, const float y1, const float x2, const float y2, const float width, const float r, const float g, const float b, const float a);
+
+					Resource::BufferView* vertexBuffer;
+
+					float* vertices;
+
+					int32_t idx;
+
+					static constexpr int32_t maxLineNum = 150000;
+
+				} roundCapLineRenderer;
+
+			};
+		}
 	}
 }
 
-#endif // !_CORE_GEAR2D_PRIMITIVEBATCH_H_
+#endif // !_GEAR_CORE_GEAR2D_PRIMITIVEBATCH_H_

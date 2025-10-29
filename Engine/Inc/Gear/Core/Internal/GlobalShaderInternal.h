@@ -1,20 +1,22 @@
 ﻿#pragma once
 
-#ifndef _CORE_GLOBALSHADER_INTERNAL_H_
-#define _CORE_GLOBALSHADER_INTERNAL_H_
+#ifndef _GEAR_CORE_GLOBALSHADER_INTERNAL_H_
+#define _GEAR_CORE_GLOBALSHADER_INTERNAL_H_
 
-namespace Core
+namespace Gear
 {
-	namespace GlobalShader
+	namespace Core
 	{
-		namespace Internal
+		namespace GlobalShader
 		{
-			void initialize();
+			namespace Internal
+			{
+				void initialize();
 
-			void release();
+				void release();
+			}
 		}
 	}
 }
 
-
-#endif // !_CORE_GLOBALSHADER_INTERNAL_H_
+#endif // !_GEAR_CORE_GLOBALSHADER_INTERNAL_H_

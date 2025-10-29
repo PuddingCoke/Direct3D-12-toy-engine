@@ -1,44 +1,47 @@
 ﻿#pragma once
 
-#ifndef _CORE_RESOURCE_DYNAMICCBUFFER_H_
-#define _CORE_RESOURCE_DYNAMICCBUFFER_H_
+#ifndef _GEAR_CORE_RESOURCE_DYNAMICCBUFFER_H_
+#define _GEAR_CORE_RESOURCE_DYNAMICCBUFFER_H_
 
 #include"ImmutableCBuffer.h"
 
-namespace Core
+namespace Gear
 {
-	namespace Resource
+	namespace Core
 	{
-		/// <summary>
-		/// 如果需要使用，那么每帧必须都更新一次
-		/// </summary>
-		class DynamicCBuffer :public ImmutableCBuffer
+		namespace Resource
 		{
-		public:
+			/// <summary>
+			/// 如果需要使用，那么每帧必须都更新一次
+			/// </summary>
+			class DynamicCBuffer :public ImmutableCBuffer
+			{
+			public:
 
-			DynamicCBuffer(const uint32_t size);
+				DynamicCBuffer(const uint32_t size);
 
-			//获取可用的数据指针
-			void acquireDataPtr();
+				//获取可用的数据指针
+				void acquireDataPtr();
 
-			//更新数据指针的内容
-			void updateData(const void* const data);
+				//更新数据指针的内容
+				void updateData(const void* const data);
 
-			//先获取再更新数据指针的内容
-			void simpleUpdate(const void* const data);
+				//先获取再更新数据指针的内容
+				void simpleUpdate(const void* const data);
 
-		private:
+			private:
 
-			const uint32_t regionIndex;
+				const uint32_t regionIndex;
 
-			void* dataPtr;
+				void* dataPtr;
 
-			uint64_t acquireFrameIndex;
+				uint64_t acquireFrameIndex;
 
-			uint64_t updateFrameIndex;
+				uint64_t updateFrameIndex;
 
-		};
+			};
+		}
 	}
 }
 
-#endif // !_CORE_RESOURCE_DYNAMICCBUFFER_H_
+#endif // !_GEAR_CORE_RESOURCE_DYNAMICCBUFFER_H_

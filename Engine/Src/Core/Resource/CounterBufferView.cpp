@@ -1,6 +1,6 @@
 ﻿#include<Gear/Core/Resource/CounterBufferView.h>
 
-Core::Resource::CounterBufferView::CounterBufferView(const bool persistent) :
+Gear::Core::Resource::CounterBufferView::CounterBufferView(const bool persistent) :
 	ResourceBase(persistent), buffer(new D3D12Resource::Buffer(4, true, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS)), srvIndex(0), uavIndex(0), viewGPUHandle(), viewCPUHandle()
 {
 	numSRVUAVCBVDescriptors = 2;
@@ -9,11 +9,11 @@ Core::Resource::CounterBufferView::CounterBufferView(const bool persistent) :
 
 	if (persistent)
 	{
-		descriptorHandle = Core::GlobalDescriptorHeap::getResourceHeap()->allocStaticDescriptor(numSRVUAVCBVDescriptors);
+		descriptorHandle = Gear::Core::GlobalDescriptorHeap::getResourceHeap()->allocStaticDescriptor(numSRVUAVCBVDescriptors);
 	}
 	else
 	{
-		descriptorHandle = Core::GlobalDescriptorHeap::getNonShaderVisibleResourceHeap()->allocDynamicDescriptor(numSRVUAVCBVDescriptors);
+		descriptorHandle = Gear::Core::GlobalDescriptorHeap::getNonShaderVisibleResourceHeap()->allocDynamicDescriptor(numSRVUAVCBVDescriptors);
 	}
 
 	srvUAVCBVHandleStart = descriptorHandle.getCPUHandle();
@@ -27,7 +27,7 @@ Core::Resource::CounterBufferView::CounterBufferView(const bool persistent) :
 		desc.Buffer.NumElements = 1;
 		desc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_RAW;
 
-		Core::GraphicsDevice::get()->CreateShaderResourceView(buffer->getResource(), &desc, descriptorHandle.getCPUHandle());
+		Gear::Core::GraphicsDevice::get()->CreateShaderResourceView(buffer->getResource(), &desc, descriptorHandle.getCPUHandle());
 
 		srvIndex = descriptorHandle.getCurrentIndex();
 
@@ -42,7 +42,7 @@ Core::Resource::CounterBufferView::CounterBufferView(const bool persistent) :
 		desc.Buffer.NumElements = 1;
 		desc.Buffer.Flags = D3D12_BUFFER_UAV_FLAG_RAW;
 
-		Core::GraphicsDevice::get()->CreateUnorderedAccessView(buffer->getResource(), nullptr, &desc, descriptorHandle.getCPUHandle());
+		Gear::Core::GraphicsDevice::get()->CreateUnorderedAccessView(buffer->getResource(), nullptr, &desc, descriptorHandle.getCPUHandle());
 
 		uavIndex = descriptorHandle.getCurrentIndex();
 
@@ -50,9 +50,9 @@ Core::Resource::CounterBufferView::CounterBufferView(const bool persistent) :
 		{
 			viewGPUHandle = descriptorHandle.getGPUHandle();
 
-			const D3D12Core::DescriptorHandle nonShaderVisibleHandle = Core::GlobalDescriptorHeap::getNonShaderVisibleResourceHeap()->allocStaticDescriptor(1);
+			const D3D12Core::DescriptorHandle nonShaderVisibleHandle = Gear::Core::GlobalDescriptorHeap::getNonShaderVisibleResourceHeap()->allocStaticDescriptor(1);
 
-			Core::GraphicsDevice::get()->CreateUnorderedAccessView(buffer->getResource(), nullptr, &desc, nonShaderVisibleHandle.getCPUHandle());
+			Gear::Core::GraphicsDevice::get()->CreateUnorderedAccessView(buffer->getResource(), nullptr, &desc, nonShaderVisibleHandle.getCPUHandle());
 
 			viewCPUHandle = nonShaderVisibleHandle.getCPUHandle();
 		}
@@ -65,7 +65,7 @@ Core::Resource::CounterBufferView::CounterBufferView(const bool persistent) :
 	}
 }
 
-Core::Resource::CounterBufferView::~CounterBufferView()
+Gear::Core::Resource::CounterBufferView::~CounterBufferView()
 {
 	if (buffer)
 	{
@@ -73,7 +73,7 @@ Core::Resource::CounterBufferView::~CounterBufferView()
 	}
 }
 
-Core::Resource::D3D12Resource::ShaderResourceDesc Core::Resource::CounterBufferView::getSRVIndex() const
+Gear::Core::Resource::D3D12Resource::ShaderResourceDesc Gear::Core::Resource::CounterBufferView::getSRVIndex() const
 {
 	D3D12Resource::ShaderResourceDesc desc = {};
 	desc.type = D3D12Resource::ShaderResourceDesc::BUFFER;
@@ -84,7 +84,7 @@ Core::Resource::D3D12Resource::ShaderResourceDesc Core::Resource::CounterBufferV
 	return desc;
 }
 
-Core::Resource::D3D12Resource::ShaderResourceDesc Core::Resource::CounterBufferView::getUAVIndex() const
+Gear::Core::Resource::D3D12Resource::ShaderResourceDesc Gear::Core::Resource::CounterBufferView::getUAVIndex() const
 {
 	D3D12Resource::ShaderResourceDesc desc = {};
 	desc.type = D3D12Resource::ShaderResourceDesc::BUFFER;
@@ -95,7 +95,7 @@ Core::Resource::D3D12Resource::ShaderResourceDesc Core::Resource::CounterBufferV
 	return desc;
 }
 
-Core::Resource::D3D12Resource::ClearUAVDesc Core::Resource::CounterBufferView::getClearUAVDesc() const
+Gear::Core::Resource::D3D12Resource::ClearUAVDesc Gear::Core::Resource::CounterBufferView::getClearUAVDesc() const
 {
 	D3D12Resource::ClearUAVDesc desc = {};
 	desc.type = D3D12Resource::ClearUAVDesc::BUFFER;
@@ -106,7 +106,7 @@ Core::Resource::D3D12Resource::ClearUAVDesc Core::Resource::CounterBufferView::g
 	return desc;
 }
 
-void Core::Resource::CounterBufferView::copyDescriptors()
+void Gear::Core::Resource::CounterBufferView::copyDescriptors()
 {
 	D3D12Core::DescriptorHandle shaderVisibleHandle = getTransientDescriptorHandle();
 
@@ -119,7 +119,7 @@ void Core::Resource::CounterBufferView::copyDescriptors()
 	viewGPUHandle = shaderVisibleHandle.getGPUHandle();
 }
 
-Core::Resource::D3D12Resource::Buffer* Core::Resource::CounterBufferView::getBuffer() const
+Gear::Core::Resource::D3D12Resource::Buffer* Gear::Core::Resource::CounterBufferView::getBuffer() const
 {
 	return buffer;
 }

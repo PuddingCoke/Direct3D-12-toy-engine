@@ -14,7 +14,7 @@
 
 #include<Gear/CompiledShaders/PrimitiveBatchPS.h>
 
-Core::Gear2D::PrimitiveBatch::PrimitiveBatch(const DXGI_FORMAT format, GraphicsContext* const context) :
+Gear::Core::Gear2D::PrimitiveBatch::PrimitiveBatch(const DXGI_FORMAT format, GraphicsContext* const context) :
 	context(context), lineWidth(1.f)
 {
 	lineVS = new D3D12Core::Shader(g_PrimitiveBatchLineVSBytes, sizeof(g_PrimitiveBatchLineVSBytes));
@@ -36,20 +36,20 @@ Core::Gear2D::PrimitiveBatch::PrimitiveBatch(const DXGI_FORMAT format, GraphicsC
 			{"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 8, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
 		};
 
-		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = Core::PipelineStateHelper::getDefaultGraphicsDesc();
+		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = Gear::Core::PipelineStateHelper::getDefaultGraphicsDesc();
 		desc.InputLayout = { layout,_countof(layout) };
 		desc.VS = lineVS->getByteCode();
 		desc.GS = lineGS->getByteCode();
 		desc.PS = primitivePS->getByteCode();
-		desc.RasterizerState = Core::PipelineStateHelper::rasterCullBack;
-		desc.BlendState = Core::PipelineStateHelper::blendDefault;
+		desc.RasterizerState = Gear::Core::PipelineStateHelper::rasterCullBack;
+		desc.BlendState = Gear::Core::PipelineStateHelper::blendDefault;
 		desc.DepthStencilState.DepthEnable = FALSE;
 		desc.DepthStencilState.StencilEnable = FALSE;
 		desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE;
 		desc.NumRenderTargets = 1;
 		desc.RTVFormats[0] = format;
 
-		Core::GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&lineState));
+		Gear::Core::GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&lineState));
 	}
 
 	{
@@ -60,20 +60,20 @@ Core::Gear2D::PrimitiveBatch::PrimitiveBatch(const DXGI_FORMAT format, GraphicsC
 			{"COLOR",0,DXGI_FORMAT_R32G32B32A32_FLOAT,0,12,D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA,1}
 		};
 
-		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = Core::PipelineStateHelper::getDefaultGraphicsDesc();
+		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = Gear::Core::PipelineStateHelper::getDefaultGraphicsDesc();
 		desc.InputLayout = { layout,_countof(layout) };
 		desc.VS = circleVS->getByteCode();
 		desc.GS = lineGS->getByteCode();
 		desc.PS = primitivePS->getByteCode();
-		desc.RasterizerState = Core::PipelineStateHelper::rasterCullBack;
-		desc.BlendState = Core::PipelineStateHelper::blendDefault;
+		desc.RasterizerState = Gear::Core::PipelineStateHelper::rasterCullBack;
+		desc.BlendState = Gear::Core::PipelineStateHelper::blendDefault;
 		desc.DepthStencilState.DepthEnable = FALSE;
 		desc.DepthStencilState.StencilEnable = FALSE;
 		desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE;
 		desc.NumRenderTargets = 1;
 		desc.RTVFormats[0] = format;
 
-		Core::GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&circleState));
+		Gear::Core::GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&circleState));
 	}
 
 	{
@@ -84,24 +84,24 @@ Core::Gear2D::PrimitiveBatch::PrimitiveBatch(const DXGI_FORMAT format, GraphicsC
 			{"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
 		};
 
-		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = Core::PipelineStateHelper::getDefaultGraphicsDesc();
+		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = Gear::Core::PipelineStateHelper::getDefaultGraphicsDesc();
 		desc.InputLayout = { layout,_countof(layout) };
 		desc.VS = rcLineVS->getByteCode();
 		desc.GS = rcLineGS->getByteCode();
 		desc.PS = primitivePS->getByteCode();
-		desc.RasterizerState = Core::PipelineStateHelper::rasterCullBack;
-		desc.BlendState = Core::PipelineStateHelper::blendDefault;
+		desc.RasterizerState = Gear::Core::PipelineStateHelper::rasterCullBack;
+		desc.BlendState = Gear::Core::PipelineStateHelper::blendDefault;
 		desc.DepthStencilState.DepthEnable = FALSE;
 		desc.DepthStencilState.StencilEnable = FALSE;
 		desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE;
 		desc.NumRenderTargets = 1;
 		desc.RTVFormats[0] = format;
 
-		Core::GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&roundCapLineState));
+		Gear::Core::GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&roundCapLineState));
 	}
 }
 
-Core::Gear2D::PrimitiveBatch::~PrimitiveBatch()
+Gear::Core::Gear2D::PrimitiveBatch::~PrimitiveBatch()
 {
 	delete lineVS;
 	delete circleVS;
@@ -111,14 +111,14 @@ Core::Gear2D::PrimitiveBatch::~PrimitiveBatch()
 	delete rcLineGS;
 }
 
-void Core::Gear2D::PrimitiveBatch::begin()
+void Gear::Core::Gear2D::PrimitiveBatch::begin()
 {
 	lineRenderer.begin();
 	circleRenderer.begin();
 	roundCapLineRenderer.begin();
 }
 
-void Core::Gear2D::PrimitiveBatch::end()
+void Gear::Core::Gear2D::PrimitiveBatch::end()
 {
 	context->setGSConstants(1, &lineWidth, 0);
 
@@ -127,44 +127,44 @@ void Core::Gear2D::PrimitiveBatch::end()
 	roundCapLineRenderer.end(context, roundCapLineState.Get());
 }
 
-void Core::Gear2D::PrimitiveBatch::drawLine(const float x1, const float y1, const float x2, const float y2, const float r, const float g, const float b, const float a)
+void Gear::Core::Gear2D::PrimitiveBatch::drawLine(const float x1, const float y1, const float x2, const float y2, const float r, const float g, const float b, const float a)
 {
 	lineRenderer.addLine(x1, y1, x2, y2, r, g, b, a);
 }
 
-void Core::Gear2D::PrimitiveBatch::drawCircle(const float x, const float y, const float length, const float r, const float g, const float b, const float a)
+void Gear::Core::Gear2D::PrimitiveBatch::drawCircle(const float x, const float y, const float length, const float r, const float g, const float b, const float a)
 {
 	circleRenderer.addCircle(x, y, length, r, g, b, a);
 }
 
-void Core::Gear2D::PrimitiveBatch::drawRoundCapLine(const float x1, const float y1, const float x2, const float y2, const float width, const float r, const float g, const float b, const float a)
+void Gear::Core::Gear2D::PrimitiveBatch::drawRoundCapLine(const float x1, const float y1, const float x2, const float y2, const float width, const float r, const float g, const float b, const float a)
 {
 	roundCapLineRenderer.addRoundCapLine(x1, y1, x2, y2, width, r, g, b, a);
 }
 
-void Core::Gear2D::PrimitiveBatch::setLineWidth(const float width)
+void Gear::Core::Gear2D::PrimitiveBatch::setLineWidth(const float width)
 {
 	lineWidth = width;
 }
 
-Core::Gear2D::PrimitiveBatch::LineRenderer::LineRenderer() :
+Gear::Core::Gear2D::PrimitiveBatch::LineRenderer::LineRenderer() :
 	vertices(new float[2 * 6 * maxLineNum]), idx(0),
 	vertexBuffer(ResourceManager::createStructuredBufferView(sizeof(float) * 6, sizeof(float) * 6 * 2 * maxLineNum, false, false, true, true, true))
 {
 }
 
-Core::Gear2D::PrimitiveBatch::LineRenderer::~LineRenderer()
+Gear::Core::Gear2D::PrimitiveBatch::LineRenderer::~LineRenderer()
 {
 	delete[] vertices;
 	delete vertexBuffer;
 }
 
-void Core::Gear2D::PrimitiveBatch::LineRenderer::begin()
+void Gear::Core::Gear2D::PrimitiveBatch::LineRenderer::begin()
 {
 	idx = 0;
 }
 
-void Core::Gear2D::PrimitiveBatch::LineRenderer::end(GraphicsContext* const context, ID3D12PipelineState* const pipelineState)
+void Gear::Core::Gear2D::PrimitiveBatch::LineRenderer::end(GraphicsContext* const context, ID3D12PipelineState* const pipelineState)
 {
 	if (idx > 0)
 	{
@@ -182,7 +182,7 @@ void Core::Gear2D::PrimitiveBatch::LineRenderer::end(GraphicsContext* const cont
 	}
 }
 
-void Core::Gear2D::PrimitiveBatch::LineRenderer::addLine(const float x1, const float y1, const float x2, const float y2, const float r, const float g, const float b, const float a)
+void Gear::Core::Gear2D::PrimitiveBatch::LineRenderer::addLine(const float x1, const float y1, const float x2, const float y2, const float r, const float g, const float b, const float a)
 {
 	vertices[idx] = x1;
 	vertices[idx + 1] = y1;
@@ -199,24 +199,24 @@ void Core::Gear2D::PrimitiveBatch::LineRenderer::addLine(const float x1, const f
 	idx += 12;
 }
 
-Core::Gear2D::PrimitiveBatch::CircleRenderer::CircleRenderer() :
+Gear::Core::Gear2D::PrimitiveBatch::CircleRenderer::CircleRenderer() :
 	vertices(new float[7 * maxCircleNum]), idx(0),
 	vertexBuffer(ResourceManager::createStructuredBufferView(sizeof(float) * 7, sizeof(float) * 7 * maxCircleNum, false, false, true, true, true))
 {
 }
 
-Core::Gear2D::PrimitiveBatch::CircleRenderer::~CircleRenderer()
+Gear::Core::Gear2D::PrimitiveBatch::CircleRenderer::~CircleRenderer()
 {
 	delete[] vertices;
 	delete vertexBuffer;
 }
 
-void Core::Gear2D::PrimitiveBatch::CircleRenderer::begin()
+void Gear::Core::Gear2D::PrimitiveBatch::CircleRenderer::begin()
 {
 	idx = 0;
 }
 
-void Core::Gear2D::PrimitiveBatch::CircleRenderer::end(GraphicsContext* const context, ID3D12PipelineState* const pipelineState)
+void Gear::Core::Gear2D::PrimitiveBatch::CircleRenderer::end(GraphicsContext* const context, ID3D12PipelineState* const pipelineState)
 {
 	if (idx > 0)
 	{
@@ -234,7 +234,7 @@ void Core::Gear2D::PrimitiveBatch::CircleRenderer::end(GraphicsContext* const co
 	}
 }
 
-void Core::Gear2D::PrimitiveBatch::CircleRenderer::addCircle(const float x, const float y, const float length, const float r, const float g, const float b, const float a)
+void Gear::Core::Gear2D::PrimitiveBatch::CircleRenderer::addCircle(const float x, const float y, const float length, const float r, const float g, const float b, const float a)
 {
 	if (length < 1.f)
 	{
@@ -251,24 +251,24 @@ void Core::Gear2D::PrimitiveBatch::CircleRenderer::addCircle(const float x, cons
 	idx += 7;
 }
 
-Core::Gear2D::PrimitiveBatch::RCLineRenderer::RCLineRenderer() :
+Gear::Core::Gear2D::PrimitiveBatch::RCLineRenderer::RCLineRenderer() :
 	vertices(new float[7 * 2 * maxLineNum]), idx(0),
 	vertexBuffer(ResourceManager::createStructuredBufferView(sizeof(float) * 7, sizeof(float) * 7 * 2 * maxLineNum, false, false, true, true, true))
 {
 }
 
-Core::Gear2D::PrimitiveBatch::RCLineRenderer::~RCLineRenderer()
+Gear::Core::Gear2D::PrimitiveBatch::RCLineRenderer::~RCLineRenderer()
 {
 	delete[] vertices;
 	delete vertexBuffer;
 }
 
-void Core::Gear2D::PrimitiveBatch::RCLineRenderer::begin()
+void Gear::Core::Gear2D::PrimitiveBatch::RCLineRenderer::begin()
 {
 	idx = 0;
 }
 
-void Core::Gear2D::PrimitiveBatch::RCLineRenderer::end(GraphicsContext* const context, ID3D12PipelineState* const pipelineState)
+void Gear::Core::Gear2D::PrimitiveBatch::RCLineRenderer::end(GraphicsContext* const context, ID3D12PipelineState* const pipelineState)
 {
 	if (idx > 0)
 	{
@@ -286,7 +286,7 @@ void Core::Gear2D::PrimitiveBatch::RCLineRenderer::end(GraphicsContext* const co
 	}
 }
 
-void Core::Gear2D::PrimitiveBatch::RCLineRenderer::addRoundCapLine(const float x1, const float y1, const float x2, const float y2, const float width, const float r, const float g, const float b, const float a)
+void Gear::Core::Gear2D::PrimitiveBatch::RCLineRenderer::addRoundCapLine(const float x1, const float y1, const float x2, const float y2, const float width, const float r, const float g, const float b, const float a)
 {
 	vertices[idx] = x1;
 	vertices[idx + 1] = y1;

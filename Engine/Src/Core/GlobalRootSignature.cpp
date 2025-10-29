@@ -7,24 +7,24 @@ namespace
 	struct GlobalRootSignaturePrivate
 	{
 
-		Core::D3D12Core::RootSignature* graphicsRootSignature = nullptr;
+		Gear::Core::D3D12Core::RootSignature* graphicsRootSignature = nullptr;
 
-		Core::D3D12Core::RootSignature* computeRootSignature = nullptr;
+		Gear::Core::D3D12Core::RootSignature* computeRootSignature = nullptr;
 
 	}pvt;
 }
 
-Core::D3D12Core::RootSignature* Core::GlobalRootSignature::getGraphicsRootSignature()
+Gear::Core::D3D12Core::RootSignature* Gear::Core::GlobalRootSignature::getGraphicsRootSignature()
 {
 	return pvt.graphicsRootSignature;
 }
 
-Core::D3D12Core::RootSignature* Core::GlobalRootSignature::getComputeRootSignature()
+Gear::Core::D3D12Core::RootSignature* Gear::Core::GlobalRootSignature::getComputeRootSignature()
 {
 	return pvt.computeRootSignature;
 }
 
-void Core::GlobalRootSignature::Internal::initialize()
+void Gear::Core::GlobalRootSignature::Internal::initialize()
 {
 	CD3DX12_STATIC_SAMPLER_DESC samplerDesc[7] = {};
 
@@ -162,7 +162,7 @@ void Core::GlobalRootSignature::Internal::initialize()
 	}
 }
 
-void Core::GlobalRootSignature::Internal::release()
+void Gear::Core::GlobalRootSignature::Internal::release()
 {
 	if (pvt.graphicsRootSignature)
 	{

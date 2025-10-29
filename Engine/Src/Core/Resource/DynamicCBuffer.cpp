@@ -8,8 +8,8 @@
 
 #include<Gear/Utils/Math.h>
 
-Core::Resource::DynamicCBuffer::DynamicCBuffer(const uint32_t size) :
-	ImmutableCBuffer(nullptr, 0u, true), regionIndex(Utils::Math::log2(size / 256u)), dataPtr(nullptr), acquireFrameIndex(UINT64_MAX), updateFrameIndex(UINT64_MAX)
+Gear::Core::Resource::DynamicCBuffer::DynamicCBuffer(const uint32_t size) :
+	ImmutableCBuffer(nullptr, 0u, true), regionIndex(Gear::Utils::Math::log2(size / 256u)), dataPtr(nullptr), acquireFrameIndex(UINT64_MAX), updateFrameIndex(UINT64_MAX)
 {
 	if (regionIndex > 1u)
 	{
@@ -17,18 +17,18 @@ Core::Resource::DynamicCBuffer::DynamicCBuffer(const uint32_t size) :
 	}
 }
 
-void Core::Resource::DynamicCBuffer::acquireDataPtr()
+void Gear::Core::Resource::DynamicCBuffer::acquireDataPtr()
 {
 #ifdef _DEBUG
-	if (acquireFrameIndex == Core::Graphics::getRenderedFrameCount())
+	if (acquireFrameIndex == Gear::Core::Graphics::getRenderedFrameCount())
 	{
 		LOGERROR(L"you can only acquire data pointer for cbuffer once per frame");
 	}
 #endif // _DEBUG
 
-	acquireFrameIndex = Core::Graphics::getRenderedFrameCount();
+	acquireFrameIndex = Gear::Core::Graphics::getRenderedFrameCount();
 
-	const Core::DynamicCBufferManager::AvailableLocation& location = Core::DynamicCBufferManager::requestLocation(regionIndex);
+	const Gear::Core::DynamicCBufferManager::AvailableLocation& location = Gear::Core::DynamicCBufferManager::requestLocation(regionIndex);
 
 	dataPtr = location.dataPtr;
 
@@ -37,26 +37,26 @@ void Core::Resource::DynamicCBuffer::acquireDataPtr()
 	bufferIndex = location.descriptorIndex;
 }
 
-void Core::Resource::DynamicCBuffer::updateData(const void* const data)
+void Gear::Core::Resource::DynamicCBuffer::updateData(const void* const data)
 {
 #ifdef _DEBUG
-	if (acquireFrameIndex != Core::Graphics::getRenderedFrameCount())
+	if (acquireFrameIndex != Gear::Core::Graphics::getRenderedFrameCount())
 	{
 		LOGERROR(L"you haven't acquire data pointer for this dynamic cbuffer yet");
 	}
 
-	if (updateFrameIndex == Core::Graphics::getRenderedFrameCount())
+	if (updateFrameIndex == Gear::Core::Graphics::getRenderedFrameCount())
 	{
 		LOGERROR(L"you can only update cbuffer once per frame");
 	}
 #endif // _DEBUG
 
-	updateFrameIndex = Core::Graphics::getRenderedFrameCount();
+	updateFrameIndex = Gear::Core::Graphics::getRenderedFrameCount();
 
 	memcpy(dataPtr, data, 256ull << regionIndex);
 }
 
-void Core::Resource::DynamicCBuffer::simpleUpdate(const void* const data)
+void Gear::Core::Resource::DynamicCBuffer::simpleUpdate(const void* const data)
 {
 	acquireDataPtr();
 

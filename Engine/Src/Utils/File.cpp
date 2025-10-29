@@ -20,12 +20,12 @@ namespace
     }pvt;
 }
 
-std::wstring Utils::File::getRootFolder()
+std::wstring Gear::Utils::File::getRootFolder()
 {
     return pvt.rootFolder;
 }
 
-std::wstring Utils::File::backslashToSlash(const std::wstring& filePath)
+std::wstring Gear::Utils::File::backslashToSlash(const std::wstring& filePath)
 {
 	std::wstring result = filePath;
 
@@ -34,7 +34,7 @@ std::wstring Utils::File::backslashToSlash(const std::wstring& filePath)
 	return result;
 }
 
-std::wstring Utils::File::getParentFolder(const std::wstring& filePath)
+std::wstring Gear::Utils::File::getParentFolder(const std::wstring& filePath)
 {
 	size_t idx = filePath.find_last_of(L'\\');
 
@@ -51,7 +51,7 @@ std::wstring Utils::File::getParentFolder(const std::wstring& filePath)
 	return filePath.substr(0, idx + 1);
 }
 
-std::wstring Utils::File::getExtension(const std::wstring& filePath)
+std::wstring Gear::Utils::File::getExtension(const std::wstring& filePath)
 {
 	const size_t idx = filePath.find_last_of(L'.');
 
@@ -63,7 +63,7 @@ std::wstring Utils::File::getExtension(const std::wstring& filePath)
 	return filePath.substr(idx + 1, filePath.size() - idx - 1);
 }
 
-std::wstring Utils::File::readAllText(const std::wstring& filePath)
+std::wstring Gear::Utils::File::readAllText(const std::wstring& filePath)
 {
     std::wifstream file(filePath);
 
@@ -79,7 +79,7 @@ std::wstring Utils::File::readAllText(const std::wstring& filePath)
     return stringStream.str();
 }
 
-std::vector<uint8_t> Utils::File::readAllBinary(const std::wstring& filePath)
+std::vector<uint8_t> Gear::Utils::File::readAllBinary(const std::wstring& filePath)
 {
     std::ifstream file(filePath, std::ios::ate | std::ios::binary);
 
@@ -101,7 +101,7 @@ std::vector<uint8_t> Utils::File::readAllBinary(const std::wstring& filePath)
     return bytes;
 }
 
-void Utils::File::Internal::setRootFolder(const std::wstring& rootFolder)
+void Gear::Utils::File::Internal::setRootFolder(const std::wstring& rootFolder)
 {
     pvt.rootFolder = rootFolder;
 }

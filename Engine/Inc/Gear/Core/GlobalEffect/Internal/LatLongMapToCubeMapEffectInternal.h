@@ -1,24 +1,27 @@
 ﻿#pragma once
 
-#ifndef _CORE_GLOBALEFFECT_LATLONGMAPTOCUBEMAPEFFECT_INTERNAL_H_
-#define _CORE_GLOBALEFFECT_LATLONGMAPTOCUBEMAPEFFECT_INTERNAL_H_
+#ifndef _GEAR_CORE_GLOBALEFFECT_LATLONGMAPTOCUBEMAPEFFECT_INTERNAL_H_
+#define _GEAR_CORE_GLOBALEFFECT_LATLONGMAPTOCUBEMAPEFFECT_INTERNAL_H_
 
 #include<Gear/Core/ResourceManager.h>
 
-namespace Core
+namespace Gear
 {
-	namespace GlobalEffect
+	namespace Core
 	{
-		namespace LatLongMapToCubeMapEffect
+		namespace GlobalEffect
 		{
-			namespace Internal
+			namespace LatLongMapToCubeMapEffect
 			{
-				void initialize(ResourceManager* const resManager);
+				namespace Internal
+				{
+					void initialize(ResourceManager* const resManager);
 
-				void release();
+					void release();
+				}
 			}
 		}
 	}
 }
 
-#endif // !_CORE_GLOBALEFFECT_LATLONGMAPTOCUBEMAPEFFECT_INTERNAL_H_
+#endif // !_GEAR_CORE_GLOBALEFFECT_LATLONGMAPTOCUBEMAPEFFECT_INTERNAL_H_

@@ -29,137 +29,137 @@ namespace
 
 		bool onScrolled = false;
 
-		Input::Event moveEvent;
+		Gear::Input::Event moveEvent;
 
-		Input::Event leftDownEvent;
+		Gear::Input::Event leftDownEvent;
 
-		Input::Event rightDownEvent;
+		Gear::Input::Event rightDownEvent;
 
-		Input::Event leftUpEvent;
+		Gear::Input::Event leftUpEvent;
 
-		Input::Event rightUpEvent;
+		Gear::Input::Event rightUpEvent;
 
-		Input::Event scrollEvent;
+		Gear::Input::Event scrollEvent;
 
 	}pvt;
 }
 
-float Input::Mouse::getX()
+float Gear::Input::Mouse::getX()
 {
 	return pvt.x;
 }
 
-float Input::Mouse::getY()
+float Gear::Input::Mouse::getY()
 {
 	return pvt.y;
 }
 
-float Input::Mouse::getDX()
+float Gear::Input::Mouse::getDX()
 {
 	return pvt.dx;
 }
 
-float Input::Mouse::getDY()
+float Gear::Input::Mouse::getDY()
 {
 	return pvt.dy;
 }
 
-float Input::Mouse::getWheelDelta()
+float Gear::Input::Mouse::getWheelDelta()
 {
 	return pvt.wheelDelta;
 }
 
-bool Input::Mouse::getLeftDown()
+bool Gear::Input::Mouse::getLeftDown()
 {
 	return pvt.leftDown;
 }
 
-bool Input::Mouse::getRightDown()
+bool Gear::Input::Mouse::getRightDown()
 {
 	return pvt.rightDown;
 }
 
-bool Input::Mouse::onMove()
+bool Gear::Input::Mouse::onMove()
 {
 	return pvt.onMoved;
 }
 
-bool Input::Mouse::onLeftDown()
+bool Gear::Input::Mouse::onLeftDown()
 {
 	return pvt.onLeftDowned;
 }
 
-bool Input::Mouse::onRightDown()
+bool Gear::Input::Mouse::onRightDown()
 {
 	return pvt.onRightDowned;
 }
 
-bool Input::Mouse::onScroll()
+bool Gear::Input::Mouse::onScroll()
 {
 	return pvt.onScrolled;
 }
 
-uint64_t Input::Mouse::addMoveEvent(const std::function<void(void)>& func)
+uint64_t Gear::Input::Mouse::addMoveEvent(const std::function<void(void)>& func)
 {
 	return pvt.moveEvent += func;
 }
 
-uint64_t Input::Mouse::addLeftDownEvent(const std::function<void(void)>& func)
+uint64_t Gear::Input::Mouse::addLeftDownEvent(const std::function<void(void)>& func)
 {
 	return pvt.leftDownEvent += func;
 }
 
-uint64_t Input::Mouse::addRightDownEvent(const std::function<void(void)>& func)
+uint64_t Gear::Input::Mouse::addRightDownEvent(const std::function<void(void)>& func)
 {
 	return pvt.rightDownEvent += func;
 }
 
-uint64_t Input::Mouse::addLeftUpEvent(const std::function<void(void)>& func)
+uint64_t Gear::Input::Mouse::addLeftUpEvent(const std::function<void(void)>& func)
 {
 	return pvt.leftUpEvent += func;
 }
 
-uint64_t Input::Mouse::addRightUpEvent(const std::function<void(void)>& func)
+uint64_t Gear::Input::Mouse::addRightUpEvent(const std::function<void(void)>& func)
 {
 	return pvt.rightUpEvent += func;
 }
 
-uint64_t Input::Mouse::addScrollEvent(const std::function<void(void)>& func)
+uint64_t Gear::Input::Mouse::addScrollEvent(const std::function<void(void)>& func)
 {
 	return pvt.scrollEvent += func;
 }
 
-void Input::Mouse::removeMoveEvent(const uint64_t id)
+void Gear::Input::Mouse::removeMoveEvent(const uint64_t id)
 {
 	pvt.moveEvent -= id;
 }
 
-void Input::Mouse::removeLeftDownEvent(const uint64_t id)
+void Gear::Input::Mouse::removeLeftDownEvent(const uint64_t id)
 {
 	pvt.leftDownEvent -= id;
 }
 
-void Input::Mouse::removeRightDownEvent(const uint64_t id)
+void Gear::Input::Mouse::removeRightDownEvent(const uint64_t id)
 {
 	pvt.rightDownEvent -= id;
 }
 
-void Input::Mouse::removeLeftUpEvent(const uint64_t id)
+void Gear::Input::Mouse::removeLeftUpEvent(const uint64_t id)
 {
 	pvt.leftUpEvent -= id;
 }
 
-void Input::Mouse::removeRightUpEvent(const uint64_t id)
+void Gear::Input::Mouse::removeRightUpEvent(const uint64_t id)
 {
 	pvt.rightUpEvent -= id;
 }
 
-void Input::Mouse::removeScrollEvent(const uint64_t id)
+void Gear::Input::Mouse::removeScrollEvent(const uint64_t id)
 {
 	pvt.scrollEvent -= id;
 }
 
-void Input::Mouse::Internal::resetDeltaValue()
+void Gear::Input::Mouse::Internal::resetDeltaValue()
 {
 	pvt.dx = 0;
 
@@ -174,7 +174,7 @@ void Input::Mouse::Internal::resetDeltaValue()
 	pvt.onScrolled = false;
 }
 
-void Input::Mouse::Internal::pressLeft()
+void Gear::Input::Mouse::Internal::pressLeft()
 {
 	pvt.leftDown = true;
 
@@ -183,7 +183,7 @@ void Input::Mouse::Internal::pressLeft()
 	pvt.leftDownEvent();
 }
 
-void Input::Mouse::Internal::pressRight()
+void Gear::Input::Mouse::Internal::pressRight()
 {
 	pvt.rightDown = true;
 
@@ -192,21 +192,21 @@ void Input::Mouse::Internal::pressRight()
 	pvt.rightDownEvent();
 }
 
-void Input::Mouse::Internal::releaseLeft()
+void Gear::Input::Mouse::Internal::releaseLeft()
 {
 	pvt.leftDown = false;
 
 	pvt.leftUpEvent();
 }
 
-void Input::Mouse::Internal::releaseRight()
+void Gear::Input::Mouse::Internal::releaseRight()
 {
 	pvt.rightDown = false;
 
 	pvt.rightUpEvent();
 }
 
-void Input::Mouse::Internal::scroll(const float delta)
+void Gear::Input::Mouse::Internal::scroll(const float delta)
 {
 	pvt.wheelDelta = delta;
 
@@ -215,7 +215,7 @@ void Input::Mouse::Internal::scroll(const float delta)
 	pvt.scrollEvent();
 }
 
-void Input::Mouse::Internal::move(const float curX, const float curY)
+void Gear::Input::Mouse::Internal::move(const float curX, const float curY)
 {
 	pvt.dx = curX - pvt.x;
 

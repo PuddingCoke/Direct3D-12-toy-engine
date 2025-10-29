@@ -1,6 +1,6 @@
 ﻿#include<Gear/Core/Resource/D3D12Resource/Texture.h>
 
-Core::Resource::D3D12Resource::Texture::Texture(const uint32_t width, const uint32_t height, const DXGI_FORMAT format, const uint32_t arraySize, const uint32_t mipLevels, const bool stateTracking, const D3D12_RESOURCE_FLAGS resFlags, const D3D12_CLEAR_VALUE* const clearValue) :
+Gear::Core::Resource::D3D12Resource::Texture::Texture(const uint32_t width, const uint32_t height, const DXGI_FORMAT format, const uint32_t arraySize, const uint32_t mipLevels, const bool stateTracking, const D3D12_RESOURCE_FLAGS resFlags, const D3D12_CLEAR_VALUE* const clearValue) :
 	D3D12ResourceBase(CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE, CD3DX12_RESOURCE_DESC::Tex2D(format, width, height, arraySize, mipLevels, 1, 0, resFlags), stateTracking, D3D12_RESOURCE_STATE_COPY_DEST, clearValue),
 	width(width),
 	height(height),
@@ -14,7 +14,7 @@ Core::Resource::D3D12Resource::Texture::Texture(const uint32_t width, const uint
 
 }
 
-Core::Resource::D3D12Resource::Texture::Texture(const ComPtr<ID3D12Resource>& texture, const bool stateTracking, const uint32_t initialState) :
+Gear::Core::Resource::D3D12Resource::Texture::Texture(const ComPtr<ID3D12Resource>& texture, const bool stateTracking, const uint32_t initialState) :
 	D3D12ResourceBase(texture, stateTracking)
 {
 	D3D12_RESOURCE_DESC desc = getResource()->GetDesc();
@@ -29,7 +29,7 @@ Core::Resource::D3D12Resource::Texture::Texture(const ComPtr<ID3D12Resource>& te
 	transitionState = new States(D3D12_RESOURCE_STATE_UNKNOWN, mipLevels);
 }
 
-Core::Resource::D3D12Resource::Texture::Texture(Texture* const tex) :
+Gear::Core::Resource::D3D12Resource::Texture::Texture(Texture* const tex) :
 	D3D12ResourceBase(tex),
 	width(tex->width),
 	height(tex->height),
@@ -43,7 +43,7 @@ Core::Resource::D3D12Resource::Texture::Texture(Texture* const tex) :
 	tex->resetInternalStates();
 }
 
-Core::Resource::D3D12Resource::Texture::~Texture()
+Gear::Core::Resource::D3D12Resource::Texture::~Texture()
 {
 	if (internalState)
 	{
@@ -56,7 +56,7 @@ Core::Resource::D3D12Resource::Texture::~Texture()
 	}
 }
 
-void Core::Resource::D3D12Resource::Texture::updateGlobalStates()
+void Gear::Core::Resource::D3D12Resource::Texture::updateGlobalStates()
 {
 	if (internalState->allState != D3D12_RESOURCE_STATE_UNKNOWN)
 	{
@@ -87,17 +87,17 @@ void Core::Resource::D3D12Resource::Texture::updateGlobalStates()
 	}
 }
 
-void Core::Resource::D3D12Resource::Texture::resetInternalStates()
+void Gear::Core::Resource::D3D12Resource::Texture::resetInternalStates()
 {
 	internalState->reset();
 }
 
-void Core::Resource::D3D12Resource::Texture::resetTransitionStates()
+void Gear::Core::Resource::D3D12Resource::Texture::resetTransitionStates()
 {
 	transitionState->reset();
 }
 
-void Core::Resource::D3D12Resource::Texture::transition(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers, std::vector<PendingTextureBarrier>& pendingBarriers)
+void Gear::Core::Resource::D3D12Resource::Texture::transition(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers, std::vector<PendingTextureBarrier>& pendingBarriers)
 {
 	//check each mipslice state of transitionState
 	//if they are the same then we set allState to that state
@@ -319,7 +319,7 @@ void Core::Resource::D3D12Resource::Texture::transition(std::vector<D3D12_RESOUR
 	resetTransitionStates();
 }
 
-void Core::Resource::D3D12Resource::Texture::solvePendingBarrier(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers, const uint32_t targetMipSlice, const uint32_t targetState)
+void Gear::Core::Resource::D3D12Resource::Texture::solvePendingBarrier(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers, const uint32_t targetMipSlice, const uint32_t targetState)
 {
 	if (targetMipSlice == D3D12_TRANSITION_ALL_MIPLEVELS)
 	{
@@ -405,32 +405,32 @@ void Core::Resource::D3D12Resource::Texture::solvePendingBarrier(std::vector<D3D
 	}
 }
 
-uint32_t Core::Resource::D3D12Resource::Texture::getWidth() const
+uint32_t Gear::Core::Resource::D3D12Resource::Texture::getWidth() const
 {
 	return width;
 }
 
-uint32_t Core::Resource::D3D12Resource::Texture::getHeight() const
+uint32_t Gear::Core::Resource::D3D12Resource::Texture::getHeight() const
 {
 	return height;
 }
 
-uint32_t Core::Resource::D3D12Resource::Texture::getArraySize() const
+uint32_t Gear::Core::Resource::D3D12Resource::Texture::getArraySize() const
 {
 	return arraySize;
 }
 
-uint32_t Core::Resource::D3D12Resource::Texture::getMipLevels() const
+uint32_t Gear::Core::Resource::D3D12Resource::Texture::getMipLevels() const
 {
 	return mipLevels;
 }
 
-DXGI_FORMAT Core::Resource::D3D12Resource::Texture::getFormat() const
+DXGI_FORMAT Gear::Core::Resource::D3D12Resource::Texture::getFormat() const
 {
 	return format;
 }
 
-void Core::Resource::D3D12Resource::Texture::setAllState(const uint32_t state)
+void Gear::Core::Resource::D3D12Resource::Texture::setAllState(const uint32_t state)
 {
 	if (transitionState->allState == D3D12_RESOURCE_STATE_UNKNOWN)
 	{
@@ -459,7 +459,7 @@ void Core::Resource::D3D12Resource::Texture::setAllState(const uint32_t state)
 	}
 }
 
-void Core::Resource::D3D12Resource::Texture::setMipSliceState(const uint32_t mipSlice, const uint32_t state)
+void Gear::Core::Resource::D3D12Resource::Texture::setMipSliceState(const uint32_t mipSlice, const uint32_t state)
 {
 	if (mipLevels > 1)
 	{
@@ -489,17 +489,17 @@ void Core::Resource::D3D12Resource::Texture::setMipSliceState(const uint32_t mip
 	}
 }
 
-uint32_t Core::Resource::D3D12Resource::Texture::getAllState() const
+uint32_t Gear::Core::Resource::D3D12Resource::Texture::getAllState() const
 {
 	return internalState->allState;
 }
 
-uint32_t Core::Resource::D3D12Resource::Texture::getMipSliceState(const uint32_t mipSlice) const
+uint32_t Gear::Core::Resource::D3D12Resource::Texture::getMipSliceState(const uint32_t mipSlice) const
 {
 	return internalState->mipLevelStates[mipSlice];
 }
 
-void Core::Resource::D3D12Resource::Texture::pushToTrackingList(std::vector<Texture*>& trackingList)
+void Gear::Core::Resource::D3D12Resource::Texture::pushToTrackingList(std::vector<Texture*>& trackingList)
 {
 	if (getStateTracking() && !getInTrackingList())
 	{
@@ -509,13 +509,13 @@ void Core::Resource::D3D12Resource::Texture::pushToTrackingList(std::vector<Text
 	}
 }
 
-Core::Resource::D3D12Resource::Texture::States::States(const uint32_t initialState, const uint32_t mipLevels) :
+Gear::Core::Resource::D3D12Resource::Texture::States::States(const uint32_t initialState, const uint32_t mipLevels) :
 	mipLevels(mipLevels), mipLevelStates(new uint32_t[mipLevels])
 {
 	set(initialState);
 }
 
-Core::Resource::D3D12Resource::Texture::States::~States()
+Gear::Core::Resource::D3D12Resource::Texture::States::~States()
 {
 	if (mipLevelStates)
 	{
@@ -523,19 +523,19 @@ Core::Resource::D3D12Resource::Texture::States::~States()
 	}
 }
 
-void Core::Resource::D3D12Resource::Texture::States::set(const uint32_t state)
+void Gear::Core::Resource::D3D12Resource::Texture::States::set(const uint32_t state)
 {
 	allState = state;
 
 	std::fill(mipLevelStates, mipLevelStates + mipLevels, state);
 }
 
-void Core::Resource::D3D12Resource::Texture::States::reset()
+void Gear::Core::Resource::D3D12Resource::Texture::States::reset()
 {
 	set(D3D12_RESOURCE_STATE_UNKNOWN);
 }
 
-void Core::Resource::D3D12Resource::Texture::States::combine(const uint32_t state)
+void Gear::Core::Resource::D3D12Resource::Texture::States::combine(const uint32_t state)
 {
 	allState = (allState | state);
 
@@ -545,7 +545,7 @@ void Core::Resource::D3D12Resource::Texture::States::combine(const uint32_t stat
 		});
 }
 
-bool Core::Resource::D3D12Resource::Texture::States::allOfEqual(const uint32_t state) const
+bool Gear::Core::Resource::D3D12Resource::Texture::States::allOfEqual(const uint32_t state) const
 {
 	return std::all_of(mipLevelStates, mipLevelStates + mipLevels,
 		[state](const uint32_t element)

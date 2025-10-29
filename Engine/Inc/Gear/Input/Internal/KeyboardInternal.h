@@ -1,23 +1,26 @@
 ﻿#pragma once
 
-#ifndef _INPUT_KEYBOARD_INTERNAL_H_
-#define _INPUT_KEYBOARD_INTERNAL_H_
+#ifndef _GEAR_INPUT_KEYBOARD_INTERNAL_H_
+#define _GEAR_INPUT_KEYBOARD_INTERNAL_H_
 
-namespace Input
+namespace Gear
 {
-	namespace Keyboard
+	namespace Input
 	{
-		namespace Internal
+		namespace Keyboard
 		{
+			namespace Internal
+			{
 
-			void resetDeltaValue();
+				void resetDeltaValue();
 
-			void pressKey(const Key key);
+				void pressKey(const Key key);
 
-			void releaseKey(const Key key);
+				void releaseKey(const Key key);
 
+			}
 		}
 	}
 }
 
-#endif // !_INPUT_KEYBOARD_INTERNAL_H_
+#endif // !_GEAR_INPUT_KEYBOARD_INTERNAL_H_

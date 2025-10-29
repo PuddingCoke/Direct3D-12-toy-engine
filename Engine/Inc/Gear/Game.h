@@ -27,13 +27,13 @@ namespace Gear
 
 		virtual void render() = 0;
 
-		void beginRenderTask(Core::RenderTask* const renderTask);
+		void beginRenderTask(Gear::Core::RenderTask* const renderTask);
 
 		void pushCreateFuture(std::future<void>&& createFuture);
 
 		void scheduleAllTasks();
 
-		std::queue<Core::RenderTask*> recordQueue;
+		std::queue<Gear::Core::RenderTask*> recordQueue;
 
 		std::queue<std::future<void>> createQueue;
 

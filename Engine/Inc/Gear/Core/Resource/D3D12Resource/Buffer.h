@@ -1,74 +1,77 @@
 ﻿#pragma once
 
-#ifndef _CORE_RESOURCE_D3D12RESOURCE_BUFFER_H_
-#define _CORE_RESOURCE_D3D12RESOURCE_BUFFER_H_
+#ifndef _GEAR_CORE_RESOURCE_D3D12RESOURCE_BUFFER_H_
+#define _GEAR_CORE_RESOURCE_D3D12RESOURCE_BUFFER_H_
 
 #include"D3D12ResourceBase.h"
 
 #include<vector>
 
-namespace Core
+namespace Gear
 {
-	namespace Resource
+	namespace Core
 	{
-		namespace D3D12Resource
+		namespace Resource
 		{
-			class Buffer;
-
-			struct PendingBufferBarrier
+			namespace D3D12Resource
 			{
-				Buffer* buffer;
+				class Buffer;
 
-				uint32_t afterState;
-			};
+				struct PendingBufferBarrier
+				{
+					Buffer* buffer;
 
-			class Buffer :public D3D12ResourceBase
-			{
-			public:
+					uint32_t afterState;
+				};
 
-				Buffer() = delete;
+				class Buffer :public D3D12ResourceBase
+				{
+				public:
 
-				Buffer(const Buffer&) = delete;
+					Buffer() = delete;
 
-				void operator=(const Buffer&) = delete;
+					Buffer(const Buffer&) = delete;
 
-				Buffer(const uint64_t size, const bool stateTracking, const D3D12_RESOURCE_FLAGS resFlags, const uint32_t initialState = D3D12_RESOURCE_STATE_COPY_DEST);
+					void operator=(const Buffer&) = delete;
 
-				Buffer(const ComPtr<ID3D12Resource>& buffer, const bool stateTracking, const uint32_t initialState);
+					Buffer(const uint64_t size, const bool stateTracking, const D3D12_RESOURCE_FLAGS resFlags, const uint32_t initialState = D3D12_RESOURCE_STATE_COPY_DEST);
 
-				Buffer(Buffer* const);
+					Buffer(const ComPtr<ID3D12Resource>& buffer, const bool stateTracking, const uint32_t initialState);
 
-				virtual ~Buffer();
+					Buffer(Buffer* const);
 
-				void updateGlobalStates() override;
+					virtual ~Buffer();
 
-				void resetInternalStates() override;
+					void updateGlobalStates() override;
 
-				void transition(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers, std::vector<PendingBufferBarrier>& pendingBarriers);
+					void resetInternalStates() override;
 
-				void solvePendingBarrier(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers, const uint32_t targetState);
+					void transition(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers, std::vector<PendingBufferBarrier>& pendingBarriers);
 
-				void setState(const uint32_t state);
+					void solvePendingBarrier(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers, const uint32_t targetState);
 
-				uint32_t getState() const;
+					void setState(const uint32_t state);
 
-				void pushToTrackingList(std::vector<Buffer*>& trackingList);
+					uint32_t getState() const;
 
-			protected:
+					void pushToTrackingList(std::vector<Buffer*>& trackingList);
 
-				void resetTransitionStates() override;
+				protected:
 
-			private:
+					void resetTransitionStates() override;
 
-				std::shared_ptr<uint32_t> globalState;
+				private:
 
-				uint32_t internalState;
+					std::shared_ptr<uint32_t> globalState;
 
-				uint32_t transitionState;
+					uint32_t internalState;
 
-			};
+					uint32_t transitionState;
+
+				};
+			}
 		}
 	}
 }
 
-#endif // !_CORE_RESOURCE_D3D12RESOURCE_BUFFER_H_
+#endif // !_GEAR_CORE_RESOURCE_D3D12RESOURCE_BUFFER_H_

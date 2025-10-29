@@ -26,13 +26,13 @@ namespace
 
 		uint64_t getUpdateSize() const;
 
-		Core::Resource::D3D12Resource::UploadHeap* getUploadHeap() const;
+		Gear::Core::Resource::D3D12Resource::UploadHeap* getUploadHeap() const;
 
 	private:
 
 		const uint64_t subRegionSize;
 
-		Core::Resource::D3D12Resource::UploadHeap** const uploadHeap;
+		Gear::Core::Resource::D3D12Resource::UploadHeap** const uploadHeap;
 
 		uint8_t** const dataPtr;
 
@@ -48,9 +48,9 @@ namespace
 
 		~DynamicCBufferManagerPrivate();
 
-		Core::DynamicCBufferManager::AvailableLocation requestLocation(const uint32_t regionIndex);
+		Gear::Core::DynamicCBufferManager::AvailableLocation requestLocation(const uint32_t regionIndex);
 
-		void recordCommands(Core::D3D12Core::CommandList* const commandList);
+		void recordCommands(Gear::Core::D3D12Core::CommandList* const commandList);
 
 	private:
 
@@ -60,7 +60,7 @@ namespace
 
 		static constexpr uint32_t numRegion = sizeof(numSubRegion) / sizeof(uint32_t);
 
-		Core::Resource::D3D12Resource::Buffer* buffer;
+		Gear::Core::Resource::D3D12Resource::Buffer* buffer;
 
 		DynamicCBufferRegion** bufferRegions;
 
@@ -77,13 +77,13 @@ namespace
 
 DynamicCBufferRegion::DynamicCBufferRegion(const uint64_t subRegionSize, const uint64_t subRegionNum) :
 	subRegionSize(subRegionSize),
-	uploadHeap(new Core::Resource::D3D12Resource::UploadHeap* [Core::Graphics::getFrameBufferCount()]),
-	dataPtr(new uint8_t* [Core::Graphics::getFrameBufferCount()]),
+	uploadHeap(new Gear::Core::Resource::D3D12Resource::UploadHeap* [Gear::Core::Graphics::getFrameBufferCount()]),
+	dataPtr(new uint8_t* [Gear::Core::Graphics::getFrameBufferCount()]),
 	currentOffset(0)
 {
-	for (uint32_t i = 0; i < Core::Graphics::getFrameBufferCount(); i++)
+	for (uint32_t i = 0; i < Gear::Core::Graphics::getFrameBufferCount(); i++)
 	{
-		uploadHeap[i] = new Core::Resource::D3D12Resource::UploadHeap(subRegionSize * subRegionNum);
+		uploadHeap[i] = new Gear::Core::Resource::D3D12Resource::UploadHeap(subRegionSize * subRegionNum);
 
 		dataPtr[i] = static_cast<uint8_t*>(uploadHeap[i]->map());
 	}
@@ -93,7 +93,7 @@ DynamicCBufferRegion::~DynamicCBufferRegion()
 {
 	if (uploadHeap)
 	{
-		for (uint32_t i = 0; i < Core::Graphics::getFrameBufferCount(); i++)
+		for (uint32_t i = 0; i < Gear::Core::Graphics::getFrameBufferCount(); i++)
 		{
 			if (uploadHeap[i])
 			{
@@ -116,7 +116,7 @@ DynamicCBufferRegion::Location DynamicCBufferRegion::acquireLocation()
 {
 	const uint64_t tempOffset = currentOffset.fetch_add(subRegionSize, std::memory_order_relaxed);
 
-	return { dataPtr[Core::Graphics::getFrameIndex()] + tempOffset,static_cast<uint32_t>(tempOffset / subRegionSize) };
+	return { dataPtr[Gear::Core::Graphics::getFrameIndex()] + tempOffset,static_cast<uint32_t>(tempOffset / subRegionSize) };
 }
 
 void DynamicCBufferRegion::reset()
@@ -129,9 +129,9 @@ uint64_t DynamicCBufferRegion::getUpdateSize() const
 	return currentOffset.load(std::memory_order_relaxed);
 }
 
-Core::Resource::D3D12Resource::UploadHeap* DynamicCBufferRegion::getUploadHeap() const
+Gear::Core::Resource::D3D12Resource::UploadHeap* DynamicCBufferRegion::getUploadHeap() const
 {
-	return uploadHeap[Core::Graphics::getFrameIndex()];
+	return uploadHeap[Gear::Core::Graphics::getFrameIndex()];
 }
 
 DynamicCBufferManagerPrivate::DynamicCBufferManagerPrivate()
@@ -147,7 +147,7 @@ DynamicCBufferManagerPrivate::DynamicCBufferManagerPrivate()
 			requiredSize += (256u << regionIndex) * numSubRegion[regionIndex];
 		}
 
-		buffer = new Core::Resource::D3D12Resource::Buffer(requiredSize, true, D3D12_RESOURCE_FLAG_NONE);
+		buffer = new Gear::Core::Resource::D3D12Resource::Buffer(requiredSize, true, D3D12_RESOURCE_FLAG_NONE);
 
 		buffer->setName(L"Large Constant Buffer");
 
@@ -173,7 +173,7 @@ DynamicCBufferManagerPrivate::DynamicCBufferManagerPrivate()
 			requiredDescriptorNum += numSubRegion[regionIndex];
 		}
 
-		Core::D3D12Core::DescriptorHandle descriptorHandle = Core::GlobalDescriptorHeap::getResourceHeap()->allocStaticDescriptor(requiredDescriptorNum);
+		Gear::Core::D3D12Core::DescriptorHandle descriptorHandle = Gear::Core::GlobalDescriptorHeap::getResourceHeap()->allocStaticDescriptor(requiredDescriptorNum);
 
 		uint64_t bufferLocationOffset = buffer->getGPUAddress();
 
@@ -191,7 +191,7 @@ DynamicCBufferManagerPrivate::DynamicCBufferManagerPrivate()
 
 				bufferLocationOffset += (256ull << regionIndex);
 
-				Core::GraphicsDevice::get()->CreateConstantBufferView(&desc, descriptorHandle.getCPUHandle());
+				Gear::Core::GraphicsDevice::get()->CreateConstantBufferView(&desc, descriptorHandle.getCPUHandle());
 
 				descriptorHandle.move();
 			}
@@ -220,14 +220,14 @@ DynamicCBufferManagerPrivate::~DynamicCBufferManagerPrivate()
 	}
 }
 
-Core::DynamicCBufferManager::AvailableLocation DynamicCBufferManagerPrivate::requestLocation(const uint32_t regionIndex)
+Gear::Core::DynamicCBufferManager::AvailableLocation DynamicCBufferManagerPrivate::requestLocation(const uint32_t regionIndex)
 {
 	const DynamicCBufferRegion::Location location = bufferRegions[regionIndex]->acquireLocation();
 
 	return { location.dataPtr,baseAddressOffsets[regionIndex] + (256u << regionIndex) * location.subregionIndex,baseDescriptorIndices[regionIndex] + location.subregionIndex };
 }
 
-void DynamicCBufferManagerPrivate::recordCommands(Core::D3D12Core::CommandList* const commandList)
+void DynamicCBufferManagerPrivate::recordCommands(Gear::Core::D3D12Core::CommandList* const commandList)
 {
 	//把大常量缓冲转变到STATE_COPY_DEST状态，用于内容更新
 	commandList->pushResourceTrackList(buffer);
@@ -256,17 +256,17 @@ void DynamicCBufferManagerPrivate::recordCommands(Core::D3D12Core::CommandList* 
 	commandList->transitionResources();
 }
 
-Core::DynamicCBufferManager::AvailableLocation Core::DynamicCBufferManager::requestLocation(const uint32_t regionIndex)
+Gear::Core::DynamicCBufferManager::AvailableLocation Gear::Core::DynamicCBufferManager::requestLocation(const uint32_t regionIndex)
 {
 	return pvt->requestLocation(regionIndex);
 }
 
-void Core::DynamicCBufferManager::Internal::initialize()
+void Gear::Core::DynamicCBufferManager::Internal::initialize()
 {
 	pvt = new DynamicCBufferManagerPrivate();
 }
 
-void Core::DynamicCBufferManager::Internal::release()
+void Gear::Core::DynamicCBufferManager::Internal::release()
 {
 	if (pvt)
 	{
@@ -274,7 +274,7 @@ void Core::DynamicCBufferManager::Internal::release()
 	}
 }
 
-void Core::DynamicCBufferManager::Internal::recordCommands(Core::D3D12Core::CommandList* const commandList)
+void Gear::Core::DynamicCBufferManager::Internal::recordCommands(Gear::Core::D3D12Core::CommandList* const commandList)
 {
 	pvt->recordCommands(commandList);
 }

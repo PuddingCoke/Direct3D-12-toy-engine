@@ -1,7 +1,7 @@
 ﻿#pragma once
 
-#ifndef _CORE_EFFECT_EFFECTBASE_H_
-#define _CORE_EFFECT_EFFECTBASE_H_
+#ifndef _GEAR_CORE_EFFECT_EFFECTBASE_H_
+#define _GEAR_CORE_EFFECT_EFFECTBASE_H_
 
 #include<Gear/Core/ResourceManager.h>
 
@@ -11,38 +11,41 @@
 
 #include<ImGUI/imgui.h>
 
-namespace Core
+namespace Gear
 {
-	namespace Effect
+	namespace Core
 	{
-		class EffectBase
+		namespace Effect
 		{
-		public:
+			class EffectBase
+			{
+			public:
 
-			EffectBase() = delete;
+				EffectBase() = delete;
 
-			EffectBase(const EffectBase&) = delete;
+				EffectBase(const EffectBase&) = delete;
 
-			void operator=(const EffectBase&) = delete;
+				void operator=(const EffectBase&) = delete;
 
-			EffectBase(GraphicsContext* const context, const uint32_t width, const uint32_t height, const DXGI_FORMAT format);
+				EffectBase(GraphicsContext* const context, const uint32_t width, const uint32_t height, const DXGI_FORMAT format);
 
-			virtual ~EffectBase();
+				virtual ~EffectBase();
 
-			virtual void imGUICall() = 0;
+				virtual void imGUICall() = 0;
 
-		protected:
+			protected:
 
-			Resource::TextureRenderView* const outputTexture;
+				Resource::TextureRenderView* const outputTexture;
 
-			GraphicsContext* const context;
+				GraphicsContext* const context;
 
-			const uint32_t width;
+				const uint32_t width;
 
-			const uint32_t height;
+				const uint32_t height;
 
-		};
+			};
+		}
 	}
 }
 
-#endif // !_CORE_EFFECT_EFFECTBASE_H_
+#endif // !_GEAR_CORE_EFFECT_EFFECTBASE_H_

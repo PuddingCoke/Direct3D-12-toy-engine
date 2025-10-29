@@ -1,7 +1,7 @@
 ﻿#pragma once
 
-#ifndef _CORE_D3D12CORE_DXCCOMPILER_H_
-#define _CORE_D3D12CORE_DXCCOMPILER_H_
+#ifndef _GEAR_CORE_D3D12CORE_DXCCOMPILER_H_
+#define _GEAR_CORE_D3D12CORE_DXCCOMPILER_H_
 
 #include<Gear/Core/GraphicsDevice.h>
 
@@ -9,34 +9,37 @@
 
 #undef DOMAIN
 
-namespace Core
+namespace Gear
 {
-	namespace D3D12Core
+	namespace Core
 	{
-		namespace DXCCompiler
+		namespace D3D12Core
 		{
-
-			enum class ShaderProfile
+			namespace DXCCompiler
 			{
-				VERTEX,
-				HULL,
-				DOMAIN,
-				GEOMETRY,
-				PIXEL,
-				AMPLIFICATION,
-				MESH,
-				COMPUTE,
-				LIBRARY
-			};
 
-			//hlsl
-			ComPtr<IDxcBlob> compile(const std::wstring& filePath, const ShaderProfile profile);
+				enum class ShaderProfile
+				{
+					VERTEX,
+					HULL,
+					DOMAIN,
+					GEOMETRY,
+					PIXEL,
+					AMPLIFICATION,
+					MESH,
+					COMPUTE,
+					LIBRARY
+				};
 
-			//cso
-			ComPtr<IDxcBlob> read(const std::wstring& filePath);
+				//hlsl
+				ComPtr<IDxcBlob> compile(const std::wstring& filePath, const ShaderProfile profile);
 
+				//cso
+				ComPtr<IDxcBlob> read(const std::wstring& filePath);
+
+			}
 		}
 	}
 }
 
-#endif // !_CORE_D3D12CORE_DXCCOMPILER_H_
+#endif // !_GEAR_CORE_D3D12CORE_DXCCOMPILER_H_

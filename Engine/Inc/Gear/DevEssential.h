@@ -31,14 +31,16 @@
 
 #include<Gear/Utils/Color.h>
 
-using namespace Core;
+using namespace Gear;
 
-using namespace Core::D3D12Core;
+using namespace Gear::Core;
 
-using namespace Core::Effect;
+using namespace Gear::Core::D3D12Core;
 
-using namespace Core::Resource;
+using namespace Gear::Core::Effect;
 
-using namespace Core::GlobalShader;
+using namespace Gear::Core::Resource;
+
+using namespace Gear::Core::GlobalShader;
 
 #endif // !_DEVESSENTIAL_H_

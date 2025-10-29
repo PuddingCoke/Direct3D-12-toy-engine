@@ -1,7 +1,7 @@
 ﻿#pragma once
 
-#ifndef _CORE_VIDEOENCODER_ENCODER_H_
-#define _CORE_VIDEOENCODER_ENCODER_H_
+#ifndef _GEAR_CORE_VIDEOENCODER_ENCODER_H_
+#define _GEAR_CORE_VIDEOENCODER_ENCODER_H_
 
 #include<mfapi.h>
 #include<mfidl.h>
@@ -13,65 +13,68 @@
 
 #include<chrono>
 
-namespace Core
+namespace Gear
 {
-	namespace VideoEncoder
+	namespace Core
 	{
-		class Encoder
+		namespace VideoEncoder
 		{
-		public:
-
-			enum class OutputVideoFormat
+			class Encoder
 			{
-				H264, HEVC, AV1
+			public:
+
+				enum class OutputVideoFormat
+				{
+					H264, HEVC, AV1
+				};
+
+				Encoder() = delete;
+
+				Encoder(const Encoder&) = delete;
+
+				void operator=(const Encoder&) = delete;
+
+				Encoder(const uint32_t frameToEncode, const OutputVideoFormat format);
+
+				virtual ~Encoder();
+
+				virtual bool encode(Resource::D3D12Resource::Texture* const inputTexture) = 0;
+
+				static constexpr uint32_t frameRate = 60;
+
+			protected:
+
+				void displayProgress() const;
+
+				//封装比特流
+				bool writeFrame(const void* const bitstreamPtr, const uint32_t bitstreamSize, const bool cleanPoint);
+
+			private:
+
+				//不要修改这个值
+				static constexpr uint32_t progressBarWidth = 32;
+
+				uint32_t frameEncoded;
+
+				const uint32_t frameToEncode;
+
+				std::chrono::steady_clock::time_point startPoint;
+
+				std::chrono::steady_clock::time_point endPoint;
+
+				float encodeTime;
+
+				ComPtr<IMFSinkWriter> sinkWriter;
+
+				DWORD streamIndex;
+
+				const LONGLONG sampleDuration;
+
+				LONGLONG sampleTime;
+
 			};
-
-			Encoder() = delete;
-
-			Encoder(const Encoder&) = delete;
-
-			void operator=(const Encoder&) = delete;
-
-			Encoder(const uint32_t frameToEncode, const OutputVideoFormat format);
-
-			virtual ~Encoder();
-
-			virtual bool encode(Resource::D3D12Resource::Texture* const inputTexture) = 0;
-
-			static constexpr uint32_t frameRate = 60;
-
-		protected:
-
-			void displayProgress() const;
-
-			//封装比特流
-			bool writeFrame(const void* const bitstreamPtr, const uint32_t bitstreamSize, const bool cleanPoint);
-
-		private:
-
-			//不要修改这个值
-			static constexpr uint32_t progressBarWidth = 32;
-
-			uint32_t frameEncoded;
-
-			const uint32_t frameToEncode;
-
-			std::chrono::steady_clock::time_point startPoint;
-
-			std::chrono::steady_clock::time_point endPoint;
-
-			float encodeTime;
-
-			ComPtr<IMFSinkWriter> sinkWriter;
-
-			DWORD streamIndex;
-
-			const LONGLONG sampleDuration;
-
-			LONGLONG sampleTime;
-
-		};
+		}
 	}
 }
 
-#endif // !_CORE_VIDEOENCODER_ENCODER_H_
+#endif // !_GEAR_CORE_VIDEOENCODER_ENCODER_H_

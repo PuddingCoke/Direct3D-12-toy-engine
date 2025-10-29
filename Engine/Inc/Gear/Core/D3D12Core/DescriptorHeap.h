@@ -1,108 +1,111 @@
 ﻿#pragma once
 
-#ifndef _CORE_D3D12CORE_DESCRIPTORHEAP_H_
-#define _CORE_D3D12CORE_DESCRIPTORHEAP_H_
+#ifndef _GEAR_CORE_D3D12CORE_DESCRIPTORHEAP_H_
+#define _GEAR_CORE_D3D12CORE_DESCRIPTORHEAP_H_
 
 #include<Gear/Core/GraphicsDevice.h>
 
 #include<mutex>
 
-namespace Core
+namespace Gear
 {
-	namespace D3D12Core
+	namespace Core
 	{
-		class DescriptorHandle;
-
-		class DescriptorHeap
+		namespace D3D12Core
 		{
-		public:
+			class DescriptorHandle;
 
-			DescriptorHeap() = delete;
+			class DescriptorHeap
+			{
+			public:
 
-			DescriptorHeap(const DescriptorHeap&) = delete;
+				DescriptorHeap() = delete;
 
-			void operator=(const DescriptorHeap&) = delete;
+				DescriptorHeap(const DescriptorHeap&) = delete;
 
-			DescriptorHeap(const uint32_t numDescriptors, const uint32_t subRegionSize, const D3D12_DESCRIPTOR_HEAP_TYPE type, const D3D12_DESCRIPTOR_HEAP_FLAGS flags);
+				void operator=(const DescriptorHeap&) = delete;
 
-			uint32_t getNumDescriptors() const;
+				DescriptorHeap(const uint32_t numDescriptors, const uint32_t subRegionSize, const D3D12_DESCRIPTOR_HEAP_TYPE type, const D3D12_DESCRIPTOR_HEAP_FLAGS flags);
 
-			uint32_t getSubRegionSize() const;
+				uint32_t getNumDescriptors() const;
 
-			D3D12_DESCRIPTOR_HEAP_TYPE getDescriptorHeapType() const;
+				uint32_t getSubRegionSize() const;
 
-			uint32_t getIncrementSize() const;
+				D3D12_DESCRIPTOR_HEAP_TYPE getDescriptorHeapType() const;
 
-			ID3D12DescriptorHeap* get() const;
+				uint32_t getIncrementSize() const;
 
-			DescriptorHandle allocStaticDescriptor(const uint32_t num);
+				ID3D12DescriptorHeap* get() const;
 
-			DescriptorHandle allocDynamicDescriptor(const uint32_t num);
+				DescriptorHandle allocStaticDescriptor(const uint32_t num);
 
-		private:
+				DescriptorHandle allocDynamicDescriptor(const uint32_t num);
 
-			friend class DescriptorHandle;
+			private:
 
-			const uint32_t numDescriptors;
+				friend class DescriptorHandle;
 
-			const uint32_t subRegionSize;
+				const uint32_t numDescriptors;
 
-			const D3D12_DESCRIPTOR_HEAP_TYPE type;
+				const uint32_t subRegionSize;
 
-			const uint32_t incrementSize;
+				const D3D12_DESCRIPTOR_HEAP_TYPE type;
 
-			ComPtr<ID3D12DescriptorHeap> descriptorHeap;
+				const uint32_t incrementSize;
 
-			CD3DX12_CPU_DESCRIPTOR_HANDLE staticCPUPointer;
+				ComPtr<ID3D12DescriptorHeap> descriptorHeap;
 
-			CD3DX12_CPU_DESCRIPTOR_HANDLE dynamicCPUPointer;
+				CD3DX12_CPU_DESCRIPTOR_HANDLE staticCPUPointer;
 
-			CD3DX12_CPU_DESCRIPTOR_HANDLE staticCPUPointerStart;
+				CD3DX12_CPU_DESCRIPTOR_HANDLE dynamicCPUPointer;
 
-			CD3DX12_CPU_DESCRIPTOR_HANDLE dynamicCPUPointerStart;
+				CD3DX12_CPU_DESCRIPTOR_HANDLE staticCPUPointerStart;
 
-			CD3DX12_GPU_DESCRIPTOR_HANDLE staticGPUPointer;
+				CD3DX12_CPU_DESCRIPTOR_HANDLE dynamicCPUPointerStart;
 
-			CD3DX12_GPU_DESCRIPTOR_HANDLE dynamicGPUPointer;
+				CD3DX12_GPU_DESCRIPTOR_HANDLE staticGPUPointer;
 
-			CD3DX12_GPU_DESCRIPTOR_HANDLE staticGPUPointerStart;
+				CD3DX12_GPU_DESCRIPTOR_HANDLE dynamicGPUPointer;
 
-			CD3DX12_GPU_DESCRIPTOR_HANDLE dynamicGPUPointerStart;
+				CD3DX12_GPU_DESCRIPTOR_HANDLE staticGPUPointerStart;
 
-			std::mutex staticPointerLock;
+				CD3DX12_GPU_DESCRIPTOR_HANDLE dynamicGPUPointerStart;
 
-			std::mutex dynamicPointerLock;
+				std::mutex staticPointerLock;
 
-		};
+				std::mutex dynamicPointerLock;
 
-		class DescriptorHandle
-		{
-		public:
+			};
 
-			DescriptorHandle();
+			class DescriptorHandle
+			{
+			public:
 
-			DescriptorHandle(const CD3DX12_CPU_DESCRIPTOR_HANDLE cpuHandle, const CD3DX12_GPU_DESCRIPTOR_HANDLE gpuHandle, const DescriptorHeap* const descriptorHeap);
+				DescriptorHandle();
 
-			uint32_t getCurrentIndex() const;
+				DescriptorHandle(const CD3DX12_CPU_DESCRIPTOR_HANDLE cpuHandle, const CD3DX12_GPU_DESCRIPTOR_HANDLE gpuHandle, const DescriptorHeap* const descriptorHeap);
 
-			CD3DX12_CPU_DESCRIPTOR_HANDLE getCPUHandle() const;
+				uint32_t getCurrentIndex() const;
 
-			CD3DX12_GPU_DESCRIPTOR_HANDLE getGPUHandle() const;
+				CD3DX12_CPU_DESCRIPTOR_HANDLE getCPUHandle() const;
 
-			void move();
+				CD3DX12_GPU_DESCRIPTOR_HANDLE getGPUHandle() const;
 
-			void offset(const uint32_t num);
+				void move();
 
-		protected:
+				void offset(const uint32_t num);
 
-			CD3DX12_CPU_DESCRIPTOR_HANDLE cpuHandle;
+			protected:
 
-			CD3DX12_GPU_DESCRIPTOR_HANDLE gpuHandle;
+				CD3DX12_CPU_DESCRIPTOR_HANDLE cpuHandle;
 
-			const DescriptorHeap* descriptorHeap;
+				CD3DX12_GPU_DESCRIPTOR_HANDLE gpuHandle;
 
-		};
+				const DescriptorHeap* descriptorHeap;
+
+			};
+		}
 	}
 }
 
-#endif // !_CORE_D3D12CORE_DESCRIPTORHEAP_H_
+#endif // !_GEAR_CORE_D3D12CORE_DESCRIPTORHEAP_H_

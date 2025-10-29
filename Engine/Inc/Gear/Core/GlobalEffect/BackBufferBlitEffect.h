@@ -1,19 +1,22 @@
 ﻿#pragma once
 
-#ifndef _CORE_GLOBALEFFECT_BACKBUFFERBLITEFFECT_H_
-#define _CORE_GLOBALEFFECT_BACKBUFFERBLITEFFECT_H_
+#ifndef _GEAR_CORE_GLOBALEFFECT_BACKBUFFERBLITEFFECT_H_
+#define _GEAR_CORE_GLOBALEFFECT_BACKBUFFERBLITEFFECT_H_
 
 #include"GlobalEffectHeader.h"
 
-namespace Core
+namespace Gear
 {
-	namespace GlobalEffect
+	namespace Core
 	{
-		namespace BackBufferBlitEffect
+		namespace GlobalEffect
 		{
-			void process(GraphicsContext* const context, Resource::TextureRenderView* const inputTexture);
+			namespace BackBufferBlitEffect
+			{
+				void process(GraphicsContext* const context, Resource::TextureRenderView* const inputTexture);
+			}
 		}
 	}
 }
 
-#endif // !_CORE_GLOBALEFFECT_BACKBUFFERBLITEFFECT_H_
+#endif // !_GEAR_CORE_GLOBALEFFECT_BACKBUFFERBLITEFFECT_H_

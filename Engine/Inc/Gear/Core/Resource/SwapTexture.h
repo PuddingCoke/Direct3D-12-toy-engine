@@ -1,44 +1,47 @@
 ﻿#pragma once
 
-#ifndef _CORE_RESOURCE_SWAPTEXTURE_H_
-#define _CORE_RESOURCE_SWAPTEXTURE_H_
+#ifndef _GEAR_CORE_RESOURCE_SWAPTEXTURE_H_
+#define _GEAR_CORE_RESOURCE_SWAPTEXTURE_H_
 
 #include"TextureRenderView.h"
 
 #include<functional>
 
-namespace Core
+namespace Gear
 {
-	namespace Resource
+	namespace Core
 	{
-		class SwapTexture
+		namespace Resource
 		{
-		private:
+			class SwapTexture
+			{
+			private:
 
-			TextureRenderView* texture0;
+				TextureRenderView* texture0;
 
-			TextureRenderView* texture1;
+				TextureRenderView* texture1;
 
-		public:
+			public:
 
-			SwapTexture() = delete;
+				SwapTexture() = delete;
 
-			SwapTexture(const std::function<TextureRenderView* (void)>& factoryFunc);
+				SwapTexture(const std::function<TextureRenderView* (void)>& factoryFunc);
 
-			~SwapTexture();
+				~SwapTexture();
 
-			TextureRenderView* read() const;
+				TextureRenderView* read() const;
 
-			TextureRenderView* write() const;
+				TextureRenderView* write() const;
 
-			void swap();
+				void swap();
 
-			const uint32_t width;
+				const uint32_t width;
 
-			const uint32_t height;
+				const uint32_t height;
 
-		};
+			};
+		}
 	}
 }
 
-#endif // !_CORE_RESOURCE_SWAPTEXTURE_H_
+#endif // !_GEAR_CORE_RESOURCE_SWAPTEXTURE_H_

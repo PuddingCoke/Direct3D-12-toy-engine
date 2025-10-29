@@ -1,19 +1,22 @@
 ﻿#pragma once
 
-#ifndef _UTILS_LOGGER_INTERNAL_H_
-#define _UTILS_LOGGER_INTERNAL_H_
+#ifndef _GEAR_UTILS_LOGGER_INTERNAL_H_
+#define _GEAR_UTILS_LOGGER_INTERNAL_H_
 
-namespace Utils
+namespace Gear
 {
-	namespace Logger
+	namespace Utils
 	{
-		namespace Internal
+		namespace Logger
 		{
-			void initialize();
+			namespace Internal
+			{
+				void initialize();
 
-			void release();
+				void release();
+			}
 		}
 	}
 }
 
-#endif // !_UTILS_LOGGER_INTERNAL_H_
+#endif // !_GEAR_UTILS_LOGGER_INTERNAL_H_

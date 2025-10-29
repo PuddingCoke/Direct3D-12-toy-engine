@@ -1,43 +1,46 @@
 ﻿#pragma once
 
-#ifndef _CORE_RESOURCE_RESOURCEBASE_H_
-#define _CORE_RESOURCE_RESOURCEBASE_H_
+#ifndef _GEAR_CORE_RESOURCE_RESOURCEBASE_H_
+#define _GEAR_CORE_RESOURCE_RESOURCEBASE_H_
 
 #include<Gear/Core/GlobalDescriptorHeap.h>
 
 #include"D3D12Resource/PipelineResourceDesc.h"
 
-namespace Core
+namespace Gear
 {
-	namespace Resource
+	namespace Core
 	{
-		class ResourceBase
+		namespace Resource
 		{
-		public:
+			class ResourceBase
+			{
+			public:
 
-			ResourceBase() = delete;
+				ResourceBase() = delete;
 
-			ResourceBase(const bool persistent);
+				ResourceBase(const bool persistent);
 
-			virtual ~ResourceBase();
+				virtual ~ResourceBase();
 
-			virtual void copyDescriptors();
+				virtual void copyDescriptors();
 
-			bool getPersistent() const;
+				bool getPersistent() const;
 
-		protected:
+			protected:
 
-			//copy non shader visible resource heap to shader visible resource heap
-			D3D12Core::DescriptorHandle getTransientDescriptorHandle() const;
+				//copy non shader visible resource heap to shader visible resource heap
+				D3D12Core::DescriptorHandle getTransientDescriptorHandle() const;
 
-			const bool persistent;
+				const bool persistent;
 
-			D3D12_CPU_DESCRIPTOR_HANDLE srvUAVCBVHandleStart;
+				D3D12_CPU_DESCRIPTOR_HANDLE srvUAVCBVHandleStart;
 
-			uint32_t numSRVUAVCBVDescriptors;
+				uint32_t numSRVUAVCBVDescriptors;
 
-		};
+			};
+		}
 	}
 }
 
-#endif // !_CORE_RESOURCE_RESOURCEBASE_H_
+#endif // !_GEAR_CORE_RESOURCE_RESOURCEBASE_H_

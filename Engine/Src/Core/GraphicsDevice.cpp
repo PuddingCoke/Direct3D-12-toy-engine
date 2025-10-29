@@ -10,12 +10,12 @@ namespace
 	}pvt;
 }
 
-ID3D12Device9* Core::GraphicsDevice::get()
+ID3D12Device9* Gear::Core::GraphicsDevice::get()
 {
 	return pvt.device.Get();
 }
 
-void Core::GraphicsDevice::Internal::initialize(IUnknown* const adapter)
+void Gear::Core::GraphicsDevice::Internal::initialize(IUnknown* const adapter)
 {
 	if (SUCCEEDED(D3D12CreateDevice(adapter, D3D_FEATURE_LEVEL_12_2, IID_PPV_ARGS(&pvt.device))))
 	{
@@ -27,12 +27,12 @@ void Core::GraphicsDevice::Internal::initialize(IUnknown* const adapter)
 	}
 }
 
-void Core::GraphicsDevice::Internal::release()
+void Gear::Core::GraphicsDevice::Internal::release()
 {
 	pvt.device = nullptr;
 }
 
-void Core::GraphicsDevice::Internal::checkFeatureSupport()
+void Gear::Core::GraphicsDevice::Internal::checkFeatureSupport()
 {
 	LOGENGINE(L"following are feature support data");
 

@@ -1,19 +1,22 @@
 ﻿#pragma once
 
-#ifndef _CORE_GLOBALEFFECT_HDRCLAMPEFFECT_H_
-#define _CORE_GLOBALEFFECT_HDRCLAMPEFFECT_H_
+#ifndef _GEAR_CORE_GLOBALEFFECT_HDRCLAMPEFFECT_H_
+#define _GEAR_CORE_GLOBALEFFECT_HDRCLAMPEFFECT_H_
 
 #include"GlobalEffectHeader.h"
 
-namespace Core
+namespace Gear
 {
-	namespace GlobalEffect
+	namespace Core
 	{
-		namespace HDRClampEffect
+		namespace GlobalEffect
 		{
-			void process(GraphicsContext* const context, Resource::TextureRenderView* const inOutTexture);
+			namespace HDRClampEffect
+			{
+				void process(GraphicsContext* const context, Resource::TextureRenderView* const inOutTexture);
+			}
 		}
 	}
 }
 
-#endif // !_CORE_GLOBALCEFFECT_HDRCLAMPEFFECT_H_
+#endif // !_GEAR_CORE_GLOBALCEFFECT_HDRCLAMPEFFECT_H_

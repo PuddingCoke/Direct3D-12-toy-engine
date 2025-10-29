@@ -1,19 +1,22 @@
 ﻿#pragma once
 
-#ifndef _CORE_GLOBALROOTSIGNATURE_INTERNAL_H_
-#define _CORE_GLOBALROOTSIGNATURE_INTERNAL_H_
+#ifndef _GEAR_CORE_GLOBALROOTSIGNATURE_INTERNAL_H_
+#define _GEAR_CORE_GLOBALROOTSIGNATURE_INTERNAL_H_
 
-namespace Core
+namespace Gear
 {
-	namespace GlobalRootSignature
+	namespace Core
 	{
-		namespace Internal
+		namespace GlobalRootSignature
 		{
-			void initialize();
+			namespace Internal
+			{
+				void initialize();
 
-			void release();
+				void release();
+			}
 		}
 	}
 }
 
-#endif // !_CORE_GLOBALROOTSIGNATURE_INTERNAL_H_
+#endif // !_GEAR_CORE_GLOBALROOTSIGNATURE_INTERNAL_H_

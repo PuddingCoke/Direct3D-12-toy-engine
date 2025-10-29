@@ -15,20 +15,20 @@ namespace
 
 		uint32_t samplerIncrementSize = 0;
 
-		Core::D3D12Core::DescriptorHeap* resourceHeap = nullptr;
+		Gear::Core::D3D12Core::DescriptorHeap* resourceHeap = nullptr;
 
-		Core::D3D12Core::DescriptorHeap* samplerHeap = nullptr;
+		Gear::Core::D3D12Core::DescriptorHeap* samplerHeap = nullptr;
 
-		Core::D3D12Core::DescriptorHeap* renderTargetHeap = nullptr;
+		Gear::Core::D3D12Core::DescriptorHeap* renderTargetHeap = nullptr;
 
-		Core::D3D12Core::DescriptorHeap* depthStencilHeap = nullptr;
+		Gear::Core::D3D12Core::DescriptorHeap* depthStencilHeap = nullptr;
 
-		Core::D3D12Core::DescriptorHeap* nonShaderVisibleResourceHeap = nullptr;
+		Gear::Core::D3D12Core::DescriptorHeap* nonShaderVisibleResourceHeap = nullptr;
 
 	}pvt;
 }
 
-void Core::GlobalDescriptorHeap::Internal::initialize()
+void Gear::Core::GlobalDescriptorHeap::Internal::initialize()
 {
 	pvt.resourceIncrementSize = GraphicsDevice::get()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
@@ -51,7 +51,7 @@ void Core::GlobalDescriptorHeap::Internal::initialize()
 	LOGSUCCESS(L"create", LogColor::brightMagenta, L"global descriptor heaps", LogColor::defaultColor, L"succeeded");
 }
 
-void Core::GlobalDescriptorHeap::Internal::release()
+void Gear::Core::GlobalDescriptorHeap::Internal::release()
 {
 	if (pvt.resourceHeap)
 	{
@@ -79,47 +79,47 @@ void Core::GlobalDescriptorHeap::Internal::release()
 	}
 }
 
-Core::D3D12Core::DescriptorHeap* Core::GlobalDescriptorHeap::getResourceHeap()
+Gear::Core::D3D12Core::DescriptorHeap* Gear::Core::GlobalDescriptorHeap::getResourceHeap()
 {
 	return pvt.resourceHeap;
 }
 
-Core::D3D12Core::DescriptorHeap* Core::GlobalDescriptorHeap::getSamplerHeap()
+Gear::Core::D3D12Core::DescriptorHeap* Gear::Core::GlobalDescriptorHeap::getSamplerHeap()
 {
 	return pvt.samplerHeap;
 }
 
-Core::D3D12Core::DescriptorHeap* Core::GlobalDescriptorHeap::getRenderTargetHeap()
+Gear::Core::D3D12Core::DescriptorHeap* Gear::Core::GlobalDescriptorHeap::getRenderTargetHeap()
 {
 	return pvt.renderTargetHeap;
 }
 
-Core::D3D12Core::DescriptorHeap* Core::GlobalDescriptorHeap::getDepthStencilHeap()
+Gear::Core::D3D12Core::DescriptorHeap* Gear::Core::GlobalDescriptorHeap::getDepthStencilHeap()
 {
 	return pvt.depthStencilHeap;
 }
 
-Core::D3D12Core::DescriptorHeap* Core::GlobalDescriptorHeap::getNonShaderVisibleResourceHeap()
+Gear::Core::D3D12Core::DescriptorHeap* Gear::Core::GlobalDescriptorHeap::getNonShaderVisibleResourceHeap()
 {
 	return pvt.nonShaderVisibleResourceHeap;
 }
 
-uint32_t Core::GlobalDescriptorHeap::getResourceIncrementSize()
+uint32_t Gear::Core::GlobalDescriptorHeap::getResourceIncrementSize()
 {
 	return pvt.resourceIncrementSize;
 }
 
-uint32_t Core::GlobalDescriptorHeap::getRenderTargetIncrementSize()
+uint32_t Gear::Core::GlobalDescriptorHeap::getRenderTargetIncrementSize()
 {
 	return pvt.renderTargetIncrementSize;
 }
 
-uint32_t Core::GlobalDescriptorHeap::getDepthStencilIncrementSize()
+uint32_t Gear::Core::GlobalDescriptorHeap::getDepthStencilIncrementSize()
 {
 	return pvt.depthStencilIncrementSize;
 }
 
-uint32_t Core::GlobalDescriptorHeap::getSamplerIncrementSize()
+uint32_t Gear::Core::GlobalDescriptorHeap::getSamplerIncrementSize()
 {
 	return pvt.samplerIncrementSize;
 }

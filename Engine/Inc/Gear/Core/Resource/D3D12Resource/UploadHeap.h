@@ -1,49 +1,52 @@
 ﻿#pragma once
 
-#ifndef _CORE_RESOURCE_D3D12RESOURCE_UPLOADHEAP_H_
-#define _CORE_RESOURCE_D3D12RESOURCE_UPLOADHEAP_H_
+#ifndef _GEAR_CORE_RESOURCE_D3D12RESOURCE_UPLOADHEAP_H_
+#define _GEAR_CORE_RESOURCE_D3D12RESOURCE_UPLOADHEAP_H_
 
 #include"D3D12ResourceBase.h"
 
-namespace Core
+namespace Gear
 {
-	namespace Resource
+	namespace Core
 	{
-		namespace D3D12Resource
+		namespace Resource
 		{
-			class UploadHeap :public D3D12ResourceBase
+			namespace D3D12Resource
 			{
-			public:
+				class UploadHeap :public D3D12ResourceBase
+				{
+				public:
 
-				UploadHeap() = delete;
+					UploadHeap() = delete;
 
-				UploadHeap(const UploadHeap&) = delete;
+					UploadHeap(const UploadHeap&) = delete;
 
-				void operator=(const UploadHeap&) = delete;
+					void operator=(const UploadHeap&) = delete;
 
-				UploadHeap(const uint64_t size, const D3D12_HEAP_FLAGS flags = D3D12_HEAP_FLAG_NONE);
+					UploadHeap(const uint64_t size, const D3D12_HEAP_FLAGS flags = D3D12_HEAP_FLAG_NONE);
 
-				UploadHeap(UploadHeap* const);
+					UploadHeap(UploadHeap* const);
 
-				virtual ~UploadHeap();
+					virtual ~UploadHeap();
 
-				void* map() const;
+					void* map() const;
 
-				void unmap() const;
+					void unmap() const;
 
-				void update(const void* const data, const uint64_t size) const;
+					void update(const void* const data, const uint64_t size) const;
 
-				void updateGlobalStates() override;
+					void updateGlobalStates() override;
 
-				void resetInternalStates() override;
+					void resetInternalStates() override;
 
-			protected:
+				protected:
 
-				void resetTransitionStates() override;
+					void resetTransitionStates() override;
 
-			};
+				};
+			}
 		}
 	}
 }
 
-#endif // !_CORE_RESOURCE_D3D12RESOURCE_UPLOADHEAP_H_
+#endif // !_GEAR_CORE_RESOURCE_D3D12RESOURCE_UPLOADHEAP_H_

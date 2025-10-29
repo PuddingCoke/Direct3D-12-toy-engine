@@ -9,14 +9,14 @@ namespace
 	struct HDRClampEffectPrivate
 	{
 
-		Core::D3D12Core::Shader* hdrClampShader;
+		Gear::Core::D3D12Core::Shader* hdrClampShader;
 
 		ComPtr<ID3D12PipelineState> hdrClampState;
 
 	}pvt;
 }
 
-void Core::GlobalEffect::HDRClampEffect::process(GraphicsContext* const context, Resource::TextureRenderView* const inOutTexture)
+void Gear::Core::GlobalEffect::HDRClampEffect::process(GraphicsContext* const context, Resource::TextureRenderView* const inOutTexture)
 {
 	if (inOutTexture->getTexture()->getFormat() == DXGI_FORMAT_R16G16B16A16_FLOAT)
 	{
@@ -32,16 +32,16 @@ void Core::GlobalEffect::HDRClampEffect::process(GraphicsContext* const context,
 	}
 }
 
-void Core::GlobalEffect::HDRClampEffect::Internal::initialize()
+void Gear::Core::GlobalEffect::HDRClampEffect::Internal::initialize()
 {
 	pvt.hdrClampShader = new D3D12Core::Shader(g_HDRClampCSBytes, sizeof(g_HDRClampCSBytes));
 
-	Core::PipelineStateHelper::createComputeState(&pvt.hdrClampState, pvt.hdrClampShader);
+	Gear::Core::PipelineStateHelper::createComputeState(&pvt.hdrClampState, pvt.hdrClampShader);
 
 	LOGSUCCESS(L"create", LogColor::brightMagenta, L"HDRClampEffect", LogColor::defaultColor, L"succeeded");
 }
 
-void Core::GlobalEffect::HDRClampEffect::Internal::release()
+void Gear::Core::GlobalEffect::HDRClampEffect::Internal::release()
 {
 	if (pvt.hdrClampShader)
 	{

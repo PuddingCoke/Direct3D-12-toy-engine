@@ -1,7 +1,7 @@
 ﻿#pragma once
 
-#ifndef _GLOBALEFFECTHEADER_H_
-#define _GLOBALEFFECTHEADER_H_
+#ifndef _GEAR_CORE_GLOBALEFFECT_GLOBALEFFECTHEADER_H_
+#define _GEAR_CORE_GLOBALEFFECT_GLOBALEFFECTHEADER_H_
 
 #include<Gear/Core/ResourceManager.h>
 
@@ -9,4 +9,4 @@
 
 #include<Gear/Core/PipelineStateHelper.h>
 
-#endif // !_GLOBALEFFECTHEADER_H_
+#endif // !_GEAR_CORE_GLOBALEFFECT_GLOBALEFFECTHEADER_H_

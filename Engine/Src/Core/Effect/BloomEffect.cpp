@@ -16,9 +16,9 @@
 
 #include<Gear/CompiledShaders/BloomKarisAveragePS.h>
 
-Core::Effect::BloomEffect::BloomEffect(GraphicsContext* const context, const uint32_t width, const uint32_t height, ResourceManager* const resManager) :
+Gear::Core::Effect::BloomEffect::BloomEffect(GraphicsContext* const context, const uint32_t width, const uint32_t height, ResourceManager* const resManager) :
 	EffectBase(context, width, height, DXGI_FORMAT_R16G16B16A16_FLOAT),
-	lensDirtTexture(resManager->createTextureRenderView(Utils::File::getRootFolder() + L"bloom_dirt_mask.png", true)),
+	lensDirtTexture(resManager->createTextureRenderView(Gear::Utils::File::getRootFolder() + L"bloom_dirt_mask.png", true)),
 	filteredTexture(ResourceManager::createTextureRenderView(width, height, DXGI_FORMAT_R16G16B16A16_FLOAT, 1, 1, false, true,
 		DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_R16G16B16A16_FLOAT))
 {
@@ -125,7 +125,7 @@ Core::Effect::BloomEffect::BloomEffect(GraphicsContext* const context, const uin
 	PipelineStateHelper::createComputeState(&bloomVBlurState, bloomVBlur);
 }
 
-Core::Effect::BloomEffect::~BloomEffect()
+Gear::Core::Effect::BloomEffect::~BloomEffect()
 {
 	for (uint32_t i = 0; i < blurSteps; i++)
 	{
@@ -146,7 +146,7 @@ Core::Effect::BloomEffect::~BloomEffect()
 	delete bloomKarisAverage;
 }
 
-Core::Resource::TextureRenderView* Core::Effect::BloomEffect::process(Resource::TextureRenderView* const inputTexture) const
+Gear::Core::Resource::TextureRenderView* Gear::Core::Effect::BloomEffect::process(Resource::TextureRenderView* const inputTexture) const
 {
 	context->setTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
@@ -247,7 +247,7 @@ Core::Resource::TextureRenderView* Core::Effect::BloomEffect::process(Resource::
 	return outputTexture;
 }
 
-void Core::Effect::BloomEffect::imGUICall()
+void Gear::Core::Effect::BloomEffect::imGUICall()
 {
 	ImGui::Begin("Bloom Effect");
 	ImGui::SliderFloat("Exposure", &bloomParam.exposure, 0.0f, 4.f);
@@ -258,49 +258,49 @@ void Core::Effect::BloomEffect::imGUICall()
 	ImGui::End();
 }
 
-void Core::Effect::BloomEffect::setExposure(const float exposure)
+void Gear::Core::Effect::BloomEffect::setExposure(const float exposure)
 {
 	bloomParam.exposure = exposure;
 }
 
-void Core::Effect::BloomEffect::setGamma(const float gamma)
+void Gear::Core::Effect::BloomEffect::setGamma(const float gamma)
 {
 	bloomParam.gamma = gamma;
 }
 
-void Core::Effect::BloomEffect::setThreshold(const float threshold)
+void Gear::Core::Effect::BloomEffect::setThreshold(const float threshold)
 {
 	bloomParam.threshold = threshold;
 }
 
-void Core::Effect::BloomEffect::setIntensity(const float intensity)
+void Gear::Core::Effect::BloomEffect::setIntensity(const float intensity)
 {
 	bloomParam.intensity = intensity;
 }
 
-void Core::Effect::BloomEffect::setSoftThreshold(const float softThreshold)
+void Gear::Core::Effect::BloomEffect::setSoftThreshold(const float softThreshold)
 {
 	bloomParam.softThreshold = softThreshold;
 }
 
-float Core::Effect::BloomEffect::getExposure() const
+float Gear::Core::Effect::BloomEffect::getExposure() const
 {
 	return bloomParam.exposure;
 }
 
-float Core::Effect::BloomEffect::getGamma() const
+float Gear::Core::Effect::BloomEffect::getGamma() const
 {
 	return bloomParam.gamma;
 }
 
-void Core::Effect::BloomEffect::updateCurve(const uint32_t index)
+void Gear::Core::Effect::BloomEffect::updateCurve(const uint32_t index)
 {
-	blurParam[index].weight[0] = Utils::Math::gauss(blurParam[index].sigma, 0.f);
+	blurParam[index].weight[0] = Gear::Utils::Math::gauss(blurParam[index].sigma, 0.f);
 
 	for (uint32_t i = 1; i < (iteration[index] - 1) * 2 + 1; i += 2)
 	{
-		const float g1 = Utils::Math::gauss(blurParam[index].sigma, (float)i);
-		const float g2 = Utils::Math::gauss(blurParam[index].sigma, (float)(i + 1));
+		const float g1 = Gear::Utils::Math::gauss(blurParam[index].sigma, (float)i);
+		const float g2 = Gear::Utils::Math::gauss(blurParam[index].sigma, (float)(i + 1));
 		blurParam[index].weight[(i + 1) / 2] = g1 + g2;
 		blurParam[index].offset[(i + 1) / 2] = (g1 * i + g2 * (i + 1)) / (g1 + g2);
 	}
