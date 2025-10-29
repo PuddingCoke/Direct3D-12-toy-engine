@@ -14,21 +14,21 @@ Gear::Core::Effect::FXAAEffect::FXAAEffect(GraphicsContext* const context, const
 	fxaaPS = new D3D12Core::Shader(g_FXAABytes, sizeof(g_FXAABytes));
 
 	{
-		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = Gear::Core::PipelineStateHelper::getDefaultFullScreenState();
+		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = PipelineStateHelper::getDefaultFullScreenState();
 		desc.PS = colorToColorLumaPS->getByteCode();
 		desc.NumRenderTargets = 1;
 		desc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
 
-		Gear::Core::GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&colorToColorLumaState));
+		GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&colorToColorLumaState));
 	}
 
 	{
-		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = Gear::Core::PipelineStateHelper::getDefaultFullScreenState();
+		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = PipelineStateHelper::getDefaultFullScreenState();
 		desc.PS = fxaaPS->getByteCode();
 		desc.NumRenderTargets = 1;
 		desc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
 
-		Gear::Core::GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&fxaaState));
+		GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&fxaaState));
 	}
 }
 
@@ -45,7 +45,7 @@ Gear::Core::Resource::TextureRenderView* Gear::Core::Effect::FXAAEffect::process
 
 	context->setViewportSimple(width, height);
 
-	context->setTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	context->setPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	context->setRenderTargets({ colorLumaTexture->getRTVMipHandle(0) });
 
@@ -59,7 +59,7 @@ Gear::Core::Resource::TextureRenderView* Gear::Core::Effect::FXAAEffect::process
 
 	context->setViewportSimple(width, height);
 
-	context->setTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	context->setPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	context->setRenderTargets({ outputTexture->getRTVMipHandle(0) });
 

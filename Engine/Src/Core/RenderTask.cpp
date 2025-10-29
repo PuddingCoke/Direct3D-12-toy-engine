@@ -7,7 +7,7 @@ Gear::Core::RenderTask::RenderTask() :
 	context(resManager->getGraphicsContext()),
 	taskCompleted(true),
 	isRunning(true),
-	workerThread(std::thread(&Gear::Core::RenderTask::workerLoop, this))
+	workerThread(std::thread(&RenderTask::workerLoop, this))
 {
 	context->begin();
 }

@@ -36,20 +36,20 @@ Gear::Core::Gear2D::PrimitiveBatch::PrimitiveBatch(const DXGI_FORMAT format, Gra
 			{"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 8, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
 		};
 
-		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = Gear::Core::PipelineStateHelper::getDefaultGraphicsDesc();
+		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = PipelineStateHelper::getDefaultGraphicsDesc();
 		desc.InputLayout = { layout,_countof(layout) };
 		desc.VS = lineVS->getByteCode();
 		desc.GS = lineGS->getByteCode();
 		desc.PS = primitivePS->getByteCode();
-		desc.RasterizerState = Gear::Core::PipelineStateHelper::rasterCullBack;
-		desc.BlendState = Gear::Core::PipelineStateHelper::blendDefault;
+		desc.RasterizerState = PipelineStateHelper::rasterCullBack;
+		desc.BlendState = PipelineStateHelper::blendDefault;
 		desc.DepthStencilState.DepthEnable = FALSE;
 		desc.DepthStencilState.StencilEnable = FALSE;
 		desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE;
 		desc.NumRenderTargets = 1;
 		desc.RTVFormats[0] = format;
 
-		Gear::Core::GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&lineState));
+		GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&lineState));
 	}
 
 	{
@@ -60,20 +60,20 @@ Gear::Core::Gear2D::PrimitiveBatch::PrimitiveBatch(const DXGI_FORMAT format, Gra
 			{"COLOR",0,DXGI_FORMAT_R32G32B32A32_FLOAT,0,12,D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA,1}
 		};
 
-		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = Gear::Core::PipelineStateHelper::getDefaultGraphicsDesc();
+		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = PipelineStateHelper::getDefaultGraphicsDesc();
 		desc.InputLayout = { layout,_countof(layout) };
 		desc.VS = circleVS->getByteCode();
 		desc.GS = lineGS->getByteCode();
 		desc.PS = primitivePS->getByteCode();
-		desc.RasterizerState = Gear::Core::PipelineStateHelper::rasterCullBack;
-		desc.BlendState = Gear::Core::PipelineStateHelper::blendDefault;
+		desc.RasterizerState = PipelineStateHelper::rasterCullBack;
+		desc.BlendState = PipelineStateHelper::blendDefault;
 		desc.DepthStencilState.DepthEnable = FALSE;
 		desc.DepthStencilState.StencilEnable = FALSE;
 		desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE;
 		desc.NumRenderTargets = 1;
 		desc.RTVFormats[0] = format;
 
-		Gear::Core::GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&circleState));
+		GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&circleState));
 	}
 
 	{
@@ -84,20 +84,20 @@ Gear::Core::Gear2D::PrimitiveBatch::PrimitiveBatch(const DXGI_FORMAT format, Gra
 			{"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
 		};
 
-		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = Gear::Core::PipelineStateHelper::getDefaultGraphicsDesc();
+		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = PipelineStateHelper::getDefaultGraphicsDesc();
 		desc.InputLayout = { layout,_countof(layout) };
 		desc.VS = rcLineVS->getByteCode();
 		desc.GS = rcLineGS->getByteCode();
 		desc.PS = primitivePS->getByteCode();
-		desc.RasterizerState = Gear::Core::PipelineStateHelper::rasterCullBack;
-		desc.BlendState = Gear::Core::PipelineStateHelper::blendDefault;
+		desc.RasterizerState = PipelineStateHelper::rasterCullBack;
+		desc.BlendState = PipelineStateHelper::blendDefault;
 		desc.DepthStencilState.DepthEnable = FALSE;
 		desc.DepthStencilState.StencilEnable = FALSE;
 		desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE;
 		desc.NumRenderTargets = 1;
 		desc.RTVFormats[0] = format;
 
-		Gear::Core::GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&roundCapLineState));
+		GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&roundCapLineState));
 	}
 }
 
@@ -172,7 +172,7 @@ void Gear::Core::Gear2D::PrimitiveBatch::LineRenderer::end(GraphicsContext* cons
 
 		context->setPipelineState(pipelineState);
 
-		context->setTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
+		context->setPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
 
 		context->setVertexBuffers(0, { vertexBuffer->getVertexBuffer() });
 
@@ -224,7 +224,7 @@ void Gear::Core::Gear2D::PrimitiveBatch::CircleRenderer::end(GraphicsContext* co
 
 		context->setPipelineState(pipelineState);
 
-		context->setTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
+		context->setPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
 
 		context->setVertexBuffers(0, { vertexBuffer->getVertexBuffer() });
 
@@ -276,7 +276,7 @@ void Gear::Core::Gear2D::PrimitiveBatch::RCLineRenderer::end(GraphicsContext* co
 
 		context->setPipelineState(pipelineState);
 
-		context->setTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
+		context->setPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
 
 		context->setVertexBuffers(0, { vertexBuffer->getVertexBuffer() });
 

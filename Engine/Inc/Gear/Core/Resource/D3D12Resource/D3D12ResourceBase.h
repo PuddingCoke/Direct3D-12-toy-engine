@@ -17,13 +17,13 @@ namespace Gear
 		{
 			namespace D3D12Resource
 			{
-				//used for internal state,transition state,global state
+				//用于内部状态、转变状态、全局状态
 				constexpr uint32_t D3D12_RESOURCE_STATE_UNKNOWN = 0xFFFFFFFF;
 
-				//used for pending resource barrier
+				//用于待定资源屏障
 				constexpr uint32_t D3D12_TRANSITION_ALL_MIPLEVELS = 0xFFFFFFFF;
 
-				//does a have b?
+				//a是否拥有b？
 				constexpr bool bitFlagSubset(const uint32_t a, const uint32_t b)
 				{
 					return b && ((a & b) == b);

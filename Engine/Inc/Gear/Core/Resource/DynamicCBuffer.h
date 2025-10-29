@@ -11,9 +11,7 @@ namespace Gear
 	{
 		namespace Resource
 		{
-			/// <summary>
-			/// 如果需要使用，那么每帧必须都更新一次
-			/// </summary>
+			//如果需要使用，那么每帧必须都更新一次。
 			class DynamicCBuffer :public ImmutableCBuffer
 			{
 			public:

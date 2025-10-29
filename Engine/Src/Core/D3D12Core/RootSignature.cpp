@@ -8,7 +8,7 @@ Gear::Core::D3D12Core::RootSignature::RootSignature(const CD3DX12_VERSIONED_ROOT
 
 	D3DX12SerializeVersionedRootSignature(&desc, D3D_ROOT_SIGNATURE_VERSION_1_1, &signature, &error);
 
-	CHECKERROR(Gear::Core::GraphicsDevice::get()->CreateRootSignature(0, signature->GetBufferPointer(), signature->GetBufferSize(), IID_PPV_ARGS(&rootSignature)));
+	CHECKERROR(GraphicsDevice::get()->CreateRootSignature(0, signature->GetBufferPointer(), signature->GetBufferSize(), IID_PPV_ARGS(&rootSignature)));
 }
 
 Gear::Core::D3D12Core::RootSignature::~RootSignature()

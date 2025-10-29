@@ -4,14 +4,14 @@
 
 Gear::Core::D3D12Core::CommandList::CommandList(const D3D12_COMMAND_LIST_TYPE type)
 {
-	allocators = new ComPtr<ID3D12CommandAllocator>[Gear::Core::Graphics::getFrameBufferCount()];
+	allocators = new ComPtr<ID3D12CommandAllocator>[Graphics::getFrameBufferCount()];
 
-	for (uint32_t i = 0; i < Gear::Core::Graphics::getFrameBufferCount(); i++)
+	for (uint32_t i = 0; i < Graphics::getFrameBufferCount(); i++)
 	{
-		Gear::Core::GraphicsDevice::get()->CreateCommandAllocator(type, IID_PPV_ARGS(&allocators[i]));
+		GraphicsDevice::get()->CreateCommandAllocator(type, IID_PPV_ARGS(&allocators[i]));
 	}
 
-	Gear::Core::GraphicsDevice::get()->CreateCommandList(0, type, allocators[Gear::Core::Graphics::getFrameIndex()].Get(), nullptr, IID_PPV_ARGS(&commandList));
+	GraphicsDevice::get()->CreateCommandList(0, type, allocators[Graphics::getFrameIndex()].Get(), nullptr, IID_PPV_ARGS(&commandList));
 
 	commandList->Close();
 }
@@ -36,9 +36,9 @@ ID3D12GraphicsCommandList6* Gear::Core::D3D12Core::CommandList::get() const
 
 void Gear::Core::D3D12Core::CommandList::open() const
 {
-	allocators[Gear::Core::Graphics::getFrameIndex()].Get()->Reset();
+	allocators[Graphics::getFrameIndex()].Get()->Reset();
 
-	commandList->Reset(allocators[Gear::Core::Graphics::getFrameIndex()].Get(), nullptr);
+	commandList->Reset(allocators[Graphics::getFrameIndex()].Get(), nullptr);
 }
 
 void Gear::Core::D3D12Core::CommandList::close() const
@@ -216,14 +216,14 @@ void Gear::Core::D3D12Core::CommandList::setComputePipelineResources(const std::
 
 void Gear::Core::D3D12Core::CommandList::setDefRenderTarget() const
 {
-	const D3D12_CPU_DESCRIPTOR_HANDLE backBufferHandle = Gear::Core::Graphics::getBackBufferHandle();
+	const D3D12_CPU_DESCRIPTOR_HANDLE backBufferHandle = Graphics::getBackBufferHandle();
 
 	commandList->OMSetRenderTargets(1, &backBufferHandle, FALSE, nullptr);
 }
 
 void Gear::Core::D3D12Core::CommandList::clearDefRenderTarget(const float clearValue[4]) const
 {
-	commandList->ClearRenderTargetView(Gear::Core::Graphics::getBackBufferHandle(), clearValue, 0, nullptr);
+	commandList->ClearRenderTargetView(Graphics::getBackBufferHandle(), clearValue, 0, nullptr);
 }
 
 void Gear::Core::D3D12Core::CommandList::setRenderTargets(const std::initializer_list<Resource::D3D12Resource::RenderTargetDesc>& renderTargets, const Resource::D3D12Resource::DepthStencilDesc* const depthStencils)

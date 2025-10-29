@@ -17,7 +17,7 @@ __debugbreak();\
 
 Gear::Core::VideoEncoder::NvidiaEncoder::NvidiaEncoder(const uint32_t frameToEncode) :
 	Encoder(frameToEncode, outputVideoFormat), encoder(nullptr),
-	readbackHeap(new Resource::D3D12Resource::ReadbackHeap(2 * 4 * Gear::Core::Graphics::getWidth() * Gear::Core::Graphics::getHeight())),
+	readbackHeap(new Resource::D3D12Resource::ReadbackHeap(2 * 4 * Graphics::getWidth() * Graphics::getHeight())),
 	nvencAPI{ NV_ENCODE_API_FUNCTION_LIST_VER },
 	outputFenceValue(0)
 {
@@ -33,7 +33,7 @@ Gear::Core::VideoEncoder::NvidiaEncoder::NvidiaEncoder(const uint32_t frameToEnc
 	LOGENGINE(L"api create instance status", static_cast<uint32_t>(NVENCAPICreateInstance(&nvencAPI)));
 
 	NV_ENC_OPEN_ENCODE_SESSION_EX_PARAMS sessionParams = { NV_ENC_OPEN_ENCODE_SESSION_EX_PARAMS_VER };
-	sessionParams.device = Gear::Core::GraphicsDevice::get();
+	sessionParams.device = GraphicsDevice::get();
 	sessionParams.deviceType = NV_ENC_DEVICE_TYPE_DIRECTX;
 	sessionParams.apiVersion = NVENCAPI_VERSION;
 
@@ -66,12 +66,12 @@ Gear::Core::VideoEncoder::NvidiaEncoder::NvidiaEncoder(const uint32_t frameToEnc
 	encoderParams.encodeGUID = codec;
 	encoderParams.presetGUID = preset;
 	encoderParams.tuningInfo = tuningInfo;
-	encoderParams.encodeWidth = Gear::Core::Graphics::getWidth();
-	encoderParams.encodeHeight = Gear::Core::Graphics::getHeight();
-	encoderParams.darWidth = Gear::Core::Graphics::getWidth();
-	encoderParams.darHeight = Gear::Core::Graphics::getHeight();
-	encoderParams.maxEncodeWidth = Gear::Core::Graphics::getWidth();
-	encoderParams.maxEncodeHeight = Gear::Core::Graphics::getHeight();
+	encoderParams.encodeWidth = Graphics::getWidth();
+	encoderParams.encodeHeight = Graphics::getHeight();
+	encoderParams.darWidth = Graphics::getWidth();
+	encoderParams.darHeight = Graphics::getHeight();
+	encoderParams.maxEncodeWidth = Graphics::getWidth();
+	encoderParams.maxEncodeHeight = Graphics::getHeight();
 	encoderParams.frameRateNum = frameRate;
 	encoderParams.frameRateDen = 1;
 	encoderParams.enablePTD = 1;
@@ -80,7 +80,7 @@ Gear::Core::VideoEncoder::NvidiaEncoder::NvidiaEncoder(const uint32_t frameToEnc
 
 	NVENCCALL(nvencAPI.nvEncInitializeEncoder(encoder, &encoderParams));
 
-	Gear::Core::GraphicsDevice::get()->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&outputFence));
+	GraphicsDevice::get()->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&outputFence));
 
 	LOGENGINE(L"start encoding");
 
@@ -90,7 +90,7 @@ Gear::Core::VideoEncoder::NvidiaEncoder::NvidiaEncoder(const uint32_t frameToEnc
 	registerOutputResource.resourceType = NV_ENC_INPUT_RESOURCE_TYPE_DIRECTX;
 	registerOutputResource.resourceToRegister = readbackHeap->getResource();
 	registerOutputResource.subResourceIndex = 0;
-	registerOutputResource.width = 2 * 4 * Gear::Core::Graphics::getWidth() * Gear::Core::Graphics::getHeight();
+	registerOutputResource.width = 2 * 4 * Graphics::getWidth() * Graphics::getHeight();
 	registerOutputResource.height = 1;
 	registerOutputResource.pitch = 0;
 	registerOutputResource.pInputFencePoint = nullptr;
@@ -147,8 +147,8 @@ bool Gear::Core::VideoEncoder::NvidiaEncoder::encode(Resource::D3D12Resource::Te
 	registerInputResource.resourceType = NV_ENC_INPUT_RESOURCE_TYPE_DIRECTX;
 	registerInputResource.resourceToRegister = inputTexture->getResource();
 	registerInputResource.subResourceIndex = 0;
-	registerInputResource.width = Gear::Core::Graphics::getWidth();
-	registerInputResource.height = Gear::Core::Graphics::getHeight();
+	registerInputResource.width = Graphics::getWidth();
+	registerInputResource.height = Graphics::getHeight();
 	registerInputResource.pitch = 0;
 	registerInputResource.pInputFencePoint = nullptr;
 
@@ -186,9 +186,9 @@ bool Gear::Core::VideoEncoder::NvidiaEncoder::encode(Resource::D3D12Resource::Te
 
 	picParams.bufferFmt = bufferFormat;
 
-	picParams.inputWidth = Gear::Core::Graphics::getWidth();
+	picParams.inputWidth = Graphics::getWidth();
 
-	picParams.inputHeight = Gear::Core::Graphics::getHeight();
+	picParams.inputHeight = Graphics::getHeight();
 
 	picParams.completionEvent = nullptr;
 

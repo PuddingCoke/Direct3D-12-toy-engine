@@ -11,11 +11,11 @@ Gear::FPSCamera::FPSCamera(const DirectX::XMVECTOR& eye, const DirectX::XMVECTOR
 {
 	this->lookDir = DirectX::XMVector3Normalize(this->lookDir);
 
-	moveEventID = Gear::Input::Mouse::addMoveEvent([this]()
+	moveEventID = Input::Mouse::addMoveEvent([this]()
 		{
-			if (Gear::Input::Mouse::getLeftDown())
+			if (Input::Mouse::getLeftDown())
 			{
-				const DirectX::XMMATRIX rotMat = DirectX::XMMatrixRotationAxis(this->up, Gear::Input::Mouse::getDX() / 120.f);
+				const DirectX::XMMATRIX rotMat = DirectX::XMMatrixRotationAxis(this->up, Input::Mouse::getDX() / 120.f);
 
 				this->lookDir = DirectX::XMVector3Transform(this->lookDir, rotMat);
 
@@ -25,17 +25,17 @@ Gear::FPSCamera::FPSCamera(const DirectX::XMVECTOR& eye, const DirectX::XMVECTOR
 
 				DirectX::XMStoreFloat(&lookUpAngle, DirectX::XMVector3AngleBetweenNormals(this->lookDir, this->up));
 
-				const float destAngle = lookUpAngle - Gear::Input::Mouse::getDY() / 120.f;
+				const float destAngle = lookUpAngle - Input::Mouse::getDY() / 120.f;
 
-				float rotAngle = -Gear::Input::Mouse::getDY() / 120.f;
+				float rotAngle = -Input::Mouse::getDY() / 120.f;
 
-				if (destAngle > Gear::Utils::Math::pi - Gear::Core::MainCamera::epsilon)
+				if (destAngle > Utils::Math::pi - Core::MainCamera::epsilon)
 				{
-					rotAngle = Gear::Utils::Math::pi - Gear::Core::MainCamera::epsilon - lookUpAngle;
+					rotAngle = Utils::Math::pi - Core::MainCamera::epsilon - lookUpAngle;
 				}
-				else if (destAngle < Gear::Core::MainCamera::epsilon)
+				else if (destAngle < Core::MainCamera::epsilon)
 				{
-					rotAngle = Gear::Core::MainCamera::epsilon - lookUpAngle;
+					rotAngle = Core::MainCamera::epsilon - lookUpAngle;
 				}
 
 				const DirectX::XMMATRIX lookDirRotMat = DirectX::XMMatrixRotationAxis(upCrossLookDir, rotAngle);
@@ -47,34 +47,34 @@ Gear::FPSCamera::FPSCamera(const DirectX::XMVECTOR& eye, const DirectX::XMVECTOR
 
 Gear::FPSCamera::~FPSCamera()
 {
-	Gear::Input::Mouse::removeMoveEvent(moveEventID);
+	Input::Mouse::removeMoveEvent(moveEventID);
 }
 
 void Gear::FPSCamera::applyInput(const float dt)
 {
-	if (Gear::Input::Keyboard::getKeyDown(Gear::Input::Keyboard::W))
+	if (Input::Keyboard::getKeyDown(Input::Keyboard::W))
 	{
 		eye = DirectX::XMVectorAdd(eye, DirectX::XMVectorScale(lookDir, dt * moveSpeed));
 	}
 
-	if (Gear::Input::Keyboard::getKeyDown(Gear::Input::Keyboard::S))
+	if (Input::Keyboard::getKeyDown(Input::Keyboard::S))
 	{
 		eye = DirectX::XMVectorAdd(eye, DirectX::XMVectorScale(lookDir, -dt * moveSpeed));
 	}
 
-	if (Gear::Input::Keyboard::getKeyDown(Gear::Input::Keyboard::A))
+	if (Input::Keyboard::getKeyDown(Input::Keyboard::A))
 	{
 		const DirectX::XMVECTOR upCrossLookDir = DirectX::XMVector3Normalize(DirectX::XMVector3Cross(up, lookDir));
 		eye = DirectX::XMVectorAdd(eye, DirectX::XMVectorScale(upCrossLookDir, -dt * moveSpeed));
 	}
 
-	if (Gear::Input::Keyboard::getKeyDown(Gear::Input::Keyboard::D))
+	if (Input::Keyboard::getKeyDown(Input::Keyboard::D))
 	{
 		const DirectX::XMVECTOR upCrossLookDir = DirectX::XMVector3Normalize(DirectX::XMVector3Cross(up, lookDir));
 		eye = DirectX::XMVectorAdd(eye, DirectX::XMVectorScale(upCrossLookDir, dt * moveSpeed));
 	}
 
-	Gear::Core::MainCamera::setView(eye, DirectX::XMVectorAdd(eye, lookDir), up);
+	Core::MainCamera::setView(eye, DirectX::XMVectorAdd(eye, lookDir), up);
 }
 
 DirectX::XMVECTOR Gear::FPSCamera::getEyePos() const

@@ -13,7 +13,7 @@ namespace Gear
 	{
 		namespace Resource
 		{
-			//versatile texture
+			//多用途纹理
 			//texturecubearray
 			//texturecube
 			//texture2darray

@@ -36,7 +36,7 @@ Gear::Core::VideoEncoder::Encoder::Encoder(const uint32_t frameToEncode, const O
 
 	LOGENGINE(L"frame to encode", frameToEncode);
 
-	MFSetAttributeSize(mediaType.Get(), MF_MT_FRAME_SIZE, Gear::Core::Graphics::getWidth(), Gear::Core::Graphics::getHeight());
+	MFSetAttributeSize(mediaType.Get(), MF_MT_FRAME_SIZE, Graphics::getWidth(), Graphics::getHeight());
 
 	MFSetAttributeRatio(mediaType.Get(), MF_MT_FRAME_RATE, frameRate, 1);
 

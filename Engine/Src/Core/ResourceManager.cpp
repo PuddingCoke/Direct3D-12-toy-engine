@@ -22,14 +22,14 @@
 
 Gear::Core::ResourceManager::ResourceManager() :
 	context(new GraphicsContext()), commandList(context->getCommandList()),
-	d3d12Resources(new std::vector<Resource::D3D12Resource::D3D12ResourceBase*>[Gear::Core::Graphics::getFrameBufferCount()]),
-	resources(new std::vector<Resource::ResourceBase*>[Gear::Core::Graphics::getFrameBufferCount()])
+	d3d12Resources(new std::vector<Resource::D3D12Resource::D3D12ResourceBase*>[Graphics::getFrameBufferCount()]),
+	resources(new std::vector<Resource::ResourceBase*>[Graphics::getFrameBufferCount()])
 {
 }
 
 Gear::Core::ResourceManager::~ResourceManager()
 {
-	for (uint32_t i = 0; i < Gear::Core::Graphics::getFrameBufferCount(); i++)
+	for (uint32_t i = 0; i < Graphics::getFrameBufferCount(); i++)
 	{
 		for (const Resource::D3D12Resource::D3D12ResourceBase* const d3d12Resource : d3d12Resources[i])
 		{
@@ -55,29 +55,29 @@ Gear::Core::ResourceManager::~ResourceManager()
 
 void Gear::Core::ResourceManager::deferredRelease(Resource::D3D12Resource::D3D12ResourceBase* const d3d12Resource)
 {
-	d3d12Resources[Gear::Core::Graphics::getFrameIndex()].push_back(d3d12Resource);
+	d3d12Resources[Graphics::getFrameIndex()].push_back(d3d12Resource);
 }
 
 void Gear::Core::ResourceManager::deferredRelease(Resource::ResourceBase* const resource)
 {
-	resources[Gear::Core::Graphics::getFrameIndex()].push_back(resource);
+	resources[Graphics::getFrameIndex()].push_back(resource);
 }
 
 void Gear::Core::ResourceManager::cleanTransientResources()
 {
-	for (const Resource::D3D12Resource::D3D12ResourceBase* const d3d12Resource : d3d12Resources[Gear::Core::Graphics::getFrameIndex()])
+	for (const Resource::D3D12Resource::D3D12ResourceBase* const d3d12Resource : d3d12Resources[Graphics::getFrameIndex()])
 	{
 		delete d3d12Resource;
 	}
 
-	d3d12Resources[Gear::Core::Graphics::getFrameIndex()].clear();
+	d3d12Resources[Graphics::getFrameIndex()].clear();
 
-	for (const Resource::ResourceBase* const resource : resources[Gear::Core::Graphics::getFrameIndex()])
+	for (const Resource::ResourceBase* const resource : resources[Graphics::getFrameIndex()])
 	{
 		delete resource;
 	}
 
-	resources[Gear::Core::Graphics::getFrameIndex()].clear();
+	resources[Graphics::getFrameIndex()].clear();
 }
 
 Gear::Core::GraphicsContext* Gear::Core::ResourceManager::getGraphicsContext() const
@@ -109,7 +109,7 @@ Gear::Core::Resource::D3D12Resource::Texture* Gear::Core::ResourceManager::creat
 {
 	Resource::D3D12Resource::Texture* texture = nullptr;
 
-	const std::wstring fileExtension = Gear::Utils::File::getExtension(filePath);
+	const std::wstring fileExtension = Utils::File::getExtension(filePath);
 
 	if (isTextureCube)
 	{
@@ -124,7 +124,7 @@ Gear::Core::Resource::D3D12Resource::Texture* Gear::Core::ResourceManager::creat
 
 		ComPtr<ID3D12Resource> tex;
 
-		CHECKERROR(DirectX::LoadWICTextureFromFileEx(Gear::Core::GraphicsDevice::get(), filePath.c_str(), 0, resFlags, DirectX::WIC_LOADER_DEFAULT, &tex, decodedData, subresource));
+		CHECKERROR(DirectX::LoadWICTextureFromFileEx(GraphicsDevice::get(), filePath.c_str(), 0, resFlags, DirectX::WIC_LOADER_DEFAULT, &tex, decodedData, subresource));
 
 		texture = new Resource::D3D12Resource::Texture(tex, true, D3D12_RESOURCE_STATE_COPY_DEST);
 
@@ -144,7 +144,7 @@ Gear::Core::Resource::D3D12Resource::Texture* Gear::Core::ResourceManager::creat
 
 		ComPtr<ID3D12Resource> tex;
 
-		CHECKERROR(DirectX::LoadDDSTextureFromFileEx(Gear::Core::GraphicsDevice::get(), filePath.c_str(), 0, resFlags, DirectX::DDS_LOADER_DEFAULT, &tex, decodedData, subresources, nullptr, isTextureCube));
+		CHECKERROR(DirectX::LoadDDSTextureFromFileEx(GraphicsDevice::get(), filePath.c_str(), 0, resFlags, DirectX::DDS_LOADER_DEFAULT, &tex, decodedData, subresources, nullptr, isTextureCube));
 
 		texture = new Resource::D3D12Resource::Texture(tex, true, D3D12_RESOURCE_STATE_COPY_DEST);
 
@@ -184,7 +184,7 @@ Gear::Core::Resource::D3D12Resource::Texture* Gear::Core::ResourceManager::creat
 
 		ComPtr<ID3D12Resource> tex;
 
-		CHECKERROR(DirectX::CreateTextureEx(Gear::Core::GraphicsDevice::get(), metadata, resFlags, DirectX::CREATETEX_DEFAULT, &tex));
+		CHECKERROR(DirectX::CreateTextureEx(GraphicsDevice::get(), metadata, resFlags, DirectX::CREATETEX_DEFAULT, &tex));
 
 		texture = new Resource::D3D12Resource::Texture(tex, true, D3D12_RESOURCE_STATE_COPY_DEST);
 
@@ -223,10 +223,10 @@ Gear::Core::Resource::D3D12Resource::Texture* Gear::Core::ResourceManager::creat
 		{
 			colors[i] =
 			{
-				static_cast<uint8_t>(Gear::Utils::Random::genUint() % 256u),
-				static_cast<uint8_t>(Gear::Utils::Random::genUint() % 256u),
-				static_cast<uint8_t>(Gear::Utils::Random::genUint() % 256u),
-				static_cast<uint8_t>(Gear::Utils::Random::genUint() % 256u)
+				static_cast<uint8_t>(Utils::Random::genUint() % 256u),
+				static_cast<uint8_t>(Utils::Random::genUint() % 256u),
+				static_cast<uint8_t>(Utils::Random::genUint() % 256u),
+				static_cast<uint8_t>(Utils::Random::genUint() % 256u)
 			};
 		}
 
@@ -258,10 +258,10 @@ Gear::Core::Resource::D3D12Resource::Texture* Gear::Core::ResourceManager::creat
 		{
 			colors[i] =
 			{
-				DirectX::PackedVector::XMConvertFloatToHalf(Gear::Utils::Random::genGauss()),
-				DirectX::PackedVector::XMConvertFloatToHalf(Gear::Utils::Random::genGauss()),
-				DirectX::PackedVector::XMConvertFloatToHalf(Gear::Utils::Random::genGauss()),
-				DirectX::PackedVector::XMConvertFloatToHalf(Gear::Utils::Random::genGauss())
+				DirectX::PackedVector::XMConvertFloatToHalf(Utils::Random::genGauss()),
+				DirectX::PackedVector::XMConvertFloatToHalf(Utils::Random::genGauss()),
+				DirectX::PackedVector::XMConvertFloatToHalf(Utils::Random::genGauss()),
+				DirectX::PackedVector::XMConvertFloatToHalf(Utils::Random::genGauss())
 			};
 		}
 
@@ -678,11 +678,11 @@ Gear::Core::Resource::TextureRenderView* Gear::Core::ResourceManager::createText
 
 	deferredRelease(equirectangularMap);
 
-	Gear::Core::GlobalEffect::HDRClampEffect::process(context, equirectangularMap);
+	GlobalEffect::HDRClampEffect::process(context, equirectangularMap);
 
 	DXGI_FORMAT resFormat = DXGI_FORMAT_UNKNOWN;
 
-	switch (Gear::Core::FMT::getByteSize(equirectangularMap->getTexture()->getFormat()))
+	switch (FMT::getByteSize(equirectangularMap->getTexture()->getFormat()))
 	{
 	case 4:
 		resFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -703,7 +703,7 @@ Gear::Core::Resource::TextureRenderView* Gear::Core::ResourceManager::createText
 
 	deferredRelease(cubeMap);
 
-	Gear::Core::GlobalEffect::LatLongMapToCubeMapEffect::process(context, equirectangularMap, cubeMap);
+	GlobalEffect::LatLongMapToCubeMapEffect::process(context, equirectangularMap, cubeMap);
 
 	bool stateTracking = true;
 

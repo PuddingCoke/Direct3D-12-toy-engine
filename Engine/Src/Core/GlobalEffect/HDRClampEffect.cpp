@@ -36,7 +36,7 @@ void Gear::Core::GlobalEffect::HDRClampEffect::Internal::initialize()
 {
 	pvt.hdrClampShader = new D3D12Core::Shader(g_HDRClampCSBytes, sizeof(g_HDRClampCSBytes));
 
-	Gear::Core::PipelineStateHelper::createComputeState(&pvt.hdrClampState, pvt.hdrClampShader);
+	PipelineStateHelper::createComputeState(&pvt.hdrClampState, pvt.hdrClampShader);
 
 	LOGSUCCESS(L"create", LogColor::brightMagenta, L"HDRClampEffect", LogColor::defaultColor, L"succeeded");
 }

@@ -486,7 +486,7 @@ protected:
 
 		context->setScissorRect(0, 0, Graphics::getWidth(), Graphics::getHeight());
 
-		context->setTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		context->setPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 		context->setRenderTargets({ originTexture->getRTVMipHandle(0) });
 
@@ -513,7 +513,7 @@ protected:
 
 		context->setScissorRect(0, 0, Graphics::getWidth(), Graphics::getHeight());
 
-		context->setTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		context->setPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 		context->setRenderTargets({ originTexture->getRTVMipHandle(0) }, &dsDesc);
 

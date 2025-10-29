@@ -27,9 +27,9 @@ Gear::Core::D3D12Core::DescriptorHandle Gear::Core::Resource::ResourceBase::getT
 	}
 #endif // _DEBUG
 	
-	D3D12Core::DescriptorHandle shaderVisibleHandle = Gear::Core::GlobalDescriptorHeap::getResourceHeap()->allocDynamicDescriptor(numSRVUAVCBVDescriptors);
+	D3D12Core::DescriptorHandle shaderVisibleHandle = GlobalDescriptorHeap::getResourceHeap()->allocDynamicDescriptor(numSRVUAVCBVDescriptors);
 
-	Gear::Core::GraphicsDevice::get()->CopyDescriptorsSimple(numSRVUAVCBVDescriptors, shaderVisibleHandle.getCPUHandle(), srvUAVCBVHandleStart, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	GraphicsDevice::get()->CopyDescriptorsSimple(numSRVUAVCBVDescriptors, shaderVisibleHandle.getCPUHandle(), srvUAVCBVHandleStart, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 	return shaderVisibleHandle;
 }

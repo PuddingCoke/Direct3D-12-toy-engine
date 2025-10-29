@@ -18,7 +18,7 @@
 
 Gear::Core::Effect::BloomEffect::BloomEffect(GraphicsContext* const context, const uint32_t width, const uint32_t height, ResourceManager* const resManager) :
 	EffectBase(context, width, height, DXGI_FORMAT_R16G16B16A16_FLOAT),
-	lensDirtTexture(resManager->createTextureRenderView(Gear::Utils::File::getRootFolder() + L"bloom_dirt_mask.png", true)),
+	lensDirtTexture(resManager->createTextureRenderView(Utils::File::getRootFolder() + L"bloom_dirt_mask.png", true)),
 	filteredTexture(ResourceManager::createTextureRenderView(width, height, DXGI_FORMAT_R16G16B16A16_FLOAT, 1, 1, false, true,
 		DXGI_FORMAT_R16G16B16A16_FLOAT, DXGI_FORMAT_UNKNOWN, DXGI_FORMAT_R16G16B16A16_FLOAT))
 {
@@ -148,7 +148,7 @@ Gear::Core::Effect::BloomEffect::~BloomEffect()
 
 Gear::Core::Resource::TextureRenderView* Gear::Core::Effect::BloomEffect::process(Resource::TextureRenderView* const inputTexture) const
 {
-	context->setTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	context->setPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	context->setViewportSimple(width, height);
 	context->setPipelineState(bloomFilterState.Get());
@@ -295,12 +295,12 @@ float Gear::Core::Effect::BloomEffect::getGamma() const
 
 void Gear::Core::Effect::BloomEffect::updateCurve(const uint32_t index)
 {
-	blurParam[index].weight[0] = Gear::Utils::Math::gauss(blurParam[index].sigma, 0.f);
+	blurParam[index].weight[0] = Utils::Math::gauss(blurParam[index].sigma, 0.f);
 
 	for (uint32_t i = 1; i < (iteration[index] - 1) * 2 + 1; i += 2)
 	{
-		const float g1 = Gear::Utils::Math::gauss(blurParam[index].sigma, (float)i);
-		const float g2 = Gear::Utils::Math::gauss(blurParam[index].sigma, (float)(i + 1));
+		const float g1 = Utils::Math::gauss(blurParam[index].sigma, (float)i);
+		const float g2 = Utils::Math::gauss(blurParam[index].sigma, (float)(i + 1));
 		blurParam[index].weight[(i + 1) / 2] = g1 + g2;
 		blurParam[index].offset[(i + 1) / 2] = (g1 * i + g2 * (i + 1)) / (g1 + g2);
 	}

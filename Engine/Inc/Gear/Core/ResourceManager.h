@@ -29,8 +29,8 @@ namespace Gear
 			GAUSS
 		};
 
-		//a tool for creating both low level resource and high level resource
-		//some method is commandList dependent so you need a ResourceManager instance
+		//用于创建低级资源和高级资源
+		//使用数据创建资源会需要CommandList，因此会需要一个ResourceManager实例
 		class ResourceManager
 		{
 		public:

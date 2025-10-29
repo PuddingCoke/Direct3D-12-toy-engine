@@ -13,11 +13,11 @@ namespace Gear
 		{
 			struct AvailableLocation
 			{
-				//provide data pointer for later update
+				//提供数据指针用于更新内容
 				void* const dataPtr;
-				//provide gpu address to directly bind constant buffer
+				//提供GPU地址来直接绑定常量缓冲
 				const D3D12_GPU_VIRTUAL_ADDRESS gpuAddress;
-				//provide index to directly access resource in resource descriptor heap
+				//提供资源视图的位置来通过ResourceDescriptorHeap访问常量缓冲
 				const uint32_t descriptorIndex;
 			} requestLocation(const uint32_t regionIndex);
 		}

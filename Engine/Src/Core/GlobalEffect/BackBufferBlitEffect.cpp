@@ -20,9 +20,9 @@ void Gear::Core::GlobalEffect::BackBufferBlitEffect::process(GraphicsContext* co
 
 	context->setDefRenderTarget();
 
-	context->setViewportSimple(Gear::Core::Graphics::getWidth(), Gear::Core::Graphics::getHeight());
+	context->setViewportSimple(Graphics::getWidth(), Graphics::getHeight());
 
-	context->setTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	context->setPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	context->setPSConstants({ inputTexture->getAllSRVIndex() }, 0);
 
@@ -33,12 +33,12 @@ void Gear::Core::GlobalEffect::BackBufferBlitEffect::process(GraphicsContext* co
 
 void Gear::Core::GlobalEffect::BackBufferBlitEffect::Internal::initialize()
 {
-	D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = Gear::Core::PipelineStateHelper::getDefaultFullScreenState();
-	desc.PS = Gear::Core::GlobalShader::getFullScreenPS()->getByteCode();
+	D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = PipelineStateHelper::getDefaultFullScreenState();
+	desc.PS = GlobalShader::getFullScreenPS()->getByteCode();
 	desc.NumRenderTargets = 1;
-	desc.RTVFormats[0] = Gear::Core::Graphics::backBufferFormat;
+	desc.RTVFormats[0] = Graphics::backBufferFormat;
 
-	Gear::Core::GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&pvt.backBufferBlitState));
+	GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&pvt.backBufferBlitState));
 
 	LOGSUCCESS(L"create", LogColor::brightMagenta, L"BackBufferBlitEffect", LogColor::defaultColor, L"succeeded");
 }

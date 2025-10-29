@@ -92,7 +92,7 @@ namespace Gear
 
 			void setIndexBuffer(const Resource::D3D12Resource::IndexBufferDesc& indexBuffers) const;
 
-			void setTopology(const D3D12_PRIMITIVE_TOPOLOGY topology) const;
+			void setPrimitiveTopology(const D3D12_PRIMITIVE_TOPOLOGY topology) const;
 
 			void setViewport(const float width, const float height);
 

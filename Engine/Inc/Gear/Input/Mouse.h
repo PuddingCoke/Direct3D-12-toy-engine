@@ -34,22 +34,16 @@ namespace Gear
 
 			bool onScroll();
 
-			//do not record command here
 			uint64_t addMoveEvent(const std::function<void(void)>& func);
 
-			//do not record command here
 			uint64_t addLeftDownEvent(const std::function<void(void)>& func);
 
-			//do not record command here
 			uint64_t addRightDownEvent(const std::function<void(void)>& func);
 
-			//do not record command here
 			uint64_t addLeftUpEvent(const std::function<void(void)>& func);
 
-			//do not record command here
 			uint64_t addRightUpEvent(const std::function<void(void)>& func);
 
-			//do not record command here
 			uint64_t addScrollEvent(const std::function<void(void)>& func);
 
 			void removeMoveEvent(const uint64_t id);

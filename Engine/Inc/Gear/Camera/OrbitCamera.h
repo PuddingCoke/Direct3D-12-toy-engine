@@ -4,6 +4,7 @@
 #define _GEAR_ORBITCAMERA_H_
 
 #include<Gear/Utils/Math.h>
+
 namespace Gear
 {
 	class OrbitCamera

@@ -258,7 +258,7 @@ protected:
 
 		context->setPipelineState(fullScreenPipelineState.Get());
 
-		context->setTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		context->setPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 		context->transitionResources();
 

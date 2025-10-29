@@ -36,14 +36,14 @@ namespace Gear
 
 					struct TextureTransitionDesc
 					{
-						D3D12Resource::Texture* texture;
+						Texture* texture;
 						uint32_t mipSlice;
 					};
 
 					struct BufferTransitionDesc
 					{
-						D3D12Resource::Buffer* buffer;
-						D3D12Resource::Buffer* counterBuffer;
+						Buffer* buffer;
+						Buffer* counterBuffer;
 					};
 
 					union
@@ -55,27 +55,27 @@ namespace Gear
 
 				struct RenderTargetDesc
 				{
-					D3D12Resource::Texture* texture;
+					Texture* texture;
 					uint32_t mipSlice;
 					D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle;
 				};
 
 				struct DepthStencilDesc
 				{
-					D3D12Resource::Texture* texture;
+					Texture* texture;
 					uint32_t mipSlice;
 					D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle;
 				};
 
 				struct VertexBufferDesc
 				{
-					D3D12Resource::Buffer* buffer;
+					Buffer* buffer;
 					D3D12_VERTEX_BUFFER_VIEW vbv;
 				};
 
 				struct IndexBufferDesc
 				{
-					D3D12Resource::Buffer* buffer;
+					Buffer* buffer;
 					D3D12_INDEX_BUFFER_VIEW ibv;
 				};
 
@@ -89,13 +89,13 @@ namespace Gear
 
 					struct TextureClearDesc
 					{
-						D3D12Resource::Texture* texture;
+						Texture* texture;
 						uint32_t mipSlice;
 					};
 
 					struct BufferClearDesc
 					{
-						D3D12Resource::Buffer* buffer;
+						Buffer* buffer;
 					};
 
 					union

@@ -359,7 +359,7 @@ private:
 
 		context->setIndexBuffer(indexBuffer->getIndexBuffer());
 
-		context->setTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		context->setPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 		context->transitionResources();
 
@@ -375,7 +375,7 @@ private:
 
 		context->setViewportSimple(Graphics::getWidth(), Graphics::getHeight());
 
-		context->setTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		context->setPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 		context->setRenderTargets({ originTexture->getRTVMipHandle(0) }, {});
 
@@ -390,7 +390,7 @@ private:
 
 		context->setViewportSimple(Graphics::getWidth(), Graphics::getHeight());
 
-		context->setTopology(D3D_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST);
+		context->setPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST);
 
 		context->setVertexBuffers(0, { vertexBuffer->getVertexBuffer() });
 

@@ -45,7 +45,7 @@ void Gear::Core::GlobalEffect::LatLongMapToCubeMapEffect::process(GraphicsContex
 
 	context->setViewportSimple(outputTexture->getTexture()->getWidth(), outputTexture->getTexture()->getHeight());
 
-	context->setTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	context->setPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	context->setRenderTargets({ outputTexture->getRTVMipHandle(0) }, {});
 
@@ -65,11 +65,11 @@ void Gear::Core::GlobalEffect::LatLongMapToCubeMapEffect::Internal::initialize(R
 	pvt.equirectangularPS = new D3D12Core::Shader(g_EquirectangularPSBytes, sizeof(g_EquirectangularPSBytes));
 
 	{
-		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = Gear::Core::PipelineStateHelper::getDefaultGraphicsDesc();
+		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = PipelineStateHelper::getDefaultGraphicsDesc();
 		desc.InputLayout = {};
 		desc.VS = pvt.equirectangularVS->getByteCode();
 		desc.PS = pvt.equirectangularPS->getByteCode();
-		desc.RasterizerState = Gear::Core::PipelineStateHelper::rasterCullNone;
+		desc.RasterizerState = PipelineStateHelper::rasterCullNone;
 		desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
 		desc.DepthStencilState.DepthEnable = FALSE;
 		desc.DepthStencilState.StencilEnable = FALSE;
@@ -77,15 +77,15 @@ void Gear::Core::GlobalEffect::LatLongMapToCubeMapEffect::Internal::initialize(R
 		desc.NumRenderTargets = 1;
 		desc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
 
-		Gear::Core::GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&pvt.equirectangularR8State));
+		GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&pvt.equirectangularR8State));
 
 		desc.RTVFormats[0] = DXGI_FORMAT_R16G16B16A16_FLOAT;
 
-		Gear::Core::GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&pvt.equirectangularR16State));
+		GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&pvt.equirectangularR16State));
 
 		desc.RTVFormats[0] = DXGI_FORMAT_R32G32B32A32_FLOAT;
 
-		Gear::Core::GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&pvt.equirectangularR32State));
+		GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&pvt.equirectangularR32State));
 	}
 
 	{
@@ -115,7 +115,7 @@ void Gear::Core::GlobalEffect::LatLongMapToCubeMapEffect::Internal::initialize(R
 				{0.0f, 1.0f,  0.0f}
 			};
 
-			const DirectX::XMMATRIX projMatrix = DirectX::XMMatrixPerspectiveFovLH(Gear::Utils::Math::halfPi, 1.f, 0.1f, 10.f);
+			const DirectX::XMMATRIX projMatrix = DirectX::XMMatrixPerspectiveFovLH(Utils::Math::halfPi, 1.f, 0.1f, 10.f);
 
 			for (uint32_t i = 0; i < 6; i++)
 			{

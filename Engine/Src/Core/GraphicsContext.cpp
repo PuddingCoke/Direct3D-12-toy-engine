@@ -273,7 +273,7 @@ void Gear::Core::GraphicsContext::setIndexBuffer(const Resource::D3D12Resource::
 	commandList->setIndexBuffer(indexBuffer);
 }
 
-void Gear::Core::GraphicsContext::setTopology(const D3D12_PRIMITIVE_TOPOLOGY topology) const
+void Gear::Core::GraphicsContext::setPrimitiveTopology(const D3D12_PRIMITIVE_TOPOLOGY topology) const
 {
 	commandList->setPrimitiveTopology(topology);
 }
@@ -367,15 +367,15 @@ void Gear::Core::GraphicsContext::begin() const
 {
 	commandList->open();
 
-	commandList->setDescriptorHeap(Gear::Core::GlobalDescriptorHeap::getResourceHeap(), Gear::Core::GlobalDescriptorHeap::getSamplerHeap());
+	commandList->setDescriptorHeap(GlobalDescriptorHeap::getResourceHeap(), GlobalDescriptorHeap::getSamplerHeap());
 
-	commandList->setGraphicsRootSignature(Gear::Core::GlobalRootSignature::getGraphicsRootSignature());
+	commandList->setGraphicsRootSignature(GlobalRootSignature::getGraphicsRootSignature());
 
-	commandList->setComputeRootSignature(Gear::Core::GlobalRootSignature::getComputeRootSignature());
+	commandList->setComputeRootSignature(GlobalRootSignature::getComputeRootSignature());
 
-	commandList->setGraphicsRootConstantBuffer(0, Gear::Core::Graphics::getReservedGlobalCBuffer()->getGPUAddress());
+	commandList->setGraphicsRootConstantBuffer(0, Graphics::getReservedGlobalCBuffer()->getGPUAddress());
 
-	commandList->setComputeRootConstantBuffer(0, Gear::Core::Graphics::getReservedGlobalCBuffer()->getGPUAddress());
+	commandList->setComputeRootConstantBuffer(0, Graphics::getReservedGlobalCBuffer()->getGPUAddress());
 }
 
 Gear::Core::D3D12Core::CommandList* Gear::Core::GraphicsContext::getCommandList() const

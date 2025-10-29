@@ -25,11 +25,11 @@ Gear::Core::Resource::BufferView::BufferView(D3D12Resource::Buffer* const buffer
 
 		if (persistent)
 		{
-			descriptorHandle = Gear::Core::GlobalDescriptorHeap::getResourceHeap()->allocStaticDescriptor(numSRVUAVCBVDescriptors);
+			descriptorHandle = GlobalDescriptorHeap::getResourceHeap()->allocStaticDescriptor(numSRVUAVCBVDescriptors);
 		}
 		else
 		{
-			descriptorHandle = Gear::Core::GlobalDescriptorHeap::getNonShaderVisibleResourceHeap()->allocDynamicDescriptor(numSRVUAVCBVDescriptors);
+			descriptorHandle = GlobalDescriptorHeap::getNonShaderVisibleResourceHeap()->allocDynamicDescriptor(numSRVUAVCBVDescriptors);
 		}
 
 		srvUAVCBVHandleStart = descriptorHandle.getCPUHandle();
@@ -43,7 +43,7 @@ Gear::Core::Resource::BufferView::BufferView(D3D12Resource::Buffer* const buffer
 			if (isTypedBuffer)
 			{
 				desc.Format = format;
-				desc.Buffer.NumElements = static_cast<uint32_t>(size) / Gear::Core::FMT::getByteSize(format);
+				desc.Buffer.NumElements = static_cast<uint32_t>(size) / FMT::getByteSize(format);
 			}
 			else if (isStructuredBuffer)
 			{
@@ -57,7 +57,7 @@ Gear::Core::Resource::BufferView::BufferView(D3D12Resource::Buffer* const buffer
 				desc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_RAW;
 			}
 
-			Gear::Core::GraphicsDevice::get()->CreateShaderResourceView(buffer->getResource(), &desc, descriptorHandle.getCPUHandle());
+			GraphicsDevice::get()->CreateShaderResourceView(buffer->getResource(), &desc, descriptorHandle.getCPUHandle());
 
 			srvIndex = descriptorHandle.getCurrentIndex();
 
@@ -72,7 +72,7 @@ Gear::Core::Resource::BufferView::BufferView(D3D12Resource::Buffer* const buffer
 			if (isTypedBuffer)
 			{
 				desc.Format = format;
-				desc.Buffer.NumElements = static_cast<uint32_t>(size) / Gear::Core::FMT::getByteSize(format);
+				desc.Buffer.NumElements = static_cast<uint32_t>(size) / FMT::getByteSize(format);
 			}
 			else if (isStructuredBuffer)
 			{
@@ -88,11 +88,11 @@ Gear::Core::Resource::BufferView::BufferView(D3D12Resource::Buffer* const buffer
 
 			if (isStructuredBuffer)
 			{
-				Gear::Core::GraphicsDevice::get()->CreateUnorderedAccessView(buffer->getResource(), counterBuffer->getBuffer()->getResource(), &desc, descriptorHandle.getCPUHandle());
+				GraphicsDevice::get()->CreateUnorderedAccessView(buffer->getResource(), counterBuffer->getBuffer()->getResource(), &desc, descriptorHandle.getCPUHandle());
 			}
 			else
 			{
-				Gear::Core::GraphicsDevice::get()->CreateUnorderedAccessView(buffer->getResource(), nullptr, &desc, descriptorHandle.getCPUHandle());
+				GraphicsDevice::get()->CreateUnorderedAccessView(buffer->getResource(), nullptr, &desc, descriptorHandle.getCPUHandle());
 			}
 
 			uavIndex = descriptorHandle.getCurrentIndex();
@@ -103,15 +103,15 @@ Gear::Core::Resource::BufferView::BufferView(D3D12Resource::Buffer* const buffer
 			{
 				viewGPUHandle = descriptorHandle.getGPUHandle();
 
-				const D3D12Core::DescriptorHandle nonShaderVisibleHandle = Gear::Core::GlobalDescriptorHeap::getNonShaderVisibleResourceHeap()->allocStaticDescriptor(1);
+				const D3D12Core::DescriptorHandle nonShaderVisibleHandle = GlobalDescriptorHeap::getNonShaderVisibleResourceHeap()->allocStaticDescriptor(1);
 
 				if (isStructuredBuffer)
 				{
-					Gear::Core::GraphicsDevice::get()->CreateUnorderedAccessView(buffer->getResource(), counterBuffer->getBuffer()->getResource(), &desc, nonShaderVisibleHandle.getCPUHandle());
+					GraphicsDevice::get()->CreateUnorderedAccessView(buffer->getResource(), counterBuffer->getBuffer()->getResource(), &desc, nonShaderVisibleHandle.getCPUHandle());
 				}
 				else
 				{
-					Gear::Core::GraphicsDevice::get()->CreateUnorderedAccessView(buffer->getResource(), nullptr, &desc, nonShaderVisibleHandle.getCPUHandle());
+					GraphicsDevice::get()->CreateUnorderedAccessView(buffer->getResource(), nullptr, &desc, nonShaderVisibleHandle.getCPUHandle());
 				}
 
 				viewCPUHandle = nonShaderVisibleHandle.getCPUHandle();
@@ -129,7 +129,7 @@ Gear::Core::Resource::BufferView::BufferView(D3D12Resource::Buffer* const buffer
 	{
 		vbv.BufferLocation = buffer->getGPUAddress();
 		vbv.SizeInBytes = static_cast<uint32_t>(size);
-		vbv.StrideInBytes = (isStructuredBuffer ? structureByteStride : Gear::Core::FMT::getByteSize(format));
+		vbv.StrideInBytes = (isStructuredBuffer ? structureByteStride : FMT::getByteSize(format));
 	}
 
 	if (createIBV)
@@ -141,9 +141,9 @@ Gear::Core::Resource::BufferView::BufferView(D3D12Resource::Buffer* const buffer
 
 	if (cpuWritable)
 	{
-		uploadHeaps = new D3D12Resource::UploadHeap * [Gear::Core::Graphics::getFrameBufferCount()];
+		uploadHeaps = new D3D12Resource::UploadHeap * [Graphics::getFrameBufferCount()];
 
-		for (uint32_t i = 0; i < Gear::Core::Graphics::getFrameBufferCount(); i++)
+		for (uint32_t i = 0; i < Graphics::getFrameBufferCount(); i++)
 		{
 			uploadHeaps[i] = new D3D12Resource::UploadHeap(size);
 		}
@@ -164,7 +164,7 @@ Gear::Core::Resource::BufferView::~BufferView()
 
 	if (uploadHeaps)
 	{
-		for (uint32_t i = 0; i < Gear::Core::Graphics::getFrameBufferCount(); i++)
+		for (uint32_t i = 0; i < Graphics::getFrameBufferCount(); i++)
 		{
 			delete uploadHeaps[i];
 		}
@@ -261,9 +261,9 @@ void Gear::Core::Resource::BufferView::copyDescriptors()
 
 Gear::Core::Resource::BufferView::UpdateStruct Gear::Core::Resource::BufferView::getUpdateStruct(const void* const data, const uint64_t size)
 {
-	uploadHeaps[Gear::Core::Graphics::getFrameIndex()]->update(data, size);
+	uploadHeaps[Graphics::getFrameIndex()]->update(data, size);
 
-	const UpdateStruct updateStruct = { buffer,uploadHeaps[Gear::Core::Graphics::getFrameIndex()] };
+	const UpdateStruct updateStruct = { buffer,uploadHeaps[Graphics::getFrameIndex()] };
 
 	return updateStruct;
 }

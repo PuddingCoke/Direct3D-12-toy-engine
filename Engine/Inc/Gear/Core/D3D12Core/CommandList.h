@@ -160,25 +160,25 @@ namespace Gear
 template<typename T>
 inline void Gear::Core::D3D12Core::CommandList::setPipelineResources(const T& descs, const uint32_t targetSRVState)
 {
-	for (const Gear::Core::Resource::D3D12Resource::ShaderResourceDesc& desc : descs)
+	for (const Resource::D3D12Resource::ShaderResourceDesc& desc : descs)
 	{
-		if (desc.type == Gear::Core::Resource::D3D12Resource::ShaderResourceDesc::BUFFER)
+		if (desc.type == Resource::D3D12Resource::ShaderResourceDesc::BUFFER)
 		{
-			Gear::Core::Resource::D3D12Resource::Buffer* const buffer = desc.bufferDesc.buffer;
+			Resource::D3D12Resource::Buffer* const buffer = desc.bufferDesc.buffer;
 
 			if (buffer && buffer->getStateTracking())
 			{
 				pushResourceTrackList(buffer);
 
-				if (desc.state == Gear::Core::Resource::D3D12Resource::ShaderResourceDesc::SRV)
+				if (desc.state == Resource::D3D12Resource::ShaderResourceDesc::SRV)
 				{
 					buffer->setState(targetSRVState);
 				}
-				else if (desc.state == Gear::Core::Resource::D3D12Resource::ShaderResourceDesc::UAV)
+				else if (desc.state == Resource::D3D12Resource::ShaderResourceDesc::UAV)
 				{
 					buffer->setState(D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
 
-					Gear::Core::Resource::D3D12Resource::Buffer* const counterBuffer = desc.bufferDesc.counterBuffer;
+					Resource::D3D12Resource::Buffer* const counterBuffer = desc.bufferDesc.counterBuffer;
 
 					if (counterBuffer)
 					{
@@ -193,17 +193,17 @@ inline void Gear::Core::D3D12Core::CommandList::setPipelineResources(const T& de
 				}
 			}
 		}
-		else if (desc.type == Gear::Core::Resource::D3D12Resource::ShaderResourceDesc::TEXTURE)
+		else if (desc.type == Resource::D3D12Resource::ShaderResourceDesc::TEXTURE)
 		{
-			Gear::Core::Resource::D3D12Resource::Texture* const texture = desc.textureDesc.texture;
+			Resource::D3D12Resource::Texture* const texture = desc.textureDesc.texture;
 
 			if (texture->getStateTracking())
 			{
 				pushResourceTrackList(texture);
 
-				if (desc.state == Gear::Core::Resource::D3D12Resource::ShaderResourceDesc::SRV)
+				if (desc.state == Resource::D3D12Resource::ShaderResourceDesc::SRV)
 				{
-					if (desc.textureDesc.mipSlice == Gear::Core::Resource::D3D12Resource::D3D12_TRANSITION_ALL_MIPLEVELS)
+					if (desc.textureDesc.mipSlice == Resource::D3D12Resource::D3D12_TRANSITION_ALL_MIPLEVELS)
 					{
 						texture->setAllState(targetSRVState);
 					}
@@ -212,9 +212,9 @@ inline void Gear::Core::D3D12Core::CommandList::setPipelineResources(const T& de
 						texture->setMipSliceState(desc.textureDesc.mipSlice, targetSRVState);
 					}
 				}
-				else if (desc.state == Gear::Core::Resource::D3D12Resource::ShaderResourceDesc::UAV)
+				else if (desc.state == Resource::D3D12Resource::ShaderResourceDesc::UAV)
 				{
-					if (desc.textureDesc.mipSlice == Gear::Core::Resource::D3D12Resource::D3D12_TRANSITION_ALL_MIPLEVELS)
+					if (desc.textureDesc.mipSlice == Resource::D3D12Resource::D3D12_TRANSITION_ALL_MIPLEVELS)
 					{
 						texture->setAllState(D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
 					}

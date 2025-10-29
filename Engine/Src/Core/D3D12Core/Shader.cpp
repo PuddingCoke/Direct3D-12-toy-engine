@@ -11,7 +11,7 @@ Gear::Core::D3D12Core::Shader::Shader(const uint8_t* const bytes, const size_t b
 
 Gear::Core::D3D12Core::Shader::Shader(const std::wstring& filePath)
 {
-	if (Gear::Utils::File::getExtension(filePath) == L"cso")
+	if (Utils::File::getExtension(filePath) == L"cso")
 	{
 		shaderBlob = DXCCompiler::read(filePath);
 
@@ -29,7 +29,7 @@ Gear::Core::D3D12Core::Shader::Shader(const std::wstring& filePath)
 
 Gear::Core::D3D12Core::Shader::Shader(const std::wstring& filePath, const DXCCompiler::ShaderProfile profile)
 {
-	if (Gear::Utils::File::getExtension(filePath) == L"hlsl")
+	if (Utils::File::getExtension(filePath) == L"hlsl")
 	{
 		shaderBlob = DXCCompiler::compile(filePath, profile);
 

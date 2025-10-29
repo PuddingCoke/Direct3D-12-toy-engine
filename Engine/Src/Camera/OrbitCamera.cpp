@@ -13,11 +13,11 @@ Gear::OrbitCamera::OrbitCamera(const DirectX::XMVECTOR& eye, const DirectX::XMVE
 
 	currentRadius = targetRadius;
 
-	moveEventID = Gear::Input::Mouse::addMoveEvent([this]()
+	moveEventID = Input::Mouse::addMoveEvent([this]()
 		{
-			if (Gear::Input::Mouse::getLeftDown())
+			if (Input::Mouse::getLeftDown())
 			{
-				const DirectX::XMMATRIX rotMat = DirectX::XMMatrixRotationAxis(this->up, Gear::Input::Mouse::getDX() / 120.f);
+				const DirectX::XMMATRIX rotMat = DirectX::XMMatrixRotationAxis(this->up, Input::Mouse::getDX() / 120.f);
 
 				this->eye = DirectX::XMVector3Transform(this->eye, rotMat);
 
@@ -25,17 +25,17 @@ Gear::OrbitCamera::OrbitCamera(const DirectX::XMVECTOR& eye, const DirectX::XMVE
 
 				DirectX::XMStoreFloat(&eyeUpAngle, DirectX::XMVector3AngleBetweenNormals(this->eye, this->up));
 
-				const float destAngle = eyeUpAngle + Gear::Input::Mouse::getDY() / 120.f;
+				const float destAngle = eyeUpAngle + Input::Mouse::getDY() / 120.f;
 
-				float rotAngle = Gear::Input::Mouse::getDY() / 120.f;
+				float rotAngle = Input::Mouse::getDY() / 120.f;
 
-				if (destAngle > Gear::Utils::Math::pi - Gear::Core::MainCamera::epsilon)
+				if (destAngle > Utils::Math::pi - Core::MainCamera::epsilon)
 				{
-					rotAngle = Gear::Utils::Math::pi - Gear::Core::MainCamera::epsilon - eyeUpAngle;
+					rotAngle = Utils::Math::pi - Core::MainCamera::epsilon - eyeUpAngle;
 				}
-				else if (destAngle < Gear::Core::MainCamera::epsilon)
+				else if (destAngle < Core::MainCamera::epsilon)
 				{
-					rotAngle = Gear::Core::MainCamera::epsilon - eyeUpAngle;
+					rotAngle = Core::MainCamera::epsilon - eyeUpAngle;
 				}
 
 				const DirectX::XMVECTOR upCrossLookDir = DirectX::XMVector3Cross(this->up, this->eye);
@@ -46,9 +46,9 @@ Gear::OrbitCamera::OrbitCamera(const DirectX::XMVECTOR& eye, const DirectX::XMVE
 			}
 		});
 
-	scrollEventID = Gear::Input::Mouse::addScrollEvent([this]()
+	scrollEventID = Input::Mouse::addScrollEvent([this]()
 		{
-			targetRadius -= 0.5f * this->zoomSpeed * Gear::Input::Mouse::getWheelDelta();
+			targetRadius -= 0.5f * this->zoomSpeed * Input::Mouse::getWheelDelta();
 
 			if (targetRadius < 0.1f)
 			{
@@ -59,16 +59,16 @@ Gear::OrbitCamera::OrbitCamera(const DirectX::XMVECTOR& eye, const DirectX::XMVE
 
 Gear::OrbitCamera::~OrbitCamera()
 {
-	Gear::Input::Mouse::removeMoveEvent(moveEventID);
+	Input::Mouse::removeMoveEvent(moveEventID);
 
-	Gear::Input::Mouse::removeScrollEvent(scrollEventID);
+	Input::Mouse::removeScrollEvent(scrollEventID);
 }
 
 void Gear::OrbitCamera::applyInput(const float dt)
 {
-	currentRadius = Gear::Utils::Math::lerp(currentRadius, targetRadius, Gear::Utils::Math::clamp(dt * 20.f, 0.f, 1.f));
+	currentRadius = Utils::Math::lerp(currentRadius, targetRadius, Utils::Math::clamp(dt * 20.f, 0.f, 1.f));
 
-	Gear::Core::MainCamera::setView(DirectX::XMVectorScale(eye, currentRadius), { 0,0,0 }, up);
+	Core::MainCamera::setView(DirectX::XMVectorScale(eye, currentRadius), { 0,0,0 }, up);
 }
 
 void Gear::OrbitCamera::rotateX(const float dTheta)
@@ -88,13 +88,13 @@ void Gear::OrbitCamera::rotateY(const float dTheta)
 
 	float rotAngle = dTheta;
 
-	if (destAngle > Gear::Utils::Math::pi - Gear::Core::MainCamera::epsilon)
+	if (destAngle > Utils::Math::pi - Core::MainCamera::epsilon)
 	{
-		rotAngle = Gear::Utils::Math::pi - Gear::Core::MainCamera::epsilon - eyeUpAngle;
+		rotAngle = Utils::Math::pi - Core::MainCamera::epsilon - eyeUpAngle;
 	}
-	else if (destAngle < Gear::Core::MainCamera::epsilon)
+	else if (destAngle < Core::MainCamera::epsilon)
 	{
-		rotAngle = Gear::Core::MainCamera::epsilon - eyeUpAngle;
+		rotAngle = Core::MainCamera::epsilon - eyeUpAngle;
 	}
 
 	const DirectX::XMVECTOR upCrossLookDir = DirectX::XMVector3Cross(up, eye);

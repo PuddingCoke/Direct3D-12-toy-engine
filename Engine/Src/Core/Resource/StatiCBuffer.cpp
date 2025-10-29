@@ -5,11 +5,11 @@
 Gear::Core::Resource::StaticCBuffer::StaticCBuffer(D3D12Resource::Buffer* const buffer, const uint32_t size, const bool persistent) :
 	ImmutableCBuffer(buffer, size, persistent)
 {
-	uploadHeaps = new D3D12Resource::UploadHeap * [Gear::Core::Graphics::getFrameBufferCount()];
+	uploadHeaps = new D3D12Resource::UploadHeap * [Graphics::getFrameBufferCount()];
 
-	dataPtrs = new void* [Gear::Core::Graphics::getFrameBufferCount()];
+	dataPtrs = new void* [Graphics::getFrameBufferCount()];
 
-	for (uint32_t i = 0; i < Gear::Core::Graphics::getFrameBufferCount(); i++)
+	for (uint32_t i = 0; i < Graphics::getFrameBufferCount(); i++)
 	{
 		uploadHeaps[i] = new D3D12Resource::UploadHeap(size);
 
@@ -21,7 +21,7 @@ Gear::Core::Resource::StaticCBuffer::~StaticCBuffer()
 {
 	if (uploadHeaps)
 	{
-		for (uint32_t i = 0; i < Gear::Core::Graphics::getFrameBufferCount(); i++)
+		for (uint32_t i = 0; i < Graphics::getFrameBufferCount(); i++)
 		{
 			if (uploadHeaps[i])
 			{
@@ -42,9 +42,9 @@ Gear::Core::Resource::StaticCBuffer::~StaticCBuffer()
 
 Gear::Core::Resource::StaticCBuffer::UpdateStruct Gear::Core::Resource::StaticCBuffer::getUpdateStruct(const void* const data, const uint64_t size)
 {
-	memcpy(dataPtrs[Gear::Core::Graphics::getFrameIndex()], data, size);
+	memcpy(dataPtrs[Graphics::getFrameIndex()], data, size);
 
-	const UpdateStruct updateStruct = { buffer,uploadHeaps[Gear::Core::Graphics::getFrameIndex()] };
+	const UpdateStruct updateStruct = { buffer,uploadHeaps[Graphics::getFrameIndex()] };
 
 	return updateStruct;
 }

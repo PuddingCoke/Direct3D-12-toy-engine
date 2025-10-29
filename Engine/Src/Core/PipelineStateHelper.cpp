@@ -7,7 +7,7 @@
 D3D12_GRAPHICS_PIPELINE_STATE_DESC Gear::Core::PipelineStateHelper::getDefaultGraphicsDesc()
 {
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = {};
-	desc.pRootSignature = Gear::Core::GlobalRootSignature::getGraphicsRootSignature()->get();
+	desc.pRootSignature = GlobalRootSignature::getGraphicsRootSignature()->get();
 	desc.SampleMask = UINT_MAX;
 	desc.SampleDesc.Count = 1;
 
@@ -18,7 +18,7 @@ D3D12_GRAPHICS_PIPELINE_STATE_DESC Gear::Core::PipelineStateHelper::getDefaultFu
 {
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = {};
 	desc.InputLayout = {};
-	desc.pRootSignature = Gear::Core::GlobalRootSignature::getGraphicsRootSignature()->get();
+	desc.pRootSignature = GlobalRootSignature::getGraphicsRootSignature()->get();
 	desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
 	desc.RasterizerState = rasterCullNone;
 	desc.DepthStencilState.DepthEnable = false;
@@ -26,7 +26,7 @@ D3D12_GRAPHICS_PIPELINE_STATE_DESC Gear::Core::PipelineStateHelper::getDefaultFu
 	desc.SampleMask = UINT_MAX;
 	desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 	desc.SampleDesc.Count = 1;
-	desc.VS = Gear::Core::GlobalShader::getFullScreenVS()->getByteCode();
+	desc.VS = GlobalShader::getFullScreenVS()->getByteCode();
 
 	return desc;
 }
@@ -34,8 +34,8 @@ D3D12_GRAPHICS_PIPELINE_STATE_DESC Gear::Core::PipelineStateHelper::getDefaultFu
 void Gear::Core::PipelineStateHelper::createComputeState(ID3D12PipelineState** const pipelineState, const D3D12Core::Shader* const shader)
 {
 	D3D12_COMPUTE_PIPELINE_STATE_DESC desc = {};
-	desc.pRootSignature = Gear::Core::GlobalRootSignature::getComputeRootSignature()->get();
+	desc.pRootSignature = GlobalRootSignature::getComputeRootSignature()->get();
 	desc.CS = shader->getByteCode();
 
-	Gear::Core::GraphicsDevice::get()->CreateComputePipelineState(&desc, IID_PPV_ARGS(pipelineState));
+	GraphicsDevice::get()->CreateComputePipelineState(&desc, IID_PPV_ARGS(pipelineState));
 }

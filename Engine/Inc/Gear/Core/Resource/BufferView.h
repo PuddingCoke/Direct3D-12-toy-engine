@@ -13,7 +13,7 @@ namespace Gear
 	{
 		namespace Resource
 		{
-			//versatile buffer
+			//多用途缓冲
 			class BufferView :public ResourceBase
 			{
 			public:

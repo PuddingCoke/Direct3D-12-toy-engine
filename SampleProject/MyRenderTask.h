@@ -37,7 +37,7 @@ protected:
 
 		context->setViewportSimple(Graphics::getWidth(), Graphics::getHeight());
 
-		context->setTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		context->setPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 		context->draw(3, 1, 0, 0);
 	}

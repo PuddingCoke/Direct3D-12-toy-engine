@@ -7,14 +7,13 @@
 
 #include<Gear/Core/D3D12Core/Shader.h>
 
-//due to limitations
-//create multiple instances for multiple render targets
 namespace Gear
 {
 	namespace Core
 	{
 		namespace Gear2D
-		{
+		{	
+			//由于这个类的实现，请为多个渲染目标创建PrimitiveBatch
 			class PrimitiveBatch
 			{
 			public:

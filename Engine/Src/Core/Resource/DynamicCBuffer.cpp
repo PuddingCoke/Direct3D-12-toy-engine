@@ -9,7 +9,7 @@
 #include<Gear/Utils/Math.h>
 
 Gear::Core::Resource::DynamicCBuffer::DynamicCBuffer(const uint32_t size) :
-	ImmutableCBuffer(nullptr, 0u, true), regionIndex(Gear::Utils::Math::log2(size / 256u)), dataPtr(nullptr), acquireFrameIndex(UINT64_MAX), updateFrameIndex(UINT64_MAX)
+	ImmutableCBuffer(nullptr, 0u, true), regionIndex(Utils::Math::log2(size / 256u)), dataPtr(nullptr), acquireFrameIndex(UINT64_MAX), updateFrameIndex(UINT64_MAX)
 {
 	if (regionIndex > 1u)
 	{
@@ -20,15 +20,15 @@ Gear::Core::Resource::DynamicCBuffer::DynamicCBuffer(const uint32_t size) :
 void Gear::Core::Resource::DynamicCBuffer::acquireDataPtr()
 {
 #ifdef _DEBUG
-	if (acquireFrameIndex == Gear::Core::Graphics::getRenderedFrameCount())
+	if (acquireFrameIndex == Graphics::getRenderedFrameCount())
 	{
 		LOGERROR(L"you can only acquire data pointer for cbuffer once per frame");
 	}
 #endif // _DEBUG
 
-	acquireFrameIndex = Gear::Core::Graphics::getRenderedFrameCount();
+	acquireFrameIndex = Graphics::getRenderedFrameCount();
 
-	const Gear::Core::DynamicCBufferManager::AvailableLocation& location = Gear::Core::DynamicCBufferManager::requestLocation(regionIndex);
+	const DynamicCBufferManager::AvailableLocation& location = DynamicCBufferManager::requestLocation(regionIndex);
 
 	dataPtr = location.dataPtr;
 
@@ -40,18 +40,18 @@ void Gear::Core::Resource::DynamicCBuffer::acquireDataPtr()
 void Gear::Core::Resource::DynamicCBuffer::updateData(const void* const data)
 {
 #ifdef _DEBUG
-	if (acquireFrameIndex != Gear::Core::Graphics::getRenderedFrameCount())
+	if (acquireFrameIndex != Graphics::getRenderedFrameCount())
 	{
 		LOGERROR(L"you haven't acquire data pointer for this dynamic cbuffer yet");
 	}
 
-	if (updateFrameIndex == Gear::Core::Graphics::getRenderedFrameCount())
+	if (updateFrameIndex == Graphics::getRenderedFrameCount())
 	{
 		LOGERROR(L"you can only update cbuffer once per frame");
 	}
 #endif // _DEBUG
 
-	updateFrameIndex = Gear::Core::Graphics::getRenderedFrameCount();
+	updateFrameIndex = Graphics::getRenderedFrameCount();
 
 	memcpy(dataPtr, data, 256ull << regionIndex);
 }

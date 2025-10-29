@@ -11,25 +11,25 @@
 
 #include<queue>
 
-//basic work flow
+//基本的工作流程
 
-//Preperation
-//1.open encode session
-//2.initialize encoder
+//准备
+//1.打开编码会议
+//2.初始化编码器
 
-//Encoding
-//1.register input resource
-//2.map input resource
-//3.register output resource
-//4.map output resource
-//5.encode picture
-//6.lock bitstream
-//7.get bitstream ptr
-//8.unlock bitstream
-//9.unmap input resource
-//10.unregister input resource
-//11.unmap output resource
-//12.unregister output resource
+//逐帧编码的流程
+//1.注册输入资源
+//2.映射输入资源
+//3.注册输出资源
+//4.映射输出资源
+//5.编码图像
+//6.锁定比特流
+//7.获得比特流指针
+//8.解锁比特流
+//9.解除输入资源映射
+//10.解除输入资源注册
+//11.解除输出资源映射
+//12.解除输出资源注册
 
 namespace Gear
 {

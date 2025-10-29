@@ -148,7 +148,7 @@ public:
 	void render(GraphicsContext* const context, ID3D12PipelineState* const pipelineState)
 	{
 		context->setPipelineState(pipelineState);
-		context->setTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		context->setPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		context->setVertexBuffers(0, { modelBuffer->getVertexBuffer() });
 
 		for (UINT i = 0; i < models.size(); i++)
@@ -162,7 +162,7 @@ public:
 	void renderCube(GraphicsContext* const context, ID3D12PipelineState* const pipelineState)
 	{
 		context->setPipelineState(pipelineState);
-		context->setTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		context->setPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		context->setVertexBuffers(0, { modelBuffer->getVertexBuffer() });
 
 		for (UINT i = 0; i < models.size(); i++)

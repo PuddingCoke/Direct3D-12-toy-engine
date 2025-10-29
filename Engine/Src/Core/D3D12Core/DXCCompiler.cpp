@@ -9,7 +9,7 @@ namespace
 	class DXCCompilerPrivate
 	{
 	public:
-
+		
 		DXCCompilerPrivate(const DXCCompilerPrivate&) = delete;
 
 		void operator=(const DXCCompilerPrivate&) = delete;

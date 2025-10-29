@@ -2,7 +2,7 @@
 
 Gear::Core::D3D12Core::DescriptorHeap::DescriptorHeap(const uint32_t numDescriptors, const uint32_t subRegionSize, const D3D12_DESCRIPTOR_HEAP_TYPE type, const D3D12_DESCRIPTOR_HEAP_FLAGS flags) :
 	numDescriptors(numDescriptors), subRegionSize(subRegionSize), type(type),
-	incrementSize(Gear::Core::GraphicsDevice::get()->GetDescriptorHandleIncrementSize(type))
+	incrementSize(GraphicsDevice::get()->GetDescriptorHandleIncrementSize(type))
 {
 	D3D12_DESCRIPTOR_HEAP_DESC desc = {};
 	desc.NodeMask = 0;
@@ -10,7 +10,7 @@ Gear::Core::D3D12Core::DescriptorHeap::DescriptorHeap(const uint32_t numDescript
 	desc.Type = type;
 	desc.Flags = flags;
 
-	Gear::Core::GraphicsDevice::get()->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&descriptorHeap));
+	GraphicsDevice::get()->CreateDescriptorHeap(&desc, IID_PPV_ARGS(&descriptorHeap));
 
 	staticCPUPointerStart = descriptorHeap->GetCPUDescriptorHandleForHeapStart();
 
