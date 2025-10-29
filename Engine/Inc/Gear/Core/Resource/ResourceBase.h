@@ -5,7 +5,7 @@
 
 #include<Gear/Core/GlobalDescriptorHeap.h>
 
-#include"D3D12Resource/D3D12ResourceDesc.h"
+#include"D3D12Resource/PipelineResourceDesc.h"
 
 namespace Core
 {

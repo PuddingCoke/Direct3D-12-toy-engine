@@ -107,7 +107,7 @@ namespace Core
 		GraphicsContext* const context;
 
 		//处理低级任务，比如用数据初始化纹理
-		//注意：这只是引用
+		//注意：这个指针只是引用
 		D3D12Core::CommandList* const commandList;
 
 	private:

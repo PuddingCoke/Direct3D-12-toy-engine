@@ -47,7 +47,7 @@ namespace Core
 
 		private:
 
-			void updateCurve(GraphicsContext* const context, const uint32_t index);
+			void updateCurve(const uint32_t index);
 
 			D3D12Core::Shader* bloomFilter;
 

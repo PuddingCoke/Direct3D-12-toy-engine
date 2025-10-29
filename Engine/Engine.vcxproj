@@ -139,7 +139,7 @@
     <ClInclude Include="Inc\Gear\Core\Internal\MainCameraInternal.h" />
     <ClInclude Include="Inc\Gear\Core\Internal\RenderEngineInternal.h" />
     <ClInclude Include="Inc\Gear\Core\RenderTask.h" />
-    <ClInclude Include="Inc\Gear\Core\Resource\D3D12Resource\D3D12ResourceDesc.h" />
+    <ClInclude Include="Inc\Gear\Core\Resource\D3D12Resource\PipelineResourceDesc.h" />
     <ClInclude Include="Inc\Gear\Core\Resource\DynamicCBuffer.h" />
     <ClInclude Include="Inc\Gear\Core\Resource\StaticCBuffer.h" />
     <ClInclude Include="Inc\Gear\Core\GlobalEffect\BackBufferBlitEffect.h" />

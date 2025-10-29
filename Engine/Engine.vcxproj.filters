@@ -459,7 +459,7 @@
     <ClInclude Include="Inc\Gear\Core\D3D12Core\Internal\DXCCompilerInternal.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="Inc\Gear\Core\Resource\D3D12Resource\D3D12ResourceDesc.h">
+    <ClInclude Include="Inc\Gear\Core\Resource\D3D12Resource\PipelineResourceDesc.h">
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="Inc\Gear\DevEssential.h">

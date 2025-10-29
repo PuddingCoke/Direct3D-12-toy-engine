@@ -55,7 +55,7 @@ Core::Effect::BloomEffect::BloomEffect(GraphicsContext* const context, const uin
 
 			blurParamBuffer[i]->getBuffer()->setName((name + std::to_wstring(i)).c_str());
 
-			updateCurve(resManager->getGraphicsContext(), i);
+			updateCurve(i);
 		}
 	}
 
@@ -68,10 +68,10 @@ Core::Effect::BloomEffect::BloomEffect(GraphicsContext* const context, const uin
 	//PS BlendState
 	auto getDefaultPipelineState =
 		[] {
-		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = Core::PipelineStateHelper::getDefaultGraphicsDesc();
+		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = PipelineStateHelper::getDefaultGraphicsDesc();
 		desc.InputLayout = {};
-		desc.VS = Core::GlobalShader::getFullScreenVS()->getByteCode();
-		desc.RasterizerState = Core::PipelineStateHelper::rasterCullBack;
+		desc.VS = GlobalShader::getFullScreenVS()->getByteCode();
+		desc.RasterizerState = PipelineStateHelper::rasterCullBack;
 		desc.DepthStencilState.DepthEnable = FALSE;
 		desc.DepthStencilState.StencilEnable = FALSE;
 		desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
@@ -85,7 +85,7 @@ Core::Effect::BloomEffect::BloomEffect(GraphicsContext* const context, const uin
 		desc.PS = bloomFilter->getByteCode();
 		desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
 
-		Core::GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&bloomFilterState));
+		GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&bloomFilterState));
 	}
 
 	{
@@ -93,7 +93,7 @@ Core::Effect::BloomEffect::BloomEffect(GraphicsContext* const context, const uin
 		desc.PS = bloomKarisAverage->getByteCode();
 		desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
 
-		Core::GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&bloomKarisAverageState));
+		GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&bloomKarisAverageState));
 	}
 
 	{
@@ -101,15 +101,15 @@ Core::Effect::BloomEffect::BloomEffect(GraphicsContext* const context, const uin
 		desc.PS = bloomDownSample->getByteCode();
 		desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
 
-		Core::GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&bloomDownSampleState));
+		GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&bloomDownSampleState));
 	}
 
 	{
 		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = getDefaultPipelineState();
-		desc.PS = Core::GlobalShader::getFullScreenPS()->getByteCode();
-		desc.BlendState = Core::PipelineStateHelper::blendAddtive;
+		desc.PS = GlobalShader::getFullScreenPS()->getByteCode();
+		desc.BlendState = PipelineStateHelper::blendAddtive;
 
-		Core::GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&bloomUpSampleState));
+		GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&bloomUpSampleState));
 	}
 
 	{
@@ -117,13 +117,12 @@ Core::Effect::BloomEffect::BloomEffect(GraphicsContext* const context, const uin
 		desc.PS = bloomFinal->getByteCode();
 		desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
 
-		Core::GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&bloomFinalState));
+		GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&bloomFinalState));
 	}
 
-	Core::PipelineStateHelper::createComputeState(&bloomHBlurState, bloomHBlur);
+	PipelineStateHelper::createComputeState(&bloomHBlurState, bloomHBlur);
 
-	Core::PipelineStateHelper::createComputeState(&bloomVBlurState, bloomVBlur);
-
+	PipelineStateHelper::createComputeState(&bloomVBlurState, bloomVBlur);
 }
 
 Core::Effect::BloomEffect::~BloomEffect()
@@ -147,7 +146,7 @@ Core::Effect::BloomEffect::~BloomEffect()
 	delete bloomKarisAverage;
 }
 
-Core::Resource::TextureRenderView* Core::Effect::BloomEffect::process(Core::Resource::TextureRenderView* const inputTexture) const
+Core::Resource::TextureRenderView* Core::Effect::BloomEffect::process(Resource::TextureRenderView* const inputTexture) const
 {
 	context->setTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
@@ -294,7 +293,7 @@ float Core::Effect::BloomEffect::getGamma() const
 	return bloomParam.gamma;
 }
 
-void Core::Effect::BloomEffect::updateCurve(GraphicsContext* const context, const uint32_t index)
+void Core::Effect::BloomEffect::updateCurve(const uint32_t index)
 {
 	blurParam[index].weight[0] = Utils::Math::gauss(blurParam[index].sigma, 0.f);
 
