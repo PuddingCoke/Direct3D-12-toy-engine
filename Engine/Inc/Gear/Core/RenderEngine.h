@@ -5,16 +5,6 @@
 
 #include<Gear/Core/D3D12Core/CommandList.h>
 
-#include<Gear/Core/Resource/D3D12Resource/ReadbackHeap.h>
-
-#include<Gear/Core/ResourceManager.h>
-
-#include<ImGUI/imgui.h>
-
-#include<ImGUI/imgui_impl_win32.h>
-
-#include<ImGUI/imgui_impl_dx12.h>
-
 namespace Gear
 {
 	namespace Core

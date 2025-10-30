@@ -3,6 +3,8 @@
 #ifndef _GEAR_CORE_RENDERENGINE_INTERNAL_H_
 #define _GEAR_CORE_RENDERENGINE_INTERNAL_H_
 
+#include<Gear/Core/Resource/D3D12Resource/ReadbackHeap.h>
+
 namespace Gear
 {
 	namespace Core

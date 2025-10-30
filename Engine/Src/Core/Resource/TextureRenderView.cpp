@@ -397,7 +397,7 @@ void Gear::Core::Resource::TextureRenderView::copyDescriptors()
 	{
 		uavMipIndexStart = allSRVIndex + 1 + texture->getMipLevels();
 
-		shaderVisibleHandle.offset(1 + texture->getMipLevels());
+		shaderVisibleHandle.move(1 + texture->getMipLevels());
 
 		viewGPUHandleStart = shaderVisibleHandle.getGPUHandle();
 	}

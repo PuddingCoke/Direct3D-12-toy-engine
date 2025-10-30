@@ -5,7 +5,9 @@
 
 #include<Gear/Core/GraphicsDevice.h>
 
-#include<mutex>
+#include<atomic>
+
+#include"DescriptorHandle.h"
 
 namespace Gear
 {
@@ -13,8 +15,6 @@ namespace Gear
 	{
 		namespace D3D12Core
 		{
-			class DescriptorHandle;
-
 			class DescriptorHeap
 			{
 			public:
@@ -25,15 +25,7 @@ namespace Gear
 
 				void operator=(const DescriptorHeap&) = delete;
 
-				DescriptorHeap(const uint32_t numDescriptors, const uint32_t subRegionSize, const D3D12_DESCRIPTOR_HEAP_TYPE type, const D3D12_DESCRIPTOR_HEAP_FLAGS flags);
-
-				uint32_t getNumDescriptors() const;
-
-				uint32_t getSubRegionSize() const;
-
-				D3D12_DESCRIPTOR_HEAP_TYPE getDescriptorHeapType() const;
-
-				uint32_t getIncrementSize() const;
+				DescriptorHeap(const uint32_t numDescriptors, const uint32_t numDynamicDescriptors, const D3D12_DESCRIPTOR_HEAP_TYPE type, const D3D12_DESCRIPTOR_HEAP_FLAGS flags);
 
 				ID3D12DescriptorHeap* get() const;
 
@@ -43,11 +35,9 @@ namespace Gear
 
 			private:
 
-				friend class DescriptorHandle;
-
 				const uint32_t numDescriptors;
 
-				const uint32_t subRegionSize;
+				const uint32_t dynamicIndexStart;
 
 				const D3D12_DESCRIPTOR_HEAP_TYPE type;
 
@@ -55,53 +45,15 @@ namespace Gear
 
 				ComPtr<ID3D12DescriptorHeap> descriptorHeap;
 
-				CD3DX12_CPU_DESCRIPTOR_HANDLE staticCPUPointer;
+				CD3DX12_CPU_DESCRIPTOR_HANDLE cpuHandleStart;
 
-				CD3DX12_CPU_DESCRIPTOR_HANDLE dynamicCPUPointer;
+				CD3DX12_GPU_DESCRIPTOR_HANDLE gpuHandleStart;
 
-				CD3DX12_CPU_DESCRIPTOR_HANDLE staticCPUPointerStart;
+				std::atomic<uint32_t> staticIndex;
 
-				CD3DX12_CPU_DESCRIPTOR_HANDLE dynamicCPUPointerStart;
+				uint32_t dynamicIndex;
 
-				CD3DX12_GPU_DESCRIPTOR_HANDLE staticGPUPointer;
-
-				CD3DX12_GPU_DESCRIPTOR_HANDLE dynamicGPUPointer;
-
-				CD3DX12_GPU_DESCRIPTOR_HANDLE staticGPUPointerStart;
-
-				CD3DX12_GPU_DESCRIPTOR_HANDLE dynamicGPUPointerStart;
-
-				std::mutex staticPointerLock;
-
-				std::mutex dynamicPointerLock;
-
-			};
-
-			class DescriptorHandle
-			{
-			public:
-
-				DescriptorHandle();
-
-				DescriptorHandle(const CD3DX12_CPU_DESCRIPTOR_HANDLE cpuHandle, const CD3DX12_GPU_DESCRIPTOR_HANDLE gpuHandle, const DescriptorHeap* const descriptorHeap);
-
-				uint32_t getCurrentIndex() const;
-
-				CD3DX12_CPU_DESCRIPTOR_HANDLE getCPUHandle() const;
-
-				CD3DX12_GPU_DESCRIPTOR_HANDLE getGPUHandle() const;
-
-				void move();
-
-				void offset(const uint32_t num);
-
-			protected:
-
-				CD3DX12_CPU_DESCRIPTOR_HANDLE cpuHandle;
-
-				CD3DX12_GPU_DESCRIPTOR_HANDLE gpuHandle;
-
-				const DescriptorHeap* descriptorHeap;
+				std::mutex dynamicRegionMutex;
 
 			};
 		}

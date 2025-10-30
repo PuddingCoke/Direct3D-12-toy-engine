@@ -17,7 +17,7 @@ using LogColor = Gear::Utils::Logger::LogColor;
 /// 因为LogContext目前的实现，窄字符串是不被支持的，在编译时会报错
 /// 此外最好不要在循环中使用日志记录器
 /// 
-/// 以下是支持的数据格式
+/// 以下是支持的数据类型
 /// 整形：int32_t、int64_t、uint32_t、uint64_t
 /// 浮点：float_t、double_t
 /// 字符串：字面宽字符串、const wchar_t*、std::wstring

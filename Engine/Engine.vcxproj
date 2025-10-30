@@ -125,6 +125,7 @@
     <ClInclude Include="Inc\D3D12Headers\dxgiformat.h" />
     <ClInclude Include="Inc\DirectXTex\DDSTextureLoader12.h" />
     <ClInclude Include="Inc\Gear\Camera\OrbitCamera.h" />
+    <ClInclude Include="Inc\Gear\Core\D3D12Core\DescriptorHandle.h" />
     <ClInclude Include="Inc\Gear\Core\D3D12Core\DXCCompiler.h" />
     <ClInclude Include="Inc\Gear\Core\D3D12Core\Internal\DXCCompilerInternal.h" />
     <ClInclude Include="Inc\Gear\Core\DynamicCBufferManager.h" />
@@ -217,6 +218,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Inc\DirectXTex\DDSTextureLoader12.cpp" />
+    <ClCompile Include="Src\Core\D3D12Core\DescriptorHandle.cpp" />
     <ClCompile Include="Src\Core\D3D12Core\DXCCompiler.cpp" />
     <ClCompile Include="Src\Core\GlobalShader.cpp" />
     <ClCompile Include="Src\Core\Resource\DynamicCBuffer.cpp" />

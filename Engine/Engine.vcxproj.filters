@@ -465,6 +465,9 @@
     <ClInclude Include="Inc\Gear\DevEssential.h">
       <Filter>Header</Filter>
     </ClInclude>
+    <ClInclude Include="Inc\Gear\Core\D3D12Core\DescriptorHandle.h">
+      <Filter>Header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\InitializationParam.cpp">
@@ -672,6 +675,9 @@
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="Src\Core\D3D12Core\DXCCompiler.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Core\D3D12Core\DescriptorHandle.cpp">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>
