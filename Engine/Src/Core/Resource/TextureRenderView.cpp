@@ -3,9 +3,8 @@
 Gear::Core::Resource::TextureRenderView::TextureRenderView(D3D12Resource::Texture* const texture, const bool isTextureCube, const bool persistent, const DXGI_FORMAT srvFormat, const DXGI_FORMAT uavFormat, const DXGI_FORMAT rtvFormat) :
 	ResourceBase(persistent), texture(texture), hasRTV((rtvFormat != DXGI_FORMAT_UNKNOWN)), hasUAV((uavFormat != DXGI_FORMAT_UNKNOWN)), rtvMipHandleStart(), viewGPUHandleStart(), viewCPUHandleStart()
 {
-	//create srv uav descriptors
+	//创建SRV、UAV
 	{
-		//plus 1 because there is a additional srv to acess all mipslices
 		numSRVUAVCBVDescriptors = 1 + texture->getMipLevels() + static_cast<uint32_t>(hasUAV) * texture->getMipLevels();
 
 		D3D12Core::DescriptorHandle descriptorHandle;
@@ -27,13 +26,13 @@ Gear::Core::Resource::TextureRenderView::TextureRenderView(D3D12Resource::Textur
 
 		uavMipIndexStart = srvMipIndexStart + texture->getMipLevels();
 
-		if (isTextureCube) //TextureCube srv creation
+		if (isTextureCube) //立方体纹理的SRV创建
 		{
 			const uint32_t cubeNum = texture->getArraySize() / 6;
 
 			if (cubeNum > 1)
 			{
-				//create srv access all miplevels
+				//创建能访问所有mipslice的SRV
 				{
 					D3D12_SHADER_RESOURCE_VIEW_DESC desc = {};
 					desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
@@ -50,7 +49,7 @@ Gear::Core::Resource::TextureRenderView::TextureRenderView(D3D12Resource::Textur
 					descriptorHandle.move();
 				}
 
-				//create srv acess each mipSlice
+				//创建访问每个mipslice的SRV
 				for (uint32_t i = 0; i < texture->getMipLevels(); i++)
 				{
 					D3D12_SHADER_RESOURCE_VIEW_DESC desc = {};
@@ -70,7 +69,7 @@ Gear::Core::Resource::TextureRenderView::TextureRenderView(D3D12Resource::Textur
 			}
 			else
 			{
-				//create srv access all miplevels
+				//创建能访问所有mipslice的SRV
 				{
 					D3D12_SHADER_RESOURCE_VIEW_DESC desc = {};
 					desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
@@ -85,7 +84,7 @@ Gear::Core::Resource::TextureRenderView::TextureRenderView(D3D12Resource::Textur
 					descriptorHandle.move();
 				}
 
-				//create srv acess each mipSlice
+				//创建访问每个mipslice的SRV
 				for (uint32_t i = 0; i < texture->getMipLevels(); i++)
 				{
 					D3D12_SHADER_RESOURCE_VIEW_DESC desc = {};
@@ -106,7 +105,7 @@ Gear::Core::Resource::TextureRenderView::TextureRenderView(D3D12Resource::Textur
 		{
 			if (texture->getArraySize() > 1)
 			{
-				//create srv access all miplevels
+				//创建能访问所有mipslice的SRV
 				{
 					D3D12_SHADER_RESOURCE_VIEW_DESC desc = {};
 					desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
@@ -124,7 +123,7 @@ Gear::Core::Resource::TextureRenderView::TextureRenderView(D3D12Resource::Textur
 					descriptorHandle.move();
 				}
 
-				//create srv acess each mipSlice
+				//创建访问每个mipslice的SRV
 				for (uint32_t i = 0; i < texture->getMipLevels(); i++)
 				{
 					D3D12_SHADER_RESOURCE_VIEW_DESC desc = {};
@@ -145,7 +144,7 @@ Gear::Core::Resource::TextureRenderView::TextureRenderView(D3D12Resource::Textur
 			}
 			else
 			{
-				//create srv access all miplevels
+				//创建能访问所有mipslice的SRV
 				{
 					D3D12_SHADER_RESOURCE_VIEW_DESC desc = {};
 					desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
@@ -161,7 +160,7 @@ Gear::Core::Resource::TextureRenderView::TextureRenderView(D3D12Resource::Textur
 					descriptorHandle.move();
 				}
 
-				//create srv acess each mipSlice
+				//创建访问每个mipslice的SRV
 				for (uint32_t i = 0; i < texture->getMipLevels(); i++)
 				{
 					D3D12_SHADER_RESOURCE_VIEW_DESC desc = {};
@@ -196,7 +195,7 @@ Gear::Core::Resource::TextureRenderView::TextureRenderView(D3D12Resource::Textur
 			{
 				viewCPUHandleStart = descriptorHandle.getCPUHandle();
 
-				//get viewGPUHandleStart later
+				//之后获取viewGPUHandleStart
 			}
 
 			if (texture->getArraySize() > 1)
@@ -217,7 +216,7 @@ Gear::Core::Resource::TextureRenderView::TextureRenderView(D3D12Resource::Textur
 
 					if (persistent)
 					{
-						//create uav to non shader visible heap at the same time
+						//同一时间在非着色器可见的资源描述符堆创建UAV
 						GraphicsDevice::get()->CreateUnorderedAccessView(texture->getResource(), nullptr, &desc, nonShaderVisibleHandle.getCPUHandle());
 
 						nonShaderVisibleHandle.move();
@@ -240,7 +239,7 @@ Gear::Core::Resource::TextureRenderView::TextureRenderView(D3D12Resource::Textur
 
 					if (persistent)
 					{
-						//create uav to non shader visible heap at the same time
+						//同一时间在非着色器可见的资源描述符堆创建UAV
 						GraphicsDevice::get()->CreateUnorderedAccessView(texture->getResource(), nullptr, &desc, nonShaderVisibleHandle.getCPUHandle());
 
 						nonShaderVisibleHandle.move();
@@ -250,7 +249,7 @@ Gear::Core::Resource::TextureRenderView::TextureRenderView(D3D12Resource::Textur
 		}
 	}
 
-	//create rtv descriptor
+	//创建RTV
 	if (hasRTV)
 	{
 		D3D12Core::DescriptorHandle descriptorHandle;

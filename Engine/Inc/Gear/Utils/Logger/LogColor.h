@@ -47,7 +47,7 @@ namespace Gear
 
 				static const LogColor brightWhite;
 
-				//main text
+				//正文颜色
 				static const LogColor defaultColor;
 
 				static const LogColor numericColor;

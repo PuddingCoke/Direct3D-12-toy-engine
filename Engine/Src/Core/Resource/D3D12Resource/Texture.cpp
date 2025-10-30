@@ -99,8 +99,8 @@ void Gear::Core::Resource::D3D12Resource::Texture::resetTransitionStates()
 
 void Gear::Core::Resource::D3D12Resource::Texture::transition(std::vector<D3D12_RESOURCE_BARRIER>& transitionBarriers, std::vector<PendingTextureBarrier>& pendingBarriers)
 {
-	//check each mipslice state of transitionState
-	//if they are the same then we set allState to that state
+	//检查transitionState的每个mipslice的状态
+	//如果它们都是相同的，那么把allState设置为那个状态
 	if (transitionState->allState == D3D12_RESOURCE_STATE_UNKNOWN)
 	{
 		const uint32_t tempState = transitionState->mipLevelStates[0];
@@ -115,13 +115,13 @@ void Gear::Core::Resource::D3D12Resource::Texture::transition(std::vector<D3D12_
 
 	bool finalStateChecking = false;
 
-	//if allState of transitionState is known
+	//如果transitionState的allState是已知的
 	if (transitionState->allState != D3D12_RESOURCE_STATE_UNKNOWN)
 	{
-		//if texture has multiple mipslices
+		//如果纹理有多个mipslice
 		if (mipLevels > 1)
 		{
-			//this is the best case,transitionState->allState and internalState->allState are all known
+			//这是最好的情况，transitionState和internalState的allState都是已知的
 			if (internalState->allState != D3D12_RESOURCE_STATE_UNKNOWN)
 			{
 				if (!bitFlagSubset(internalState->allState, transitionState->allState))
@@ -139,16 +139,13 @@ void Gear::Core::Resource::D3D12Resource::Texture::transition(std::vector<D3D12_
 					internalState->set(transitionState->allState);
 				}
 			}
-			//internalState->allState equals to D3D12_RESOURCE_STATE_UNKNOWN
-			//in this case we need furthur checking
+			//internalState的allState是未知的，那么需要进一步检查
 			else
 			{
-				//first we check if all mipslice states of internalState are all unknown
+				//首先检查internalState的所有mipslice的状态是否都是未知的
 				const bool allStatesUnknown = internalState->allOfEqual(D3D12_RESOURCE_STATE_UNKNOWN);
 
-				//if mipslice states of internalState are all unknown
-				//we set barrier.mipSlice to D3D12_TRANSITION_ALL_MIPLEVELS
-				//handle this when commandList is submitted for execution
+				//如果internalState的所有mipslice的状态都是未知的，那么我们需要待定资源屏障
 				if (allStatesUnknown)
 				{
 					PendingTextureBarrier barrier = {};
@@ -160,15 +157,14 @@ void Gear::Core::Resource::D3D12Resource::Texture::transition(std::vector<D3D12_
 
 					internalState->set(transitionState->allState);
 				}
-				//some mipslice states of internalState are known
-				//in this case we need to check each mipslice state
+				//internalState的有些mipslice的状态是已知的
 				else
 				{
-					//for unknown internal state we push PendingTextureBarrier
-					//for known internal state we push D3D12_RESOURCE_BARRIER
+					//对于未知的内部状态我们需要PendingTextureBarrier
+					//对于已知的内部状态我们需要D3D12_RESOURCE_BARRIER
 					for (uint32_t mipSlice = 0; mipSlice < mipLevels; mipSlice++)
 					{
-						//unknown
+						//未知
 						if (internalState->mipLevelStates[mipSlice] == D3D12_RESOURCE_STATE_UNKNOWN)
 						{
 							finalStateChecking = true;
@@ -182,7 +178,7 @@ void Gear::Core::Resource::D3D12Resource::Texture::transition(std::vector<D3D12_
 
 							internalState->mipLevelStates[mipSlice] = transitionState->mipLevelStates[mipSlice];
 						}
-						//known
+						//已知
 						else
 						{
 							if (!bitFlagSubset(internalState->mipLevelStates[mipSlice], transitionState->mipLevelStates[mipSlice]))
@@ -209,7 +205,7 @@ void Gear::Core::Resource::D3D12Resource::Texture::transition(std::vector<D3D12_
 				}
 			}
 		}
-		//if texture has only one mipslice
+		//如果纹理只有一个mipslice
 		else
 		{
 			if (internalState->allState == D3D12_RESOURCE_STATE_UNKNOWN)
@@ -242,16 +238,18 @@ void Gear::Core::Resource::D3D12Resource::Texture::transition(std::vector<D3D12_
 			}
 		}
 	}
-	//if allState of transitionState is unknown
-	//in this case we need to check both mipslice state of internalState and transitionState
+	//如果transitionState的allState是未知的
+	//在这种情况下我们需要检查internalState和transitionState的各个mipslice的状态
 	else
 	{
 		if (mipLevels > 1)
 		{
 			for (uint32_t mipSlice = 0; mipSlice < mipLevels; mipSlice++)
 			{
+				//检查transitionState的每个mipslice的状态，只有已知情况才进行状态转变
 				if (transitionState->mipLevelStates[mipSlice] != D3D12_RESOURCE_STATE_UNKNOWN)
 				{
+					//未知
 					if (internalState->mipLevelStates[mipSlice] == D3D12_RESOURCE_STATE_UNKNOWN)
 					{
 						finalStateChecking = true;
@@ -265,6 +263,7 @@ void Gear::Core::Resource::D3D12Resource::Texture::transition(std::vector<D3D12_
 
 						internalState->mipLevelStates[mipSlice] = transitionState->mipLevelStates[mipSlice];
 					}
+					//已知
 					else
 					{
 						if (!bitFlagSubset(internalState->mipLevelStates[mipSlice], transitionState->mipLevelStates[mipSlice]))
@@ -296,8 +295,8 @@ void Gear::Core::Resource::D3D12Resource::Texture::transition(std::vector<D3D12_
 		}
 	}
 
-	//previous operation might make each mipslice state of internal state the same
-	//so we need to check each mipslice state of internal state and set internalState->allState base on it
+	//之前的操作可能会让纹理的内部状态的每个mipslice的状态相同
+	//因此我们需要进行检查，如果所有mipslice的状态相同，那么要设置internalState的allState为那个状态
 	if (finalStateChecking)
 	{
 		const uint32_t tempState = internalState->mipLevelStates[0];
@@ -314,8 +313,7 @@ void Gear::Core::Resource::D3D12Resource::Texture::transition(std::vector<D3D12_
 		}
 	}
 
-	//at last reset transition state
-	//this is important because we need to make this resource available for subsequent uses
+	//最后要重置transitionState用于后续的使用
 	resetTransitionStates();
 }
 

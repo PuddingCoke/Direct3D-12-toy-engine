@@ -86,8 +86,8 @@ Gear::Core::D3D12Core::DescriptorHandle Gear::Core::D3D12Core::DescriptorHeap::a
 {
 	std::lock_guard<std::mutex> lockGuard(dynamicPointerLock);
 
-	//if there is no enough room for target descriptor num just reset cpuPointer and gpuPointer
-	
+	//如果没有足够的描述符，那么直接重置cpuPointer和gpuPointer
+
 	const uint32_t movedLocation = static_cast<uint32_t>(dynamicCPUPointer.ptr - staticCPUPointerStart.ptr) / incrementSize + num;
 
 	if (movedLocation > numDescriptors)

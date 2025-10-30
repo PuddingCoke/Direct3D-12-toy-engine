@@ -60,7 +60,7 @@ namespace
 
 		Gear::Game* game;
 
-		//screenshot
+		//用于截屏
 		Gear::Core::Resource::D3D12Resource::ReadbackHeap* backBufferHeap;
 
 		Gear::InitializationParam::EngineUsage usage;

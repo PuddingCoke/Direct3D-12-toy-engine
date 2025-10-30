@@ -48,7 +48,7 @@ Gear::Core::VideoEncoder::NvidiaEncoder::NvidiaEncoder(const uint32_t frameToEnc
 	config.version = NV_ENC_CONFIG_VER;
 	config.profileGUID = profile;
 
-	//high quality encode
+	//高质量编码
 	config.gopLength = 120;
 	config.frameIntervalP = 1;
 	config.rcParams.enableLookahead = 1;

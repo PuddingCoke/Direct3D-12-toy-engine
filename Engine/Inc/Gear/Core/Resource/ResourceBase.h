@@ -29,7 +29,7 @@ namespace Gear
 
 			protected:
 
-				//copy non shader visible resource heap to shader visible resource heap
+				//把非着色器可见的资源描述符堆上的描述符拷贝到着色器可见的资源描述符堆上，并返回DescriptorHandle
 				D3D12Core::DescriptorHandle getTransientDescriptorHandle() const;
 
 				const bool persistent;

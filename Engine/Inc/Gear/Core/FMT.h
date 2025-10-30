@@ -8,7 +8,7 @@
 #include<dxgiformat.h>
 
 /// <summary>
-/// channel order + per channel bits + type
+/// 通道顺序 + 每通道比特 + 类型
 /// </summary>
 namespace Gear
 {

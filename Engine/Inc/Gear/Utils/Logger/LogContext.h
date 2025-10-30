@@ -95,7 +95,7 @@ namespace Gear
 
 				void packRestArgument();
 
-				//forbidden default case
+				//匹配模板函数是禁止的，在这种情况下会抛出编译错误
 				template<typename Arg>
 				void packArgument(const Arg& arg);
 
@@ -126,16 +126,16 @@ namespace Gear
 				//double
 				void packArgument(const double_t& arg);
 
-				//change integer mode
+				//改变整数模式
 				void packArgument(const IntegerMode& mode);
 
-				//change float precision
+				//改变浮点精度
 				void packArgument(const FloatPrecision& precision);
 
-				//change text color
+				//改变正文颜色
 				void packArgument(const LogColor& arg);
 
-				//change display color
+				//改变显示颜色
 				void setDisplayColor(const LogColor& color);
 
 				void resetState();
@@ -274,7 +274,7 @@ inline void Gear::Utils::Logger::LogContext::packArgument(const Arg& arg)
 {
 	static_assert(0, "not supported type");
 
-	//test use only
+	//用于测试
 	/*setDisplayColor(textColor);
 
 	const std::string ty = typeid(Arg).name();

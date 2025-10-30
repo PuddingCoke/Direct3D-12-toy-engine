@@ -29,40 +29,40 @@ namespace Gear
 
 			void updateBuffer(Resource::StaticCBuffer* const staticCBuffer, const void* const data, const uint32_t size) const;
 
-			//4 values availiable
+			//4个值可用
 			void setVSConstants(const std::initializer_list<Resource::D3D12Resource::ShaderResourceDesc>& descs, const uint32_t offset);
 
-			//4 values availiable
+			//4个值可用
 			void setVSConstants(const uint32_t numValues, const void* const data, const uint32_t offset) const;
 
-			//4 values availiable
+			//4个值可用
 			void setHSConstants(const std::initializer_list<Resource::D3D12Resource::ShaderResourceDesc>& descs, const uint32_t offset);
 
-			//4 values availiable
+			//4个值可用
 			void setHSConstants(const uint32_t numValues, const void* const data, const uint32_t offset) const;
 
-			//8 values availiable
+			//8个值可用
 			void setDSConstants(const std::initializer_list<Resource::D3D12Resource::ShaderResourceDesc>& descs, const uint32_t offset);
 
-			//8 values availiable
+			//8个值可用
 			void setDSConstants(const uint32_t numValues, const void* const data, const uint32_t offset) const;
 
-			//4 values availiable
+			//4个值可用
 			void setGSConstants(const std::initializer_list<Resource::D3D12Resource::ShaderResourceDesc>& descs, const uint32_t offset);
 
-			//4 values availiable
+			//4个值可用
 			void setGSConstants(const uint32_t numValues, const void* const data, const uint32_t offset) const;
 
-			//24 values availiable
+			//24个值可用
 			void setPSConstants(const std::initializer_list<Resource::D3D12Resource::ShaderResourceDesc>& descs, const uint32_t offset);
 
-			//24 values availiable
+			//24个值可用
 			void setPSConstants(const uint32_t numValues, const void* const data, const uint32_t offset) const;
 
-			//32 values availiable
+			//32个值可用
 			void setCSConstants(const std::initializer_list<Resource::D3D12Resource::ShaderResourceDesc>& descs, const uint32_t offset);
 
-			//32 values availiable
+			//32个值可用
 			void setCSConstants(const uint32_t numValues, const void* const data, const uint32_t offset) const;
 
 			void setGlobalConstantBuffer(const Resource::ImmutableCBuffer* const immutableCBuffer);

@@ -123,13 +123,10 @@ namespace Gear
 
 			bool getKeyDown(const Key key);
 
-			//trigger once
 			bool onKeyDown(const Key key);
 
-			//do not record command here
 			uint64_t addKeyDownEvent(const Key key, const std::function<void(void)>& func);
 
-			//do not record command here
 			uint64_t addKeyUpEvent(const Key key, const std::function<void(void)>& func);
 
 			void removeKeyDownEvent(const Key key, const uint64_t id);

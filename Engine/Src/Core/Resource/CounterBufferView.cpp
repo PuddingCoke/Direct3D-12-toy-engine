@@ -60,7 +60,7 @@ Gear::Core::Resource::CounterBufferView::CounterBufferView(const bool persistent
 		{
 			viewCPUHandle = descriptorHandle.getCPUHandle();
 
-			//get viewGPUHandle later
+			//之后获取viewGPUHandle
 		}
 	}
 }

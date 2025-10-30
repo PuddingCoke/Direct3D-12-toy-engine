@@ -30,7 +30,6 @@ namespace Gear
 				Shader(const std::wstring& filePath);
 
 				//hlsl
-				//note:should copy Common.hlsl under Engine/Shaders to project directory if you want to use Common.hlsl
 				Shader(const std::wstring& filePath, const DXCCompiler::ShaderProfile profile);
 
 				D3D12_SHADER_BYTECODE getByteCode() const;

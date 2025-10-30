@@ -48,7 +48,7 @@ Gear::Core::Resource::TextureDepthView::TextureDepthView(D3D12Resource::Texture*
 		break;
 	}
 
-	//create dsvs
+	//创建DSV
 	{
 		D3D12Core::DescriptorHandle descriptorHandle;
 
@@ -119,7 +119,7 @@ Gear::Core::Resource::TextureDepthView::TextureDepthView(D3D12Resource::Texture*
 
 		if (depthSRVFormat != DXGI_FORMAT_UNKNOWN)
 		{
-			//create depth srvs
+			//创建深度SRV
 			if (isTextureCube)
 			{
 				const uint32_t numCube = arraySize / 6;
@@ -267,7 +267,7 @@ Gear::Core::Resource::TextureDepthView::TextureDepthView(D3D12Resource::Texture*
 
 		if (stencilSRVFormat != DXGI_FORMAT_UNKNOWN)
 		{
-			//create stencil srvs
+			//创建模板SRV
 			if (isTextureCube)
 			{
 				const uint32_t numCube = arraySize / 6;

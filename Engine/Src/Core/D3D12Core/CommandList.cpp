@@ -241,7 +241,7 @@ void Gear::Core::D3D12Core::CommandList::setRenderTargets(const std::initializer
 		texture->setMipSliceState(desc.mipSlice, D3D12_RESOURCE_STATE_RENDER_TARGET);
 	}
 
-	//not support read only dsv currently
+	//目前不支持只读DSV
 	if (depthStencils)
 	{
 		Resource::D3D12Resource::Texture* const texture = depthStencils->texture;

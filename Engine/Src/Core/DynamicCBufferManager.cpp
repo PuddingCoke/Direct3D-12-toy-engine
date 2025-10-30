@@ -54,7 +54,7 @@ namespace
 
 	private:
 
-		//define number of each region's subregion
+		//每个区域的子区域数量
 		//256bytes 512bytes 1024bytes .....
 		static constexpr uint32_t numSubRegion[] = { 4096,2048 };
 
@@ -136,7 +136,7 @@ Gear::Core::Resource::D3D12Resource::UploadHeap* DynamicCBufferRegion::getUpload
 
 DynamicCBufferManagerPrivate::DynamicCBufferManagerPrivate()
 {
-	//create a large buffer that used as constant buffer
+	//创建一个大缓冲作为常量缓冲
 	{
 		uint32_t requiredSize = 0;
 
@@ -154,7 +154,7 @@ DynamicCBufferManagerPrivate::DynamicCBufferManagerPrivate()
 		LOGSUCCESS(L"create", FloatPrecision(0), requiredSize / 1024.f, L"kbytes constant buffer succeeded");
 	}
 
-	//create large upload heap for each region
+	//为大缓冲的每个区域创建上传堆，并进行管理
 	{
 		bufferRegions = new DynamicCBufferRegion * [numRegion];
 
@@ -164,7 +164,7 @@ DynamicCBufferManagerPrivate::DynamicCBufferManagerPrivate()
 		}
 	}
 
-	//create descriptors for each region's subregion
+	//为每个区域的子区域创建CBV
 	{
 		uint32_t requiredDescriptorNum = 0;
 

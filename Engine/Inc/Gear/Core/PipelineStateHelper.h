@@ -9,7 +9,6 @@ namespace Gear
 {
 	namespace Core
 	{
-		//helper namespace
 		namespace PipelineStateHelper
 		{
 
@@ -43,7 +42,7 @@ namespace Gear
 
 			constexpr D3D12_DEPTH_STENCIL_DESC depthLess = { true,D3D12_DEPTH_WRITE_MASK_ALL,D3D12_COMPARISON_FUNC_LESS,false };
 
-			//configure
+			//配置
 			//InputLayout
 			//BlendState
 			//RasterizerState
@@ -54,7 +53,7 @@ namespace Gear
 			//DSVFormat
 			D3D12_GRAPHICS_PIPELINE_STATE_DESC getDefaultGraphicsDesc();
 
-			//configure
+			//配置
 			//NumRenderTargets
 			//RTVFormats
 			//PS

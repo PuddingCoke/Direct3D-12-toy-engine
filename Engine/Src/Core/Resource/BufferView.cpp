@@ -15,7 +15,7 @@ Gear::Core::Resource::BufferView::BufferView(D3D12Resource::Buffer* const buffer
 
 	if (numSRVUAVCBVDescriptors)
 	{
-		//create counter buffer for structured buffer
+		//为结构化缓冲创建计数器缓冲
 		if (isStructuredBuffer && createUAV)
 		{
 			counterBuffer = new CounterBufferView(persistent);
@@ -97,8 +97,8 @@ Gear::Core::Resource::BufferView::BufferView(D3D12Resource::Buffer* const buffer
 
 			uavIndex = descriptorHandle.getCurrentIndex();
 
-			//for persistent resource we need an extra descriptor in non shader visible heap to get a view cpu handle
-			//for non persistent resource we already have a descriptor in non shader visible heap
+			//对于持久性资源我们需要在非着色器可见的描述符堆创建一个额外的描述符来获得一个viewCPUHandle
+			//而对于非持久性资源，我们已经有了
 			if (persistent)
 			{
 				viewGPUHandle = descriptorHandle.getGPUHandle();
@@ -120,7 +120,7 @@ Gear::Core::Resource::BufferView::BufferView(D3D12Resource::Buffer* const buffer
 			{
 				viewCPUHandle = descriptorHandle.getCPUHandle();
 
-				//get viewGPUHandle later
+				//之后获取viewGPUHandle
 			}
 		}
 	}

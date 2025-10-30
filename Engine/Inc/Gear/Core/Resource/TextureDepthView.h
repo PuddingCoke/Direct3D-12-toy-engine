@@ -19,7 +19,7 @@ namespace Gear
 
 				TextureDepthView() = delete;
 
-				//supported types
+				//支持的类型
 				//R32_TYPELESS 
 				//R16_TYPELESS 
 				//R32G8X24_TYPELESS 
