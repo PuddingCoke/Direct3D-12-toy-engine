@@ -4,8 +4,12 @@
 #define _GEAR_INPUT_EVENT_H_
 
 #include<map>
+
 #include<functional>
+
 #include<cstdint>
+
+#include<mutex>
 
 namespace Gear
 {
@@ -28,6 +32,8 @@ namespace Gear
 			uint64_t idx;
 
 			std::map<uint64_t, std::function<void(void)>> functions;
+
+			std::mutex containerMutex;
 
 		};
 	}

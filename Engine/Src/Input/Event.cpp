@@ -7,16 +7,26 @@ Gear::Input::Event::Event() :
 
 void Gear::Input::Event::operator-=(const uint64_t id)
 {
-	functions.erase(id);
+	{
+		std::lock_guard<std::mutex> lockGuard(containerMutex);
+
+		functions.erase(id);
+	}
 }
 
 uint64_t Gear::Input::Event::operator+=(const std::function<void(void)>& func)
 {
-	const uint64_t retIdx = idx++;
+	uint64_t retIndex;
 
-	functions.emplace(retIdx, func);
+	{
+		std::lock_guard<std::mutex> lockGuard(containerMutex);
 
-	return retIdx;
+		retIndex = idx++;
+
+		functions.emplace(retIndex, func);
+	}
+
+	return retIndex;
 }
 
 void Gear::Input::Event::operator()()

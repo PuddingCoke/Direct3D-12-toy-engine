@@ -42,14 +42,17 @@ Gear::Core::D3D12Core::DescriptorHandle Gear::Core::D3D12Core::DescriptorHeap::a
 
 Gear::Core::D3D12Core::DescriptorHandle Gear::Core::D3D12Core::DescriptorHeap::allocDynamicDescriptor(const uint32_t num)
 {
+	//这里还能继续优化，可以变成取模版本，于是就不需要mutex
+	//但是会导致descriptorHandle需要环绕，一旦需要环绕那么getTransientDescriptorHandle方法就会出问题
+	//把非持久性资源的descriptor拷贝ResourceDescriptorHeap中会变麻烦，其实这还涉及到如何让非持久性资源的descriptor被管线使用
+	//也许根本就不需要copyDescriptors方法。哎，这里好难呀！暂时还没想到该具体怎么改，头皮发麻了............
+	//反正得好好想想，正好写了一个月的代码感觉好累的，我也想休息下了
 	uint32_t retIndex;
 
 	{
 		std::lock_guard<std::mutex> lockGuard(dynamicRegionMutex);
 
-		const uint32_t movedLocation = dynamicIndex + num;
-
-		if (movedLocation > numDescriptors)
+		if (dynamicIndex + num > numDescriptors)
 		{
 			dynamicIndex = dynamicIndexStart;
 		}
