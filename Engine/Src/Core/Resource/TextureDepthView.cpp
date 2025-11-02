@@ -1,7 +1,7 @@
 ﻿#include<Gear/Core/Resource/TextureDepthView.h>
 
 Gear::Core::Resource::TextureDepthView::TextureDepthView(D3D12Resource::Texture* const texture, const bool isTextureCube, const bool persistent) :
-	ResourceBase(persistent), texture(texture), dsvMipHandleStart(), allDepthIndex(0), allStencilIndex(0), depthMipIndexStart(0), stencilMipIndexStart(0)
+	ResourceBase(persistent), texture(texture), allDepthSRVIndex(0), allStencilSRVIndex(0)
 {
 	const uint32_t mipLevels = texture->getMipLevels();
 	const uint32_t arraySize = texture->getArraySize();
@@ -48,6 +48,10 @@ Gear::Core::Resource::TextureDepthView::TextureDepthView(D3D12Resource::Texture*
 		break;
 	}
 
+	hasDepthSRV = (depthSRVFormat != DXGI_FORMAT_UNKNOWN);
+
+	hasStencilSRV = (stencilSRVFormat != DXGI_FORMAT_UNKNOWN);
+
 	//创建DSV
 	{
 		D3D12Core::DescriptorHandle descriptorHandle;
@@ -61,10 +65,12 @@ Gear::Core::Resource::TextureDepthView::TextureDepthView(D3D12Resource::Texture*
 			descriptorHandle = GlobalDescriptorHeap::getDepthStencilHeap()->allocDynamicDescriptor(mipLevels);
 		}
 
-		dsvMipHandleStart = descriptorHandle.getCPUHandle();
+		dsvMipHandles.resize(mipLevels);
 
 		for (uint32_t i = 0; i < mipLevels; i++)
 		{
+			dsvMipHandles[i] = descriptorHandle.getCurrentCPUHandle();
+
 			if (arraySize > 1)
 			{
 				D3D12_DEPTH_STENCIL_VIEW_DESC desc = {};
@@ -74,7 +80,7 @@ Gear::Core::Resource::TextureDepthView::TextureDepthView(D3D12Resource::Texture*
 				desc.Texture2DArray.FirstArraySlice = 0;
 				desc.Texture2DArray.MipSlice = i;
 
-				GraphicsDevice::get()->CreateDepthStencilView(texture->getResource(), &desc, descriptorHandle.getCPUHandle());
+				GraphicsDevice::get()->CreateDepthStencilView(texture->getResource(), &desc, descriptorHandle.getCurrentCPUHandle());
 
 				descriptorHandle.move();
 			}
@@ -85,40 +91,25 @@ Gear::Core::Resource::TextureDepthView::TextureDepthView(D3D12Resource::Texture*
 				desc.Format = dsvFormat;
 				desc.Texture2D.MipSlice = i;
 
-				GraphicsDevice::get()->CreateDepthStencilView(texture->getResource(), &desc, descriptorHandle.getCPUHandle());
+				GraphicsDevice::get()->CreateDepthStencilView(texture->getResource(), &desc, descriptorHandle.getCurrentCPUHandle());
 
 				descriptorHandle.move();
 			}
 		}
 	}
 
-	numSRVUAVCBVDescriptors = (static_cast<uint32_t>((stencilSRVFormat != DXGI_FORMAT_UNKNOWN)) + static_cast<uint32_t>((depthSRVFormat != DXGI_FORMAT_UNKNOWN))) * (1 + mipLevels);
+	setNumCBVSRVUAVDescriptors((static_cast<uint32_t>(hasDepthSRV) + static_cast<uint32_t>(hasStencilSRV)) * (1 + mipLevels));
 
-	if (numSRVUAVCBVDescriptors)
+	if (getNumCBVSRVUAVDescriptors())
 	{
-		D3D12Core::DescriptorHandle descriptorHandle;
+		D3D12Core::DescriptorHandle descriptorHandle = allocCBVSRVUAVDescriptors();
 
-		if (persistent)
+		if (hasDepthSRV)
 		{
-			descriptorHandle = GlobalDescriptorHeap::getResourceHeap()->allocStaticDescriptor(numSRVUAVCBVDescriptors);
-		}
-		else
-		{
-			descriptorHandle = GlobalDescriptorHeap::getNonShaderVisibleResourceHeap()->allocDynamicDescriptor(numSRVUAVCBVDescriptors);
-		}
+			allDepthSRVIndex = descriptorHandle.getCurrentIndex();
 
-		srvUAVCBVHandleStart = descriptorHandle.getCPUHandle();
+			depthSRVMipIndices.resize(mipLevels);
 
-		allDepthIndex = descriptorHandle.getCurrentIndex();
-
-		depthMipIndexStart = allDepthIndex + 1;
-
-		allStencilIndex = depthMipIndexStart + mipLevels;
-
-		stencilMipIndexStart = allStencilIndex + 1;
-
-		if (depthSRVFormat != DXGI_FORMAT_UNKNOWN)
-		{
 			//创建深度SRV
 			if (isTextureCube)
 			{
@@ -137,13 +128,15 @@ Gear::Core::Resource::TextureDepthView::TextureDepthView(D3D12Resource::Texture*
 						desc.TextureCubeArray.NumCubes = numCube;
 						desc.TextureCubeArray.ResourceMinLODClamp = 0.f;
 
-						GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCPUHandle());
+						GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCurrentCPUHandle());
 
 						descriptorHandle.move();
 					}
 
 					for (uint32_t i = 0; i < mipLevels; i++)
 					{
+						depthSRVMipIndices[i] = descriptorHandle.getCurrentIndex();
+
 						D3D12_SHADER_RESOURCE_VIEW_DESC desc = {};
 						desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 						desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBEARRAY;
@@ -154,7 +147,7 @@ Gear::Core::Resource::TextureDepthView::TextureDepthView(D3D12Resource::Texture*
 						desc.TextureCubeArray.NumCubes = numCube;
 						desc.TextureCubeArray.ResourceMinLODClamp = 0.f;
 
-						GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCPUHandle());
+						GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCurrentCPUHandle());
 
 						descriptorHandle.move();
 					}
@@ -170,13 +163,15 @@ Gear::Core::Resource::TextureDepthView::TextureDepthView(D3D12Resource::Texture*
 						desc.TextureCube.MostDetailedMip = 0;
 						desc.TextureCube.ResourceMinLODClamp = 0.f;
 
-						GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCPUHandle());
+						GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCurrentCPUHandle());
 
 						descriptorHandle.move();
 					}
 
 					for (uint32_t i = 0; i < mipLevels; i++)
 					{
+						depthSRVMipIndices[i] = descriptorHandle.getCurrentIndex();
+
 						D3D12_SHADER_RESOURCE_VIEW_DESC desc = {};
 						desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 						desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBE;
@@ -185,7 +180,7 @@ Gear::Core::Resource::TextureDepthView::TextureDepthView(D3D12Resource::Texture*
 						desc.TextureCube.MostDetailedMip = i;
 						desc.TextureCube.ResourceMinLODClamp = 0.f;
 
-						GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCPUHandle());
+						GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCurrentCPUHandle());
 
 						descriptorHandle.move();
 					}
@@ -207,13 +202,15 @@ Gear::Core::Resource::TextureDepthView::TextureDepthView(D3D12Resource::Texture*
 						desc.Texture2DArray.PlaneSlice = 0;
 						desc.Texture2DArray.ResourceMinLODClamp = 0.f;
 
-						GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCPUHandle());
+						GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCurrentCPUHandle());
 
 						descriptorHandle.move();
 					}
 
 					for (uint32_t i = 0; i < mipLevels; i++)
 					{
+						depthSRVMipIndices[i] = descriptorHandle.getCurrentIndex();
+
 						D3D12_SHADER_RESOURCE_VIEW_DESC desc = {};
 						desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 						desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2DARRAY;
@@ -225,7 +222,7 @@ Gear::Core::Resource::TextureDepthView::TextureDepthView(D3D12Resource::Texture*
 						desc.Texture2DArray.PlaneSlice = 0;
 						desc.Texture2DArray.ResourceMinLODClamp = 0.f;
 
-						GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCPUHandle());
+						GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCurrentCPUHandle());
 
 						descriptorHandle.move();
 					}
@@ -241,13 +238,15 @@ Gear::Core::Resource::TextureDepthView::TextureDepthView(D3D12Resource::Texture*
 						desc.Texture2D.MostDetailedMip = 0;
 						desc.Texture2D.PlaneSlice = 0;
 						desc.Texture2D.ResourceMinLODClamp = 0.f;
-						GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCPUHandle());
+						GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCurrentCPUHandle());
 
 						descriptorHandle.move();
 					}
 
 					for (uint32_t i = 0; i < mipLevels; i++)
 					{
+						depthSRVMipIndices[i] = descriptorHandle.getCurrentIndex();
+
 						D3D12_SHADER_RESOURCE_VIEW_DESC desc = {};
 						desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 						desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
@@ -257,7 +256,7 @@ Gear::Core::Resource::TextureDepthView::TextureDepthView(D3D12Resource::Texture*
 						desc.Texture2D.PlaneSlice = 0;
 						desc.Texture2D.ResourceMinLODClamp = 0.f;
 
-						GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCPUHandle());
+						GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCurrentCPUHandle());
 
 						descriptorHandle.move();
 					}
@@ -265,8 +264,12 @@ Gear::Core::Resource::TextureDepthView::TextureDepthView(D3D12Resource::Texture*
 			}
 		}
 
-		if (stencilSRVFormat != DXGI_FORMAT_UNKNOWN)
+		if (hasStencilSRV)
 		{
+			allStencilSRVIndex = descriptorHandle.getCurrentIndex();
+
+			stencilSRVMipIndices.resize(mipLevels);
+
 			//创建模板SRV
 			if (isTextureCube)
 			{
@@ -285,13 +288,15 @@ Gear::Core::Resource::TextureDepthView::TextureDepthView(D3D12Resource::Texture*
 						desc.TextureCubeArray.NumCubes = numCube;
 						desc.TextureCubeArray.ResourceMinLODClamp = 0.f;
 
-						GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCPUHandle());
+						GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCurrentCPUHandle());
 
 						descriptorHandle.move();
 					}
 
 					for (uint32_t i = 0; i < mipLevels; i++)
 					{
+						stencilSRVMipIndices[i] = descriptorHandle.getCurrentIndex();
+
 						D3D12_SHADER_RESOURCE_VIEW_DESC desc = {};
 						desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 						desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBEARRAY;
@@ -302,7 +307,7 @@ Gear::Core::Resource::TextureDepthView::TextureDepthView(D3D12Resource::Texture*
 						desc.TextureCubeArray.NumCubes = numCube;
 						desc.TextureCubeArray.ResourceMinLODClamp = 0.f;
 
-						GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCPUHandle());
+						GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCurrentCPUHandle());
 
 						descriptorHandle.move();
 					}
@@ -318,13 +323,15 @@ Gear::Core::Resource::TextureDepthView::TextureDepthView(D3D12Resource::Texture*
 						desc.TextureCube.MostDetailedMip = 0;
 						desc.TextureCube.ResourceMinLODClamp = 0.f;
 
-						GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCPUHandle());
+						GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCurrentCPUHandle());
 
 						descriptorHandle.move();
 					}
 
 					for (uint32_t i = 0; i < mipLevels; i++)
 					{
+						stencilSRVMipIndices[i] = descriptorHandle.getCurrentIndex();
+
 						D3D12_SHADER_RESOURCE_VIEW_DESC desc = {};
 						desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 						desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBE;
@@ -333,7 +340,7 @@ Gear::Core::Resource::TextureDepthView::TextureDepthView(D3D12Resource::Texture*
 						desc.TextureCube.MostDetailedMip = i;
 						desc.TextureCube.ResourceMinLODClamp = 0.f;
 
-						GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCPUHandle());
+						GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCurrentCPUHandle());
 
 						descriptorHandle.move();
 					}
@@ -355,13 +362,15 @@ Gear::Core::Resource::TextureDepthView::TextureDepthView(D3D12Resource::Texture*
 						desc.Texture2DArray.PlaneSlice = 0;
 						desc.Texture2DArray.ResourceMinLODClamp = 0.f;
 
-						GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCPUHandle());
+						GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCurrentCPUHandle());
 
 						descriptorHandle.move();
 					}
 
 					for (uint32_t i = 0; i < mipLevels; i++)
 					{
+						stencilSRVMipIndices[i] = descriptorHandle.getCurrentIndex();
+
 						D3D12_SHADER_RESOURCE_VIEW_DESC desc = {};
 						desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 						desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2DARRAY;
@@ -373,7 +382,7 @@ Gear::Core::Resource::TextureDepthView::TextureDepthView(D3D12Resource::Texture*
 						desc.Texture2DArray.PlaneSlice = 0;
 						desc.Texture2DArray.ResourceMinLODClamp = 0.f;
 
-						GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCPUHandle());
+						GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCurrentCPUHandle());
 
 						descriptorHandle.move();
 					}
@@ -389,13 +398,15 @@ Gear::Core::Resource::TextureDepthView::TextureDepthView(D3D12Resource::Texture*
 						desc.Texture2D.MostDetailedMip = 0;
 						desc.Texture2D.PlaneSlice = 0;
 						desc.Texture2D.ResourceMinLODClamp = 0.f;
-						GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCPUHandle());
+						GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCurrentCPUHandle());
 
 						descriptorHandle.move();
 					}
 
 					for (uint32_t i = 0; i < mipLevels; i++)
 					{
+						stencilSRVMipIndices[i] = descriptorHandle.getCurrentIndex();
+
 						D3D12_SHADER_RESOURCE_VIEW_DESC desc = {};
 						desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 						desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
@@ -405,7 +416,7 @@ Gear::Core::Resource::TextureDepthView::TextureDepthView(D3D12Resource::Texture*
 						desc.Texture2D.PlaneSlice = 0;
 						desc.Texture2D.ResourceMinLODClamp = 0.f;
 
-						GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCPUHandle());
+						GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCurrentCPUHandle());
 
 						descriptorHandle.move();
 					}
@@ -417,11 +428,13 @@ Gear::Core::Resource::TextureDepthView::TextureDepthView(D3D12Resource::Texture*
 
 Gear::Core::Resource::TextureDepthView::TextureDepthView(const TextureDepthView& tdv) :
 	ResourceBase(tdv.persistent),
-	allDepthIndex(tdv.allDepthIndex),
-	allStencilIndex(tdv.allStencilIndex),
-	depthMipIndexStart(tdv.depthMipIndexStart),
-	stencilMipIndexStart(tdv.stencilMipIndexStart),
-	dsvMipHandleStart(tdv.dsvMipHandleStart),
+	hasDepthSRV(tdv.hasDepthSRV),
+	hasStencilSRV(tdv.hasStencilSRV),
+	allDepthSRVIndex(tdv.allDepthSRVIndex),
+	allStencilSRVIndex(tdv.allStencilSRVIndex),
+	depthSRVMipIndices(tdv.depthSRVMipIndices),
+	stencilSRVMipIndices(tdv.stencilSRVMipIndices),
+	dsvMipHandles(tdv.dsvMipHandles),
 	texture(new D3D12Resource::Texture(tdv.texture))
 {
 }
@@ -439,7 +452,7 @@ Gear::Core::Resource::D3D12Resource::ShaderResourceDesc Gear::Core::Resource::Te
 	D3D12Resource::ShaderResourceDesc desc = {};
 	desc.type = D3D12Resource::ShaderResourceDesc::TEXTURE;
 	desc.state = D3D12Resource::ShaderResourceDesc::SRV;
-	desc.resourceIndex = allDepthIndex;
+	desc.resourceIndex = allDepthSRVIndex;
 	desc.textureDesc.texture = texture;
 	desc.textureDesc.mipSlice = D3D12Resource::D3D12_TRANSITION_ALL_MIPLEVELS;
 
@@ -451,7 +464,7 @@ Gear::Core::Resource::D3D12Resource::ShaderResourceDesc Gear::Core::Resource::Te
 	D3D12Resource::ShaderResourceDesc desc = {};
 	desc.type = D3D12Resource::ShaderResourceDesc::TEXTURE;
 	desc.state = D3D12Resource::ShaderResourceDesc::SRV;
-	desc.resourceIndex = allStencilIndex;
+	desc.resourceIndex = allStencilSRVIndex;
 	desc.textureDesc.texture = texture;
 	desc.textureDesc.mipSlice = D3D12Resource::D3D12_TRANSITION_ALL_MIPLEVELS;
 
@@ -463,7 +476,7 @@ Gear::Core::Resource::D3D12Resource::ShaderResourceDesc Gear::Core::Resource::Te
 	D3D12Resource::ShaderResourceDesc desc = {};
 	desc.type = D3D12Resource::ShaderResourceDesc::TEXTURE;
 	desc.state = D3D12Resource::ShaderResourceDesc::SRV;
-	desc.resourceIndex = depthMipIndexStart + mipSlice;
+	desc.resourceIndex = depthSRVMipIndices[mipSlice];
 	desc.textureDesc.texture = texture;
 	desc.textureDesc.mipSlice = mipSlice;
 
@@ -475,7 +488,7 @@ Gear::Core::Resource::D3D12Resource::ShaderResourceDesc Gear::Core::Resource::Te
 	D3D12Resource::ShaderResourceDesc desc = {};
 	desc.type = D3D12Resource::ShaderResourceDesc::TEXTURE;
 	desc.state = D3D12Resource::ShaderResourceDesc::SRV;
-	desc.resourceIndex = stencilMipIndexStart + mipSlice;
+	desc.resourceIndex = stencilSRVMipIndices[mipSlice];
 	desc.textureDesc.texture = texture;
 	desc.textureDesc.mipSlice = mipSlice;
 
@@ -487,7 +500,7 @@ Gear::Core::Resource::D3D12Resource::DepthStencilDesc Gear::Core::Resource::Text
 	D3D12Resource::DepthStencilDesc desc = {};
 	desc.texture = texture;
 	desc.mipSlice = mipSlice;
-	desc.dsvHandle = CD3DX12_CPU_DESCRIPTOR_HANDLE(dsvMipHandleStart, mipSlice, GlobalDescriptorHeap::getDepthStencilIncrementSize());
+	desc.dsvHandle = dsvMipHandles[mipSlice];
 
 	return desc;
 }
@@ -499,13 +512,33 @@ Gear::Core::Resource::D3D12Resource::Texture* Gear::Core::Resource::TextureDepth
 
 void Gear::Core::Resource::TextureDepthView::copyDescriptors()
 {
-	const D3D12Core::DescriptorHandle handle = getTransientDescriptorHandle();
+	D3D12Core::DescriptorHandle shaderVisibleHandle = copyToResourceHeap();
 
-	allDepthIndex = handle.getCurrentIndex();
+	if (hasDepthSRV)
+	{
+		allDepthSRVIndex = shaderVisibleHandle.getCurrentIndex();
 
-	depthMipIndexStart = allDepthIndex + 1;
+		shaderVisibleHandle.move();
 
-	allStencilIndex = depthMipIndexStart + texture->getMipLevels();
+		for (uint32_t i = 0; i < texture->getMipLevels(); i++)
+		{
+			depthSRVMipIndices[i] = shaderVisibleHandle.getCurrentIndex();
 
-	stencilMipIndexStart = allStencilIndex + 1;
+			shaderVisibleHandle.move();
+		}
+	}
+
+	if (hasStencilSRV)
+	{
+		allStencilSRVIndex = shaderVisibleHandle.getCurrentIndex();
+
+		shaderVisibleHandle.move();
+
+		for (uint32_t i = 0; i < texture->getMipLevels(); i++)
+		{
+			stencilSRVMipIndices[i] = shaderVisibleHandle.getCurrentIndex();
+
+			shaderVisibleHandle.move();
+		}
+	}
 }

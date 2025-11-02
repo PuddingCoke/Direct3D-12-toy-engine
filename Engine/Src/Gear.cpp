@@ -333,9 +333,9 @@ void GearPrivate::runVideoRender()
 
 				renderTextures[i] = new Gear::Core::Resource::D3D12Resource::Texture(Gear::Core::Graphics::getWidth(), Gear::Core::Graphics::getHeight(), Gear::Core::Graphics::backBufferFormat, 1, 1, true, D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET, &clearValue);
 
-				Gear::Core::GraphicsDevice::get()->CreateRenderTargetView(renderTextures[i]->getResource(), &rtvDesc, descriptorHandle.getCPUHandle());
+				Gear::Core::GraphicsDevice::get()->CreateRenderTargetView(renderTextures[i]->getResource(), &rtvDesc, descriptorHandle.getCurrentCPUHandle());
 
-				textureHandles[i] = descriptorHandle.getCPUHandle();
+				textureHandles[i] = descriptorHandle.getCurrentCPUHandle();
 
 				descriptorHandle.move();
 			}

@@ -5,7 +5,7 @@
 Gear::Core::Resource::BufferView::BufferView(D3D12Resource::Buffer* const buffer, const uint32_t structureByteStride, const DXGI_FORMAT format, const uint64_t size, const bool createSRV, const bool createUAV, const bool createVBV, const bool createIBV, const bool cpuWritable, const bool persistent) :
 	ResourceBase(persistent), buffer(buffer), counterBuffer(nullptr), vbv{}, srvIndex(0), uavIndex(0), uploadHeaps(nullptr), hasSRV(createSRV), hasUAV(createUAV), viewCPUHandle(), viewGPUHandle()
 {
-	numSRVUAVCBVDescriptors = static_cast<uint32_t>(createSRV) + static_cast<uint32_t>(createUAV);
+	setNumCBVSRVUAVDescriptors(static_cast<uint32_t>(createSRV) + static_cast<uint32_t>(createUAV));
 
 	const bool isTypedBuffer = (structureByteStride == 0 && format != DXGI_FORMAT_UNKNOWN);
 
@@ -13,7 +13,7 @@ Gear::Core::Resource::BufferView::BufferView(D3D12Resource::Buffer* const buffer
 
 	const bool isByteAddressBuffer = (structureByteStride == 0 && format == DXGI_FORMAT_UNKNOWN);
 
-	if (numSRVUAVCBVDescriptors)
+	if (getNumCBVSRVUAVDescriptors())
 	{
 		//为结构化缓冲创建计数器缓冲
 		if (isStructuredBuffer && createUAV)
@@ -21,18 +21,7 @@ Gear::Core::Resource::BufferView::BufferView(D3D12Resource::Buffer* const buffer
 			counterBuffer = new CounterBufferView(persistent);
 		}
 
-		D3D12Core::DescriptorHandle descriptorHandle;
-
-		if (persistent)
-		{
-			descriptorHandle = GlobalDescriptorHeap::getResourceHeap()->allocStaticDescriptor(numSRVUAVCBVDescriptors);
-		}
-		else
-		{
-			descriptorHandle = GlobalDescriptorHeap::getNonShaderVisibleResourceHeap()->allocDynamicDescriptor(numSRVUAVCBVDescriptors);
-		}
-
-		srvUAVCBVHandleStart = descriptorHandle.getCPUHandle();
+		D3D12Core::DescriptorHandle descriptorHandle = allocCBVSRVUAVDescriptors();
 
 		if (createSRV)
 		{
@@ -57,7 +46,7 @@ Gear::Core::Resource::BufferView::BufferView(D3D12Resource::Buffer* const buffer
 				desc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_RAW;
 			}
 
-			GraphicsDevice::get()->CreateShaderResourceView(buffer->getResource(), &desc, descriptorHandle.getCPUHandle());
+			GraphicsDevice::get()->CreateShaderResourceView(buffer->getResource(), &desc, descriptorHandle.getCurrentCPUHandle());
 
 			srvIndex = descriptorHandle.getCurrentIndex();
 
@@ -88,11 +77,11 @@ Gear::Core::Resource::BufferView::BufferView(D3D12Resource::Buffer* const buffer
 
 			if (isStructuredBuffer)
 			{
-				GraphicsDevice::get()->CreateUnorderedAccessView(buffer->getResource(), counterBuffer->getBuffer()->getResource(), &desc, descriptorHandle.getCPUHandle());
+				GraphicsDevice::get()->CreateUnorderedAccessView(buffer->getResource(), counterBuffer->getBuffer()->getResource(), &desc, descriptorHandle.getCurrentCPUHandle());
 			}
 			else
 			{
-				GraphicsDevice::get()->CreateUnorderedAccessView(buffer->getResource(), nullptr, &desc, descriptorHandle.getCPUHandle());
+				GraphicsDevice::get()->CreateUnorderedAccessView(buffer->getResource(), nullptr, &desc, descriptorHandle.getCurrentCPUHandle());
 			}
 
 			uavIndex = descriptorHandle.getCurrentIndex();
@@ -101,24 +90,24 @@ Gear::Core::Resource::BufferView::BufferView(D3D12Resource::Buffer* const buffer
 			//而对于非持久性资源，我们已经有了
 			if (persistent)
 			{
-				viewGPUHandle = descriptorHandle.getGPUHandle();
+				viewGPUHandle = descriptorHandle.getCurrentGPUHandle();
 
-				const D3D12Core::DescriptorHandle nonShaderVisibleHandle = GlobalDescriptorHeap::getNonShaderVisibleResourceHeap()->allocStaticDescriptor(1);
+				const D3D12Core::DescriptorHandle nonShaderVisibleHandle = GlobalDescriptorHeap::getStagingResourceHeap()->allocStaticDescriptor(1);
 
 				if (isStructuredBuffer)
 				{
-					GraphicsDevice::get()->CreateUnorderedAccessView(buffer->getResource(), counterBuffer->getBuffer()->getResource(), &desc, nonShaderVisibleHandle.getCPUHandle());
+					GraphicsDevice::get()->CreateUnorderedAccessView(buffer->getResource(), counterBuffer->getBuffer()->getResource(), &desc, nonShaderVisibleHandle.getCurrentCPUHandle());
 				}
 				else
 				{
-					GraphicsDevice::get()->CreateUnorderedAccessView(buffer->getResource(), nullptr, &desc, nonShaderVisibleHandle.getCPUHandle());
+					GraphicsDevice::get()->CreateUnorderedAccessView(buffer->getResource(), nullptr, &desc, nonShaderVisibleHandle.getCurrentCPUHandle());
 				}
 
-				viewCPUHandle = nonShaderVisibleHandle.getCPUHandle();
+				viewCPUHandle = nonShaderVisibleHandle.getCurrentCPUHandle();
 			}
 			else
 			{
-				viewCPUHandle = descriptorHandle.getCPUHandle();
+				viewCPUHandle = descriptorHandle.getCurrentCPUHandle();
 
 				//之后获取viewGPUHandle
 			}
@@ -242,7 +231,7 @@ Gear::Core::Resource::D3D12Resource::Buffer* Gear::Core::Resource::BufferView::g
 
 void Gear::Core::Resource::BufferView::copyDescriptors()
 {
-	D3D12Core::DescriptorHandle shaderVisibleHandle = getTransientDescriptorHandle();
+	D3D12Core::DescriptorHandle shaderVisibleHandle = copyToResourceHeap();
 
 	if (hasSRV)
 	{
@@ -255,7 +244,7 @@ void Gear::Core::Resource::BufferView::copyDescriptors()
 	{
 		uavIndex = shaderVisibleHandle.getCurrentIndex();
 
-		viewGPUHandle = shaderVisibleHandle.getGPUHandle();
+		viewGPUHandle = shaderVisibleHandle.getCurrentGPUHandle();
 	}
 }
 

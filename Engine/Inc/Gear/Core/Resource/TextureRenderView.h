@@ -53,15 +53,15 @@ namespace Gear
 
 				uint32_t allSRVIndex;
 
-				uint32_t srvMipIndexStart;
+				std::vector<uint32_t> srvMipIndices;
 
-				uint32_t uavMipIndexStart;
+				std::vector<uint32_t> uavMipIndices;
 
-				D3D12_CPU_DESCRIPTOR_HANDLE rtvMipHandleStart;
+				std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> rtvMipHandles;
 
-				D3D12_GPU_DESCRIPTOR_HANDLE viewGPUHandleStart;
+				std::vector<D3D12_GPU_DESCRIPTOR_HANDLE> viewGPUHandles;
 
-				D3D12_CPU_DESCRIPTOR_HANDLE viewCPUHandleStart;
+				std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> viewCPUHandles;
 
 				D3D12Resource::Texture* texture;
 			};

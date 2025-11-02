@@ -37,7 +37,7 @@ namespace Gear
 
 				const uint32_t numDescriptors;
 
-				const uint32_t dynamicIndexStart;
+				const uint32_t numDynamicDescriptors;
 
 				const D3D12_DESCRIPTOR_HEAP_TYPE type;
 
@@ -49,11 +49,9 @@ namespace Gear
 
 				CD3DX12_GPU_DESCRIPTOR_HANDLE gpuHandleStart;
 
-				std::atomic<uint32_t> staticIndex;
+				std::atomic<uint64_t> staticIndex;
 
-				uint32_t dynamicIndex;
-
-				std::mutex dynamicRegionMutex;
+				std::atomic<uint64_t> dynamicIndex;
 
 			};
 		}

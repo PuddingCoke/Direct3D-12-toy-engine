@@ -14,22 +14,11 @@ Gear::Core::Resource::ImmutableCBuffer::ImmutableCBuffer(D3D12Resource::Buffer* 
 		desc.BufferLocation = buffer->getGPUAddress();
 		desc.SizeInBytes = size;
 
-		numSRVUAVCBVDescriptors = 1;
+		setNumCBVSRVUAVDescriptors(1);
 
-		D3D12Core::DescriptorHandle descriptorHandle;
+		D3D12Core::DescriptorHandle descriptorHandle = allocCBVSRVUAVDescriptors();
 
-		if (persistent)
-		{
-			descriptorHandle = GlobalDescriptorHeap::getResourceHeap()->allocStaticDescriptor(numSRVUAVCBVDescriptors);
-		}
-		else
-		{
-			descriptorHandle = GlobalDescriptorHeap::getNonShaderVisibleResourceHeap()->allocDynamicDescriptor(numSRVUAVCBVDescriptors);
-		}
-
-		srvUAVCBVHandleStart = descriptorHandle.getCPUHandle();
-
-		GraphicsDevice::get()->CreateConstantBufferView(&desc, descriptorHandle.getCPUHandle());
+		GraphicsDevice::get()->CreateConstantBufferView(&desc, descriptorHandle.getCurrentCPUHandle());
 
 		gpuAddress = buffer->getGPUAddress();
 
@@ -68,7 +57,7 @@ Gear::Core::Resource::D3D12Resource::Buffer* Gear::Core::Resource::ImmutableCBuf
 
 void Gear::Core::Resource::ImmutableCBuffer::copyDescriptors()
 {
-	const D3D12Core::DescriptorHandle handle = getTransientDescriptorHandle();
+	const D3D12Core::DescriptorHandle shaderVisibleHandle = copyToResourceHeap();
 
-	bufferIndex = handle.getCurrentIndex();
+	bufferIndex = shaderVisibleHandle.getCurrentIndex();
 }

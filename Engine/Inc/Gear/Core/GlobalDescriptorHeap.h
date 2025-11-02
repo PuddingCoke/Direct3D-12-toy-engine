@@ -11,7 +11,10 @@ namespace Gear
 	{
 		namespace GlobalDescriptorHeap
 		{
+
 			D3D12Core::DescriptorHeap* getResourceHeap();
+
+			D3D12Core::DescriptorHeap* getStagingResourceHeap();
 
 			D3D12Core::DescriptorHeap* getSamplerHeap();
 
@@ -19,15 +22,6 @@ namespace Gear
 
 			D3D12Core::DescriptorHeap* getDepthStencilHeap();
 
-			D3D12Core::DescriptorHeap* getNonShaderVisibleResourceHeap();
-
-			uint32_t getResourceIncrementSize();
-
-			uint32_t getRenderTargetIncrementSize();
-
-			uint32_t getDepthStencilIncrementSize();
-
-			uint32_t getSamplerIncrementSize();
 		}
 	}
 }

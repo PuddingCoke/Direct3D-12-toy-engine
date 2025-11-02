@@ -191,7 +191,7 @@ DynamicCBufferManagerPrivate::DynamicCBufferManagerPrivate()
 
 				bufferLocationOffset += (256ull << regionIndex);
 
-				Gear::Core::GraphicsDevice::get()->CreateConstantBufferView(&desc, descriptorHandle.getCPUHandle());
+				Gear::Core::GraphicsDevice::get()->CreateConstantBufferView(&desc, descriptorHandle.getCurrentCPUHandle());
 
 				descriptorHandle.move();
 			}

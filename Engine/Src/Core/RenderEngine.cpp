@@ -263,9 +263,9 @@ RenderEnginePrivate::RenderEnginePrivate(const uint32_t width, const uint32_t he
 
 			swapChain->GetBuffer(i, IID_PPV_ARGS(&texture));
 
-			Gear::Core::GraphicsDevice::get()->CreateRenderTargetView(texture.Get(), nullptr, descriptorHandle.getCPUHandle());
+			Gear::Core::GraphicsDevice::get()->CreateRenderTargetView(texture.Get(), nullptr, descriptorHandle.getCurrentCPUHandle());
 
-			backBufferHandles[i] = descriptorHandle.getCPUHandle();
+			backBufferHandles[i] = descriptorHandle.getCurrentCPUHandle();
 
 			descriptorHandle.move();
 
@@ -288,7 +288,7 @@ RenderEnginePrivate::RenderEnginePrivate(const uint32_t width, const uint32_t he
 
 		ImGui_ImplWin32_Init(hwnd);
 		ImGui_ImplDX12_Init(Gear::Core::GraphicsDevice::get(), Gear::Core::Graphics::getFrameBufferCount(), Gear::Core::Graphics::backBufferFormat,
-			Gear::Core::GlobalDescriptorHeap::getResourceHeap()->get(), handle.getCPUHandle(), handle.getGPUHandle());
+			Gear::Core::GlobalDescriptorHeap::getResourceHeap()->get(), handle.getCurrentCPUHandle(), handle.getCurrentGPUHandle());
 	}
 	else
 	{

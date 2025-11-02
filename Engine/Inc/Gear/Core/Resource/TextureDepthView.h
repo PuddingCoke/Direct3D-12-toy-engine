@@ -46,15 +46,19 @@ namespace Gear
 
 			private:
 
-				uint32_t allDepthIndex;
+				bool hasDepthSRV;
 
-				uint32_t allStencilIndex;
+				bool hasStencilSRV;
 
-				uint32_t depthMipIndexStart;
+				uint32_t allDepthSRVIndex;
 
-				uint32_t stencilMipIndexStart;
+				uint32_t allStencilSRVIndex;
 
-				D3D12_CPU_DESCRIPTOR_HANDLE dsvMipHandleStart;
+				std::vector<uint32_t> depthSRVMipIndices;
+
+				std::vector<uint32_t> stencilSRVMipIndices;
+
+				std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> dsvMipHandles;
 
 				D3D12Resource::Texture* texture;
 			};

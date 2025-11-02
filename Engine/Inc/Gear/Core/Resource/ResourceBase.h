@@ -23,20 +23,33 @@ namespace Gear
 
 				virtual ~ResourceBase();
 
-				virtual void copyDescriptors();
+				virtual void copyDescriptors() = 0;
 
 				bool getPersistent() const;
 
+				uint32_t getNumCBVSRVUAVDescriptors() const;
+
+				void setNumCBVSRVUAVDescriptors(const uint32_t numDescriptors);
+
 			protected:
 
-				//把非着色器可见的资源描述符堆上的描述符拷贝到着色器可见的资源描述符堆上，并返回DescriptorHandle
-				D3D12Core::DescriptorHandle getTransientDescriptorHandle() const;
+				//从描述器堆申请可用的描述符并返回DescriptorHandle
+				//在调用前要设置numCBVSRVUAVDescriptors！
+				D3D12Core::DescriptorHandle allocCBVSRVUAVDescriptors();
+
+				//把非持久性资源的描述符拷贝到资源描述符堆上，并返回DescriptorHandle
+				//仅用于非持久性资源！
+				D3D12Core::DescriptorHandle copyToResourceHeap() const;
 
 				const bool persistent;
 
-				D3D12_CPU_DESCRIPTOR_HANDLE srvUAVCBVHandleStart;
+			private:
 
-				uint32_t numSRVUAVCBVDescriptors;
+				//资源需要的CBV、SRV、UAV描述符的数量
+				uint32_t numCBVSRVUAVDescriptors;
+
+				//对于非持久性资源的拷贝开始位置
+				D3D12Core::DescriptorHandle copySrcDescriptorHandle;
 
 			};
 		}
