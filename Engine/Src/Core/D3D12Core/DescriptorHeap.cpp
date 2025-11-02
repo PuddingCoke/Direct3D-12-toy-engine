@@ -33,6 +33,14 @@ Gear::Core::D3D12Core::DescriptorHandle Gear::Core::D3D12Core::DescriptorHeap::a
 {
 	const uint64_t retIndex = staticIndex.fetch_add(num, std::memory_order_relaxed);
 
+	//这里要加个错误检测
+#ifdef _DEBUG
+	if (retIndex + num > numDescriptors - numDynamicDescriptors)
+	{
+		LOGERROR("staticIndex out of boundary");
+	}
+#endif // _DEBUG
+
 	return DescriptorHandle(cpuHandleStart, gpuHandleStart, static_cast<uint32_t>(retIndex), incrementSize, 0u, numDescriptors);
 }
 
