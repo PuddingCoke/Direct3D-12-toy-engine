@@ -11,6 +11,9 @@ namespace Gear
 	{
 		namespace DynamicCBufferManager
 		{
+
+			uint32_t getNumRegion();
+
 			struct AvailableLocation
 			{
 				//提供数据指针用于更新内容
@@ -20,6 +23,7 @@ namespace Gear
 				//提供资源视图的位置来通过ResourceDescriptorHeap访问常量缓冲
 				const uint32_t descriptorIndex;
 			} requestLocation(const uint32_t regionIndex);
+
 		}
 	}
 }

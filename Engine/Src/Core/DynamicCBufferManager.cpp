@@ -52,13 +52,13 @@ namespace
 
 		void recordCommands(Gear::Core::D3D12Core::CommandList* const commandList);
 
-	private:
-
 		//每个区域的子区域数量
 		//256bytes 512bytes 1024bytes .....
 		static constexpr uint32_t numSubRegion[] = { 4096,2048 };
 
 		static constexpr uint32_t numRegion = sizeof(numSubRegion) / sizeof(uint32_t);
+
+	private:
 
 		Gear::Core::Resource::D3D12Resource::Buffer* buffer;
 
@@ -254,6 +254,11 @@ void DynamicCBufferManagerPrivate::recordCommands(Gear::Core::D3D12Core::Command
 	buffer->setState(D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
 
 	commandList->transitionResources();
+}
+
+uint32_t Gear::Core::DynamicCBufferManager::getNumRegion()
+{
+	return DynamicCBufferManagerPrivate::numRegion;
 }
 
 Gear::Core::DynamicCBufferManager::AvailableLocation Gear::Core::DynamicCBufferManager::requestLocation(const uint32_t regionIndex)

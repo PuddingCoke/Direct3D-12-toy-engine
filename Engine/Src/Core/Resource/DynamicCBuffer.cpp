@@ -9,11 +9,22 @@
 #include<Gear/Utils/Math.h>
 
 Gear::Core::Resource::DynamicCBuffer::DynamicCBuffer(const uint32_t size) :
-	ImmutableCBuffer(nullptr, 0u, true), regionIndex(Utils::Math::log2(size / 256u)), dataPtr(nullptr), acquireFrameIndex(UINT64_MAX), updateFrameIndex(UINT64_MAX)
+	ImmutableCBuffer(nullptr, size, true), regionIndex(Utils::Math::log2(size / 256u)), dataPtr(nullptr), acquireFrameIndex(UINT64_MAX), updateFrameIndex(UINT64_MAX)
 {
-	if (regionIndex > 1u)
+	if (regionIndex >= DynamicCBufferManager::getNumRegion())
 	{
-		LOGERROR(L"size should be one of 256bytes 512bytes");
+		std::wstring errorString = L"dynamic constant buffer size should be one of";
+
+		uint32_t factor = 1u;
+
+		for (uint32_t i = 0; i < DynamicCBufferManager::getNumRegion(); i++)
+		{
+			errorString += L" " + std::to_wstring(256u * factor) + L"bytes";
+
+			factor <<= 1u;
+		}
+
+		LOGERROR(errorString);
 	}
 }
 

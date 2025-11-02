@@ -37,7 +37,7 @@ Gear::Core::D3D12Core::DescriptorHandle Gear::Core::D3D12Core::DescriptorHeap::a
 #ifdef _DEBUG
 	if (retIndex + num > numDescriptors - numDynamicDescriptors)
 	{
-		LOGERROR("staticIndex out of boundary");
+		LOGERROR(L"staticIndex out of boundary");
 	}
 #endif // _DEBUG
 
