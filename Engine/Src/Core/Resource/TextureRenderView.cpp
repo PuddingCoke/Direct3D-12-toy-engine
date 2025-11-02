@@ -9,19 +9,18 @@ Gear::Core::Resource::TextureRenderView::TextureRenderView(D3D12Resource::Textur
 
 		D3D12Core::DescriptorHandle descriptorHandle = allocCBVSRVUAVDescriptors();
 
-		allSRVIndex = descriptorHandle.getCurrentIndex();
-
-		srvMipIndices.resize(texture->getMipLevels());
-
-		if (isTextureCube) //立方体纹理的SRV创建
+		//创建访问所有mipslice的SRV
 		{
-			const uint32_t cubeNum = texture->getArraySize() / 6;
+			allSRVIndex = descriptorHandle.getCurrentIndex();
 
-			if (cubeNum > 1)
+			D3D12_SHADER_RESOURCE_VIEW_DESC desc = {};
+
+			if (isTextureCube)
 			{
-				//创建能访问所有mipslice的SRV
+				const uint32_t cubeNum = texture->getArraySize() / 6;
+
+				if (cubeNum > 1)
 				{
-					D3D12_SHADER_RESOURCE_VIEW_DESC desc = {};
 					desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 					desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBEARRAY;
 					desc.Format = srvFormat;
@@ -30,75 +29,21 @@ Gear::Core::Resource::TextureRenderView::TextureRenderView(D3D12Resource::Textur
 					desc.TextureCubeArray.MostDetailedMip = 0;
 					desc.TextureCubeArray.ResourceMinLODClamp = 0.f;
 					desc.TextureCubeArray.NumCubes = cubeNum;
-
-					GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCurrentCPUHandle());
-
-					descriptorHandle.move();
 				}
-
-				//创建访问每个mipslice的SRV
-				for (uint32_t i = 0; i < texture->getMipLevels(); i++)
+				else
 				{
-					srvMipIndices[i] = descriptorHandle.getCurrentIndex();
-
-					D3D12_SHADER_RESOURCE_VIEW_DESC desc = {};
-					desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-					desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBEARRAY;
-					desc.Format = srvFormat;
-					desc.TextureCubeArray.First2DArrayFace = 0;
-					desc.TextureCubeArray.MipLevels = 1;
-					desc.TextureCubeArray.MostDetailedMip = i;
-					desc.TextureCubeArray.ResourceMinLODClamp = 0.f;
-					desc.TextureCubeArray.NumCubes = cubeNum;
-
-					GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCurrentCPUHandle());
-
-					descriptorHandle.move();
-				}
-			}
-			else
-			{
-				//创建能访问所有mipslice的SRV
-				{
-					D3D12_SHADER_RESOURCE_VIEW_DESC desc = {};
 					desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 					desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBE;
 					desc.Format = srvFormat;
 					desc.TextureCube.MipLevels = texture->getMipLevels();
 					desc.TextureCube.MostDetailedMip = 0;
 					desc.TextureCube.ResourceMinLODClamp = 0.f;
-
-					GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCurrentCPUHandle());
-
-					descriptorHandle.move();
-				}
-
-				//创建访问每个mipslice的SRV
-				for (uint32_t i = 0; i < texture->getMipLevels(); i++)
-				{
-					srvMipIndices[i] = descriptorHandle.getCurrentIndex();
-
-					D3D12_SHADER_RESOURCE_VIEW_DESC desc = {};
-					desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-					desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBE;
-					desc.Format = srvFormat;
-					desc.TextureCube.MipLevels = 1;
-					desc.TextureCube.MostDetailedMip = i;
-					desc.TextureCube.ResourceMinLODClamp = 0.f;
-
-					GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCurrentCPUHandle());
-
-					descriptorHandle.move();
 				}
 			}
-		}
-		else
-		{
-			if (texture->getArraySize() > 1)
+			else
 			{
-				//创建能访问所有mipslice的SRV
+				if (texture->getArraySize() > 1)
 				{
-					D3D12_SHADER_RESOURCE_VIEW_DESC desc = {};
 					desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 					desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2DARRAY;
 					desc.Format = srvFormat;
@@ -108,38 +53,9 @@ Gear::Core::Resource::TextureRenderView::TextureRenderView(D3D12Resource::Textur
 					desc.Texture2DArray.MostDetailedMip = 0;
 					desc.Texture2DArray.PlaneSlice = 0;
 					desc.Texture2DArray.ResourceMinLODClamp = 0.f;
-
-					GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCurrentCPUHandle());
-
-					descriptorHandle.move();
 				}
-
-				//创建访问每个mipslice的SRV
-				for (uint32_t i = 0; i < texture->getMipLevels(); i++)
+				else
 				{
-					srvMipIndices[i] = descriptorHandle.getCurrentIndex();
-
-					D3D12_SHADER_RESOURCE_VIEW_DESC desc = {};
-					desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-					desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2DARRAY;
-					desc.Format = srvFormat;
-					desc.Texture2DArray.ArraySize = texture->getArraySize();
-					desc.Texture2DArray.FirstArraySlice = 0;
-					desc.Texture2DArray.MipLevels = 1;
-					desc.Texture2DArray.MostDetailedMip = i;
-					desc.Texture2DArray.PlaneSlice = 0;
-					desc.Texture2DArray.ResourceMinLODClamp = 0.f;
-
-					GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCurrentCPUHandle());
-
-					descriptorHandle.move();
-				}
-			}
-			else
-			{
-				//创建能访问所有mipslice的SRV
-				{
-					D3D12_SHADER_RESOURCE_VIEW_DESC desc = {};
 					desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 					desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
 					desc.Format = srvFormat;
@@ -147,30 +63,78 @@ Gear::Core::Resource::TextureRenderView::TextureRenderView(D3D12Resource::Textur
 					desc.Texture2D.MostDetailedMip = 0;
 					desc.Texture2D.PlaneSlice = 0;
 					desc.Texture2D.ResourceMinLODClamp = 0.f;
-
-					GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCurrentCPUHandle());
-
-					descriptorHandle.move();
 				}
+			}
 
-				//创建访问每个mipslice的SRV
-				for (uint32_t i = 0; i < texture->getMipLevels(); i++)
+			GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCurrentCPUHandle());
+
+			descriptorHandle.move();
+		}
+
+		//创建访问各个mipslice的SRV
+		{
+			srvMipIndices.resize(texture->getMipLevels());
+
+			for (uint32_t i = 0; i < texture->getMipLevels(); i++)
+			{
+				srvMipIndices[i] = descriptorHandle.getCurrentIndex();
+
+				D3D12_SHADER_RESOURCE_VIEW_DESC desc = {};
+
+				if (isTextureCube)
 				{
-					srvMipIndices[i] = descriptorHandle.getCurrentIndex();
+					const uint32_t cubeNum = texture->getArraySize() / 6;
 
-					D3D12_SHADER_RESOURCE_VIEW_DESC desc = {};
-					desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-					desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-					desc.Format = srvFormat;
-					desc.Texture2D.MipLevels = 1;
-					desc.Texture2D.MostDetailedMip = i;
-					desc.Texture2D.PlaneSlice = 0;
-					desc.Texture2D.ResourceMinLODClamp = 0.f;
-
-					GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCurrentCPUHandle());
-
-					descriptorHandle.move();
+					if (cubeNum > 1)
+					{
+						desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+						desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBEARRAY;
+						desc.Format = srvFormat;
+						desc.TextureCubeArray.First2DArrayFace = 0;
+						desc.TextureCubeArray.MipLevels = 1;
+						desc.TextureCubeArray.MostDetailedMip = i;
+						desc.TextureCubeArray.ResourceMinLODClamp = 0.f;
+						desc.TextureCubeArray.NumCubes = cubeNum;
+					}
+					else
+					{
+						desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+						desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURECUBE;
+						desc.Format = srvFormat;
+						desc.TextureCube.MipLevels = 1;
+						desc.TextureCube.MostDetailedMip = i;
+						desc.TextureCube.ResourceMinLODClamp = 0.f;
+					}
 				}
+				else
+				{
+					if (texture->getArraySize() > 1)
+					{
+						desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+						desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2DARRAY;
+						desc.Format = srvFormat;
+						desc.Texture2DArray.ArraySize = texture->getArraySize();
+						desc.Texture2DArray.FirstArraySlice = 0;
+						desc.Texture2DArray.MipLevels = 1;
+						desc.Texture2DArray.MostDetailedMip = i;
+						desc.Texture2DArray.PlaneSlice = 0;
+						desc.Texture2DArray.ResourceMinLODClamp = 0.f;
+					}
+					else
+					{
+						desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+						desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+						desc.Format = srvFormat;
+						desc.Texture2D.MipLevels = 1;
+						desc.Texture2D.MostDetailedMip = i;
+						desc.Texture2D.PlaneSlice = 0;
+						desc.Texture2D.ResourceMinLODClamp = 0.f;
+					}
+				}
+
+				GraphicsDevice::get()->CreateShaderResourceView(texture->getResource(), &desc, descriptorHandle.getCurrentCPUHandle());
+
+				descriptorHandle.move();
 			}
 		}
 
@@ -178,90 +142,59 @@ Gear::Core::Resource::TextureRenderView::TextureRenderView(D3D12Resource::Textur
 		{
 			D3D12Core::DescriptorHandle nonShaderVisibleHandle;
 
+			if (persistent)
+			{
+				nonShaderVisibleHandle = GlobalDescriptorHeap::getStagingResourceHeap()->allocStaticDescriptor(texture->getMipLevels());
+			}
+
 			uavMipIndices.resize(texture->getMipLevels());
 
 			viewGPUHandles.resize(texture->getMipLevels());
 
 			viewCPUHandles.resize(texture->getMipLevels());
 
-			if (persistent)
+			for (uint32_t i = 0; i < texture->getMipLevels(); i++)
 			{
-				nonShaderVisibleHandle = GlobalDescriptorHeap::getStagingResourceHeap()->allocStaticDescriptor(texture->getMipLevels());
-			}
+				uavMipIndices[i] = descriptorHandle.getCurrentIndex();
 
-			if (texture->getArraySize() > 1)
-			{
-				for (uint32_t i = 0; i < texture->getMipLevels(); i++)
+				D3D12_UNORDERED_ACCESS_VIEW_DESC desc = {};
+
+				if (texture->getArraySize() > 1)
 				{
-					uavMipIndices[i] = descriptorHandle.getCurrentIndex();
-
-					D3D12_UNORDERED_ACCESS_VIEW_DESC desc = {};
 					desc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2DARRAY;
 					desc.Format = uavFormat;
 					desc.Texture2DArray.ArraySize = texture->getArraySize();
 					desc.Texture2DArray.FirstArraySlice = 0;
 					desc.Texture2DArray.MipSlice = i;
 					desc.Texture2DArray.PlaneSlice = 0;
-
-					GraphicsDevice::get()->CreateUnorderedAccessView(texture->getResource(), nullptr, &desc, descriptorHandle.getCurrentCPUHandle());
-
-					if (persistent)
-					{
-						viewGPUHandles[i] = descriptorHandle.getCurrentGPUHandle();
-					}
-					else
-					{
-						viewCPUHandles[i] = descriptorHandle.getCurrentCPUHandle();
-					}
-
-					descriptorHandle.move();
-
-					if (persistent)
-					{
-						//同一时间在非着色器可见的资源描述符堆创建UAV
-						GraphicsDevice::get()->CreateUnorderedAccessView(texture->getResource(), nullptr, &desc, nonShaderVisibleHandle.getCurrentCPUHandle());
-
-						viewCPUHandles[i] = nonShaderVisibleHandle.getCurrentCPUHandle();
-
-						nonShaderVisibleHandle.move();
-					}
 				}
-			}
-			else
-			{
-				for (uint32_t i = 0; i < texture->getMipLevels(); i++)
+				else
 				{
-					uavMipIndices[i] = descriptorHandle.getCurrentIndex();
-
-					D3D12_UNORDERED_ACCESS_VIEW_DESC desc = {};
 					desc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
 					desc.Format = uavFormat;
 					desc.Texture2D.MipSlice = i;
 					desc.Texture2D.PlaneSlice = 0;
-
-					GraphicsDevice::get()->CreateUnorderedAccessView(texture->getResource(), nullptr, &desc, descriptorHandle.getCurrentCPUHandle());
-
-					if (persistent)
-					{
-						viewGPUHandles[i] = descriptorHandle.getCurrentGPUHandle();
-					}
-					else
-					{
-						viewCPUHandles[i] = descriptorHandle.getCurrentCPUHandle();
-					}
-
-					descriptorHandle.move();
-
-					if (persistent)
-					{
-						//同一时间在非着色器可见的资源描述符堆创建UAV
-						GraphicsDevice::get()->CreateUnorderedAccessView(texture->getResource(), nullptr, &desc, nonShaderVisibleHandle.getCurrentCPUHandle());
-
-						viewCPUHandles[i] = nonShaderVisibleHandle.getCurrentCPUHandle();
-
-						nonShaderVisibleHandle.move();
-					}
 				}
+
+				GraphicsDevice::get()->CreateUnorderedAccessView(texture->getResource(), nullptr, &desc, descriptorHandle.getCurrentCPUHandle());
+
+				if (persistent)
+				{
+					//同一时间在非着色器可见的资源描述符堆创建UAV
+					GraphicsDevice::get()->CreateUnorderedAccessView(texture->getResource(), nullptr, &desc, nonShaderVisibleHandle.getCurrentCPUHandle());
+
+					viewGPUHandles[i] = descriptorHandle.getCurrentGPUHandle();
+
+					viewCPUHandles[i] = nonShaderVisibleHandle.getCurrentCPUHandle();
+
+					nonShaderVisibleHandle.move();
+				}
+				else
+				{
+					viewCPUHandles[i] = descriptorHandle.getCurrentCPUHandle();
+				}
+
+				descriptorHandle.move();
 			}
 		}
 	}
@@ -270,8 +203,6 @@ Gear::Core::Resource::TextureRenderView::TextureRenderView(D3D12Resource::Textur
 	if (hasRTV)
 	{
 		D3D12Core::DescriptorHandle descriptorHandle;
-
-		rtvMipHandles.resize(texture->getMipLevels());
 
 		if (persistent)
 		{
@@ -282,41 +213,34 @@ Gear::Core::Resource::TextureRenderView::TextureRenderView(D3D12Resource::Textur
 			descriptorHandle = GlobalDescriptorHeap::getRenderTargetHeap()->allocDynamicDescriptor(texture->getMipLevels());
 		}
 
-		if (texture->getArraySize() > 1)
-		{
-			for (uint32_t i = 0; i < texture->getMipLevels(); i++)
-			{
-				rtvMipHandles[i] = descriptorHandle.getCurrentCPUHandle();
+		rtvMipHandles.resize(texture->getMipLevels());
 
-				D3D12_RENDER_TARGET_VIEW_DESC desc = {};
+		for (uint32_t i = 0; i < texture->getMipLevels(); i++)
+		{
+			rtvMipHandles[i] = descriptorHandle.getCurrentCPUHandle();
+
+			D3D12_RENDER_TARGET_VIEW_DESC desc = {};
+
+			if (texture->getArraySize() > 1)
+			{
 				desc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2DARRAY;
 				desc.Format = rtvFormat;
 				desc.Texture2DArray.ArraySize = texture->getArraySize();
 				desc.Texture2DArray.FirstArraySlice = 0;
 				desc.Texture2DArray.MipSlice = i;
 				desc.Texture2DArray.PlaneSlice = 0;
-
-				GraphicsDevice::get()->CreateRenderTargetView(texture->getResource(), &desc, descriptorHandle.getCurrentCPUHandle());
-
-				descriptorHandle.move();
 			}
-		}
-		else
-		{
-			for (uint32_t i = 0; i < texture->getMipLevels(); i++)
+			else
 			{
-				rtvMipHandles[i] = descriptorHandle.getCurrentCPUHandle();
-
-				D3D12_RENDER_TARGET_VIEW_DESC desc = {};
 				desc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
 				desc.Format = rtvFormat;
 				desc.Texture2D.MipSlice = i;
 				desc.Texture2D.PlaneSlice = 0;
-
-				GraphicsDevice::get()->CreateRenderTargetView(texture->getResource(), &desc, descriptorHandle.getCurrentCPUHandle());
-
-				descriptorHandle.move();
 			}
+
+			GraphicsDevice::get()->CreateRenderTargetView(texture->getResource(), &desc, descriptorHandle.getCurrentCPUHandle());
+
+			descriptorHandle.move();
 		}
 	}
 }
