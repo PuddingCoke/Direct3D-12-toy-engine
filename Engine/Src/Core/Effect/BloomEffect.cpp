@@ -65,85 +65,88 @@ Gear::Core::Effect::BloomEffect::BloomEffect(GraphicsContext* const context, con
 	bloomParam.intensity = 1.f;
 	bloomParam.softThreshold = 1.f;
 
-	//PS BlendState
-	auto getDefaultPipelineState =
-		[] {
-		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = PipelineStateHelper::getDefaultGraphicsDesc();
-		desc.InputLayout = {};
-		desc.VS = GlobalShader::getFullScreenVS()->getByteCode();
-		desc.RasterizerState = PipelineStateHelper::rasterCullBack;
-		desc.DepthStencilState.DepthEnable = FALSE;
-		desc.DepthStencilState.StencilEnable = FALSE;
-		desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-		desc.NumRenderTargets = 1;
-		desc.RTVFormats[0] = DXGI_FORMAT_R16G16B16A16_FLOAT;
-		return desc;
+	auto getDefaultBuilder = []
+		{
+			return PipelineStateBuilder()
+				.setBlendState(CD3DX12_BLEND_DESC(D3D12_DEFAULT))
+				.setVS(GlobalShader::getFullScreenVS())
+				.setRasterizerState(PipelineStateHelper::rasterCullNone)
+				.setDepthStencilState(PipelineStateHelper::depthCompareNone)
+				.setPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE)
+				.setRTVFormats({ FMT::RGBA16F });
 		};
 
-	{
-		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = getDefaultPipelineState();
-		desc.PS = bloomFilter->getByteCode();
-		desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
+	bloomFilterState = getDefaultBuilder().setPS(bloomFilter).build();
 
-		GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&bloomFilterState));
-	}
+	bloomKarisAverageState = getDefaultBuilder().setPS(bloomKarisAverage).build();
 
-	{
-		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = getDefaultPipelineState();
-		desc.PS = bloomKarisAverage->getByteCode();
-		desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
+	bloomDownSampleState = getDefaultBuilder().setPS(bloomDownSample).build();
 
-		GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&bloomKarisAverageState));
-	}
+	bloomUpSampleState = getDefaultBuilder().setPS(GlobalShader::getFullScreenPS()).setBlendState(PipelineStateHelper::blendAddtive).build();
 
-	{
-		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = getDefaultPipelineState();
-		desc.PS = bloomDownSample->getByteCode();
-		desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
+	bloomFinalState = getDefaultBuilder().setPS(bloomFinal).build();
 
-		GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&bloomDownSampleState));
-	}
+	bloomHBlurState = PipelineStateBuilder::buildComputeState(bloomHBlur);
 
-	{
-		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = getDefaultPipelineState();
-		desc.PS = GlobalShader::getFullScreenPS()->getByteCode();
-		desc.BlendState = PipelineStateHelper::blendAddtive;
+	bloomVBlurState = PipelineStateBuilder::buildComputeState(bloomVBlur);
 
-		GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&bloomUpSampleState));
-	}
-
-	{
-		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = getDefaultPipelineState();
-		desc.PS = bloomFinal->getByteCode();
-		desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
-
-		GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&bloomFinalState));
-	}
-
-	PipelineStateHelper::createComputeState(&bloomHBlurState, bloomHBlur);
-
-	PipelineStateHelper::createComputeState(&bloomVBlurState, bloomVBlur);
 }
 
 Gear::Core::Effect::BloomEffect::~BloomEffect()
 {
 	for (uint32_t i = 0; i < blurSteps; i++)
 	{
-		delete swapTexture[i];
-		delete blurParamBuffer[i];
+		if (swapTexture[i])
+			delete swapTexture[i];
+
+		if (blurParamBuffer[i])
+			delete blurParamBuffer[i];
 	}
 
-	delete filteredTexture;
+	if (filteredTexture)
+		delete filteredTexture;
 
-	delete bloomFilter;
-	delete bloomFinal;
+	if (bloomFilter)
+		delete bloomFilter;
 
-	delete lensDirtTexture;
+	if (bloomFilterState)
+		delete bloomFilterState;
 
-	delete bloomHBlur;
-	delete bloomVBlur;
-	delete bloomDownSample;
-	delete bloomKarisAverage;
+	if (bloomFinal)
+		delete bloomFinal;
+
+	if (bloomFinalState)
+		delete bloomFinalState;
+
+	if (lensDirtTexture)
+		delete lensDirtTexture;
+
+	if (bloomHBlur)
+		delete bloomHBlur;
+
+	if (bloomHBlurState)
+		delete bloomHBlurState;
+
+	if (bloomVBlur)
+		delete bloomVBlur;
+
+	if (bloomVBlurState)
+		delete bloomVBlurState;
+
+	if (bloomDownSample)
+		delete bloomDownSample;
+
+	if (bloomDownSampleState)
+		delete bloomDownSampleState;
+
+	if (bloomKarisAverage)
+		delete bloomKarisAverage;
+
+	if (bloomKarisAverageState)
+		delete bloomKarisAverageState;
+
+	if (bloomUpSampleState)
+		delete bloomUpSampleState;
 }
 
 Gear::Core::Resource::TextureRenderView* Gear::Core::Effect::BloomEffect::process(Resource::TextureRenderView* const inputTexture) const
@@ -151,7 +154,7 @@ Gear::Core::Resource::TextureRenderView* Gear::Core::Effect::BloomEffect::proces
 	context->setPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	context->setViewportSimple(width, height);
-	context->setPipelineState(bloomFilterState.Get());
+	context->setPipelineState(bloomFilterState);
 	context->setRenderTargets({ filteredTexture->getRTVMipHandle(0) }, {});
 	context->setPSConstants({ inputTexture->getAllSRVIndex() }, 0);
 	context->setPSConstants(5, &bloomParam, 1);
@@ -159,7 +162,7 @@ Gear::Core::Resource::TextureRenderView* Gear::Core::Effect::BloomEffect::proces
 	context->draw(3, 1, 0, 0);
 
 	context->setViewportSimple(resolutions[0].x, resolutions[0].y);
-	context->setPipelineState(bloomKarisAverageState.Get());
+	context->setPipelineState(bloomKarisAverageState);
 	context->setRenderTargets({ swapTexture[0]->write()->getRTVMipHandle(0) }, {});
 	context->setPSConstants({ filteredTexture->getAllSRVIndex() }, 0);
 	context->setPSConstants(4, &bloomParam, 1);
@@ -167,7 +170,7 @@ Gear::Core::Resource::TextureRenderView* Gear::Core::Effect::BloomEffect::proces
 	context->draw(3, 1, 0, 0);
 	swapTexture[0]->swap();
 
-	context->setPipelineState(bloomDownSampleState.Get());
+	context->setPipelineState(bloomDownSampleState);
 
 	for (uint32_t i = 0; i < blurSteps - 1; i++)
 	{
@@ -179,25 +182,27 @@ Gear::Core::Resource::TextureRenderView* Gear::Core::Effect::BloomEffect::proces
 		swapTexture[i + 1]->swap();
 	}
 
+	context->setPipelineState(bloomHBlurState);
+
 	context->setCSConstants({
 		swapTexture[blurSteps - 1]->read()->getAllSRVIndex(),
 		swapTexture[blurSteps - 1]->write()->getUAVMipIndex(0) }, 0);
 
 	context->setCSConstantBuffer(blurParamBuffer[blurSteps - 1]);
 
-	context->setPipelineState(bloomHBlurState.Get());
 	context->transitionResources();
 	context->dispatch(resolutions[blurSteps - 1].x / workGroupSize.x, resolutions[blurSteps - 1].y / workGroupSize.y + 1, 1);
 	context->uavBarrier({ swapTexture[blurSteps - 1]->write()->getTexture() });
 	swapTexture[blurSteps - 1]->swap();
 
+	context->setPipelineState(bloomVBlurState);
+
 	context->setCSConstants({
 		swapTexture[blurSteps - 1]->read()->getAllSRVIndex(),
 		swapTexture[blurSteps - 1]->write()->getUAVMipIndex(0) }, 0);
 
 	context->setCSConstantBuffer(blurParamBuffer[blurSteps - 1]);
 
-	context->setPipelineState(bloomVBlurState.Get());
 	context->transitionResources();
 	context->dispatch(resolutions[blurSteps - 1].x / workGroupSize.x, resolutions[blurSteps - 1].y / workGroupSize.y + 1, 1);
 	context->uavBarrier({ swapTexture[blurSteps - 1]->write()->getTexture() });
@@ -205,27 +210,33 @@ Gear::Core::Resource::TextureRenderView* Gear::Core::Effect::BloomEffect::proces
 
 	for (uint32_t i = 0; i < blurSteps - 1; i++)
 	{
-		context->setCSConstantBuffer(blurParamBuffer[blurSteps - 2 - i]);
+		context->setPipelineState(bloomHBlurState);
 
 		context->setCSConstants({
 			swapTexture[blurSteps - 2 - i]->read()->getAllSRVIndex(),
 			swapTexture[blurSteps - 2 - i]->write()->getUAVMipIndex(0) }, 0);
-		context->setPipelineState(bloomHBlurState.Get());
+
+		context->setCSConstantBuffer(blurParamBuffer[blurSteps - 2 - i]);
+
 		context->transitionResources();
 		context->dispatch(resolutions[blurSteps - 2 - i].x / workGroupSize.x, resolutions[blurSteps - 2 - i].y / workGroupSize.y + 1, 1);
 		context->uavBarrier({ swapTexture[blurSteps - 2 - i]->write()->getTexture() });
 		swapTexture[blurSteps - 2 - i]->swap();
 
+		context->setPipelineState(bloomVBlurState);
+
 		context->setCSConstants({
 			swapTexture[blurSteps - 2 - i]->read()->getAllSRVIndex(),
 			swapTexture[blurSteps - 2 - i]->write()->getUAVMipIndex(0) }, 0);
-		context->setPipelineState(bloomVBlurState.Get());
+
+		context->setCSConstantBuffer(blurParamBuffer[blurSteps - 2 - i]);
+
 		context->transitionResources();
 		context->dispatch(resolutions[blurSteps - 2 - i].x / workGroupSize.x, resolutions[blurSteps - 2 - i].y / workGroupSize.y + 1, 1);
 		context->uavBarrier({ swapTexture[blurSteps - 2 - i]->write()->getTexture() });
 
 		context->setViewportSimple(resolutions[blurSteps - 2 - i].x, resolutions[blurSteps - 2 - i].y);
-		context->setPipelineState(bloomUpSampleState.Get());
+		context->setPipelineState(bloomUpSampleState);
 		context->setRenderTargets({ swapTexture[blurSteps - 2 - i]->write()->getRTVMipHandle(0) }, {});
 		context->setPSConstants({ swapTexture[blurSteps - 1 - i]->read()->getAllSRVIndex() }, 0);
 		context->transitionResources();
@@ -234,7 +245,7 @@ Gear::Core::Resource::TextureRenderView* Gear::Core::Effect::BloomEffect::proces
 	}
 
 	context->setViewportSimple(width, height);
-	context->setPipelineState(bloomFinalState.Get());
+	context->setPipelineState(bloomFinalState);
 	context->setRenderTargets({ outputTexture->getRTVMipHandle(0) }, {});
 	context->setPSConstants({
 		inputTexture->getAllSRVIndex(),

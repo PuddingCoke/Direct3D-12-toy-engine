@@ -13,35 +13,32 @@ Gear::Core::Effect::FXAAEffect::FXAAEffect(GraphicsContext* const context, const
 
 	fxaaPS = new D3D12Core::Shader(g_FXAABytes, sizeof(g_FXAABytes));
 
-	{
-		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = PipelineStateHelper::getDefaultFullScreenState();
-		desc.PS = colorToColorLumaPS->getByteCode();
-		desc.NumRenderTargets = 1;
-		desc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
+	colorToColorLumaState = PipelineStateBuilder().setDefaultFullScreenState().setPS(colorToColorLumaPS).setRTVFormats({ FMT::RGBA8UN }).build();
 
-		GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&colorToColorLumaState));
-	}
-
-	{
-		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = PipelineStateHelper::getDefaultFullScreenState();
-		desc.PS = fxaaPS->getByteCode();
-		desc.NumRenderTargets = 1;
-		desc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
-
-		GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&fxaaState));
-	}
+	fxaaState = PipelineStateBuilder().setDefaultFullScreenState().setPS(fxaaPS).setRTVFormats({ FMT::RGBA8UN }).build();
 }
 
 Gear::Core::Effect::FXAAEffect::~FXAAEffect()
 {
-	delete colorLumaTexture;
-	delete colorToColorLumaPS;
-	delete fxaaPS;
+	if (colorLumaTexture)
+		delete colorLumaTexture;
+
+	if (colorToColorLumaPS)
+		delete colorToColorLumaPS;
+
+	if (fxaaPS)
+		delete fxaaPS;
+
+	if (colorToColorLumaState)
+		delete colorToColorLumaState;
+
+	if (fxaaState)
+		delete fxaaState;
 }
 
 Gear::Core::Resource::TextureRenderView* Gear::Core::Effect::FXAAEffect::process(Resource::TextureRenderView* const inputTexture) const
 {
-	context->setPipelineState(colorToColorLumaState.Get());
+	context->setPipelineState(colorToColorLumaState);
 
 	context->setViewportSimple(width, height);
 
@@ -55,7 +52,7 @@ Gear::Core::Resource::TextureRenderView* Gear::Core::Effect::FXAAEffect::process
 
 	context->draw(3, 1, 0, 0);
 
-	context->setPipelineState(fxaaState.Get());
+	context->setPipelineState(fxaaState);
 
 	context->setViewportSimple(width, height);
 

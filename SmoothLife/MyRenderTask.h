@@ -16,11 +16,11 @@ public:
 		originTexture(ResourceManager::createTextureRenderView(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R8G8B8A8_UNORM, 1, 1, false, true,
 			DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_UNKNOWN))
 	{
-		PipelineStateHelper::createComputeState(&whiteNoiseState, whiteNoiseCS);
+		whiteNoiseState = PipelineStateBuilder::buildComputeState(whiteNoiseCS);
 
-		PipelineStateHelper::createComputeState(&evolveState, evolveCS);
+		evolveState = PipelineStateBuilder::buildComputeState(evolveCS);
 
-		PipelineStateHelper::createComputeState(&visualizeState, visualizeCS);
+		visualizeState = PipelineStateBuilder::buildComputeState(visualizeCS);
 
 		swapTexture = new SwapTexture([] {return ResourceManager::createTextureRenderView(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R32_FLOAT, 1, 1, false, true,
 			DXGI_FORMAT_R32_FLOAT, DXGI_FORMAT_R32_FLOAT, DXGI_FORMAT_UNKNOWN); });
@@ -30,10 +30,20 @@ public:
 
 	~MyRenderTask()
 	{
+		delete whiteNoiseState;
+
+		delete evolveState;
+		
+		delete visualizeState;
+
 		delete whiteNoiseCS;
+
 		delete evolveCS;
+
 		delete visualizeCS;
+
 		delete swapTexture;
+
 		delete originTexture;
 	}
 
@@ -63,7 +73,7 @@ protected:
 
 	void whiteNoise(SwapTexture* swapTexture)
 	{
-		context->setPipelineState(whiteNoiseState.Get());
+		context->setPipelineState(whiteNoiseState);
 
 		context->setCSConstants({ swapTexture->write()->getUAVMipIndex(0) }, 0);
 
@@ -82,7 +92,7 @@ protected:
 
 	void evolve(SwapTexture* swapTexture)
 	{
-		context->setPipelineState(evolveState.Get());
+		context->setPipelineState(evolveState);
 
 		context->setCSConstants({ swapTexture->read()->getAllSRVIndex(),
 			swapTexture->write()->getUAVMipIndex(0) }, 0);
@@ -113,7 +123,7 @@ protected:
 
 	void visualize()
 	{
-		context->setPipelineState(visualizeState.Get());
+		context->setPipelineState(visualizeState);
 
 		context->setCSConstants({ originTexture->getUAVMipIndex(0),
 			swapTexture->read()->getAllSRVIndex() }, 0);
@@ -157,15 +167,15 @@ private:
 
 	Shader* whiteNoiseCS;
 
-	ComPtr<ID3D12PipelineState> whiteNoiseState;
+	PipelineState* whiteNoiseState;
 
 	Shader* evolveCS;
 
-	ComPtr<ID3D12PipelineState> evolveState;
+	PipelineState* evolveState;
 
 	Shader* visualizeCS;
 
-	ComPtr<ID3D12PipelineState> visualizeState;
+	PipelineState* visualizeState;
 
 	SwapTexture* swapTexture;
 

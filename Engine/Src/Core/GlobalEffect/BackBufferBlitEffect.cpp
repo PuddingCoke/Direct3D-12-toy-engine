@@ -10,13 +10,13 @@ namespace
 {
 	struct BackBufferBlitEffectPrivate
 	{
-		ComPtr<ID3D12PipelineState> backBufferBlitState;
+		Gear::Core::D3D12Core::PipelineState* backBufferBlitState;
 	}pvt;
 }
 
 void Gear::Core::GlobalEffect::BackBufferBlitEffect::process(GraphicsContext* const context, Resource::TextureRenderView* const inputTexture)
 {
-	context->setPipelineState(pvt.backBufferBlitState.Get());
+	context->setPipelineState(pvt.backBufferBlitState);
 
 	context->setDefRenderTarget();
 
@@ -33,17 +33,19 @@ void Gear::Core::GlobalEffect::BackBufferBlitEffect::process(GraphicsContext* co
 
 void Gear::Core::GlobalEffect::BackBufferBlitEffect::Internal::initialize()
 {
-	D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = PipelineStateHelper::getDefaultFullScreenState();
-	desc.PS = GlobalShader::getFullScreenPS()->getByteCode();
-	desc.NumRenderTargets = 1;
-	desc.RTVFormats[0] = Graphics::backBufferFormat;
-
-	GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&pvt.backBufferBlitState));
+	pvt.backBufferBlitState = PipelineStateBuilder()
+		.setDefaultFullScreenState()
+		.setPS(GlobalShader::getFullScreenPS())
+		.setRTVFormats({ Graphics::backBufferFormat })
+		.build();
 
 	LOGSUCCESS(L"create", LogColor::brightMagenta, L"BackBufferBlitEffect", LogColor::defaultColor, L"succeeded");
 }
 
 void Gear::Core::GlobalEffect::BackBufferBlitEffect::Internal::release()
 {
-	pvt.backBufferBlitState = nullptr;
+	if (pvt.backBufferBlitState)
+	{
+		delete pvt.backBufferBlitState;
+	}
 }

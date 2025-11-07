@@ -468,6 +468,12 @@
     <ClInclude Include="Inc\Gear\Core\D3D12Core\DescriptorHandle.h">
       <Filter>Header</Filter>
     </ClInclude>
+    <ClInclude Include="Inc\Gear\Core\D3D12Core\PipelineState.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Gear\Core\PipelineStateBuilder.h">
+      <Filter>Header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\InitializationParam.cpp">
@@ -593,9 +599,6 @@
     <ClCompile Include="Src\Core\GraphicsDevice.cpp">
       <Filter>Source\Core</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Core\PipelineStateHelper.cpp">
-      <Filter>Source\Core</Filter>
-    </ClCompile>
     <ClCompile Include="Src\Core\RenderEngine.cpp">
       <Filter>Source\Core</Filter>
     </ClCompile>
@@ -678,6 +681,12 @@
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="Src\Core\D3D12Core\DescriptorHandle.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Core\D3D12Core\PipelineState.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Core\PipelineStateBuilder.cpp">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>

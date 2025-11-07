@@ -46,19 +46,24 @@ void Gear::Core::D3D12Core::CommandList::close() const
 	commandList->Close();
 }
 
-void Gear::Core::D3D12Core::CommandList::setDescriptorHeap(DescriptorHeap* const resourceHeap, DescriptorHeap* const samplerHeap) const
+void Gear::Core::D3D12Core::CommandList::setDescriptorHeap(const DescriptorHeap* const resourceHeap,const DescriptorHeap* const samplerHeap) const
 {
-	ID3D12DescriptorHeap* descriptorHeaps[2] = { resourceHeap->get(),samplerHeap->get() };
+	ID3D12DescriptorHeap* const descriptorHeaps[2] = { resourceHeap->get(),samplerHeap->get() };
 
 	commandList->SetDescriptorHeaps(2, descriptorHeaps);
 }
 
-void Gear::Core::D3D12Core::CommandList::setGraphicsRootSignature(RootSignature* const rootSignature) const
+void Gear::Core::D3D12Core::CommandList::setPipelineState(const PipelineState* const pipelineState) const
+{
+	commandList->SetPipelineState(pipelineState->get());
+}
+
+void Gear::Core::D3D12Core::CommandList::setGraphicsRootSignature(const RootSignature* const rootSignature) const
 {
 	commandList->SetGraphicsRootSignature(rootSignature->get());
 }
 
-void Gear::Core::D3D12Core::CommandList::setComputeRootSignature(RootSignature* const rootSignature) const
+void Gear::Core::D3D12Core::CommandList::setComputeRootSignature(const RootSignature* const rootSignature) const
 {
 	commandList->SetComputeRootSignature(rootSignature->get());
 }
@@ -111,11 +116,6 @@ void Gear::Core::D3D12Core::CommandList::setViewports(const uint32_t numViewport
 void Gear::Core::D3D12Core::CommandList::setScissorRects(const uint32_t numRects, const D3D12_RECT* const pRects) const
 {
 	commandList->RSSetScissorRects(numRects, pRects);
-}
-
-void Gear::Core::D3D12Core::CommandList::setPipelineState(ID3D12PipelineState* const pipelineState) const
-{
-	commandList->SetPipelineState(pipelineState);
 }
 
 void Gear::Core::D3D12Core::CommandList::clearRenderTargetView(const D3D12_CPU_DESCRIPTOR_HANDLE renderTargetView, const float colorRGBA[4], const uint32_t numRects, const D3D12_RECT* const pRects) const

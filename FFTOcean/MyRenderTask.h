@@ -38,93 +38,68 @@ public:
 
 		spectrumParam[2].mapLength = lengthScale2;
 
-		{
-			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = PipelineStateHelper::getDefaultGraphicsDesc();
-			desc.InputLayout = {};
-			desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
-			desc.RasterizerState = PipelineStateHelper::rasterCullBack;
-			desc.DepthStencilState.DepthEnable = false;
-			desc.DepthStencilState.StencilEnable = false;
-			desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-			desc.NumRenderTargets = 1;
-			desc.RTVFormats[0] = DXGI_FORMAT_R16G16B16A16_FLOAT;
-			desc.VS = GlobalShader::getTextureCubeVS()->getByteCode();
-			desc.PS = textureCubePS->getByteCode();
+		textureCubeState = PipelineStateBuilder()
+			.setBlendState(CD3DX12_BLEND_DESC(D3D12_DEFAULT))
+			.setRasterizerState(PipelineStateHelper::rasterCullBack)
+			.setDepthStencilState(PipelineStateHelper::depthCompareNone)
+			.setPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE)
+			.setRTVFormats({ FMT::RGBA16F })
+			.setVS(GlobalShader::getTextureCubeVS())
+			.setPS(textureCubePS)
+			.build();
 
-			GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&textureCubeState));
-		}
-		
-		{
-			D3D12_INPUT_ELEMENT_DESC inputLayoutDesc[] =
-			{
-				{"POSITION",0,DXGI_FORMAT_R32G32B32_FLOAT,0,D3D12_APPEND_ALIGNED_ELEMENT,D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0},
-			};
+		gridDebugState = PipelineStateBuilder()
+			.setInputElements({ {"POSITION",0,DXGI_FORMAT_R32G32B32_FLOAT,0,D3D12_APPEND_ALIGNED_ELEMENT,D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0} })
+			.setBlendState(CD3DX12_BLEND_DESC(D3D12_DEFAULT))
+			.setRasterizerState(PipelineStateHelper::rasterCullBack)
+			.setDepthStencilState(PipelineStateHelper::depthCompareNone)
+			.setPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE)
+			.setRTVFormats({Graphics::backBufferFormat})
+			.setVS(gridDebugVS)
+			.setPS(gridDebugPS)
+			.build();
 
-			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = PipelineStateHelper::getDefaultGraphicsDesc();
-			desc.InputLayout = { inputLayoutDesc,_countof(inputLayoutDesc) };
-			desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
-			desc.RasterizerState = PipelineStateHelper::rasterCullBack;
-			desc.DepthStencilState.DepthEnable = FALSE;
-			desc.DepthStencilState.StencilEnable = FALSE;
-			desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-			desc.NumRenderTargets = 1;
-			desc.RTVFormats[0] = Graphics::backBufferFormat;
-			desc.VS = gridDebugVS->getByteCode();
-			desc.PS = gridDebugPS->getByteCode();
+		oceanState = PipelineStateBuilder()
+			.setInputElements({ {"POSITION",0,DXGI_FORMAT_R32G32B32_FLOAT,0,D3D12_APPEND_ALIGNED_ELEMENT,D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0} })
+			.setBlendState(CD3DX12_BLEND_DESC(D3D12_DEFAULT))
+			.setRasterizerState(PipelineStateHelper::rasterCullBack)
+			.setDepthStencilState(PipelineStateHelper::depthCompareLess)
+			.setPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_PATCH)
+			.setRTVFormats({ FMT::RGBA16F })
+			.setDSVFormat(FMT::D32F)
+			.setVS(oceanVS)
+			.setHS(oceanHS)
+			.setDS(oceanDS)
+			.setPS(oceanPS)
+			.build();
 
-			GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&gridDebugState));
-		}
+		spectrumState = PipelineStateBuilder::buildComputeState(spectrumCS);
 
-		{
-			D3D12_INPUT_ELEMENT_DESC inputLayoutDesc[] =
-			{
-				{"POSITION",0,DXGI_FORMAT_R32G32B32_FLOAT,0,D3D12_APPEND_ALIGNED_ELEMENT,D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0},
-			};
+		conjugateState = PipelineStateBuilder::buildComputeState(conjugateCS);
 
-			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = PipelineStateHelper::getDefaultGraphicsDesc();
-			desc.InputLayout = { inputLayoutDesc,_countof(inputLayoutDesc) };
-			desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
-			desc.RasterizerState = PipelineStateHelper::rasterCullBack;
-			desc.DepthStencilState = PipelineStateHelper::depthLess;
-			desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_PATCH;
-			desc.NumRenderTargets = 1;
-			desc.RTVFormats[0] = DXGI_FORMAT_R16G16B16A16_FLOAT;
-			desc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
-			desc.VS = oceanVS->getByteCode();
-			desc.HS = oceanHS->getByteCode();
-			desc.DS = oceanDS->getByteCode();
-			desc.PS = oceanPS->getByteCode();
+		displacementSpectrumState = PipelineStateBuilder::buildComputeState(displacementSpectrumCS);
 
-			GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&oceanState));
-		}
+		ifftState = PipelineStateBuilder::buildComputeState(ifftCS);
 
-		PipelineStateHelper::createComputeState(&spectrumState, spectrumCS);
+		permutationState = PipelineStateBuilder::buildComputeState(permutationCS);
 
-		PipelineStateHelper::createComputeState(&conjugateState, conjugateCS);
-
-		PipelineStateHelper::createComputeState(&displacementSpectrumState, displacementSpectrumCS);
-
-		PipelineStateHelper::createComputeState(&ifftState, ifftCS);
-
-		PipelineStateHelper::createComputeState(&permutationState, permutationCS);
-
-		PipelineStateHelper::createComputeState(&waveMergeState, waveMergeCS);
+		waveMergeState = PipelineStateBuilder::buildComputeState(waveMergeCS);
 
 		tildeh0Texture = createTexture(textureResolution, DXGI_FORMAT_R32G32_FLOAT);
 
 		tempTexture = createTexture(textureResolution, DXGI_FORMAT_R32G32_FLOAT);
 
-		WaveCascade::spectrumState = spectrumState.Get();
+		WaveCascade::spectrumState = spectrumState;
 
-		WaveCascade::conjugateState = conjugateState.Get();
+		WaveCascade::conjugateState = conjugateState;
 
-		WaveCascade::displacementSpectrumState = displacementSpectrumState.Get();
+		WaveCascade::displacementSpectrumState = displacementSpectrumState;
 
-		WaveCascade::ifftState = ifftState.Get();
+		WaveCascade::ifftState = ifftState;
 
-		WaveCascade::permutationState = permutationState.Get();
+		WaveCascade::permutationState = permutationState;
 
-		WaveCascade::waveMergeState = waveMergeState.Get();
+		WaveCascade::waveMergeState = waveMergeState;
 
 		WaveCascade::tildeh0Texture = tildeh0Texture;
 
@@ -189,7 +164,7 @@ public:
 
 		depthTexture->getTexture()->setName(L"depthTexture");
 
-		oceanState->SetName(L"oceanState");
+		oceanState->get()->SetName(L"oceanState");
 
 		effect->setExposure(0.59f);
 
@@ -200,6 +175,24 @@ public:
 
 	~MyRenderTask()
 	{
+		delete textureCubeState;
+
+		delete gridDebugState;
+
+		delete oceanState;
+
+		delete spectrumState;
+
+		delete conjugateState;
+
+		delete displacementSpectrumState;
+
+		delete ifftState;
+
+		delete permutationState;
+
+		delete waveMergeState;
+
 		delete vertexBuffer;
 
 		delete indexBuffer;
@@ -371,7 +364,7 @@ private:
 
 		renderParamBuffer->simpleUpdate(&renderParam);
 
-		context->setPipelineState(textureCubeState.Get());
+		context->setPipelineState(textureCubeState);
 
 		context->setViewportSimple(Graphics::getWidth(), Graphics::getHeight());
 
@@ -386,7 +379,7 @@ private:
 
 		context->draw(36, 1, 0, 0);
 
-		context->setPipelineState(oceanState.Get());
+		context->setPipelineState(oceanState);
 
 		context->setViewportSimple(Graphics::getWidth(), Graphics::getHeight());
 
@@ -717,13 +710,13 @@ private:
 
 	Shader* textureCubePS;
 
-	ComPtr<ID3D12PipelineState> textureCubeState;
+	PipelineState* textureCubeState;
 
 	Shader* gridDebugVS;
 
 	Shader* gridDebugPS;
 
-	ComPtr<ID3D12PipelineState> gridDebugState;
+	PipelineState* gridDebugState;
 
 	Shader* oceanVS;
 
@@ -733,32 +726,32 @@ private:
 
 	Shader* oceanPS;
 
-	ComPtr<ID3D12PipelineState> oceanState;
+	PipelineState* oceanState;
 
 	Shader* spectrumCS;
 
-	ComPtr<ID3D12PipelineState> spectrumState;
+	PipelineState* spectrumState;
 
 	Shader* conjugateCS;
 
-	ComPtr<ID3D12PipelineState> conjugateState;
+	PipelineState* conjugateState;
 
 	Shader* displacementSpectrumCS;
 
-	ComPtr<ID3D12PipelineState> displacementSpectrumState;
+	PipelineState* displacementSpectrumState;
 
 	Shader* ifftCS;
 
-	ComPtr<ID3D12PipelineState> ifftState;
+	PipelineState* ifftState;
 
 	//sign correction
 	Shader* permutationCS;
 
-	ComPtr<ID3D12PipelineState> permutationState;
+	PipelineState* permutationState;
 
 	Shader* waveMergeCS;
 
-	ComPtr<ID3D12PipelineState> waveMergeState;
+	PipelineState* waveMergeState;
 
 	TextureRenderView* enviromentCube;
 

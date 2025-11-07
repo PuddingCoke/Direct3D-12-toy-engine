@@ -17,11 +17,11 @@ namespace
 
 		Gear::Core::D3D12Core::Shader* equirectangularPS;
 
-		ComPtr<ID3D12PipelineState> equirectangularR8State;
+		Gear::Core::D3D12Core::PipelineState* equirectangularR8State;
 
-		ComPtr<ID3D12PipelineState> equirectangularR16State;
+		Gear::Core::D3D12Core::PipelineState* equirectangularR16State;
 
-		ComPtr<ID3D12PipelineState> equirectangularR32State;
+		Gear::Core::D3D12Core::PipelineState* equirectangularR32State;
 
 		Gear::Core::Resource::ImmutableCBuffer* matricesBuffer;
 
@@ -33,13 +33,13 @@ void Gear::Core::GlobalEffect::LatLongMapToCubeMapEffect::process(GraphicsContex
 	switch (outputTexture->getTexture()->getFormat())
 	{
 	case DXGI_FORMAT_R8G8B8A8_UNORM:
-		context->setPipelineState(pvt.equirectangularR8State.Get());
+		context->setPipelineState(pvt.equirectangularR8State);
 		break;
 	case DXGI_FORMAT_R16G16B16A16_FLOAT:
-		context->setPipelineState(pvt.equirectangularR16State.Get());
+		context->setPipelineState(pvt.equirectangularR16State);
 		break;
 	case DXGI_FORMAT_R32G32B32A32_FLOAT:
-		context->setPipelineState(pvt.equirectangularR32State.Get());
+		context->setPipelineState(pvt.equirectangularR32State);
 		break;
 	}
 
@@ -65,27 +65,22 @@ void Gear::Core::GlobalEffect::LatLongMapToCubeMapEffect::Internal::initialize(R
 	pvt.equirectangularPS = new D3D12Core::Shader(g_EquirectangularPSBytes, sizeof(g_EquirectangularPSBytes));
 
 	{
-		D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = PipelineStateHelper::getDefaultGraphicsDesc();
-		desc.InputLayout = {};
-		desc.VS = pvt.equirectangularVS->getByteCode();
-		desc.PS = pvt.equirectangularPS->getByteCode();
-		desc.RasterizerState = PipelineStateHelper::rasterCullNone;
-		desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
-		desc.DepthStencilState.DepthEnable = FALSE;
-		desc.DepthStencilState.StencilEnable = FALSE;
-		desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-		desc.NumRenderTargets = 1;
-		desc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
+		auto getBuilder = [] {
+			return PipelineStateBuilder()
+				.setVS(pvt.equirectangularVS)
+				.setPS(pvt.equirectangularPS)
+				.setRasterizerState(PipelineStateHelper::rasterCullNone)
+				.setBlendState(CD3DX12_BLEND_DESC(D3D12_DEFAULT))
+				.setDepthStencilState(PipelineStateHelper::depthCompareNone)
+				.setPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE);
+			};
 
-		GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&pvt.equirectangularR8State));
+		pvt.equirectangularR8State = getBuilder().setRTVFormats({ FMT::RGBA8UN }).build();
 
-		desc.RTVFormats[0] = DXGI_FORMAT_R16G16B16A16_FLOAT;
+		pvt.equirectangularR16State = getBuilder().setRTVFormats({ FMT::RGBA16F }).build();
 
-		GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&pvt.equirectangularR16State));
+		pvt.equirectangularR32State = getBuilder().setRTVFormats({ FMT::RGBA32F }).build();
 
-		desc.RTVFormats[0] = DXGI_FORMAT_R32G32B32A32_FLOAT;
-
-		GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&pvt.equirectangularR32State));
 	}
 
 	{
@@ -146,11 +141,20 @@ void Gear::Core::GlobalEffect::LatLongMapToCubeMapEffect::Internal::release()
 		delete pvt.equirectangularPS;
 	}
 
-	pvt.equirectangularR8State = nullptr;
+	if (pvt.equirectangularR8State)
+	{
+		delete pvt.equirectangularR8State;
+	}
 
-	pvt.equirectangularR16State = nullptr;
+	if (pvt.equirectangularR16State)
+	{
+		delete pvt.equirectangularR16State;
+	}
 
-	pvt.equirectangularR32State = nullptr;
+	if (pvt.equirectangularR32State)
+	{
+		delete pvt.equirectangularR32State;
+	}
 
 	if (pvt.matricesBuffer)
 	{

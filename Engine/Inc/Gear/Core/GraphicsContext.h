@@ -5,6 +5,10 @@
 
 #include<Gear/Core/D3D12Core/CommandList.h>
 
+#include<Gear/Core/D3D12Core/RootSignature.h>
+
+#include<Gear/Core/D3D12Core/PipelineState.h>
+
 #include<Gear/Core/Resource/BufferView.h>
 
 #include<Gear/Core/Resource/StaticCBuffer.h>
@@ -28,6 +32,8 @@ namespace Gear
 			void updateBuffer(Resource::BufferView* const bufferView, const void* const data, const uint32_t size) const;
 
 			void updateBuffer(Resource::StaticCBuffer* const staticCBuffer, const void* const data, const uint32_t size) const;
+
+			void setGlobalConstantBuffer(const Resource::ImmutableCBuffer* const immutableCBuffer);
 
 			//4个值可用
 			void setVSConstants(const std::initializer_list<Resource::D3D12Resource::ShaderResourceDesc>& descs, const uint32_t offset);
@@ -64,8 +70,6 @@ namespace Gear
 
 			//32个值可用
 			void setCSConstants(const uint32_t numValues, const void* const data, const uint32_t offset) const;
-
-			void setGlobalConstantBuffer(const Resource::ImmutableCBuffer* const immutableCBuffer);
 
 			void setVSConstantBuffer(const Resource::ImmutableCBuffer* const immutableCBuffer);
 
@@ -106,7 +110,7 @@ namespace Gear
 
 			void setViewportSimple(const uint32_t width, const uint32_t height);
 
-			void setPipelineState(ID3D12PipelineState* const pipelineState) const;
+			void setPipelineState(const D3D12Core::PipelineState* const pipelineState);
 
 			void clearRenderTarget(const Resource::D3D12Resource::RenderTargetDesc& desc, const float clearValue[4]) const;
 
@@ -124,7 +128,7 @@ namespace Gear
 
 			void dispatch(const uint32_t threadGroupCountX, const uint32_t threadGroupCountY, const uint32_t threadGroupCountZ) const;
 
-			void begin() const;
+			void begin();
 
 			D3D12Core::CommandList* getCommandList() const;
 
@@ -146,6 +150,10 @@ namespace Gear
 
 			void pushRootConstantBufferDesc(const RootConstantBufferDesc& desc);
 
+			void setGraphicsRootSignature(const D3D12Core::RootSignature* const rootSignature);
+
+			void setComputeRootSignature(const D3D12Core::RootSignature* const rootSignature);
+
 			D3D12_VIEWPORT vp;
 
 			D3D12_RECT rt;
@@ -155,6 +163,14 @@ namespace Gear
 			uint32_t resourceIndices[32];
 
 			std::vector<RootConstantBufferDesc> rootConstantBufferDescs;
+
+			const Resource::ImmutableCBuffer* userDefinedGlobalConstantBuffer;
+
+			const D3D12Core::PipelineState* currentPipelineState;
+
+			const D3D12Core::RootSignature* graphicsRootSignature;
+
+			const D3D12Core::RootSignature* computeRootSignature;
 
 		};
 	}

@@ -16,37 +16,18 @@ public:
 		cameraParam{ Utils::Math::pi / 4.f + 0.4f,0.f,3.0f,8.f },
 		accumulateParam{ 0,0.f }
 	{
-		{
-			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = PipelineStateHelper::getDefaultGraphicsDesc();
-			desc.InputLayout = {};
-			desc.VS = GlobalShader::getFullScreenVS()->getByteCode();
-			desc.PS = accumulateShader->getByteCode();
-			desc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
-			desc.BlendState = PipelineStateHelper::blendDefault;
-			desc.DepthStencilState.DepthEnable = FALSE;
-			desc.DepthStencilState.StencilEnable = FALSE;
-			desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-			desc.NumRenderTargets = 1;
-			desc.RTVFormats[0] = accumulatedTexture->getTexture()->getFormat();
+		accumulateState = PipelineStateBuilder()
+			.setDefaultFullScreenState()
+			.setBlendState(PipelineStateHelper::blendDefault)
+			.setRTVFormats({ accumulatedTexture->getTexture()->getFormat() })
+			.setPS(accumulateShader)
+			.build();
 
-			GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&accumulateState));
-		}
-
-		{
-			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = PipelineStateHelper::getDefaultGraphicsDesc();
-			desc.InputLayout = {};
-			desc.VS = GlobalShader::getFullScreenVS()->getByteCode();
-			desc.PS = displayShader->getByteCode();
-			desc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
-			desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
-			desc.DepthStencilState.DepthEnable = FALSE;
-			desc.DepthStencilState.StencilEnable = FALSE;
-			desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-			desc.NumRenderTargets = 1;
-			desc.RTVFormats[0] = Graphics::backBufferFormat;
-
-			GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&displayState));
-		}
+		displayState = PipelineStateBuilder()
+			.setDefaultFullScreenState()
+			.setRTVFormats({ Graphics::backBufferFormat })
+			.setPS(displayShader)
+			.build();
 
 		Input::Mouse::addMoveEvent([this]()
 			{
@@ -79,8 +60,14 @@ public:
 	~MyRenderTask()
 	{
 		delete accumulateShader;
+
 		delete displayShader;
+
 		delete accumulatedTexture;
+
+		delete accumulateState;
+
+		delete displayState;
 	}
 
 protected:
@@ -99,7 +86,7 @@ protected:
 
 		context->setScissorRect(0.f, 0.f, static_cast<float>(Graphics::getWidth()), static_cast<float>(Graphics::getHeight()));
 
-		context->setPipelineState(accumulateState.Get());
+		context->setPipelineState(accumulateState);
 
 		context->setPSConstants(2, &accumulateParam, 0);
 
@@ -111,7 +98,7 @@ protected:
 
 		context->draw(3, 1, 0, 0);
 
-		context->setPipelineState(displayState.Get());
+		context->setPipelineState(displayState);
 
 		context->setPSConstants({ accumulatedTexture->getAllSRVIndex() }, 0);
 
@@ -130,9 +117,9 @@ private:
 
 	TextureRenderView* accumulatedTexture;
 
-	ComPtr<ID3D12PipelineState> accumulateState;
+	PipelineState* accumulateState;
 
-	ComPtr<ID3D12PipelineState> displayState;
+	PipelineState* displayState;
 
 	struct CameraParam
 	{

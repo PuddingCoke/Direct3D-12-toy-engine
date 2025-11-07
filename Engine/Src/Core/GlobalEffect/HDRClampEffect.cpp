@@ -11,7 +11,7 @@ namespace
 
 		Gear::Core::D3D12Core::Shader* hdrClampShader;
 
-		ComPtr<ID3D12PipelineState> hdrClampState;
+		Gear::Core::D3D12Core::PipelineState* hdrClampState;
 
 	}pvt;
 }
@@ -20,7 +20,7 @@ void Gear::Core::GlobalEffect::HDRClampEffect::process(GraphicsContext* const co
 {
 	if (inOutTexture->getTexture()->getFormat() == DXGI_FORMAT_R16G16B16A16_FLOAT)
 	{
-		context->setPipelineState(pvt.hdrClampState.Get());
+		context->setPipelineState(pvt.hdrClampState);
 
 		context->setCSConstants({ inOutTexture->getUAVMipIndex(0) }, 0);
 
@@ -36,7 +36,7 @@ void Gear::Core::GlobalEffect::HDRClampEffect::Internal::initialize()
 {
 	pvt.hdrClampShader = new D3D12Core::Shader(g_HDRClampCSBytes, sizeof(g_HDRClampCSBytes));
 
-	PipelineStateHelper::createComputeState(&pvt.hdrClampState, pvt.hdrClampShader);
+	pvt.hdrClampState = PipelineStateBuilder::buildComputeState(pvt.hdrClampShader);
 
 	LOGSUCCESS(L"create", LogColor::brightMagenta, L"HDRClampEffect", LogColor::defaultColor, L"succeeded");
 }
@@ -48,5 +48,8 @@ void Gear::Core::GlobalEffect::HDRClampEffect::Internal::release()
 		delete pvt.hdrClampShader;
 	}
 
-	pvt.hdrClampState = nullptr;
+	if (pvt.hdrClampState)
+	{
+		delete pvt.hdrClampState;
+	}
 }

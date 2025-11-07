@@ -145,9 +145,8 @@ public:
 		}
 	}
 
-	void render(GraphicsContext* const context, ID3D12PipelineState* const pipelineState)
+	void render(GraphicsContext* const context)
 	{
-		context->setPipelineState(pipelineState);
 		context->setPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		context->setVertexBuffers(0, { modelBuffer->getVertexBuffer() });
 
@@ -159,9 +158,8 @@ public:
 	}
 
 	//rasterize whole scene to a texture cube
-	void renderCube(GraphicsContext* const context, ID3D12PipelineState* const pipelineState)
+	void renderCube(GraphicsContext* const context)
 	{
-		context->setPipelineState(pipelineState);
 		context->setPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		context->setVertexBuffers(0, { modelBuffer->getVertexBuffer() });
 

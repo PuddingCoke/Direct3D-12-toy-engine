@@ -7,8 +7,6 @@
 
 #include<dxccompiler/dxcapi.h>
 
-#undef DOMAIN
-
 namespace Gear
 {
 	namespace Core

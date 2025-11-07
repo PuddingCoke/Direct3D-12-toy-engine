@@ -7,6 +7,8 @@
 
 #include<Gear/Core/D3D12Core/Shader.h>
 
+#include<Gear/Core/PipelineStateBuilder.h>
+
 #include<Gear/Core/PipelineStateHelper.h>
 
 #include<ImGUI/imgui.h>

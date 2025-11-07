@@ -12,18 +12,17 @@ public:
 	{
 		pixelShader = new Shader(Utils::File::getRootFolder() + L"PixelShader.cso");
 
-		{
-			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = PipelineStateHelper::getDefaultFullScreenState();
-			desc.NumRenderTargets = 1;
-			desc.RTVFormats[0] = Graphics::backBufferFormat;
-			desc.PS = pixelShader->getByteCode();
-
-			GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&pipelineState));
-		}
+		pipelineState = PipelineStateBuilder()
+			.setDefaultFullScreenState()
+			.setRTVFormats({ Graphics::backBufferFormat })
+			.setPS(pixelShader)
+			.build();
 	}
 
 	~MyRenderTask()
 	{
+		delete pipelineState;
+
 		delete pixelShader;
 	}
 
@@ -33,7 +32,7 @@ protected:
 	{
 		context->setDefRenderTarget();
 
-		context->setPipelineState(pipelineState.Get());
+		context->setPipelineState(pipelineState);
 
 		context->setViewportSimple(Graphics::getWidth(), Graphics::getHeight());
 
@@ -44,7 +43,7 @@ protected:
 
 private:
 
-	ComPtr<ID3D12PipelineState> pipelineState;
+	PipelineState* pipelineState;
 
 	Shader* pixelShader;
 

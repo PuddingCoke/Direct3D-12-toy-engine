@@ -128,6 +128,7 @@
     <ClInclude Include="Inc\Gear\Core\D3D12Core\DescriptorHandle.h" />
     <ClInclude Include="Inc\Gear\Core\D3D12Core\DXCCompiler.h" />
     <ClInclude Include="Inc\Gear\Core\D3D12Core\Internal\DXCCompilerInternal.h" />
+    <ClInclude Include="Inc\Gear\Core\D3D12Core\PipelineState.h" />
     <ClInclude Include="Inc\Gear\Core\DynamicCBufferManager.h" />
     <ClInclude Include="Inc\Gear\Core\Effect\FXAAEffect.h" />
     <ClInclude Include="Inc\Gear\Core\GlobalShader.h" />
@@ -139,6 +140,7 @@
     <ClInclude Include="Inc\Gear\Core\Internal\GraphicsInternal.h" />
     <ClInclude Include="Inc\Gear\Core\Internal\MainCameraInternal.h" />
     <ClInclude Include="Inc\Gear\Core\Internal\RenderEngineInternal.h" />
+    <ClInclude Include="Inc\Gear\Core\PipelineStateBuilder.h" />
     <ClInclude Include="Inc\Gear\Core\RenderTask.h" />
     <ClInclude Include="Inc\Gear\Core\Resource\D3D12Resource\PipelineResourceDesc.h" />
     <ClInclude Include="Inc\Gear\Core\Resource\DynamicCBuffer.h" />
@@ -220,7 +222,9 @@
     <ClCompile Include="Inc\DirectXTex\DDSTextureLoader12.cpp" />
     <ClCompile Include="Src\Core\D3D12Core\DescriptorHandle.cpp" />
     <ClCompile Include="Src\Core\D3D12Core\DXCCompiler.cpp" />
+    <ClCompile Include="Src\Core\D3D12Core\PipelineState.cpp" />
     <ClCompile Include="Src\Core\GlobalShader.cpp" />
+    <ClCompile Include="Src\Core\PipelineStateBuilder.cpp" />
     <ClCompile Include="Src\Core\Resource\DynamicCBuffer.cpp" />
     <ClCompile Include="Src\Core\Resource\StatiCBuffer.cpp" />
     <ClCompile Include="Src\Core\GlobalEffect\BackBufferBlitEffect.cpp" />
@@ -249,7 +253,6 @@
     <ClCompile Include="Src\Core\GlobalDescriptorHeap.cpp" />
     <ClCompile Include="Src\Core\GlobalRootSignature.cpp" />
     <ClCompile Include="Src\Core\GraphicsContext.cpp" />
-    <ClCompile Include="Src\Core\PipelineStateHelper.cpp" />
     <ClCompile Include="Src\Core\RenderEngine.cpp" />
     <ClCompile Include="Src\Core\Resource\D3D12Resource\Texture.cpp" />
     <ClCompile Include="Src\Core\Graphics.cpp" />

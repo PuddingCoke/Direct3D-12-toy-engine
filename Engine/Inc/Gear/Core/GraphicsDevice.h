@@ -31,6 +31,8 @@ LOGERROR(L"Failed with",IntegerMode::HEX,static_cast<uint32_t>(hr),L"Failed reas
 }\
 }\
 
+#undef DOMAIN
+
 namespace Gear
 {
 	namespace Core

@@ -3,7 +3,7 @@
 #ifndef _GEAR_CORE_PIPELINESTATEHELPER_H_
 #define _GEAR_CORE_PIPELINESTATEHELPER_H_
 
-#include<Gear/Core/D3D12Core/Shader.h>
+#include<D3D12Headers/d3dx12.h>
 
 namespace Gear
 {
@@ -38,28 +38,11 @@ namespace Gear
 
 			constexpr D3D12_RASTERIZER_DESC rasterWireFrame = { D3D12_FILL_MODE_WIREFRAME,D3D12_CULL_MODE_BACK,false,0,0.f,0.f,true };
 
-			constexpr D3D12_DEPTH_STENCIL_DESC depthLessEqual = { true,D3D12_DEPTH_WRITE_MASK_ALL,D3D12_COMPARISON_FUNC_LESS_EQUAL,false };
+			constexpr D3D12_DEPTH_STENCIL_DESC depthCompareLessEqual = { true,D3D12_DEPTH_WRITE_MASK_ALL,D3D12_COMPARISON_FUNC_LESS_EQUAL,false };
 
-			constexpr D3D12_DEPTH_STENCIL_DESC depthLess = { true,D3D12_DEPTH_WRITE_MASK_ALL,D3D12_COMPARISON_FUNC_LESS,false };
+			constexpr D3D12_DEPTH_STENCIL_DESC depthCompareLess = { true,D3D12_DEPTH_WRITE_MASK_ALL,D3D12_COMPARISON_FUNC_LESS,false };
 
-			//配置
-			//InputLayout
-			//BlendState
-			//RasterizerState
-			//DepthStencilState
-			//PrimitiveTopologyType
-			//NumRenderTargets
-			//RTVFormats
-			//DSVFormat
-			D3D12_GRAPHICS_PIPELINE_STATE_DESC getDefaultGraphicsDesc();
-
-			//配置
-			//NumRenderTargets
-			//RTVFormats
-			//PS
-			D3D12_GRAPHICS_PIPELINE_STATE_DESC getDefaultFullScreenState();
-
-			void createComputeState(ID3D12PipelineState** const pipelineState, const D3D12Core::Shader* const shader);
+			constexpr D3D12_DEPTH_STENCIL_DESC depthCompareNone = { false,D3D12_DEPTH_WRITE_MASK_ZERO,D3D12_COMPARISON_FUNC_NONE,false };
 
 		}
 	}

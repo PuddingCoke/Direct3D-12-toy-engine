@@ -7,6 +7,8 @@
 
 #include<Gear/Core/D3D12Core/Shader.h>
 
+#include<Gear/Core/PipelineStateBuilder.h>
+
 #include<Gear/Core/PipelineStateHelper.h>
 
 #endif // !_GEAR_CORE_GLOBALEFFECT_GLOBALEFFECTHEADER_H_

@@ -10,6 +10,8 @@
 
 #include"Scene.h"
 
+#include<iostream>
+
 using namespace Core;
 
 class MyRenderTask :public RenderTask
@@ -66,99 +68,73 @@ public:
 
 		distanceCube->getTexture()->setName(L"Distance Cube");
 
-		{
-			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = PipelineStateHelper::getDefaultGraphicsDesc();
-			desc.InputLayout = { inputDesc,_countof(inputDesc) };
-			desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
-			desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-			desc.RasterizerState = PipelineStateHelper::rasterShadow;
-			desc.DepthStencilState = PipelineStateHelper::depthLess;
-			desc.NumRenderTargets = 0;
-			desc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
-			desc.VS = shadowVS->getByteCode();
+		shadowPipelineState = PipelineStateBuilder()
+			.setInputElements(inputDesc)
+			.setBlendState(CD3DX12_BLEND_DESC(D3D12_DEFAULT))
+			.setPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE)
+			.setRasterizerState(PipelineStateHelper::rasterShadow)
+			.setDepthStencilState(PipelineStateHelper::depthCompareLess)
+			.setNoRTV()
+			.setDSVFormat(FMT::D32F)
+			.setVS(shadowVS)
+			.build();
 
-			GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&shadowPipelineState));
-		}
+		deferredPipelineState = PipelineStateBuilder()
+			.setInputElements(inputDesc)
+			.setBlendState(CD3DX12_BLEND_DESC(D3D12_DEFAULT))
+			.setPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE)
+			.setRasterizerState(PipelineStateHelper::rasterCullBack)
+			.setDepthStencilState(PipelineStateHelper::depthCompareLess)
+			.setRTVFormats({FMT::RGBA32F,FMT::RGBA32F,FMT::RGBA8UN})
+			.setDSVFormat(FMT::D32F)
+			.setVS(deferredVShader)
+			.setPS(deferredPShader)
+			.build();
 
-		{
-			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = PipelineStateHelper::getDefaultGraphicsDesc();
-			desc.InputLayout = { inputDesc,_countof(inputDesc) };
-			desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
-			desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-			desc.RasterizerState = PipelineStateHelper::rasterCullBack;
-			desc.DepthStencilState = PipelineStateHelper::depthLess;
-			desc.NumRenderTargets = 3;
-			desc.RTVFormats[0] = DXGI_FORMAT_R32G32B32A32_FLOAT;
-			desc.RTVFormats[1] = DXGI_FORMAT_R32G32B32A32_FLOAT;
-			desc.RTVFormats[2] = DXGI_FORMAT_R8G8B8A8_UNORM;
-			desc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
-			desc.VS = deferredVShader->getByteCode();
-			desc.PS = deferredPShader->getByteCode();
+		deferredFinalPipelineState = PipelineStateBuilder()
+			.setDefaultFullScreenState()
+			.setRTVFormats({ FMT::RGBA16F })
+			.setPS(deferredFinal)
+			.build();
 
-			GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&deferredPipelineState));
-		}
+		probeCapturePipelineState = PipelineStateBuilder()
+			.setInputElements(inputDesc)
+			.setBlendState(CD3DX12_BLEND_DESC(D3D12_DEFAULT))
+			.setPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE)
+			.setRasterizerState(PipelineStateHelper::rasterCullBack)
+			.setDepthStencilState(PipelineStateHelper::depthCompareLess)
+			.setRTVFormats({ FMT::RGBA16F,FMT::R32F })
+			.setDSVFormat(FMT::D32F)
+			.setVS(cubeRenderVS)
+			.setPS(cubeRenderPS)
+			.build();
 
-		{
-			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = PipelineStateHelper::getDefaultFullScreenState();
-			desc.NumRenderTargets = 1;
-			desc.RTVFormats[0] = DXGI_FORMAT_R16G16B16A16_FLOAT;
-			desc.PS = deferredFinal->getByteCode();
+		probeCaptureBouncePipelineState = PipelineStateBuilder()
+			.setInputElements(inputDesc)
+			.setBlendState(CD3DX12_BLEND_DESC(D3D12_DEFAULT))
+			.setPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE)
+			.setRasterizerState(PipelineStateHelper::rasterCullBack)
+			.setDepthStencilState(PipelineStateHelper::depthCompareLess)
+			.setRTVFormats({ FMT::RGBA16F })
+			.setDSVFormat(FMT::D32F)
+			.setVS(cubeRenderVS)
+			.setPS(cubeRenderBouncePS)
+			.build();
 
-			GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&deferredFinalPipelineState));
-		}
+		skyboxState = PipelineStateBuilder()
+			.setBlendState(CD3DX12_BLEND_DESC(D3D12_DEFAULT))
+			.setRasterizerState(PipelineStateHelper::rasterCullBack)
+			.setDepthStencilState(PipelineStateHelper::depthCompareLessEqual)
+			.setPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE)
+			.setRTVFormats({ FMT::RGBA16F })
+			.setDSVFormat(FMT::D32F)
+			.setVS(GlobalShader::getTextureCubeVS())
+			.setPS(skyboxPShader)
+			.build();
 
-		{
-			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = PipelineStateHelper::getDefaultGraphicsDesc();
-			desc.InputLayout = { inputDesc,_countof(inputDesc) };
-			desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
-			desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-			desc.RasterizerState = PipelineStateHelper::rasterCullBack;
-			desc.DepthStencilState = PipelineStateHelper::depthLess;
-			desc.NumRenderTargets = 2;
-			desc.RTVFormats[0] = DXGI_FORMAT_R16G16B16A16_FLOAT;
-			desc.RTVFormats[1] = DXGI_FORMAT_R32_FLOAT;
-			desc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
-			desc.VS = cubeRenderVS->getByteCode();
-			desc.PS = cubeRenderPS->getByteCode();
+		irradianceOctahedralEncodeState = PipelineStateBuilder::buildComputeState(irradianceOctahedralEncode);
 
-			GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&probeCapturePipelineState));
-		}
-
-		{
-			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = PipelineStateHelper::getDefaultGraphicsDesc();
-			desc.InputLayout = { inputDesc,_countof(inputDesc) };
-			desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
-			desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-			desc.RasterizerState = PipelineStateHelper::rasterCullBack;
-			desc.DepthStencilState = PipelineStateHelper::depthLess;
-			desc.NumRenderTargets = 1;
-			desc.RTVFormats[0] = DXGI_FORMAT_R16G16B16A16_FLOAT;
-			desc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
-			desc.VS = cubeRenderVS->getByteCode();
-			desc.PS = cubeRenderBouncePS->getByteCode();
-
-			GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&probeCaptureBouncePipelineState));
-		}
-
-		{
-			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = PipelineStateHelper::getDefaultGraphicsDesc();
-			desc.InputLayout = {};
-			desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
-			desc.RasterizerState = PipelineStateHelper::rasterCullBack;
-			desc.DepthStencilState = PipelineStateHelper::depthLessEqual;
-			desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-			desc.NumRenderTargets = 1;
-			desc.RTVFormats[0] = DXGI_FORMAT_R16G16B16A16_FLOAT;
-			desc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
-			desc.VS = GlobalShader::getTextureCubeVS()->getByteCode();
-			desc.PS = skyboxPShader->getByteCode();
-
-			GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&skyboxState));
-		}
-
-		PipelineStateHelper::createComputeState(&irradianceOctahedralEncodeState, irradianceOctahedralEncode);
-
-		PipelineStateHelper::createComputeState(&depthOctahedralEncodeState, depthOctahedralEncode);
+		depthOctahedralEncodeState = PipelineStateBuilder::buildComputeState(depthOctahedralEncode);
 
 		skybox = resManager->createTextureCube(wAssetPath + L"/sky/kloppenheim_05_4k.hdr", 1024, true);
 
@@ -271,6 +247,22 @@ public:
 
 		delete bloomEffect;
 		delete fxaaEffect;
+
+		delete shadowPipelineState;
+
+		delete deferredPipelineState;
+
+		delete deferredFinalPipelineState;
+
+		delete probeCapturePipelineState;
+
+		delete probeCaptureBouncePipelineState;
+
+		delete irradianceOctahedralEncodeState;
+
+		delete depthOctahedralEncodeState;
+
+		delete skyboxState;
 	}
 
 	void imGUICall() override
@@ -319,6 +311,8 @@ protected:
 
 	void updateShadow()
 	{
+		context->setPipelineState(shadowPipelineState);
+
 		const D3D12Resource::DepthStencilDesc dsDesc = shadowTexture->getDSVMipHandle(0);
 
 		context->setRenderTargets({}, &dsDesc);
@@ -333,7 +327,7 @@ protected:
 
 		context->clearDepthStencil(dsDesc, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0);
 
-		scene->render(context, shadowPipelineState.Get());
+		scene->render(context);
 	}
 
 	void updateLightProbe()
@@ -351,6 +345,8 @@ protected:
 
 	void renderCubeAt(const ImmutableCBuffer* const cubeRenderBuffer)
 	{
+		context->setPipelineState(probeCapturePipelineState);
+
 		context->setViewport(probeCaptureResolution, probeCaptureResolution);
 
 		context->setScissorRect(0, 0, probeCaptureResolution, probeCaptureResolution);
@@ -376,9 +372,9 @@ protected:
 
 		context->clearDepthStencil(dsDesc, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0);
 
-		scene->renderCube(context, probeCapturePipelineState.Get());
+		scene->renderCube(context);
 
-		context->setPipelineState(irradianceOctahedralEncodeState.Get());
+		context->setPipelineState(irradianceOctahedralEncodeState);
 
 		context->setCSConstants({
 			irradianceOctahedralMap->getUAVMipIndex(0),
@@ -393,7 +389,7 @@ protected:
 
 		context->uavBarrier({ irradianceOctahedralMap->getTexture() });
 
-		context->setPipelineState(depthOctahedralEncodeState.Get());
+		context->setPipelineState(depthOctahedralEncodeState);
 
 		context->setCSConstants({
 			depthOctahedralMap->getUAVMipIndex(0),
@@ -411,6 +407,8 @@ protected:
 
 	void renderCubeBounceAt(const ImmutableCBuffer* const cubeRenderBuffer)
 	{
+		context->setPipelineState(probeCaptureBouncePipelineState);
+
 		context->setViewport(probeCaptureResolution, probeCaptureResolution);
 
 		context->setScissorRect(0, 0, probeCaptureResolution, probeCaptureResolution);
@@ -436,9 +434,9 @@ protected:
 
 		context->clearDepthStencil(dsDesc, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0);
 
-		scene->renderCube(context, probeCaptureBouncePipelineState.Get());
+		scene->renderCube(context);
 
-		context->setPipelineState(irradianceOctahedralEncodeState.Get());
+		context->setPipelineState(irradianceOctahedralEncodeState);
 
 		context->setCSConstants({
 			irradianceBounceOctahedralMap->getUAVMipIndex(0),
@@ -456,6 +454,8 @@ protected:
 
 	void recordCommand() override
 	{
+		context->setPipelineState(deferredPipelineState);
+
 		context->setViewport(Graphics::getWidth(), Graphics::getHeight());
 
 		context->setScissorRect(0, 0, Graphics::getWidth(), Graphics::getHeight());
@@ -478,9 +478,9 @@ protected:
 
 		context->clearDepthStencil(dsDesc, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0);
 
-		scene->render(context, deferredPipelineState.Get());
+		scene->render(context);
 
-		context->setPipelineState(deferredFinalPipelineState.Get());
+		context->setPipelineState(deferredFinalPipelineState);
 
 		context->setViewport(Graphics::getWidth(), Graphics::getHeight());
 
@@ -507,7 +507,7 @@ protected:
 
 		context->draw(3, 1, 0, 0);
 
-		context->setPipelineState(skyboxState.Get());
+		context->setPipelineState(skyboxState);
 
 		context->setViewport(Graphics::getWidth(), Graphics::getHeight());
 
@@ -601,21 +601,21 @@ protected:
 
 	TextureRenderView* skybox;
 
-	ComPtr<ID3D12PipelineState> shadowPipelineState;
+	PipelineState* shadowPipelineState;
 
-	ComPtr<ID3D12PipelineState> deferredPipelineState;
+	PipelineState* deferredPipelineState;
 
-	ComPtr<ID3D12PipelineState> deferredFinalPipelineState;
+	PipelineState* deferredFinalPipelineState;
 
-	ComPtr<ID3D12PipelineState> probeCapturePipelineState;
+	PipelineState* probeCapturePipelineState;
 
-	ComPtr<ID3D12PipelineState> probeCaptureBouncePipelineState;
+	PipelineState* probeCaptureBouncePipelineState;
 
-	ComPtr<ID3D12PipelineState> irradianceOctahedralEncodeState;
+	PipelineState* irradianceOctahedralEncodeState;
 
-	ComPtr<ID3D12PipelineState> depthOctahedralEncodeState;
+	PipelineState* depthOctahedralEncodeState;
 
-	ComPtr<ID3D12PipelineState> skyboxState;
+	PipelineState* skyboxState;
 
 	Shader* shadowVS;
 

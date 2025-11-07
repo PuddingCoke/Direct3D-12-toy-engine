@@ -181,17 +181,17 @@ public:
 			jacobianTexture->getTexture() });
 	}
 
-	static ID3D12PipelineState* spectrumState;
+	static PipelineState* spectrumState;
 
-	static ID3D12PipelineState* conjugateState;
+	static PipelineState* conjugateState;
 
-	static ID3D12PipelineState* displacementSpectrumState;
+	static PipelineState* displacementSpectrumState;
 
-	static ID3D12PipelineState* ifftState;
+	static PipelineState* ifftState;
 
-	static ID3D12PipelineState* permutationState;
+	static PipelineState* permutationState;
 
-	static ID3D12PipelineState* waveMergeState;
+	static PipelineState* waveMergeState;
 
 	static TextureRenderView* tempTexture;
 
@@ -243,17 +243,17 @@ private:
 
 };
 
-ID3D12PipelineState* WaveCascade::spectrumState = nullptr;
+PipelineState* WaveCascade::spectrumState = nullptr;
 
-ID3D12PipelineState* WaveCascade::conjugateState = nullptr;
+PipelineState* WaveCascade::conjugateState = nullptr;
 
-ID3D12PipelineState* WaveCascade::displacementSpectrumState = nullptr;
+PipelineState* WaveCascade::displacementSpectrumState = nullptr;
 
-ID3D12PipelineState* WaveCascade::ifftState = nullptr;
+PipelineState* WaveCascade::ifftState = nullptr;
 
-ID3D12PipelineState* WaveCascade::permutationState = nullptr;
+PipelineState* WaveCascade::permutationState = nullptr;
 
-ID3D12PipelineState* WaveCascade::waveMergeState = nullptr;
+PipelineState* WaveCascade::waveMergeState = nullptr;
 
 TextureRenderView* WaveCascade::tempTexture = nullptr;
 

@@ -12,9 +12,20 @@ namespace Gear
 		namespace GlobalRootSignature
 		{
 
-			D3D12Core::RootSignature* getGraphicsRootSignature();
+			//用于使用顶点的时候
+			const D3D12Core::RootSignature* getBasicShaderRootSignature();
 
-			D3D12Core::RootSignature* getComputeRootSignature();
+			//用于开启镶嵌细分的时候
+			const D3D12Core::RootSignature* getTessellationRootSignature();
+
+			//用于使用几何着色器的时候
+			const D3D12Core::RootSignature* getGeometryShaderRootSignature();
+
+			//用于同时使用镶嵌细分和几何着色器的时候
+			const D3D12Core::RootSignature* getAllShaderRootSignature();
+
+			//用于使用计算着色器的时候
+			const D3D12Core::RootSignature* getComputeShaderRootSignature();
 
 		}
 	}

@@ -43,11 +43,11 @@ namespace Gear
 
 				D3D12Core::Shader* colorToColorLumaPS;
 
-				ComPtr<ID3D12PipelineState> colorToColorLumaState;
+				D3D12Core::PipelineState* colorToColorLumaState;
 
 				D3D12Core::Shader* fxaaPS;
 
-				ComPtr<ID3D12PipelineState> fxaaState;
+				D3D12Core::PipelineState* fxaaState;
 
 			};
 		}

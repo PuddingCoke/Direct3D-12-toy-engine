@@ -82,33 +82,33 @@ public:
 
 		simulationParam.vorticityIntensity = config.vorticityIntensity;
 
-		PipelineStateHelper::createComputeState(&splatVelocityState, splatVelocityCS);
+		splatVelocityState = PipelineStateBuilder::buildComputeState(splatVelocityCS);
 
-		PipelineStateHelper::createComputeState(&splatColorState, splatColorCS);
+		splatColorState = PipelineStateBuilder::buildComputeState(splatColorCS);
 
-		PipelineStateHelper::createComputeState(&vorticityState, vorticityCS);
+		vorticityState = PipelineStateBuilder::buildComputeState(vorticityCS);
 
-		PipelineStateHelper::createComputeState(&vorticityConfinementState, vorticityConfinementCS);
+		vorticityConfinementState = PipelineStateBuilder::buildComputeState(vorticityConfinementCS);
 
-		PipelineStateHelper::createComputeState(&divergenceState, divergenceCS);
+		divergenceState = PipelineStateBuilder::buildComputeState(divergenceCS);
 
-		PipelineStateHelper::createComputeState(&pressureResetState, pressureResetCS);
+		pressureResetState = PipelineStateBuilder::buildComputeState(pressureResetCS);
 
-		PipelineStateHelper::createComputeState(&pressureState, pressureCS);
+		pressureState = PipelineStateBuilder::buildComputeState(pressureCS);
 
-		PipelineStateHelper::createComputeState(&gradientSubtractState, gradientSubtractCS);
+		gradientSubtractState = PipelineStateBuilder::buildComputeState(gradientSubtractCS);
 
-		PipelineStateHelper::createComputeState(&velocityAdvectionState, velocityAdvectionCS);
+		velocityAdvectionState = PipelineStateBuilder::buildComputeState(velocityAdvectionCS);
 
-		PipelineStateHelper::createComputeState(&colorAdvectionState, colorAdvectionCS);
+		colorAdvectionState = PipelineStateBuilder::buildComputeState(colorAdvectionCS);
 
-		PipelineStateHelper::createComputeState(&velocityBoundaryState, velocityBoundaryCS);
+		velocityBoundaryState = PipelineStateBuilder::buildComputeState(velocityBoundaryCS);
 
-		PipelineStateHelper::createComputeState(&pressureBoundaryState, pressureBoundaryCS);
+		pressureBoundaryState = PipelineStateBuilder::buildComputeState(pressureBoundaryCS);
 
-		PipelineStateHelper::createComputeState(&phongShadeState, phongShadeCS);
+		phongShadeState = PipelineStateBuilder::buildComputeState(phongShadeCS);
 
-		PipelineStateHelper::createComputeState(&edgeHighlightState, edgeHighlightCS);
+		edgeHighlightState = PipelineStateBuilder::buildComputeState(edgeHighlightCS);
 
 		effect = new BloomEffect(context, Graphics::getWidth(), Graphics::getHeight(), resManager);
 
@@ -153,6 +153,21 @@ public:
 		delete pressureBoundaryCS;
 		delete phongShadeCS;
 		delete edgeHighlightCS;
+
+		delete splatVelocityState;
+		delete splatColorState;
+		delete vorticityState;
+		delete vorticityConfinementState;
+		delete divergenceState;
+		delete pressureResetState;
+		delete pressureState;
+		delete gradientSubtractState;
+		delete velocityAdvectionState;
+		delete colorAdvectionState;
+		delete velocityBoundaryState;
+		delete pressureBoundaryState;
+		delete phongShadeState;
+		delete edgeHighlightState;
 	}
 
 	void imGUICall() override
@@ -181,14 +196,14 @@ public:
 	{
 		if (config.vortex || (Input::Mouse::onMove() && Input::Mouse::getLeftDown()))
 		{
-			context->setPipelineState(splatVelocityState.Get());
+			context->setPipelineState(splatVelocityState);
 			context->setCSConstants({ velocityTex->read()->getAllSRVIndex(),velocityTex->write()->getUAVMipIndex(0) }, 0);
 			context->transitionResources();
 			context->dispatch(velocityTex->width / 16, velocityTex->height / 9, 1);
 			context->uavBarrier({ velocityTex->write()->getTexture() });
 			velocityTex->swap();
 
-			context->setPipelineState(splatColorState.Get());
+			context->setPipelineState(splatColorState);
 			context->setCSConstants({ colorTex->read()->getAllSRVIndex(),colorTex->write()->getUAVMipIndex(0) }, 0);
 			context->transitionResources();
 			context->dispatch(colorTex->width / 16, colorTex->height / 9, 1);
@@ -200,14 +215,14 @@ public:
 	void vorticityConfinement()
 	{
 		//calculate vorticity
-		context->setPipelineState(vorticityState.Get());
+		context->setPipelineState(vorticityState);
 		context->setCSConstants({ velocityTex->read()->getAllSRVIndex(),vorticityTex->getUAVMipIndex(0) }, 0);
 		context->transitionResources();
 		context->dispatch(vorticityTex->getTexture()->getWidth() / 16, vorticityTex->getTexture()->getHeight() / 9, 1);
 		context->uavBarrier({ vorticityTex->getTexture() });
 
 		//apply vorticity confinement
-		context->setPipelineState(vorticityConfinementState.Get());
+		context->setPipelineState(vorticityConfinementState);
 		context->setCSConstants({ vorticityTex->getAllSRVIndex(),velocityTex->read()->getAllSRVIndex(),velocityTex->write()->getUAVMipIndex(0) }, 0);
 		context->transitionResources();
 		context->dispatch(velocityTex->width / 16, velocityTex->height / 9, 1);
@@ -215,7 +230,7 @@ public:
 		velocityTex->swap();
 
 		//obstacle
-		context->setPipelineState(velocityBoundaryState.Get());
+		context->setPipelineState(velocityBoundaryState);
 		context->setCSConstants({ velocityTex->read()->getAllSRVIndex(),velocityTex->write()->getUAVMipIndex(0) }, 0);
 		context->transitionResources();
 		context->dispatch(velocityTex->width / 16, velocityTex->height / 9, 1);
@@ -226,14 +241,14 @@ public:
 	void project()
 	{
 		//calculate divergence
-		context->setPipelineState(divergenceState.Get());
+		context->setPipelineState(divergenceState);
 		context->setCSConstants({ velocityTex->read()->getAllSRVIndex(),divergenceTex->getUAVMipIndex(0) }, 0);
 		context->transitionResources();
 		context->dispatch(divergenceTex->getTexture()->getWidth() / 16, divergenceTex->getTexture()->getHeight() / 9, 1);
 		context->uavBarrier({ divergenceTex->getTexture() });
 
 		//reset pressure
-		context->setPipelineState(pressureResetState.Get());
+		context->setPipelineState(pressureResetState);
 		context->setCSConstants({ pressureTex->write()->getUAVMipIndex(0) }, 0);
 		context->transitionResources();
 		context->dispatch(pressureTex->width / 16, pressureTex->height / 9, 1);
@@ -243,7 +258,7 @@ public:
 		//calculate pressure
 		for (UINT i = 0; i < config.pressureIteraion; i++)
 		{
-			context->setPipelineState(pressureState.Get());
+			context->setPipelineState(pressureState);
 			context->setCSConstants({ divergenceTex->getAllSRVIndex(),pressureTex->read()->getAllSRVIndex(),pressureTex->write()->getUAVMipIndex(0) }, 0);
 			context->transitionResources();
 			context->dispatch(pressureTex->width / 16, pressureTex->height / 9, 1);
@@ -251,7 +266,7 @@ public:
 			pressureTex->swap();
 
 			//obstacle
-			context->setPipelineState(pressureBoundaryState.Get());
+			context->setPipelineState(pressureBoundaryState);
 			context->setCSConstants({ pressureTex->read()->getAllSRVIndex(),pressureTex->write()->getUAVMipIndex(0) }, 0);
 			context->transitionResources();
 			context->dispatch(pressureTex->width / 16, pressureTex->height / 9, 1);
@@ -260,7 +275,7 @@ public:
 		}
 
 		//velocity subtract gradient of pressure
-		context->setPipelineState(gradientSubtractState.Get());
+		context->setPipelineState(gradientSubtractState);
 		context->setCSConstants({ pressureTex->read()->getAllSRVIndex(),velocityTex->read()->getAllSRVIndex(),velocityTex->write()->getUAVMipIndex(0) }, 0);
 		context->transitionResources();
 		context->dispatch(velocityTex->width / 16, velocityTex->height / 9, 1);
@@ -268,7 +283,7 @@ public:
 		velocityTex->swap();
 
 		//obstacle
-		context->setPipelineState(velocityBoundaryState.Get());
+		context->setPipelineState(velocityBoundaryState);
 		context->setCSConstants({ velocityTex->read()->getAllSRVIndex(),velocityTex->write()->getUAVMipIndex(0) }, 0);
 		context->transitionResources();
 		context->dispatch(velocityTex->width / 16, velocityTex->height / 9, 1);
@@ -279,7 +294,7 @@ public:
 	void advect()
 	{
 		//velocity advection
-		context->setPipelineState(velocityAdvectionState.Get());
+		context->setPipelineState(velocityAdvectionState);
 		context->setCSConstants({ velocityTex->read()->getAllSRVIndex(),velocityTex->write()->getUAVMipIndex(0) }, 0);
 		context->transitionResources();
 		context->dispatch(velocityTex->width / 16, velocityTex->height / 9, 1);
@@ -287,7 +302,7 @@ public:
 		velocityTex->swap();
 
 		//obstacle
-		context->setPipelineState(velocityBoundaryState.Get());
+		context->setPipelineState(velocityBoundaryState);
 		context->setCSConstants({ velocityTex->read()->getAllSRVIndex(),velocityTex->write()->getUAVMipIndex(0) }, 0);
 		context->transitionResources();
 		context->dispatch(velocityTex->width / 16, velocityTex->height / 9, 1);
@@ -295,7 +310,7 @@ public:
 		velocityTex->swap();
 
 		//color advection
-		context->setPipelineState(colorAdvectionState.Get());
+		context->setPipelineState(colorAdvectionState);
 		context->setCSConstants({ velocityTex->read()->getAllSRVIndex(),colorTex->read()->getAllSRVIndex(),colorTex->write()->getUAVMipIndex(0) }, 0);
 		context->transitionResources();
 		context->dispatch(colorTex->width / 16, colorTex->height / 9, 1);
@@ -358,7 +373,7 @@ public:
 
 		if (config.phongShading)
 		{
-			context->setPipelineState(phongShadeState.Get());
+			context->setPipelineState(phongShadeState);
 			context->setCSConstants({ colorTex->read()->getAllSRVIndex(),phongShadeTexture->getUAVMipIndex(0) }, 0);
 			context->transitionResources();
 			context->dispatch(phongShadeTexture->getTexture()->getWidth() / 16, phongShadeTexture->getTexture()->getHeight() / 9, 1);
@@ -373,7 +388,7 @@ public:
 
 		if (config.edgeHighlight)
 		{
-			context->setPipelineState(edgeHighlightState.Get());
+			context->setPipelineState(edgeHighlightState);
 			context->setCSConstants({ outputTexture->getAllSRVIndex(),edgeHighlightTexture->getUAVMipIndex(0) }, 0);
 			context->transitionResources();
 			context->dispatch(edgeHighlightTexture->getTexture()->getWidth() / 16, edgeHighlightTexture->getTexture()->getHeight() / 9, 1);
@@ -450,58 +465,58 @@ private:
 
 	Shader* splatVelocityCS;
 
-	ComPtr<ID3D12PipelineState> splatVelocityState;
+	PipelineState* splatVelocityState;
 
 	Shader* splatColorCS;
 
-	ComPtr<ID3D12PipelineState> splatColorState;
+	PipelineState* splatColorState;
 
 	Shader* vorticityCS;
 
-	ComPtr<ID3D12PipelineState> vorticityState;
+	PipelineState* vorticityState;
 
 	Shader* vorticityConfinementCS;
 
-	ComPtr<ID3D12PipelineState> vorticityConfinementState;
+	PipelineState* vorticityConfinementState;
 
 	Shader* divergenceCS;
 
-	ComPtr<ID3D12PipelineState> divergenceState;
+	PipelineState* divergenceState;
 
 	Shader* pressureResetCS;
 
-	ComPtr<ID3D12PipelineState> pressureResetState;
+	PipelineState* pressureResetState;
 
 	Shader* pressureCS;
 
-	ComPtr<ID3D12PipelineState> pressureState;
+	PipelineState* pressureState;
 
 	Shader* gradientSubtractCS;
 
-	ComPtr<ID3D12PipelineState> gradientSubtractState;
+	PipelineState* gradientSubtractState;
 
 	Shader* velocityAdvectionCS;
 
-	ComPtr<ID3D12PipelineState> velocityAdvectionState;
+	PipelineState* velocityAdvectionState;
 
 	Shader* colorAdvectionCS;
 
-	ComPtr<ID3D12PipelineState> colorAdvectionState;
+	PipelineState* colorAdvectionState;
 
 	Shader* velocityBoundaryCS;
 
-	ComPtr<ID3D12PipelineState> velocityBoundaryState;
+	PipelineState* velocityBoundaryState;
 
 	Shader* pressureBoundaryCS;
 
-	ComPtr<ID3D12PipelineState> pressureBoundaryState;
+	PipelineState* pressureBoundaryState;
 
 	Shader* phongShadeCS;
 
-	ComPtr<ID3D12PipelineState> phongShadeState;
+	PipelineState* phongShadeState;
 
 	Shader* edgeHighlightCS;
 
-	ComPtr<ID3D12PipelineState> edgeHighlightState;
+	PipelineState* edgeHighlightState;
 
 };

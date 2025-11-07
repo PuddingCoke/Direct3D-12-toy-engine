@@ -16,7 +16,7 @@ public:
 		originTexture(ResourceManager::createTextureRenderView(Graphics::getWidth(), Graphics::getHeight(), DXGI_FORMAT_R16G16B16A16_UNORM, 1, 1, false, true,
 			DXGI_FORMAT_R16G16B16A16_UNORM, DXGI_FORMAT_R16G16B16A16_UNORM, DXGI_FORMAT_UNKNOWN))
 	{
-		PipelineStateHelper::createComputeState(&computeState, computeCS);
+		computeState = PipelineStateBuilder::buildComputeState(computeCS);
 
 		effect.setExposure(1.9f);
 
@@ -34,6 +34,8 @@ public:
 	~MyRenderTask()
 	{
 		delete computeCS;
+
+		delete computeState;
 
 		delete originTexture;
 	}
@@ -82,7 +84,7 @@ protected:
 
 		accParam.floatSeed = Graphics::getTimeElapsed();
 
-		context->setPipelineState(computeState.Get());
+		context->setPipelineState(computeState);
 
 		context->setCSConstants({ originTexture->getUAVMipIndex(0) }, 0);
 
@@ -105,7 +107,7 @@ private:
 
 	Shader* computeCS;
 
-	ComPtr<ID3D12PipelineState> computeState;
+	PipelineState* computeState;
 
 	TextureRenderView* originTexture;
 

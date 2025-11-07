@@ -5,6 +5,8 @@
 
 #include"DescriptorHeap.h"
 
+#include"PipelineState.h"
+
 #include"RootSignature.h"
 
 #include<Gear/Core/Resource/D3D12Resource/Buffer.h>
@@ -43,11 +45,13 @@ namespace Gear
 
 				void close() const;
 
-				void setDescriptorHeap(DescriptorHeap* const resourceHeap, DescriptorHeap* const samplerHeap) const;
+				void setDescriptorHeap(const DescriptorHeap* const resourceHeap,const DescriptorHeap* const samplerHeap) const;
 
-				void setGraphicsRootSignature(RootSignature* const rootSignature) const;
+				void setPipelineState(const PipelineState* const pipelineState) const;
 
-				void setComputeRootSignature(RootSignature* const rootSignature) const;
+				void setGraphicsRootSignature(const RootSignature* const rootSignature) const;
+
+				void setComputeRootSignature(const RootSignature* const rootSignature) const;
 
 				void setGraphicsRootConstantBuffer(const uint32_t rootParameterIndex, const D3D12_GPU_VIRTUAL_ADDRESS bufferLocation) const;
 
@@ -68,8 +72,6 @@ namespace Gear
 				void setViewports(const uint32_t numViewports, const D3D12_VIEWPORT* const pViewports) const;
 
 				void setScissorRects(const uint32_t numRects, const D3D12_RECT* const pRects) const;
-
-				void setPipelineState(ID3D12PipelineState* const pipelineState) const;
 
 				void clearRenderTargetView(const D3D12_CPU_DESCRIPTOR_HANDLE renderTargetView, const float colorRGBA[4], const uint32_t numRects, const D3D12_RECT* const pRects) const;
 

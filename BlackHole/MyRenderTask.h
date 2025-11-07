@@ -18,18 +18,19 @@ public:
 			FMT::RGBA16F, FMT::UNKNOWN, FMT::RGBA16F)),
 		effect(new BloomEffect(context, Graphics::getWidth(), Graphics::getHeight(), resManager))
 	{
-		auto desc = PipelineStateHelper::getDefaultFullScreenState();
-		desc.NumRenderTargets = 1;
-		desc.RTVFormats[0] = originTexture->getTexture()->getFormat();
-		desc.PS = blackHoleShader->getByteCode();
-
-		GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&pipelineState));
+		pipelineState = PipelineStateBuilder()
+			.setDefaultFullScreenState()
+			.setRTVFormats({ originTexture->getTexture()->getFormat() })
+			.setPS(blackHoleShader)
+			.build();
 
 		Input::Keyboard::addKeyDownEvent(Input::Keyboard::K, [this]() {perframeData.useOriginalVer = ~perframeData.useOriginalVer; });
 	}
 
 	~MyRenderTask()
 	{
+		delete pipelineState;
+
 		delete blackHoleShader;
 
 		delete noiseTexture;
@@ -67,7 +68,7 @@ protected:
 	{
 		context->setRenderTargets({ originTexture->getRTVMipHandle(0) });
 
-		context->setPipelineState(pipelineState.Get());
+		context->setPipelineState(pipelineState);
 
 		context->setViewportSimple(Graphics::getWidth(), Graphics::getHeight());
 
@@ -96,7 +97,7 @@ protected:
 
 private:
 
-	ComPtr<ID3D12PipelineState> pipelineState;
+	PipelineState* pipelineState;
 
 	Shader* blackHoleShader;
 

@@ -705,7 +705,6 @@ void RenderEnginePrivate::drawImGuiFrame(Gear::Core::D3D12Core::CommandList* con
 	{
 		ImGui::Render();
 
-		//这里假设了全局描述符堆和全局采样器堆已经进行了绑定
 		//targetCommandList->setDescriptorHeap(Gear::Core::GlobalDescriptorHeap::getResourceHeap(), Gear::Core::GlobalDescriptorHeap::getSamplerHeap());
 
 		targetCommandList->setDefRenderTarget();

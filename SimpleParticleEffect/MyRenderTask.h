@@ -22,30 +22,23 @@ public:
 
 		particleCS = new Shader(L"ParticleCS.hlsl", DXCCompiler::ShaderProfile::COMPUTE);
 
-		Core::PipelineStateHelper::createComputeState(&particleComputeState, particleCS);
+		particleComputeState = PipelineStateBuilder::buildComputeState(particleCS);
 
-		{
-			D3D12_INPUT_ELEMENT_DESC inputDesc[2] =
-			{
+		particleRenderState = PipelineStateBuilder()
+			.setInputElements({
 				{"POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
 				{"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}
-			};
-
-			D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = Core::PipelineStateHelper::getDefaultGraphicsDesc();
-			desc.InputLayout = { inputDesc,_countof(inputDesc) };
-			desc.VS = particleVS->getByteCode();
-			desc.GS = particleGS->getByteCode();
-			desc.PS = particlePS->getByteCode();
-			desc.BlendState = Core::PipelineStateHelper::blendAddtive;
-			desc.RasterizerState = Core::PipelineStateHelper::rasterCullBack;
-			desc.DepthStencilState = Core::PipelineStateHelper::depthLess;
-			desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_POINT;
-			desc.NumRenderTargets = 1;
-			desc.RTVFormats[0] = DXGI_FORMAT_R16G16B16A16_FLOAT;
-			desc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
-
-			Core::GraphicsDevice::get()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&particleRenderState));
-		}
+				})
+			.setBlendState(PipelineStateHelper::blendAddtive)
+			.setRasterizerState(PipelineStateHelper::rasterCullBack)
+			.setDepthStencilState(PipelineStateHelper::depthCompareLess)
+			.setPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_POINT)
+			.setRTVFormats({ FMT::RGBA16F })
+			.setDSVFormat(FMT::D32F)
+			.setVS(particleVS)
+			.setGS(particleGS)
+			.setPS(particlePS)
+			.build();
 
 		bloomEffect = new BloomEffect(context, Core::Graphics::getWidth(), Core::Graphics::getHeight(), resManager);
 
@@ -95,6 +88,10 @@ public:
 
 	~MyRenderTask()
 	{
+		delete particleComputeState;
+
+		delete particleRenderState;
+
 		delete bloomEffect;
 		delete fxaaEffect;
 
@@ -131,7 +128,7 @@ protected:
 
 	void recordCommand() override
 	{
-		context->setPipelineState(particleComputeState.Get());
+		context->setPipelineState(particleComputeState);
 
 		context->setCSConstants({ positionBuffer->getUAVIndex() }, 0);
 
@@ -145,7 +142,7 @@ protected:
 
 		const D3D12Resource::DepthStencilDesc dsDesc = depthTexture->getDSVMipHandle(0);
 
-		context->setPipelineState(particleRenderState.Get());
+		context->setPipelineState(particleRenderState);
 
 		context->setRenderTargets({ originTexture->getRTVMipHandle(0) }, &dsDesc);
 
@@ -189,9 +186,9 @@ private:
 
 	FXAAEffect* fxaaEffect;
 
-	ComPtr<ID3D12PipelineState> particleComputeState;
+	PipelineState* particleComputeState;
 
-	ComPtr<ID3D12PipelineState> particleRenderState;
+	PipelineState* particleRenderState;
 
 	Shader* particleVS;
 

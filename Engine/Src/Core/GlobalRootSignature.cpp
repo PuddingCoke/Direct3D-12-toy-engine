@@ -7,21 +7,46 @@ namespace
 	struct GlobalRootSignaturePrivate
 	{
 
-		Gear::Core::D3D12Core::RootSignature* graphicsRootSignature = nullptr;
+		//用于使用顶点和像素着色器的时候
+		Gear::Core::D3D12Core::RootSignature* basicShaderRootSignature = nullptr;
 
-		Gear::Core::D3D12Core::RootSignature* computeRootSignature = nullptr;
+		//用于开启镶嵌细分的时候
+		Gear::Core::D3D12Core::RootSignature* tessellationRootSignature = nullptr;
+
+		//用于使用几何着色器的时候
+		Gear::Core::D3D12Core::RootSignature* geometryShaderRootSignature = nullptr;
+
+		//用于同时使用镶嵌细分和几何着色器的时候
+		Gear::Core::D3D12Core::RootSignature* allShaderRootSignature = nullptr;
+
+		Gear::Core::D3D12Core::RootSignature* computeShaderRootSignature = nullptr;
 
 	}pvt;
 }
 
-Gear::Core::D3D12Core::RootSignature* Gear::Core::GlobalRootSignature::getGraphicsRootSignature()
+const Gear::Core::D3D12Core::RootSignature* Gear::Core::GlobalRootSignature::getBasicShaderRootSignature()
 {
-	return pvt.graphicsRootSignature;
+	return pvt.basicShaderRootSignature;
 }
 
-Gear::Core::D3D12Core::RootSignature* Gear::Core::GlobalRootSignature::getComputeRootSignature()
+const Gear::Core::D3D12Core::RootSignature* Gear::Core::GlobalRootSignature::getTessellationRootSignature()
 {
-	return pvt.computeRootSignature;
+	return pvt.tessellationRootSignature;
+}
+
+const Gear::Core::D3D12Core::RootSignature* Gear::Core::GlobalRootSignature::getGeometryShaderRootSignature()
+{
+	return pvt.geometryShaderRootSignature;
+}
+
+const Gear::Core::D3D12Core::RootSignature* Gear::Core::GlobalRootSignature::getAllShaderRootSignature()
+{
+	return pvt.allShaderRootSignature;
+}
+
+const Gear::Core::D3D12Core::RootSignature* Gear::Core::GlobalRootSignature::getComputeShaderRootSignature()
+{
+	return pvt.computeShaderRootSignature;
 }
 
 void Gear::Core::GlobalRootSignature::Internal::initialize()
@@ -108,69 +133,94 @@ void Gear::Core::GlobalRootSignature::Internal::initialize()
 		samplerDesc[6].MaxLOD = D3D12_FLOAT32_MAX;
 	}
 
-	{
-		//2+2+4+4+8+4+24+2*5 = 58 dwords
-		CD3DX12_ROOT_PARAMETER1 rootParameters[12] = {};
+	//总计 48 DWORDS
+	pvt.basicShaderRootSignature = new D3D12Core::RootSignature(8u, 0u, 0u, 0u, 32u, 0u, samplerDesc, _countof(samplerDesc),
+		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT |
+		D3D12_ROOT_SIGNATURE_FLAG_DENY_AMPLIFICATION_SHADER_ROOT_ACCESS |
+		D3D12_ROOT_SIGNATURE_FLAG_DENY_MESH_SHADER_ROOT_ACCESS |
+		D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS |
+		D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS |
+		D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS |
+		D3D12_ROOT_SIGNATURE_FLAG_CBV_SRV_UAV_HEAP_DIRECTLY_INDEXED |
+		D3D12_ROOT_SIGNATURE_FLAG_SAMPLER_HEAP_DIRECTLY_INDEXED);
 
-		//由引擎决定的所有着色器可见的全局常量缓冲
-		rootParameters[0].InitAsConstantBufferView(0, 0, D3D12_ROOT_DESCRIPTOR_FLAG_DATA_STATIC_WHILE_SET_AT_EXECUTE, D3D12_SHADER_VISIBILITY_ALL);
-		//用户决定的所有着色器可见的全局常量缓冲
-		rootParameters[1].InitAsConstantBufferView(1, 0, D3D12_ROOT_DESCRIPTOR_FLAG_DATA_STATIC_WHILE_SET_AT_EXECUTE, D3D12_SHADER_VISIBILITY_ALL);
-		//用于每次绘制调用的各个着色器的常量
-		rootParameters[2].InitAsConstants(4, 2, 0, D3D12_SHADER_VISIBILITY_VERTEX);
-		rootParameters[3].InitAsConstants(4, 2, 0, D3D12_SHADER_VISIBILITY_HULL);
-		rootParameters[4].InitAsConstants(8, 2, 0, D3D12_SHADER_VISIBILITY_DOMAIN);
-		rootParameters[5].InitAsConstants(4, 2, 0, D3D12_SHADER_VISIBILITY_GEOMETRY);
-		rootParameters[6].InitAsConstants(24, 2, 0, D3D12_SHADER_VISIBILITY_PIXEL);
-		//用于每次绘制调用的各个着色器的常量缓冲
-		rootParameters[7].InitAsConstantBufferView(3, 0, D3D12_ROOT_DESCRIPTOR_FLAG_DATA_STATIC_WHILE_SET_AT_EXECUTE, D3D12_SHADER_VISIBILITY_VERTEX);
-		rootParameters[8].InitAsConstantBufferView(3, 0, D3D12_ROOT_DESCRIPTOR_FLAG_DATA_STATIC_WHILE_SET_AT_EXECUTE, D3D12_SHADER_VISIBILITY_HULL);
-		rootParameters[9].InitAsConstantBufferView(3, 0, D3D12_ROOT_DESCRIPTOR_FLAG_DATA_STATIC_WHILE_SET_AT_EXECUTE, D3D12_SHADER_VISIBILITY_DOMAIN);
-		rootParameters[10].InitAsConstantBufferView(3, 0, D3D12_ROOT_DESCRIPTOR_FLAG_DATA_STATIC_WHILE_SET_AT_EXECUTE, D3D12_SHADER_VISIBILITY_GEOMETRY);
-		rootParameters[11].InitAsConstantBufferView(3, 0, D3D12_ROOT_DESCRIPTOR_FLAG_DATA_STATIC_WHILE_SET_AT_EXECUTE, D3D12_SHADER_VISIBILITY_PIXEL);
+	pvt.basicShaderRootSignature->get()->SetName(L"Basic Shader On Root Signature");
 
-		CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC rootSignatureDesc;
-		rootSignatureDesc.Init_1_1(_countof(rootParameters), rootParameters, _countof(samplerDesc), samplerDesc,
-			D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT |
-			D3D12_ROOT_SIGNATURE_FLAG_DENY_AMPLIFICATION_SHADER_ROOT_ACCESS | D3D12_ROOT_SIGNATURE_FLAG_DENY_MESH_SHADER_ROOT_ACCESS |
-			D3D12_ROOT_SIGNATURE_FLAG_CBV_SRV_UAV_HEAP_DIRECTLY_INDEXED | D3D12_ROOT_SIGNATURE_FLAG_SAMPLER_HEAP_DIRECTLY_INDEXED);
+	LOGSUCCESS(L"create", LogColor::brightMagenta, L"vertex pixel root signature", LogColor::defaultColor, L"succeeded");
 
-		pvt.graphicsRootSignature = new D3D12Core::RootSignature(rootSignatureDesc);
+	//总计 56 DWORDS
+	pvt.tessellationRootSignature = new D3D12Core::RootSignature(4u, 4u, 12u, 0u, 24u, 0u, samplerDesc, _countof(samplerDesc),
+		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT |
+		D3D12_ROOT_SIGNATURE_FLAG_DENY_AMPLIFICATION_SHADER_ROOT_ACCESS |
+		D3D12_ROOT_SIGNATURE_FLAG_DENY_MESH_SHADER_ROOT_ACCESS |
+		D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS |
+		D3D12_ROOT_SIGNATURE_FLAG_CBV_SRV_UAV_HEAP_DIRECTLY_INDEXED |
+		D3D12_ROOT_SIGNATURE_FLAG_SAMPLER_HEAP_DIRECTLY_INDEXED);
 
-		LOGSUCCESS(L"create", LogColor::brightMagenta, L"global graphics root signature", LogColor::defaultColor, L"succeeded");
-	}
+	pvt.tessellationRootSignature->get()->SetName(L"Tessellation On Root Signature");
 
-	{
-		//2+2+32+2 38 dwords
-		CD3DX12_ROOT_PARAMETER1 rootParameters[4] = {};
-		//由引擎决定的所有着色器可见的全局常量缓冲
-		rootParameters[0].InitAsConstantBufferView(0, 0, D3D12_ROOT_DESCRIPTOR_FLAG_DATA_STATIC_WHILE_SET_AT_EXECUTE, D3D12_SHADER_VISIBILITY_ALL);
-		//用户决定的所有着色器可见的全局常量缓冲
-		rootParameters[1].InitAsConstantBufferView(1, 0, D3D12_ROOT_DESCRIPTOR_FLAG_DATA_STATIC_WHILE_SET_AT_EXECUTE, D3D12_SHADER_VISIBILITY_ALL);
-		//用于每次分发调用的常量
-		rootParameters[2].InitAsConstants(32, 2, 0, D3D12_SHADER_VISIBILITY_ALL);
-		//用于每次分发调用的常量缓冲
-		rootParameters[3].InitAsConstantBufferView(3, 0, D3D12_ROOT_DESCRIPTOR_FLAG_DATA_STATIC_WHILE_SET_AT_EXECUTE, D3D12_SHADER_VISIBILITY_ALL);
+	LOGSUCCESS(L"create", LogColor::brightMagenta, L"hull domain root signature", LogColor::defaultColor, L"succeeded");
 
-		CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC rootSignatureDesc;
-		rootSignatureDesc.Init_1_1(_countof(rootParameters), rootParameters, _countof(samplerDesc), samplerDesc,
-			D3D12_ROOT_SIGNATURE_FLAG_CBV_SRV_UAV_HEAP_DIRECTLY_INDEXED | D3D12_ROOT_SIGNATURE_FLAG_SAMPLER_HEAP_DIRECTLY_INDEXED);
+	//总计 54 DWORDS
+	pvt.geometryShaderRootSignature = new D3D12Core::RootSignature(8u, 0u, 0u, 8u, 28u, 0u, samplerDesc, _countof(samplerDesc),
+		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT |
+		D3D12_ROOT_SIGNATURE_FLAG_DENY_AMPLIFICATION_SHADER_ROOT_ACCESS |
+		D3D12_ROOT_SIGNATURE_FLAG_DENY_MESH_SHADER_ROOT_ACCESS |
+		D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS |
+		D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS |
+		D3D12_ROOT_SIGNATURE_FLAG_CBV_SRV_UAV_HEAP_DIRECTLY_INDEXED |
+		D3D12_ROOT_SIGNATURE_FLAG_SAMPLER_HEAP_DIRECTLY_INDEXED);
 
-		pvt.computeRootSignature = new D3D12Core::RootSignature(rootSignatureDesc);
+	pvt.geometryShaderRootSignature->get()->SetName(L"Geometry Shader On Root Signature");
 
-		LOGSUCCESS(L"create", LogColor::brightMagenta, L"global compute root signature", LogColor::defaultColor, L"succeeded");
-	}
+	LOGSUCCESS(L"create", LogColor::brightMagenta, L"geometry root signature", LogColor::defaultColor, L"succeeded");
+
+	//总计 58 DWORDS
+	pvt.allShaderRootSignature = new D3D12Core::RootSignature(4u, 4u, 8u, 4u, 24u, 0u, samplerDesc, _countof(samplerDesc),
+		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT |
+		D3D12_ROOT_SIGNATURE_FLAG_DENY_AMPLIFICATION_SHADER_ROOT_ACCESS |
+		D3D12_ROOT_SIGNATURE_FLAG_DENY_MESH_SHADER_ROOT_ACCESS |
+		D3D12_ROOT_SIGNATURE_FLAG_CBV_SRV_UAV_HEAP_DIRECTLY_INDEXED |
+		D3D12_ROOT_SIGNATURE_FLAG_SAMPLER_HEAP_DIRECTLY_INDEXED);
+
+	pvt.allShaderRootSignature->get()->SetName(L"All Shader On Root Signature");
+
+	LOGSUCCESS(L"create", LogColor::brightMagenta, L"hull domain geometry graphics root signature", LogColor::defaultColor, L"succeeded");
+
+	//总计 38 DWORDS
+	pvt.computeShaderRootSignature = new D3D12Core::RootSignature(0u, 0u, 0u, 0u, 0u, 32u, samplerDesc, _countof(samplerDesc),
+		D3D12_ROOT_SIGNATURE_FLAG_CBV_SRV_UAV_HEAP_DIRECTLY_INDEXED |
+		D3D12_ROOT_SIGNATURE_FLAG_SAMPLER_HEAP_DIRECTLY_INDEXED);
+
+	pvt.computeShaderRootSignature->get()->SetName(L"Compute Root Signature");
+
+	LOGSUCCESS(L"create", LogColor::brightMagenta, L"global compute root signature", LogColor::defaultColor, L"succeeded");
 }
 
 void Gear::Core::GlobalRootSignature::Internal::release()
 {
-	if (pvt.graphicsRootSignature)
+	if (pvt.basicShaderRootSignature)
 	{
-		delete pvt.graphicsRootSignature;
+		delete pvt.basicShaderRootSignature;
 	}
 
-	if (pvt.computeRootSignature)
+	if (pvt.tessellationRootSignature)
 	{
-		delete pvt.computeRootSignature;
+		delete pvt.tessellationRootSignature;
+	}
+
+	if (pvt.geometryShaderRootSignature)
+	{
+		delete pvt.geometryShaderRootSignature;
+	}
+
+	if (pvt.allShaderRootSignature)
+	{
+		delete pvt.allShaderRootSignature;
+	}
+
+	if (pvt.computeShaderRootSignature)
+	{
+		delete pvt.computeShaderRootSignature;
 	}
 }

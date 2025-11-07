@@ -53,29 +53,29 @@ namespace Gear
 
 				D3D12Core::Shader* bloomFilter;
 
-				ComPtr<ID3D12PipelineState> bloomFilterState;
+				D3D12Core::PipelineState* bloomFilterState;
 
 				D3D12Core::Shader* bloomHBlur;
 
-				ComPtr<ID3D12PipelineState> bloomHBlurState;
+				D3D12Core::PipelineState* bloomHBlurState;
 
 				D3D12Core::Shader* bloomVBlur;
 
-				ComPtr<ID3D12PipelineState> bloomVBlurState;
+				D3D12Core::PipelineState* bloomVBlurState;
 
 				D3D12Core::Shader* bloomFinal;
 
-				ComPtr<ID3D12PipelineState> bloomFinalState;
+				D3D12Core::PipelineState* bloomFinalState;
 
 				D3D12Core::Shader* bloomDownSample;
 
-				ComPtr<ID3D12PipelineState> bloomDownSampleState;
+				D3D12Core::PipelineState* bloomDownSampleState;
 
 				D3D12Core::Shader* bloomKarisAverage;
 
-				ComPtr<ID3D12PipelineState> bloomKarisAverageState;
+				D3D12Core::PipelineState* bloomKarisAverageState;
 
-				ComPtr<ID3D12PipelineState> bloomUpSampleState;
+				D3D12Core::PipelineState* bloomUpSampleState;
 
 				DirectX::XMUINT2 resolutions[blurSteps];
 
