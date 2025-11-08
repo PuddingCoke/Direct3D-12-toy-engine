@@ -78,14 +78,9 @@ namespace Gear
 		template<size_t N>
 		inline PipelineStateBuilder& PipelineStateBuilder::setRTVFormats(const DXGI_FORMAT(&rtvFormats)[N])
 		{
-			uint32_t rtvIndex = 0u;
+			memcpy(graphicsDesc.RTVFormats, rtvFormats, sizeof(DXGI_FORMAT) * N);
 
-			for (; rtvIndex < N; rtvIndex++)
-			{
-				graphicsDesc.RTVFormats[rtvIndex] = rtvFormats[rtvIndex];
-			}
-
-			graphicsDesc.NumRenderTargets = rtvIndex;
+			graphicsDesc.NumRenderTargets = N;
 
 			return *this;
 		}
@@ -93,10 +88,7 @@ namespace Gear
 		template<size_t N>
 		inline PipelineStateBuilder& PipelineStateBuilder::setInputElements(const D3D12_INPUT_ELEMENT_DESC(&descs)[N])
 		{
-			for (uint32_t i = 0; i < N; i++)
-			{
-				inputElements.push_back(descs[i]);
-			}
+			inputElements = std::vector<D3D12_INPUT_ELEMENT_DESC>(descs, descs + N);
 
 			graphicsDesc.InputLayout = { inputElements.data(),static_cast<uint32_t>(inputElements.size()) };
 

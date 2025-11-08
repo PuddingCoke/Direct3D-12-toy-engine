@@ -54,7 +54,7 @@ public:
 			.setRasterizerState(PipelineStateHelper::rasterCullBack)
 			.setDepthStencilState(PipelineStateHelper::depthCompareNone)
 			.setPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE)
-			.setRTVFormats({Graphics::backBufferFormat})
+			.setRTVFormats({ Graphics::backBufferFormat })
 			.setVS(gridDebugVS)
 			.setPS(gridDebugPS)
 			.build();
@@ -418,7 +418,7 @@ private:
 
 		context->clearDepthStencil(depthTexture->getDSVMipHandle(0), D3D12_CLEAR_FLAG_DEPTH, 1.f, 0);
 
-		context->drawIndexed(indices.size(), 1, 0, 0, 0);
+		context->drawIndexed(static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
 
 		TextureRenderView* bloomTexture = effect->process(originTexture);
 

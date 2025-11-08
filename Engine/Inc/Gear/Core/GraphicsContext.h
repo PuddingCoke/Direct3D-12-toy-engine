@@ -35,40 +35,34 @@ namespace Gear
 
 			void setGlobalConstantBuffer(const Resource::ImmutableCBuffer* const immutableCBuffer);
 
-			//4个值可用
-			void setVSConstants(const std::initializer_list<Resource::D3D12Resource::ShaderResourceDesc>& descs, const uint32_t offset);
+			template<size_t N>
+			void setVSConstants(const Resource::D3D12Resource::ShaderResourceDesc(&descs)[N], const uint32_t offset);
 
-			//4个值可用
+			template<size_t N>
+			void setHSConstants(const Resource::D3D12Resource::ShaderResourceDesc(&descs)[N], const uint32_t offset);
+
+			template<size_t N>
+			void setDSConstants(const Resource::D3D12Resource::ShaderResourceDesc(&descs)[N], const uint32_t offset);
+
+			template<size_t N>
+			void setGSConstants(const Resource::D3D12Resource::ShaderResourceDesc(&descs)[N], const uint32_t offset);
+
+			template<size_t N>
+			void setPSConstants(const Resource::D3D12Resource::ShaderResourceDesc(&descs)[N], const uint32_t offset);
+
+			template<size_t N>
+			void setCSConstants(const Resource::D3D12Resource::ShaderResourceDesc(&descs)[N], const uint32_t offset);
+
 			void setVSConstants(const uint32_t numValues, const void* const data, const uint32_t offset) const;
 
-			//4个值可用
-			void setHSConstants(const std::initializer_list<Resource::D3D12Resource::ShaderResourceDesc>& descs, const uint32_t offset);
-
-			//4个值可用
 			void setHSConstants(const uint32_t numValues, const void* const data, const uint32_t offset) const;
 
-			//8个值可用
-			void setDSConstants(const std::initializer_list<Resource::D3D12Resource::ShaderResourceDesc>& descs, const uint32_t offset);
-
-			//8个值可用
 			void setDSConstants(const uint32_t numValues, const void* const data, const uint32_t offset) const;
 
-			//4个值可用
-			void setGSConstants(const std::initializer_list<Resource::D3D12Resource::ShaderResourceDesc>& descs, const uint32_t offset);
-
-			//4个值可用
 			void setGSConstants(const uint32_t numValues, const void* const data, const uint32_t offset) const;
 
-			//24个值可用
-			void setPSConstants(const std::initializer_list<Resource::D3D12Resource::ShaderResourceDesc>& descs, const uint32_t offset);
-
-			//24个值可用
 			void setPSConstants(const uint32_t numValues, const void* const data, const uint32_t offset) const;
 
-			//32个值可用
-			void setCSConstants(const std::initializer_list<Resource::D3D12Resource::ShaderResourceDesc>& descs, const uint32_t offset);
-
-			//32个值可用
 			void setCSConstants(const uint32_t numValues, const void* const data, const uint32_t offset) const;
 
 			void setVSConstantBuffer(const Resource::ImmutableCBuffer* const immutableCBuffer);
@@ -86,15 +80,22 @@ namespace Gear
 			//绑定资源后必须调用这个方法！！
 			void transitionResources();
 
-			void setRenderTargets(const std::initializer_list<Resource::D3D12Resource::RenderTargetDesc>& renderTargets, const Resource::D3D12Resource::DepthStencilDesc* const depthStencils = nullptr) const;
+			void setPipelineState(const D3D12Core::PipelineState* const pipelineState);
+
+			void setRenderTargets(const std::initializer_list<Resource::D3D12Resource::RenderTargetDesc>& renderTargets, const Resource::D3D12Resource::DepthStencilDesc* const depthStencils = nullptr);
 
 			void setDefRenderTarget() const;
 
 			void clearDefRenderTarget(const float clearValue[4]) const;
 
-			void setVertexBuffers(const uint32_t startSlot, const std::initializer_list<Resource::D3D12Resource::VertexBufferDesc>& vertexBuffers) const;
+			void clearRenderTarget(const Resource::D3D12Resource::RenderTargetDesc& desc, const float clearValue[4]) const;
 
-			void setIndexBuffer(const Resource::D3D12Resource::IndexBufferDesc& indexBuffers) const;
+			void clearDepthStencil(const Resource::D3D12Resource::DepthStencilDesc& desc, const D3D12_CLEAR_FLAGS flags, const float depth, const uint8_t stencil) const;
+
+			template<size_t N>
+			void setVertexBuffers(const uint32_t startSlot, const Resource::D3D12Resource::VertexBufferDesc(&vertexBuffers)[N]);
+
+			void setIndexBuffer(const Resource::D3D12Resource::IndexBufferDesc& indexBuffers);
 
 			void setPrimitiveTopology(const D3D12_PRIMITIVE_TOPOLOGY topology) const;
 
@@ -110,23 +111,18 @@ namespace Gear
 
 			void setViewportSimple(const uint32_t width, const uint32_t height);
 
-			void setPipelineState(const D3D12Core::PipelineState* const pipelineState);
-
-			void clearRenderTarget(const Resource::D3D12Resource::RenderTargetDesc& desc, const float clearValue[4]) const;
-
-			void clearDepthStencil(const Resource::D3D12Resource::DepthStencilDesc& desc, const D3D12_CLEAR_FLAGS flags, const float depth, const uint8_t stencil) const;
-
 			void clearUnorderedAccess(const Resource::D3D12Resource::ClearUAVDesc& desc, const float values[4]);
 
 			void clearUnorderedAccess(const Resource::D3D12Resource::ClearUAVDesc& desc, const uint32_t values[4]);
-
-			void uavBarrier(const std::initializer_list<Resource::D3D12Resource::D3D12ResourceBase*>& resources) const;
 
 			void draw(const uint32_t vertexCountPerInstance, const uint32_t instanceCount, const uint32_t startVertexLocation, const uint32_t startInstanceLocation) const;
 
 			void drawIndexed(const uint32_t indexCountPerInstance, const uint32_t instanceCount, const uint32_t startIndexLocation, const int32_t baseVertexLocation, const uint32_t startInstanceLocation) const;
 
 			void dispatch(const uint32_t threadGroupCountX, const uint32_t threadGroupCountY, const uint32_t threadGroupCountZ) const;
+
+			template<size_t N>
+			void uavBarrier(const Resource::D3D12Resource::D3D12ResourceBase* const(&resources)[N]);
 
 			void begin();
 
@@ -146,7 +142,9 @@ namespace Gear
 				D3D12_GPU_VIRTUAL_ADDRESS gpuAddress;
 			};
 
-			void getResourceIndicesFromDescs(const std::initializer_list<Resource::D3D12Resource::ShaderResourceDesc>& descs);
+			//从提供的ShaderResourceDesc提取索引
+			template<size_t N>
+			void getResourceIndicesFromDescs(const Resource::D3D12Resource::ShaderResourceDesc(&descs)[N]);
 
 			void pushRootConstantBufferDesc(const RootConstantBufferDesc& desc);
 
@@ -172,7 +170,120 @@ namespace Gear
 
 			const D3D12Core::RootSignature* computeRootSignature;
 
+			std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> transientRTVHandles;
+
+			std::vector<D3D12_VERTEX_BUFFER_VIEW> transientVBViews;
+
+			std::vector<D3D12_RESOURCE_BARRIER> transientUAVBarriers;
+
 		};
+
+		template<size_t N>
+		inline void GraphicsContext::setVSConstants(const Resource::D3D12Resource::ShaderResourceDesc(&descs)[N], const uint32_t offset)
+		{
+			getResourceIndicesFromDescs(descs);
+
+			commandList->setShaderResources(descs, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
+
+			setVSConstants(N, resourceIndices, offset);
+		}
+
+		template<size_t N>
+		inline void GraphicsContext::setHSConstants(const Resource::D3D12Resource::ShaderResourceDesc(&descs)[N], const uint32_t offset)
+		{
+			getResourceIndicesFromDescs(descs);
+
+			commandList->setShaderResources(descs, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
+
+			setHSConstants(N, resourceIndices, offset);
+		}
+
+		template<size_t N>
+		inline void GraphicsContext::setDSConstants(const Resource::D3D12Resource::ShaderResourceDesc(&descs)[N], const uint32_t offset)
+		{
+			getResourceIndicesFromDescs(descs);
+
+			commandList->setShaderResources(descs, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
+
+			setDSConstants(N, resourceIndices, offset);
+		}
+
+		template<size_t N>
+		inline void GraphicsContext::setGSConstants(const Resource::D3D12Resource::ShaderResourceDesc(&descs)[N], const uint32_t offset)
+		{
+			getResourceIndicesFromDescs(descs);
+
+			commandList->setShaderResources(descs, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
+
+			setGSConstants(N, resourceIndices, offset);
+		}
+
+		template<size_t N>
+		inline void GraphicsContext::setPSConstants(const Resource::D3D12Resource::ShaderResourceDesc(&descs)[N], const uint32_t offset)
+		{
+			getResourceIndicesFromDescs(descs);
+
+			commandList->setShaderResources(descs, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+
+			setPSConstants(N, resourceIndices, offset);
+		}
+
+		template<size_t N>
+		inline void GraphicsContext::setCSConstants(const Resource::D3D12Resource::ShaderResourceDesc(&descs)[N], const uint32_t offset)
+		{
+			getResourceIndicesFromDescs(descs);
+
+			commandList->setShaderResources(descs, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
+
+			setCSConstants(N, resourceIndices, offset);
+		}
+
+		template<size_t N>
+		inline void GraphicsContext::getResourceIndicesFromDescs(const Resource::D3D12Resource::ShaderResourceDesc(&descs)[N])
+		{
+			for (uint32_t i = 0; i < N; i++)
+			{
+				resourceIndices[i] = descs[i].resourceIndex;
+			}
+		}
+
+		template<size_t N>
+		inline void GraphicsContext::setVertexBuffers(const uint32_t startSlot, const Resource::D3D12Resource::VertexBufferDesc(&vertexBuffers)[N])
+		{
+			transientVBViews.clear();
+
+			for (const Resource::D3D12Resource::VertexBufferDesc& desc : vertexBuffers)
+			{
+				transientVBViews.emplace_back(desc.vbv);
+
+				Resource::D3D12Resource::Buffer* const buffer = desc.buffer;
+
+				commandList->pushResourceTrackList(buffer);
+
+				buffer->setState(D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
+			}
+
+			commandList->setVertexBuffers(startSlot, static_cast<uint32_t>(transientVBViews.size()), transientVBViews.data());
+		}
+
+		template<size_t N>
+		inline void GraphicsContext::uavBarrier(const Resource::D3D12Resource::D3D12ResourceBase* const(&resources)[N])
+		{
+			transientUAVBarriers.clear();
+
+			for (const Resource::D3D12Resource::D3D12ResourceBase* const resource : resources)
+			{
+				D3D12_RESOURCE_BARRIER barrier = {};
+				barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+				barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_UAV;
+				barrier.UAV.pResource = resource->getResource();
+
+				transientUAVBarriers.emplace_back(barrier);
+			}
+
+			commandList->resourceBarrier(static_cast<uint32_t>(transientUAVBarriers.size()), transientUAVBarriers.data());
+		}
+
 	}
 }
 

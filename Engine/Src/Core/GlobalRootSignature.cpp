@@ -19,6 +19,7 @@ namespace
 		//用于同时使用镶嵌细分和几何着色器的时候
 		Gear::Core::D3D12Core::RootSignature* allShaderRootSignature = nullptr;
 
+		//用于使用计算着色器的时候
 		Gear::Core::D3D12Core::RootSignature* computeShaderRootSignature = nullptr;
 
 	}pvt;
@@ -144,9 +145,9 @@ void Gear::Core::GlobalRootSignature::Internal::initialize()
 		D3D12_ROOT_SIGNATURE_FLAG_CBV_SRV_UAV_HEAP_DIRECTLY_INDEXED |
 		D3D12_ROOT_SIGNATURE_FLAG_SAMPLER_HEAP_DIRECTLY_INDEXED);
 
-	pvt.basicShaderRootSignature->get()->SetName(L"Basic Shader On Root Signature");
+	pvt.basicShaderRootSignature->get()->SetName(L"Basic Shader Root Signature");
 
-	LOGSUCCESS(L"create", LogColor::brightMagenta, L"vertex pixel root signature", LogColor::defaultColor, L"succeeded");
+	LOGSUCCESS(L"create", LogColor::brightMagenta, L"basic shader root signature", LogColor::defaultColor, L"succeeded");
 
 	//总计 56 DWORDS
 	pvt.tessellationRootSignature = new D3D12Core::RootSignature(4u, 4u, 12u, 0u, 24u, 0u, samplerDesc, _countof(samplerDesc),
@@ -157,9 +158,9 @@ void Gear::Core::GlobalRootSignature::Internal::initialize()
 		D3D12_ROOT_SIGNATURE_FLAG_CBV_SRV_UAV_HEAP_DIRECTLY_INDEXED |
 		D3D12_ROOT_SIGNATURE_FLAG_SAMPLER_HEAP_DIRECTLY_INDEXED);
 
-	pvt.tessellationRootSignature->get()->SetName(L"Tessellation On Root Signature");
+	pvt.tessellationRootSignature->get()->SetName(L"Tessellation Root Signature");
 
-	LOGSUCCESS(L"create", LogColor::brightMagenta, L"hull domain root signature", LogColor::defaultColor, L"succeeded");
+	LOGSUCCESS(L"create", LogColor::brightMagenta, L"tessellation root signature", LogColor::defaultColor, L"succeeded");
 
 	//总计 54 DWORDS
 	pvt.geometryShaderRootSignature = new D3D12Core::RootSignature(8u, 0u, 0u, 8u, 28u, 0u, samplerDesc, _countof(samplerDesc),
@@ -171,9 +172,9 @@ void Gear::Core::GlobalRootSignature::Internal::initialize()
 		D3D12_ROOT_SIGNATURE_FLAG_CBV_SRV_UAV_HEAP_DIRECTLY_INDEXED |
 		D3D12_ROOT_SIGNATURE_FLAG_SAMPLER_HEAP_DIRECTLY_INDEXED);
 
-	pvt.geometryShaderRootSignature->get()->SetName(L"Geometry Shader On Root Signature");
+	pvt.geometryShaderRootSignature->get()->SetName(L"Geometry Shader Root Signature");
 
-	LOGSUCCESS(L"create", LogColor::brightMagenta, L"geometry root signature", LogColor::defaultColor, L"succeeded");
+	LOGSUCCESS(L"create", LogColor::brightMagenta, L"geometry shader root signature", LogColor::defaultColor, L"succeeded");
 
 	//总计 58 DWORDS
 	pvt.allShaderRootSignature = new D3D12Core::RootSignature(4u, 4u, 8u, 4u, 24u, 0u, samplerDesc, _countof(samplerDesc),
@@ -183,18 +184,18 @@ void Gear::Core::GlobalRootSignature::Internal::initialize()
 		D3D12_ROOT_SIGNATURE_FLAG_CBV_SRV_UAV_HEAP_DIRECTLY_INDEXED |
 		D3D12_ROOT_SIGNATURE_FLAG_SAMPLER_HEAP_DIRECTLY_INDEXED);
 
-	pvt.allShaderRootSignature->get()->SetName(L"All Shader On Root Signature");
+	pvt.allShaderRootSignature->get()->SetName(L"All Shader Root Signature");
 
-	LOGSUCCESS(L"create", LogColor::brightMagenta, L"hull domain geometry graphics root signature", LogColor::defaultColor, L"succeeded");
+	LOGSUCCESS(L"create", LogColor::brightMagenta, L"all shader root signature", LogColor::defaultColor, L"succeeded");
 
 	//总计 38 DWORDS
 	pvt.computeShaderRootSignature = new D3D12Core::RootSignature(0u, 0u, 0u, 0u, 0u, 32u, samplerDesc, _countof(samplerDesc),
 		D3D12_ROOT_SIGNATURE_FLAG_CBV_SRV_UAV_HEAP_DIRECTLY_INDEXED |
 		D3D12_ROOT_SIGNATURE_FLAG_SAMPLER_HEAP_DIRECTLY_INDEXED);
 
-	pvt.computeShaderRootSignature->get()->SetName(L"Compute Root Signature");
+	pvt.computeShaderRootSignature->get()->SetName(L"Compute Shader Root Signature");
 
-	LOGSUCCESS(L"create", LogColor::brightMagenta, L"global compute root signature", LogColor::defaultColor, L"succeeded");
+	LOGSUCCESS(L"create", LogColor::brightMagenta, L"compute shader root signature", LogColor::defaultColor, L"succeeded");
 }
 
 void Gear::Core::GlobalRootSignature::Internal::release()

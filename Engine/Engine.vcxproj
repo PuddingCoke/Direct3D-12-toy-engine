@@ -129,6 +129,7 @@
     <ClInclude Include="Inc\Gear\Core\D3D12Core\DXCCompiler.h" />
     <ClInclude Include="Inc\Gear\Core\D3D12Core\Internal\DXCCompilerInternal.h" />
     <ClInclude Include="Inc\Gear\Core\D3D12Core\PipelineState.h" />
+    <ClInclude Include="Inc\Gear\Core\D3D12Core\ResourceStateTracker.h" />
     <ClInclude Include="Inc\Gear\Core\DynamicCBufferManager.h" />
     <ClInclude Include="Inc\Gear\Core\Effect\FXAAEffect.h" />
     <ClInclude Include="Inc\Gear\Core\GlobalShader.h" />
@@ -220,6 +221,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Inc\DirectXTex\DDSTextureLoader12.cpp" />
+    <ClCompile Include="Inc\Gear\Core\D3D12Core\ResourceStateTracker.cpp" />
     <ClCompile Include="Src\Core\D3D12Core\DescriptorHandle.cpp" />
     <ClCompile Include="Src\Core\D3D12Core\DXCCompiler.cpp" />
     <ClCompile Include="Src\Core\D3D12Core\PipelineState.cpp" />

@@ -474,6 +474,9 @@
     <ClInclude Include="Inc\Gear\Core\PipelineStateBuilder.h">
       <Filter>Header</Filter>
     </ClInclude>
+    <ClInclude Include="Inc\Gear\Core\D3D12Core\ResourceStateTracker.h">
+      <Filter>Header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\InitializationParam.cpp">
@@ -687,6 +690,9 @@
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="Src\Core\PipelineStateBuilder.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Inc\Gear\Core\D3D12Core\ResourceStateTracker.cpp">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>
