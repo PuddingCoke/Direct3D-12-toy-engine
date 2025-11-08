@@ -144,7 +144,7 @@ protected:
 
 		context->setPipelineState(particleRenderState);
 
-		context->setRenderTargets({ originTexture->getRTVMipHandle(0) }, &dsDesc);
+		context->setRenderTargets({ originTexture->getRTVMipHandle(0) }, dsDesc);
 
 		context->setViewportSimple(Core::Graphics::getWidth(), Core::Graphics::getHeight());
 

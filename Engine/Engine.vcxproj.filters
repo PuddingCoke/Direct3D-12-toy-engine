@@ -692,7 +692,7 @@
     <ClCompile Include="Src\Core\PipelineStateBuilder.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="Inc\Gear\Core\D3D12Core\ResourceStateTracker.cpp">
+    <ClCompile Include="Src\Core\D3D12Core\ResourceStateTracker.cpp">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>

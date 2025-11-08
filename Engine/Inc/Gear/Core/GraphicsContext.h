@@ -82,7 +82,10 @@ namespace Gear
 
 			void setPipelineState(const D3D12Core::PipelineState* const pipelineState);
 
-			void setRenderTargets(const std::initializer_list<Resource::D3D12Resource::RenderTargetDesc>& renderTargets, const Resource::D3D12Resource::DepthStencilDesc* const depthStencils = nullptr);
+			template<size_t N>
+			void setRenderTargets(const Resource::D3D12Resource::RenderTargetDesc(&renderTargets)[N], const Resource::D3D12Resource::DepthStencilDesc& depthStencils = {});
+
+			void setRenderTargets(const Resource::D3D12Resource::DepthStencilDesc& depthStencils);
 
 			void setDefRenderTarget() const;
 
@@ -142,6 +145,9 @@ namespace Gear
 				D3D12_GPU_VIRTUAL_ADDRESS gpuAddress;
 			};
 
+			template<size_t N>
+			void setShaderResources(const Resource::D3D12Resource::ShaderResourceDesc(&descs)[N], const uint32_t targetSRVState);
+
 			//从提供的ShaderResourceDesc提取索引
 			template<size_t N>
 			void getResourceIndicesFromDescs(const Resource::D3D12Resource::ShaderResourceDesc(&descs)[N]);
@@ -151,6 +157,12 @@ namespace Gear
 			void setGraphicsRootSignature(const D3D12Core::RootSignature* const rootSignature);
 
 			void setComputeRootSignature(const D3D12Core::RootSignature* const rootSignature);
+
+			//根据ShaderResourceDesc设置对应资源的转变状态
+			void setResourceState(const Resource::D3D12Resource::ShaderResourceDesc& desc, const uint32_t targetSRVState);
+
+			//根据ClearUAVDesc设置对应资源的转变状态
+			Resource::D3D12Resource::D3D12ResourceBase* setResourceState(const Resource::D3D12Resource::ClearUAVDesc& desc);
 
 			D3D12_VIEWPORT vp;
 
@@ -183,7 +195,7 @@ namespace Gear
 		{
 			getResourceIndicesFromDescs(descs);
 
-			commandList->setShaderResources(descs, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
+			setShaderResources(descs, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
 
 			setVSConstants(N, resourceIndices, offset);
 		}
@@ -193,7 +205,7 @@ namespace Gear
 		{
 			getResourceIndicesFromDescs(descs);
 
-			commandList->setShaderResources(descs, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
+			setShaderResources(descs, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
 
 			setHSConstants(N, resourceIndices, offset);
 		}
@@ -203,7 +215,7 @@ namespace Gear
 		{
 			getResourceIndicesFromDescs(descs);
 
-			commandList->setShaderResources(descs, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
+			setShaderResources(descs, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
 
 			setDSConstants(N, resourceIndices, offset);
 		}
@@ -213,7 +225,7 @@ namespace Gear
 		{
 			getResourceIndicesFromDescs(descs);
 
-			commandList->setShaderResources(descs, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
+			setShaderResources(descs, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
 
 			setGSConstants(N, resourceIndices, offset);
 		}
@@ -223,7 +235,7 @@ namespace Gear
 		{
 			getResourceIndicesFromDescs(descs);
 
-			commandList->setShaderResources(descs, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+			setShaderResources(descs, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 
 			setPSConstants(N, resourceIndices, offset);
 		}
@@ -233,7 +245,7 @@ namespace Gear
 		{
 			getResourceIndicesFromDescs(descs);
 
-			commandList->setShaderResources(descs, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
+			setShaderResources(descs, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
 
 			setCSConstants(N, resourceIndices, offset);
 		}
@@ -248,6 +260,30 @@ namespace Gear
 		}
 
 		template<size_t N>
+		inline void GraphicsContext::setRenderTargets(const Resource::D3D12Resource::RenderTargetDesc(&renderTargets)[N], const Resource::D3D12Resource::DepthStencilDesc& depthStencils)
+		{
+			transientRTVHandles.clear();
+
+			for (const Resource::D3D12Resource::RenderTargetDesc& desc : renderTargets)
+			{
+				transientRTVHandles.emplace_back(desc.rtvHandle);
+
+				commandList->setTextureState(desc.texture, desc.mipSlice, D3D12_RESOURCE_STATE_RENDER_TARGET);
+			}
+
+			if (depthStencils.texture)
+			{
+				commandList->setTextureState(depthStencils.texture, depthStencils.mipSlice, D3D12_RESOURCE_STATE_DEPTH_WRITE);
+
+				commandList->setRenderTargets(static_cast<uint32_t>(transientRTVHandles.size()), transientRTVHandles.data(), FALSE, &(depthStencils.dsvHandle));
+			}
+			else
+			{
+				commandList->setRenderTargets(static_cast<uint32_t>(transientRTVHandles.size()), transientRTVHandles.data(), FALSE, nullptr);
+			}
+		}
+
+		template<size_t N>
 		inline void GraphicsContext::setVertexBuffers(const uint32_t startSlot, const Resource::D3D12Resource::VertexBufferDesc(&vertexBuffers)[N])
 		{
 			transientVBViews.clear();
@@ -256,11 +292,7 @@ namespace Gear
 			{
 				transientVBViews.emplace_back(desc.vbv);
 
-				Resource::D3D12Resource::Buffer* const buffer = desc.buffer;
-
-				commandList->pushResourceTrackList(buffer);
-
-				buffer->setState(D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
+				commandList->setBufferState(desc.buffer, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
 			}
 
 			commandList->setVertexBuffers(startSlot, static_cast<uint32_t>(transientVBViews.size()), transientVBViews.data());
@@ -282,6 +314,15 @@ namespace Gear
 			}
 
 			commandList->resourceBarrier(static_cast<uint32_t>(transientUAVBarriers.size()), transientUAVBarriers.data());
+		}
+
+		template<size_t N>
+		inline void GraphicsContext::setShaderResources(const Resource::D3D12Resource::ShaderResourceDesc(&descs)[N], const uint32_t targetSRVState)
+		{
+			for (const Resource::D3D12Resource::ShaderResourceDesc& desc : descs)
+			{
+				setResourceState(desc, targetSRVState);
+			}
 		}
 
 	}

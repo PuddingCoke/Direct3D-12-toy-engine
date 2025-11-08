@@ -55,6 +55,11 @@ void Gear::Core::Resource::D3D12Resource::D3D12ResourceBase::setName(LPCWSTR con
 	resource->SetName(name);
 }
 
+bool Gear::Core::Resource::D3D12Resource::D3D12ResourceBase::getInReferredList() const
+{
+	return inReferredList;
+}
+
 bool Gear::Core::Resource::D3D12Resource::D3D12ResourceBase::getInTrackingList() const
 {
 	return inTrackingList;
@@ -63,7 +68,7 @@ bool Gear::Core::Resource::D3D12Resource::D3D12ResourceBase::getInTrackingList()
 void Gear::Core::Resource::D3D12Resource::D3D12ResourceBase::pushToReferredList(std::vector<D3D12ResourceBase*>& referredList)
 {
 	//只为需要状态追踪的共享资源更新它的全局状态
-	if (getStateTracking() && getSharedResource() && !inReferredList)
+	if (getSharedResource() && !getInReferredList())
 	{
 		referredList.push_back(this);
 

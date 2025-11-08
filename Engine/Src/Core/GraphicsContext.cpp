@@ -46,14 +46,9 @@ void Gear::Core::GraphicsContext::setGlobalConstantBuffer(const Resource::Immuta
 
 		Resource::D3D12Resource::Buffer* const buffer = userDefinedGlobalConstantBuffer->getBuffer();
 
-		if (buffer && buffer->getStateTracking())
-		{
-			commandList->pushResourceTrackList(buffer);
+		commandList->setBufferState(buffer, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
 
-			buffer->setState(D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
-
-			commandList->transitionResources();
-		}
+		commandList->transitionResources();
 	}
 }
 
@@ -91,12 +86,7 @@ void Gear::Core::GraphicsContext::setVSConstantBuffer(const Resource::ImmutableC
 {
 	Resource::D3D12Resource::Buffer* const buffer = immutableCBuffer->getBuffer();
 
-	if (buffer && buffer->getStateTracking())
-	{
-		commandList->pushResourceTrackList(buffer);
-
-		buffer->setState(D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
-	}
+	commandList->setBufferState(buffer, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
 
 	pushRootConstantBufferDesc({ RootConstantBufferDesc::GRAPHICS,graphicsRootSignature->getVSConstantBufferParameterIndex(),immutableCBuffer->getGPUAddress() });
 }
@@ -105,12 +95,7 @@ void Gear::Core::GraphicsContext::setHSConstantBuffer(const Resource::ImmutableC
 {
 	Resource::D3D12Resource::Buffer* const buffer = immutableCBuffer->getBuffer();
 
-	if (buffer && buffer->getStateTracking())
-	{
-		commandList->pushResourceTrackList(buffer);
-
-		buffer->setState(D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
-	}
+	commandList->setBufferState(buffer, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
 
 	pushRootConstantBufferDesc({ RootConstantBufferDesc::GRAPHICS,graphicsRootSignature->getHSConstantBufferParameterIndex(),immutableCBuffer->getGPUAddress() });
 }
@@ -119,12 +104,7 @@ void Gear::Core::GraphicsContext::setDSConstantBuffer(const Resource::ImmutableC
 {
 	Resource::D3D12Resource::Buffer* const buffer = immutableCBuffer->getBuffer();
 
-	if (buffer && buffer->getStateTracking())
-	{
-		commandList->pushResourceTrackList(buffer);
-
-		buffer->setState(D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
-	}
+	commandList->setBufferState(buffer, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
 
 	pushRootConstantBufferDesc({ RootConstantBufferDesc::GRAPHICS,graphicsRootSignature->getDSConstantBufferParameterIndex(),immutableCBuffer->getGPUAddress() });
 }
@@ -133,12 +113,7 @@ void Gear::Core::GraphicsContext::setGSConstantBuffer(const Resource::ImmutableC
 {
 	Resource::D3D12Resource::Buffer* const buffer = immutableCBuffer->getBuffer();
 
-	if (buffer && buffer->getStateTracking())
-	{
-		commandList->pushResourceTrackList(buffer);
-
-		buffer->setState(D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
-	}
+	commandList->setBufferState(buffer, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
 
 	pushRootConstantBufferDesc({ RootConstantBufferDesc::GRAPHICS,graphicsRootSignature->getGSConstantBufferParameterIndex(),immutableCBuffer->getGPUAddress() });
 }
@@ -147,12 +122,7 @@ void Gear::Core::GraphicsContext::setPSConstantBuffer(const Resource::ImmutableC
 {
 	Resource::D3D12Resource::Buffer* const buffer = immutableCBuffer->getBuffer();
 
-	if (buffer && buffer->getStateTracking())
-	{
-		commandList->pushResourceTrackList(buffer);
-
-		buffer->setState(D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
-	}
+	commandList->setBufferState(buffer, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
 
 	pushRootConstantBufferDesc({ RootConstantBufferDesc::GRAPHICS,graphicsRootSignature->getPSConstantBufferParameterIndex(),immutableCBuffer->getGPUAddress() });
 }
@@ -161,12 +131,7 @@ void Gear::Core::GraphicsContext::setCSConstantBuffer(const Resource::ImmutableC
 {
 	Resource::D3D12Resource::Buffer* const buffer = immutableCBuffer->getBuffer();
 
-	if (buffer && buffer->getStateTracking())
-	{
-		commandList->pushResourceTrackList(buffer);
-
-		buffer->setState(D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
-	}
+	commandList->setBufferState(buffer, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
 
 	pushRootConstantBufferDesc({ RootConstantBufferDesc::COMPUTE,computeRootSignature->getCSConstantBufferParameterIndex(),immutableCBuffer->getGPUAddress() });
 }
@@ -220,39 +185,20 @@ void Gear::Core::GraphicsContext::setPipelineState(const D3D12Core::PipelineStat
 	}
 }
 
-void Gear::Core::GraphicsContext::setRenderTargets(const std::initializer_list<Resource::D3D12Resource::RenderTargetDesc>& renderTargets, const Resource::D3D12Resource::DepthStencilDesc* const depthStencils)
+void Gear::Core::GraphicsContext::setRenderTargets(const Resource::D3D12Resource::DepthStencilDesc& depthStencils)
 {
+#ifdef _DEBUG
+	if (nullptr == depthStencils.texture)
+	{
+		LOGERROR(L"if you want to bind only depth stencil view then texture pointer cannot be nullptr");
+	}
+#endif // _DEBUG
+
 	transientRTVHandles.clear();
 
-	for (const Resource::D3D12Resource::RenderTargetDesc& desc : renderTargets)
-	{
-		transientRTVHandles.emplace_back(desc.rtvHandle);
+	commandList->setTextureState(depthStencils.texture, depthStencils.mipSlice, D3D12_RESOURCE_STATE_DEPTH_WRITE);
 
-		Resource::D3D12Resource::Texture* const texture = desc.texture;
-
-		commandList->pushResourceTrackList(texture);
-
-		texture->setMipSliceState(desc.mipSlice, D3D12_RESOURCE_STATE_RENDER_TARGET);
-	}
-
-	//目前不支持只读DSV
-	if (depthStencils)
-	{
-		Resource::D3D12Resource::Texture* const texture = depthStencils->texture;
-
-		commandList->pushResourceTrackList(texture);
-
-		texture->setMipSliceState(depthStencils->mipSlice, D3D12_RESOURCE_STATE_DEPTH_WRITE);
-	}
-
-	if (depthStencils)
-	{
-		commandList->setRenderTargets(static_cast<uint32_t>(transientRTVHandles.size()), transientRTVHandles.data(), FALSE, &(depthStencils->dsvHandle));
-	}
-	else
-	{
-		commandList->setRenderTargets(static_cast<uint32_t>(transientRTVHandles.size()), transientRTVHandles.data(), FALSE, nullptr);
-	}
+	commandList->setRenderTargets(static_cast<uint32_t>(transientRTVHandles.size()), transientRTVHandles.data(), FALSE, &(depthStencils.dsvHandle));
 }
 
 void Gear::Core::GraphicsContext::setDefRenderTarget() const
@@ -277,11 +223,7 @@ void Gear::Core::GraphicsContext::clearDepthStencil(const Resource::D3D12Resourc
 
 void Gear::Core::GraphicsContext::setIndexBuffer(const Resource::D3D12Resource::IndexBufferDesc& indexBuffer)
 {
-	Resource::D3D12Resource::Buffer* const buffer = indexBuffer.buffer;
-
-	commandList->pushResourceTrackList(buffer);
-
-	buffer->setState(D3D12_RESOURCE_STATE_INDEX_BUFFER);
+	commandList->setBufferState(indexBuffer.buffer, D3D12_RESOURCE_STATE_INDEX_BUFFER);
 
 	commandList->setIndexBuffer(&indexBuffer.ibv);
 }
@@ -333,28 +275,7 @@ void Gear::Core::GraphicsContext::setViewportSimple(const uint32_t width, const 
 
 void Gear::Core::GraphicsContext::clearUnorderedAccess(const Resource::D3D12Resource::ClearUAVDesc& desc, const float values[4])
 {
-	Resource::D3D12Resource::D3D12ResourceBase* resource = nullptr;
-
-	if (desc.type == Resource::D3D12Resource::ShaderResourceDesc::BUFFER)
-	{
-		Resource::D3D12Resource::Buffer* const buffer = desc.bufferDesc.buffer;
-
-		resource = buffer;
-
-		commandList->pushResourceTrackList(buffer);
-
-		buffer->setState(D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
-	}
-	else if (desc.type == Resource::D3D12Resource::ShaderResourceDesc::TEXTURE)
-	{
-		Resource::D3D12Resource::Texture* const texture = desc.textureDesc.texture;
-
-		resource = texture;
-
-		commandList->pushResourceTrackList(texture);
-
-		texture->setMipSliceState(desc.textureDesc.mipSlice, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
-	}
+	Resource::D3D12Resource::D3D12ResourceBase* resource = setResourceState(desc);
 
 	transitionResources();
 
@@ -367,28 +288,7 @@ void Gear::Core::GraphicsContext::clearUnorderedAccess(const Resource::D3D12Reso
 
 void Gear::Core::GraphicsContext::clearUnorderedAccess(const Resource::D3D12Resource::ClearUAVDesc& desc, const uint32_t values[4])
 {
-	Resource::D3D12Resource::D3D12ResourceBase* resource = nullptr;
-
-	if (desc.type == Resource::D3D12Resource::ShaderResourceDesc::BUFFER)
-	{
-		Resource::D3D12Resource::Buffer* const buffer = desc.bufferDesc.buffer;
-
-		resource = buffer;
-
-		commandList->pushResourceTrackList(buffer);
-
-		buffer->setState(D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
-	}
-	else if (desc.type == Resource::D3D12Resource::ShaderResourceDesc::TEXTURE)
-	{
-		Resource::D3D12Resource::Texture* const texture = desc.textureDesc.texture;
-
-		resource = texture;
-
-		commandList->pushResourceTrackList(texture);
-
-		texture->setMipSliceState(desc.textureDesc.mipSlice, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
-	}
+	Resource::D3D12Resource::D3D12ResourceBase* resource = setResourceState(desc);
 
 	transitionResources();
 
@@ -468,4 +368,56 @@ void Gear::Core::GraphicsContext::setComputeRootSignature(const D3D12Core::RootS
 		if (userDefinedGlobalConstantBuffer)
 			commandList->setComputeRootConstantBuffer(D3D12Core::RootSignature::getUserDefinedGlobalConstantBufferParameterIndex(), userDefinedGlobalConstantBuffer->getGPUAddress());
 	}
+}
+
+void Gear::Core::GraphicsContext::setResourceState(const Resource::D3D12Resource::ShaderResourceDesc& desc, const uint32_t targetSRVState)
+{
+	if (desc.type == Resource::D3D12Resource::ShaderResourceDesc::BUFFER)
+	{
+		if (desc.state == Resource::D3D12Resource::ShaderResourceDesc::SRV)
+		{
+			commandList->setBufferState(desc.bufferDesc.buffer, targetSRVState);
+		}
+		else if (desc.state == Resource::D3D12Resource::ShaderResourceDesc::UAV)
+		{
+			commandList->setBufferState(desc.bufferDesc.buffer, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+
+			commandList->setBufferState(desc.bufferDesc.counterBuffer, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+		}
+		else
+		{
+			commandList->setBufferState(desc.bufferDesc.buffer, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
+		}
+	}
+	else if (desc.type == Resource::D3D12Resource::ShaderResourceDesc::TEXTURE)
+	{
+		if (desc.state == Resource::D3D12Resource::ShaderResourceDesc::SRV)
+		{
+			commandList->setTextureState(desc.textureDesc.texture, desc.textureDesc.mipSlice, targetSRVState);
+		}
+		else if (desc.state == Resource::D3D12Resource::ShaderResourceDesc::UAV)
+		{
+			commandList->setTextureState(desc.textureDesc.texture, desc.textureDesc.mipSlice, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+		}
+	}
+}
+
+Gear::Core::Resource::D3D12Resource::D3D12ResourceBase* Gear::Core::GraphicsContext::setResourceState(const Resource::D3D12Resource::ClearUAVDesc& desc)
+{
+	Resource::D3D12Resource::D3D12ResourceBase* resource = nullptr;
+
+	if (desc.type == Resource::D3D12Resource::ClearUAVDesc::BUFFER)
+	{
+		resource = desc.bufferDesc.buffer;
+
+		commandList->setBufferState(desc.bufferDesc.buffer, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+	}
+	else if (desc.type == Resource::D3D12Resource::ClearUAVDesc::TEXTURE)
+	{
+		resource = desc.textureDesc.texture;
+
+		commandList->setTextureState(desc.textureDesc.texture, desc.textureDesc.mipSlice, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+	}
+
+	return resource;
 }

@@ -499,7 +499,7 @@ uint32_t Gear::Core::Resource::D3D12Resource::Texture::getMipSliceState(const ui
 
 void Gear::Core::Resource::D3D12Resource::Texture::pushToTrackingList(std::vector<Texture*>& trackingList)
 {
-	if (getStateTracking() && !getInTrackingList())
+	if (!getInTrackingList())
 	{
 		trackingList.push_back(this);
 

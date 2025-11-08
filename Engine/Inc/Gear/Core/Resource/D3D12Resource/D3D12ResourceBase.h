@@ -64,6 +64,8 @@ namespace Gear
 
 					void setName(LPCWSTR const name) const;
 
+					bool getInReferredList() const;
+
 					bool getInTrackingList() const;
 
 					void pushToReferredList(std::vector<D3D12ResourceBase*>& referredList);

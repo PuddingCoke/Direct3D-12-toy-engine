@@ -3,19 +3,9 @@
 #ifndef _GEAR_CORE_D3D12CORE_COMMANDLIST_H_
 #define _GEAR_CORE_D3D12CORE_COMMANDLIST_H_
 
-#include"DescriptorHeap.h"
-
-#include"PipelineState.h"
-
-#include"RootSignature.h"
-
-#include<Gear/Core/Resource/D3D12Resource/Buffer.h>
-
-#include<Gear/Core/Resource/D3D12Resource/Texture.h>
+#include"ResourceStateTracker.h"
 
 #include<Gear/Core/Resource/D3D12Resource/UploadHeap.h>
-
-#include<Gear/Core/Resource/D3D12Resource/PipelineResourceDesc.h>
 
 namespace Gear
 {
@@ -23,7 +13,7 @@ namespace Gear
 	{
 		namespace D3D12Core
 		{
-			class CommandList
+			class CommandList :public ResourceStateTracker
 			{
 			public:
 
@@ -91,13 +81,6 @@ namespace Gear
 
 				void transitionResources();
 
-				void pushResourceTrackList(Resource::D3D12Resource::Texture* const texture);
-
-				void pushResourceTrackList(Resource::D3D12Resource::Buffer* const buffer);
-
-				template<size_t N>
-				void setShaderResources(const Resource::D3D12Resource::ShaderResourceDesc(&descs)[N], const uint32_t targetSRVState);
-
 				void copyBufferRegion(Resource::D3D12Resource::Buffer* const dstBuffer, const uint64_t dstOffset, Resource::D3D12Resource::UploadHeap* srcBuffer, const uint64_t srcOffset, const uint64_t numBytes);
 
 				void copyBufferRegion(Resource::D3D12Resource::Buffer* const dstBuffer, const uint64_t dstOffset, Resource::D3D12Resource::Buffer* srcBuffer, const uint64_t srcOffset, const uint64_t numBytes);
@@ -108,100 +91,13 @@ namespace Gear
 
 				void copyTextureRegion(Resource::D3D12Resource::Texture* const dstTexture, const uint32_t dstSubresource, Resource::D3D12Resource::Texture* const srcTexture, const uint32_t srcSubresource);
 
-				void solvePendingBarriers(std::vector<D3D12_RESOURCE_BARRIER>& barriers);
-
-				void updateReferredSharedResourceStates();
-
 			private:
 
 				ComPtr<ID3D12CommandAllocator>* allocators;
 
 				ComPtr<ID3D12GraphicsCommandList6> commandList;
 
-				std::vector<Resource::D3D12Resource::D3D12ResourceBase*> referredResources;
-
-				std::vector<Resource::D3D12Resource::Buffer*> transitionBuffers;
-
-				std::vector<Resource::D3D12Resource::Texture*> transitionTextures;
-
-				std::vector<D3D12_RESOURCE_BARRIER> transitionBarriers;
-
-				std::vector<Resource::D3D12Resource::PendingBufferBarrier> pendingBufferBarrier;
-
-				std::vector<Resource::D3D12Resource::PendingTextureBarrier> pendingTextureBarrier;
-
 			};
-
-			template<size_t N>
-			inline void CommandList::setShaderResources(const Resource::D3D12Resource::ShaderResourceDesc(&descs)[N], const uint32_t targetSRVState)
-			{
-				for (const Resource::D3D12Resource::ShaderResourceDesc& desc : descs)
-				{
-					if (desc.type == Resource::D3D12Resource::ShaderResourceDesc::BUFFER)
-					{
-						Resource::D3D12Resource::Buffer* const buffer = desc.bufferDesc.buffer;
-
-						if (buffer && buffer->getStateTracking())
-						{
-							pushResourceTrackList(buffer);
-
-							if (desc.state == Resource::D3D12Resource::ShaderResourceDesc::SRV)
-							{
-								buffer->setState(targetSRVState);
-							}
-							else if (desc.state == Resource::D3D12Resource::ShaderResourceDesc::UAV)
-							{
-								buffer->setState(D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
-
-								Resource::D3D12Resource::Buffer* const counterBuffer = desc.bufferDesc.counterBuffer;
-
-								if (counterBuffer)
-								{
-									pushResourceTrackList(counterBuffer);
-
-									counterBuffer->setState(D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
-								}
-							}
-							else
-							{
-								buffer->setState(D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
-							}
-						}
-					}
-					else if (desc.type == Resource::D3D12Resource::ShaderResourceDesc::TEXTURE)
-					{
-						Resource::D3D12Resource::Texture* const texture = desc.textureDesc.texture;
-
-						if (texture->getStateTracking())
-						{
-							pushResourceTrackList(texture);
-
-							if (desc.state == Resource::D3D12Resource::ShaderResourceDesc::SRV)
-							{
-								if (desc.textureDesc.mipSlice == Resource::D3D12Resource::D3D12_TRANSITION_ALL_MIPLEVELS)
-								{
-									texture->setAllState(targetSRVState);
-								}
-								else
-								{
-									texture->setMipSliceState(desc.textureDesc.mipSlice, targetSRVState);
-								}
-							}
-							else if (desc.state == Resource::D3D12Resource::ShaderResourceDesc::UAV)
-							{
-								if (desc.textureDesc.mipSlice == Resource::D3D12Resource::D3D12_TRANSITION_ALL_MIPLEVELS)
-								{
-									texture->setAllState(D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
-								}
-								else
-								{
-									texture->setMipSliceState(desc.textureDesc.mipSlice, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
-								}
-							}
-						}
-					}
-				}
-			}
 		}
 	}
 }

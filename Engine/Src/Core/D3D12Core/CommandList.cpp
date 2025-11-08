@@ -162,65 +162,12 @@ void Gear::Core::D3D12Core::CommandList::clearUnorderedAccessUint(const D3D12_GP
 
 void Gear::Core::D3D12Core::CommandList::transitionResources()
 {
-	for (Resource::D3D12Resource::Buffer* const buff : transitionBuffers)
-	{
-		buff->transition(transitionBarriers, pendingBufferBarrier);
-
-		buff->popFromTrackingList();
-	}
-
-	transitionBuffers.clear();
-
-	for (Resource::D3D12Resource::Texture* const tex : transitionTextures)
-	{
-		tex->transition(transitionBarriers, pendingTextureBarrier);
-
-		tex->popFromTrackingList();
-	}
-
-	transitionTextures.clear();
-
-	if (transitionBarriers.size())
-	{
-		commandList->ResourceBarrier(static_cast<uint32_t>(transitionBarriers.size()), transitionBarriers.data());
-
-		transitionBarriers.clear();
-	}
-}
-
-void Gear::Core::D3D12Core::CommandList::updateReferredSharedResourceStates()
-{
-	for (Resource::D3D12Resource::D3D12ResourceBase* const res : referredResources)
-	{
-		res->updateGlobalStates();
-
-		res->resetInternalStates();
-
-		res->popFromReferredList();
-	}
-
-	referredResources.clear();
-}
-
-void Gear::Core::D3D12Core::CommandList::pushResourceTrackList(Resource::D3D12Resource::Texture* const texture)
-{
-	texture->pushToReferredList(referredResources);
-
-	texture->pushToTrackingList(transitionTextures);
-}
-
-void Gear::Core::D3D12Core::CommandList::pushResourceTrackList(Resource::D3D12Resource::Buffer* const buffer)
-{
-	buffer->pushToReferredList(referredResources);
-
-	buffer->pushToTrackingList(transitionBuffers);
+	ResourceStateTracker::transitionResources(commandList.Get());
 }
 
 void Gear::Core::D3D12Core::CommandList::copyBufferRegion(Resource::D3D12Resource::Buffer* const dstBuffer, const uint64_t dstOffset, Resource::D3D12Resource::UploadHeap* srcBuffer, const uint64_t srcOffset, const uint64_t numBytes)
 {
-	pushResourceTrackList(dstBuffer);
-
-	dstBuffer->setState(D3D12_RESOURCE_STATE_COPY_DEST);
+	setBufferState(dstBuffer, D3D12_RESOURCE_STATE_COPY_DEST);
 
 	transitionResources();
 
@@ -229,13 +176,9 @@ void Gear::Core::D3D12Core::CommandList::copyBufferRegion(Resource::D3D12Resourc
 
 void Gear::Core::D3D12Core::CommandList::copyBufferRegion(Resource::D3D12Resource::Buffer* const dstBuffer, const uint64_t dstOffset, Resource::D3D12Resource::Buffer* srcBuffer, const uint64_t srcOffset, const uint64_t numBytes)
 {
-	pushResourceTrackList(dstBuffer);
+	setBufferState(dstBuffer, D3D12_RESOURCE_STATE_COPY_DEST);
 
-	dstBuffer->setState(D3D12_RESOURCE_STATE_COPY_DEST);
-
-	pushResourceTrackList(srcBuffer);
-
-	srcBuffer->setState(D3D12_RESOURCE_STATE_COPY_SOURCE);
+	setBufferState(srcBuffer, D3D12_RESOURCE_STATE_COPY_SOURCE);
 
 	transitionResources();
 
@@ -244,9 +187,7 @@ void Gear::Core::D3D12Core::CommandList::copyBufferRegion(Resource::D3D12Resourc
 
 void Gear::Core::D3D12Core::CommandList::copyResource(Resource::D3D12Resource::Buffer* const dstBuffer, Resource::D3D12Resource::UploadHeap* const srcBuffer)
 {
-	pushResourceTrackList(dstBuffer);
-
-	dstBuffer->setState(D3D12_RESOURCE_STATE_COPY_DEST);
+	setBufferState(dstBuffer, D3D12_RESOURCE_STATE_COPY_DEST);
 
 	transitionResources();
 
@@ -255,13 +196,9 @@ void Gear::Core::D3D12Core::CommandList::copyResource(Resource::D3D12Resource::B
 
 void Gear::Core::D3D12Core::CommandList::copyResource(Resource::D3D12Resource::Buffer* const dstBuffer, Resource::D3D12Resource::Buffer* const srcBuffer)
 {
-	pushResourceTrackList(dstBuffer);
+	setBufferState(dstBuffer, D3D12_RESOURCE_STATE_COPY_DEST);
 
-	dstBuffer->setState(D3D12_RESOURCE_STATE_COPY_DEST);
-
-	pushResourceTrackList(srcBuffer);
-
-	srcBuffer->setState(D3D12_RESOURCE_STATE_COPY_SOURCE);
+	setBufferState(srcBuffer, D3D12_RESOURCE_STATE_COPY_SOURCE);
 
 	transitionResources();
 
@@ -270,13 +207,9 @@ void Gear::Core::D3D12Core::CommandList::copyResource(Resource::D3D12Resource::B
 
 void Gear::Core::D3D12Core::CommandList::copyTextureRegion(Resource::D3D12Resource::Texture* const dstTexture, const uint32_t dstSubresource, Resource::D3D12Resource::Texture* const srcTexture, const uint32_t srcSubresource)
 {
-	pushResourceTrackList(dstTexture);
+	setTextureState(dstTexture, Resource::D3D12Resource::D3D12_TRANSITION_ALL_MIPLEVELS, D3D12_RESOURCE_STATE_COPY_DEST);
 
-	dstTexture->setAllState(D3D12_RESOURCE_STATE_COPY_DEST);
-
-	pushResourceTrackList(srcTexture);
-
-	srcTexture->setAllState(D3D12_RESOURCE_STATE_COPY_SOURCE);
+	setTextureState(srcTexture, Resource::D3D12Resource::D3D12_TRANSITION_ALL_MIPLEVELS, D3D12_RESOURCE_STATE_COPY_SOURCE);
 
 	transitionResources();
 
@@ -293,25 +226,3 @@ void Gear::Core::D3D12Core::CommandList::copyTextureRegion(Resource::D3D12Resour
 	commandList->CopyTextureRegion(&dstLocation, 0, 0, 0, &srcLocation, nullptr);
 }
 
-void Gear::Core::D3D12Core::CommandList::solvePendingBarriers(std::vector<D3D12_RESOURCE_BARRIER>& barriers)
-{
-	if (pendingBufferBarrier.size())
-	{
-		for (const Resource::D3D12Resource::PendingBufferBarrier& pendingBarrier : pendingBufferBarrier)
-		{
-			pendingBarrier.buffer->solvePendingBarrier(barriers, pendingBarrier.afterState);
-		}
-
-		pendingBufferBarrier.clear();
-	}
-
-	if (pendingTextureBarrier.size())
-	{
-		for (const Resource::D3D12Resource::PendingTextureBarrier& pendingBarrier : pendingTextureBarrier)
-		{
-			pendingBarrier.texture->solvePendingBarrier(barriers, pendingBarrier.mipSlice, pendingBarrier.afterState);
-		}
-
-		pendingTextureBarrier.clear();
-	}
-}

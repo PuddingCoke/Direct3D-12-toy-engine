@@ -199,11 +199,7 @@ Gear::Core::Resource::D3D12Resource::ShaderResourceDesc Gear::Core::Resource::Bu
 	desc.state = D3D12Resource::ShaderResourceDesc::UAV;
 	desc.resourceIndex = uavIndex;
 	desc.bufferDesc.buffer = buffer;
-
-	if (counterBuffer)
-	{
-		desc.bufferDesc.counterBuffer = counterBuffer->getBuffer();
-	}
+	desc.bufferDesc.counterBuffer = (counterBuffer ? counterBuffer->getBuffer() : nullptr);
 
 	return desc;
 }

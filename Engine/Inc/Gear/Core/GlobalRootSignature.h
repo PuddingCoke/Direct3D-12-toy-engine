@@ -22,7 +22,7 @@ namespace Gear
 			const D3D12Core::RootSignature* getGeometryShaderRootSignature();
 
 			//用于同时使用镶嵌细分和几何着色器的时候
-			const D3D12Core::RootSignature* getAllShaderRootSignature();
+			const D3D12Core::RootSignature* getAllGraphicsShaderRootSignature();
 
 			//用于使用计算着色器的时候
 			const D3D12Core::RootSignature* getComputeShaderRootSignature();

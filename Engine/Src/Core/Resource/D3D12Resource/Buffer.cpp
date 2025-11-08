@@ -112,7 +112,7 @@ uint32_t Gear::Core::Resource::D3D12Resource::Buffer::getState() const
 
 void Gear::Core::Resource::D3D12Resource::Buffer::pushToTrackingList(std::vector<Buffer*>& trackingList)
 {
-	if (getStateTracking() && !getInTrackingList())
+	if (!getInTrackingList())
 	{
 		trackingList.push_back(this);
 

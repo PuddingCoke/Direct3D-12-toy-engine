@@ -288,9 +288,7 @@ Gear::Core::Resource::ImmutableCBuffer* Gear::Core::ResourceManager::createImmut
 {
 	Resource::D3D12Resource::Buffer* const buffer = createBuffer(data, size, D3D12_RESOURCE_FLAG_NONE);
 
-	commandList->pushResourceTrackList(buffer);
-
-	buffer->setState(D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
+	commandList->setBufferState(buffer, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
 
 	commandList->transitionResources();
 
@@ -360,9 +358,7 @@ Gear::Core::Resource::BufferView* Gear::Core::ResourceManager::createTypedBuffer
 			finalState |= D3D12_RESOURCE_STATE_INDEX_BUFFER;
 		}
 
-		commandList->pushResourceTrackList(buffer);
-
-		buffer->setState(finalState);
+		commandList->setBufferState(buffer, finalState);
 
 		commandList->transitionResources();
 
@@ -416,9 +412,7 @@ Gear::Core::Resource::BufferView* Gear::Core::ResourceManager::createStructuredB
 			finalState |= D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER;
 		}
 
-		commandList->pushResourceTrackList(buffer);
-
-		buffer->setState(finalState);
+		commandList->setBufferState(buffer, finalState);
 
 		commandList->transitionResources();
 
@@ -462,9 +456,7 @@ Gear::Core::Resource::BufferView* Gear::Core::ResourceManager::createByteAddress
 			finalState |= D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE;
 		}
 
-		commandList->pushResourceTrackList(buffer);
-
-		buffer->setState(finalState);
+		commandList->setBufferState(buffer, finalState);
 
 		commandList->transitionResources();
 
@@ -554,9 +546,7 @@ Gear::Core::Resource::TextureRenderView* Gear::Core::ResourceManager::createText
 
 	if (!stateTracking)
 	{
-		commandList->pushResourceTrackList(texture);
-
-		texture->setAllState(D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
+		commandList->setTextureState(texture, Resource::D3D12Resource::D3D12_TRANSITION_ALL_MIPLEVELS, D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
 
 		commandList->transitionResources();
 
@@ -606,9 +596,7 @@ Gear::Core::Resource::TextureRenderView* Gear::Core::ResourceManager::createText
 
 	if (!stateTracking)
 	{
-		commandList->pushResourceTrackList(texture);
-
-		texture->setAllState(D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
+		commandList->setTextureState(texture, Resource::D3D12Resource::D3D12_TRANSITION_ALL_MIPLEVELS, D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
 
 		commandList->transitionResources();
 
@@ -741,9 +729,7 @@ Gear::Core::Resource::TextureRenderView* Gear::Core::ResourceManager::createText
 
 	if (!stateTracking)
 	{
-		commandList->pushResourceTrackList(dstTexture);
-
-		dstTexture->setAllState(D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
+		commandList->setTextureState(dstTexture, Resource::D3D12Resource::D3D12_TRANSITION_ALL_MIPLEVELS, D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
 
 		commandList->transitionResources();
 
@@ -817,9 +803,7 @@ Gear::Core::Resource::TextureRenderView* Gear::Core::ResourceManager::createText
 
 	if (!stateTracking)
 	{
-		commandList->pushResourceTrackList(dstTexture);
-
-		dstTexture->setAllState(D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
+		commandList->setTextureState(dstTexture, Resource::D3D12Resource::D3D12_TRANSITION_ALL_MIPLEVELS, D3D12_RESOURCE_STATE_ALL_SHADER_RESOURCE);
 
 		commandList->transitionResources();
 

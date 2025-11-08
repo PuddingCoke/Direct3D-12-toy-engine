@@ -470,11 +470,7 @@ void RenderEnginePrivate::end()
 
 	//把后备缓冲转变到STATE_RENDER_TARGET，并更新所有动态常量缓冲
 	{
-		{
-			prepareCommandList->pushResourceTrackList(getRenderTexture());
-
-			getRenderTexture()->setAllState(D3D12_RESOURCE_STATE_RENDER_TARGET);
-		}
+		prepareCommandList->setTextureState(getRenderTexture(), Gear::Core::Resource::D3D12Resource::D3D12_TRANSITION_ALL_MIPLEVELS, D3D12_RESOURCE_STATE_RENDER_TARGET);
 
 		updateConstantBuffer();
 
@@ -500,9 +496,7 @@ void RenderEnginePrivate::end()
 
 		drawImGuiFrame(finishCommandList);
 
-		finishCommandList->pushResourceTrackList(getRenderTexture());
-
-		getRenderTexture()->setAllState(D3D12_RESOURCE_STATE_PRESENT);
+		finishCommandList->setTextureState(getRenderTexture(), Gear::Core::Resource::D3D12Resource::D3D12_TRANSITION_ALL_MIPLEVELS, D3D12_RESOURCE_STATE_PRESENT);
 
 		finishCommandList->transitionResources();
 	}

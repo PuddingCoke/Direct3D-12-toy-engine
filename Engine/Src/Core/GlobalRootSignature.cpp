@@ -17,7 +17,7 @@ namespace
 		Gear::Core::D3D12Core::RootSignature* geometryShaderRootSignature = nullptr;
 
 		//用于同时使用镶嵌细分和几何着色器的时候
-		Gear::Core::D3D12Core::RootSignature* allShaderRootSignature = nullptr;
+		Gear::Core::D3D12Core::RootSignature* allGraphicsShaderRootSignature = nullptr;
 
 		//用于使用计算着色器的时候
 		Gear::Core::D3D12Core::RootSignature* computeShaderRootSignature = nullptr;
@@ -40,9 +40,9 @@ const Gear::Core::D3D12Core::RootSignature* Gear::Core::GlobalRootSignature::get
 	return pvt.geometryShaderRootSignature;
 }
 
-const Gear::Core::D3D12Core::RootSignature* Gear::Core::GlobalRootSignature::getAllShaderRootSignature()
+const Gear::Core::D3D12Core::RootSignature* Gear::Core::GlobalRootSignature::getAllGraphicsShaderRootSignature()
 {
-	return pvt.allShaderRootSignature;
+	return pvt.allGraphicsShaderRootSignature;
 }
 
 const Gear::Core::D3D12Core::RootSignature* Gear::Core::GlobalRootSignature::getComputeShaderRootSignature()
@@ -177,14 +177,14 @@ void Gear::Core::GlobalRootSignature::Internal::initialize()
 	LOGSUCCESS(L"create", LogColor::brightMagenta, L"geometry shader root signature", LogColor::defaultColor, L"succeeded");
 
 	//总计 58 DWORDS
-	pvt.allShaderRootSignature = new D3D12Core::RootSignature(4u, 4u, 8u, 4u, 24u, 0u, samplerDesc, _countof(samplerDesc),
+	pvt.allGraphicsShaderRootSignature = new D3D12Core::RootSignature(4u, 4u, 8u, 4u, 24u, 0u, samplerDesc, _countof(samplerDesc),
 		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT |
 		D3D12_ROOT_SIGNATURE_FLAG_DENY_AMPLIFICATION_SHADER_ROOT_ACCESS |
 		D3D12_ROOT_SIGNATURE_FLAG_DENY_MESH_SHADER_ROOT_ACCESS |
 		D3D12_ROOT_SIGNATURE_FLAG_CBV_SRV_UAV_HEAP_DIRECTLY_INDEXED |
 		D3D12_ROOT_SIGNATURE_FLAG_SAMPLER_HEAP_DIRECTLY_INDEXED);
 
-	pvt.allShaderRootSignature->get()->SetName(L"All Shader Root Signature");
+	pvt.allGraphicsShaderRootSignature->get()->SetName(L"All Graphics Shader Root Signature");
 
 	LOGSUCCESS(L"create", LogColor::brightMagenta, L"all shader root signature", LogColor::defaultColor, L"succeeded");
 
@@ -215,9 +215,9 @@ void Gear::Core::GlobalRootSignature::Internal::release()
 		delete pvt.geometryShaderRootSignature;
 	}
 
-	if (pvt.allShaderRootSignature)
+	if (pvt.allGraphicsShaderRootSignature)
 	{
-		delete pvt.allShaderRootSignature;
+		delete pvt.allGraphicsShaderRootSignature;
 	}
 
 	if (pvt.computeShaderRootSignature)

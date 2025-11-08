@@ -7,10 +7,6 @@
 
 #include<Gear/Core/Resource/D3D12Resource/Texture.h>
 
-#include<Gear/Core/Resource/D3D12Resource/UploadHeap.h>
-
-#include<Gear/Core/Resource/D3D12Resource/PipelineResourceDesc.h>
-
 namespace Gear
 {
 	namespace Core
@@ -21,8 +17,9 @@ namespace Gear
 			{
 			public:
 
-				template<size_t N>
-				void setShaderResources(const Resource::D3D12Resource::ShaderResourceDesc(&descs)[N], const uint32_t targetSRVState);
+				void setTextureState(Resource::D3D12Resource::Texture* const texture, const uint32_t mipslice, const uint32_t state);
+
+				void setBufferState(Resource::D3D12Resource::Buffer* const buffer, const uint32_t state);
 
 				void solvePendingBarriers(std::vector<D3D12_RESOURCE_BARRIER>& outBarriers);
 
@@ -52,84 +49,12 @@ namespace Gear
 
 				//以下是待定资源屏障，对于共享且需要状态追踪的资源来说它的内部状态是未知的，即STATE_BEFORE是未知的
 				//因此需要待定资源屏障，并让主渲染线程解决这个问题
-				
+
 				std::vector<Resource::D3D12Resource::PendingBufferBarrier> pendingBufferBarrier;
 
 				std::vector<Resource::D3D12Resource::PendingTextureBarrier> pendingTextureBarrier;
 
 			};
-
-			template<size_t N>
-			inline void ResourceStateTracker::setShaderResources(const Resource::D3D12Resource::ShaderResourceDesc(&descs)[N], const uint32_t targetSRVState)
-			{
-				for (const Resource::D3D12Resource::ShaderResourceDesc& desc : descs)
-				{
-					if (desc.type == Resource::D3D12Resource::ShaderResourceDesc::BUFFER)
-					{
-						Resource::D3D12Resource::Buffer* const buffer = desc.bufferDesc.buffer;
-
-						if (buffer && buffer->getStateTracking())
-						{
-							pushResourceTrackList(buffer);
-
-							if (desc.state == Resource::D3D12Resource::ShaderResourceDesc::SRV)
-							{
-								buffer->setState(targetSRVState);
-							}
-							else if (desc.state == Resource::D3D12Resource::ShaderResourceDesc::UAV)
-							{
-								buffer->setState(D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
-
-								Resource::D3D12Resource::Buffer* const counterBuffer = desc.bufferDesc.counterBuffer;
-
-								if (counterBuffer)
-								{
-									pushResourceTrackList(counterBuffer);
-
-									counterBuffer->setState(D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
-								}
-							}
-							else
-							{
-								buffer->setState(D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
-							}
-						}
-					}
-					else if (desc.type == Resource::D3D12Resource::ShaderResourceDesc::TEXTURE)
-					{
-						Resource::D3D12Resource::Texture* const texture = desc.textureDesc.texture;
-
-						if (texture->getStateTracking())
-						{
-							pushResourceTrackList(texture);
-
-							if (desc.state == Resource::D3D12Resource::ShaderResourceDesc::SRV)
-							{
-								if (desc.textureDesc.mipSlice == Resource::D3D12Resource::D3D12_TRANSITION_ALL_MIPLEVELS)
-								{
-									texture->setAllState(targetSRVState);
-								}
-								else
-								{
-									texture->setMipSliceState(desc.textureDesc.mipSlice, targetSRVState);
-								}
-							}
-							else if (desc.state == Resource::D3D12Resource::ShaderResourceDesc::UAV)
-							{
-								if (desc.textureDesc.mipSlice == Resource::D3D12Resource::D3D12_TRANSITION_ALL_MIPLEVELS)
-								{
-									texture->setAllState(D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
-								}
-								else
-								{
-									texture->setMipSliceState(desc.textureDesc.mipSlice, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
-								}
-							}
-						}
-					}
-				}
-			}
-
 		}
 	}
 }

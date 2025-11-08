@@ -391,7 +391,7 @@ private:
 
 		const D3D12Resource::DepthStencilDesc depthStencilDesc = depthTexture->getDSVMipHandle(0);
 
-		context->setRenderTargets({ originTexture->getRTVMipHandle(0) }, &depthStencilDesc);
+		context->setRenderTargets({ originTexture->getRTVMipHandle(0) }, depthStencilDesc);
 
 		context->setDSConstants({
 			cascade[0]->displacementTexture->getAllSRVIndex(),
@@ -416,7 +416,7 @@ private:
 
 		context->transitionResources();
 
-		context->clearDepthStencil(depthTexture->getDSVMipHandle(0), D3D12_CLEAR_FLAG_DEPTH, 1.f, 0);
+		context->clearDepthStencil(depthStencilDesc, D3D12_CLEAR_FLAG_DEPTH, 1.f, 0);
 
 		context->drawIndexed(static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
 

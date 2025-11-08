@@ -315,7 +315,7 @@ protected:
 
 		const D3D12Resource::DepthStencilDesc dsDesc = shadowTexture->getDSVMipHandle(0);
 
-		context->setRenderTargets({}, &dsDesc);
+		context->setRenderTargets(dsDesc);
 
 		context->setViewport(shadowTextureResolution, shadowTextureResolution);
 
@@ -353,7 +353,7 @@ protected:
 
 		const D3D12Resource::DepthStencilDesc dsDesc = depthCube->getDSVMipHandle(0);
 
-		context->setRenderTargets({ radianceCube->getRTVMipHandle(0),distanceCube->getRTVMipHandle(0) }, &dsDesc);
+		context->setRenderTargets({ radianceCube->getRTVMipHandle(0),distanceCube->getRTVMipHandle(0) }, dsDesc);
 
 		context->setVSConstantBuffer(cubeRenderBuffer);
 
@@ -415,7 +415,7 @@ protected:
 
 		const D3D12Resource::DepthStencilDesc dsDesc = depthCube->getDSVMipHandle(0);
 
-		context->setRenderTargets({ radianceCube->getRTVMipHandle(0) }, &dsDesc);
+		context->setRenderTargets({ radianceCube->getRTVMipHandle(0) }, dsDesc);
 
 		context->setVSConstantBuffer(cubeRenderBuffer);
 
@@ -466,7 +466,7 @@ protected:
 			gPosition->getRTVMipHandle(0),
 			gNormalSpecular->getRTVMipHandle(0),
 			gBaseColor->getRTVMipHandle(0)
-			}, &dsDesc);
+			}, dsDesc);
 
 		context->transitionResources();
 
@@ -515,7 +515,7 @@ protected:
 
 		context->setPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-		context->setRenderTargets({ originTexture->getRTVMipHandle(0) }, &dsDesc);
+		context->setRenderTargets({ originTexture->getRTVMipHandle(0) }, dsDesc);
 
 		context->setPSConstants({ skybox->getAllSRVIndex() }, 0);
 

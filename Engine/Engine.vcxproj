@@ -221,7 +221,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Inc\DirectXTex\DDSTextureLoader12.cpp" />
-    <ClCompile Include="Inc\Gear\Core\D3D12Core\ResourceStateTracker.cpp" />
+    <ClCompile Include="Src\Core\D3D12Core\ResourceStateTracker.cpp" />
     <ClCompile Include="Src\Core\D3D12Core\DescriptorHandle.cpp" />
     <ClCompile Include="Src\Core\D3D12Core\DXCCompiler.cpp" />
     <ClCompile Include="Src\Core\D3D12Core\PipelineState.cpp" />

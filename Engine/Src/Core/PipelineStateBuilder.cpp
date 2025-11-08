@@ -161,7 +161,7 @@ Gear::Core::D3D12Core::PipelineState* Gear::Core::PipelineStateBuilder::build()
 		}
 		else
 		{
-			selectedRootSignature = GlobalRootSignature::getAllShaderRootSignature();
+			selectedRootSignature = GlobalRootSignature::getAllGraphicsShaderRootSignature();
 		}
 
 		pipelineStateType = D3D12Core::PipelineState::PipelineStateType::GRAPHICS;
