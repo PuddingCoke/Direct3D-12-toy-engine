@@ -33,7 +33,10 @@ void Gear::Game::scheduleAllTasks()
 {
 	while (recordQueue.size())
 	{
-		recordQueue.front()->waitTask();
+		if (recordQueue.front()->waitTask())
+		{
+			throw "error occur while command recording";
+		}
 
 		Core::RenderEngine::submitCommandList(recordQueue.front()->getCommandList());
 
@@ -42,7 +45,10 @@ void Gear::Game::scheduleAllTasks()
 
 	while (createQueue.size())
 	{
-		createQueue.front()->waitTaskInitialized();
+		if (createQueue.front()->waitInitialized())
+		{
+			throw "error occur while resource creation";
+		}
 
 		createQueue.pop();
 	}

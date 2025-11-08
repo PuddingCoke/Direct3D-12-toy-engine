@@ -451,3 +451,10 @@ void Gear::release()
 		delete pvt;
 	}
 }
+
+void Gear::failureExit()
+{
+	Gear::Utils::Logger::Internal::release();
+
+	std::quick_exit(EXIT_FAILURE);
+}

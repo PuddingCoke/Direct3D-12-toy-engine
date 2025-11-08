@@ -19,13 +19,15 @@ namespace Gear
 
 			~RenderThread();
 
-			void waitTaskInitialized();
+			bool waitInitialized();
 
 		private:
 
 			void workerLoop();
 
-			bool taskInitialized;
+			bool initialized;
+
+			bool errorOccured;
 
 			std::mutex taskMutex;
 

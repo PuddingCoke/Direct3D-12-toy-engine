@@ -6,6 +6,7 @@ Gear::Core::RenderTask::RenderTask() :
 	resManager(new ResourceManager()),
 	context(resManager->getGraphicsContext()),
 	taskCompleted(true),
+	errorOccur(false),
 	isRunning(true),
 	renderThread(nullptr)
 {
@@ -40,11 +41,13 @@ void Gear::Core::RenderTask::beginTask()
 	taskCondition.notify_one();
 }
 
-void Gear::Core::RenderTask::waitTask()
+bool Gear::Core::RenderTask::waitTask()
 {
 	std::unique_lock<std::mutex> lock(taskMutex);
 
 	taskCondition.wait(lock, [this]() {return taskCompleted; });
+
+	return errorOccur;
 }
 
 Gear::Core::D3D12Core::CommandList* Gear::Core::RenderTask::getCommandList() const
@@ -64,27 +67,48 @@ void Gear::Core::RenderTask::blit(Resource::TextureRenderView* const texture) co
 
 void Gear::Core::RenderTask::workerLoop()
 {
-	while (true)
+#ifdef _DEBUG
+	try
+	{
+#endif // _DEBUG
+		while (true)
+		{
+			{
+				std::unique_lock<std::mutex> lock(taskMutex);
+
+				taskCondition.wait(lock, [this]() {return !taskCompleted; });
+
+				if (!isRunning)
+				{
+					break;
+				}
+
+				resManager->cleanTransientResources();
+
+				context->begin();
+
+				recordCommand();
+
+				taskCompleted = true;
+			}
+
+			taskCondition.notify_one();
+		}
+#ifdef _DEBUG
+	}
+	catch (const std::exception&)
 	{
 		{
 			std::unique_lock<std::mutex> lock(taskMutex);
 
-			taskCondition.wait(lock, [this]() {return !taskCompleted; });
-
-			if (!isRunning)
-			{
-				break;
-			}
-
-			resManager->cleanTransientResources();
-
-			context->begin();
-
-			recordCommand();
-
 			taskCompleted = true;
+
+			errorOccur = true;
 		}
 
 		taskCondition.notify_one();
+
+		return;
 	}
+#endif // _DEBUG
 }

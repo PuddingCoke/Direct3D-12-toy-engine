@@ -8,12 +8,23 @@ int wmain(int argc, const wchar_t* argv[])
 {
 	const InitializationParam param = InitializationParam::RealTime(1920, 1080, L"MandelBulb");
 
-	Gear::initialize();
-
-	if (!Gear::iniEngine(param, argc, argv))
+#ifdef _DEBUG
+	try
 	{
-		Gear::iniGame(new MyGame());
-	}
+#endif // _DEBUG
+		Gear::initialize();
 
-	Gear::release();
+		if (!Gear::iniEngine(param, argc, argv))
+		{
+			Gear::iniGame(new MyGame());
+		}
+
+		Gear::release();
+#ifdef _DEBUG
+	}
+	catch (const std::exception&)
+	{
+		Gear::failureExit();
+	}
+#endif // _DEBUG
 }

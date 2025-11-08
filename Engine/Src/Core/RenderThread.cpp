@@ -5,7 +5,7 @@
 #include<Gear/Core/Internal/GlobalDescriptorHeapInternal.h>
 
 Gear::Core::RenderThread::RenderThread(const std::function<void(RenderTask**)>& createFunc) :
-	taskInitialized(false), createFunc(createFunc), renderTask(nullptr)
+	initialized(false), createFunc(createFunc), renderTask(nullptr), errorOccured(false)
 {
 	renderThread = std::thread(&RenderThread::workerLoop, this);
 }
@@ -18,11 +18,13 @@ Gear::Core::RenderThread::~RenderThread()
 	}
 }
 
-void Gear::Core::RenderThread::waitTaskInitialized()
+bool Gear::Core::RenderThread::waitInitialized()
 {
 	std::unique_lock<std::mutex> lock(taskMutex);
 
-	taskCondition.wait(lock, [this]() {return taskInitialized; });
+	taskCondition.wait(lock, [this]() {return initialized; });
+
+	return errorOccured;
 }
 
 void Gear::Core::RenderThread::workerLoop()
@@ -30,18 +32,40 @@ void Gear::Core::RenderThread::workerLoop()
 	//申请每个渲染线程的 staging resource heap render target heap depth stencil heap
 	GlobalDescriptorHeap::Internal::initializeLocalDescriptorHeaps();
 
-	//开始创建RenderTask
+#ifdef _DEBUG
+	try
 	{
-		std::lock_guard<std::mutex> lockGuard(taskMutex);
+#endif // _DEBUG
+		//开始创建RenderTask
+		{
+			std::lock_guard<std::mutex> lockGuard(taskMutex);
 
-		createFunc(&renderTask);
+			createFunc(&renderTask);
 
-		renderTask->renderThread = this;
+			renderTask->renderThread = this;
 
-		RenderEngine::submitCommandList(renderTask->getCommandList());
+			RenderEngine::submitCommandList(renderTask->getCommandList());
 
-		taskInitialized = true;
+			initialized = true;
+		}
+#ifdef _DEBUG
 	}
+	catch (const std::exception&)
+	{
+		{
+			std::lock_guard<std::mutex> lockGuard(taskMutex);
+
+			initialized = true;
+
+			errorOccured = true;
+		}
+
+		//通知主渲染线程子渲染线程创建完毕
+		taskCondition.notify_one();
+
+		return;
+	}
+#endif // _DEBUG
 
 	//通知主渲染线程子渲染线程创建完毕
 	taskCondition.notify_one();

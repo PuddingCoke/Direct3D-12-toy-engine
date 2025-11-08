@@ -25,7 +25,7 @@ namespace Gear
 
 			void beginTask();
 
-			void waitTask();
+			bool waitTask();
 
 			D3D12Core::CommandList* getCommandList() const;
 
@@ -49,6 +49,8 @@ namespace Gear
 			void workerLoop();
 
 			bool taskCompleted;
+
+			bool errorOccur;
 
 			bool isRunning;
 

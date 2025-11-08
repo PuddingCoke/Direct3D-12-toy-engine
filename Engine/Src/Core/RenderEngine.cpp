@@ -374,7 +374,10 @@ RenderEnginePrivate::~RenderEnginePrivate()
 
 	Gear::Core::GraphicsDevice::Internal::release();
 
-	CloseHandle(fenceEvent);
+	if (fenceEvent)
+	{
+		CloseHandle(fenceEvent);
+	}
 }
 
 void RenderEnginePrivate::submitCommandList(Gear::Core::D3D12Core::CommandList* const commandList)

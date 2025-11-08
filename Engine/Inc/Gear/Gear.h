@@ -20,6 +20,8 @@ namespace Gear
 
 	void release();
 
+	void failureExit();
+
 }
 
 #endif // !_GEAR_H_
