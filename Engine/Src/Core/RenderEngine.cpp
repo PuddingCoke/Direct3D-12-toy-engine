@@ -203,7 +203,9 @@ RenderEnginePrivate::RenderEnginePrivate(const uint32_t width, const uint32_t he
 
 	Gear::Core::GlobalShader::Internal::initialize();
 
-	Gear::Core::GlobalDescriptorHeap::Internal::initialize();
+	Gear::Core::GlobalDescriptorHeap::Internal::initializeGlobalDescriptorHeaps();
+
+	Gear::Core::GlobalDescriptorHeap::Internal::initializeLocalDescriptorHeaps();
 
 	Gear::Core::GlobalRootSignature::Internal::initialize();
 
@@ -360,7 +362,9 @@ RenderEnginePrivate::~RenderEnginePrivate()
 
 	Gear::Core::GlobalRootSignature::Internal::release();
 
-	Gear::Core::GlobalDescriptorHeap::Internal::release();
+	Gear::Core::GlobalDescriptorHeap::Internal::releaseLocalDescriptorHeaps();
+
+	Gear::Core::GlobalDescriptorHeap::Internal::releaseGlobalDescriptorHeaps();
 
 	Gear::Core::GlobalShader::Internal::release();
 

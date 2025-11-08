@@ -19,7 +19,7 @@ public:
 	{
 		Core::MainCamera::setProj(Utils::Math::pi / 4.f, Core::Graphics::getAspectRatio(), 0.01f, 512.f);
 
-		pushCreateFuture(createRenderTaskAsync(&renderTask));
+		pushCreateAsync(createRenderTaskAsync(&renderTask));
 
 		scheduleAllTasks();
 	}

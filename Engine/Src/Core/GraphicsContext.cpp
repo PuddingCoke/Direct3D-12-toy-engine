@@ -144,20 +144,16 @@ void Gear::Core::GraphicsContext::transitionResources()
 	{
 		for (uint32_t i = 0; i < rootConstantBufferDescs.size(); i++)
 		{
+			const uint32_t rootParameterIndex = rootConstantBufferDescs[i].rootParameterIndex;
+
+			const D3D12_GPU_VIRTUAL_ADDRESS gpuAddress = rootConstantBufferDescs[i].gpuAddress;
+
 			if (rootConstantBufferDescs[i].type == RootConstantBufferDesc::GRAPHICS)
 			{
-				const uint32_t rootParameterIndex = rootConstantBufferDescs[i].rootParameterIndex;
-
-				const D3D12_GPU_VIRTUAL_ADDRESS gpuAddress = rootConstantBufferDescs[i].gpuAddress;
-
 				commandList->setGraphicsRootConstantBuffer(rootParameterIndex, gpuAddress);
 			}
 			else
 			{
-				const uint32_t rootParameterIndex = rootConstantBufferDescs[i].rootParameterIndex;
-
-				const D3D12_GPU_VIRTUAL_ADDRESS gpuAddress = rootConstantBufferDescs[i].gpuAddress;
-
 				commandList->setComputeRootConstantBuffer(rootParameterIndex, gpuAddress);
 			}
 		}

@@ -143,6 +143,7 @@
     <ClInclude Include="Inc\Gear\Core\Internal\RenderEngineInternal.h" />
     <ClInclude Include="Inc\Gear\Core\PipelineStateBuilder.h" />
     <ClInclude Include="Inc\Gear\Core\RenderTask.h" />
+    <ClInclude Include="Inc\Gear\Core\RenderThread.h" />
     <ClInclude Include="Inc\Gear\Core\Resource\D3D12Resource\PipelineResourceDesc.h" />
     <ClInclude Include="Inc\Gear\Core\Resource\DynamicCBuffer.h" />
     <ClInclude Include="Inc\Gear\Core\Resource\StaticCBuffer.h" />
@@ -221,6 +222,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Inc\DirectXTex\DDSTextureLoader12.cpp" />
+    <ClCompile Include="Src\Core\RenderThread.cpp" />
     <ClCompile Include="Src\Core\D3D12Core\ResourceStateTracker.cpp" />
     <ClCompile Include="Src\Core\D3D12Core\DescriptorHandle.cpp" />
     <ClCompile Include="Src\Core\D3D12Core\DXCCompiler.cpp" />

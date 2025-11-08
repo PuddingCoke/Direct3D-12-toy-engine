@@ -1,4 +1,4 @@
-﻿#include<Gear/Core/RenderTask.h>
+﻿#include<Gear/Core/RenderThread.h>
 
 #include<Gear/Core/GlobalEffect/BackBufferBlitEffect.h>
 
@@ -7,7 +7,7 @@ Gear::Core::RenderTask::RenderTask() :
 	context(resManager->getGraphicsContext()),
 	taskCompleted(true),
 	isRunning(true),
-	workerThread(std::thread(&RenderTask::workerLoop, this))
+	renderThread(nullptr)
 {
 	context->begin();
 }
@@ -18,9 +18,9 @@ Gear::Core::RenderTask::~RenderTask()
 
 	beginTask();
 
-	if (workerThread.joinable())
+	if (renderThread)
 	{
-		workerThread.join();
+		delete renderThread;
 	}
 
 	if (resManager)

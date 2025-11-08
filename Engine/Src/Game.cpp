@@ -24,9 +24,9 @@ void Gear::Game::beginRenderTask(Core::RenderTask* const renderTask)
 	}
 }
 
-void Gear::Game::pushCreateFuture(std::future<void>&& future)
+void Gear::Game::pushCreateAsync(Core::RenderThread* const renderThread)
 {
-	createQueue.push(std::move(future));
+	createQueue.push(renderThread);
 }
 
 void Gear::Game::scheduleAllTasks()
@@ -42,7 +42,7 @@ void Gear::Game::scheduleAllTasks()
 
 	while (createQueue.size())
 	{
-		createQueue.front().get();
+		createQueue.front()->waitTaskInitialized();
 
 		createQueue.pop();
 	}

@@ -32,7 +32,7 @@ namespace Gear
 			template<size_t N>
 			PipelineStateBuilder& setRTVFormats(const DXGI_FORMAT(&rtvFormats)[N]);
 
-			PipelineStateBuilder& setNoRTV();
+			PipelineStateBuilder& setRTVFormats();
 
 			PipelineStateBuilder& setDSVFormat(const DXGI_FORMAT format);
 

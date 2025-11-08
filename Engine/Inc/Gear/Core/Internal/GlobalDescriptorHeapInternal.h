@@ -11,9 +11,26 @@ namespace Gear
 		{
 			namespace Internal
 			{
-				void initialize();
+				void initializeGlobalDescriptorHeaps();
 
-				void release();
+				void initializeLocalDescriptorHeaps();
+
+				void releaseGlobalDescriptorHeaps();
+
+				void releaseLocalDescriptorHeaps();
+
+				constexpr uint32_t numResourceHeapDescriptors = 1000000u;
+
+				constexpr uint32_t numStaticSRVDescriptors = 100000u;
+
+				constexpr uint32_t numStaticCBVSRVUAVDescriptors = numStaticSRVDescriptors * 2u;
+
+				constexpr uint32_t numStagingResourceDescriptors = 2000000u;
+
+				constexpr uint32_t numRTVDescriptors = 500000u;
+
+				constexpr uint32_t numStaticRTVDescriptors = 150000u;
+
 			}
 		}
 	}

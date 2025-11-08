@@ -3,7 +3,7 @@
 #ifndef _GEAR_GAME_H_
 #define _GEAR_GAME_H_
 
-#include<Gear/Core/RenderTask.h>
+#include<Gear/Core/RenderThread.h>
 
 #include<queue>
 
@@ -29,13 +29,15 @@ namespace Gear
 
 		void beginRenderTask(Core::RenderTask* const renderTask);
 
-		void pushCreateFuture(std::future<void>&& createFuture);
+		void pushCreateAsync(Core::RenderThread* const renderThread);
 
 		void scheduleAllTasks();
 
+	private:
+
 		std::queue<Core::RenderTask*> recordQueue;
 
-		std::queue<std::future<void>> createQueue;
+		std::queue<Core::RenderThread*> createQueue;
 
 	};
 }

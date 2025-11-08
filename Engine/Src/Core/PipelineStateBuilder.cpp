@@ -50,7 +50,7 @@ Gear::Core::PipelineStateBuilder& Gear::Core::PipelineStateBuilder::setPS(const 
 	return *this;
 }
 
-Gear::Core::PipelineStateBuilder& Gear::Core::PipelineStateBuilder::setNoRTV()
+Gear::Core::PipelineStateBuilder& Gear::Core::PipelineStateBuilder::setRTVFormats()
 {
 	graphicsDesc.NumRenderTargets = 0u;
 

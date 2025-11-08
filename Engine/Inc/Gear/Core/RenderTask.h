@@ -7,8 +7,6 @@
 
 #include<Gear/Core/ResourceManager.h>
 
-#include<future>
-
 namespace Gear
 {
 	namespace Core
@@ -46,6 +44,8 @@ namespace Gear
 
 		private:
 
+			friend class RenderThread;
+
 			void workerLoop();
 
 			bool taskCompleted;
@@ -56,23 +56,10 @@ namespace Gear
 
 			std::condition_variable taskCondition;
 
-			std::thread workerThread;
+			RenderThread* renderThread;
 
 		};
 	}
-}
-
-template <typename First, typename... Rest>
-std::future<void> createRenderTaskAsync(const First& first, const Rest&... args)
-{
-	using RenderTaskType = std::remove_pointer_t<std::remove_pointer_t<First>>;
-
-	return std::async(std::launch::async, [=]()
-		{
-			*first = new RenderTaskType(args...);
-
-			Gear::Core::RenderEngine::submitCommandList((*first)->getCommandList());
-		});
 }
 
 #endif // !_GEAR_CORE_RENDERTASK_H_

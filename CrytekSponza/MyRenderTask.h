@@ -74,7 +74,7 @@ public:
 			.setPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE)
 			.setRasterizerState(PipelineStateHelper::rasterShadow)
 			.setDepthStencilState(PipelineStateHelper::depthCompareLess)
-			.setNoRTV()
+			.setRTVFormats()
 			.setDSVFormat(FMT::D32F)
 			.setVS(shadowVS)
 			.build();
