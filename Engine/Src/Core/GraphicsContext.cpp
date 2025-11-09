@@ -181,10 +181,10 @@ void Gear::Core::GraphicsContext::setPipelineState(const D3D12Core::PipelineStat
 	}
 }
 
-void Gear::Core::GraphicsContext::setRenderTargets(const Resource::D3D12Resource::DepthStencilDesc& depthStencils)
+void Gear::Core::GraphicsContext::setRenderTargets(const Resource::D3D12Resource::DepthStencilDesc& depthStencil)
 {
 #ifdef _DEBUG
-	if (nullptr == depthStencils.texture)
+	if (nullptr == depthStencil.texture)
 	{
 		LOGERROR(L"if you want to bind only depth stencil view then texture pointer cannot be nullptr");
 	}
@@ -192,9 +192,9 @@ void Gear::Core::GraphicsContext::setRenderTargets(const Resource::D3D12Resource
 
 	transientRTVHandles.clear();
 
-	commandList->setTextureState(depthStencils.texture, depthStencils.mipSlice, D3D12_RESOURCE_STATE_DEPTH_WRITE);
+	setResourceState(depthStencil);
 
-	commandList->setRenderTargets(static_cast<uint32_t>(transientRTVHandles.size()), transientRTVHandles.data(), FALSE, &(depthStencils.dsvHandle));
+	commandList->setRenderTargets(static_cast<uint32_t>(transientRTVHandles.size()), transientRTVHandles.data(), FALSE, &depthStencil.dsvHandle);
 }
 
 void Gear::Core::GraphicsContext::setDefRenderTarget() const
@@ -219,7 +219,7 @@ void Gear::Core::GraphicsContext::clearDepthStencil(const Resource::D3D12Resourc
 
 void Gear::Core::GraphicsContext::setIndexBuffer(const Resource::D3D12Resource::IndexBufferDesc& indexBuffer)
 {
-	commandList->setBufferState(indexBuffer.buffer, D3D12_RESOURCE_STATE_INDEX_BUFFER);
+	setResourceState(indexBuffer);
 
 	commandList->setIndexBuffer(&indexBuffer.ibv);
 }
@@ -396,6 +396,26 @@ void Gear::Core::GraphicsContext::setResourceState(const Resource::D3D12Resource
 			commandList->setTextureState(desc.textureDesc.texture, desc.textureDesc.mipSlice, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
 		}
 	}
+}
+
+void Gear::Core::GraphicsContext::setResourceState(const Resource::D3D12Resource::RenderTargetDesc& desc)
+{
+	commandList->setTextureState(desc.texture, desc.mipSlice, D3D12_RESOURCE_STATE_RENDER_TARGET);
+}
+
+void Gear::Core::GraphicsContext::setResourceState(const Resource::D3D12Resource::DepthStencilDesc& desc)
+{
+	commandList->setTextureState(desc.texture, desc.mipSlice, D3D12_RESOURCE_STATE_DEPTH_WRITE);
+}
+
+void Gear::Core::GraphicsContext::setResourceState(const Resource::D3D12Resource::VertexBufferDesc& desc)
+{
+	commandList->setBufferState(desc.buffer, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
+}
+
+void Gear::Core::GraphicsContext::setResourceState(const Resource::D3D12Resource::IndexBufferDesc& desc)
+{
+	commandList->setBufferState(desc.buffer, D3D12_RESOURCE_STATE_INDEX_BUFFER);
 }
 
 Gear::Core::Resource::D3D12Resource::D3D12ResourceBase* Gear::Core::GraphicsContext::setResourceState(const Resource::D3D12Resource::ClearUAVDesc& desc)
