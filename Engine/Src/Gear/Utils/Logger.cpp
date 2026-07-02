@@ -2,9 +2,13 @@
 
 #include<Gear/Utils/Internal/LoggerInternal.h>
 
-#include<iostream>
+#include<fileapi.h>
 
-#include<fstream>
+#include<consoleapi.h>
+
+#include<locale>
+
+#include<string>
 
 #include<queue>
 
@@ -21,18 +25,26 @@ namespace Gear::Utils::Logger
 			void operator=(const LoggerImpl&) = delete;
 
 			LoggerImpl() :
-				isRunning(true)
+				isRunning(true), fileHandle(nullptr), consoleHandle(nullptr)
 			{
 				//设置locale为.UTF-8用于多语言支持
 				std::locale::global(std::locale(".UTF-8"));
 
-				file = std::ofstream("log.txt", std::ios_base::out | std::ios_base::trunc);
+				fileHandle = CreateFileA("log.txt", GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN, nullptr);
+
+				if (INVALID_HANDLE_VALUE == fileHandle)
+				{
+					fileHandle = nullptr;
+				}
 
 				consoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
 
-				consoleEnabled = (INVALID_HANDLE_VALUE != consoleHandle);
+				if (INVALID_HANDLE_VALUE == consoleHandle)
+				{
+					consoleHandle = nullptr;
+				}
 
-				if (consoleEnabled)
+				if (consoleHandle)
 				{
 					SetConsoleOutputCP(CP_UTF8);
 
@@ -52,11 +64,11 @@ namespace Gear::Utils::Logger
 			{
 				shutdown();
 
-				if (file.is_open())
+				if (fileHandle)
 				{
-					file.flush();
+					CloseHandle(fileHandle);
 
-					file.close();
+					fileHandle = nullptr;
 				}
 			}
 
@@ -73,8 +85,6 @@ namespace Gear::Utils::Logger
 
 		private:
 
-			std::ofstream file;
-
 			std::queue<LogMessage> messages;
 
 			bool isRunning;
@@ -87,9 +97,9 @@ namespace Gear::Utils::Logger
 
 			std::thread worker;
 
-			HANDLE consoleHandle;
+			HANDLE fileHandle;
 
-			bool consoleEnabled;
+			HANDLE consoleHandle;
 
 			void shutdown()
 			{
@@ -122,9 +132,11 @@ namespace Gear::Utils::Logger
 
 					message.inUseCV.notify_one();
 
-					if (file.is_open())
+					if (fileHandle)
 					{
-						file << temp;
+						DWORD bytesWritten = 0;
+
+						WriteFile(fileHandle, temp.c_str(), static_cast<DWORD>(temp.size()), &bytesWritten, nullptr);
 					}
 				}
 			}
@@ -160,12 +172,18 @@ namespace Gear::Utils::Logger
 
 						message.inUseCV.notify_one();
 
-						if (consoleEnabled && message.type != LogType::LOG_ERROR)
+						//ERROR类型在Gear::failureExit处被统一处理
+						if (consoleHandle && message.type != LogType::LOG_ERROR)
 						{
 							WriteConsoleA(consoleHandle, temp.c_str(), static_cast<DWORD>(temp.size()), nullptr, nullptr);
 						}
 
-						file << temp;
+						if (fileHandle)
+						{
+							DWORD bytesWritten = 0;
+
+							WriteFile(fileHandle, temp.c_str(), static_cast<DWORD>(temp.size()), &bytesWritten, nullptr);
+						}
 
 						lock.lock();
 					}
