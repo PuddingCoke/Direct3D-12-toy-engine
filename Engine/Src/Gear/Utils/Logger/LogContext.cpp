@@ -120,6 +120,8 @@ namespace Gear::Utils::Logger
 		{
 			_itoa_s(arg, convertBuffer + 2, convertBufferLength - 2ull, 16);
 
+			_strupr_s(convertBuffer + 2, convertBufferLength - 2ull);
+
 			convertBuffer[0] = '0';
 
 			convertBuffer[1] = 'x';
@@ -143,6 +145,8 @@ namespace Gear::Utils::Logger
 		if (integerMode == IntegerMode::HEX)
 		{
 			_i64toa_s(arg, convertBuffer + 2, convertBufferLength - 2ull, 16);
+
+			_strupr_s(convertBuffer + 2, convertBufferLength - 2ull);
 
 			convertBuffer[0] = '0';
 
@@ -168,6 +172,8 @@ namespace Gear::Utils::Logger
 		{
 			_ultoa_s(arg, convertBuffer + 2, convertBufferLength - 2ull, 16);
 
+			_strupr_s(convertBuffer + 2, convertBufferLength - 2ull);
+
 			convertBuffer[0] = '0';
 
 			convertBuffer[1] = 'x';
@@ -191,6 +197,8 @@ namespace Gear::Utils::Logger
 		if (integerMode == IntegerMode::HEX)
 		{
 			_ui64toa_s(arg, convertBuffer + 2, convertBufferLength - 2ull, 16);
+
+			_strupr_s(convertBuffer + 2, convertBufferLength - 2ull);
 
 			convertBuffer[0] = '0';
 
