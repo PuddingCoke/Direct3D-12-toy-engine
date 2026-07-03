@@ -8,20 +8,35 @@ class MyRenderTask :public RenderTask
 {
 public:
 
+	MyRenderTask() :
+		pixelShader(Shader::create(File::getWRootFolder() + L"PixelShader.cso"))
+	{
+		state = PipelineStateBuilder()
+			.setRasterizerState(PipelineStateHelper::rasterCullNone)
+			.setDepthStencilState(PipelineStateHelper::depthCompareNone)
+			.setBlendState(PipelineStateHelper::blendReplace)
+			.setVS(*GlobalShader::getFullScreenVS())
+			.setPS(*pixelShader)
+			.build();
+	}
+
 	void recordCommand() override
 	{
+		context->setPipelineState(*state);
+
 		context->setDefRenderTarget();
 
-		const float clearValue[4] = {
-			cosf(Graphics::getTimeElapsed()) * 0.5f + 0.5f,
-			sinf(Graphics::getTimeElapsed()) * 0.5f + 0.5f,
-			1.0f,
-			1.0f
-		};
+		context->setViewportSimple(Graphics::getWidth(), Graphics::getHeight());
 
-		context->clearDefRenderTarget(clearValue);
+		context->setPrimitiveTopology(TOPOLOGY::TRIANGLELIST);
+
+		context->drawQuad();
 	}
 
 private:
+
+	ShaderPtr pixelShader;
+
+	GraphicsStatePtr state;
 
 };

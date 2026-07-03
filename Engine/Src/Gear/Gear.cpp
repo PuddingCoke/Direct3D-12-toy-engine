@@ -30,6 +30,8 @@
 
 #include<iostream>
 
+#include<locale>
+
 #include<dxgidebug.h>
 
 #include<dxgi1_6.h>
@@ -118,6 +120,9 @@ namespace Gear
 
 	int32_t GearImpl::initEngine(const InitializationParam& param, const int32_t argc, const wchar_t* argv[])
 	{
+		//设置locale为.UTF-8用于多语言支持
+		std::locale::global(std::locale(".UTF-8"));
+
 		loggerToken = makeUnique<Logger::Internal::InitializeToken>();
 
 		fileToken = makeUnique<File::Internal::InitializeToken>(File::backslashToSlash(File::getParentFolder(argv[0])));

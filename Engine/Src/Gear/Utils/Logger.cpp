@@ -6,8 +6,6 @@
 
 #include<consoleapi.h>
 
-#include<locale>
-
 #include<string>
 
 #include<queue>
@@ -27,9 +25,6 @@ namespace Gear::Utils::Logger
 			LoggerImpl() :
 				isRunning(true), fileHandle(nullptr), consoleHandle(nullptr)
 			{
-				//设置locale为.UTF-8用于多语言支持
-				std::locale::global(std::locale(".UTF-8"));
-
 				fileHandle = CreateFileA("log.txt", GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN, nullptr);
 
 				if (INVALID_HANDLE_VALUE == fileHandle)
