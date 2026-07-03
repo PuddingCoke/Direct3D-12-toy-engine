@@ -18,46 +18,6 @@
 
 namespace Gear::Utils::File
 {
-	namespace Internal
-	{
-		struct FileImpl
-		{
-			FileImpl(const std::wstring& wRootFolder);
-
-			const std::wstring wRootFolder;
-
-			const std::string rootFolder;
-		};
-
-		FileImpl::FileImpl(const std::wstring& wRootFolder) :
-			wRootFolder(wRootFolder),
-			rootFolder(String::wStringToString(wRootFolder))
-		{
-		}
-
-		UniquePtr<FileImpl> impl;
-
-		void initialize(const std::wstring& rootFolder)
-		{
-			impl = makeUnique<FileImpl>(rootFolder);
-		}
-
-		void release()
-		{
-			impl.reset();
-		}
-	}
-
-	std::wstring getWRootFolder()
-	{
-		return Internal::impl->wRootFolder;
-	}
-
-	std::string getRootFolder()
-	{
-		return Internal::impl->rootFolder;
-	}
-
 	std::wstring backslashToSlash(const std::wstring& filePath)
 	{
 		std::wstring result = filePath;
@@ -162,5 +122,45 @@ namespace Gear::Utils::File
 	bool exist(const std::wstring& filePath)
 	{
 		return GetFileAttributesW(filePath.c_str()) != INVALID_FILE_ATTRIBUTES;
+	}
+
+	struct FileImpl
+	{
+		FileImpl(const std::wstring& wRootFolder);
+
+		const std::wstring wRootFolder;
+
+		const std::string rootFolder;
+	};
+
+	FileImpl::FileImpl(const std::wstring& wRootFolder) :
+		wRootFolder(wRootFolder),
+		rootFolder(String::wStringToString(wRootFolder))
+	{
+	}
+
+	UniquePtr<FileImpl> impl;
+
+	namespace Internal
+	{
+		void initialize(const std::wstring& rootFolder)
+		{
+			impl = makeUnique<FileImpl>(rootFolder);
+		}
+
+		void release()
+		{
+			impl.reset();
+		}
+	}
+
+	std::wstring getWRootFolder()
+	{
+		return impl->wRootFolder;
+	}
+
+	std::string getRootFolder()
+	{
+		return impl->rootFolder;
 	}
 }

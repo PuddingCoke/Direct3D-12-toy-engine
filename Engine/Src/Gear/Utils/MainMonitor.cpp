@@ -8,23 +8,22 @@
 
 namespace Gear::Utils::MainMonitor
 {
+	struct MainMonitorImpl
+	{
+
+		uint32_t width;
+
+		uint32_t height;
+
+		uint32_t refreshRate;
+
+		float scale;
+
+	} impl;
+
 	namespace Internal
 	{
-		struct MainMonitorImpl
-		{
-			void getSettings();
-
-			uint32_t width;
-
-			uint32_t height;
-
-			uint32_t refreshRate;
-
-			float scale;
-
-		} impl;
-
-		void MainMonitorImpl::getSettings()
+		void getCurrentSettings()
 		{
 			HMONITOR monitor = MonitorFromWindow(GetDesktopWindow(), MONITOR_DEFAULTTONEAREST);
 
@@ -42,55 +41,50 @@ namespace Gear::Utils::MainMonitor
 				LOGERROR("无法获取主监视器信息");
 			}
 
-			width = devMode.dmPelsWidth;
+			impl.width = devMode.dmPelsWidth;
 
-			height = devMode.dmPelsHeight;
+			impl.height = devMode.dmPelsHeight;
 
 			if (devMode.dmDisplayFrequency == 0 || devMode.dmDisplayFrequency == 1)
 			{
-				refreshRate = 60u;
+				impl.refreshRate = 60u;
 			}
 			else
 			{
-				refreshRate = devMode.dmDisplayFrequency;
+				impl.refreshRate = devMode.dmDisplayFrequency;
 			}
 
-			scale = static_cast<float>(devMode.dmLogPixels) / 96.f;
+			impl.scale = static_cast<float>(devMode.dmLogPixels) / 96.f;
 
 			LOGENGINE("以下是主监视器信息");
 
-			LOGENGINE("主监视器宽", width);
+			LOGENGINE("主监视器宽", impl.width);
 
-			LOGENGINE("主监视器高", height);
+			LOGENGINE("主监视器高", impl.height);
 
-			LOGENGINE("主监视器刷新率", refreshRate);
+			LOGENGINE("主监视器刷新率", impl.refreshRate);
 
-			LOGENGINE("主监视器缩放比率", scale);
-		}
-
-		void getSettings()
-		{
-			impl.getSettings();
+			LOGENGINE("主监视器缩放比率", impl.scale);
 		}
 	}
 
 	uint32_t getWidth()
 	{
-		return Internal::impl.width;
+		return impl.width;
 	}
 
 	uint32_t getHeight()
 	{
-		return Internal::impl.height;
+		return impl.height;
 	}
 
 	uint32_t getRefreshRate()
 	{
-		return Internal::impl.refreshRate;
+		return impl.refreshRate;
 	}
 
 	float getScale()
 	{
-		return Internal::impl.scale;
+		return impl.scale;
 	}
 }

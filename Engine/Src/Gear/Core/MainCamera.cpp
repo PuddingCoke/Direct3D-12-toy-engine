@@ -2,33 +2,30 @@
 
 namespace Gear::Core::MainCamera
 {
-	namespace Internal
+	struct MainCameraImpl
 	{
-		struct MainCameraImpl
-		{
 
-			DirectX::XMMATRIX projMatrix = {};
+		DirectX::XMMATRIX projMatrix = {};
 
-			DirectX::XMMATRIX viewMatrix = {};
+		DirectX::XMMATRIX viewMatrix = {};
 
-			DirectX::XMVECTOR eyePos = {};
+		DirectX::XMVECTOR eyePos = {};
 
-		}impl;
-	}
+	}impl;
 
 	DirectX::XMMATRIX getProj()
 	{
-		return Internal::impl.projMatrix;
+		return impl.projMatrix;
 	}
 
 	DirectX::XMMATRIX getView()
 	{
-		return Internal::impl.viewMatrix;
+		return impl.viewMatrix;
 	}
 
 	DirectX::XMVECTOR getEyePos()
 	{
-		return Internal::impl.eyePos;
+		return impl.eyePos;
 	}
 
 	void setProj(const float fov, const float aspectRatio, const float zNear, const float zFar)
@@ -38,18 +35,18 @@ namespace Gear::Core::MainCamera
 
 	void setView(const DirectX::XMVECTOR& eyePos, const DirectX::XMVECTOR& focus, const DirectX::XMVECTOR& up)
 	{
-		Internal::impl.eyePos = eyePos;
+		impl.eyePos = eyePos;
 
 		setView(DirectX::XMMatrixLookAtLH(eyePos, focus, up));
 	}
 
 	void setProj(const DirectX::XMMATRIX& proj)
 	{
-		Internal::impl.projMatrix = proj;
+		impl.projMatrix = proj;
 	}
 
 	void setView(const DirectX::XMMATRIX& view)
 	{
-		Internal::impl.viewMatrix = view;
+		impl.viewMatrix = view;
 	}
 }

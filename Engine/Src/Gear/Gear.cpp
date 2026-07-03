@@ -129,9 +129,9 @@ namespace Gear
 
 		LOGENGINE("EXE根目录", LogColor::brightBlue, File::getWRootFolder());
 
-		usage = param.usage;
+		MainMonitor::Internal::getCurrentSettings();
 
-		MainMonitor::Internal::getSettings();
+		usage = param.usage;
 
 		switch (usage)
 		{

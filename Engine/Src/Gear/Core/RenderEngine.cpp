@@ -44,833 +44,833 @@
 
 namespace Gear::Core::RenderEngine
 {
-	namespace Internal
+	struct ImGuiToken
 	{
-		struct ImGuiToken
+		ImGuiToken(const HWND hWnd, ImFont** mediumFont, ImFont** largeFont)
 		{
-			ImGuiToken(const HWND hWnd, ImFont** mediumFont, ImFont** largeFont)
-			{
-				IMGUI_CHECKVERSION();
-				ImGui::CreateContext();
-				ImGuiIO& io = ImGui::GetIO();
-				(void)io;
+			IMGUI_CHECKVERSION();
+			ImGui::CreateContext();
+			ImGuiIO& io = ImGui::GetIO();
+			(void)io;
 
-				ImGui::StyleColorsDark();
+			ImGui::StyleColorsDark();
 
-				ImGui::GetStyle().ScaleAllSizes(Utils::MainMonitor::getScale());
+			ImGui::GetStyle().ScaleAllSizes(Utils::MainMonitor::getScale());
 
-				const D3D12Core::DescriptorHandle handle = GlobalDescriptorHeap::getResourceHeap()->allocStaticDescriptor(1);
+			const D3D12Core::DescriptorHandle handle = GlobalDescriptorHeap::getResourceHeap()->allocStaticDescriptor(1);
 
-				ImGui_ImplWin32_Init(hWnd);
-				ImGui_ImplDX12_Init(GraphicsDevice::get(), Graphics::getFrameBufferCount(), Graphics::backBufferFormat,
-					GlobalDescriptorHeap::getResourceHeap()->get(), handle.getCurrentCPUHandle(), handle.getCurrentGPUHandle());
+			ImGui_ImplWin32_Init(hWnd);
+			ImGui_ImplDX12_Init(GraphicsDevice::get(), Graphics::getFrameBufferCount(), Graphics::backBufferFormat,
+				GlobalDescriptorHeap::getResourceHeap()->get(), handle.getCurrentCPUHandle(), handle.getCurrentGPUHandle());
 
-				//显示输入法的待选框
-				ImGui::GetMainViewport()->PlatformHandleRaw = (void*)hWnd;
+			//显示输入法的待选框
+			ImGui::GetMainViewport()->PlatformHandleRaw = (void*)hWnd;
 
-				ImFontGlyphRangesBuilder builder;
+			ImFontGlyphRangesBuilder builder;
 
-				//加载常用汉字，GetGlyphRangesChineseSimplifiedCommon提供的汉字完全不够
-				std::vector<uint8_t> chineseCharacters = Utils::File::readAllBinary(Utils::File::getWRootFolder() + L"7000+symbols.txt");
+			//加载常用汉字，GetGlyphRangesChineseSimplifiedCommon提供的汉字完全不够
+			std::vector<uint8_t> chineseCharacters = Utils::File::readAllBinary(Utils::File::getWRootFolder() + L"7000+symbols.txt");
 
-				chineseCharacters.push_back('\0');
+			chineseCharacters.push_back('\0');
 
-				builder.AddText(reinterpret_cast<const char*>(chineseCharacters.data()));
+			builder.AddText(reinterpret_cast<const char*>(chineseCharacters.data()));
 
-				//加载常用字符
-				builder.AddRanges(io.Fonts->GetGlyphRangesDefault());
+			//加载常用字符
+			builder.AddRanges(io.Fonts->GetGlyphRangesDefault());
 
-				ImVector<ImWchar> ranges;
+			ImVector<ImWchar> ranges;
 
-				builder.BuildRanges(&ranges);
+			builder.BuildRanges(&ranges);
 
-				//加载微软雅黑字体
-				*mediumFont = io.Fonts->AddFontFromFileTTF("C:/Windows/Fonts/msyh.ttc", 18.f * Utils::MainMonitor::getScale(), nullptr, ranges.Data);
+			//加载微软雅黑字体
+			*mediumFont = io.Fonts->AddFontFromFileTTF("C:/Windows/Fonts/msyh.ttc", 18.f * Utils::MainMonitor::getScale(), nullptr, ranges.Data);
 
-				*largeFont = io.Fonts->AddFontFromFileTTF("C:/Windows/Fonts/msyh.ttc", 22.f * Utils::MainMonitor::getScale(), nullptr, ranges.Data);
+			*largeFont = io.Fonts->AddFontFromFileTTF("C:/Windows/Fonts/msyh.ttc", 22.f * Utils::MainMonitor::getScale(), nullptr, ranges.Data);
 
-				io.FontDefault = *mediumFont;
+			io.FontDefault = *mediumFont;
 
-				io.Fonts->GetTexDataAsRGBA32(nullptr, nullptr, nullptr);
-			}
+			io.Fonts->GetTexDataAsRGBA32(nullptr, nullptr, nullptr);
+		}
 
-			~ImGuiToken()
-			{
-				ImGui_ImplDX12_Shutdown();
-				ImGui_ImplWin32_Shutdown();
-				ImGui::DestroyContext();
-			}
-		};
-
-		struct RenderResourceToken
+		~ImGuiToken()
 		{
-			RenderResourceToken(ResourceManager* const resManager) :
-				latLongMapToCubeMapEffect(resManager)
-			{
+			ImGui_ImplDX12_Shutdown();
+			ImGui_ImplWin32_Shutdown();
+			ImGui::DestroyContext();
+		}
+	};
 
-			}
-
-			Effect::BackBufferBlitEffect::Internal::InitializeToken backBufferBlitEffect;
-
-			Effect::HDRClampEffect::Internal::InitializeToken hdrClampEffect;
-
-			Effect::LatLongMapToCubeMapEffect::Internal::InitializeToken latLongMapToCubeMapEffect;
-
-			Effect::ToneMapEffect::Internal::InitializeToken toneMapEffect;
-
-			Effect::GammaCorrectEffect::Internal::InitializeToken gammaCorrectEffect;
-		};
-
-		class RenderEngineImpl
+	struct RenderResourceToken
+	{
+		RenderResourceToken(ResourceManager* const resManager) :
+			latLongMapToCubeMapEffect(resManager)
 		{
-		public:
 
-			RenderEngineImpl() = delete;
+		}
 
-			RenderEngineImpl(const RenderEngineImpl&) = delete;
+		Effect::BackBufferBlitEffect::Internal::InitializeToken backBufferBlitEffect;
 
-			void operator=(const RenderEngineImpl&) = delete;
+		Effect::HDRClampEffect::Internal::InitializeToken hdrClampEffect;
 
-			RenderEngineImpl(const uint32_t width, const uint32_t height, const HWND hWnd, const bool useSwapChainBuffer, const bool initializeImGuiSurface);
+		Effect::LatLongMapToCubeMapEffect::Internal::InitializeToken latLongMapToCubeMapEffect;
 
-			~RenderEngineImpl();
+		Effect::ToneMapEffect::Internal::InitializeToken toneMapEffect;
 
-			void submitCommandList(D3D12Core::CommandList* const commandList);
+		Effect::GammaCorrectEffect::Internal::InitializeToken gammaCorrectEffect;
+	};
 
-			AdapterVendor getVendor() const;
+	class RenderEngineImpl
+	{
+	public:
 
-			D3D12Resource::Texture* getRenderTexture() const;
+		RenderEngineImpl() = delete;
 
-			ID3D12CommandQueue* getCommandQueue() const;
+		RenderEngineImpl(const RenderEngineImpl&) = delete;
 
-			void waitForCurrentFrame();
+		void operator=(const RenderEngineImpl&) = delete;
 
-			void waitForNextFrame();
+		RenderEngineImpl(const uint32_t width, const uint32_t height, const HWND hWnd, const bool useSwapChainBuffer, const bool initializeImGuiSurface);
 
-			void beginFrame();
+		~RenderEngineImpl();
 
-			void endFrame();
+		void submitCommandList(D3D12Core::CommandList* const commandList);
 
-			void processCommandLists();
+		AdapterVendor getVendor() const;
 
-			void present() const;
+		D3D12Resource::Texture* getRenderTexture() const;
 
-			void setDeltaTime(const float deltaTime) const;
+		ID3D12CommandQueue* getCommandQueue() const;
 
-			void updateTimeElapsed() const;
+		void waitForCurrentFrame();
 
-			void setDefRenderTexture();
+		void waitForNextFrame();
 
-			void setRenderTexture(D3D12Resource::Texture* const renderTexture, const D3D12_CPU_DESCRIPTOR_HANDLE handle);
+		void beginFrame();
 
-			void initializeResources();
+		void endFrame();
 
-			void saveBackBuffer(D3D12Resource::ReadbackHeap* const readbackHeap);
+		void processCommandLists();
 
-			bool getDisplayImGuiSurface() const;
+		void present() const;
 
-			void toggleImGuiSurface();
+		void setDeltaTime(const float deltaTime) const;
 
-			void toggleEngineImGuiSurface();
+		void updateTimeElapsed() const;
 
-			ImFont* getMediumFont() const;
+		void setDefRenderTexture();
 
-			ImFont* getLargeFont() const;
+		void setRenderTexture(D3D12Resource::Texture* const renderTexture, const D3D12_CPU_DESCRIPTOR_HANDLE handle);
 
-		private:
+		void initializeResources();
 
-			ComPtr<IDXGIAdapter4> getBestAdapterAndVendor(IDXGIFactory7* const factory);
+		void saveBackBuffer(D3D12Resource::ReadbackHeap* const readbackHeap);
 
-			void updateDynamicCBuffers() const;
+		bool getDisplayImGuiSurface() const;
 
-			void beginImGuiFrame() const;
+		void toggleImGuiSurface();
 
-			void drawImGuiFrame();
+		void toggleEngineImGuiSurface();
 
-			UniquePtr<GraphicsDevice::Internal::InitializeToken> graphicsDeviceToken;
+		ImFont* getMediumFont() const;
 
-			ComPtr<ID3D12CommandQueue> commandQueue;
+		ImFont* getLargeFont() const;
 
-			ComPtr<ID3D12Fence> fence;
+	private:
 
-			UniquePtr<D3D12Core::GraphicsCommandList> prepareCommandList;
+		ComPtr<IDXGIAdapter4> getBestAdapterAndVendor(IDXGIFactory7* const factory);
 
-			D3D12Core::GraphicsCommandList* finishCommandList;
+		void updateDynamicCBuffers() const;
 
-			D3D12Core::CommandList* lastDirectTypeCommandList;
+		void beginImGuiFrame() const;
 
-			UniquePtr<RenderThreadLocal::Internal::InitializeToken> renderThreadLocalToken;
+		void drawImGuiFrame();
 
-			UniquePtr<RenderThreadGlobal::Internal::InitializeToken> renderThreadGlobalToken;
+		UniquePtr<GraphicsDevice::Internal::InitializeToken> graphicsDeviceToken;
 
-			UniquePtr<Resource::DynamicCBuffer> engineGlobalCBuffer;
+		ComPtr<ID3D12CommandQueue> commandQueue;
 
-			UniquePtr<ResourceManager> resManager;
+		ComPtr<ID3D12Fence> fence;
 
-			UniquePtr<RenderResourceToken> renderResourceToken;
+		UniquePtr<D3D12Core::GraphicsCommandList> prepareCommandList;
 
-			ComPtr<IDXGISwapChain4> swapChain;
+		D3D12Core::GraphicsCommandList* finishCommandList;
 
-			UniquePtr<D3D12_CPU_DESCRIPTOR_HANDLE[]> backBufferHandles;
+		D3D12Core::CommandList* lastDirectTypeCommandList;
 
-			UniquePtr<D3D12Resource::TexturePtr[]> backBufferTextures;
+		UniquePtr<RenderThreadLocal::Internal::InitializeToken> renderThreadLocalToken;
 
-			const bool initializeImGuiSurface;
+		UniquePtr<RenderThreadGlobal::Internal::InitializeToken> renderThreadGlobalToken;
 
-			bool displayImGuiSurface;
+		UniquePtr<Resource::DynamicCBuffer> engineGlobalCBuffer;
 
-			bool displayEngineImGuiSurface;
+		UniquePtr<ResourceManager> resManager;
 
-			AdapterVendor vendor;
+		UniquePtr<RenderResourceToken> renderResourceToken;
 
-			static constexpr uint64_t recordCommandListsLength = 32ull;
+		ComPtr<IDXGISwapChain4> swapChain;
 
-			Utils::StaticVector<D3D12Core::CommandList*, recordCommandListsLength> recordCommandLists;
+		UniquePtr<D3D12_CPU_DESCRIPTOR_HANDLE[]> backBufferHandles;
 
-			Utils::StaticVector<ID3D12CommandList*, recordCommandListsLength> id3d12CommandLists;
+		UniquePtr<D3D12Resource::TexturePtr[]> backBufferTextures;
 
-			UniquePtr<uint64_t[]> fenceValues;
+		const bool initializeImGuiSurface;
 
-			HANDLE fenceEvent;
+		bool displayImGuiSurface;
 
-			UniquePtr<ImGuiToken> imGuiToken;
+		bool displayEngineImGuiSurface;
 
-			ImFont* mediumFont;
+		AdapterVendor vendor;
 
-			ImFont* largeFont;
+		static constexpr uint64_t recordCommandListsLength = 32ull;
 
-			//引用
-			D3D12Resource::Texture* renderTexture;
+		Utils::StaticVector<D3D12Core::CommandList*, recordCommandListsLength> recordCommandLists;
 
-			std::mutex submitCommandListLock;
+		Utils::StaticVector<ID3D12CommandList*, recordCommandListsLength> id3d12CommandLists;
 
-			int32_t syncInterval;
+		UniquePtr<uint64_t[]> fenceValues;
 
-			D3D12Core::CommonShaderLayout::PerframeResource perframeResource;
+		HANDLE fenceEvent;
 
-			std::vector<D3D12_RESOURCE_BARRIER> resourceBarriers;
+		UniquePtr<ImGuiToken> imGuiToken;
 
-		};
+		ImFont* mediumFont;
 
-		RenderEngineImpl::RenderEngineImpl(const uint32_t width, const uint32_t height, const HWND hWnd, const bool useSwapChainBuffer, const bool initializeImGuiSurface) :
-			fenceEvent(CreateEvent(nullptr, FALSE, FALSE, nullptr)),
-			vendor(AdapterVendor::UNKNOWN),
-			finishCommandList(nullptr),
-			lastDirectTypeCommandList(nullptr),
-			initializeImGuiSurface(initializeImGuiSurface),
-			displayImGuiSurface(false),
-			displayEngineImGuiSurface(true),
-			syncInterval(1),
-			resManager(nullptr),
-			perframeResource{}
-		{
-			//初始化一些渲染需要的信息，如width、height、frameIndex等
-			Graphics::Internal::initialize(useSwapChainBuffer ? 3 : 1, width, height);
+		ImFont* largeFont;
 
-			ComPtr<IDXGIFactory7> factory;
+		//引用
+		D3D12Resource::Texture* renderTexture;
+
+		std::mutex submitCommandListLock;
+
+		int32_t syncInterval;
+
+		D3D12Core::CommonShaderLayout::PerframeResource perframeResource;
+
+		std::vector<D3D12_RESOURCE_BARRIER> resourceBarriers;
+
+	};
+
+	RenderEngineImpl::RenderEngineImpl(const uint32_t width, const uint32_t height, const HWND hWnd, const bool useSwapChainBuffer, const bool initializeImGuiSurface) :
+		fenceEvent(CreateEvent(nullptr, FALSE, FALSE, nullptr)),
+		vendor(AdapterVendor::UNKNOWN),
+		finishCommandList(nullptr),
+		lastDirectTypeCommandList(nullptr),
+		initializeImGuiSurface(initializeImGuiSurface),
+		displayImGuiSurface(false),
+		displayEngineImGuiSurface(true),
+		syncInterval(1),
+		resManager(nullptr),
+		perframeResource{}
+	{
+		//初始化一些渲染需要的信息，如width、height、frameIndex等
+		Graphics::Internal::initialize(useSwapChainBuffer ? 3 : 1, width, height);
+
+		ComPtr<IDXGIFactory7> factory;
 
 #ifdef _DEBUG
-			LOGENGINE(LogColor::brightGreen, "开启", LogColor::brightMagenta, "调试层");
+		LOGENGINE(LogColor::brightGreen, "开启", LogColor::brightMagenta, "调试层");
 
-			ComPtr<ID3D12Debug> debugController;
+		ComPtr<ID3D12Debug> debugController;
 
-			D3D12GetDebugInterface(IID_PPV_ARGS(&debugController));
+		D3D12GetDebugInterface(IID_PPV_ARGS(&debugController));
 
-			debugController->EnableDebugLayer();
+		debugController->EnableDebugLayer();
 
-			CreateDXGIFactory2(DXGI_CREATE_FACTORY_DEBUG, IID_PPV_ARGS(&factory));
+		CreateDXGIFactory2(DXGI_CREATE_FACTORY_DEBUG, IID_PPV_ARGS(&factory));
 #else
-			LOGENGINE(LogColor::brightRed, "关闭", LogColor::brightMagenta, "调试层");
+		LOGENGINE(LogColor::brightRed, "关闭", LogColor::brightMagenta, "调试层");
 
-			CreateDXGIFactory2(0, IID_PPV_ARGS(&factory));
+		CreateDXGIFactory2(0, IID_PPV_ARGS(&factory));
 #endif // _DEBUG
 
-			//获取适配器
-			ComPtr<IDXGIAdapter4> adapter = getBestAdapterAndVendor(factory.Get());
+		//获取适配器
+		ComPtr<IDXGIAdapter4> adapter = getBestAdapterAndVendor(factory.Get());
 
-			//传入适配器，初始化图形设备(ID3D12Device)
-			graphicsDeviceToken = makeUnique<GraphicsDevice::Internal::InitializeToken>(adapter.Get());
+		//传入适配器，初始化图形设备(ID3D12Device)
+		graphicsDeviceToken = makeUnique<GraphicsDevice::Internal::InitializeToken>(adapter.Get());
 
-			//检查并输出一些特性的支持情况
-			//不支持Shader Model 6.6或有类型UAV读取会报错
-			GraphicsDevice::Internal::checkFeatureSupport();
+		//检查并输出一些特性的支持情况
+		//不支持Shader Model 6.6或有类型UAV读取会报错
+		GraphicsDevice::Internal::checkFeatureSupport();
 
-			//初始化图形设备后创建命令队列
-			{
-				D3D12_COMMAND_QUEUE_DESC queueDesc = {};
-				queueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
-				queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_DISABLE_GPU_TIMEOUT;
+		//初始化图形设备后创建命令队列
+		{
+			D3D12_COMMAND_QUEUE_DESC queueDesc = {};
+			queueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
+			queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_DISABLE_GPU_TIMEOUT;
 
-				GraphicsDevice::get()->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&commandQueue));
+			GraphicsDevice::get()->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&commandQueue));
 
-				commandQueue->SetName(L"Graphics Command Queue");
-			}
+			commandQueue->SetName(L"Graphics Command Queue");
+		}
 
-			//创建fence对象用于CPU和GPU之间的同步
-			fenceValues = makeUnique<uint64_t[]>(Graphics::getFrameBufferCount());
+		//创建fence对象用于CPU和GPU之间的同步
+		fenceValues = makeUnique<uint64_t[]>(Graphics::getFrameBufferCount());
+
+		for (uint32_t i = 0; i < Graphics::getFrameBufferCount(); i++)
+		{
+			fenceValues[i] = 0;
+		}
+
+		GraphicsDevice::get()->CreateFence(fenceValues[Graphics::getFrameIndex()], D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
+
+		fenceValues[Graphics::getFrameIndex()]++;
+
+		//创建准备命令列表
+		prepareCommandList = makeUnique<D3D12Core::GraphicsCommandList>();
+
+		//初始化线程局部资源
+		renderThreadLocalToken = makeUnique<RenderThreadLocal::Internal::InitializeToken>();
+
+		//初始化线程全局资源
+		renderThreadGlobalToken = makeUnique<RenderThreadGlobal::Internal::InitializeToken>();
+
+		//引擎需要使用一个动态常量缓冲为每一帧的渲染提供有用的信息
+		engineGlobalCBuffer = ResourceManager::createDynamicCBuffer(sizeof(perframeResource));
+
+		Graphics::Internal::setEngineGlobalCBuffer(engineGlobalCBuffer.get());
+
+		//把准备命令列表推入容器中，因为资源的初始化可能需要动态常量缓冲
+		//而动态常量缓冲更新的指令记录是由prepareCommandList负责的
+		prepareCommandList->open();
+
+		recordCommandLists.push(prepareCommandList.get());
+
+		resManager = makeUnique<ResourceManager>();
+
+		{
+			GraphicsContext* const context = resManager->getGraphicsContext();
+
+			context->begin();
+
+			renderResourceToken = makeUnique<RenderResourceToken>(resManager.get());
+
+			submitCommandList(resManager->getCommandList());
+		}
+
+		//创建交换链
+		{
+			DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
+			swapChainDesc.BufferCount = useSwapChainBuffer ? Graphics::getFrameBufferCount() : 2;
+			swapChainDesc.Width = Graphics::getWidth();
+			swapChainDesc.Height = Graphics::getHeight();
+			swapChainDesc.Format = Graphics::backBufferFormat;
+			swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+			swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+			swapChainDesc.SampleDesc.Count = 1;
+			swapChainDesc.SampleDesc.Quality = 0;
+
+			ComPtr<IDXGISwapChain1> swapChain1;
+
+			factory->CreateSwapChainForHwnd(commandQueue.Get(), hWnd, &swapChainDesc, nullptr, nullptr, &swapChain1);
+
+			factory->MakeWindowAssociation(hWnd, DXGI_MWA_NO_ALT_ENTER);
+
+			swapChain1.As(&swapChain);
+		}
+
+		//如果需要使用交换链的后备缓冲
+		//那么需要取出纹理用于状态追踪并为其纹理创建RTV
+		if (useSwapChainBuffer)
+		{
+			D3D12Core::DescriptorHandle descriptorHandle = LocalDescriptorHeap::getRenderTargetHeap()->allocStaticDescriptor(Graphics::getFrameBufferCount());
+
+			backBufferHandles = makeUnique<D3D12_CPU_DESCRIPTOR_HANDLE[]>(Graphics::getFrameBufferCount());
+
+			backBufferTextures = makeUnique<D3D12Resource::TexturePtr[]>(Graphics::getFrameBufferCount());
 
 			for (uint32_t i = 0; i < Graphics::getFrameBufferCount(); i++)
 			{
-				fenceValues[i] = 0;
+				ComPtr<ID3D12Resource> texture;
+
+				swapChain->GetBuffer(i, IID_PPV_ARGS(&texture));
+
+				const std::wstring backBufferName = L"Back Buffer (" + std::to_wstring(i) + L")";
+
+				texture->SetName(backBufferName.c_str());
+
+				GraphicsDevice::get()->CreateRenderTargetView(texture.Get(), nullptr, descriptorHandle.getCurrentCPUHandle());
+
+				backBufferHandles[i] = descriptorHandle.getCurrentCPUHandle();
+
+				descriptorHandle.move();
+
+				//后备缓冲的初态为D3D12_RESOURCE_STATE_PRESENT
+				backBufferTextures[i] = makeUnique<D3D12Resource::Texture>(texture, true, D3D12_RESOURCE_STATE_PRESENT);
 			}
+		}
+		else
+		{
+			//仅在视频渲染模式下关闭1047错误
+			//D3D12 ERROR: ID3D12CommandQueue::ExecuteCommandLists: Simultaneous-access or Buffer Resource (0x0000019DB876CEF0:'Unnamed Object') is still referenced by write|transition_barrier GPU operations in-flight on   another Command Queue (0x0000019DB7F9A360:'Unnamed ID3D12CommandQueue Object'). It is not safe to start read|transition_barrier GPU operations now on this Command Queue (0x0000019D831DC120:'Unnamed ID3D12CommandQueue Object'). This can result in race conditions and application instability. [ EXECUTION ERROR #1047: OBJECT_ACCESSED_WHILE_STILL_IN_USE]
 
-			GraphicsDevice::get()->CreateFence(fenceValues[Graphics::getFrameIndex()], D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
+			ComPtr<ID3D12InfoQueue> infoQueue;
 
-			fenceValues[Graphics::getFrameIndex()]++;
+			CHECKERROR(GraphicsDevice::get()->QueryInterface(IID_PPV_ARGS(&infoQueue)));
 
-			//创建准备命令列表
-			prepareCommandList = makeUnique<D3D12Core::GraphicsCommandList>();
+			D3D12_MESSAGE_ID messageHideIDList[] = { static_cast<D3D12_MESSAGE_ID>(1047) };
 
-			//初始化线程局部资源
-			renderThreadLocalToken = makeUnique<RenderThreadLocal::Internal::InitializeToken>();
+			D3D12_INFO_QUEUE_FILTER infoQueuefilter = {};
 
-			//初始化线程全局资源
-			renderThreadGlobalToken = makeUnique<RenderThreadGlobal::Internal::InitializeToken>();
+			infoQueuefilter.DenyList.NumIDs = _countof(messageHideIDList);
 
-			//引擎需要使用一个动态常量缓冲为每一帧的渲染提供有用的信息
-			engineGlobalCBuffer = ResourceManager::createDynamicCBuffer(sizeof(perframeResource));
+			infoQueuefilter.DenyList.pIDList = messageHideIDList;
 
-			Graphics::Internal::setEngineGlobalCBuffer(engineGlobalCBuffer.get());
+			CHECKERROR(infoQueue->AddStorageFilterEntries(&infoQueuefilter));
+		}
 
-			//把准备命令列表推入容器中，因为资源的初始化可能需要动态常量缓冲
-			//而动态常量缓冲更新的指令记录是由prepareCommandList负责的
-			prepareCommandList->open();
+		//如果有需要，那么初始化ImGUI
+		if (initializeImGuiSurface)
+		{
+			LOGENGINE(LogColor::brightGreen, "开启", LogColor::brightMagenta, "ImGui");
 
-			recordCommandLists.push(prepareCommandList.get());
+			imGuiToken = makeUnique<ImGuiToken>(hWnd, &mediumFont, &largeFont);
+		}
+		else
+		{
+			LOGENGINE(LogColor::brightRed, "关闭", LogColor::brightMagenta, "ImGui");
+		}
 
-			resManager = makeUnique<ResourceManager>();
+		//设置默认的2D投影矩阵
+		MainCamera::setProj(DirectX::XMMatrixOrthographicOffCenterLH(0.f, static_cast<float>(Graphics::getWidth()), 0, static_cast<float>(Graphics::getHeight()), -1.f, 1.f));
 
+		//设置默认的视图矩阵
+		MainCamera::setView(DirectX::XMMatrixIdentity());
+	}
+
+	RenderEngineImpl::~RenderEngineImpl()
+	{
+		if (fenceEvent)
+		{
+			CloseHandle(fenceEvent);
+		}
+	}
+
+	void RenderEngineImpl::submitCommandList(D3D12Core::CommandList* const commandList)
+	{
+		std::lock_guard<std::mutex> lockGuard(submitCommandListLock);
+
+		D3D12Core::CommandList* const helperCommandList = recordCommandLists.back();
+
+		if (commandList->hasPendingResource())
+		{
+			resourceBarriers.clear();
+
+			commandList->flushPendingResources(resourceBarriers);
+
+			if (helperCommandList != prepareCommandList.get())
 			{
-				GraphicsContext* const context = resManager->getGraphicsContext();
-
-				context->begin();
-
-				renderResourceToken = makeUnique<RenderResourceToken>(resManager.get());
-
-				submitCommandList(resManager->getCommandList());
-			}
-
-			//创建交换链
-			{
-				DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
-				swapChainDesc.BufferCount = useSwapChainBuffer ? Graphics::getFrameBufferCount() : 2;
-				swapChainDesc.Width = Graphics::getWidth();
-				swapChainDesc.Height = Graphics::getHeight();
-				swapChainDesc.Format = Graphics::backBufferFormat;
-				swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-				swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
-				swapChainDesc.SampleDesc.Count = 1;
-				swapChainDesc.SampleDesc.Quality = 0;
-
-				ComPtr<IDXGISwapChain1> swapChain1;
-
-				factory->CreateSwapChainForHwnd(commandQueue.Get(), hWnd, &swapChainDesc, nullptr, nullptr, &swapChain1);
-
-				factory->MakeWindowAssociation(hWnd, DXGI_MWA_NO_ALT_ENTER);
-
-				swapChain1.As(&swapChain);
-			}
-
-			//如果需要使用交换链的后备缓冲
-			//那么需要取出纹理用于状态追踪并为其纹理创建RTV
-			if (useSwapChainBuffer)
-			{
-				D3D12Core::DescriptorHandle descriptorHandle = LocalDescriptorHeap::getRenderTargetHeap()->allocStaticDescriptor(Graphics::getFrameBufferCount());
-
-				backBufferHandles = makeUnique<D3D12_CPU_DESCRIPTOR_HANDLE[]>(Graphics::getFrameBufferCount());
-
-				backBufferTextures = makeUnique<D3D12Resource::TexturePtr[]>(Graphics::getFrameBufferCount());
-
-				for (uint32_t i = 0; i < Graphics::getFrameBufferCount(); i++)
-				{
-					ComPtr<ID3D12Resource> texture;
-
-					swapChain->GetBuffer(i, IID_PPV_ARGS(&texture));
-
-					const std::wstring backBufferName = L"Back Buffer (" + std::to_wstring(i) + L")";
-
-					texture->SetName(backBufferName.c_str());
-
-					GraphicsDevice::get()->CreateRenderTargetView(texture.Get(), nullptr, descriptorHandle.getCurrentCPUHandle());
-
-					backBufferHandles[i] = descriptorHandle.getCurrentCPUHandle();
-
-					descriptorHandle.move();
-
-					//后备缓冲的初态为D3D12_RESOURCE_STATE_PRESENT
-					backBufferTextures[i] = makeUnique<D3D12Resource::Texture>(texture, true, D3D12_RESOURCE_STATE_PRESENT);
-				}
+				helperCommandList->resourceBarrier(static_cast<uint32_t>(resourceBarriers.size()), resourceBarriers.data());
 			}
 			else
 			{
-				//仅在视频渲染模式下关闭1047错误
-				//D3D12 ERROR: ID3D12CommandQueue::ExecuteCommandLists: Simultaneous-access or Buffer Resource (0x0000019DB876CEF0:'Unnamed Object') is still referenced by write|transition_barrier GPU operations in-flight on   another Command Queue (0x0000019DB7F9A360:'Unnamed ID3D12CommandQueue Object'). It is not safe to start read|transition_barrier GPU operations now on this Command Queue (0x0000019D831DC120:'Unnamed ID3D12CommandQueue Object'). This can result in race conditions and application instability. [ EXECUTION ERROR #1047: OBJECT_ACCESSED_WHILE_STILL_IN_USE]
-
-				ComPtr<ID3D12InfoQueue> infoQueue;
-
-				CHECKERROR(GraphicsDevice::get()->QueryInterface(IID_PPV_ARGS(&infoQueue)));
-
-				D3D12_MESSAGE_ID messageHideIDList[] = { static_cast<D3D12_MESSAGE_ID>(1047) };
-
-				D3D12_INFO_QUEUE_FILTER infoQueuefilter = {};
-
-				infoQueuefilter.DenyList.NumIDs = _countof(messageHideIDList);
-
-				infoQueuefilter.DenyList.pIDList = messageHideIDList;
-
-				CHECKERROR(infoQueue->AddStorageFilterEntries(&infoQueuefilter));
+				//尽量减少D3D12 API ResourceBarrier调用
+				helperCommandList->pushResourceBarriers(resourceBarriers);
 			}
 
-			//如果有需要，那么初始化ImGUI
-			if (initializeImGuiSurface)
-			{
-				LOGENGINE(LogColor::brightGreen, "开启", LogColor::brightMagenta, "ImGui");
-
-				imGuiToken = makeUnique<ImGuiToken>(hWnd, &mediumFont, &largeFont);
-			}
-			else
-			{
-				LOGENGINE(LogColor::brightRed, "关闭", LogColor::brightMagenta, "ImGui");
-			}
-
-			//设置默认的2D投影矩阵
-			MainCamera::setProj(DirectX::XMMatrixOrthographicOffCenterLH(0.f, static_cast<float>(Graphics::getWidth()), 0, static_cast<float>(Graphics::getHeight()), -1.f, 1.f));
-
-			//设置默认的视图矩阵
-			MainCamera::setView(DirectX::XMMatrixIdentity());
+			//有待定资源那么会需要更新资源的全局状态
+			//因此最后会需要更新使用过的资源的全局状态
+			commandList->flushReferredResources();
 		}
 
-		RenderEngineImpl::~RenderEngineImpl()
+		//不应该关闭准备命令列表或最后一个可用的直接类型的命令列表
+		//因为准备命令列表是被用来记录动态常量缓冲更新指令的
+		//而最后一个可用的直接类型的命令列表会被用来执行一些收尾的工作
+		if (helperCommandList != lastDirectTypeCommandList && helperCommandList != prepareCommandList.get())
 		{
-			if (fenceEvent)
-			{
-				CloseHandle(fenceEvent);
-			}
+			helperCommandList->close();
 		}
 
-		void RenderEngineImpl::submitCommandList(D3D12Core::CommandList* const commandList)
+		//获取最后一个可用的直接类型的命令列表
+		if (commandList->getType() == D3D12_COMMAND_LIST_TYPE_DIRECT)
 		{
-			std::lock_guard<std::mutex> lockGuard(submitCommandListLock);
-
-			D3D12Core::CommandList* const helperCommandList = recordCommandLists.back();
-
-			if (commandList->hasPendingResource())
+			if (lastDirectTypeCommandList)
 			{
-				resourceBarriers.clear();
-
-				commandList->flushPendingResources(resourceBarriers);
-
-				if (helperCommandList != prepareCommandList.get())
-				{
-					helperCommandList->resourceBarrier(static_cast<uint32_t>(resourceBarriers.size()), resourceBarriers.data());
-				}
-				else
-				{
-					//尽量减少D3D12 API ResourceBarrier调用
-					helperCommandList->pushResourceBarriers(resourceBarriers);
-				}
-
-				//有待定资源那么会需要更新资源的全局状态
-				//因此最后会需要更新使用过的资源的全局状态
-				commandList->flushReferredResources();
+				lastDirectTypeCommandList->close();
 			}
 
-			//不应该关闭准备命令列表或最后一个可用的直接类型的命令列表
-			//因为准备命令列表是被用来记录动态常量缓冲更新指令的
-			//而最后一个可用的直接类型的命令列表会被用来执行一些收尾的工作
-			if (helperCommandList != lastDirectTypeCommandList && helperCommandList != prepareCommandList.get())
-			{
-				helperCommandList->close();
-			}
-
-			//获取最后一个可用的直接类型的命令列表
-			if (commandList->getType() == D3D12_COMMAND_LIST_TYPE_DIRECT)
-			{
-				if (lastDirectTypeCommandList)
-				{
-					lastDirectTypeCommandList->close();
-				}
-
-				lastDirectTypeCommandList = commandList;
-			}
-
-			recordCommandLists.push(commandList);
+			lastDirectTypeCommandList = commandList;
 		}
 
-		AdapterVendor RenderEngineImpl::getVendor() const
-		{
-			return vendor;
-		}
+		recordCommandLists.push(commandList);
+	}
 
-		D3D12Resource::Texture* RenderEngineImpl::getRenderTexture() const
-		{
-			return renderTexture;
-		}
+	AdapterVendor RenderEngineImpl::getVendor() const
+	{
+		return vendor;
+	}
 
-		ID3D12CommandQueue* RenderEngineImpl::getCommandQueue() const
-		{
-			return commandQueue.Get();
-		}
+	D3D12Resource::Texture* RenderEngineImpl::getRenderTexture() const
+	{
+		return renderTexture;
+	}
 
-		void RenderEngineImpl::waitForCurrentFrame()
-		{
-			commandQueue->Signal(fence.Get(), fenceValues[Graphics::getFrameIndex()]);
+	ID3D12CommandQueue* RenderEngineImpl::getCommandQueue() const
+	{
+		return commandQueue.Get();
+	}
 
+	void RenderEngineImpl::waitForCurrentFrame()
+	{
+		commandQueue->Signal(fence.Get(), fenceValues[Graphics::getFrameIndex()]);
+
+		fence->SetEventOnCompletion(fenceValues[Graphics::getFrameIndex()], fenceEvent);
+
+		WaitForSingleObjectEx(fenceEvent, INFINITE, FALSE);
+
+		fenceValues[Graphics::getFrameIndex()]++;
+	}
+
+	void RenderEngineImpl::waitForNextFrame()
+	{
+		const uint64_t currentFenceValue = fenceValues[Graphics::getFrameIndex()];
+
+		commandQueue->Signal(fence.Get(), currentFenceValue);
+
+		Graphics::Internal::setFrameIndex(swapChain->GetCurrentBackBufferIndex());
+
+		if (fence->GetCompletedValue() < fenceValues[Graphics::getFrameIndex()])
+		{
 			fence->SetEventOnCompletion(fenceValues[Graphics::getFrameIndex()], fenceEvent);
 
 			WaitForSingleObjectEx(fenceEvent, INFINITE, FALSE);
-
-			fenceValues[Graphics::getFrameIndex()]++;
 		}
 
-		void RenderEngineImpl::waitForNextFrame()
+		fenceValues[Graphics::getFrameIndex()] = currentFenceValue + 1;
+	}
+
+	void RenderEngineImpl::beginFrame()
+	{
+		beginImGuiFrame();
+
+		prepareCommandList->open();
+
+		finishCommandList = nullptr;
+
+		lastDirectTypeCommandList = nullptr;
+
+		recordCommandLists.push(prepareCommandList.get());
+
+		//先获取可用的位置，供GraphicsContext在这一帧使用
+		engineGlobalCBuffer->acquireDataPtr();
+
+		//把后备缓冲转变到STATE_RENDER_TARGET，并暂存资源屏障
+		prepareCommandList->trackAndSetResourceState(getRenderTexture(), D3D12Resource::D3D12_TRANSITION_ALL_MIPLEVELS, D3D12_RESOURCE_STATE_RENDER_TARGET);
+
+		prepareCommandList->flushTransitionResources();
+	}
+
+	void RenderEngineImpl::endFrame()
+	{
+		//到这里我们已经知道了哪些动态常量缓冲需要更新
+		updateDynamicCBuffers();
+
+		//一些比较基础的信息的设置
 		{
-			const uint64_t currentFenceValue = fenceValues[Graphics::getFrameIndex()];
+			perframeResource.deltaTime = Graphics::getDeltaTime();
 
-			commandQueue->Signal(fence.Get(), currentFenceValue);
+			perframeResource.timeElapsed = Graphics::getTimeElapsed();
 
-			Graphics::Internal::setFrameIndex(swapChain->GetCurrentBackBufferIndex());
+			perframeResource.uintSeed = Utils::Random::genUint();
 
-			if (fence->GetCompletedValue() < fenceValues[Graphics::getFrameIndex()])
+			perframeResource.floatSeed = Utils::Random::genFloat();
+
+			perframeResource.screenSize = DirectX::XMFLOAT2(
+				static_cast<float>(Graphics::getWidth()),
+				static_cast<float>(Graphics::getHeight()));
+
+			perframeResource.screenTexelSize = DirectX::XMFLOAT2(
+				1.f / perframeResource.screenSize.x,
+				1.f / perframeResource.screenSize.y);
+		}
+
+		//主相机相关信息的设置
+		{
+			perframeResource.prevViewProj = perframeResource.viewProj;
+
+			perframeResource.proj = DirectX::XMMatrixTranspose(MainCamera::getProj());
+
+			perframeResource.view = DirectX::XMMatrixTranspose(MainCamera::getView());
+
+			perframeResource.viewProj = DirectX::XMMatrixTranspose(MainCamera::getView() * MainCamera::getProj());
+
+			//逆的转置的转置等于没有转置
+			perframeResource.normalMatrix = DirectX::XMMatrixInverse(nullptr, MainCamera::getView());
+
+			DirectX::XMStoreFloat4(&perframeResource.eyePos, MainCamera::getEyePos());
+		}
+		//关于为什么要转置我找到了一篇有关的文章
+		//https://www.douduck08.com/zh-tw/why-dx11-need-matrix-transpose-before-cbuffer-mapping/
+		//这里简要说一下，其实和矩阵如何被解释有关，矩阵实际上是以一维数组的形式被存储的
+		//DirectXMath默认其为Row Major，而HLSL默认其为Column Major
+		//在DirectXMath中我们一般使用DirectX::XMVector4Transform，它背后的数学运算是 vec*matrix
+		//如果数据原封不动上传到显存上，那么这个矩阵会被HLSL用另一种方式来解释，我们因此需要的数学运算是 matrix*vec，即mul(matrix,vec)
+		//然而，mul(vec,matrix)是有一些性能优势的，为了利用这个性能优势，矩阵在上传前要被转置
+
+		engineGlobalCBuffer->updateData(&perframeResource);
+
+		//使用收尾命令列表绘制ImGui界面
+		drawImGuiFrame();
+
+		//使用最后一个可用的直接类型的命令列表把后备缓冲转变到STATE_PRESENT
+		lastDirectTypeCommandList->trackAndSetResourceState(getRenderTexture(), D3D12Resource::D3D12_TRANSITION_ALL_MIPLEVELS, D3D12_RESOURCE_STATE_PRESENT);
+
+		lastDirectTypeCommandList->flushResourceBarriers();
+	}
+
+	void RenderEngineImpl::processCommandLists()
+	{
+		recordCommandLists.front()->close();
+
+		if (recordCommandLists.size() > 1)
+		{
+			recordCommandLists.back()->close();
+
+			if (lastDirectTypeCommandList != recordCommandLists.back())
 			{
-				fence->SetEventOnCompletion(fenceValues[Graphics::getFrameIndex()], fenceEvent);
+				lastDirectTypeCommandList->close();
+			}
+		}
 
-				WaitForSingleObjectEx(fenceEvent, INFINITE, FALSE);
+		id3d12CommandLists.clear();
+
+		for (const D3D12Core::CommandList* const commandList : recordCommandLists)
+		{
+			id3d12CommandLists.push(commandList->get());
+		}
+
+		recordCommandLists.clear();
+
+		commandQueue->ExecuteCommandLists(static_cast<uint32_t>(id3d12CommandLists.size()), id3d12CommandLists.data());
+	}
+
+	void RenderEngineImpl::present() const
+	{
+		swapChain->Present(static_cast<uint32_t>(syncInterval), 0);
+	}
+
+	void RenderEngineImpl::setDeltaTime(const float deltaTime) const
+	{
+		Graphics::Internal::setDeltaTime(deltaTime);
+	}
+
+	void RenderEngineImpl::updateTimeElapsed() const
+	{
+		Graphics::Internal::updateTimeElapsed();
+
+		Graphics::Internal::renderedFrameCountInc();
+	}
+
+	void RenderEngineImpl::setDefRenderTexture()
+	{
+		setRenderTexture(backBufferTextures[Graphics::getFrameIndex()].get(), backBufferHandles[Graphics::getFrameIndex()]);
+	}
+
+	void RenderEngineImpl::setRenderTexture(D3D12Resource::Texture* const renderTexture, const D3D12_CPU_DESCRIPTOR_HANDLE handle)
+	{
+		//接管renderTexture的状态转变
+		this->renderTexture = renderTexture;
+
+		//获取CPU描述符句柄供GraphicsContext在这一帧使用
+		Graphics::Internal::setBackBufferHandle(handle);
+	}
+
+	void RenderEngineImpl::initializeResources()
+	{
+		//如果有需要，那么开启ImGui
+		toggleImGuiSurface();
+
+		//更新动态常量缓冲，因为资源创建可能会需要动态常量缓冲
+		updateDynamicCBuffers();
+
+		processCommandLists();
+
+		//等待准备工作完成
+		waitForCurrentFrame();
+
+		RenderThreadLocal::Internal::flushCopiedResources();
+
+		//清理静态资源管理器创建的临时资源
+		resManager->cleanTransientResources();
+	}
+
+	void RenderEngineImpl::saveBackBuffer(D3D12Resource::ReadbackHeap* const readbackHeap)
+	{
+		D3D12_PLACED_SUBRESOURCE_FOOTPRINT bufferFootprint = {};
+
+		bufferFootprint.Footprint.Width = getRenderTexture()->getWidth();
+
+		bufferFootprint.Footprint.Height = getRenderTexture()->getHeight();
+
+		bufferFootprint.Footprint.Depth = 1;
+
+		bufferFootprint.Footprint.RowPitch = FMT::getByteSize(Graphics::backBufferFormat) * getRenderTexture()->getWidth();
+
+		bufferFootprint.Footprint.Format = Graphics::backBufferFormat;
+
+		const CD3DX12_TEXTURE_COPY_LOCATION copyDest(readbackHeap->getResource(), bufferFootprint);
+
+		const CD3DX12_TEXTURE_COPY_LOCATION copySrc(getRenderTexture()->getResource(), 0);
+
+		if (!finishCommandList)
+		{
+			finishCommandList = dynamic_cast<D3D12Core::GraphicsCommandList*>(lastDirectTypeCommandList);
+		}
+
+		finishCommandList->trackAndSetResourceState(getRenderTexture(), D3D12Resource::D3D12_TRANSITION_ALL_MIPLEVELS, D3D12_RESOURCE_STATE_COPY_SOURCE);
+
+		finishCommandList->flushResourceBarriers();
+
+		finishCommandList->get()->CopyTextureRegion(&copyDest, 0, 0, 0, &copySrc, nullptr);
+	}
+
+	bool RenderEngineImpl::getDisplayImGuiSurface() const
+	{
+		return displayImGuiSurface;
+	}
+
+	void RenderEngineImpl::toggleImGuiSurface()
+	{
+		if (initializeImGuiSurface)
+		{
+			displayImGuiSurface = !displayImGuiSurface;
+		}
+	}
+
+	void RenderEngineImpl::toggleEngineImGuiSurface()
+	{
+		displayEngineImGuiSurface = !displayEngineImGuiSurface;
+	}
+
+	ImFont* RenderEngineImpl::getMediumFont() const
+	{
+		return mediumFont;
+	}
+
+	ImFont* RenderEngineImpl::getLargeFont() const
+	{
+		return largeFont;
+	}
+
+	ComPtr<IDXGIAdapter4> RenderEngineImpl::getBestAdapterAndVendor(IDXGIFactory7* const factory)
+	{
+		ComPtr<IDXGIAdapter4> adapter;
+
+		for (uint32_t adapterIndex = 0;
+			SUCCEEDED(factory->EnumAdapterByGpuPreference(adapterIndex, DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE, IID_PPV_ARGS(&adapter)));
+			adapterIndex++)
+		{
+			DXGI_ADAPTER_DESC3 desc = {};
+
+			adapter->GetDesc3(&desc);
+
+			if (desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE)
+			{
+				continue;
 			}
 
-			fenceValues[Graphics::getFrameIndex()] = currentFenceValue + 1;
-		}
-
-		void RenderEngineImpl::beginFrame()
-		{
-			beginImGuiFrame();
-
-			prepareCommandList->open();
-
-			finishCommandList = nullptr;
-
-			lastDirectTypeCommandList = nullptr;
-
-			recordCommandLists.push(prepareCommandList.get());
-
-			//先获取可用的位置，供GraphicsContext在这一帧使用
-			engineGlobalCBuffer->acquireDataPtr();
-
-			//把后备缓冲转变到STATE_RENDER_TARGET，并暂存资源屏障
-			prepareCommandList->trackAndSetResourceState(getRenderTexture(), D3D12Resource::D3D12_TRANSITION_ALL_MIPLEVELS, D3D12_RESOURCE_STATE_RENDER_TARGET);
-
-			prepareCommandList->flushTransitionResources();
-		}
-
-		void RenderEngineImpl::endFrame()
-		{
-			//到这里我们已经知道了哪些动态常量缓冲需要更新
-			updateDynamicCBuffers();
-
-			//一些比较基础的信息的设置
+			if (SUCCEEDED(D3D12CreateDevice(adapter.Get(), D3D_FEATURE_LEVEL_11_0, _uuidof(ID3D12Device), nullptr)))
 			{
-				perframeResource.deltaTime = Graphics::getDeltaTime();
+				const uint32_t vendorID = desc.VendorId;
 
-				perframeResource.timeElapsed = Graphics::getTimeElapsed();
+				std::string vendorName;
 
-				perframeResource.uintSeed = Utils::Random::genUint();
-
-				perframeResource.floatSeed = Utils::Random::genFloat();
-
-				perframeResource.screenSize = DirectX::XMFLOAT2(
-					static_cast<float>(Graphics::getWidth()),
-					static_cast<float>(Graphics::getHeight()));
-
-				perframeResource.screenTexelSize = DirectX::XMFLOAT2(
-					1.f / perframeResource.screenSize.x,
-					1.f / perframeResource.screenSize.y);
-			}
-
-			//主相机相关信息的设置
-			{
-				perframeResource.prevViewProj = perframeResource.viewProj;
-
-				perframeResource.proj = DirectX::XMMatrixTranspose(MainCamera::getProj());
-
-				perframeResource.view = DirectX::XMMatrixTranspose(MainCamera::getView());
-
-				perframeResource.viewProj = DirectX::XMMatrixTranspose(MainCamera::getView() * MainCamera::getProj());
-
-				//逆的转置的转置等于没有转置
-				perframeResource.normalMatrix = DirectX::XMMatrixInverse(nullptr, MainCamera::getView());
-
-				DirectX::XMStoreFloat4(&perframeResource.eyePos, MainCamera::getEyePos());
-			}
-			//关于为什么要转置我找到了一篇有关的文章
-			//https://www.douduck08.com/zh-tw/why-dx11-need-matrix-transpose-before-cbuffer-mapping/
-			//这里简要说一下，其实和矩阵如何被解释有关，矩阵实际上是以一维数组的形式被存储的
-			//DirectXMath默认其为Row Major，而HLSL默认其为Column Major
-			//在DirectXMath中我们一般使用DirectX::XMVector4Transform，它背后的数学运算是 vec*matrix
-			//如果数据原封不动上传到显存上，那么这个矩阵会被HLSL用另一种方式来解释，我们因此需要的数学运算是 matrix*vec，即mul(matrix,vec)
-			//然而，mul(vec,matrix)是有一些性能优势的，为了利用这个性能优势，矩阵在上传前要被转置
-
-			engineGlobalCBuffer->updateData(&perframeResource);
-
-			//使用收尾命令列表绘制ImGui界面
-			drawImGuiFrame();
-
-			//使用最后一个可用的直接类型的命令列表把后备缓冲转变到STATE_PRESENT
-			lastDirectTypeCommandList->trackAndSetResourceState(getRenderTexture(), D3D12Resource::D3D12_TRANSITION_ALL_MIPLEVELS, D3D12_RESOURCE_STATE_PRESENT);
-
-			lastDirectTypeCommandList->flushResourceBarriers();
-		}
-
-		void RenderEngineImpl::processCommandLists()
-		{
-			recordCommandLists.front()->close();
-
-			if (recordCommandLists.size() > 1)
-			{
-				recordCommandLists.back()->close();
-
-				if (lastDirectTypeCommandList != recordCommandLists.back())
+				if (vendorID == 0x10DE)
 				{
-					lastDirectTypeCommandList->close();
+					vendor = AdapterVendor::NVIDIA;
+
+					vendorName = "NVIDIA";
 				}
+				else if (vendorID == 0x1002 || vendorID == 0x1022)
+				{
+					vendor = AdapterVendor::AMD;
+
+					vendorName = "AMD";
+				}
+				else if (vendorID == 0x163C || vendorID == 0x8086 || vendorID == 0x8087)
+				{
+					vendor = AdapterVendor::INTEL;
+
+					vendorName = "INTEL";
+				}
+				else
+				{
+					vendor = AdapterVendor::UNKNOWN;
+
+					vendorName = "UNKNOWN";
+				}
+
+				LOGENGINE("以下是适配器的相关信息");
+
+				LOGENGINE("适配器名称", LogColor::brightMagenta, desc.Description);
+
+				LOGENGINE("适配器生产商ID", IntegerMode::HEX, vendorID);
+
+				LOGENGINE("适配器生产商", LogColor::brightMagenta, vendorName);
+
+				LOGENGINE("适配器专有视频内存", static_cast<float>(desc.DedicatedVideoMemory) / 1024.f / 1024.f / 1024.f, "GB");
+
+				break;
 			}
+		}
 
-			id3d12CommandLists.clear();
+		return adapter;
+	}
 
-			for (const D3D12Core::CommandList* const commandList : recordCommandLists)
+	void RenderEngineImpl::updateDynamicCBuffers() const
+	{
+		DynamicCBufferManager::Internal::recordCommands(prepareCommandList.get());
+	}
+
+	void RenderEngineImpl::beginImGuiFrame() const
+	{
+		if (displayImGuiSurface)
+		{
+			ImGui_ImplDX12_NewFrame();
+			ImGui_ImplWin32_NewFrame();
+			ImGui::NewFrame();
+		}
+	}
+
+	void RenderEngineImpl::drawImGuiFrame()
+	{
+		if (displayImGuiSurface)
+		{
+			if (displayEngineImGuiSurface)
 			{
-				id3d12CommandLists.push(commandList->get());
+				ImGui::Begin("Frame Profile");
+				ImGui::Text("TimeElapsed %.2f", Graphics::getTimeElapsed());
+				ImGui::Text("FrameTime %.8f", ImGui::GetIO().DeltaTime * 1000.f);
+				ImGui::Text("FrameRate %.1f", ImGui::GetIO().Framerate);
+				ImGui::SliderInt("Sync Interval", &syncInterval, 0, 3);
+				ImGui::End();
+
+				Graphics::Internal::imGuiCall();
 			}
-
-			recordCommandLists.clear();
-
-			commandQueue->ExecuteCommandLists(static_cast<uint32_t>(id3d12CommandLists.size()), id3d12CommandLists.data());
-		}
-
-		void RenderEngineImpl::present() const
-		{
-			swapChain->Present(static_cast<uint32_t>(syncInterval), 0);
-		}
-
-		void RenderEngineImpl::setDeltaTime(const float deltaTime) const
-		{
-			Graphics::Internal::setDeltaTime(deltaTime);
-		}
-
-		void RenderEngineImpl::updateTimeElapsed() const
-		{
-			Graphics::Internal::updateTimeElapsed();
-
-			Graphics::Internal::renderedFrameCountInc();
-		}
-
-		void RenderEngineImpl::setDefRenderTexture()
-		{
-			setRenderTexture(backBufferTextures[Graphics::getFrameIndex()].get(), backBufferHandles[Graphics::getFrameIndex()]);
-		}
-
-		void RenderEngineImpl::setRenderTexture(D3D12Resource::Texture* const renderTexture, const D3D12_CPU_DESCRIPTOR_HANDLE handle)
-		{
-			//接管renderTexture的状态转变
-			this->renderTexture = renderTexture;
-
-			//获取CPU描述符句柄供GraphicsContext在这一帧使用
-			Graphics::Internal::setBackBufferHandle(handle);
-		}
-
-		void RenderEngineImpl::initializeResources()
-		{
-			//如果有需要，那么开启ImGui
-			toggleImGuiSurface();
-
-			//更新动态常量缓冲，因为资源创建可能会需要动态常量缓冲
-			updateDynamicCBuffers();
-
-			processCommandLists();
-
-			//等待准备工作完成
-			waitForCurrentFrame();
-
-			RenderThreadLocal::Internal::flushCopiedResources();
-
-			//清理静态资源管理器创建的临时资源
-			resManager->cleanTransientResources();
-		}
-
-		void RenderEngineImpl::saveBackBuffer(D3D12Resource::ReadbackHeap* const readbackHeap)
-		{
-			D3D12_PLACED_SUBRESOURCE_FOOTPRINT bufferFootprint = {};
-
-			bufferFootprint.Footprint.Width = getRenderTexture()->getWidth();
-
-			bufferFootprint.Footprint.Height = getRenderTexture()->getHeight();
-
-			bufferFootprint.Footprint.Depth = 1;
-
-			bufferFootprint.Footprint.RowPitch = FMT::getByteSize(Graphics::backBufferFormat) * getRenderTexture()->getWidth();
-
-			bufferFootprint.Footprint.Format = Graphics::backBufferFormat;
-
-			const CD3DX12_TEXTURE_COPY_LOCATION copyDest(readbackHeap->getResource(), bufferFootprint);
-
-			const CD3DX12_TEXTURE_COPY_LOCATION copySrc(getRenderTexture()->getResource(), 0);
 
 			if (!finishCommandList)
 			{
 				finishCommandList = dynamic_cast<D3D12Core::GraphicsCommandList*>(lastDirectTypeCommandList);
 			}
 
-			finishCommandList->trackAndSetResourceState(getRenderTexture(), D3D12Resource::D3D12_TRANSITION_ALL_MIPLEVELS, D3D12_RESOURCE_STATE_COPY_SOURCE);
+			finishCommandList->trackAndSetResourceState(getRenderTexture(), D3D12Resource::D3D12_TRANSITION_ALL_MIPLEVELS, D3D12_RESOURCE_STATE_RENDER_TARGET);
 
 			finishCommandList->flushResourceBarriers();
 
-			finishCommandList->get()->CopyTextureRegion(&copyDest, 0, 0, 0, &copySrc, nullptr);
+			finishCommandList->setDescriptorHeap(GlobalDescriptorHeap::getResourceHeap()->get(), GlobalDescriptorHeap::getSamplerHeap()->get());
+
+			ImGui::Render();
+
+			finishCommandList->setDefRenderTarget();
+
+			ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), finishCommandList->get());
 		}
+	}
 
-		bool RenderEngineImpl::getDisplayImGuiSurface() const
-		{
-			return displayImGuiSurface;
-		}
+	UniquePtr<RenderEngineImpl> impl;
 
-		void RenderEngineImpl::toggleImGuiSurface()
-		{
-			if (initializeImGuiSurface)
-			{
-				displayImGuiSurface = !displayImGuiSurface;
-			}
-		}
-
-		void RenderEngineImpl::toggleEngineImGuiSurface()
-		{
-			displayEngineImGuiSurface = !displayEngineImGuiSurface;
-		}
-
-		ImFont* RenderEngineImpl::getMediumFont() const
-		{
-			return mediumFont;
-		}
-
-		ImFont* RenderEngineImpl::getLargeFont() const
-		{
-			return largeFont;
-		}
-
-		ComPtr<IDXGIAdapter4> RenderEngineImpl::getBestAdapterAndVendor(IDXGIFactory7* const factory)
-		{
-			ComPtr<IDXGIAdapter4> adapter;
-
-			for (uint32_t adapterIndex = 0;
-				SUCCEEDED(factory->EnumAdapterByGpuPreference(adapterIndex, DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE, IID_PPV_ARGS(&adapter)));
-				adapterIndex++)
-			{
-				DXGI_ADAPTER_DESC3 desc = {};
-
-				adapter->GetDesc3(&desc);
-
-				if (desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE)
-				{
-					continue;
-				}
-
-				if (SUCCEEDED(D3D12CreateDevice(adapter.Get(), D3D_FEATURE_LEVEL_11_0, _uuidof(ID3D12Device), nullptr)))
-				{
-					const uint32_t vendorID = desc.VendorId;
-
-					std::string vendorName;
-
-					if (vendorID == 0x10DE)
-					{
-						vendor = AdapterVendor::NVIDIA;
-
-						vendorName = "NVIDIA";
-					}
-					else if (vendorID == 0x1002 || vendorID == 0x1022)
-					{
-						vendor = AdapterVendor::AMD;
-
-						vendorName = "AMD";
-					}
-					else if (vendorID == 0x163C || vendorID == 0x8086 || vendorID == 0x8087)
-					{
-						vendor = AdapterVendor::INTEL;
-
-						vendorName = "INTEL";
-					}
-					else
-					{
-						vendor = AdapterVendor::UNKNOWN;
-
-						vendorName = "UNKNOWN";
-					}
-
-					LOGENGINE("以下是适配器的相关信息");
-
-					LOGENGINE("适配器名称", LogColor::brightMagenta, desc.Description);
-
-					LOGENGINE("适配器生产商ID", IntegerMode::HEX, vendorID);
-
-					LOGENGINE("适配器生产商", LogColor::brightMagenta, vendorName);
-
-					LOGENGINE("适配器专有视频内存", static_cast<float>(desc.DedicatedVideoMemory) / 1024.f / 1024.f / 1024.f, "GB");
-
-					break;
-				}
-			}
-
-			return adapter;
-		}
-
-		void RenderEngineImpl::updateDynamicCBuffers() const
-		{
-			DynamicCBufferManager::Internal::recordCommands(prepareCommandList.get());
-		}
-
-		void RenderEngineImpl::beginImGuiFrame() const
-		{
-			if (displayImGuiSurface)
-			{
-				ImGui_ImplDX12_NewFrame();
-				ImGui_ImplWin32_NewFrame();
-				ImGui::NewFrame();
-			}
-		}
-
-		void RenderEngineImpl::drawImGuiFrame()
-		{
-			if (displayImGuiSurface)
-			{
-				if (displayEngineImGuiSurface)
-				{
-					ImGui::Begin("Frame Profile");
-					ImGui::Text("TimeElapsed %.2f", Graphics::getTimeElapsed());
-					ImGui::Text("FrameTime %.8f", ImGui::GetIO().DeltaTime * 1000.f);
-					ImGui::Text("FrameRate %.1f", ImGui::GetIO().Framerate);
-					ImGui::SliderInt("Sync Interval", &syncInterval, 0, 3);
-					ImGui::End();
-
-					Graphics::Internal::imGuiCall();
-				}
-
-				if (!finishCommandList)
-				{
-					finishCommandList = dynamic_cast<D3D12Core::GraphicsCommandList*>(lastDirectTypeCommandList);
-				}
-
-				finishCommandList->trackAndSetResourceState(getRenderTexture(), D3D12Resource::D3D12_TRANSITION_ALL_MIPLEVELS, D3D12_RESOURCE_STATE_RENDER_TARGET);
-
-				finishCommandList->flushResourceBarriers();
-
-				finishCommandList->setDescriptorHeap(GlobalDescriptorHeap::getResourceHeap()->get(), GlobalDescriptorHeap::getSamplerHeap()->get());
-
-				ImGui::Render();
-
-				finishCommandList->setDefRenderTarget();
-
-				ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), finishCommandList->get());
-			}
-		}
-
-		UniquePtr<RenderEngineImpl> impl;
-
+	namespace Internal
+	{
 		void initialize(const uint32_t width, const uint32_t height, const HWND hwnd, const bool useSwapChainBuffer, const bool initializeImGuiSurface)
 		{
 			impl = makeUnique<RenderEngineImpl>(width, height, hwnd, useSwapChainBuffer, initializeImGuiSurface);
@@ -944,46 +944,46 @@ namespace Gear::Core::RenderEngine
 
 	void submitCommandList(D3D12Core::CommandList* const commandList)
 	{
-		Internal::impl->submitCommandList(commandList);
+		impl->submitCommandList(commandList);
 	}
 
 	AdapterVendor getVendor()
 	{
-		return Internal::impl->getVendor();
+		return impl->getVendor();
 	}
 
 	D3D12Resource::Texture* getRenderTexture()
 	{
-		return Internal::impl->getRenderTexture();
+		return impl->getRenderTexture();
 	}
 
 	ID3D12CommandQueue* getCommandQueue()
 	{
-		return Internal::impl->getCommandQueue();
+		return impl->getCommandQueue();
 	}
 
 	bool getDisplayImGuiSurface()
 	{
-		return Internal::impl->getDisplayImGuiSurface();
+		return impl->getDisplayImGuiSurface();
 	}
 
 	void toggleImGuiSurface()
 	{
-		Internal::impl->toggleImGuiSurface();
+		impl->toggleImGuiSurface();
 	}
 
 	void toggleEngineImGuiSurface()
 	{
-		Internal::impl->toggleEngineImGuiSurface();
+		impl->toggleEngineImGuiSurface();
 	}
 
 	ImFont* getMediumFont()
 	{
-		return Internal::impl->getMediumFont();
+		return impl->getMediumFont();
 	}
 
 	ImFont* getLargeFont()
 	{
-		return Internal::impl->getLargeFont();
+		return impl->getLargeFont();
 	}
 }

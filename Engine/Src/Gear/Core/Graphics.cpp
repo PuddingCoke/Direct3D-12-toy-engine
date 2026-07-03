@@ -6,37 +6,37 @@
 
 namespace Gear::Core::Graphics
 {
+	struct GraphicsImpl
+	{
+
+		float exposure = 1.f;
+
+		float gamma = 2.2f;
+
+		uint32_t frameBufferCount = 0;
+
+		uint32_t frameIndex = 0;
+
+		uint32_t width = 0;
+
+		uint32_t height = 0;
+
+		uint64_t renderedFrameCount = 0;
+
+		float aspectRatio = 0.f;
+
+		float deltaTime = 0.f;
+
+		float timeElapsed = 0.f;
+
+		D3D12_CPU_DESCRIPTOR_HANDLE backBufferHandle = {};
+
+		Resource::ImmutableCBuffer* engineGlobalCBuffer = nullptr;
+
+	}impl;
+
 	namespace Internal
 	{
-		struct GraphicsImpl
-		{
-
-			float exposure = 1.f;
-
-			float gamma = 2.2f;
-
-			uint32_t frameBufferCount = 0;
-
-			uint32_t frameIndex = 0;
-
-			uint32_t width = 0;
-
-			uint32_t height = 0;
-
-			uint64_t renderedFrameCount = 0;
-
-			float aspectRatio = 0.f;
-
-			float deltaTime = 0.f;
-
-			float timeElapsed = 0.f;
-
-			D3D12_CPU_DESCRIPTOR_HANDLE backBufferHandle = {};
-
-			Resource::ImmutableCBuffer* engineGlobalCBuffer = nullptr;
-
-		}impl;
-
 		void initialize(const uint32_t frameBufferCount, const uint32_t width, const uint32_t height)
 		{
 			impl.frameBufferCount = frameBufferCount;
@@ -89,71 +89,71 @@ namespace Gear::Core::Graphics
 
 	float getExposure()
 	{
-		return Internal::impl.exposure;
+		return impl.exposure;
 	}
 
 	void setExposure(const float exposure)
 	{
-		Internal::impl.exposure = exposure;
+		impl.exposure = exposure;
 	}
 
 	float getGamma()
 	{
-		return Internal::impl.gamma;
+		return impl.gamma;
 	}
 
 	void setGamma(const float gamma)
 	{
-		Internal::impl.gamma = gamma;
+		impl.gamma = gamma;
 	}
 
 	uint32_t getFrameBufferCount()
 	{
-		return Internal::impl.frameBufferCount;
+		return impl.frameBufferCount;
 	}
 
 	uint32_t getFrameIndex()
 	{
-		return Internal::impl.frameIndex;
+		return impl.frameIndex;
 	}
 
 	float getDeltaTime()
 	{
-		return Internal::impl.deltaTime;
+		return impl.deltaTime;
 	}
 
 	float getTimeElapsed()
 	{
-		return Internal::impl.timeElapsed;
+		return impl.timeElapsed;
 	}
 
 	uint32_t getWidth()
 	{
-		return Internal::impl.width;
+		return impl.width;
 	}
 
 	uint32_t getHeight()
 	{
-		return Internal::impl.height;
+		return impl.height;
 	}
 
 	float getAspectRatio()
 	{
-		return Internal::impl.aspectRatio;
+		return impl.aspectRatio;
 	}
 
 	uint64_t getRenderedFrameCount()
 	{
-		return Internal::impl.renderedFrameCount;
+		return impl.renderedFrameCount;
 	}
 
 	D3D12_CPU_DESCRIPTOR_HANDLE getBackBufferHandle()
 	{
-		return Internal::impl.backBufferHandle;
+		return impl.backBufferHandle;
 	}
 
 	Resource::ImmutableCBuffer* getEngineGlobalCBuffer()
 	{
-		return Internal::impl.engineGlobalCBuffer;
+		return impl.engineGlobalCBuffer;
 	}
 }

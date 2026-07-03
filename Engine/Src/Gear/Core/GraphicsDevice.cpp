@@ -4,13 +4,13 @@
 
 namespace Gear::Core::GraphicsDevice
 {
+	struct GraphicsDeviceImpl
+	{
+		ComPtr<ID3D12Device9> device;
+	}impl;
+
 	namespace Internal
 	{
-		struct GraphicsDeviceImpl
-		{
-			ComPtr<ID3D12Device9> device;
-		}impl;
-
 		void initialize(IUnknown* const adapter)
 		{
 			if (SUCCEEDED(D3D12CreateDevice(adapter, D3D_FEATURE_LEVEL_12_0, IID_PPV_ARGS(&impl.device))))
@@ -143,6 +143,6 @@ namespace Gear::Core::GraphicsDevice
 
 	ID3D12Device9* get()
 	{
-		return Internal::impl.device.Get();
+		return impl.device.Get();
 	}
 }

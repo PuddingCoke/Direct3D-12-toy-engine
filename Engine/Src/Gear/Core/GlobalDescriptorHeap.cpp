@@ -4,28 +4,28 @@
 
 namespace Gear::Core::GlobalDescriptorHeap
 {
+	struct GlobalDescriptorHeapImpl
+	{
+		GlobalDescriptorHeapImpl();
+
+		UniquePtr<D3D12Core::DescriptorHeap> resourceHeap;
+
+		UniquePtr<D3D12Core::DescriptorHeap> samplerHeap;
+	};
+
+	GlobalDescriptorHeapImpl::GlobalDescriptorHeapImpl()
+	{
+		resourceHeap = makeUnique<D3D12Core::DescriptorHeap>(Internal::numResourceHeapDescriptors, Internal::numResourceHeapDescriptors - Internal::numStaticCBVSRVUAVDescriptors, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE);
+
+		samplerHeap = makeUnique<D3D12Core::DescriptorHeap>(Internal::numSamplerDescriptors, 0, D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER, D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE);
+
+		LOGSUCCESS("创建", LogColor::brightMagenta, TOSTRING(GlobalDescriptorHeap));
+	}
+
+	UniquePtr<GlobalDescriptorHeapImpl> impl;
+
 	namespace Internal
 	{
-		struct GlobalDescriptorHeapImpl
-		{
-			GlobalDescriptorHeapImpl();
-
-			UniquePtr<D3D12Core::DescriptorHeap> resourceHeap;
-
-			UniquePtr<D3D12Core::DescriptorHeap> samplerHeap;
-		};
-
-		GlobalDescriptorHeapImpl::GlobalDescriptorHeapImpl()
-		{
-			resourceHeap = makeUnique<D3D12Core::DescriptorHeap>(numResourceHeapDescriptors, numResourceHeapDescriptors - numStaticCBVSRVUAVDescriptors, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE);
-
-			samplerHeap = makeUnique<D3D12Core::DescriptorHeap>(1024, 0, D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER, D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE);
-
-			LOGSUCCESS("创建", LogColor::brightMagenta, TOSTRING(GlobalDescriptorHeap));
-		}
-
-		UniquePtr<GlobalDescriptorHeapImpl> impl;
-
 		void initialize()
 		{
 			impl = makeUnique<GlobalDescriptorHeapImpl>();
@@ -39,12 +39,12 @@ namespace Gear::Core::GlobalDescriptorHeap
 
 	D3D12Core::DescriptorHeap* getResourceHeap()
 	{
-		return Internal::impl->resourceHeap.get();
+		return impl->resourceHeap.get();
 	}
 
 	D3D12Core::DescriptorHeap* getSamplerHeap()
 	{
-		return Internal::impl->samplerHeap.get();
+		return impl->samplerHeap.get();
 	}
 }
 

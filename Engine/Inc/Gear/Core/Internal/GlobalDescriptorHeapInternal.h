@@ -16,6 +16,8 @@ namespace Gear::Core::GlobalDescriptorHeap::Internal
 	constexpr uint32_t numResourceHeapDescriptors = 1000000u;
 
 	constexpr uint32_t numStaticCBVSRVUAVDescriptors = 200000u;
+
+	constexpr uint32_t numSamplerDescriptors = 1024u;
 }
 
 #endif // !_GEAR_CORE_GLOBALDESCRIPTORHEAP_INTERNAL_H_

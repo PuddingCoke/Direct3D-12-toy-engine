@@ -5,7 +5,7 @@
 
 namespace Gear::Utils::MainMonitor::Internal
 {
-	void getSettings();
+	void getCurrentSettings();
 }
 
 #endif // !_GEAR_UTILS_MAINMONITOR_INTERNAL_H_

@@ -9,32 +9,32 @@
 /// </summary>
 namespace Gear::Core::LocalDescriptorHeap
 {
+	struct LocalDescriptorHeapImpl
+	{
+		LocalDescriptorHeapImpl();
+
+		UniquePtr<D3D12Core::DescriptorHeap> perThreadStagingResourceHeap;
+
+		UniquePtr<D3D12Core::DescriptorHeap> perThreadRenderTargetHeap;
+
+		UniquePtr<D3D12Core::DescriptorHeap> perThreadDepthStencilHeap;
+	};
+
+	LocalDescriptorHeapImpl::LocalDescriptorHeapImpl()
+	{
+		perThreadStagingResourceHeap = makeUnique<D3D12Core::DescriptorHeap>(Internal::numStagingResourceDescriptors + Internal::numStaticSRVDescriptors, Internal::numStagingResourceDescriptors, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, D3D12_DESCRIPTOR_HEAP_FLAG_NONE);
+
+		perThreadRenderTargetHeap = makeUnique<D3D12Core::DescriptorHeap>(Internal::numRTVDescriptors, Internal::numRTVDescriptors - Internal::numStaticRTVDescriptors, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, D3D12_DESCRIPTOR_HEAP_FLAG_NONE);
+
+		perThreadDepthStencilHeap = makeUnique<D3D12Core::DescriptorHeap>(Internal::numRTVDescriptors, Internal::numRTVDescriptors - Internal::numStaticRTVDescriptors, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, D3D12_DESCRIPTOR_HEAP_FLAG_NONE);
+
+		LOGSUCCESS("创建", LogColor::brightMagenta, TOSTRING(LocalDescriptorHeap));
+	}
+
+	thread_local UniquePtr<LocalDescriptorHeapImpl> impl;
+
 	namespace Internal
 	{
-		struct LocalDescriptorHeapImpl
-		{
-			LocalDescriptorHeapImpl();
-
-			UniquePtr<D3D12Core::DescriptorHeap> perThreadStagingResourceHeap;
-
-			UniquePtr<D3D12Core::DescriptorHeap> perThreadRenderTargetHeap;
-
-			UniquePtr<D3D12Core::DescriptorHeap> perThreadDepthStencilHeap;
-		};
-
-		LocalDescriptorHeapImpl::LocalDescriptorHeapImpl()
-		{
-			perThreadStagingResourceHeap = makeUnique<D3D12Core::DescriptorHeap>(numStagingResourceDescriptors + numStaticSRVDescriptors, numStagingResourceDescriptors, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, D3D12_DESCRIPTOR_HEAP_FLAG_NONE);
-
-			perThreadRenderTargetHeap = makeUnique<D3D12Core::DescriptorHeap>(numRTVDescriptors, numRTVDescriptors - numStaticRTVDescriptors, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, D3D12_DESCRIPTOR_HEAP_FLAG_NONE);
-
-			perThreadDepthStencilHeap = makeUnique<D3D12Core::DescriptorHeap>(numRTVDescriptors, numRTVDescriptors - numStaticRTVDescriptors, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, D3D12_DESCRIPTOR_HEAP_FLAG_NONE);
-
-			LOGSUCCESS("创建", LogColor::brightMagenta, TOSTRING(LocalDescriptorHeap));
-		}
-
-		thread_local UniquePtr<LocalDescriptorHeapImpl> impl;
-
 		void initialize()
 		{
 			impl = makeUnique<LocalDescriptorHeapImpl>();
@@ -49,36 +49,36 @@ namespace Gear::Core::LocalDescriptorHeap
 	D3D12Core::DescriptorHeap* getStagingResourceHeap()
 	{
 #ifdef _DEBUG
-		if (!Internal::impl.get())
+		if (!impl.get())
 		{
 			LOGERROR("你还没有申请线程局部描述符堆!");
 		}
 #endif // _DEBUG
 
-		return Internal::impl->perThreadStagingResourceHeap.get();
+		return impl->perThreadStagingResourceHeap.get();
 	}
 
 	D3D12Core::DescriptorHeap* getRenderTargetHeap()
 	{
 #ifdef _DEBUG
-		if (!Internal::impl.get())
+		if (!impl.get())
 		{
 			LOGERROR("你还没有申请线程局部描述符堆!");
 		}
 #endif // _DEBUG
 
-		return Internal::impl->perThreadRenderTargetHeap.get();
+		return impl->perThreadRenderTargetHeap.get();
 	}
 
 	D3D12Core::DescriptorHeap* getDepthStencilHeap()
 	{
 #ifdef _DEBUG
-		if (!Internal::impl.get())
+		if (!impl.get())
 		{
 			LOGERROR("你还没有申请线程局部描述符堆!");
 		}
 #endif // _DEBUG
 
-		return Internal::impl->perThreadDepthStencilHeap.get();
+		return impl->perThreadDepthStencilHeap.get();
 	}
 }

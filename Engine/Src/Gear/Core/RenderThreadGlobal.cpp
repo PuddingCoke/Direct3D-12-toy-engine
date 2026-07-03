@@ -12,21 +12,21 @@
 
 namespace Gear::Core::RenderThreadGlobal
 {
+	struct RenderThreadGlobalImpl
+	{
+		GlobalShader::Internal::InitializeToken globalShader;
+
+		GlobalDescriptorHeap::Internal::InitializeToken globalDescriptorHeap;
+
+		GlobalRootSignature::Internal::InitializeToken globalRootSignature;
+
+		DynamicCBufferManager::Internal::InitializeToken dynamicCBufferManager;
+	};
+
+	UniquePtr<RenderThreadGlobalImpl> impl;
+
 	namespace Internal
 	{
-		struct RenderThreadGlobalImpl
-		{
-			GlobalShader::Internal::InitializeToken globalShader;
-
-			GlobalDescriptorHeap::Internal::InitializeToken globalDescriptorHeap;
-
-			GlobalRootSignature::Internal::InitializeToken globalRootSignature;
-
-			DynamicCBufferManager::Internal::InitializeToken dynamicCBufferManager;
-		};
-
-		UniquePtr<RenderThreadGlobalImpl> impl;
-
 		void initialize()
 		{
 			impl = makeUnique<RenderThreadGlobalImpl>();
