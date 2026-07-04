@@ -5,12 +5,12 @@
 namespace Gear::Core::D3D12Resource
 {
 	VideoTexture::VideoTexture(const uint32_t width, const uint32_t height, const DXGI_FORMAT format, const D3D12_RESOURCE_FLAGS resFlags) :
-		D3D12ResourceBase(CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE, CD3DX12_RESOURCE_DESC::Tex2D(format, width, height, 1, 1, 1, 0, resFlags), true, D3D12_RESOURCE_STATE_COPY_DEST, nullptr),
+		D3D12ResourceBase(CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE, CD3DX12_RESOURCE_DESC::Tex2D(format, width, height, 1, 1, 1, 0, resFlags), true, D3D12_RESOURCE_STATE_COMMON, nullptr),
 		width(width),
 		height(height),
 		format(format),
-		globalState(makeShared<uint32_t>(D3D12_RESOURCE_STATE_COPY_DEST)),
-		internalState(D3D12_RESOURCE_STATE_COPY_DEST),
+		globalState(makeShared<uint32_t>(D3D12_RESOURCE_STATE_COMMON)),
+		internalState(D3D12_RESOURCE_STATE_COMMON),
 		transitionState(D3D12_RESOURCE_STATE_UNKNOWN),
 		pendingState(D3D12_RESOURCE_STATE_UNKNOWN)
 	{

@@ -6,6 +6,12 @@
 
 #include<Gear/Core/MainCamera.h>
 
+#include<Gear/Core/Device.h>
+
+#include<Gear/Core/Internal/DeviceInternal.h>
+
+#include<Gear/Core/GraphicsDevice.h>
+
 #include<Gear/Utils/Random.h>
 
 #include<Gear/Utils/File.h>
@@ -15,8 +21,6 @@
 #include<Gear/Core/D3D12Core/CommonShaderLayout.h>
 
 #include<Gear/Core/Internal/GraphicsInternal.h>
-
-#include<Gear/Core/Internal/GraphicsDeviceInternal.h>
 
 #include<Gear/Core/Internal/RenderThreadLocalInternal.h>
 
@@ -185,7 +189,7 @@ namespace Gear::Core::RenderEngine
 
 		void drawImGuiFrame();
 
-		UniquePtr<GraphicsDevice::Internal::InitializeToken> graphicsDeviceToken;
+		UniquePtr<Device::Internal::InitializeToken> deviceToken;
 
 		ComPtr<ID3D12CommandQueue> commandQueue;
 
@@ -287,11 +291,11 @@ namespace Gear::Core::RenderEngine
 		ComPtr<IDXGIAdapter4> adapter = getBestAdapterAndVendor(factory.Get());
 
 		//传入适配器，初始化图形设备(ID3D12Device)
-		graphicsDeviceToken = makeUnique<GraphicsDevice::Internal::InitializeToken>(adapter.Get());
+		deviceToken = makeUnique<Device::Internal::InitializeToken>(adapter.Get());
 
 		//检查并输出一些特性的支持情况
 		//不支持Shader Model 6.6或有类型UAV读取会报错
-		GraphicsDevice::Internal::checkFeatureSupport();
+		Device::checkFeatureSupport();
 
 		//初始化图形设备后创建命令队列
 		{

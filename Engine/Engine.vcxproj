@@ -120,16 +120,19 @@
     <ClInclude Include="Inc\Gear\Core\D3D12Core\DXCCompiler.h" />
     <ClInclude Include="Inc\Gear\Core\D3D12Core\GraphicsCommandList.h" />
     <ClInclude Include="Inc\Gear\Core\D3D12Core\GraphicsState.h" />
+    <ClInclude Include="Inc\Gear\Core\Internal\DeviceInternal.h" />
     <ClInclude Include="Inc\Gear\Core\D3D12Core\Internal\DXCCompilerInternal.h" />
     <ClInclude Include="Inc\Gear\Core\D3D12Core\PipelineState.h" />
     <ClInclude Include="Inc\Gear\Core\D3D12Core\ResourceStateTracker.h" />
     <ClInclude Include="Inc\Gear\Core\D3D12Core\VideoProcessCommandList.h" />
     <ClInclude Include="Inc\Gear\Core\D3D12Resource\VideoTexture.h" />
+    <ClInclude Include="Inc\Gear\Core\Device.h" />
     <ClInclude Include="Inc\Gear\Core\DynamicCBufferManager.h" />
     <ClInclude Include="Inc\Gear\Core\Internal\RenderThreadGlobalInternal.h" />
     <ClInclude Include="Inc\Gear\Core\Internal\RenderThreadLocalInternal.h" />
     <ClInclude Include="Inc\Gear\Core\RenderThreadGlobal.h" />
     <ClInclude Include="Inc\Gear\Core\RenderThreadLocal.h" />
+    <ClInclude Include="Inc\Gear\Core\VideoDevice.h" />
     <ClInclude Include="Inc\Gear\Core\VideoEncoder\D3D12Encoder.h" />
     <ClInclude Include="Inc\Gear\Effect\FXAAEffect.h" />
     <ClInclude Include="Inc\Gear\Effect\HBAOPlusEffect.h" />
@@ -144,7 +147,6 @@
     <ClInclude Include="Inc\Gear\Core\Internal\GlobalDescriptorHeapInternal.h" />
     <ClInclude Include="Inc\Gear\Core\Internal\GlobalRootSignatureInternal.h" />
     <ClInclude Include="Inc\Gear\Core\Internal\GlobalShaderInternal.h" />
-    <ClInclude Include="Inc\Gear\Core\Internal\GraphicsDeviceInternal.h" />
     <ClInclude Include="Inc\Gear\Core\Internal\GraphicsInternal.h" />
     <ClInclude Include="Inc\Gear\Core\Internal\RenderEngineInternal.h" />
     <ClInclude Include="Inc\Gear\Core\LocalDescriptorHeap.h" />
@@ -279,7 +281,7 @@
     <ClCompile Include="Src\Gear\Core\D3D12Core\CommandList.cpp" />
     <ClCompile Include="Src\Gear\Core\D3D12Resource\D3D12ResourceBase.cpp" />
     <ClCompile Include="Src\Gear\Core\D3D12Resource\UploadHeap.cpp" />
-    <ClCompile Include="Src\Gear\Core\GraphicsDevice.cpp" />
+    <ClCompile Include="Src\Gear\Core\Device.cpp" />
     <ClCompile Include="Src\Gear\Core\ResourceManager.cpp" />
     <ClCompile Include="Src\Gear\Resource\BufferView.cpp" />
     <ClCompile Include="Src\Gear\Resource\ImmutableCBuffer.cpp" />

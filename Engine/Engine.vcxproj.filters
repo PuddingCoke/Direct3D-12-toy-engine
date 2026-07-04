@@ -312,9 +312,6 @@
     <ClInclude Include="Inc\Gear\Input\Internal\MouseInternal.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="Inc\Gear\Core\Internal\GraphicsDeviceInternal.h">
-      <Filter>Header</Filter>
-    </ClInclude>
     <ClInclude Include="Inc\Gear\Core\Internal\GlobalDescriptorHeapInternal.h">
       <Filter>Header</Filter>
     </ClInclude>
@@ -447,6 +444,15 @@
     <ClInclude Include="Inc\Gear\Utils\Internal\MainMonitorInternal.h">
       <Filter>Header</Filter>
     </ClInclude>
+    <ClInclude Include="Inc\Gear\Core\VideoDevice.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Gear\Core\Device.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Gear\Core\Internal\DeviceInternal.h">
+      <Filter>Header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Gear\InitializationParam.cpp">
@@ -569,7 +575,7 @@
     <ClCompile Include="Src\Gear\Core\GraphicsContext.cpp">
       <Filter>Source\Core</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Core\GraphicsDevice.cpp">
+    <ClCompile Include="Src\Gear\Core\Device.cpp">
       <Filter>Source\Core</Filter>
     </ClCompile>
     <ClCompile Include="Src\Gear\Core\RenderEngine.cpp">
