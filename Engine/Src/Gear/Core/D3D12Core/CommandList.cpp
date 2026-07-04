@@ -37,9 +37,9 @@ namespace Gear::Core::D3D12Core
 		}
 	}
 
-	void CommandList::setAndCloseCommandList(ID3D12CommandList* const commandList)
+	void CommandList::setAndCloseCommandList(ID3D12CommandList* const id3d12CommandList)
 	{
-		this->commandList = commandList;
+		commandList = id3d12CommandList;
 
 		close();
 	}

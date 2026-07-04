@@ -17,7 +17,7 @@ namespace Gear::Utils
 	{
 		historyDeltatime[historyDeltaTimeIndex] = lastDeltaTime;
 
-		if (historyDeltaTimeIndex == 10)
+		if (historyDeltaTimeIndex == numRecord - 1u)
 		{
 			populated = true;
 		}

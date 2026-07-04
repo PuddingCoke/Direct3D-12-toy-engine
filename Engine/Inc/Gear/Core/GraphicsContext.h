@@ -132,9 +132,9 @@ namespace Gear::Core
 
 		void setCSConstantBuffer(const Resource::ImmutableCBuffer& immutableCBuffer);
 
-		void setPipelineState(D3D12Core::ComputeState& computeState);
+		void setPipelineState(D3D12Core::GraphicsState& graphicsPipelineState);
 
-		void setPipelineState(D3D12Core::GraphicsState& graphicsState);
+		void setPipelineState(D3D12Core::ComputeState& computePipelineState);
 
 		//以下的方法用于设置渲染目标
 
@@ -257,9 +257,9 @@ namespace Gear::Core
 
 			~DepthStencilClearDesc() = default;
 
-			void setHandle(const D3D12_CPU_DESCRIPTOR_HANDLE handle) noexcept;
+			void setHandle(const D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle) noexcept;
 
-			void setClearData(const D3D12_CLEAR_FLAGS flags, const float depth, const uint8_t stencil) noexcept;
+			void setClearData(const D3D12_CLEAR_FLAGS clearFlags, const float clearDepth, const uint8_t clearStencil) noexcept;
 
 			void reset() noexcept;
 

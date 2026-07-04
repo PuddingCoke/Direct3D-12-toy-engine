@@ -134,25 +134,25 @@ static constexpr uint32_t dsvFormatToIndex(const DXGI_FORMAT format)
 
 static constexpr uint64_t formatIndexArrayLength = 256;
 
-static constexpr std::array<uint8_t, formatIndexArrayLength> rtvFormatIndices = []() constexpr
+static constexpr std::array<uint16_t, formatIndexArrayLength> rtvFormatIndices = []() constexpr
 	{
-		std::array<uint8_t, formatIndexArrayLength> arr;
+		std::array<uint16_t, formatIndexArrayLength> arr;
 
 		for (uint64_t i = 0; i < formatIndexArrayLength; i++)
 		{
-			arr[i] = rtvFormatToIndex(static_cast<DXGI_FORMAT>(i));
+			arr[i] = static_cast<uint16_t>(rtvFormatToIndex(static_cast<DXGI_FORMAT>(i)));
 		}
 
 		return arr;
 	}();
 
-static constexpr std::array<uint8_t, formatIndexArrayLength> dsvFormatIndices = []() constexpr
+static constexpr std::array<uint16_t, formatIndexArrayLength> dsvFormatIndices = []() constexpr
 	{
-		std::array<uint8_t, formatIndexArrayLength> arr;
+		std::array<uint16_t, formatIndexArrayLength> arr;
 
 		for (uint64_t i = 0; i < formatIndexArrayLength; i++)
 		{
-			arr[i] = dsvFormatToIndex(static_cast<DXGI_FORMAT>(i));
+			arr[i] = static_cast<uint16_t>(dsvFormatToIndex(static_cast<DXGI_FORMAT>(i)));
 		}
 
 		return arr;
@@ -180,7 +180,7 @@ namespace Gear::Core::D3D12Core
 
 		const uint64_t uid = getUID();
 
-		if (uid != currentUID)
+		if (currentUID != uid)
 		{
 			const auto it = pipelineStates.find(uid);
 

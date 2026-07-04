@@ -112,8 +112,6 @@ namespace Gear::Core
 		}
 
 		LOGERROR("无法得到", static_cast<uint32_t>(componentType), "和", static_cast<uint32_t>(mask), "表示的", TOSTRING(DXGI_FORMAT));
-
-		return FMT::UNKNOWN;
 	}
 
 	PipelineStateBuilder& PipelineStateBuilder::setVS(const D3D12Core::Shader& vs)
@@ -261,8 +259,6 @@ namespace Gear::Core
 		const bool hasDomainShader = graphicsDesc.DS.BytecodeLength;
 
 		const bool hasGeometryShader = graphicsDesc.GS.BytecodeLength;
-
-		const bool hasPixelShader = graphicsDesc.PS.BytecodeLength;
 
 		if (!hasVertexShader)
 		{

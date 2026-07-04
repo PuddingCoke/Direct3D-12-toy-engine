@@ -36,7 +36,7 @@ namespace Gear::Utils::Logger
 
 		const int32_t sizeNeeded = WideCharToMultiByte(CP_UTF8, 0, arg.data(), -1, nullptr, 0, nullptr, nullptr);
 
-		if (0 == sizeNeeded)
+		if (sizeNeeded == 0)
 		{
 			*messageStr += "WideCharToMultiByte调用失败";
 		}
@@ -60,7 +60,7 @@ namespace Gear::Utils::Logger
 
 		const int32_t sizeNeeded = WideCharToMultiByte(CP_UTF8, 0, arg, -1, nullptr, 0, nullptr, nullptr);
 
-		if (0 == sizeNeeded)
+		if (sizeNeeded == 0)
 		{
 			*messageStr += "WideCharToMultiByte调用失败";
 		}

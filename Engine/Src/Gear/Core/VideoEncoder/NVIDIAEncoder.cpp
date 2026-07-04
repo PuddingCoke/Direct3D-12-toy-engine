@@ -4,12 +4,12 @@
 
 #define NVENCCALL(func) \
 {\
-const NVENCSTATUS status = func;\
-if(status != NV_ENC_SUCCESS && status != NV_ENC_ERR_NEED_MORE_INPUT)\
+const NVENCSTATUS _status_ = func;\
+if(_status_ != NV_ENC_SUCCESS && _status_ != NV_ENC_ERR_NEED_MORE_INPUT)\
 {\
 std::cout<<"error occured at function "<<#func<<"\n";\
 const char* error = nvencAPI.nvEncGetLastErrorString(encoder);\
-std::cout << "status " << status << "\n";\
+std::cout << "status " << _status_ << "\n";\
 std::cout << error << "\n";\
 __debugbreak();\
 }\
@@ -25,7 +25,7 @@ namespace Gear::Core::VideoEncoder
 	{
 		moduleNvEncAPI = LoadLibraryA("nvEncodeAPI64.dll");
 
-		if (moduleNvEncAPI == 0)
+		if (moduleNvEncAPI == nullptr)
 		{
 			LOGERROR("无法读取nvEncodeAPI64.dll！");
 		}

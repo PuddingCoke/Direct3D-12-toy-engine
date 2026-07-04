@@ -17,7 +17,7 @@ namespace Gear::Utils::String
 
 		const int sizeNeeded = WideCharToMultiByte(CP_UTF8, 0, wstr.data(), -1, nullptr, 0, nullptr, nullptr);
 
-		if (0 == sizeNeeded)
+		if (sizeNeeded == 0)
 		{
 			return "WideCharToMultiByte调用失败";
 		}
@@ -38,7 +38,7 @@ namespace Gear::Utils::String
 
 		const int sizeNeeded = MultiByteToWideChar(CP_UTF8, 0, str.data(), -1, nullptr, 0);
 
-		if (0 == sizeNeeded)
+		if (sizeNeeded == 0)
 		{
 			return L"MultiByteToWideChar调用失败";
 		}

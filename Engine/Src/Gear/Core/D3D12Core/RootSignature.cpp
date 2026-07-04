@@ -94,6 +94,7 @@ namespace Gear::Core::D3D12Core
 						shaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
 						break;
 					default:
+						LOGERROR("无法为", TOSTRING(ShaderType), static_cast<uint32_t>(shaderType), "找到对应的", TOSTRING(D3D12_SHADER_VISIBILITY));
 						break;
 					}
 

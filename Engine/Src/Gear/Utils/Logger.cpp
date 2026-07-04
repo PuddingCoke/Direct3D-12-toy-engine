@@ -25,14 +25,14 @@ namespace Gear::Utils::Logger
 		{
 			fileHandle = CreateFileA("log.txt", GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN, nullptr);
 
-			if (INVALID_HANDLE_VALUE == fileHandle)
+			if (fileHandle == INVALID_HANDLE_VALUE)
 			{
 				fileHandle = nullptr;
 			}
 
 			consoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
 
-			if (INVALID_HANDLE_VALUE == consoleHandle)
+			if (consoleHandle == INVALID_HANDLE_VALUE)
 			{
 				consoleHandle = nullptr;
 			}

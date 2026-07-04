@@ -52,9 +52,9 @@ namespace Gear::Resource
 			break;
 		}
 
-		const bool hasDepthSRV = (FMT::UNKNOWN != depthSRVFormat);
+		const bool hasDepthSRV = (depthSRVFormat != FMT::UNKNOWN);
 
-		const bool hasStencilSRV = (FMT::UNKNOWN != stencilSRVFormat);
+		const bool hasStencilSRV = (stencilSRVFormat != FMT::UNKNOWN);
 
 		//创建DSV
 		{
@@ -473,7 +473,7 @@ namespace Gear::Resource
 
 		if (copied)
 		{
-			if (FMT::UNKNOWN != depthSRVFormat)
+			if (depthSRVFormat != FMT::UNKNOWN)
 			{
 				*allDepthSRVIndex = shaderVisibleHandle.getCurrentIndex();
 
@@ -489,7 +489,7 @@ namespace Gear::Resource
 				}
 			}
 
-			if (FMT::UNKNOWN != stencilSRVFormat)
+			if (stencilSRVFormat != FMT::UNKNOWN)
 			{
 				*allStencilSRVIndex = shaderVisibleHandle.getCurrentIndex();
 

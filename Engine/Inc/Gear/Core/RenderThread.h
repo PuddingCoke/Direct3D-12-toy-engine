@@ -48,7 +48,7 @@ namespace Gear::Core
 		//引用
 		RenderTask* renderTask;
 
-		std::thread renderThread;
+		std::thread thread;
 
 		std::string errorStr;
 

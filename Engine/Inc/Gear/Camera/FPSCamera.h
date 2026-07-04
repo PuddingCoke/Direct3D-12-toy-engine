@@ -35,13 +35,13 @@ namespace Gear
 
 			const float moveSpeed;
 
+			uint64_t moveEventID;
+
 			DirectX::XMVECTOR eye;
 
 			DirectX::XMVECTOR lookDir;
 
 			DirectX::XMVECTOR up;
-
-			uint64_t moveEventID;
 
 		};
 	}

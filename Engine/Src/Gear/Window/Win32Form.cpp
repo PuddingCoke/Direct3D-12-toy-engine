@@ -51,11 +51,11 @@ namespace Gear::Window::Win32Form
 
 	private:
 
-		HWND hWnd;
+		HWND windowHandle;
 
 		const bool initTrayIcon;
 
-		HMENU hMenu;
+		HMENU menuHandle;
 
 		NOTIFYICONDATA nid;
 
@@ -64,7 +64,7 @@ namespace Gear::Window::Win32Form
 	};
 
 	Win32FormImpl::Win32FormImpl(const std::wstring& title, const uint32_t startX, const uint32_t startY, const uint32_t width, const uint32_t height, const DWORD windowStyle, LRESULT(*windowCallback)(HWND hwnd, uint32_t msg, WPARAM wParam, LPARAM lParam)) :
-		hWnd(nullptr), initTrayIcon(windowCallback == wallpaperCallBack), hMenu(nullptr), nid{}, mouseHook(nullptr)
+		windowHandle(nullptr), initTrayIcon(windowCallback == wallpaperCallBack), menuHandle(nullptr), nid{}, mouseHook(nullptr)
 	{
 		SetProcessDPIAware();
 
@@ -87,20 +87,20 @@ namespace Gear::Window::Win32Form
 
 		AdjustWindowRect(&rect, windowStyle, false);
 
-		hWnd = CreateWindow(L"MyWindowClass", title.c_str(), windowStyle, startX, startY,
+		windowHandle = CreateWindow(L"MyWindowClass", title.c_str(), windowStyle, startX, startY,
 			rect.right - rect.left, rect.bottom - rect.top, nullptr, nullptr, hInstance, nullptr);
 
-		if (!hWnd)
+		if (!windowHandle)
 		{
 			LOGERROR("创建窗体失败！");
 		}
 
-		ShowWindow(hWnd, SW_SHOW);
+		ShowWindow(windowHandle, SW_SHOW);
 
 		if (initTrayIcon)
 		{
 			nid.cbSize = sizeof(NOTIFYICONDATA);
-			nid.hWnd = hWnd;
+			nid.hWnd = windowHandle;
 			nid.uID = 0;
 			nid.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP;
 			nid.uCallbackMessage = WM_TRAYICON;
@@ -109,9 +109,9 @@ namespace Gear::Window::Win32Form
 
 			Shell_NotifyIcon(NIM_ADD, &nid);
 
-			hMenu = CreatePopupMenu();
+			menuHandle = CreatePopupMenu();
 
-			AppendMenu(hMenu, MF_STRING, EXITUID, L"退出程序");
+			AppendMenu(menuHandle, MF_STRING, EXITUID, L"退出程序");
 
 			mouseHook = SetWindowsHookEx(WH_MOUSE_LL, Win32Form::mouseHookProc, nullptr, 0);
 		}
@@ -123,12 +123,12 @@ namespace Gear::Window::Win32Form
 		{
 			UnhookWindowsHookEx(mouseHook);
 
-			DestroyMenu(hMenu);
+			DestroyMenu(menuHandle);
 
 			Shell_NotifyIcon(NIM_DELETE, &nid);
 		}
 
-		DestroyWindow(hWnd);
+		DestroyWindow(windowHandle);
 	}
 
 	bool Win32FormImpl::pollEvents()
@@ -180,7 +180,7 @@ namespace Gear::Window::Win32Form
 
 	HWND Win32FormImpl::getHandle() const
 	{
-		return hWnd;
+		return windowHandle;
 	}
 
 	LRESULT Win32FormImpl::windowProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam) const
@@ -319,7 +319,7 @@ namespace Gear::Window::Win32Form
 
 				SetForegroundWindow(hWnd);
 
-				TrackPopupMenu(hMenu, TPM_RIGHTBUTTON, pt.x, pt.y, 0, hWnd, nullptr);
+				TrackPopupMenu(menuHandle, TPM_RIGHTBUTTON, pt.x, pt.y, 0, hWnd, nullptr);
 			}
 			break;
 

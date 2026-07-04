@@ -159,7 +159,7 @@ namespace Gear::Core::RenderEngine
 
 		void setDefRenderTexture();
 
-		void setRenderTexture(D3D12Resource::Texture* const renderTexture, const D3D12_CPU_DESCRIPTOR_HANDLE handle);
+		void setRenderTexture(D3D12Resource::Texture* const texture, const D3D12_CPU_DESCRIPTOR_HANDLE handle);
 
 		void initializeResources();
 
@@ -666,10 +666,10 @@ namespace Gear::Core::RenderEngine
 		setRenderTexture(backBufferTextures[Graphics::getFrameIndex()].get(), backBufferHandles[Graphics::getFrameIndex()]);
 	}
 
-	void RenderEngineImpl::setRenderTexture(D3D12Resource::Texture* const renderTexture, const D3D12_CPU_DESCRIPTOR_HANDLE handle)
+	void RenderEngineImpl::setRenderTexture(D3D12Resource::Texture* const texture, const D3D12_CPU_DESCRIPTOR_HANDLE handle)
 	{
 		//接管renderTexture的状态转变
-		this->renderTexture = renderTexture;
+		renderTexture = texture;
 
 		//获取CPU描述符句柄供GraphicsContext在这一帧使用
 		Graphics::Internal::setBackBufferHandle(handle);
@@ -764,7 +764,7 @@ namespace Gear::Core::RenderEngine
 
 			adapter->GetDesc3(&desc);
 
-			if (desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE)
+			if (desc.Flags & DXGI_ADAPTER_FLAG3_SOFTWARE)
 			{
 				continue;
 			}

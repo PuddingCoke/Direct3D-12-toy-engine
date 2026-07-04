@@ -31,19 +31,19 @@ namespace Gear
 
 		private:
 
-			DirectX::XMVECTOR eye;
-
 			float currentRadius;
 
 			float targetRadius;
 
 			const float zoomSpeed;
 
-			const DirectX::XMVECTOR up;
-
 			uint64_t moveEventID;
 
 			uint64_t scrollEventID;
+
+			DirectX::XMVECTOR eye;
+
+			const DirectX::XMVECTOR up;
 
 		};
 	}

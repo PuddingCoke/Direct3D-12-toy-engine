@@ -9,7 +9,7 @@ namespace Gear::Core
 	RenderThread::RenderThread(const std::function<void(RenderTask**)>& createFunc) :
 		taskCompleted(false), errorOccured(false), isRunning(true), createFunc(createFunc), renderTask(nullptr)
 	{
-		renderThread = std::thread(&RenderThread::workerLoop, this);
+		thread = std::thread(&RenderThread::workerLoop, this);
 	}
 
 	RenderThread::~RenderThread()
@@ -18,9 +18,9 @@ namespace Gear::Core
 
 		beginTask();
 
-		if (renderThread.joinable())
+		if (thread.joinable())
 		{
-			renderThread.join();
+			thread.join();
 		}
 	}
 

@@ -598,7 +598,7 @@ namespace Gear::Core
 
 	Resource::RenderTextureViewPtr ResourceManager::createRenderTextureView(const uint32_t width, const uint32_t height, const DXGI_FORMAT resFormat, const uint32_t arraySize, const uint32_t mipLevels, const bool isTextureCube, const bool persistent, DXGI_FORMAT srvFormat, DXGI_FORMAT uavFormat, DXGI_FORMAT rtvFormat, const float* const color)
 	{
-		if (FMT::UNKNOWN == srvFormat && FMT::UNKNOWN == uavFormat && FMT::UNKNOWN == rtvFormat)
+		if (srvFormat == FMT::UNKNOWN && uavFormat == FMT::UNKNOWN && rtvFormat == FMT::UNKNOWN)
 		{
 			srvFormat = resFormat;
 
@@ -607,14 +607,14 @@ namespace Gear::Core
 			rtvFormat = resFormat;
 		}
 
-		if (FMT::UNKNOWN == srvFormat)
+		if (srvFormat == FMT::UNKNOWN)
 		{
 			LOGERROR(TOSTRING(srvFormat), "不能为", TOSTRING(FMT::UNKNOWN));
 		}
 
-		const bool hasUAV = (FMT::UNKNOWN != uavFormat);
+		const bool hasUAV = (uavFormat != FMT::UNKNOWN);
 
-		const bool hasRTV = (FMT::UNKNOWN != rtvFormat);
+		const bool hasRTV = (rtvFormat != FMT::UNKNOWN);
 
 		if (!hasUAV && !hasRTV)
 		{
@@ -653,13 +653,13 @@ namespace Gear::Core
 
 	Resource::RenderTextureViewPtr ResourceManager::createGraphicsTexture(const uint32_t width, const uint32_t height, const DXGI_FORMAT resFormat, const uint32_t arraySize, const uint32_t mipLevels, const bool isTextureCube, const bool persistent, const float* const color, DXGI_FORMAT srvFormat, DXGI_FORMAT rtvFormat)
 	{
-		if (FMT::UNKNOWN == srvFormat && FMT::UNKNOWN == rtvFormat)
+		if (srvFormat == FMT::UNKNOWN && rtvFormat == FMT::UNKNOWN)
 		{
 			srvFormat = resFormat;
 
 			rtvFormat = resFormat;
 		}
-		else if (FMT::UNKNOWN == srvFormat && FMT::UNKNOWN != rtvFormat || FMT::UNKNOWN != srvFormat && FMT::UNKNOWN == rtvFormat)
+		else if ((srvFormat == FMT::UNKNOWN && rtvFormat != FMT::UNKNOWN) || (srvFormat != FMT::UNKNOWN && rtvFormat == FMT::UNKNOWN))
 		{
 			LOGERROR(TOSTRING(srvFormat), "和", TOSTRING(rtvFormat), "要么同时为", TOSTRING(FMT::UNKNOWN), "，要么同时得被设置成有效值！");
 		}
@@ -669,13 +669,13 @@ namespace Gear::Core
 
 	Resource::RenderTextureViewPtr ResourceManager::createComputeTexture(const uint32_t width, const uint32_t height, const DXGI_FORMAT resFormat, const uint32_t arraySize, const uint32_t mipLevels, const bool isTextureCube, const bool persistent, DXGI_FORMAT srvFormat, DXGI_FORMAT uavFormat)
 	{
-		if (FMT::UNKNOWN == srvFormat && FMT::UNKNOWN == uavFormat)
+		if (srvFormat == FMT::UNKNOWN && uavFormat == FMT::UNKNOWN)
 		{
 			srvFormat = resFormat;
 
 			uavFormat = resFormat;
 		}
-		else if (FMT::UNKNOWN == srvFormat && FMT::UNKNOWN != uavFormat || FMT::UNKNOWN != srvFormat && FMT::UNKNOWN == uavFormat)
+		else if ((srvFormat == FMT::UNKNOWN && uavFormat != FMT::UNKNOWN) || (srvFormat != FMT::UNKNOWN && uavFormat == FMT::UNKNOWN))
 		{
 			LOGERROR(TOSTRING(srvFormat), "和", TOSTRING(uavFormat), "要么同时为", TOSTRING(FMT::UNKNOWN), "，要么同时得被设置成有效值！");
 		}

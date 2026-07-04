@@ -122,11 +122,11 @@ namespace Gear::Core::D3D12Resource
 		}
 	}
 
-	void D3D12ResourceBase::transition(std::vector<D3D12_RESOURCE_BARRIER>& resourceBarriers, std::vector<D3D12ResourceBase*>& pendingResources)
+	void D3D12ResourceBase::transition(std::vector<D3D12_RESOURCE_BARRIER>&, std::vector<D3D12ResourceBase*>&)
 	{
 	}
 
-	void D3D12ResourceBase::resolvePendingState(std::vector<D3D12_RESOURCE_BARRIER>& resourceBarriers)
+	void D3D12ResourceBase::resolvePendingState(std::vector<D3D12_RESOURCE_BARRIER>&)
 	{
 	}
 

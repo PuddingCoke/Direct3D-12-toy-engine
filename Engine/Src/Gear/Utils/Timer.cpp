@@ -35,9 +35,9 @@ namespace Gear::Utils
 		currrentTime = 0.f;
 	}
 
-	void Timer::setTimeLimit(const float timeLimit)
+	void Timer::setTimeLimit(const float limit)
 	{
-		this->timeLimit = timeLimit;
+		timeLimit = limit;
 	}
 
 	float Timer::getTimeLimit() const

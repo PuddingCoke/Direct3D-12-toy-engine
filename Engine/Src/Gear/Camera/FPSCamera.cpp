@@ -11,7 +11,7 @@ namespace Gear
 	namespace Camera
 	{
 		FPSCamera::FPSCamera(const DirectX::XMVECTOR& eye, const DirectX::XMVECTOR& lookDir, const DirectX::XMVECTOR& up, const float moveSpeed) :
-			eye(eye), lookDir(lookDir), up(up), moveSpeed(moveSpeed)
+			moveSpeed(moveSpeed), eye(eye), lookDir(lookDir), up(up)
 		{
 			this->lookDir = DirectX::XMVector3Normalize(this->lookDir);
 

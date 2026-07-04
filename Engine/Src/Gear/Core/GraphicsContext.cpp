@@ -105,7 +105,7 @@ namespace Gear::Core
 
 	void GraphicsContext::setGlobalConstantBuffer(const Resource::ImmutableCBuffer& immutableCBuffer)
 	{
-		if (&immutableCBuffer != userGlobalCBuffer)
+		if (userGlobalCBuffer != &immutableCBuffer)
 		{
 			userGlobalCBuffer = &immutableCBuffer;
 
@@ -237,20 +237,20 @@ namespace Gear::Core
 		pushRootConstantBufferDesc({ getComputeRootSignature()->getCSConstantBufferParameterIndex(),immutableCBuffer.getGPUAddress() });
 	}
 
-	void GraphicsContext::setPipelineState(D3D12Core::ComputeState& computeState)
+	void GraphicsContext::setPipelineState(D3D12Core::GraphicsState& graphicsPipelineState)
 	{
-		this->computeState = &computeState;
+		graphicsState = &graphicsPipelineState;
 
-		setPipelineState(computeState.getPipelineState());
-
-		setComputeRootSignature(computeState.getRootSignature());
+		setGraphicsRootSignature(graphicsState->getRootSignature());
 	}
 
-	void GraphicsContext::setPipelineState(D3D12Core::GraphicsState& graphicsState)
+	void GraphicsContext::setPipelineState(D3D12Core::ComputeState& computePipelineState)
 	{
-		this->graphicsState = &graphicsState;
+		computeState = &computePipelineState;
 
-		setGraphicsRootSignature(graphicsState.getRootSignature());
+		setPipelineState(computeState->getPipelineState());
+
+		setComputeRootSignature(computeState->getRootSignature());
 	}
 
 	void GraphicsContext::setRenderTargets(const Resource::DepthStencilDesc& depthStencil)
@@ -329,7 +329,7 @@ namespace Gear::Core
 
 	void GraphicsContext::setPrimitiveTopology(const D3D12_PRIMITIVE_TOPOLOGY topology)
 	{
-		if (topology != primitiveTopology)
+		if (primitiveTopology != topology)
 		{
 			primitiveTopology = topology;
 
@@ -553,7 +553,7 @@ namespace Gear::Core
 
 	void GraphicsContext::setPipelineState(ID3D12PipelineState* const pipelineState)
 	{
-		if (pipelineState != currentPipelineState)
+		if (currentPipelineState != pipelineState)
 		{
 			currentPipelineState = pipelineState;
 
@@ -634,7 +634,7 @@ namespace Gear::Core
 
 	void GraphicsContext::setGraphicsRootSignature(const D3D12Core::RootSignature* const rootSignature)
 	{
-		if (rootSignature != graphicsRootSignature)
+		if (graphicsRootSignature != rootSignature)
 		{
 			graphicsRootSignature = rootSignature;
 
@@ -651,7 +651,7 @@ namespace Gear::Core
 
 	void GraphicsContext::setComputeRootSignature(const D3D12Core::RootSignature* const rootSignature)
 	{
-		if (rootSignature != computeRootSignature)
+		if (computeRootSignature != rootSignature)
 		{
 			computeRootSignature = rootSignature;
 
@@ -836,23 +836,23 @@ namespace Gear::Core
 		}
 	}
 
-	void GraphicsContext::DepthStencilClearDesc::setHandle(const D3D12_CPU_DESCRIPTOR_HANDLE handle) noexcept
+	void GraphicsContext::DepthStencilClearDesc::setHandle(const D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle) noexcept
 	{
-		this->handle = handle;
+		handle = cpuHandle;
 	}
 
-	void GraphicsContext::DepthStencilClearDesc::setClearData(const D3D12_CLEAR_FLAGS flags, const float depth, const uint8_t stencil) noexcept
+	void GraphicsContext::DepthStencilClearDesc::setClearData(const D3D12_CLEAR_FLAGS clearFlags, const float clearDepth, const uint8_t clearStencil) noexcept
 	{
-		this->flags = flags;
+		flags = clearFlags;
 
-		this->depth = depth;
+		depth = clearDepth;
 
-		this->stencil = stencil;
+		stencil = clearStencil;
 	}
 
 	void GraphicsContext::DepthStencilClearDesc::reset() noexcept
 	{
-		this->flags = 0;
+		flags = 0;
 	}
 
 	D3D12_CPU_DESCRIPTOR_HANDLE GraphicsContext::DepthStencilClearDesc::getHandle() const noexcept

@@ -17,7 +17,7 @@ namespace Gear::Utils
 
 		void restart();
 
-		void setTimeLimit(const float timeLimit);
+		void setTimeLimit(const float limit);
 
 		float getTimeLimit() const;
 
