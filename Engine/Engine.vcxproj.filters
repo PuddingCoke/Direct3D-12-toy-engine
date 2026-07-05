@@ -453,6 +453,9 @@
     <ClInclude Include="Inc\Gear\Core\Internal\DeviceInternal.h">
       <Filter>Header</Filter>
     </ClInclude>
+    <ClInclude Include="Inc\Gear\Core\D3D12Core\CommonShaderLayout.h">
+      <Filter>Header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Gear\InitializationParam.cpp">

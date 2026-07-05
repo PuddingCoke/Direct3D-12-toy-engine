@@ -24,15 +24,20 @@ namespace Gear::Core::RenderEngine::Internal
 		}
 	};
 
-	void waitForCurrentFrame();
+	void updateFrameIndex();
 
-	void waitForNextFrame();
+	void waitDestroyable();
 
+	void waitFrameGPUComplete();
+
+	void waitFrameCPUReusable();
+
+	//开始一帧
 	void beginFrame();
 
+	//结束这一帧，调用ExecuteCommandLists
+	//后备缓冲被转换到STATE_PRESENT
 	void endFrame();
-
-	void processCommandLists();
 
 	void present();
 

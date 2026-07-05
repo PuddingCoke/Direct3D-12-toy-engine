@@ -145,9 +145,15 @@ namespace Gear::Core::RenderEngine
 
 		ID3D12CommandQueue* getCommandQueue() const;
 
-		void waitForCurrentFrame();
+		void updateFrameIndex();
 
-		void waitForNextFrame();
+		void signal();
+
+		void waitDestroyable();
+
+		void waitFrameCPUReusable();
+
+		void waitFrameGPUComplete();
 
 		void beginFrame();
 
@@ -235,6 +241,8 @@ namespace Gear::Core::RenderEngine
 
 		HANDLE fenceEvent;
 
+		uint64_t currentFenceValue;
+
 		UniquePtr<ImGuiToken> imGuiToken;
 
 		ImFont* mediumFont;
@@ -264,7 +272,8 @@ namespace Gear::Core::RenderEngine
 		displayEngineImGuiSurface(true),
 		syncInterval(1),
 		resManager(nullptr),
-		perframeResource{}
+		perframeResource{},
+		currentFenceValue(0ull)
 	{
 		//初始化一些渲染需要的信息，如width、height、frameIndex等
 		Graphics::Internal::initialize(useSwapChainBuffer ? 3 : 1, width, height);
@@ -317,8 +326,6 @@ namespace Gear::Core::RenderEngine
 		}
 
 		GraphicsDevice::get()->CreateFence(fenceValues[Graphics::getFrameIndex()], D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
-
-		fenceValues[Graphics::getFrameIndex()]++;
 
 		//创建准备命令列表
 		prepareCommandList = makeUnique<D3D12Core::GraphicsCommandList>();
@@ -514,33 +521,44 @@ namespace Gear::Core::RenderEngine
 		return commandQueue.Get();
 	}
 
-	void RenderEngineImpl::waitForCurrentFrame()
+	void RenderEngineImpl::updateFrameIndex()
 	{
-		commandQueue->Signal(fence.Get(), fenceValues[Graphics::getFrameIndex()]);
-
-		fence->SetEventOnCompletion(fenceValues[Graphics::getFrameIndex()], fenceEvent);
-
-		WaitForSingleObjectEx(fenceEvent, INFINITE, FALSE);
-
-		fenceValues[Graphics::getFrameIndex()]++;
+		Graphics::Internal::setFrameIndex(swapChain->GetCurrentBackBufferIndex());
 	}
 
-	void RenderEngineImpl::waitForNextFrame()
+	void RenderEngineImpl::signal()
 	{
-		const uint64_t currentFenceValue = fenceValues[Graphics::getFrameIndex()];
+		currentFenceValue++;
 
 		commandQueue->Signal(fence.Get(), currentFenceValue);
 
-		Graphics::Internal::setFrameIndex(swapChain->GetCurrentBackBufferIndex());
+		//Signal后要记录fenceValue
+		//如果fence->getCompletedValue小于记录的fenceValue，那么要等待CPU可复用
+		fenceValues[Graphics::getFrameIndex()] = currentFenceValue;
+	}
 
+	void RenderEngineImpl::waitDestroyable()
+	{
+		signal();
+
+		waitFrameGPUComplete();
+	}
+
+	void RenderEngineImpl::waitFrameGPUComplete()
+	{
+		fence->SetEventOnCompletion(currentFenceValue, fenceEvent);
+
+		WaitForSingleObjectEx(fenceEvent, INFINITE, FALSE);
+	}
+
+	void RenderEngineImpl::waitFrameCPUReusable()
+	{
 		if (fence->GetCompletedValue() < fenceValues[Graphics::getFrameIndex()])
 		{
 			fence->SetEventOnCompletion(fenceValues[Graphics::getFrameIndex()], fenceEvent);
 
 			WaitForSingleObjectEx(fenceEvent, INFINITE, FALSE);
 		}
-
-		fenceValues[Graphics::getFrameIndex()] = currentFenceValue + 1;
 	}
 
 	void RenderEngineImpl::beginFrame()
@@ -620,6 +638,8 @@ namespace Gear::Core::RenderEngine
 		lastDirectTypeCommandList->trackAndSetResourceState(getRenderTexture(), D3D12Resource::D3D12_TRANSITION_ALL_MIPLEVELS, D3D12_RESOURCE_STATE_PRESENT);
 
 		lastDirectTypeCommandList->flushResourceBarriers();
+
+		processCommandLists();
 	}
 
 	void RenderEngineImpl::processCommandLists()
@@ -646,6 +666,8 @@ namespace Gear::Core::RenderEngine
 		recordCommandLists.clear();
 
 		commandQueue->ExecuteCommandLists(static_cast<uint32_t>(id3d12CommandLists.size()), id3d12CommandLists.data());
+
+		signal();
 	}
 
 	void RenderEngineImpl::present() const
@@ -690,7 +712,7 @@ namespace Gear::Core::RenderEngine
 		processCommandLists();
 
 		//等待准备工作完成
-		waitForCurrentFrame();
+		waitFrameGPUComplete();
 
 		RenderThreadLocal::Internal::flushCopiedResources();
 
@@ -885,14 +907,24 @@ namespace Gear::Core::RenderEngine
 			impl.reset();
 		}
 
-		void waitForCurrentFrame()
+		void updateFrameIndex()
 		{
-			impl->waitForCurrentFrame();
+			impl->updateFrameIndex();
 		}
 
-		void waitForNextFrame()
+		void waitDestroyable()
 		{
-			impl->waitForNextFrame();
+			impl->waitDestroyable();
+		}
+
+		void waitFrameGPUComplete()
+		{
+			impl->waitFrameGPUComplete();
+		}
+
+		void waitFrameCPUReusable()
+		{
+			impl->waitFrameCPUReusable();
 		}
 
 		void beginFrame()

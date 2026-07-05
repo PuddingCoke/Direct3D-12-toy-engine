@@ -100,7 +100,7 @@ namespace Gear
 
 	GearImpl::~GearImpl()
 	{
-		RenderEngine::Internal::waitForCurrentFrame();
+		RenderEngine::Internal::waitDestroyable();
 
 #ifdef _DEBUG
 
@@ -231,6 +231,11 @@ namespace Gear
 		{
 			const std::chrono::high_resolution_clock::time_point startPoint = std::chrono::high_resolution_clock::now();
 
+			//帧索引的更新必须置于首位
+			RenderEngine::Internal::updateFrameIndex();
+
+			RenderEngine::Internal::waitFrameCPUReusable();
+
 			RenderEngine::Internal::setDefRenderTexture();
 
 			RenderEngine::Internal::beginFrame();
@@ -248,16 +253,12 @@ namespace Gear
 
 			RenderEngine::Internal::endFrame();
 
-			RenderEngine::Internal::processCommandLists();
-
 			RenderEngine::Internal::present();
 
 			if (needScreenGrab)
 			{
-				RenderEngine::Internal::waitForCurrentFrame();
+				RenderEngine::Internal::waitFrameGPUComplete();
 			}
-
-			RenderEngine::Internal::waitForNextFrame();
 
 			const std::chrono::high_resolution_clock::time_point endPoint = std::chrono::high_resolution_clock::now();
 
@@ -368,9 +369,7 @@ namespace Gear
 
 				RenderEngine::Internal::endFrame();
 
-				RenderEngine::Internal::processCommandLists();
-
-				RenderEngine::Internal::waitForCurrentFrame();
+				RenderEngine::Internal::waitFrameGPUComplete();
 
 				RenderEngine::Internal::updateTimeElapsed();
 
@@ -404,6 +403,11 @@ namespace Gear
 
 			const std::chrono::high_resolution_clock::time_point startPoint = std::chrono::high_resolution_clock::now();
 
+			//帧索引的更新必须置于首位
+			RenderEngine::Internal::updateFrameIndex();
+
+			RenderEngine::Internal::waitFrameCPUReusable();
+
 			RenderEngine::Internal::setDefRenderTexture();
 
 			RenderEngine::Internal::beginFrame();
@@ -414,11 +418,7 @@ namespace Gear
 
 			RenderEngine::Internal::endFrame();
 
-			RenderEngine::Internal::processCommandLists();
-
 			RenderEngine::Internal::present();
-
-			RenderEngine::Internal::waitForNextFrame();
 
 			const std::chrono::high_resolution_clock::time_point endPoint = std::chrono::high_resolution_clock::now();
 

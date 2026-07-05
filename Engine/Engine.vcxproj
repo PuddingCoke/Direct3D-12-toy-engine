@@ -115,6 +115,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Inc\Gear\Camera\OrbitCamera.h" />
+    <ClInclude Include="Inc\Gear\Core\D3D12Core\CommonShaderLayout.h" />
     <ClInclude Include="Inc\Gear\Core\D3D12Core\ComputeState.h" />
     <ClInclude Include="Inc\Gear\Core\D3D12Core\DescriptorHandle.h" />
     <ClInclude Include="Inc\Gear\Core\D3D12Core\DXCCompiler.h" />
