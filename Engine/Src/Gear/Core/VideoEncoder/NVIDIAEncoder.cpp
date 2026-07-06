@@ -118,30 +118,6 @@ namespace Gear::Core::VideoEncoder
 
 		mappedOutputResourcePtr = mapOutputResource.mappedResource;
 
-		D3D12_VIDEO_PROCESS_INPUT_STREAM_DESC inputDesc =
-		{
-			.Format = Graphics::backBufferFormat,
-			.ColorSpace = DXGI_COLOR_SPACE_RGB_FULL_G22_NONE_P709,
-			.FrameRate = {frameRate, 1},
-			.SourceSizeRange = {Graphics::getWidth(), Graphics::getHeight(), Graphics::getWidth(), Graphics::getHeight()},
-			.DestinationSizeRange = {Graphics::getWidth(), Graphics::getHeight(), Graphics::getWidth(), Graphics::getHeight()},
-		};
-
-		D3D12_VIDEO_PROCESS_OUTPUT_STREAM_DESC outputDesc =
-		{
-		.Format = DXGI_FORMAT_NV12,
-		.ColorSpace = DXGI_COLOR_SPACE_YCBCR_STUDIO_G22_LEFT_P709,
-		.FrameRate = {frameRate, 1},
-		};
-
-		CHECKERROR(VideoDevice::get()->CreateVideoProcessor(0, &outputDesc, 1, &inputDesc, IID_PPV_ARGS(&videoProcessor)));
-
-		vpCommandList = makeUnique<D3D12Core::VideoProcessCommandList>();
-
-		vpCommandQueue = makeUnique<D3D12Core::CommandQueue>(D3D12_COMMAND_LIST_TYPE_VIDEO_PROCESS);
-
-		vpCommandQueue->setPrepareCommandList(vpCommandList.get());
-
 		for (uint32_t i = 0; i < numNV12Textures; i++)
 		{
 			nv12Textures[i] = makeUnique<D3D12Resource::VideoTexture>(Graphics::getWidth(), Graphics::getHeight(), FMT::NV12);
@@ -150,11 +126,6 @@ namespace Gear::Core::VideoEncoder
 
 	NVIDIAEncoder::~NVIDIAEncoder()
 	{
-		if (vpCommandQueue)
-		{
-			vpCommandQueue->waitDestroyable();
-		}
-
 		if (moduleNvEncAPI)
 		{
 			nvencAPI.nvEncUnmapInputResource(encoder, mappedOutputResourcePtr);
@@ -183,23 +154,11 @@ namespace Gear::Core::VideoEncoder
 
 	bool NVIDIAEncoder::encode(D3D12Resource::Texture* const inputTexture)
 	{
-		currentNV12Texture = nv12Textures[nv12TextureIndex].get();
+		D3D12Resource::VideoTexture* const currentNV12Texture = nv12Textures[nv12TextureIndex].get();
 
 		nv12TextureIndex = (nv12TextureIndex + 1) % numNV12Textures;
 
-		vpCommandQueue->begin();
-
-		D3D12Core::VPInputArguments inputArgs = D3D12Core::VPInputArguments(inputTexture);
-
-		D3D12Core::VPOutputArguments outputArgs = D3D12Core::VPOutputArguments(currentNV12Texture);
-
-		vpCommandList->processFrames(videoProcessor.Get(), outputArgs, { inputArgs });
-
-		vpCommandQueue->processCommandLists();
-
-		vpCommandQueue->waitFrameGPUComplete();
-
-		vpCommandQueue->signal(inputFence.get());
+		bgraToNV12(inputTexture, currentNV12Texture, inputFence.get());
 
 		bool encoding = true;
 

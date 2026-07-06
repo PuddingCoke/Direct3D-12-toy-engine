@@ -15,6 +15,10 @@
 
 #include<Gear/Core/D3D12Resource/VideoTexture.h>
 
+#include<Gear/Core/D3D12Core/VideoProcessCommandList.h>
+
+#include<Gear/Core/D3D12Core/CommandQueue.h>
+
 #include<chrono>
 
 namespace Gear::Core::VideoEncoder
@@ -42,10 +46,20 @@ namespace Gear::Core::VideoEncoder
 
 		static constexpr uint32_t frameRate = 60;
 
+		void waitFor(D3D12Core::CommandQueue* const queueWaitFor, D3D12Core::Fence* const fence);
+
 	protected:
 
 		//封装比特流
 		bool writeFrame(const void* const bitstreamPtr, const uint32_t bitstreamSize, const bool cleanPoint);
+
+		void bgraToNV12(D3D12Resource::Texture* inputTexture, D3D12Resource::VideoTexture* nv12Texture, D3D12Core::Fence* const fence);
+
+		ComPtr<ID3D12VideoProcessor> videoProcessor;
+
+		D3D12Core::VideoProcessCommandListPtr vpCommandList;
+
+		D3D12Core::CommandQueuePtr vpCommandQueue;
 
 	private:
 

@@ -41,6 +41,11 @@ namespace Gear::Core::D3D12Core
 
 		void signal(Fence* const fence);
 
+		void wait(Fence* const fence);
+
+		//等待另一个命令队列
+		void waitFor(CommandQueue* const queueWaitFor, Fence* const fence);
+
 		CommandList* getLastUsableCommandList() const;
 
 	private:

@@ -45,15 +45,52 @@ namespace Gear::Core::VideoEncoder
 		sinkWriter->AddStream(mediaType.Get(), &streamIndex);
 
 		sinkWriter->BeginWriting();
+
+		D3D12_VIDEO_PROCESS_INPUT_STREAM_DESC inputDesc =
+		{
+			.Format = Graphics::backBufferFormat,
+			.ColorSpace = DXGI_COLOR_SPACE_RGB_FULL_G22_NONE_P709,
+			.FrameRate = {frameRate, 1},
+			.SourceSizeRange = {Graphics::getWidth(), Graphics::getHeight(), Graphics::getWidth(), Graphics::getHeight()},
+			.DestinationSizeRange = {Graphics::getWidth(), Graphics::getHeight(), Graphics::getWidth(), Graphics::getHeight()},
+		};
+
+		D3D12_VIDEO_PROCESS_OUTPUT_STREAM_DESC outputDesc =
+		{
+		.Format = DXGI_FORMAT_NV12,
+		.ColorSpace = DXGI_COLOR_SPACE_YCBCR_STUDIO_G22_LEFT_P709,
+		.FrameRate = {frameRate, 1},
+		};
+
+		CHECKERROR(VideoDevice::get()->CreateVideoProcessor(0, &outputDesc, 1, &inputDesc, IID_PPV_ARGS(&videoProcessor)));
+
+		vpCommandList = makeUnique<D3D12Core::VideoProcessCommandList>();
+
+		vpCommandQueue = makeUnique<D3D12Core::CommandQueue>(D3D12_COMMAND_LIST_TYPE_VIDEO_PROCESS);
+
+		vpCommandQueue->setPrepareCommandList(vpCommandList.get());
 	}
 
 	Encoder::~Encoder()
 	{
-		sinkWriter->Finalize();
+		if (vpCommandQueue)
+		{
+			vpCommandQueue->waitDestroyable();
+		}
 
-		sinkWriter = nullptr;
+		if (sinkWriter)
+		{
+			sinkWriter->Finalize();
+
+			sinkWriter = nullptr;
+		}
 
 		MFShutdown();
+	}
+
+	void Encoder::waitFor(D3D12Core::CommandQueue* const queueWaitFor, D3D12Core::Fence* const fence)
+	{
+		vpCommandQueue->waitFor(queueWaitFor, fence);
 	}
 
 	bool Encoder::writeFrame(const void* const bitstreamPtr, const uint32_t bitstreamSize, const bool cleanPoint)
@@ -96,6 +133,23 @@ namespace Gear::Core::VideoEncoder
 		displayProgress();
 
 		return !(frameEncoded == frameToEncode);
+	}
+
+	void Encoder::bgraToNV12(D3D12Resource::Texture* inputTexture, D3D12Resource::VideoTexture* nv12Texture, D3D12Core::Fence* const fence)
+	{
+		vpCommandQueue->begin();
+
+		D3D12Core::VPInputArguments inputArgs = D3D12Core::VPInputArguments(inputTexture);
+
+		D3D12Core::VPOutputArguments outputArgs = D3D12Core::VPOutputArguments(nv12Texture);
+
+		vpCommandList->processFrames(videoProcessor.Get(), outputArgs, { inputArgs });
+
+		vpCommandQueue->processCommandLists();
+
+		vpCommandQueue->waitFrameGPUComplete();
+
+		vpCommandQueue->signal(fence);
 	}
 
 	void Encoder::displayProgress() const

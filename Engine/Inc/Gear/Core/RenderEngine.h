@@ -12,6 +12,8 @@ namespace Gear::Core
 	namespace D3D12Core
 	{
 		class CommandList;
+
+		class CommandQueue;
 	}
 
 	namespace D3D12Resource
@@ -35,7 +37,7 @@ namespace Gear::Core
 
 		D3D12Resource::Texture* getRenderTexture();
 
-		ID3D12CommandQueue* getCommandQueue();
+		D3D12Core::CommandQueue* getCommandQueue();
 
 		bool getDisplayImGuiSurface();
 

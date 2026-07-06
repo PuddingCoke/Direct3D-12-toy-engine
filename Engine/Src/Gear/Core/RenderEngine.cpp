@@ -145,7 +145,7 @@ namespace Gear::Core::RenderEngine
 
 		D3D12Resource::Texture* getRenderTexture() const;
 
-		ID3D12CommandQueue* getCommandQueue() const;
+		D3D12Core::CommandQueue* getCommandQueue() const;
 
 		void updateFrameIndex();
 
@@ -334,7 +334,7 @@ namespace Gear::Core::RenderEngine
 
 			ComPtr<IDXGISwapChain1> swapChain1;
 
-			factory->CreateSwapChainForHwnd(getCommandQueue(), hWnd, &swapChainDesc, nullptr, nullptr, &swapChain1);
+			factory->CreateSwapChainForHwnd(commandQueue->get(), hWnd, &swapChainDesc, nullptr, nullptr, &swapChain1);
 
 			factory->MakeWindowAssociation(hWnd, DXGI_MWA_NO_ALT_ENTER);
 
@@ -410,9 +410,9 @@ namespace Gear::Core::RenderEngine
 		return renderTexture;
 	}
 
-	ID3D12CommandQueue* RenderEngineImpl::getCommandQueue() const
+	D3D12Core::CommandQueue* RenderEngineImpl::getCommandQueue() const
 	{
-		return commandQueue->get();
+		return commandQueue.get();
 	}
 
 	void RenderEngineImpl::updateFrameIndex()
@@ -844,7 +844,7 @@ namespace Gear::Core::RenderEngine
 		return impl->getRenderTexture();
 	}
 
-	ID3D12CommandQueue* getCommandQueue()
+	D3D12Core::CommandQueue* getCommandQueue()
 	{
 		return impl->getCommandQueue();
 	}

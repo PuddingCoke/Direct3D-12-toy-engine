@@ -9,12 +9,6 @@
 
 #include<NvEnc/nvEncodeAPI.h>
 
-#include<Gear/Core/D3D12Core/Fence.h>
-
-#include<Gear/Core/D3D12Core/VideoProcessCommandList.h>
-
-#include<Gear/Core/D3D12Core/CommandQueue.h>
-
 #include<queue>
 
 //基本的工作流程
@@ -93,15 +87,7 @@ namespace Gear::Core::VideoEncoder
 
 		NV_ENC_INPUT_PTR mappedOutputResourcePtr;
 
-		ComPtr<ID3D12VideoProcessor> videoProcessor;
-
-		D3D12Core::VideoProcessCommandListPtr vpCommandList;
-
-		D3D12Core::CommandQueuePtr vpCommandQueue;
-
 		D3D12Resource::VideoTexturePtr nv12Textures[numNV12Textures];
-
-		D3D12Resource::VideoTexture* currentNV12Texture;
 
 		uint64_t nv12TextureIndex;
 

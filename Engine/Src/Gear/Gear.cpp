@@ -322,48 +322,50 @@ namespace Gear
 			break;
 		}
 
-		if (vendor == AdapterVendor::NVIDIA)
+		UniquePtr<D3D12Resource::Texture> renderTexture = makeUnique<D3D12Resource::Texture>(Graphics::getWidth(), Graphics::getHeight(), Graphics::backBufferFormat, 1, 1, true, D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET, nullptr);
+
+		D3D12_CPU_DESCRIPTOR_HANDLE textureHandle;
+
 		{
-			UniquePtr<D3D12Resource::Texture> renderTexture = makeUnique<D3D12Resource::Texture>(Graphics::getWidth(), Graphics::getHeight(), Graphics::backBufferFormat, 1, 1, true, D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET, nullptr);
+			DescriptorHandle descriptorHandle = LocalDescriptorHeap::getRenderTargetHeap()->allocStaticDescriptor(1);
 
-			D3D12_CPU_DESCRIPTOR_HANDLE textureHandle;
+			D3D12_RENDER_TARGET_VIEW_DESC rtvDesc = {};
+			rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
+			rtvDesc.Format = Graphics::backBufferFormat;
+			rtvDesc.Texture2D.MipSlice = 0;
+			rtvDesc.Texture2D.PlaneSlice = 0;
 
+			GraphicsDevice::get()->CreateRenderTargetView(renderTexture->getResource(), &rtvDesc, descriptorHandle.getCurrentCPUHandle());
+
+			textureHandle = descriptorHandle.getCurrentCPUHandle();
+		}
+
+		RenderEngine::Internal::setDeltaTime(1.f / static_cast<float>(VideoEncoder::Encoder::frameRate));
+
+		D3D12Core::FencePtr vpSyncFence = makeUnique<D3D12Core::Fence>();
+
+		while (true)
+		{
+			RenderEngine::Internal::setRenderTexture(renderTexture.get(), textureHandle);
+
+			RenderEngine::Internal::beginFrame();
+
+			game->update(Graphics::getDeltaTime());
+
+			game->render();
+
+			RenderEngine::Internal::endFrame();
+
+			RenderEngine::Internal::updateTimeElapsed();
+
+			RenderEngine::Internal::waitFrameGPUComplete();
+
+			//编码器管理的命令队列需要等待渲染引擎管理的命令队列完成工作
+			encoder->waitFor(RenderEngine::getCommandQueue(), vpSyncFence.get());
+
+			if (!encoder->encode(RenderEngine::getRenderTexture()))
 			{
-				DescriptorHandle descriptorHandle = LocalDescriptorHeap::getRenderTargetHeap()->allocStaticDescriptor(1);
-
-				D3D12_RENDER_TARGET_VIEW_DESC rtvDesc = {};
-				rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
-				rtvDesc.Format = Graphics::backBufferFormat;
-				rtvDesc.Texture2D.MipSlice = 0;
-				rtvDesc.Texture2D.PlaneSlice = 0;
-
-				GraphicsDevice::get()->CreateRenderTargetView(renderTexture->getResource(), &rtvDesc, descriptorHandle.getCurrentCPUHandle());
-
-				textureHandle = descriptorHandle.getCurrentCPUHandle();
-			}
-
-			RenderEngine::Internal::setDeltaTime(1.f / static_cast<float>(VideoEncoder::Encoder::frameRate));
-
-			while (true)
-			{
-				RenderEngine::Internal::setRenderTexture(renderTexture.get(), textureHandle);
-
-				RenderEngine::Internal::beginFrame();
-
-				game->update(Graphics::getDeltaTime());
-
-				game->render();
-
-				RenderEngine::Internal::endFrame();
-
-				RenderEngine::Internal::waitFrameGPUComplete();
-
-				RenderEngine::Internal::updateTimeElapsed();
-
-				if (!encoder->encode(RenderEngine::getRenderTexture()))
-				{
-					break;
-				}
+				break;
 			}
 		}
 	}

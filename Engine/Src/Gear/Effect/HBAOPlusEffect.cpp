@@ -4,6 +4,8 @@
 
 #include<Gear/Core/RenderEngine.h>
 
+#include<Gear/Core/D3D12Core/CommandQueue.h>
+
 namespace Gear::Effect
 {
 	HBAOPlusEffectPtr HBAOPlusEffect::create(GraphicsContext& contextRef, const uint32_t width, const uint32_t height)
@@ -126,7 +128,7 @@ namespace Gear::Effect
 
 		commandList->flushResourceBarriers();
 
-		const GFSDK_SSAO_Status status = aoContext->RenderAO(RenderEngine::getCommandQueue(), commandList->get(), inputData, aoParameters, output, renderMask);
+		const GFSDK_SSAO_Status status = aoContext->RenderAO(RenderEngine::getCommandQueue()->get(), commandList->get(), inputData, aoParameters, output, renderMask);
 
 		if (status != GFSDK_SSAO_OK)
 		{

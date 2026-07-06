@@ -151,6 +151,18 @@ namespace Gear::Core::D3D12Core
 		fence->signal(commandQueue.Get());
 	}
 
+	void CommandQueue::wait(Fence* const fence)
+	{
+		commandQueue->Wait(fence->get(), fence->getCurrentFenceValue());
+	}
+
+	void CommandQueue::waitFor(CommandQueue* const queueWaitFor, Fence* const fence)
+	{
+		queueWaitFor->signal(fence);
+
+		wait(fence);
+	}
+
 	CommandList* CommandQueue::getLastUsableCommandList() const
 	{
 		return lastUsableCommandList;
