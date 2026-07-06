@@ -115,10 +115,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Inc\Gear\Camera\OrbitCamera.h" />
+    <ClInclude Include="Inc\Gear\Core\D3D12Core\CommandQueue.h" />
     <ClInclude Include="Inc\Gear\Core\D3D12Core\CommonShaderLayout.h" />
     <ClInclude Include="Inc\Gear\Core\D3D12Core\ComputeState.h" />
     <ClInclude Include="Inc\Gear\Core\D3D12Core\DescriptorHandle.h" />
     <ClInclude Include="Inc\Gear\Core\D3D12Core\DXCCompiler.h" />
+    <ClInclude Include="Inc\Gear\Core\D3D12Core\Fence.h" />
     <ClInclude Include="Inc\Gear\Core\D3D12Core\GraphicsCommandList.h" />
     <ClInclude Include="Inc\Gear\Core\D3D12Core\GraphicsState.h" />
     <ClInclude Include="Inc\Gear\Core\Internal\DeviceInternal.h" />
@@ -234,6 +236,8 @@
     <ClCompile Include="External\ImGUI\imgui_tables.cpp" />
     <ClCompile Include="External\ImGUI\imgui_widgets.cpp" />
     <ClCompile Include="External\WICTextureLoader\WICTextureLoader12.cpp" />
+    <ClCompile Include="Src\Gear\Core\D3D12Core\CommandQueue.cpp" />
+    <ClCompile Include="Src\Gear\Core\D3D12Core\Fence.cpp" />
     <ClCompile Include="Src\Gear\Core\D3D12Core\GraphicsCommandList.cpp" />
     <ClCompile Include="Src\Gear\Core\D3D12Core\VideoProcessCommandList.cpp" />
     <ClCompile Include="Src\Gear\Core\D3D12Resource\VideoTexture.cpp" />

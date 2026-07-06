@@ -2,13 +2,15 @@
 
 #include<Gear/Core/Internal/RenderEngineInternal.h>
 
-#include<Gear/Core/Graphics.h>
-
-#include<Gear/Core/MainCamera.h>
-
 #include<Gear/Core/Device.h>
 
 #include<Gear/Core/Internal/DeviceInternal.h>
+
+#include<Gear/Core/Graphics.h>
+
+#include<Gear/Core/Internal/GraphicsInternal.h>
+
+#include<Gear/Core/MainCamera.h>
 
 #include<Gear/Core/GraphicsDevice.h>
 
@@ -18,9 +20,9 @@
 
 #include<Gear/Utils/MainMonitor.h>
 
-#include<Gear/Core/D3D12Core/CommonShaderLayout.h>
+#include<Gear/Core/D3D12Core/CommandQueue.h>
 
-#include<Gear/Core/Internal/GraphicsInternal.h>
+#include<Gear/Core/D3D12Core/CommonShaderLayout.h>
 
 #include<Gear/Core/Internal/RenderThreadLocalInternal.h>
 
@@ -147,8 +149,6 @@ namespace Gear::Core::RenderEngine
 
 		void updateFrameIndex();
 
-		void signal();
-
 		void waitDestroyable();
 
 		void waitFrameCPUReusable();
@@ -197,15 +197,11 @@ namespace Gear::Core::RenderEngine
 
 		UniquePtr<Device::Internal::InitializeToken> deviceToken;
 
-		ComPtr<ID3D12CommandQueue> commandQueue;
+		D3D12Core::CommandQueuePtr commandQueue;
 
-		ComPtr<ID3D12Fence> fence;
+		UniquePtr<D3D12Core::GraphicsCommandList> prepareGraphicsCommandList;
 
-		UniquePtr<D3D12Core::GraphicsCommandList> prepareCommandList;
-
-		D3D12Core::GraphicsCommandList* finishCommandList;
-
-		D3D12Core::CommandList* lastDirectTypeCommandList;
+		D3D12Core::GraphicsCommandList* lastUsableGraphicsCommandList;
 
 		UniquePtr<RenderThreadLocal::Internal::InitializeToken> renderThreadLocalToken;
 
@@ -231,18 +227,6 @@ namespace Gear::Core::RenderEngine
 
 		AdapterVendor vendor;
 
-		static constexpr uint64_t recordCommandListsLength = 32ull;
-
-		Utils::StaticVector<D3D12Core::CommandList*, recordCommandListsLength> recordCommandLists;
-
-		Utils::StaticVector<ID3D12CommandList*, recordCommandListsLength> id3d12CommandLists;
-
-		UniquePtr<uint64_t[]> fenceValues;
-
-		HANDLE fenceEvent;
-
-		uint64_t currentFenceValue;
-
 		UniquePtr<ImGuiToken> imGuiToken;
 
 		ImFont* mediumFont;
@@ -252,28 +236,21 @@ namespace Gear::Core::RenderEngine
 		//引用
 		D3D12Resource::Texture* renderTexture;
 
-		std::mutex submitCommandListLock;
-
 		int32_t syncInterval;
 
 		D3D12Core::CommonShaderLayout::PerframeResource perframeResource;
 
-		std::vector<D3D12_RESOURCE_BARRIER> resourceBarriers;
-
 	};
 
 	RenderEngineImpl::RenderEngineImpl(const uint32_t width, const uint32_t height, const HWND hWnd, const bool useSwapChainBuffer, const bool initializeImGuiSurface) :
-		fenceEvent(CreateEvent(nullptr, FALSE, FALSE, nullptr)),
 		vendor(AdapterVendor::UNKNOWN),
-		finishCommandList(nullptr),
-		lastDirectTypeCommandList(nullptr),
+		lastUsableGraphicsCommandList(nullptr),
 		initializeImGuiSurface(initializeImGuiSurface),
 		displayImGuiSurface(false),
 		displayEngineImGuiSurface(true),
 		syncInterval(1),
 		resManager(nullptr),
-		perframeResource{},
-		currentFenceValue(0ull)
+		perframeResource{}
 	{
 		//初始化一些渲染需要的信息，如width、height、frameIndex等
 		Graphics::Internal::initialize(useSwapChainBuffer ? 3 : 1, width, height);
@@ -307,28 +284,14 @@ namespace Gear::Core::RenderEngine
 		Device::checkFeatureSupport();
 
 		//初始化图形设备后创建命令队列
-		{
-			D3D12_COMMAND_QUEUE_DESC queueDesc = {};
-			queueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
-			queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_DISABLE_GPU_TIMEOUT;
+		commandQueue = makeUnique<D3D12Core::CommandQueue>(D3D12_COMMAND_LIST_TYPE_DIRECT);
 
-			GraphicsDevice::get()->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&commandQueue));
-
-			commandQueue->SetName(L"Graphics Command Queue");
-		}
-
-		//创建fence对象用于CPU和GPU之间的同步
-		fenceValues = makeUnique<uint64_t[]>(Graphics::getFrameBufferCount());
-
-		for (uint32_t i = 0; i < Graphics::getFrameBufferCount(); i++)
-		{
-			fenceValues[i] = 0;
-		}
-
-		GraphicsDevice::get()->CreateFence(fenceValues[Graphics::getFrameIndex()], D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
+		commandQueue->setName(L"Graphics Command Queue");
 
 		//创建准备命令列表
-		prepareCommandList = makeUnique<D3D12Core::GraphicsCommandList>();
+		prepareGraphicsCommandList = makeUnique<D3D12Core::GraphicsCommandList>();
+
+		commandQueue->setPrepareCommandList(prepareGraphicsCommandList.get());
 
 		//初始化线程局部资源
 		renderThreadLocalToken = makeUnique<RenderThreadLocal::Internal::InitializeToken>();
@@ -343,9 +306,7 @@ namespace Gear::Core::RenderEngine
 
 		//把准备命令列表推入容器中，因为资源的初始化可能需要动态常量缓冲
 		//而动态常量缓冲更新的指令记录是由prepareCommandList负责的
-		prepareCommandList->open();
-
-		recordCommandLists.push(prepareCommandList.get());
+		commandQueue->begin();
 
 		resManager = makeUnique<ResourceManager>();
 
@@ -373,7 +334,7 @@ namespace Gear::Core::RenderEngine
 
 			ComPtr<IDXGISwapChain1> swapChain1;
 
-			factory->CreateSwapChainForHwnd(commandQueue.Get(), hWnd, &swapChainDesc, nullptr, nullptr, &swapChain1);
+			factory->CreateSwapChainForHwnd(getCommandQueue(), hWnd, &swapChainDesc, nullptr, nullptr, &swapChain1);
 
 			factory->MakeWindowAssociation(hWnd, DXGI_MWA_NO_ALT_ENTER);
 
@@ -451,59 +412,11 @@ namespace Gear::Core::RenderEngine
 
 	RenderEngineImpl::~RenderEngineImpl()
 	{
-		if (fenceEvent)
-		{
-			CloseHandle(fenceEvent);
-		}
 	}
 
 	void RenderEngineImpl::submitCommandList(D3D12Core::CommandList* const commandList)
 	{
-		std::lock_guard<std::mutex> lockGuard(submitCommandListLock);
-
-		D3D12Core::CommandList* const helperCommandList = recordCommandLists.back();
-
-		if (commandList->hasPendingResource())
-		{
-			resourceBarriers.clear();
-
-			commandList->flushPendingResources(resourceBarriers);
-
-			if (helperCommandList != prepareCommandList.get())
-			{
-				helperCommandList->resourceBarrier(static_cast<uint32_t>(resourceBarriers.size()), resourceBarriers.data());
-			}
-			else
-			{
-				//尽量减少D3D12 API ResourceBarrier调用
-				helperCommandList->pushResourceBarriers(resourceBarriers);
-			}
-
-			//有待定资源那么会需要更新资源的全局状态
-			//因此最后会需要更新使用过的资源的全局状态
-			commandList->flushReferredResources();
-		}
-
-		//不应该关闭准备命令列表或最后一个可用的直接类型的命令列表
-		//因为准备命令列表是被用来记录动态常量缓冲更新指令的
-		//而最后一个可用的直接类型的命令列表会被用来执行一些收尾的工作
-		if (helperCommandList != lastDirectTypeCommandList && helperCommandList != prepareCommandList.get())
-		{
-			helperCommandList->close();
-		}
-
-		//获取最后一个可用的直接类型的命令列表
-		if (commandList->getType() == D3D12_COMMAND_LIST_TYPE_DIRECT)
-		{
-			if (lastDirectTypeCommandList)
-			{
-				lastDirectTypeCommandList->close();
-			}
-
-			lastDirectTypeCommandList = commandList;
-		}
-
-		recordCommandLists.push(commandList);
+		commandQueue->submitCommandList(commandList);
 	}
 
 	AdapterVendor RenderEngineImpl::getVendor() const
@@ -518,7 +431,7 @@ namespace Gear::Core::RenderEngine
 
 	ID3D12CommandQueue* RenderEngineImpl::getCommandQueue() const
 	{
-		return commandQueue.Get();
+		return commandQueue->get();
 	}
 
 	void RenderEngineImpl::updateFrameIndex()
@@ -526,60 +439,36 @@ namespace Gear::Core::RenderEngine
 		Graphics::Internal::setFrameIndex(swapChain->GetCurrentBackBufferIndex());
 	}
 
-	void RenderEngineImpl::signal()
-	{
-		currentFenceValue++;
-
-		commandQueue->Signal(fence.Get(), currentFenceValue);
-
-		//Signal后要记录fenceValue
-		//如果fence->getCompletedValue小于记录的fenceValue，那么要等待CPU可复用
-		fenceValues[Graphics::getFrameIndex()] = currentFenceValue;
-	}
-
 	void RenderEngineImpl::waitDestroyable()
 	{
-		signal();
-
-		waitFrameGPUComplete();
+		commandQueue->waitDestroyable();
 	}
 
 	void RenderEngineImpl::waitFrameGPUComplete()
 	{
-		fence->SetEventOnCompletion(currentFenceValue, fenceEvent);
-
-		WaitForSingleObjectEx(fenceEvent, INFINITE, FALSE);
+		commandQueue->waitFrameGPUComplete();
 	}
 
 	void RenderEngineImpl::waitFrameCPUReusable()
 	{
-		if (fence->GetCompletedValue() < fenceValues[Graphics::getFrameIndex()])
-		{
-			fence->SetEventOnCompletion(fenceValues[Graphics::getFrameIndex()], fenceEvent);
-
-			WaitForSingleObjectEx(fenceEvent, INFINITE, FALSE);
-		}
+		commandQueue->waitFrameCPUReusable();
 	}
 
 	void RenderEngineImpl::beginFrame()
 	{
 		beginImGuiFrame();
 
-		prepareCommandList->open();
+		commandQueue->begin();
 
-		finishCommandList = nullptr;
-
-		lastDirectTypeCommandList = nullptr;
-
-		recordCommandLists.push(prepareCommandList.get());
+		lastUsableGraphicsCommandList = nullptr;
 
 		//先获取可用的位置，供GraphicsContext在这一帧使用
 		engineGlobalCBuffer->acquireDataPtr();
 
 		//把后备缓冲转变到STATE_RENDER_TARGET，并暂存资源屏障
-		prepareCommandList->trackAndSetResourceState(getRenderTexture(), D3D12Resource::D3D12_TRANSITION_ALL_MIPLEVELS, D3D12_RESOURCE_STATE_RENDER_TARGET);
+		prepareGraphicsCommandList->trackAndSetResourceState(getRenderTexture(), D3D12Resource::D3D12_TRANSITION_ALL_MIPLEVELS, D3D12_RESOURCE_STATE_RENDER_TARGET);
 
-		prepareCommandList->flushTransitionResources();
+		prepareGraphicsCommandList->flushTransitionResources();
 	}
 
 	void RenderEngineImpl::endFrame()
@@ -634,40 +523,21 @@ namespace Gear::Core::RenderEngine
 		//使用收尾命令列表绘制ImGui界面
 		drawImGuiFrame();
 
-		//使用最后一个可用的直接类型的命令列表把后备缓冲转变到STATE_PRESENT
-		lastDirectTypeCommandList->trackAndSetResourceState(getRenderTexture(), D3D12Resource::D3D12_TRANSITION_ALL_MIPLEVELS, D3D12_RESOURCE_STATE_PRESENT);
+		{
+			D3D12Core::CommandList* const lastUsableCommandList = commandQueue->getLastUsableCommandList();
 
-		lastDirectTypeCommandList->flushResourceBarriers();
+			//使用最后一个可用的直接类型的命令列表把后备缓冲转变到STATE_PRESENT
+			lastUsableCommandList->trackAndSetResourceState(getRenderTexture(), D3D12Resource::D3D12_TRANSITION_ALL_MIPLEVELS, D3D12_RESOURCE_STATE_PRESENT);
+
+			lastUsableCommandList->flushResourceBarriers();
+		}
 
 		processCommandLists();
 	}
 
 	void RenderEngineImpl::processCommandLists()
 	{
-		recordCommandLists.front()->close();
-
-		if (recordCommandLists.size() > 1)
-		{
-			recordCommandLists.back()->close();
-
-			if (lastDirectTypeCommandList != recordCommandLists.back())
-			{
-				lastDirectTypeCommandList->close();
-			}
-		}
-
-		id3d12CommandLists.clear();
-
-		for (const D3D12Core::CommandList* const commandList : recordCommandLists)
-		{
-			id3d12CommandLists.push(commandList->get());
-		}
-
-		recordCommandLists.clear();
-
-		commandQueue->ExecuteCommandLists(static_cast<uint32_t>(id3d12CommandLists.size()), id3d12CommandLists.data());
-
-		signal();
+		commandQueue->processCommandLists();
 	}
 
 	void RenderEngineImpl::present() const
@@ -738,16 +608,16 @@ namespace Gear::Core::RenderEngine
 
 		const CD3DX12_TEXTURE_COPY_LOCATION copySrc(getRenderTexture()->getResource(), 0);
 
-		if (!finishCommandList)
+		if (!lastUsableGraphicsCommandList)
 		{
-			finishCommandList = dynamic_cast<D3D12Core::GraphicsCommandList*>(lastDirectTypeCommandList);
+			lastUsableGraphicsCommandList = dynamic_cast<D3D12Core::GraphicsCommandList*>(commandQueue->getLastUsableCommandList());
 		}
 
-		finishCommandList->trackAndSetResourceState(getRenderTexture(), D3D12Resource::D3D12_TRANSITION_ALL_MIPLEVELS, D3D12_RESOURCE_STATE_COPY_SOURCE);
+		lastUsableGraphicsCommandList->trackAndSetResourceState(getRenderTexture(), D3D12Resource::D3D12_TRANSITION_ALL_MIPLEVELS, D3D12_RESOURCE_STATE_COPY_SOURCE);
 
-		finishCommandList->flushResourceBarriers();
+		lastUsableGraphicsCommandList->flushResourceBarriers();
 
-		finishCommandList->get()->CopyTextureRegion(&copyDest, 0, 0, 0, &copySrc, nullptr);
+		lastUsableGraphicsCommandList->get()->CopyTextureRegion(&copyDest, 0, 0, 0, &copySrc, nullptr);
 	}
 
 	bool RenderEngineImpl::getDisplayImGuiSurface() const
@@ -845,7 +715,7 @@ namespace Gear::Core::RenderEngine
 
 	void RenderEngineImpl::updateDynamicCBuffers() const
 	{
-		DynamicCBufferManager::Internal::recordCommands(prepareCommandList.get());
+		DynamicCBufferManager::Internal::recordCommands(prepareGraphicsCommandList.get());
 	}
 
 	void RenderEngineImpl::beginImGuiFrame() const
@@ -874,22 +744,22 @@ namespace Gear::Core::RenderEngine
 				Graphics::Internal::imGuiCall();
 			}
 
-			if (!finishCommandList)
+			if (!lastUsableGraphicsCommandList)
 			{
-				finishCommandList = dynamic_cast<D3D12Core::GraphicsCommandList*>(lastDirectTypeCommandList);
+				lastUsableGraphicsCommandList = dynamic_cast<D3D12Core::GraphicsCommandList*>(commandQueue->getLastUsableCommandList());
 			}
 
-			finishCommandList->trackAndSetResourceState(getRenderTexture(), D3D12Resource::D3D12_TRANSITION_ALL_MIPLEVELS, D3D12_RESOURCE_STATE_RENDER_TARGET);
+			lastUsableGraphicsCommandList->trackAndSetResourceState(getRenderTexture(), D3D12Resource::D3D12_TRANSITION_ALL_MIPLEVELS, D3D12_RESOURCE_STATE_RENDER_TARGET);
 
-			finishCommandList->flushResourceBarriers();
+			lastUsableGraphicsCommandList->flushResourceBarriers();
 
-			finishCommandList->setDescriptorHeap(GlobalDescriptorHeap::getResourceHeap()->get(), GlobalDescriptorHeap::getSamplerHeap()->get());
+			lastUsableGraphicsCommandList->setDescriptorHeap(GlobalDescriptorHeap::getResourceHeap()->get(), GlobalDescriptorHeap::getSamplerHeap()->get());
 
 			ImGui::Render();
 
-			finishCommandList->setDefRenderTarget();
+			lastUsableGraphicsCommandList->setDefRenderTarget();
 
-			ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), finishCommandList->get());
+			ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), lastUsableGraphicsCommandList->get());
 		}
 	}
 

@@ -1,0 +1,163 @@
+#include<Gear/Core/D3D12Core/CommandQueue.h>
+
+#include<Gear/Core/Graphics.h>
+
+namespace Gear::Core::D3D12Core
+{
+	CommandQueue::CommandQueue(const D3D12_COMMAND_LIST_TYPE type) :
+		prepareCommandList(nullptr), lastUsableCommandList(nullptr), commandQueueType(type)
+	{
+		D3D12_COMMAND_QUEUE_DESC queueDesc = {};
+		queueDesc.Type = commandQueueType;
+		queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_DISABLE_GPU_TIMEOUT;
+
+		GraphicsDevice::get()->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&commandQueue));
+
+		fenceValues = makeUnique<uint64_t[]>(Graphics::getFrameBufferCount());
+
+		for (uint32_t i = 0; i < Graphics::getFrameBufferCount(); i++)
+		{
+			fenceValues[i] = 0;
+		}
+
+		fence = makeUnique<D3D12Core::Fence>();
+	}
+
+	CommandQueue::~CommandQueue()
+	{
+	}
+
+	ID3D12CommandQueue* CommandQueue::get() const
+	{
+		return commandQueue.Get();
+	}
+
+	void CommandQueue::setName(const wchar_t* const name)
+	{
+		commandQueue->SetName(name);
+	}
+
+	void CommandQueue::setPrepareCommandList(CommandList* const commandList)
+	{
+		prepareCommandList = commandList;
+	}
+
+	void CommandQueue::waitDestroyable()
+	{
+		signal();
+
+		waitFrameGPUComplete();
+	}
+
+	void CommandQueue::waitFrameCPUReusable()
+	{
+		if (fence->getCompletedValue() < fenceValues[Graphics::getFrameIndex()])
+		{
+			fence->waitValue(fenceValues[Graphics::getFrameIndex()]);
+		}
+	}
+
+	void CommandQueue::waitFrameGPUComplete()
+	{
+		fence->waitCurrentValue();
+	}
+
+	void CommandQueue::begin()
+	{
+		prepareCommandList->open();
+
+		recordCommandLists.push(prepareCommandList);
+
+		lastUsableCommandList = nullptr;
+	}
+
+	void CommandQueue::submitCommandList(D3D12Core::CommandList* const commandList)
+	{
+		std::lock_guard<std::mutex> lockGuard(submitCommandListMutex);
+
+		D3D12Core::CommandList* const helperCommandList = recordCommandLists.back();
+
+		if (commandList->hasPendingResource())
+		{
+			resourceBarriers.clear();
+
+			commandList->flushPendingResources(resourceBarriers);
+
+			if (helperCommandList != prepareCommandList)
+			{
+				helperCommandList->resourceBarrier(static_cast<uint32_t>(resourceBarriers.size()), resourceBarriers.data());
+			}
+			else
+			{
+				//尽量减少D3D12 API ResourceBarrier调用
+				helperCommandList->pushResourceBarriers(resourceBarriers);
+			}
+
+			//有待定资源那么会需要更新资源的全局状态
+			//因此最后会需要更新使用过的资源的全局状态
+			commandList->flushReferredResources();
+		}
+
+		//不应该关闭准备命令列表或最后一个可用的直接类型的命令列表
+		//因为这两个命令列表是特殊的，可能会被用来执行一些特殊操作
+		if (helperCommandList != lastUsableCommandList && helperCommandList != prepareCommandList)
+		{
+			helperCommandList->close();
+		}
+
+		//获取最后一个可用的命令列表
+		if (commandList->getType() == commandQueueType)
+		{
+			if (lastUsableCommandList)
+			{
+				lastUsableCommandList->close();
+			}
+
+			lastUsableCommandList = commandList;
+		}
+
+		recordCommandLists.push(commandList);
+	}
+
+	void CommandQueue::processCommandLists()
+	{
+		recordCommandLists.front()->close();
+
+		if (recordCommandLists.size() > 1)
+		{
+			recordCommandLists.back()->close();
+
+			if (lastUsableCommandList != recordCommandLists.back())
+			{
+				lastUsableCommandList->close();
+			}
+		}
+
+		id3d12CommandLists.clear();
+
+		for (const D3D12Core::CommandList* const commandList : recordCommandLists)
+		{
+			id3d12CommandLists.push(commandList->get());
+		}
+
+		recordCommandLists.clear();
+
+		commandQueue->ExecuteCommandLists(static_cast<uint32_t>(id3d12CommandLists.size()), id3d12CommandLists.data());
+
+		signal();
+	}
+
+	D3D12Core::CommandList* CommandQueue::getLastUsableCommandList() const
+	{
+		return lastUsableCommandList;
+	}
+
+	void CommandQueue::signal()
+	{
+		fence->signal(commandQueue.Get());
+
+		//Signal后要记录fenceValue
+		//如果fence->getCompletedValue小于记录的fenceValue，那么要等待CPU可复用
+		fenceValues[Graphics::getFrameIndex()] = fence->getCurrentFenceValue();
+	}
+}
