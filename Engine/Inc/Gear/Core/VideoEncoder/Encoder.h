@@ -9,7 +9,11 @@
 
 #include<Gear/Core/Graphics.h>
 
+#include<Gear/Core/VideoDevice.h>
+
 #include<Gear/Core/D3D12Resource/Texture.h>
+
+#include<Gear/Core/D3D12Resource/VideoTexture.h>
 
 #include<chrono>
 
@@ -60,9 +64,9 @@ namespace Gear::Core::VideoEncoder
 
 		float encodeTime;
 
-		ComPtr<IMFSinkWriter> sinkWriter;
-
 		DWORD streamIndex;
+
+		ComPtr<IMFSinkWriter> sinkWriter;
 
 		const LONGLONG sampleDuration;
 

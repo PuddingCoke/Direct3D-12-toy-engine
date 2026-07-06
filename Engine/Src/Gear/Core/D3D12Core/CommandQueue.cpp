@@ -5,7 +5,8 @@
 namespace Gear::Core::D3D12Core
 {
 	CommandQueue::CommandQueue(const D3D12_COMMAND_LIST_TYPE type) :
-		prepareCommandList(nullptr), lastUsableCommandList(nullptr), commandQueueType(type)
+		prepareCommandList(nullptr), lastUsableCommandList(nullptr), commandQueueType(type),
+		frameBufferFence(makeUnique<Fence>())
 	{
 		D3D12_COMMAND_QUEUE_DESC queueDesc = {};
 		queueDesc.Type = commandQueueType;
@@ -13,14 +14,12 @@ namespace Gear::Core::D3D12Core
 
 		GraphicsDevice::get()->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&commandQueue));
 
-		fenceValues = makeUnique<uint64_t[]>(Graphics::getFrameBufferCount());
+		frameBufferFenceValues = makeUnique<uint64_t[]>(Graphics::getFrameBufferCount());
 
 		for (uint32_t i = 0; i < Graphics::getFrameBufferCount(); i++)
 		{
-			fenceValues[i] = 0;
+			frameBufferFenceValues[i] = 0;
 		}
-
-		fence = makeUnique<D3D12Core::Fence>();
 	}
 
 	CommandQueue::~CommandQueue()
@@ -51,15 +50,15 @@ namespace Gear::Core::D3D12Core
 
 	void CommandQueue::waitFrameCPUReusable()
 	{
-		if (fence->getCompletedValue() < fenceValues[Graphics::getFrameIndex()])
+		if (frameBufferFence->getCompletedValue() < frameBufferFenceValues[Graphics::getFrameIndex()])
 		{
-			fence->waitValue(fenceValues[Graphics::getFrameIndex()]);
+			frameBufferFence->waitValue(frameBufferFenceValues[Graphics::getFrameIndex()]);
 		}
 	}
 
 	void CommandQueue::waitFrameGPUComplete()
 	{
-		fence->waitCurrentValue();
+		frameBufferFence->waitCurrentValue();
 	}
 
 	void CommandQueue::begin()
@@ -71,11 +70,11 @@ namespace Gear::Core::D3D12Core
 		lastUsableCommandList = nullptr;
 	}
 
-	void CommandQueue::submitCommandList(D3D12Core::CommandList* const commandList)
+	void CommandQueue::submitCommandList(CommandList* const commandList)
 	{
 		std::lock_guard<std::mutex> lockGuard(submitCommandListMutex);
 
-		D3D12Core::CommandList* const helperCommandList = recordCommandLists.back();
+		CommandList* const helperCommandList = recordCommandLists.back();
 
 		if (commandList->hasPendingResource())
 		{
@@ -98,7 +97,7 @@ namespace Gear::Core::D3D12Core
 			commandList->flushReferredResources();
 		}
 
-		//不应该关闭准备命令列表或最后一个可用的直接类型的命令列表
+		//不应该关闭准备命令列表或最后一个可用的命令列表
 		//因为这两个命令列表是特殊的，可能会被用来执行一些特殊操作
 		if (helperCommandList != lastUsableCommandList && helperCommandList != prepareCommandList)
 		{
@@ -135,7 +134,7 @@ namespace Gear::Core::D3D12Core
 
 		id3d12CommandLists.clear();
 
-		for (const D3D12Core::CommandList* const commandList : recordCommandLists)
+		for (const CommandList* const commandList : recordCommandLists)
 		{
 			id3d12CommandLists.push(commandList->get());
 		}
@@ -147,17 +146,22 @@ namespace Gear::Core::D3D12Core
 		signal();
 	}
 
-	D3D12Core::CommandList* CommandQueue::getLastUsableCommandList() const
+	void CommandQueue::signal(Fence* const fence)
+	{
+		fence->signal(commandQueue.Get());
+	}
+
+	CommandList* CommandQueue::getLastUsableCommandList() const
 	{
 		return lastUsableCommandList;
 	}
 
 	void CommandQueue::signal()
 	{
-		fence->signal(commandQueue.Get());
+		frameBufferFence->signal(commandQueue.Get());
 
 		//Signal后要记录fenceValue
 		//如果fence->getCompletedValue小于记录的fenceValue，那么要等待CPU可复用
-		fenceValues[Graphics::getFrameIndex()] = fence->getCurrentFenceValue();
+		frameBufferFenceValues[Graphics::getFrameIndex()] = frameBufferFence->getCurrentFenceValue();
 	}
 }

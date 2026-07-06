@@ -35,11 +35,13 @@ namespace Gear::Core::D3D12Core
 
 		void begin();
 
-		void submitCommandList(D3D12Core::CommandList* const commandList);
+		void submitCommandList(CommandList* const commandList);
 
 		void processCommandLists();
 
-		D3D12Core::CommandList* getLastUsableCommandList() const;
+		void signal(Fence* const fence);
+
+		CommandList* getLastUsableCommandList() const;
 
 	private:
 
@@ -50,9 +52,9 @@ namespace Gear::Core::D3D12Core
 
 		const D3D12_COMMAND_LIST_TYPE commandQueueType;
 
-		FencePtr fence;
+		FencePtr frameBufferFence;
 
-		UniquePtr<uint64_t[]> fenceValues;
+		UniquePtr<uint64_t[]> frameBufferFenceValues;
 
 		static constexpr uint64_t recordCommandListsLength = 32ull;
 
@@ -66,7 +68,7 @@ namespace Gear::Core::D3D12Core
 
 		CommandList* prepareCommandList;
 
-		D3D12Core::CommandList* lastUsableCommandList;
+		CommandList* lastUsableCommandList;
 
 	};
 }

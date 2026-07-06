@@ -20,8 +20,10 @@ namespace Gear::Core::VideoEncoder
 	NVIDIAEncoder::NVIDIAEncoder(const uint32_t frameToEncode) :
 		Encoder(frameToEncode, outputVideoFormat), encoder(nullptr),
 		readbackHeap(makeUnique<D3D12Resource::ReadbackHeap>(2 * 4 * Graphics::getWidth() * Graphics::getHeight())),
+		inputFence(makeUnique<D3D12Core::Fence>()),
+		outputFence(makeUnique<D3D12Core::Fence>()),
 		nvencAPI{ NV_ENCODE_API_FUNCTION_LIST_VER },
-		outputFenceValue(0)
+		nv12TextureIndex(0)
 	{
 		moduleNvEncAPI = LoadLibraryA("nvEncodeAPI64.dll");
 
@@ -92,8 +94,6 @@ namespace Gear::Core::VideoEncoder
 
 		NVENCCALL(nvencAPI.nvEncInitializeEncoder(encoder, &encoderParams));
 
-		GraphicsDevice::get()->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&outputFence));
-
 		LOGENGINE("开始编码");
 
 		NV_ENC_REGISTER_RESOURCE registerOutputResource = { NV_ENC_REGISTER_RESOURCE_VER };
@@ -117,10 +117,44 @@ namespace Gear::Core::VideoEncoder
 		NVENCCALL(nvencAPI.nvEncMapInputResource(encoder, &mapOutputResource));
 
 		mappedOutputResourcePtr = mapOutputResource.mappedResource;
+
+		D3D12_VIDEO_PROCESS_INPUT_STREAM_DESC inputDesc =
+		{
+			.Format = Graphics::backBufferFormat,
+			.ColorSpace = DXGI_COLOR_SPACE_RGB_FULL_G22_NONE_P709,
+			.FrameRate = {frameRate, 1},
+			.SourceSizeRange = {Graphics::getWidth(), Graphics::getHeight(), Graphics::getWidth(), Graphics::getHeight()},
+			.DestinationSizeRange = {Graphics::getWidth(), Graphics::getHeight(), Graphics::getWidth(), Graphics::getHeight()},
+		};
+
+		D3D12_VIDEO_PROCESS_OUTPUT_STREAM_DESC outputDesc =
+		{
+		.Format = DXGI_FORMAT_NV12,
+		.ColorSpace = DXGI_COLOR_SPACE_YCBCR_STUDIO_G22_LEFT_P709,
+		.FrameRate = {frameRate, 1},
+		};
+
+		CHECKERROR(VideoDevice::get()->CreateVideoProcessor(0, &outputDesc, 1, &inputDesc, IID_PPV_ARGS(&videoProcessor)));
+
+		vpCommandList = makeUnique<D3D12Core::VideoProcessCommandList>();
+
+		vpCommandQueue = makeUnique<D3D12Core::CommandQueue>(D3D12_COMMAND_LIST_TYPE_VIDEO_PROCESS);
+
+		vpCommandQueue->setPrepareCommandList(vpCommandList.get());
+
+		for (uint32_t i = 0; i < numNV12Textures; i++)
+		{
+			nv12Textures[i] = makeUnique<D3D12Resource::VideoTexture>(Graphics::getWidth(), Graphics::getHeight(), FMT::NV12);
+		}
 	}
 
 	NVIDIAEncoder::~NVIDIAEncoder()
 	{
+		if (vpCommandQueue)
+		{
+			vpCommandQueue->waitDestroyable();
+		}
+
 		if (moduleNvEncAPI)
 		{
 			nvencAPI.nvEncUnmapInputResource(encoder, mappedOutputResourcePtr);
@@ -149,13 +183,31 @@ namespace Gear::Core::VideoEncoder
 
 	bool NVIDIAEncoder::encode(D3D12Resource::Texture* const inputTexture)
 	{
+		currentNV12Texture = nv12Textures[nv12TextureIndex].get();
+
+		nv12TextureIndex = (nv12TextureIndex + 1) % numNV12Textures;
+
+		vpCommandQueue->begin();
+
+		D3D12Core::VPInputArguments inputArgs = D3D12Core::VPInputArguments(inputTexture);
+
+		D3D12Core::VPOutputArguments outputArgs = D3D12Core::VPOutputArguments(currentNV12Texture);
+
+		vpCommandList->processFrames(videoProcessor.Get(), outputArgs, { inputArgs });
+
+		vpCommandQueue->processCommandLists();
+
+		vpCommandQueue->waitFrameGPUComplete();
+
+		vpCommandQueue->signal(inputFence.get());
+
 		bool encoding = true;
 
 		NV_ENC_REGISTER_RESOURCE registerInputResource = { NV_ENC_REGISTER_RESOURCE_VER };
 		registerInputResource.bufferFormat = bufferFormat;
 		registerInputResource.bufferUsage = NV_ENC_INPUT_IMAGE;
 		registerInputResource.resourceType = NV_ENC_INPUT_RESOURCE_TYPE_DIRECTX;
-		registerInputResource.resourceToRegister = inputTexture->getResource();
+		registerInputResource.resourceToRegister = currentNV12Texture->getResource();
 		registerInputResource.subResourceIndex = 0;
 		registerInputResource.width = Graphics::getWidth();
 		registerInputResource.height = Graphics::getHeight();
@@ -176,12 +228,17 @@ namespace Gear::Core::VideoEncoder
 		NV_ENC_INPUT_RESOURCE_D3D12 inputResource = { NV_ENC_INPUT_RESOURCE_D3D12_VER };
 		inputResource.pInputBuffer = mapInputResource.mappedResource;
 		inputResource.inputFencePoint = NV_ENC_FENCE_POINT_D3D12{ NV_ENC_FENCE_POINT_D3D12_VER };
+		inputResource.inputFencePoint.pFence = inputFence->get();
+		inputResource.inputFencePoint.waitValue = inputFence->getCurrentFenceValue();
+		inputResource.inputFencePoint.bWait = true;
 
-		NV_ENC_OUTPUT_RESOURCE_D3D12 outputResource = { NV_ENC_INPUT_RESOURCE_D3D12_VER };
+		outputFence->increment();
+
+		NV_ENC_OUTPUT_RESOURCE_D3D12 outputResource = { NV_ENC_OUTPUT_RESOURCE_D3D12_VER };
 		outputResource.pOutputBuffer = mappedOutputResourcePtr;
 		outputResource.outputFencePoint = NV_ENC_FENCE_POINT_D3D12{ NV_ENC_FENCE_POINT_D3D12_VER };
-		outputResource.outputFencePoint.pFence = outputFence.Get();
-		outputResource.outputFencePoint.signalValue = ++outputFenceValue;
+		outputResource.outputFencePoint.pFence = outputFence->get();
+		outputResource.outputFencePoint.signalValue = outputFence->getCurrentFenceValue();
 		outputResource.outputFencePoint.bSignal = true;
 
 		outputResources.push(outputResource);

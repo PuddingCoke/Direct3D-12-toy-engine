@@ -371,25 +371,6 @@ namespace Gear::Core::RenderEngine
 				backBufferTextures[i] = makeUnique<D3D12Resource::Texture>(texture, true, D3D12_RESOURCE_STATE_PRESENT);
 			}
 		}
-		else
-		{
-			//仅在视频渲染模式下关闭1047错误
-			//D3D12 ERROR: ID3D12CommandQueue::ExecuteCommandLists: Simultaneous-access or Buffer Resource (0x0000019DB876CEF0:'Unnamed Object') is still referenced by write|transition_barrier GPU operations in-flight on   another Command Queue (0x0000019DB7F9A360:'Unnamed ID3D12CommandQueue Object'). It is not safe to start read|transition_barrier GPU operations now on this Command Queue (0x0000019D831DC120:'Unnamed ID3D12CommandQueue Object'). This can result in race conditions and application instability. [ EXECUTION ERROR #1047: OBJECT_ACCESSED_WHILE_STILL_IN_USE]
-
-			ComPtr<ID3D12InfoQueue> infoQueue;
-
-			CHECKERROR(GraphicsDevice::get()->QueryInterface(IID_PPV_ARGS(&infoQueue)));
-
-			D3D12_MESSAGE_ID messageHideIDList[] = { static_cast<D3D12_MESSAGE_ID>(1047) };
-
-			D3D12_INFO_QUEUE_FILTER infoQueuefilter = {};
-
-			infoQueuefilter.DenyList.NumIDs = _countof(messageHideIDList);
-
-			infoQueuefilter.DenyList.pIDList = messageHideIDList;
-
-			CHECKERROR(infoQueue->AddStorageFilterEntries(&infoQueuefilter));
-		}
 
 		//如果有需要，那么初始化ImGUI
 		if (initializeImGuiSurface)

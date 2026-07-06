@@ -17,6 +17,10 @@ namespace Gear::Core::D3D12Core
 
 		~Fence();
 
+		ID3D12Fence* get() const;
+
+		void increment();
+
 		//CPU等待
 		void waitCurrentValue();
 

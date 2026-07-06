@@ -16,6 +16,16 @@ namespace Gear::Core::D3D12Core
 		}
 	}
 
+	ID3D12Fence* Fence::get() const
+	{
+		return fence.Get();
+	}
+
+	void Fence::increment()
+	{
+		currentFenceValue++;
+	}
+
 	void Fence::waitCurrentValue()
 	{
 		fence->SetEventOnCompletion(currentFenceValue, fenceEvent);

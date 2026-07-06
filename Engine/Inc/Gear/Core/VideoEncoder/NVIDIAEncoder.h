@@ -9,6 +9,12 @@
 
 #include<NvEnc/nvEncodeAPI.h>
 
+#include<Gear/Core/D3D12Core/Fence.h>
+
+#include<Gear/Core/D3D12Core/VideoProcessCommandList.h>
+
+#include<Gear/Core/D3D12Core/CommandQueue.h>
+
 #include<queue>
 
 //基本的工作流程
@@ -47,11 +53,13 @@ namespace Gear::Core::VideoEncoder
 
 		bool encode(D3D12Resource::Texture* const inputTexture) override;
 
-		static constexpr uint32_t lookaheadDepth = 31;
-
 	private:
 
-		static constexpr NV_ENC_BUFFER_FORMAT bufferFormat = NV_ENC_BUFFER_FORMAT_ARGB;
+		static constexpr uint32_t lookaheadDepth = 31;
+
+		static constexpr uint64_t numNV12Textures = lookaheadDepth + 1;
+
+		static constexpr NV_ENC_BUFFER_FORMAT bufferFormat = NV_ENC_BUFFER_FORMAT_NV12;
 
 		static constexpr NV_ENC_TUNING_INFO tuningInfo = NV_ENC_TUNING_INFO_HIGH_QUALITY;
 
@@ -71,9 +79,9 @@ namespace Gear::Core::VideoEncoder
 
 		UniquePtr<D3D12Resource::ReadbackHeap> readbackHeap;
 
-		ComPtr<ID3D12Fence> outputFence;
+		D3D12Core::FencePtr inputFence;
 
-		uint32_t outputFenceValue;
+		D3D12Core::FencePtr outputFence;
 
 		std::queue<NV_ENC_REGISTERED_PTR> registeredInputResourcePtrs;
 
@@ -84,6 +92,18 @@ namespace Gear::Core::VideoEncoder
 		NV_ENC_REGISTERED_PTR registeredOutputResourcePtr;
 
 		NV_ENC_INPUT_PTR mappedOutputResourcePtr;
+
+		ComPtr<ID3D12VideoProcessor> videoProcessor;
+
+		D3D12Core::VideoProcessCommandListPtr vpCommandList;
+
+		D3D12Core::CommandQueuePtr vpCommandQueue;
+
+		D3D12Resource::VideoTexturePtr nv12Textures[numNV12Textures];
+
+		D3D12Resource::VideoTexture* currentNV12Texture;
+
+		uint64_t nv12TextureIndex;
 
 	};
 }

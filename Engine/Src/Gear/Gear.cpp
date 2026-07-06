@@ -324,14 +324,12 @@ namespace Gear
 
 		if (vendor == AdapterVendor::NVIDIA)
 		{
-			const uint32_t numTextures = VideoEncoder::NVIDIAEncoder::lookaheadDepth + 1;
+			UniquePtr<D3D12Resource::Texture> renderTexture = makeUnique<D3D12Resource::Texture>(Graphics::getWidth(), Graphics::getHeight(), Graphics::backBufferFormat, 1, 1, true, D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET, nullptr);
 
-			UniquePtr<D3D12Resource::Texture> renderTextures[numTextures] = {};
-
-			D3D12_CPU_DESCRIPTOR_HANDLE textureHandles[numTextures] = {};
+			D3D12_CPU_DESCRIPTOR_HANDLE textureHandle;
 
 			{
-				DescriptorHandle descriptorHandle = LocalDescriptorHeap::getRenderTargetHeap()->allocStaticDescriptor(numTextures);
+				DescriptorHandle descriptorHandle = LocalDescriptorHeap::getRenderTargetHeap()->allocStaticDescriptor(1);
 
 				D3D12_RENDER_TARGET_VIEW_DESC rtvDesc = {};
 				rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
@@ -339,27 +337,16 @@ namespace Gear
 				rtvDesc.Texture2D.MipSlice = 0;
 				rtvDesc.Texture2D.PlaneSlice = 0;
 
-				for (uint32_t i = 0; i < numTextures; i++)
-				{
-					const D3D12_CLEAR_VALUE clearValue = { Graphics::backBufferFormat ,{0.f,0.f,0.f,1.f} };
+				GraphicsDevice::get()->CreateRenderTargetView(renderTexture->getResource(), &rtvDesc, descriptorHandle.getCurrentCPUHandle());
 
-					renderTextures[i] = makeUnique<D3D12Resource::Texture>(Graphics::getWidth(), Graphics::getHeight(), Graphics::backBufferFormat, 1, 1, true, D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET, &clearValue);
-
-					GraphicsDevice::get()->CreateRenderTargetView(renderTextures[i]->getResource(), &rtvDesc, descriptorHandle.getCurrentCPUHandle());
-
-					textureHandles[i] = descriptorHandle.getCurrentCPUHandle();
-
-					descriptorHandle.move();
-				}
+				textureHandle = descriptorHandle.getCurrentCPUHandle();
 			}
-
-			uint32_t index = 0;
 
 			RenderEngine::Internal::setDeltaTime(1.f / static_cast<float>(VideoEncoder::Encoder::frameRate));
 
 			while (true)
 			{
-				RenderEngine::Internal::setRenderTexture(renderTextures[index].get(), textureHandles[index]);
+				RenderEngine::Internal::setRenderTexture(renderTexture.get(), textureHandle);
 
 				RenderEngine::Internal::beginFrame();
 
@@ -377,8 +364,6 @@ namespace Gear
 				{
 					break;
 				}
-
-				index = (index + 1) % numTextures;
 			}
 		}
 	}

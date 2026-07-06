@@ -104,11 +104,11 @@ namespace Gear::Core::VideoEncoder
 		{
 			const uint32_t num = progressBarWidth * frameEncoded / frameToEncode;
 
-			const uint32_t buffLength = 12 + 2 + progressBarWidth + 1 + 6 + 1 + 1;
+			const uint32_t buffLength = 13 + 2 + progressBarWidth + 1 + 6 + 1 + 1;
 
 			char str[buffLength] = {};
 
-			sprintf_s(str, buffLength, "Encoding... [%.*s%.*s] %.2f%%",
+			sprintf_s(str, buffLength, "编码中... [%.*s%.*s] %.2f%%",
 				num, "********************************",
 				progressBarWidth - num, "////////////////////////////////",
 				100.f * static_cast<float>(frameEncoded) / static_cast<float>(frameToEncode));
