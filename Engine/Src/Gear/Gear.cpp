@@ -50,11 +50,9 @@ namespace Gear
 
 		void operator=(const GearImpl&) = delete;
 
-		GearImpl();
+		GearImpl(const InitializationParam& param, const int32_t argc, const wchar_t* argv[]);
 
 		~GearImpl();
-
-		int32_t initEngine(const InitializationParam& param, const int32_t argc, const wchar_t* argv[]);
 
 		void initGame(UniquePtr<Game> gamePtr);
 
@@ -94,31 +92,7 @@ namespace Gear
 
 	};
 
-	GearImpl::GearImpl()
-	{
-	}
-
-	GearImpl::~GearImpl()
-	{
-		RenderEngine::Internal::waitDestroyable();
-
-#ifdef _DEBUG
-
-		//由于Debug模式下需要输出存活的对象，所以需要手动释放相关资源
-		backBufferHeap.reset();
-
-		game.reset();
-
-		renderEngineToken.reset();
-
-		reportLiveObjects();
-
-#endif // _DEBUG
-
-		LOGENGINE("资源销毁完毕");
-	}
-
-	int32_t GearImpl::initEngine(const InitializationParam& param, const int32_t argc, const wchar_t* argv[])
+	GearImpl::GearImpl(const InitializationParam& param, const int32_t argc, const wchar_t* argv[])
 	{
 		//设置locale为.UTF-8用于多语言支持
 		std::locale::global(std::locale(".UTF-8"));
@@ -192,8 +166,26 @@ namespace Gear
 		LOGENGINE("横纵比", Graphics::getAspectRatio());
 
 		LOGENGINE("后备缓冲数量", Graphics::getFrameBufferCount());
+	}
 
-		return 0;
+	GearImpl::~GearImpl()
+	{
+		RenderEngine::Internal::waitDestroyable();
+
+#ifdef _DEBUG
+
+		//由于Debug模式下需要输出存活的对象，所以需要手动释放相关资源
+		backBufferHeap.reset();
+
+		game.reset();
+
+		renderEngineToken.reset();
+
+		reportLiveObjects();
+
+#endif // _DEBUG
+
+		LOGENGINE("资源销毁完毕");
 	}
 
 	void GearImpl::initGame(UniquePtr<Game> gamePtr)
@@ -205,19 +197,13 @@ namespace Gear
 		switch (usage)
 		{
 		case InitializationParam::EngineUsage::REALTIMERENDER:
-			runRealTimeRender();
-			break;
-
+			return runRealTimeRender();
 		case InitializationParam::EngineUsage::VIDEORENDER:
-			runVideoRender();
-			break;
-
+			return runVideoRender();
 		case InitializationParam::EngineUsage::WALLPAPER:
-			runWallpaper();
-			break;
-
+			return runWallpaper();
 		default:
-			break;
+			return;
 		}
 	}
 
@@ -344,8 +330,9 @@ namespace Gear
 
 		D3D12Core::FencePtr vpSyncFence = makeUnique<D3D12Core::Fence>();
 
-		while (true)
+		do
 		{
+
 			RenderEngine::Internal::setRenderTexture(renderTexture.get(), textureHandle);
 
 			RenderEngine::Internal::beginFrame();
@@ -363,11 +350,7 @@ namespace Gear
 			//编码器管理的命令队列需要等待渲染引擎管理的命令队列完成工作
 			encoder->waitFor(RenderEngine::getCommandQueue(), vpSyncFence.get());
 
-			if (!encoder->encode(RenderEngine::getRenderTexture()))
-			{
-				break;
-			}
-		}
+		} while (encoder->encode(RenderEngine::getRenderTexture()));
 	}
 
 	void GearImpl::runWallpaper()
@@ -435,19 +418,9 @@ namespace Gear
 
 	UniquePtr<GearImpl> impl;
 
-	int32_t initEngine(const InitializationParam& param, const int32_t argc, const wchar_t* argv[])
+	void initialize(const InitializationParam& param, const int32_t argc, const wchar_t* argv[])
 	{
-		return impl->initEngine(param, argc, argv);
-	}
-
-	void initGame(UniquePtr<Game> gamePtr)
-	{
-		impl->initGame(std::move(gamePtr));
-	}
-
-	void initialize()
-	{
-		impl = makeUnique<GearImpl>();
+		impl = makeUnique<GearImpl>(param, argc, argv);
 	}
 
 	void release()
@@ -455,8 +428,14 @@ namespace Gear
 		impl.reset();
 	}
 
+	void initGame(UniquePtr<Game> gamePtr)
+	{
+		impl->initGame(std::move(gamePtr));
+	}
+
 	void failureExit(const std::exception& e)
 	{
+		//保证错误信息被输出到log.txt
 		Logger::Internal::release();
 
 		std::cerr << e.what();

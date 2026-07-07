@@ -10,15 +10,13 @@
 namespace Gear
 {
 
-	int32_t initEngine(const InitializationParam& param, const int32_t argc, const wchar_t* argv[]);
-
 	void initGame(UniquePtr<Game> gamePtr);
 
-	void initialize();
+	void initialize(const InitializationParam& param, const int32_t argc, const wchar_t* argv[]);
 
 	void release();
 
-	struct InitializeToken { InitializeToken() { initialize(); } ~InitializeToken() { release(); } };
+	struct EngineInitializeToken { EngineInitializeToken(const InitializationParam& param, const int32_t argc, const wchar_t* argv[]) { initialize(param, argc, argv); } ~EngineInitializeToken() { release(); } };
 
 	void failureExit(const std::exception& e);
 

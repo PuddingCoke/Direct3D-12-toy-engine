@@ -50,8 +50,8 @@ namespace Gear::Core::D3D12Core
 
 	private:
 
-		//仅内部使用，用于N重缓冲
-		void signal();
+		//用于N重缓冲
+		void signalFrameCPUReusable();
 
 		ComPtr<ID3D12CommandQueue> commandQueue;
 

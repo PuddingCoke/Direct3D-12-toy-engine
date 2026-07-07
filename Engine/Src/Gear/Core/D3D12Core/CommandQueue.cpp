@@ -43,7 +43,7 @@ namespace Gear::Core::D3D12Core
 
 	void CommandQueue::waitDestroyable()
 	{
-		signal();
+		signalFrameCPUReusable();
 
 		waitFrameGPUComplete();
 	}
@@ -143,7 +143,7 @@ namespace Gear::Core::D3D12Core
 
 		commandQueue->ExecuteCommandLists(static_cast<uint32_t>(id3d12CommandLists.size()), id3d12CommandLists.data());
 
-		signal();
+		signalFrameCPUReusable();
 	}
 
 	void CommandQueue::signal(Fence* const fence)
@@ -168,9 +168,9 @@ namespace Gear::Core::D3D12Core
 		return lastUsableCommandList;
 	}
 
-	void CommandQueue::signal()
+	void CommandQueue::signalFrameCPUReusable()
 	{
-		frameBufferFence->signal(commandQueue.Get());
+		signal(frameBufferFence.get());
 
 		//Signal后要记录fenceValue
 		//如果fence->getCompletedValue小于记录的fenceValue，那么要等待CPU可复用
