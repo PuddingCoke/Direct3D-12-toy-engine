@@ -10,111 +10,112 @@
 
 namespace Gear::Effect::LatLongMapToCubeMapEffect
 {
-	namespace Internal
+	class LatLongMapToCubeMapEffectImpl
 	{
-		class LatLongMapToCubeMapEffectImpl
+	public:
+
+		LatLongMapToCubeMapEffectImpl(ResourceManager* const resManager);
+
+		void process(GraphicsContext& contextRef, RenderTextureView& inputTexture, RenderTextureView& outputTexture);
+
+	private:
+
+		ShaderPtr equirectangularVS;
+
+		ShaderPtr equirectangularPS;
+
+		GraphicsStatePtr equirectangularState;
+
+		ImmutableCBufferPtr matricesBuffer;
+
+	};
+
+	LatLongMapToCubeMapEffectImpl::LatLongMapToCubeMapEffectImpl(ResourceManager* const resManager)
+	{
+		equirectangularVS = Shader::create(g_EquirectangularVSBytes, sizeof(g_EquirectangularVSBytes));
+
+		equirectangularPS = Shader::create(g_EquirectangularPSBytes, sizeof(g_EquirectangularPSBytes));
+
+		equirectangularState = PipelineStateBuilder()
+			.setVS(*equirectangularVS)
+			.setPS(*equirectangularPS)
+			.setRasterizerState(PipelineStateHelper::rasterCullNone)
+			.setBlendState(PipelineStateHelper::blendReplace)
+			.setDepthStencilState(PipelineStateHelper::depthCompareNone)
+			.build();
+
 		{
-		public:
-
-			LatLongMapToCubeMapEffectImpl(ResourceManager* const resManager);
-
-			void process(GraphicsContext& contextRef, RenderTextureView& inputTexture, RenderTextureView& outputTexture);
-
-		private:
-
-			ShaderPtr equirectangularVS;
-
-			ShaderPtr equirectangularPS;
-
-			GraphicsStatePtr equirectangularState;
-
-			ImmutableCBufferPtr matricesBuffer;
-
-		};
-
-		LatLongMapToCubeMapEffectImpl::LatLongMapToCubeMapEffectImpl(ResourceManager* const resManager)
-		{
-			equirectangularVS = Shader::create(g_EquirectangularVSBytes, sizeof(g_EquirectangularVSBytes));
-
-			equirectangularPS = Shader::create(g_EquirectangularPSBytes, sizeof(g_EquirectangularPSBytes));
-
-			equirectangularState = PipelineStateBuilder()
-				.setVS(*equirectangularVS)
-				.setPS(*equirectangularPS)
-				.setRasterizerState(PipelineStateHelper::rasterCullNone)
-				.setBlendState(PipelineStateHelper::blendReplace)
-				.setDepthStencilState(PipelineStateHelper::depthCompareNone)
-				.build();
+			struct Matrices
+			{
+				DirectX::XMMATRIX matrices[6];
+				DirectX::XMFLOAT4 padding[8];
+			} matrices{};
 
 			{
-				struct Matrices
+				const DirectX::XMVECTOR focusPoints[6] =
 				{
-					DirectX::XMMATRIX matrices[6];
-					DirectX::XMFLOAT4 padding[8];
-				} matrices{};
-
+					{1.0f,  0.0f,  0.0f},
+					{-1.0f,  0.0f,  0.0f},
+					{0.0f,  1.0f,  0.0f},
+					{0.0f, -1.0f,  0.0f},
+					{0.0f,  0.0f,  1.0f},
+					{0.0f,  0.0f, -1.0f}
+				};
+				const DirectX::XMVECTOR upVectors[6] =
 				{
-					const DirectX::XMVECTOR focusPoints[6] =
-					{
-						{1.0f,  0.0f,  0.0f},
-						{-1.0f,  0.0f,  0.0f},
-						{0.0f,  1.0f,  0.0f},
-						{0.0f, -1.0f,  0.0f},
-						{0.0f,  0.0f,  1.0f},
-						{0.0f,  0.0f, -1.0f}
-					};
-					const DirectX::XMVECTOR upVectors[6] =
-					{
-						{0.0f, 1.0f,  0.0f},
-						{0.0f, 1.0f,  0.0f},
-						{0.0f,  0.0f,  -1.0f},
-						{0.0f,  0.0f, 1.0f},
-						{0.0f, 1.0f,  0.0f},
-						{0.0f, 1.0f,  0.0f}
-					};
+					{0.0f, 1.0f,  0.0f},
+					{0.0f, 1.0f,  0.0f},
+					{0.0f,  0.0f,  -1.0f},
+					{0.0f,  0.0f, 1.0f},
+					{0.0f, 1.0f,  0.0f},
+					{0.0f, 1.0f,  0.0f}
+				};
 
-					const DirectX::XMMATRIX projMatrix = DirectX::XMMatrixPerspectiveFovLH(Utils::Math::halfPi, 1.f, 0.1f, 10.f);
+				const DirectX::XMMATRIX projMatrix = DirectX::XMMatrixPerspectiveFovLH(Utils::Math::halfPi, 1.f, 0.1f, 10.f);
 
-					for (uint32_t i = 0; i < 6; i++)
-					{
-						const DirectX::XMMATRIX viewMatrix = DirectX::XMMatrixLookAtLH({ 0.f,0.f,0.f }, focusPoints[i], upVectors[i]);
-						const DirectX::XMMATRIX viewProj = DirectX::XMMatrixTranspose(viewMatrix * projMatrix);
+				for (uint32_t i = 0; i < 6; i++)
+				{
+					const DirectX::XMMATRIX viewMatrix = DirectX::XMMatrixLookAtLH({ 0.f,0.f,0.f }, focusPoints[i], upVectors[i]);
+					const DirectX::XMMATRIX viewProj = DirectX::XMMatrixTranspose(viewMatrix * projMatrix);
 
-						matrices.matrices[i] = viewProj;
-					}
+					matrices.matrices[i] = viewProj;
 				}
-
-				matricesBuffer = resManager->createImmutableCBuffer(sizeof(Matrices), &matrices, false);
-
-				matricesBuffer->getBuffer()->setName(L"LatLongMap To Cubemap Matrices");
 			}
 
-			LOGSUCCESS("创建", LogColor::brightMagenta, TOSTRING(LatLongMapToCubeMapEffect));
+			matricesBuffer = resManager->createImmutableCBuffer(sizeof(Matrices), &matrices, false);
+
+			matricesBuffer->getBuffer()->setName(L"LatLongMap To Cubemap Matrices");
 		}
 
-		void LatLongMapToCubeMapEffectImpl::process(GraphicsContext& contextRef, RenderTextureView& inputTexture, RenderTextureView& outputTexture)
-		{
-			GraphicsContext* const context = &contextRef;
+		LOGSUCCESS("创建", LogColor::brightMagenta, TOSTRING(LatLongMapToCubeMapEffect));
+	}
 
-			context->setPipelineState(*equirectangularState);
+	void LatLongMapToCubeMapEffectImpl::process(GraphicsContext& contextRef, RenderTextureView& inputTexture, RenderTextureView& outputTexture)
+	{
+		GraphicsContext* const context = &contextRef;
 
-			context->setViewportSimple(outputTexture.get2Dimension());
+		context->setPipelineState(*equirectangularState);
 
-			context->setPrimitiveTopology(TOPOLOGY::TRIANGLELIST);
+		context->setViewportSimple(outputTexture.get2Dimension());
 
-			context->setRenderTargets({ outputTexture.getRTVMip(0) }, {});
+		context->setPrimitiveTopology(TOPOLOGY::TRIANGLELIST);
 
-			context->setVSConstantBuffer(*matricesBuffer);
+		context->setRenderTargets({ outputTexture.getRTVMip(0) }, {});
 
-			SETCONSTS({
-			context->setPSConstants({ inputTexture.getAllSRVIndex() }, co);
-				});
+		context->setVSConstantBuffer(*matricesBuffer);
 
-			context->draw(36, 6, 0, 0);
-		}
+		SETCONSTS({
+		context->setPSConstants({ inputTexture.getAllSRVIndex() }, co);
+			});
 
-		UniquePtr<LatLongMapToCubeMapEffectImpl> impl;
+		context->draw(36, 6, 0, 0);
+	}
 
+	UniquePtr<LatLongMapToCubeMapEffectImpl> impl;
+
+	namespace Internal
+	{
+		
 		void initialize(ResourceManager* const resManager)
 		{
 			impl = makeUnique<LatLongMapToCubeMapEffectImpl>(resManager);
@@ -124,11 +125,12 @@ namespace Gear::Effect::LatLongMapToCubeMapEffect
 		{
 			impl.reset();
 		}
+
 	}
 
 	void process(GraphicsContext& contextRef, RenderTextureView& inputTexture, RenderTextureView& outputTexture)
 	{
-		Internal::impl->process(contextRef, inputTexture, outputTexture);
+		impl->process(contextRef, inputTexture, outputTexture);
 	}
 }
 

@@ -8,53 +8,53 @@
 
 namespace Gear::Effect::BackBufferBlitEffect
 {
+	class BackBufferBlitEffectImpl
+	{
+	public:
+
+		BackBufferBlitEffectImpl();
+
+		void process(GraphicsContext& contextRef, RenderTextureView& inputTexture);
+
+	private:
+
+		GraphicsStatePtr backBufferBlitState;
+
+	};
+
+	BackBufferBlitEffectImpl::BackBufferBlitEffectImpl()
+	{
+		backBufferBlitState = PipelineStateBuilder()
+			.setDefaultFullScreenState()
+			.setPS(*GlobalShader::getFullScreenPS())
+			.build();
+
+		LOGSUCCESS("创建", LogColor::brightMagenta, TOSTRING(BackBufferBlitEffect));
+	}
+
+	void BackBufferBlitEffectImpl::process(GraphicsContext& contextRef, RenderTextureView& inputTexture)
+	{
+		GraphicsContext* const context = &contextRef;
+
+		context->setPipelineState(*backBufferBlitState);
+
+		context->setDefRenderTarget();
+
+		context->setViewportSimple(Graphics::getWidth(), Graphics::getHeight());
+
+		context->setPrimitiveTopology(TOPOLOGY::TRIANGLELIST);
+
+		SETCONSTS({
+		context->setPSConstants({ inputTexture.getAllSRVIndex() }, co);
+			});
+
+		context->drawQuad();
+	}
+
+	UniquePtr<BackBufferBlitEffectImpl> impl;
+
 	namespace Internal
 	{
-		class BackBufferBlitEffectImpl
-		{
-		public:
-
-			BackBufferBlitEffectImpl();
-
-			void process(GraphicsContext& contextRef, RenderTextureView& inputTexture);
-
-		private:
-
-			GraphicsStatePtr backBufferBlitState;
-
-		};
-
-		BackBufferBlitEffectImpl::BackBufferBlitEffectImpl()
-		{
-			backBufferBlitState = PipelineStateBuilder()
-				.setDefaultFullScreenState()
-				.setPS(*GlobalShader::getFullScreenPS())
-				.build();
-
-			LOGSUCCESS("创建", LogColor::brightMagenta, TOSTRING(BackBufferBlitEffect));
-		}
-
-		void BackBufferBlitEffectImpl::process(GraphicsContext& contextRef, RenderTextureView& inputTexture)
-		{
-			GraphicsContext* const context = &contextRef;
-
-			context->setPipelineState(*backBufferBlitState);
-
-			context->setDefRenderTarget();
-
-			context->setViewportSimple(Graphics::getWidth(), Graphics::getHeight());
-
-			context->setPrimitiveTopology(TOPOLOGY::TRIANGLELIST);
-
-			SETCONSTS({
-			context->setPSConstants({ inputTexture.getAllSRVIndex() }, co);
-				});
-
-			context->drawQuad();
-		}
-
-		UniquePtr<BackBufferBlitEffectImpl> impl;
-
 		void initialize()
 		{
 			impl = makeUnique<BackBufferBlitEffectImpl>();
@@ -68,6 +68,6 @@ namespace Gear::Effect::BackBufferBlitEffect
 
 	void process(GraphicsContext& contextRef, RenderTextureView& inputTexture)
 	{
-		Internal::impl->process(contextRef, inputTexture);
+		impl->process(contextRef, inputTexture);
 	}
 }

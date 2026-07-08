@@ -6,46 +6,47 @@
 
 namespace Gear::Effect::HDRClampEffect
 {
+	class HDRClampEffectImpl
+	{
+	public:
+
+		HDRClampEffectImpl();
+
+		void process(GraphicsContext& contextRef, Resource::RenderTextureView& inOutTexture);
+
+	private:
+
+		ComputeStatePtr hdrClampState;
+
+	};
+
+	HDRClampEffectImpl::HDRClampEffectImpl()
+	{
+		hdrClampState = PipelineStateBuilder::build(Shader::create(g_HDRClampCSBytes, sizeof(g_HDRClampCSBytes)));
+
+		LOGSUCCESS("创建", LogColor::brightMagenta, TOSTRING(HDRClampEffect));
+	}
+
+	void HDRClampEffectImpl::process(GraphicsContext& contextRef, Resource::RenderTextureView& inOutTexture)
+	{
+		GraphicsContext* const context = &contextRef;
+
+		if (inOutTexture.getTexture()->getFormat() == FMT::RGBA16F)
+		{
+			context->setPipelineState(*hdrClampState);
+
+			SETCONSTS({
+			context->setCSConstants({ inOutTexture.getUAVMipIndex(0) }, co);
+				});
+
+			context->dispatchDim(inOutTexture.get3Dimension());
+		}
+	}
+
+	UniquePtr<HDRClampEffectImpl> impl;
+
 	namespace Internal
 	{
-		class HDRClampEffectImpl
-		{
-		public:
-
-			HDRClampEffectImpl();
-
-			void process(GraphicsContext& contextRef, Resource::RenderTextureView& inOutTexture);
-
-		private:
-
-			ComputeStatePtr hdrClampState;
-
-		};
-
-		HDRClampEffectImpl::HDRClampEffectImpl()
-		{
-			hdrClampState = PipelineStateBuilder::build(Shader::create(g_HDRClampCSBytes, sizeof(g_HDRClampCSBytes)));
-
-			LOGSUCCESS("创建", LogColor::brightMagenta, TOSTRING(HDRClampEffect));
-		}
-
-		void HDRClampEffectImpl::process(GraphicsContext& contextRef, Resource::RenderTextureView& inOutTexture)
-		{
-			GraphicsContext* const context = &contextRef;
-
-			if (inOutTexture.getTexture()->getFormat() == FMT::RGBA16F)
-			{
-				context->setPipelineState(*hdrClampState);
-
-				SETCONSTS({
-				context->setCSConstants({ inOutTexture.getUAVMipIndex(0) }, co);
-					});
-
-				context->dispatchDim(inOutTexture.get3Dimension());
-			}
-		}
-
-		UniquePtr<HDRClampEffectImpl> impl;
 
 		void initialize()
 		{
@@ -56,10 +57,11 @@ namespace Gear::Effect::HDRClampEffect
 		{
 			impl.reset();
 		}
+
 	}
 
 	void process(GraphicsContext& contextRef, Resource::RenderTextureView& inOutTexture)
 	{
-		Internal::impl->process(contextRef, inOutTexture);
+		impl->process(contextRef, inOutTexture);
 	}
 }

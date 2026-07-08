@@ -15,6 +15,8 @@
 
 #include<type_traits>
 
+#include<string_view>
+
 namespace Gear::Utils::Logger
 {
 	enum class LogType
@@ -63,12 +65,12 @@ namespace Gear::Utils::Logger
 		~LogContext();
 
 		template<typename... Args>
-		static LogMessage createLogMessage(const char* const functionName, const LogType& type, const Args&... args);
+		static LogMessage createLogMessage(const std::string_view& functionName, const LogType& type, const Args&... args);
 
 	private:
 
 		template<typename... Args>
-		LogMessage getLogMessage(const char* const functionName, const LogType& type, const Args&... args);
+		LogMessage getLogMessage(const std::string_view& functionName, const LogType& type, const Args&... args);
 
 		template<typename First, typename... Rest>
 		void packRestArgument(const First& first, const Rest&... rest);
@@ -159,7 +161,7 @@ namespace Gear::Utils::Logger
 	};
 
 	template<typename ...Args>
-	inline LogMessage LogContext::createLogMessage(const char* const functionName, const LogType& type, const Args & ...args)
+	inline LogMessage LogContext::createLogMessage(const std::string_view& functionName, const LogType& type, const Args & ...args)
 	{
 		thread_local UniquePtr<LogContext> context = makeUnique<LogContext>();
 
@@ -169,7 +171,7 @@ namespace Gear::Utils::Logger
 	}
 
 	template<typename ...Args>
-	inline LogMessage LogContext::getLogMessage(const char* const functionName, const LogType& type, const Args & ...args)
+	inline LogMessage LogContext::getLogMessage(const std::string_view& functionName, const LogType& type, const Args & ...args)
 	{
 		writeIndex++;
 
@@ -202,7 +204,7 @@ namespace Gear::Utils::Logger
 			//headerStrLen = 5+2+8+1+5+2+1+10+1+5+2+length(functionName)+1+1
 			//			   = 44+length(functionName)
 			sprintf_s(convertBuffer, convertBufferLength, "%s[%d:%d:%d] %s{T%u} %s(%s) ", LogColor::timeStampColor.code, localTime.tm_hour, localTime.tm_min, localTime.tm_sec,
-				LogColor::threadIdColor.code, threadId, LogColor::functionNameColor.code, functionName);
+				LogColor::threadIdColor.code, threadId, LogColor::functionNameColor.code, functionName.data());
 
 			*messageStr += convertBuffer;
 		}

@@ -35,18 +35,78 @@ namespace Gear::Utils::Logger
 	void submitLogMessage(const LogMessage& msg);
 }
 
+constexpr std::string_view getShortFuncName(const char* const funcName)
+{
+	std::string_view sv(funcName);
+
+	const auto internalPos = sv.rfind("::Internal::");
+
+	if (internalPos != std::string_view::npos)
+	{
+		if (internalPos == 0ull)
+		{
+			return sv;
+		}
+
+		const auto prevPos = sv.rfind("::", internalPos - 1ull);
+
+		//ASD::ASD::Internal::ASD -> ASD::Internal::ASD
+		if (prevPos != std::string_view::npos)
+		{
+			return sv.substr(prevPos + 2ull);
+		}
+		//ASD::Internal::ASD -> ASD::Internal::ASD
+		else
+		{
+			return sv;
+		}
+	}
+	else
+	{
+		const auto prevPos = sv.rfind("::");
+
+		//ASDFGH -> ASDFGH
+		if (prevPos == std::string_view::npos)
+		{
+			return sv;
+		}
+		else
+		{
+			const auto prevPrevPos = sv.rfind("::", prevPos - 1ull);
+
+			//::ASDFGH -> ::ASDFGH
+			if (prevPos == 0ull)
+			{
+				return sv;
+			}
+			//ASDFG::ASDFG::ASDFG -> ASDFG::ASDFG
+			else if (prevPrevPos != std::string_view::npos)
+			{
+				return sv.substr(prevPrevPos + 2ull);
+			}
+			//ASDFG::ASDFG -> ASDFG::ASDFG
+			else
+			{
+				return sv;
+			}
+		}
+	}
+}
+
 #define TOSTRING(x) #x
 
 #define TOWSTRING(x) L#x
 
-#define LOGSUCCESS(...) Gear::Utils::Logger::submitLogMessage(Gear::Utils::Logger::LogContext::createLogMessage(__FUNCTION__,Gear::Utils::Logger::LogType::LOG_SUCCESS,__VA_ARGS__))
+#define TOSHORTFUNCNAME(x) getShortFuncName(x)
 
-#define LOGENGINE(...) Gear::Utils::Logger::submitLogMessage(Gear::Utils::Logger::LogContext::createLogMessage(__FUNCTION__,Gear::Utils::Logger::LogType::LOG_ENGINE,__VA_ARGS__))
+#define LOGSUCCESS(...) Gear::Utils::Logger::submitLogMessage(Gear::Utils::Logger::LogContext::createLogMessage(TOSHORTFUNCNAME(__FUNCTION__),Gear::Utils::Logger::LogType::LOG_SUCCESS,__VA_ARGS__))
 
-#define LOGUSER(...) Gear::Utils::Logger::submitLogMessage(Gear::Utils::Logger::LogContext::createLogMessage(__FUNCTION__,Gear::Utils::Logger::LogType::LOG_USER,__VA_ARGS__))
+#define LOGENGINE(...) Gear::Utils::Logger::submitLogMessage(Gear::Utils::Logger::LogContext::createLogMessage(TOSHORTFUNCNAME(__FUNCTION__),Gear::Utils::Logger::LogType::LOG_ENGINE,__VA_ARGS__))
+
+#define LOGUSER(...) Gear::Utils::Logger::submitLogMessage(Gear::Utils::Logger::LogContext::createLogMessage(TOSHORTFUNCNAME(__FUNCTION__),Gear::Utils::Logger::LogType::LOG_USER,__VA_ARGS__))
 
 #define LOGERROR(...) do { \
-const Gear::Utils::Logger::LogMessage _logMessage_ = Gear::Utils::Logger::LogContext::createLogMessage(__FUNCTION__,Gear::Utils::Logger::LogType::LOG_ERROR,__FILE__,"LINE",static_cast<int32_t>(__LINE__),__VA_ARGS__); \
+const Gear::Utils::Logger::LogMessage _logMessage_ = Gear::Utils::Logger::LogContext::createLogMessage(TOSHORTFUNCNAME(__FUNCTION__),Gear::Utils::Logger::LogType::LOG_ERROR,__FILE__,"LINE",static_cast<int32_t>(__LINE__),__VA_ARGS__); \
 const std::string _errorStr_ = _logMessage_.str; \
 Gear::Utils::Logger::submitLogMessage(_logMessage_); \
 throw std::runtime_error(_errorStr_); \
