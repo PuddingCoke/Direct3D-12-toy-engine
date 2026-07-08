@@ -42,7 +42,7 @@ namespace Gear::Core::D3D12Core
 
 	void Fence::signal(ID3D12CommandQueue* const commandQueue)
 	{
-		currentFenceValue++;
+		increment();
 
 		commandQueue->Signal(fence.Get(), currentFenceValue);
 	}

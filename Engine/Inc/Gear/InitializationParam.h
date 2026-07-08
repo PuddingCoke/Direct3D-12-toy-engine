@@ -41,6 +41,8 @@ namespace Gear
 			uint32_t height;
 
 			uint32_t second;
+
+			uint32_t bFrames;
 		};
 
 		union

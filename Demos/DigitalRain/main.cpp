@@ -4,9 +4,9 @@
 
 int wmain(int argc, const wchar_t* argv[])
 {
-	//const InitializationParam param = InitializationParam::RealTime(1920, 1080, L"Digital Rain");
+	//InitializationParam param = InitializationParam::RealTime(1920, 1080, L"Digital Rain");
 
-	const InitializationParam param = InitializationParam::Wallpaper();
+	InitializationParam param = InitializationParam::Wallpaper();
 
 	try
 	{

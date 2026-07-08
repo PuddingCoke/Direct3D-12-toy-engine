@@ -297,7 +297,7 @@ namespace Gear
 		switch (vendor)
 		{
 		case AdapterVendor::NVIDIA:
-			encoder = makeUnique<VideoEncoder::NVIDIAEncoder>(frameToEncode);
+			encoder = makeUnique<VideoEncoder::NVIDIAEncoder>(frameToEncode, videoRender.bFrames);
 			break;
 		case AdapterVendor::AMD:
 		case AdapterVendor::INTEL:

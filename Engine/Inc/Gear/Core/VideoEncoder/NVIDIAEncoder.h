@@ -41,7 +41,7 @@ namespace Gear::Core::VideoEncoder
 
 		NVIDIAEncoder(const NVIDIAEncoder&) = delete;
 
-		NVIDIAEncoder(const uint32_t frameToEncode);
+		NVIDIAEncoder(const uint32_t frameToEncode, const uint32_t bFrames);
 
 		~NVIDIAEncoder();
 
@@ -51,7 +51,7 @@ namespace Gear::Core::VideoEncoder
 
 		static constexpr uint32_t lookaheadDepth = 31;
 
-		static constexpr uint64_t numNV12Textures = lookaheadDepth + 1;
+		static constexpr uint32_t extraOutput = 8;
 
 		static constexpr NV_ENC_BUFFER_FORMAT bufferFormat = NV_ENC_BUFFER_FORMAT_NV12;
 
@@ -65,13 +65,19 @@ namespace Gear::Core::VideoEncoder
 
 		const GUID profile = NV_ENC_H264_PROFILE_HIGH_GUID;
 
+		const uint64_t readbackHeapSize = 3 * Graphics::getWidth() * Graphics::getHeight();
+
+		const uint32_t frameIntervalP;
+
+		const uint64_t numNV12Textures;
+
 		HMODULE moduleNvEncAPI;
 
 		NV_ENCODE_API_FUNCTION_LIST nvencAPI;
 
 		void* encoder;
 
-		UniquePtr<D3D12Resource::ReadbackHeap> readbackHeap;
+		uint64_t dts;
 
 		D3D12Core::FencePtr inputFence;
 
@@ -83,11 +89,13 @@ namespace Gear::Core::VideoEncoder
 
 		std::queue<NV_ENC_OUTPUT_RESOURCE_D3D12> outputResources;
 
-		NV_ENC_REGISTERED_PTR registeredOutputResourcePtr;
+		std::queue<NV_ENC_REGISTERED_PTR> registeredOutputResourcePtrs;
 
-		NV_ENC_INPUT_PTR mappedOutputResourcePtr;
+		std::queue<NV_ENC_INPUT_PTR> mappedOutputResourcePtrs;
 
-		D3D12Resource::VideoTexturePtr nv12Textures[numNV12Textures];
+		UniquePtr<D3D12Resource::VideoTexturePtr[]> nv12Textures;
+
+		UniquePtr<D3D12Resource::ReadbackHeapPtr[]> readbackHeaps;
 
 		uint64_t nv12TextureIndex;
 

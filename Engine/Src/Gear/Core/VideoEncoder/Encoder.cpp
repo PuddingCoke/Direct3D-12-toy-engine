@@ -3,7 +3,7 @@
 namespace Gear::Core::VideoEncoder
 {
 	Encoder::Encoder(const uint32_t frameToEncode, const OutputVideoFormat format) :
-		frameEncoded(0), frameToEncode(frameToEncode), encodeTime(0.f), streamIndex(0), sampleDuration(10000000u / frameRate), sampleTime(0)
+		frameEncoded(0), frameToEncode(frameToEncode), encodeTime(0.f), streamIndex(0), sampleDuration(10000000u / frameRate), dts(0)
 	{
 		CHECKERROR(MFStartup(MF_VERSION));
 
@@ -93,7 +93,7 @@ namespace Gear::Core::VideoEncoder
 		vpCommandQueue->waitFor(queueWaitFor, fence);
 	}
 
-	bool Encoder::writeFrame(const void* const bitstreamPtr, const uint32_t bitstreamSize, const bool cleanPoint)
+	bool Encoder::writeFrame(const void* const bitstreamPtr, const uint32_t bitstreamSize, const bool cleanPoint, const LONGLONG pts)
 	{
 		ComPtr<IMFMediaBuffer> buffer;
 
@@ -115,9 +115,24 @@ namespace Gear::Core::VideoEncoder
 
 		sample->AddBuffer(buffer.Get());
 
-		sample->SetSampleTime(sampleTime);
+		if (pts == INT64_MIN)
+		{
+			//pts + dts
+			sample->SetSampleTime(dts * sampleDuration);
+		}
+		else
+		{
+			//pts
+			sample->SetSampleTime(pts * sampleDuration);
 
+			//dts
+			sample->SetUINT64(MFSampleExtension_DecodeTimestamp, static_cast<uint64_t>(dts * sampleDuration));
+		}
+
+		//duration
 		sample->SetSampleDuration(sampleDuration);
+
+		dts++;
 
 		if (cleanPoint)
 		{
@@ -125,8 +140,6 @@ namespace Gear::Core::VideoEncoder
 		}
 
 		sinkWriter->WriteSample(streamIndex, sample.Get());
-
-		sampleTime += sampleDuration;
 
 		frameEncoded++;
 
@@ -156,16 +169,18 @@ namespace Gear::Core::VideoEncoder
 	{
 		if ((frameEncoded % (frameRate / 4)) == 0)
 		{
-			const uint32_t num = progressBarWidth * frameEncoded / frameToEncode;
+			const float progress = Utils::Math::saturate(static_cast<float>(frameEncoded) / static_cast<float>(frameToEncode));
 
-			const uint32_t buffLength = 13 + 2 + progressBarWidth + 1 + 6 + 1 + 1;
+			const uint32_t num = static_cast<uint32_t>(std::max(std::min(static_cast<int32_t>(progressBarWidth * progress), static_cast<int32_t>(progressBarWidth)), 0));
+
+			const uint32_t buffLength = 13 + 2 + progressBarWidth + 1 + 6 + 1 + 1 + 8;
 
 			char str[buffLength] = {};
 
 			sprintf_s(str, buffLength, "编码中... [%.*s%.*s] %.2f%%",
 				num, "********************************",
 				progressBarWidth - num, "////////////////////////////////",
-				100.f * static_cast<float>(frameEncoded) / static_cast<float>(frameToEncode));
+				100.f * progress);
 
 			LOGENGINE(str);
 		}

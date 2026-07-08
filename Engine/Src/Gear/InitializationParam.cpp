@@ -33,6 +33,8 @@ namespace Gear
 
 		param.videoRender.second = second;
 
+		param.videoRender.bFrames = 2;
+
 		return param;
 	}
 
