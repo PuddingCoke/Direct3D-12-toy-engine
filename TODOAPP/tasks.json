@@ -4,7 +4,7 @@
   "DXR支持（垂涎已久）",
   "开场动画，实现TextBatch、SpriteBatch还有视频解码框架",
   "动态壁纸模式需要帧率控制类",
-  "实现D3D12Encoder类",
   "NVIDIAEncoder改进成异步编码模式",
-  "将项目中所有的var.get()传参替换成*var传参"
+  "将项目中所有的var.get()传参替换成*var传参",
+  "集成软件编码框架"
 ]
