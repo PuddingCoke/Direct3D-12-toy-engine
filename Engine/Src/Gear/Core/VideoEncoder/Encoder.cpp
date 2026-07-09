@@ -3,7 +3,7 @@
 namespace Gear::Core::VideoEncoder
 {
 	Encoder::Encoder(const uint32_t frameToEncode, const OutputVideoFormat format) :
-		frameEncoded(0), frameToEncode(frameToEncode), encodeTime(0.f), streamIndex(0), sampleDuration(10000000u / frameRate), dts(0)
+		frameEncoded(0), frameToEncode(frameToEncode), encodeTime(0.f), streamIndex(0), sampleDuration(timeBase / static_cast<LONGLONG>(frameRate)), dts(0)
 	{
 		CHECKERROR(MFStartup(MF_VERSION));
 
@@ -115,19 +115,11 @@ namespace Gear::Core::VideoEncoder
 
 		sample->AddBuffer(buffer.Get());
 
-		if (pts == INT64_MIN)
-		{
-			//pts + dts
-			sample->SetSampleTime(dts * sampleDuration);
-		}
-		else
-		{
-			//pts
-			sample->SetSampleTime(pts * sampleDuration);
+		//pts
+		sample->SetSampleTime(pts * sampleDuration);
 
-			//dts
-			sample->SetUINT64(MFSampleExtension_DecodeTimestamp, static_cast<uint64_t>(dts * sampleDuration));
-		}
+		//dts
+		sample->SetUINT64(MFSampleExtension_DecodeTimestamp, static_cast<uint64_t>(dts * sampleDuration));
 
 		//duration
 		sample->SetSampleDuration(sampleDuration);

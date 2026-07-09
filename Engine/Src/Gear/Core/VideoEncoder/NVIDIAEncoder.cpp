@@ -1,17 +1,14 @@
 #include<Gear/Core/VideoEncoder/NVIDIAEncoder.h>
 
-#include<iostream>
+#include<Gear/Utils/Logger.h>
 
 #define NVENCCALL(func) \
 {\
 const NVENCSTATUS _status_ = func;\
-if(_status_ != NV_ENC_SUCCESS && _status_ != NV_ENC_ERR_NEED_MORE_INPUT)\
+if(_status_ != NV_ENC_SUCCESS && _status_ != NV_ENC_ERR_LOCK_BUSY && _status_ != NV_ENC_ERR_NEED_MORE_INPUT && _status_ != NV_ENC_ERR_NEED_MORE_OUTPUT)\
 {\
-std::cout<<"error occured at function "<<#func<<"\n";\
-const char* error = nvencAPI.nvEncGetLastErrorString(encoder);\
-std::cout << "status " << _status_ << "\n";\
-std::cout << error << "\n";\
-__debugbreak();\
+const std::string errorString = nvencAPI.nvEncGetLastErrorString(encoder);\
+LOGERROR("调用", #func, "时发生错误，错误码", static_cast<uint32_t>(_status_), "错误信息", errorString);\
 }\
 }\
 
@@ -133,6 +130,7 @@ namespace Gear::Core::VideoEncoder
 	{
 		if (moduleNvEncAPI)
 		{
+			//进行冲刷
 			while (outputResources.size())
 			{
 				NV_ENC_LOCK_BITSTREAM lockBitstream = { NV_ENC_LOCK_BITSTREAM_VER };
@@ -181,7 +179,7 @@ namespace Gear::Core::VideoEncoder
 				registeredInputResourcePtrs.pop();
 			}
 
-			NVENCCALL(nvencAPI.nvEncDestroyEncoder(encoder));
+			nvencAPI.nvEncDestroyEncoder(encoder);
 
 			FreeLibrary(moduleNvEncAPI);
 		}
@@ -283,68 +281,55 @@ namespace Gear::Core::VideoEncoder
 
 		dts++;
 
-		const NVENCSTATUS status = nvencAPI.nvEncEncodePicture(encoder, &picParams);
+		NVENCCALL(nvencAPI.nvEncEncodePicture(encoder, &picParams));
 
-		if (status == NV_ENC_SUCCESS || status == NV_ENC_ERR_NEED_MORE_INPUT)
+		while (!outputResources.empty())
 		{
-			while (!outputResources.empty())
+			NV_ENC_LOCK_BITSTREAM lockBitstream = { NV_ENC_LOCK_BITSTREAM_VER };
+
+			lockBitstream.outputBitstream = &outputResources.front();
+
+			lockBitstream.doNotWait = 1;
+
+			const NVENCSTATUS status = nvencAPI.nvEncLockBitstream(encoder, &lockBitstream); NVENCCALL(status);
+
+			if (status != NV_ENC_SUCCESS)
 			{
-				NV_ENC_LOCK_BITSTREAM lockBitstream = { NV_ENC_LOCK_BITSTREAM_VER };
-
-				lockBitstream.outputBitstream = &outputResources.front();
-
-				lockBitstream.doNotWait = 1;
-
-				const NVENCSTATUS lockStatus = nvencAPI.nvEncLockBitstream(encoder, &lockBitstream);
-
-				if (lockStatus != NV_ENC_SUCCESS)
-				{
-					break;
-				}
-
-				encoding = writeFrame(lockBitstream.bitstreamBufferPtr, lockBitstream.bitstreamSizeInBytes, lockBitstream.pictureType == NV_ENC_PIC_TYPE_IDR, static_cast<LONGLONG>(lockBitstream.outputTimeStamp));
-
-				NVENCCALL(nvencAPI.nvEncUnlockBitstream(encoder, lockBitstream.outputBitstream));
-
-				outputResources.pop();
-
-				NVENCCALL(nvencAPI.nvEncUnmapInputResource(encoder, mappedInputResourcePtrs.front()));
-
-				mappedInputResourcePtrs.pop();
-
-				NVENCCALL(nvencAPI.nvEncUnregisterResource(encoder, registeredInputResourcePtrs.front()));
-
-				registeredInputResourcePtrs.pop();
-
-				NVENCCALL(nvencAPI.nvEncUnmapInputResource(encoder, mappedOutputResourcePtrs.front()));
-
-				mappedOutputResourcePtrs.pop();
-
-				NVENCCALL(nvencAPI.nvEncUnregisterResource(encoder, registeredOutputResourcePtrs.front()));
-
-				registeredOutputResourcePtrs.pop();
-
-				if (!encoding)
-				{
-					NV_ENC_PIC_PARAMS eosParams = { NV_ENC_PIC_PARAMS_VER };
-
-					eosParams.encodePicFlags = NV_ENC_PIC_FLAG_EOS;
-
-					NVENCCALL(nvencAPI.nvEncEncodePicture(encoder, &eosParams));
-
-					break;
-				}
+				break;
 			}
-		}
-		else if (status != NV_ENC_ERR_NEED_MORE_INPUT)
-		{
-			const char* error = nvencAPI.nvEncGetLastErrorString(encoder);
 
-			std::cout << "status " << status << "\n";
+			encoding = writeFrame(lockBitstream.bitstreamBufferPtr, lockBitstream.bitstreamSizeInBytes, lockBitstream.pictureType == NV_ENC_PIC_TYPE_IDR, static_cast<LONGLONG>(lockBitstream.outputTimeStamp));
 
-			std::cout << error << "\n";
+			NVENCCALL(nvencAPI.nvEncUnlockBitstream(encoder, lockBitstream.outputBitstream));
 
-			__debugbreak();
+			outputResources.pop();
+
+			NVENCCALL(nvencAPI.nvEncUnmapInputResource(encoder, mappedInputResourcePtrs.front()));
+
+			mappedInputResourcePtrs.pop();
+
+			NVENCCALL(nvencAPI.nvEncUnregisterResource(encoder, registeredInputResourcePtrs.front()));
+
+			registeredInputResourcePtrs.pop();
+
+			NVENCCALL(nvencAPI.nvEncUnmapInputResource(encoder, mappedOutputResourcePtrs.front()));
+
+			mappedOutputResourcePtrs.pop();
+
+			NVENCCALL(nvencAPI.nvEncUnregisterResource(encoder, registeredOutputResourcePtrs.front()));
+
+			registeredOutputResourcePtrs.pop();
+
+			if (!encoding)
+			{
+				NV_ENC_PIC_PARAMS eosParams = { NV_ENC_PIC_PARAMS_VER };
+
+				eosParams.encodePicFlags = NV_ENC_PIC_FLAG_EOS;
+
+				NVENCCALL(nvencAPI.nvEncEncodePicture(encoder, &eosParams));
+
+				break;
+			}
 		}
 
 		return encoding;

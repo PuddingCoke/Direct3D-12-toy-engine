@@ -55,10 +55,10 @@ namespace Gear::Core::VideoEncoder
 		/// </summary>
 		/// <param name="bitstreamPtr">比特流指针</param>
 		/// <param name="bitstreamSize">比特流字节大小</param>
-		/// <param name="cleanPoint">同步点 pictureType == IDR</param>
+		/// <param name="cleanPoint">同步点 pictureType == IDR 用于视频的正确跳转</param>
 		/// <param name="pts">呈现时间戳 0、1、2、3.....</param>
 		/// <returns></returns>
-		bool writeFrame(const void* const bitstreamPtr, const uint32_t bitstreamSize, const bool cleanPoint, const LONGLONG pts = INT64_MIN);
+		bool writeFrame(const void* const bitstreamPtr, const uint32_t bitstreamSize, const bool cleanPoint, const LONGLONG pts);
 
 		void bgraToNV12(D3D12Resource::Texture* inputTexture, D3D12Resource::VideoTexture* nv12Texture, D3D12Core::Fence* const fence);
 
@@ -68,6 +68,8 @@ namespace Gear::Core::VideoEncoder
 
 		//不要修改这个值
 		static constexpr uint32_t progressBarWidth = 32;
+
+		static constexpr LONGLONG timeBase = 10000000;
 
 		uint32_t frameEncoded;
 
