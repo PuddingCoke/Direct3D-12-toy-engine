@@ -96,6 +96,24 @@ namespace Gear::Utils::Logger
 		*messageStr += " ";
 	}
 
+	void LogContext::packArgument(const std::u8string& arg)
+	{
+		setDisplayColor(textColor);
+
+		*messageStr += reinterpret_cast<const char*>(arg.c_str());
+
+		*messageStr += " ";
+	}
+
+	void LogContext::packArgument(const char8_t* arg)
+	{
+		setDisplayColor(textColor);
+
+		*messageStr += reinterpret_cast<const char*>(arg);
+
+		*messageStr += " ";
+	}
+
 	void LogContext::packArgument(const bool& arg)
 	{
 		if (arg)

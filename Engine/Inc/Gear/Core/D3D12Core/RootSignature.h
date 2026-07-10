@@ -74,6 +74,8 @@ namespace Gear::Core::D3D12Core
 
 		uint32_t getNumShaderConstants(const ShaderType shaderType) const;
 
+		void setName(const wchar_t* const name);
+
 		static constexpr uint32_t maxDWORD = 64u;
 
 		static constexpr uint32_t perConstantDWORD = 1u;

@@ -14,6 +14,16 @@ public:
 
 		LOGUSER(L"宽字符串测试", L"日志测试", L"Log Testing", L"Проверка журнала");
 
+		LOGUSER(u8"UTF8字符串测试", u8"日志测试", u8"Log Testing", u8"Проверка журнала");
+
+		LOGUSER("表情", "😎😂🎉🔥👍🏻");
+
+		LOGUSER("组合字符", "e\u0301 ñ");
+
+		LOGUSER("零宽空间", "Hel\u200Blo");
+
+		LOGUSER("极长连字", "﷽");
+
 		LOGUSER("单线程测试");
 
 		LOGUSER("32位有符号整数测试", IntegerMode::HEX, 12895, -123456, INT_MAX, INT_MIN, IntegerMode::DEC, 12895, -123456, INT_MAX, INT_MIN);

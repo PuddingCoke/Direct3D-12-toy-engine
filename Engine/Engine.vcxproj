@@ -137,6 +137,7 @@
     <ClInclude Include="Inc\Gear\Core\RenderThreadLocal.h" />
     <ClInclude Include="Inc\Gear\Core\VideoDevice.h" />
     <ClInclude Include="Inc\Gear\Core\VideoEncoder\D3D12Encoder.h" />
+    <ClInclude Include="Inc\Gear\Core\VideoEncoder\X264Encoder.h" />
     <ClInclude Include="Inc\Gear\Effect\FXAAEffect.h" />
     <ClInclude Include="Inc\Gear\Effect\HBAOPlusEffect.h" />
     <ClInclude Include="Inc\Gear\Effect\SSREffect.h" />

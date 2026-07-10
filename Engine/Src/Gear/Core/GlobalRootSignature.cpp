@@ -120,7 +120,7 @@ namespace Gear::Core::GlobalRootSignature
 			D3D12_ROOT_SIGNATURE_FLAG_CBV_SRV_UAV_HEAP_DIRECTLY_INDEXED |
 			D3D12_ROOT_SIGNATURE_FLAG_SAMPLER_HEAP_DIRECTLY_INDEXED);
 
-		basicShaderRootSignature->get()->SetName(L"Basic Shader Root Signature");
+		basicShaderRootSignature->setName(L"Basic Shader Root Signature");
 
 		LOGSUCCESS("创建", LogColor::brightMagenta, TOSTRING(basicShaderRootSignature));
 
@@ -133,7 +133,7 @@ namespace Gear::Core::GlobalRootSignature
 			D3D12_ROOT_SIGNATURE_FLAG_CBV_SRV_UAV_HEAP_DIRECTLY_INDEXED |
 			D3D12_ROOT_SIGNATURE_FLAG_SAMPLER_HEAP_DIRECTLY_INDEXED);
 
-		tessellationRootSignature->get()->SetName(L"Tessellation Root Signature");
+		tessellationRootSignature->setName(L"Tessellation Root Signature");
 
 		LOGSUCCESS("创建", LogColor::brightMagenta, TOSTRING(tessellationRootSignature));
 
@@ -147,7 +147,7 @@ namespace Gear::Core::GlobalRootSignature
 			D3D12_ROOT_SIGNATURE_FLAG_CBV_SRV_UAV_HEAP_DIRECTLY_INDEXED |
 			D3D12_ROOT_SIGNATURE_FLAG_SAMPLER_HEAP_DIRECTLY_INDEXED);
 
-		geometryShaderRootSignature->get()->SetName(L"Geometry Shader Root Signature");
+		geometryShaderRootSignature->setName(L"Geometry Shader Root Signature");
 
 		LOGSUCCESS("创建", LogColor::brightMagenta, TOSTRING(geometryShaderRootSignature));
 
@@ -159,7 +159,7 @@ namespace Gear::Core::GlobalRootSignature
 			D3D12_ROOT_SIGNATURE_FLAG_CBV_SRV_UAV_HEAP_DIRECTLY_INDEXED |
 			D3D12_ROOT_SIGNATURE_FLAG_SAMPLER_HEAP_DIRECTLY_INDEXED);
 
-		allGraphicsShaderRootSignature->get()->SetName(L"All Graphics Shader Root Signature");
+		allGraphicsShaderRootSignature->setName(L"All Graphics Shader Root Signature");
 
 		LOGSUCCESS("创建", LogColor::brightMagenta, TOSTRING(allGraphicsShaderRootSignature));
 
@@ -168,7 +168,7 @@ namespace Gear::Core::GlobalRootSignature
 			D3D12_ROOT_SIGNATURE_FLAG_CBV_SRV_UAV_HEAP_DIRECTLY_INDEXED |
 			D3D12_ROOT_SIGNATURE_FLAG_SAMPLER_HEAP_DIRECTLY_INDEXED);
 
-		computeShaderRootSignature->get()->SetName(L"Compute Shader Root Signature");
+		computeShaderRootSignature->setName(L"Compute Shader Root Signature");
 
 		LOGSUCCESS("创建", LogColor::brightMagenta, TOSTRING(computeShaderRootSignature));
 	}

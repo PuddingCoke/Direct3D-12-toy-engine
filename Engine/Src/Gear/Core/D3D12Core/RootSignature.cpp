@@ -245,6 +245,11 @@ namespace Gear::Core::D3D12Core
 		return numShaderConstants[static_cast<uint32_t>(shaderType)];
 	}
 
+	void RootSignature::setName(const wchar_t* const name)
+	{
+		rootSignature->SetName(name);
+	}
+
 	CommonShaderLayout::ShaderLocalParameterIndices RootSignature::getLocalParameterIndices(const ShaderType shaderType) const
 	{
 		const uint32_t index = static_cast<uint32_t>(shaderType);

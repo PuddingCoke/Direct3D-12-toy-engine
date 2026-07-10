@@ -90,6 +90,12 @@ namespace Gear::Utils::Logger
 		//窄字符串
 		void packArgument(const std::string& arg);
 
+		//UTF8字符串
+		void packArgument(const std::u8string& arg);
+
+		//原生UTF8字符串
+		void packArgument(const char8_t* arg);
+
 		//原生窄字符串
 		void packArgument(const char* arg);
 

@@ -462,6 +462,9 @@
     <ClInclude Include="Inc\Gear\Core\D3D12Core\Fence.h">
       <Filter>Header</Filter>
     </ClInclude>
+    <ClInclude Include="Inc\Gear\Core\VideoEncoder\X264Encoder.h">
+      <Filter>Header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Gear\InitializationParam.cpp">
