@@ -15,7 +15,7 @@ LOGERROR("调用", #func, "时发生错误，错误码", static_cast<uint32_t>(_
 namespace Gear::Core::VideoEncoder
 {
 	NVIDIAEncoder::NVIDIAEncoder(const uint32_t frameToEncode, const uint32_t bFrames) :
-		Encoder(frameToEncode, videoFormat),
+		Encoder(frameToEncode, videoFormat, bFrames),
 		moduleNvEncAPI(nullptr),
 		nvencAPI{ NV_ENCODE_API_FUNCTION_LIST_VER },
 		encoder(nullptr),
@@ -298,7 +298,8 @@ namespace Gear::Core::VideoEncoder
 				break;
 			}
 
-			encoding = writeFrame(lockBitstream.bitstreamBufferPtr, lockBitstream.bitstreamSizeInBytes, lockBitstream.pictureType == NV_ENC_PIC_TYPE_IDR, static_cast<LONGLONG>(lockBitstream.outputTimeStamp));
+			encoding = writeFrame(lockBitstream.bitstreamBufferPtr, lockBitstream.bitstreamSizeInBytes,
+				lockBitstream.pictureType == NV_ENC_PIC_TYPE_IDR, static_cast<uint32_t>(lockBitstream.outputTimeStamp));
 
 			NVENCCALL(nvencAPI.nvEncUnlockBitstream(encoder, lockBitstream.outputBitstream));
 

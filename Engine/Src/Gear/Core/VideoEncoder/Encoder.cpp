@@ -2,51 +2,59 @@
 
 namespace Gear::Core::VideoEncoder
 {
-	Encoder::Encoder(const uint32_t frameToEncode, const VideoFormat videoFormat) :
-		frameEncoded(0), frameToEncode(frameToEncode), encodeTime(0.f), streamIndex(0), sampleDuration(timeBase / static_cast<LONGLONG>(frameRate)), dts(0)
+	Encoder::Encoder(const uint32_t frameToEncode, const VideoFormat videoFormat, const uint32_t maxBFrames) :
+		frameEncoded(0), frameToEncode(frameToEncode), encodeTime(0.f), maxBFrames(maxBFrames)
 	{
-		CHECKERROR(MFStartup(MF_VERSION));
+		avformat_network_init();
 
-		CHECKERROR(MFCreateSinkWriterFromURL(L"output.mp4", nullptr, nullptr, &sinkWriter));
+		avformat_alloc_output_context2(&outContext, nullptr, "mp4", "output.mp4");
 
-		ComPtr<IMFMediaType> mediaType;
+		outStream = avformat_new_stream(outContext, nullptr);
 
-		CHECKERROR(MFCreateMediaType(&mediaType));
+		outStream->time_base = AVRational{ 1, AV_TIME_BASE };
 
-		mediaType->SetGUID(MF_MT_MAJOR_TYPE, MFMediaType_Video);
+		outStream->id = 0;
+
+		LOGENGINE("视频名称", "output.mp4");
+
+		LOGENGINE("视频时间", FloatPrecision(1), static_cast<float>(frameToEncode) / static_cast<float>(frameRate), "秒");
+
+		LOGENGINE("视频帧率", frameRate);
+
+		AVCodecParameters* const param = outStream->codecpar;
 
 		switch (videoFormat)
 		{
 		case VideoFormat::H264:
 			LOGENGINE("视频格式", LogColor::brightMagenta, "H264");
-			mediaType->SetGUID(MF_MT_SUBTYPE, MFVideoFormat_H264);
+			param->codec_id = AV_CODEC_ID_H264;
 			break;
 		case VideoFormat::HEVC:
 			LOGENGINE("视频格式", LogColor::brightMagenta, "HEVC");
-			mediaType->SetGUID(MF_MT_SUBTYPE, MFVideoFormat_HEVC);
+			param->codec_id = AV_CODEC_ID_HEVC;
 			break;
 		case VideoFormat::AV1:
 			LOGENGINE("视频格式", LogColor::brightMagenta, "AV1");
-			mediaType->SetGUID(MF_MT_SUBTYPE, MFVideoFormat_AV1);
+			param->codec_id = AV_CODEC_ID_AV1;
 			break;
 		default:
 			LOGERROR("不被支持的视频格式！");
 			break;
 		}
 
-		LOGENGINE("视频时间", FloatPrecision(1), static_cast<float>(frameToEncode) / static_cast<float>(frameRate), "秒");
+		param->codec_type = AVMEDIA_TYPE_VIDEO;
 
-		LOGENGINE("视频帧率", frameRate);
+		param->width = static_cast<int32_t>(Graphics::getWidth());
+
+		param->height = static_cast<int32_t>(Graphics::getHeight());
+
+		param->framerate = AVRational{ static_cast<int32_t>(frameRate),1 };
+
+		avio_open(&outContext->pb, outContext->url, AVIO_FLAG_WRITE);
+
+		avformat_write_header(outContext, nullptr);
 
 		LOGENGINE("待编码帧数", frameToEncode);
-
-		MFSetAttributeSize(mediaType.Get(), MF_MT_FRAME_SIZE, Graphics::getWidth(), Graphics::getHeight());
-
-		MFSetAttributeRatio(mediaType.Get(), MF_MT_FRAME_RATE, frameRate, 1);
-
-		sinkWriter->AddStream(mediaType.Get(), &streamIndex);
-
-		sinkWriter->BeginWriting();
 
 		D3D12_VIDEO_PROCESS_INPUT_STREAM_DESC inputDesc =
 		{
@@ -80,14 +88,13 @@ namespace Gear::Core::VideoEncoder
 			vpCommandQueue->waitDestroyable();
 		}
 
-		if (sinkWriter)
-		{
-			sinkWriter->Finalize();
+		av_write_trailer(outContext);
 
-			sinkWriter = nullptr;
-		}
+		avio_close(outContext->pb);
 
-		MFShutdown();
+		avformat_free_context(outContext);
+
+		avformat_network_deinit();
 	}
 
 	void Encoder::waitFor(D3D12Core::CommandQueue* const queueWaitFor, D3D12Core::Fence* const fence)
@@ -95,51 +102,38 @@ namespace Gear::Core::VideoEncoder
 		vpCommandQueue->waitFor(queueWaitFor, fence);
 	}
 
-	bool Encoder::writeFrame(const void* const bitstreamPtr, const uint32_t bitstreamSize, const bool cleanPoint, const LONGLONG pts)
+	bool Encoder::writeFrame(void* const bitstreamPtr, const uint32_t bitstreamSize, const bool syncPoint, const uint32_t presentFrameIndex)
 	{
-		ComPtr<IMFMediaBuffer> buffer;
+		AVPacket* packet = av_packet_alloc();
 
-		MFCreateMemoryBuffer(bitstreamSize, &buffer);
+		packet->pts = av_rescale_q(static_cast<int64_t>(presentFrameIndex), AVRational{ 1,static_cast<int32_t>(frameRate) }, outStream->time_base);
 
-		BYTE* data = nullptr;
+		//[mp4 @ 000001bdb1381100] pts (46500) < dts (48000) in stream 0 报错
+		//解决方法 https://github.com/FFmpeg/FFmpeg/commit/670ff6c7ce0c70798a9909b334310625fe067a34?diff=split
+		packet->dts = av_rescale_q(static_cast<int64_t>(frameEncoded) - static_cast<int64_t>(maxBFrames), AVRational{ 1,static_cast<int32_t>(frameRate) }, outStream->time_base);
 
-		buffer->Lock(&data, nullptr, nullptr);
+		packet->duration = av_rescale_q(1, AVRational{ 1,static_cast<int32_t>(frameRate) }, outStream->time_base);
 
-		memcpy(data, bitstreamPtr, bitstreamSize);
+		packet->stream_index = outStream->index;
 
-		buffer->Unlock();
+		packet->data = static_cast<uint8_t*>(bitstreamPtr);
 
-		buffer->SetCurrentLength(bitstreamSize);
+		packet->size = bitstreamSize;
 
-		ComPtr<IMFSample> sample;
-
-		MFCreateSample(&sample);
-
-		sample->AddBuffer(buffer.Get());
-
-		//pts
-		sample->SetSampleTime(pts * sampleDuration);
-
-		//dts
-		sample->SetUINT64(MFSampleExtension_DecodeTimestamp, static_cast<uint64_t>(dts * sampleDuration));
-
-		//duration
-		sample->SetSampleDuration(sampleDuration);
-
-		dts++;
-
-		if (cleanPoint)
+		if (syncPoint)
 		{
-			sample->SetUINT32(MFSampleExtension_CleanPoint, TRUE);
+			packet->flags |= AV_PKT_FLAG_KEY;
 		}
 
-		sinkWriter->WriteSample(streamIndex, sample.Get());
+		av_interleaved_write_frame(outContext, packet);
+
+		av_packet_free(&packet);
 
 		frameEncoded++;
 
 		displayProgress();
 
-		return !(frameEncoded == frameToEncode);
+		return frameEncoded != frameToEncode;
 	}
 
 	void Encoder::bgraToNV12(D3D12Resource::Texture* inputTexture, D3D12Resource::VideoTexture* nv12Texture, D3D12Core::Fence* const fence)

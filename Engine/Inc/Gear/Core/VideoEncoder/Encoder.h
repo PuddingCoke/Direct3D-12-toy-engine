@@ -3,10 +3,6 @@
 #ifndef _GEAR_CORE_VIDEOENCODER_ENCODER_H_
 #define _GEAR_CORE_VIDEOENCODER_ENCODER_H_
 
-#include<mfapi.h>
-#include<mfidl.h>
-#include<mfreadwrite.h>
-
 #include<Gear/Core/Graphics.h>
 
 #include<Gear/Core/VideoDevice.h>
@@ -20,6 +16,13 @@
 #include<Gear/Core/D3D12Core/CommandQueue.h>
 
 #include<chrono>
+
+extern "C"
+{
+#include<ffmpeg/libavutil/avutil.h>
+#include<ffmpeg/libavformat/avformat.h>
+#include<ffmpeg/libavcodec/avcodec.h>
+}
 
 namespace Gear::Core::VideoEncoder
 {
@@ -38,7 +41,7 @@ namespace Gear::Core::VideoEncoder
 
 		void operator=(const Encoder&) = delete;
 
-		Encoder(const uint32_t frameToEncode, const VideoFormat videoFormat);
+		Encoder(const uint32_t frameToEncode, const VideoFormat videoFormat, const uint32_t maxBFrames);
 
 		virtual ~Encoder();
 
@@ -51,14 +54,14 @@ namespace Gear::Core::VideoEncoder
 	protected:
 
 		/// <summary>
-		/// 封装比特流
+		/// 封装裸的比特流
 		/// </summary>
 		/// <param name="bitstreamPtr">比特流指针</param>
 		/// <param name="bitstreamSize">比特流字节大小</param>
 		/// <param name="cleanPoint">同步点 pictureType == IDR 用于视频的正确跳转</param>
 		/// <param name="pts">呈现时间戳 0、1、2、3.....</param>
 		/// <returns></returns>
-		bool writeFrame(const void* const bitstreamPtr, const uint32_t bitstreamSize, const bool cleanPoint, const LONGLONG pts);
+		bool writeFrame(void* const bitstreamPtr, const uint32_t bitstreamSize, const bool syncPoint, const uint32_t presentFrameIndex);
 
 		void bgraToNV12(D3D12Resource::Texture* inputTexture, D3D12Resource::VideoTexture* nv12Texture, D3D12Core::Fence* const fence);
 
@@ -68,8 +71,6 @@ namespace Gear::Core::VideoEncoder
 
 		//不要修改这个值
 		static constexpr uint32_t progressBarWidth = 32;
-
-		static constexpr LONGLONG timeBase = 10000000;
 
 		uint32_t frameEncoded;
 
@@ -81,13 +82,11 @@ namespace Gear::Core::VideoEncoder
 
 		float encodeTime;
 
-		DWORD streamIndex;
+		const uint32_t maxBFrames;
 
-		ComPtr<IMFSinkWriter> sinkWriter;
+		AVFormatContext* outContext;
 
-		const LONGLONG sampleDuration;
-
-		LONGLONG dts;
+		AVStream* outStream;
 
 		ComPtr<ID3D12VideoProcessor> videoProcessor;
 
