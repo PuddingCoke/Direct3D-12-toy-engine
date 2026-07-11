@@ -8,13 +8,13 @@
 
 namespace Gear::Effect
 {
-	SSREffectPtr SSREffect::create(GraphicsContext& contextRef, const uint32_t width, const uint32_t height)
+	SSREffectPtr SSREffect::create(ResourceManager& refResManager, const uint32_t width, const uint32_t height)
 	{
-		return makeUnique<SSREffect>(contextRef, width, height);
+		return makeUnique<SSREffect>(refResManager, width, height);
 	}
 
-	SSREffect::SSREffect(GraphicsContext& contextRef, const uint32_t width, const uint32_t height) :
-		EffectBase(contextRef, width, height, outputTextureFormat),
+	SSREffect::SSREffect(ResourceManager& refResManager, const uint32_t width, const uint32_t height) :
+		EffectBase(refResManager, width, height, outputTextureFormat),
 		hiZTexture(ResourceManager::createComputeTexture(width, height, hiZTextureFormat, 1, hiZMiplvel, false, true))
 	{
 		hiZProcessPS = Shader::create(g_HiZProcessPSBytes, sizeof(g_HiZProcessPSBytes));

@@ -27,7 +27,7 @@ namespace Gear::Core::VideoEncoder
 	{
 	public:
 
-		enum class OutputVideoFormat
+		enum class VideoFormat
 		{
 			H264, HEVC, AV1
 		};
@@ -38,7 +38,7 @@ namespace Gear::Core::VideoEncoder
 
 		void operator=(const Encoder&) = delete;
 
-		Encoder(const uint32_t frameToEncode, const OutputVideoFormat format);
+		Encoder(const uint32_t frameToEncode, const VideoFormat videoFormat);
 
 		virtual ~Encoder();
 

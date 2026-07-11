@@ -7,7 +7,7 @@
 
 namespace Gear::Effect::BackBufferBlitEffect
 {
-	void process(GraphicsContext& contextRef, RenderTextureView& inputTexture);
+	void process(GraphicsContext& refContext, RenderTextureView& inputTexture);
 }
 
 #endif // !_GEAR_EFFECT_BACKBUFFERBLITEFFECT_H_

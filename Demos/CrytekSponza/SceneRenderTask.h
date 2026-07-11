@@ -163,9 +163,9 @@ public:
 			}
 		}
 
-		hbaoPlusEffect = HBAOPlusEffect::create(*context, Graphics::getWidth(), Graphics::getHeight());
+		hbaoPlusEffect = HBAOPlusEffect::create(*resManager, Graphics::getWidth(), Graphics::getHeight());
 
-		ssrEffect = SSREffect::create(*context, Graphics::getWidth(), Graphics::getHeight());
+		ssrEffect = SSREffect::create(*resManager, Graphics::getWidth(), Graphics::getHeight());
 
 		scene = makeUnique<Scene>(assetPath + "Sponza.gltf", *resManager);
 

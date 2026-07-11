@@ -13,20 +13,20 @@ namespace Gear::Core::LocalDescriptorHeap
 	{
 		LocalDescriptorHeapImpl();
 
-		UniquePtr<D3D12Core::DescriptorHeap> perThreadStagingResourceHeap;
+		UniquePtr<D3D12Core::DescriptorHeap> stagingResourceHeap;
 
-		UniquePtr<D3D12Core::DescriptorHeap> perThreadRenderTargetHeap;
+		UniquePtr<D3D12Core::DescriptorHeap> renderTargetHeap;
 
-		UniquePtr<D3D12Core::DescriptorHeap> perThreadDepthStencilHeap;
+		UniquePtr<D3D12Core::DescriptorHeap> depthStencilHeap;
 	};
 
 	LocalDescriptorHeapImpl::LocalDescriptorHeapImpl()
 	{
-		perThreadStagingResourceHeap = makeUnique<D3D12Core::DescriptorHeap>(Internal::numStagingResourceDescriptors + Internal::numStaticSRVDescriptors, Internal::numStagingResourceDescriptors, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, D3D12_DESCRIPTOR_HEAP_FLAG_NONE);
+		stagingResourceHeap = makeUnique<D3D12Core::DescriptorHeap>(Internal::numStagingResourceDescriptors + Internal::numStaticSRVDescriptors, Internal::numStagingResourceDescriptors, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, D3D12_DESCRIPTOR_HEAP_FLAG_NONE);
 
-		perThreadRenderTargetHeap = makeUnique<D3D12Core::DescriptorHeap>(Internal::numRTVDescriptors, Internal::numRTVDescriptors - Internal::numStaticRTVDescriptors, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, D3D12_DESCRIPTOR_HEAP_FLAG_NONE);
+		renderTargetHeap = makeUnique<D3D12Core::DescriptorHeap>(Internal::numRTVDescriptors, Internal::numRTVDescriptors - Internal::numStaticRTVDescriptors, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, D3D12_DESCRIPTOR_HEAP_FLAG_NONE);
 
-		perThreadDepthStencilHeap = makeUnique<D3D12Core::DescriptorHeap>(Internal::numRTVDescriptors, Internal::numRTVDescriptors - Internal::numStaticRTVDescriptors, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, D3D12_DESCRIPTOR_HEAP_FLAG_NONE);
+		depthStencilHeap = makeUnique<D3D12Core::DescriptorHeap>(Internal::numRTVDescriptors, Internal::numRTVDescriptors - Internal::numStaticRTVDescriptors, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, D3D12_DESCRIPTOR_HEAP_FLAG_NONE);
 
 		LOGSUCCESS("创建", LogColor::brightMagenta, TOSTRING(LocalDescriptorHeap));
 	}
@@ -55,7 +55,7 @@ namespace Gear::Core::LocalDescriptorHeap
 		}
 #endif // _DEBUG
 
-		return impl->perThreadStagingResourceHeap.get();
+		return impl->stagingResourceHeap.get();
 	}
 
 	D3D12Core::DescriptorHeap* getRenderTargetHeap()
@@ -67,7 +67,7 @@ namespace Gear::Core::LocalDescriptorHeap
 		}
 #endif // _DEBUG
 
-		return impl->perThreadRenderTargetHeap.get();
+		return impl->renderTargetHeap.get();
 	}
 
 	D3D12Core::DescriptorHeap* getDepthStencilHeap()
@@ -79,6 +79,6 @@ namespace Gear::Core::LocalDescriptorHeap
 		}
 #endif // _DEBUG
 
-		return impl->perThreadDepthStencilHeap.get();
+		return impl->depthStencilHeap.get();
 	}
 }

@@ -57,7 +57,7 @@ namespace Gear::Core::VideoEncoder
 
 		static constexpr NV_ENC_TUNING_INFO tuningInfo = NV_ENC_TUNING_INFO_HIGH_QUALITY;
 
-		static constexpr OutputVideoFormat outputVideoFormat = OutputVideoFormat::H264;
+		static constexpr VideoFormat videoFormat = VideoFormat::H264;
 
 		const GUID codec = NV_ENC_CODEC_H264_GUID;
 

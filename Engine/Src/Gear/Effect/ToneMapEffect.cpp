@@ -14,7 +14,7 @@ namespace Gear::Effect::ToneMapEffect
 
 		ToneMapEffectImpl();
 
-		RenderTextureView* process(GraphicsContext& contextRef, RenderTextureView& inputTexture);
+		RenderTextureView* process(GraphicsContext& refContext, RenderTextureView& inputTexture);
 
 	private:
 
@@ -37,9 +37,9 @@ namespace Gear::Effect::ToneMapEffect
 		LOGSUCCESS("创建", LogColor::brightMagenta, TOSTRING(ToneMapEffect));
 	}
 
-	RenderTextureView* ToneMapEffectImpl::process(GraphicsContext& contextRef, RenderTextureView& inputTexture)
+	RenderTextureView* ToneMapEffectImpl::process(GraphicsContext& refContext, RenderTextureView& inputTexture)
 	{
-		GraphicsContext* const context = &contextRef;
+		GraphicsContext* const context = &refContext;
 
 		context->setPipelineState(*toneMapState);
 
@@ -73,8 +73,8 @@ namespace Gear::Effect::ToneMapEffect
 
 	}
 
-	RenderTextureView* process(GraphicsContext& contextRef, RenderTextureView& inputTexture)
+	RenderTextureView* process(GraphicsContext& refContext, RenderTextureView& inputTexture)
 	{
-		return impl->process(contextRef, inputTexture);
+		return impl->process(refContext, inputTexture);
 	}
 }

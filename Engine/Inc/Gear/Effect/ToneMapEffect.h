@@ -7,7 +7,7 @@
 
 namespace Gear::Effect::ToneMapEffect
 {
-	RenderTextureView* process(GraphicsContext& contextRef, RenderTextureView& inputTexture);
+	RenderTextureView* process(GraphicsContext& refContext, RenderTextureView& inputTexture);
 }
 
 #endif // !_GEAR_EFFECT_TONEMAPEFFECT_H_

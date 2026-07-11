@@ -8,13 +8,13 @@
 
 namespace Gear::Effect
 {
-	HBAOPlusEffectPtr HBAOPlusEffect::create(GraphicsContext& contextRef, const uint32_t width, const uint32_t height)
+	HBAOPlusEffectPtr HBAOPlusEffect::create(ResourceManager& refResManager, const uint32_t width, const uint32_t height)
 	{
-		return makeUnique<HBAOPlusEffect>(contextRef, width, height);
+		return makeUnique<HBAOPlusEffect>(refResManager, width, height);
 	}
 
-	HBAOPlusEffect::HBAOPlusEffect(GraphicsContext& contextRef, const uint32_t width, const uint32_t height) :
-		EffectBase(contextRef, width, height, FMT::R32F), aoParameters{}
+	HBAOPlusEffect::HBAOPlusEffect(ResourceManager& refResManager, const uint32_t width, const uint32_t height) :
+		EffectBase(refResManager, width, height, FMT::R32F), aoParameters{}
 	{
 		GFSDK_SSAO_CustomHeap customHeap;
 

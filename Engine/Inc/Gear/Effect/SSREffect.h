@@ -14,9 +14,9 @@ namespace Gear::Effect
 	{
 	public:
 
-		static SSREffectPtr create(GraphicsContext& contextRef, const uint32_t width, const uint32_t height);
+		static SSREffectPtr create(ResourceManager& refResManager, const uint32_t width, const uint32_t height);
 
-		SSREffect(GraphicsContext& contextRef, const uint32_t width, const uint32_t height);
+		SSREffect(ResourceManager& refResManager, const uint32_t width, const uint32_t height);
 
 		~SSREffect();
 

@@ -6,13 +6,13 @@
 
 namespace Gear::Effect
 {
-	FXAAEffectPtr FXAAEffect::create(GraphicsContext& contextRef, const uint32_t width, const uint32_t height)
+	FXAAEffectPtr FXAAEffect::create(ResourceManager& refResManager, const uint32_t width, const uint32_t height)
 	{
-		return makeUnique<FXAAEffect>(contextRef, width, height);
+		return makeUnique<FXAAEffect>(refResManager, width, height);
 	}
 
-	FXAAEffect::FXAAEffect(GraphicsContext& contextRef, const uint32_t width, const uint32_t height) :
-		EffectBase(contextRef, width, height, FMT::RGBA16UN), fxaaParam{ 1.0f,0.75f,0.166f,0.0633f },
+	FXAAEffect::FXAAEffect(ResourceManager& refResManager, const uint32_t width, const uint32_t height) :
+		EffectBase(refResManager, width, height, FMT::RGBA16UN), fxaaParam{ 1.0f,0.75f,0.166f,0.0633f },
 		colorLumaTexture(ResourceManager::createGraphicsTexture(width, height, FMT::RGBA16UN, 1, 1, false, true))
 	{
 		colorToColorLumaPS = Shader::create(g_ColorToColorLumaBytes, sizeof(g_ColorToColorLumaBytes));

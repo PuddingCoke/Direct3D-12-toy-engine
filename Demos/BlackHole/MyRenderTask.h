@@ -15,7 +15,7 @@ public:
 		diskTexture(resManager->createRenderTextureView(L"Disk.jpg", true)),
 		originTexture(ResourceManager::createGraphicsTexture(Graphics::getWidth(), Graphics::getHeight(), FMT::RGBA16F, 1, 1, false, true)),
 		colorGradingTexture(ResourceManager::createGraphicsTexture(Graphics::getWidth(), Graphics::getHeight(), FMT::RGBA16UN, 1, 1, false, true)),
-		effect(BloomEffect::create(*context, Graphics::getWidth(), Graphics::getHeight(), *resManager))
+		effect(BloomEffect::create(*resManager, Graphics::getWidth(), Graphics::getHeight()))
 	{
 		pipelineState = PipelineStateBuilder()
 			.setDefaultFullScreenState()

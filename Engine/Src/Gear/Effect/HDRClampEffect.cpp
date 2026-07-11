@@ -12,7 +12,7 @@ namespace Gear::Effect::HDRClampEffect
 
 		HDRClampEffectImpl();
 
-		void process(GraphicsContext& contextRef, Resource::RenderTextureView& inOutTexture);
+		void process(GraphicsContext& refContext, Resource::RenderTextureView& inOutTexture);
 
 	private:
 
@@ -27,9 +27,9 @@ namespace Gear::Effect::HDRClampEffect
 		LOGSUCCESS("创建", LogColor::brightMagenta, TOSTRING(HDRClampEffect));
 	}
 
-	void HDRClampEffectImpl::process(GraphicsContext& contextRef, Resource::RenderTextureView& inOutTexture)
+	void HDRClampEffectImpl::process(GraphicsContext& refContext, Resource::RenderTextureView& inOutTexture)
 	{
-		GraphicsContext* const context = &contextRef;
+		GraphicsContext* const context = &refContext;
 
 		if (inOutTexture.getTexture()->getFormat() == FMT::RGBA16F)
 		{
@@ -60,8 +60,8 @@ namespace Gear::Effect::HDRClampEffect
 
 	}
 
-	void process(GraphicsContext& contextRef, Resource::RenderTextureView& inOutTexture)
+	void process(GraphicsContext& refContext, Resource::RenderTextureView& inOutTexture)
 	{
-		impl->process(contextRef, inOutTexture);
+		impl->process(refContext, inOutTexture);
 	}
 }

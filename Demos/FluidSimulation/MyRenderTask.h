@@ -81,7 +81,7 @@ public:
 
 		edgeHighlightState = PipelineStateBuilder::build(Shader::create(File::getWRootFolder() + L"EdgeHighlightCS.cso"));
 
-		effect = BloomEffect::create(*context, Graphics::getWidth(), Graphics::getHeight(), *resManager);
+		effect = BloomEffect::create(*resManager, Graphics::getWidth(), Graphics::getHeight());
 
 		effect->setThreshold(0.f);
 

@@ -14,7 +14,7 @@ namespace Gear::Effect::BackBufferBlitEffect
 
 		BackBufferBlitEffectImpl();
 
-		void process(GraphicsContext& contextRef, RenderTextureView& inputTexture);
+		void process(GraphicsContext& refContext, RenderTextureView& inputTexture);
 
 	private:
 
@@ -32,9 +32,9 @@ namespace Gear::Effect::BackBufferBlitEffect
 		LOGSUCCESS("创建", LogColor::brightMagenta, TOSTRING(BackBufferBlitEffect));
 	}
 
-	void BackBufferBlitEffectImpl::process(GraphicsContext& contextRef, RenderTextureView& inputTexture)
+	void BackBufferBlitEffectImpl::process(GraphicsContext& refContext, RenderTextureView& inputTexture)
 	{
-		GraphicsContext* const context = &contextRef;
+		GraphicsContext* const context = &refContext;
 
 		context->setPipelineState(*backBufferBlitState);
 
@@ -66,8 +66,8 @@ namespace Gear::Effect::BackBufferBlitEffect
 		}
 	}
 
-	void process(GraphicsContext& contextRef, RenderTextureView& inputTexture)
+	void process(GraphicsContext& refContext, RenderTextureView& inputTexture)
 	{
-		impl->process(contextRef, inputTexture);
+		impl->process(refContext, inputTexture);
 	}
 }

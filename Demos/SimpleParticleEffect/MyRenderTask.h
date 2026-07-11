@@ -31,9 +31,9 @@ public:
 			.setPS(*particlePS)
 			.build();
 
-		bloomEffect = BloomEffect::create(*context, Graphics::getWidth(), Graphics::getHeight(), *resManager);
+		bloomEffect = BloomEffect::create(*resManager, Graphics::getWidth(), Graphics::getHeight());
 
-		fxaaEffect = FXAAEffect::create(*context, Graphics::getWidth(), Graphics::getHeight());
+		fxaaEffect = FXAAEffect::create(*resManager, Graphics::getWidth(), Graphics::getHeight());
 
 		originTexture = ResourceManager::createGraphicsTexture(Graphics::getWidth(), Graphics::getHeight(), FMT::RGBA16F, 1, 1, false, true, DirectX::Colors::Black);
 

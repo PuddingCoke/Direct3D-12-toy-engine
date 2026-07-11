@@ -15,8 +15,6 @@
 
 #include<Gear/Core/GlobalShader.h>
 
-#include<Gear/Core/D3D12Core/Shader.h>
-
 #include<Gear/Effect/BloomEffect.h>
 
 #include<Gear/Effect/FXAAEffect.h>

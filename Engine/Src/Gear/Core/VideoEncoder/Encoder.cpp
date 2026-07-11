@@ -2,7 +2,7 @@
 
 namespace Gear::Core::VideoEncoder
 {
-	Encoder::Encoder(const uint32_t frameToEncode, const OutputVideoFormat format) :
+	Encoder::Encoder(const uint32_t frameToEncode, const VideoFormat videoFormat) :
 		frameEncoded(0), frameToEncode(frameToEncode), encodeTime(0.f), streamIndex(0), sampleDuration(timeBase / static_cast<LONGLONG>(frameRate)), dts(0)
 	{
 		CHECKERROR(MFStartup(MF_VERSION));
@@ -15,24 +15,26 @@ namespace Gear::Core::VideoEncoder
 
 		mediaType->SetGUID(MF_MT_MAJOR_TYPE, MFMediaType_Video);
 
-		switch (format)
+		switch (videoFormat)
 		{
-		case OutputVideoFormat::H264:
-			LOGENGINE("输出视频格式", LogColor::brightMagenta, "H264");
+		case VideoFormat::H264:
+			LOGENGINE("视频格式", LogColor::brightMagenta, "H264");
 			mediaType->SetGUID(MF_MT_SUBTYPE, MFVideoFormat_H264);
 			break;
-		case OutputVideoFormat::HEVC:
-			LOGENGINE("输出视频格式", LogColor::brightMagenta, "HEVC");
+		case VideoFormat::HEVC:
+			LOGENGINE("视频格式", LogColor::brightMagenta, "HEVC");
 			mediaType->SetGUID(MF_MT_SUBTYPE, MFVideoFormat_HEVC);
 			break;
-		case OutputVideoFormat::AV1:
-			LOGENGINE("输出视频格式", LogColor::brightMagenta, "AV1");
+		case VideoFormat::AV1:
+			LOGENGINE("视频格式", LogColor::brightMagenta, "AV1");
 			mediaType->SetGUID(MF_MT_SUBTYPE, MFVideoFormat_AV1);
 			break;
 		default:
-			LOGERROR("不被支持的输出视频格式！");
+			LOGERROR("不被支持的视频格式！");
 			break;
 		}
+
+		LOGENGINE("视频时间", FloatPrecision(1), static_cast<float>(frameToEncode) / static_cast<float>(frameRate), "秒");
 
 		LOGENGINE("视频帧率", frameRate);
 

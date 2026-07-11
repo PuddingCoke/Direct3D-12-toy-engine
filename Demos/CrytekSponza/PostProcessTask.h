@@ -13,7 +13,7 @@ public:
 	PostProcessTask(const RenderTextureView& ssrCombinedTexture) :
 		ssrCombinedTexture(makeUnique<RenderTextureView>(ssrCombinedTexture))
 	{
-		bloomEffect = BloomEffect::create(*context, Graphics::getWidth(), Graphics::getHeight(), *resManager);
+		bloomEffect = BloomEffect::create(*resManager, Graphics::getWidth(), Graphics::getHeight());
 
 		bloomEffect->setThreshold(0.f);
 
@@ -21,7 +21,7 @@ public:
 
 		bloomEffect->setIntensity(0.17f);
 
-		fxaaEffect = FXAAEffect::create(*context, Graphics::getWidth(), Graphics::getHeight());
+		fxaaEffect = FXAAEffect::create(*resManager, Graphics::getWidth(), Graphics::getHeight());
 	}
 
 	~PostProcessTask()

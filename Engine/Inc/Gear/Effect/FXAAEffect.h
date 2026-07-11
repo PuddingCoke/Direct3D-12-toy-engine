@@ -13,9 +13,9 @@ namespace Gear::Effect
 	{
 	public:
 
-		static FXAAEffectPtr create(GraphicsContext& contextRef, const uint32_t width, const uint32_t height);
+		static FXAAEffectPtr create(ResourceManager& refResManager, const uint32_t width, const uint32_t height);
 
-		FXAAEffect(GraphicsContext& contextRef, const uint32_t width, const uint32_t height);
+		FXAAEffect(ResourceManager& refResManager, const uint32_t width, const uint32_t height);
 
 		~FXAAEffect();
 

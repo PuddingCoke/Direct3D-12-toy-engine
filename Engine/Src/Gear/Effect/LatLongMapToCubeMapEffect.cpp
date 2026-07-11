@@ -16,7 +16,7 @@ namespace Gear::Effect::LatLongMapToCubeMapEffect
 
 		LatLongMapToCubeMapEffectImpl(ResourceManager* const resManager);
 
-		void process(GraphicsContext& contextRef, RenderTextureView& inputTexture, RenderTextureView& outputTexture);
+		void process(GraphicsContext& refContext, RenderTextureView& inputTexture, RenderTextureView& outputTexture);
 
 	private:
 
@@ -90,9 +90,9 @@ namespace Gear::Effect::LatLongMapToCubeMapEffect
 		LOGSUCCESS("创建", LogColor::brightMagenta, TOSTRING(LatLongMapToCubeMapEffect));
 	}
 
-	void LatLongMapToCubeMapEffectImpl::process(GraphicsContext& contextRef, RenderTextureView& inputTexture, RenderTextureView& outputTexture)
+	void LatLongMapToCubeMapEffectImpl::process(GraphicsContext& refContext, RenderTextureView& inputTexture, RenderTextureView& outputTexture)
 	{
-		GraphicsContext* const context = &contextRef;
+		GraphicsContext* const context = &refContext;
 
 		context->setPipelineState(*equirectangularState);
 
@@ -128,9 +128,9 @@ namespace Gear::Effect::LatLongMapToCubeMapEffect
 
 	}
 
-	void process(GraphicsContext& contextRef, RenderTextureView& inputTexture, RenderTextureView& outputTexture)
+	void process(GraphicsContext& refContext, RenderTextureView& inputTexture, RenderTextureView& outputTexture)
 	{
-		impl->process(contextRef, inputTexture, outputTexture);
+		impl->process(refContext, inputTexture, outputTexture);
 	}
 }
 

@@ -14,7 +14,7 @@ namespace Gear::Effect::GammaCorrectEffect
 
 		GammaCorrectEffectImpl();
 
-		RenderTextureView* process(GraphicsContext& contextRef, RenderTextureView& inputTexture);
+		RenderTextureView* process(GraphicsContext& refContext, RenderTextureView& inputTexture);
 
 	private:
 
@@ -37,9 +37,9 @@ namespace Gear::Effect::GammaCorrectEffect
 		LOGSUCCESS("创建", LogColor::brightMagenta, TOSTRING(GammaCorrectEffect));
 	}
 
-	RenderTextureView* GammaCorrectEffectImpl::process(GraphicsContext& contextRef, RenderTextureView& inputTexture)
+	RenderTextureView* GammaCorrectEffectImpl::process(GraphicsContext& refContext, RenderTextureView& inputTexture)
 	{
-		GraphicsContext* const context = &contextRef;
+		GraphicsContext* const context = &refContext;
 
 		context->setPipelineState(*gammaCorrectState);
 
@@ -73,8 +73,8 @@ namespace Gear::Effect::GammaCorrectEffect
 
 	}
 
-	RenderTextureView* process(GraphicsContext& contextRef, RenderTextureView& inputTexture)
+	RenderTextureView* process(GraphicsContext& refContext, RenderTextureView& inputTexture)
 	{
-		return impl->process(contextRef, inputTexture);
+		return impl->process(refContext, inputTexture);
 	}
 }

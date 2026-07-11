@@ -21,9 +21,9 @@ namespace Gear::Effect
 
 		static constexpr uint32_t iteration[blurSteps] = { 2,3,4,5,6 };
 
-		static BloomEffectPtr create(GraphicsContext& contextRef, const uint32_t width, const uint32_t height, ResourceManager& resManager);
+		static BloomEffectPtr create(ResourceManager& refResManager, const uint32_t width, const uint32_t height);
 
-		BloomEffect(GraphicsContext& contextRef, const uint32_t width, const uint32_t height, ResourceManager& resManager);
+		BloomEffect(ResourceManager& refResManager, const uint32_t width, const uint32_t height);
 
 		~BloomEffect();
 

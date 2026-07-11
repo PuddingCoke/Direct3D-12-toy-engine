@@ -15,9 +15,9 @@ namespace Gear::Effect
 	{
 	public:
 
-		static HBAOPlusEffectPtr create(GraphicsContext& contextRef, const uint32_t width, const uint32_t height);
+		static HBAOPlusEffectPtr create(ResourceManager& refResManager, const uint32_t width, const uint32_t height);
 
-		HBAOPlusEffect(GraphicsContext& contextRef, const uint32_t width, const uint32_t height);
+		HBAOPlusEffect(ResourceManager& refResManager, const uint32_t width, const uint32_t height);
 
 		~HBAOPlusEffect();
 

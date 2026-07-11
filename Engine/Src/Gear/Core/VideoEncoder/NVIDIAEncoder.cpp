@@ -15,7 +15,7 @@ LOGERROR("调用", #func, "时发生错误，错误码", static_cast<uint32_t>(_
 namespace Gear::Core::VideoEncoder
 {
 	NVIDIAEncoder::NVIDIAEncoder(const uint32_t frameToEncode, const uint32_t bFrames) :
-		Encoder(frameToEncode, outputVideoFormat),
+		Encoder(frameToEncode, videoFormat),
 		moduleNvEncAPI(nullptr),
 		nvencAPI{ NV_ENCODE_API_FUNCTION_LIST_VER },
 		encoder(nullptr),

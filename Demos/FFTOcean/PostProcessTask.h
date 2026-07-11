@@ -11,11 +11,11 @@ public:
 	PostProcessTask(const RenderTextureView& originTexture) :
 		originTexture(makeUnique<RenderTextureView>(originTexture))
 	{
-		bloomEffect = BloomEffect::create(*context, Graphics::getWidth(), Graphics::getHeight(), *resManager);
+		bloomEffect = BloomEffect::create(*resManager, Graphics::getWidth(), Graphics::getHeight());
 
 		bloomEffect->setSoftThreshold(0.85f);
 
-		fxaaEffect = FXAAEffect::create(*context, Graphics::getWidth(), Graphics::getHeight());
+		fxaaEffect = FXAAEffect::create(*resManager, Graphics::getWidth(), Graphics::getHeight());
 	}
 
 	~PostProcessTask()
