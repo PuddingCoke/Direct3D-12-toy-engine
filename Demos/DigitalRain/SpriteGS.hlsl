@@ -27,8 +27,8 @@ void main(
     GSOutput output;
     output.color = input[0].color;
     
-    float3 cameraRight = float3(perframeResource.view[0][0], perframeResource.view[1][0], perframeResource.view[2][0]);
-    float3 cameraUp = float3(perframeResource.view[0][1], perframeResource.view[1][1], perframeResource.view[2][1]);
+    float3 cameraRight = perframeResource.cameraRight.xyz;
+    float3 cameraUp = perframeResource.cameraUp.xyz;
     
     output.pos = mul(input[0].position + float4(cameraRight * -0.5 * input[0].size.x + cameraUp * -0.5 * input[0].size.y, 0.0), perframeResource.viewProj);
     output.texCoord = float2(input[0].uvLeft, input[0].uvBottom);

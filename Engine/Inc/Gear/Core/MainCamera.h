@@ -13,9 +13,15 @@ namespace Gear::Core::MainCamera
 
 	DirectX::XMVECTOR getEyePos();
 
+	float getFovAngleY();
+
+	float getZNear();
+
+	float getZFar();
+
 	void setProj(const float fov, const float aspectRatio, const float zNear, const float zFar);
 
-	void setView(const DirectX::XMVECTOR& eyePos, const DirectX::XMVECTOR& focus, const DirectX::XMVECTOR& up);
+	void setView(const DirectX::XMVECTOR& cameraPos, const DirectX::XMVECTOR& focus, const DirectX::XMVECTOR& up);
 
 	void setProj(const DirectX::XMMATRIX& proj);
 

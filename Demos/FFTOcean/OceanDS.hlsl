@@ -52,7 +52,7 @@ DS_OUTPUT main(
     
     Output.texCoord = position.xz;
     
-    Output.viewDir = perframeResource.eyePos.xyz - position;
+    Output.viewDir = perframeResource.cameraPos.xyz - position;
     
     const float viewDist = length(Output.viewDir);
     

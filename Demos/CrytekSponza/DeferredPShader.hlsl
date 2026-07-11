@@ -37,7 +37,7 @@ PixelOutput main(PixelInput input)
 {
     float4 baseColor = tDiffuse.Sample(anisotrophicWrapSampler, input.uv);
     
-    float dist = distance(perframeResource.eyePos.xyz, input.pos.xyz);
+    float dist = distance(perframeResource.cameraPos.xyz, input.pos.xyz);
     
     float alphaBlendFactor = 1.0 - pow(dist / clipMaxDistance, clipExponent);
     

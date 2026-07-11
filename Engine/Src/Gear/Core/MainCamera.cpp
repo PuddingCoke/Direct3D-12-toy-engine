@@ -9,7 +9,13 @@ namespace Gear::Core::MainCamera
 
 		DirectX::XMMATRIX viewMatrix = {};
 
-		DirectX::XMVECTOR eyePos = {};
+		DirectX::XMVECTOR cameraPos = {};
+
+		float fovAngleY = 0.f;
+
+		float zNear = 0.f;
+
+		float zFar = 0.f;
 
 	}impl;
 
@@ -25,19 +31,40 @@ namespace Gear::Core::MainCamera
 
 	DirectX::XMVECTOR getEyePos()
 	{
-		return impl.eyePos;
+		return impl.cameraPos;
+	}
+
+	float getFovAngleY()
+	{
+		return impl.fovAngleY;
+	}
+
+	float getZNear()
+	{
+		return impl.zNear;
+	}
+
+	float getZFar()
+	{
+		return impl.zFar;
 	}
 
 	void setProj(const float fov, const float aspectRatio, const float zNear, const float zFar)
 	{
+		impl.fovAngleY = fov;
+
+		impl.zNear = zNear;
+
+		impl.zFar = zFar;
+
 		setProj(DirectX::XMMatrixPerspectiveFovLH(fov, aspectRatio, zNear, zFar));
 	}
 
-	void setView(const DirectX::XMVECTOR& eyePos, const DirectX::XMVECTOR& focus, const DirectX::XMVECTOR& up)
+	void setView(const DirectX::XMVECTOR& cameraPos, const DirectX::XMVECTOR& focus, const DirectX::XMVECTOR& up)
 	{
-		impl.eyePos = eyePos;
+		impl.cameraPos = cameraPos;
 
-		setView(DirectX::XMMatrixLookAtLH(eyePos, focus, up));
+		setView(DirectX::XMMatrixLookAtLH(cameraPos, focus, up));
 	}
 
 	void setProj(const DirectX::XMMATRIX& proj)

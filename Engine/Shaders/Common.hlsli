@@ -11,12 +11,18 @@ struct PerframeResource
     float floatSeed;
     matrix proj;
     matrix view;
-    float4 eyePos;
     matrix prevViewProj;
     matrix viewProj;
     matrix normalMatrix;
     float2 screenSize;
     float2 screenTexelSize;
+    float4 cameraPos;
+    float4 cameraRight;
+    float4 cameraUp;
+    float4 cameraForward;
+    float fovAngleY;
+    float zNear;
+    float zFar;
 };
 
 ConstantBuffer<PerframeResource> perframeResource : register(ENGINE_GLOBAL_CBUFFER);

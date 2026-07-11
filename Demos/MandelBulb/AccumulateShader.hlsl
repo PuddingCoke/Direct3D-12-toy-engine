@@ -1,8 +1,8 @@
 #include"Common.hlsli"
 
 #define MAXITERATION 100
+
 #define LEVELOFDETAIL 0.0005
-#define FOVANGLEY 0.78539816339744
 
 #define RAYMARCHITERATION 150
 
@@ -10,9 +10,6 @@ struct DrawCallParam
 {
     uint frameIndex;
     float floatSeed;
-    float phi;
-    float theta;
-    float radius;
     float POWER;
 };
 
@@ -140,22 +137,27 @@ float4 main(float2 texCoord : TEXCOORD, float4 pixelCoord : SV_POSITION) : SV_TA
     
     float2 screenSize = perframeResource.screenSize;
     
+    //pixelCoord屏幕左上坐标为(1/texelSize).xx
     float2 planePos = (floor(pixelCoord.xy) + Hash2(hashSeed)) / screenSize * 2.0 - 1.0;
+    
+    planePos.y *= -1.0;
+    
     planePos.x *= screenSize.x / screenSize.y;
     
-    float3 cameraPos = float3(cos(drawCallParam.phi) * sin(drawCallParam.theta), cos(drawCallParam.phi) * cos(drawCallParam.theta), sin(drawCallParam.phi)) * drawCallParam.radius;
+    float3 cameraPos = perframeResource.cameraPos.xyz;
     
-    float3 helper = float3(0.0, 0.0, 1.0);
+    float3 xVec = perframeResource.cameraRight.xyz;
     
-    float3 xVec = normalize(cross(helper, cameraPos));
-    float3 yVec = normalize(cross(xVec, cameraPos));
+    float3 yVec = perframeResource.cameraUp.xyz;
     
-    float3 rayDir = normalize(xVec * planePos.x + yVec * planePos.y - normalize(cameraPos) / tan(FOVANGLEY / 2.0));
+    float3 rayDir = normalize(xVec * planePos.x + yVec * planePos.y + perframeResource.cameraForward.xyz / tan(perframeResource.fovAngleY / 2.0));
+    
     float3 curPos = cameraPos;
     
     bool hit = false;
     
     float3 atten = float3(1.0, 1.0, 1.0);
+    
     float3 color = float3(0.0, 0.0, 0.0);
     
     [loop]

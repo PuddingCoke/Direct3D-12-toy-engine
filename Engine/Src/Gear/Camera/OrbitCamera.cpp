@@ -10,8 +10,8 @@ namespace Gear
 {
 	namespace Camera
 	{
-		OrbitCamera::OrbitCamera(const DirectX::XMVECTOR& eye, const DirectX::XMVECTOR& up, const float zoomSpeed) :
-			zoomSpeed(zoomSpeed), eye(DirectX::XMVector3Normalize(eye)), up(DirectX::XMVector3Normalize(up))
+		OrbitCamera::OrbitCamera(const DirectX::XMVECTOR& eye, const DirectX::XMVECTOR& up, const float zoomSpeed, const bool smoothZoom) :
+			zoomSpeed(zoomSpeed), eye(DirectX::XMVector3Normalize(eye)), up(DirectX::XMVector3Normalize(up)), smoothZoom(smoothZoom)
 		{
 			DirectX::XMStoreFloat(&targetRadius, DirectX::XMVector3Length(eye));
 
@@ -54,6 +54,11 @@ namespace Gear
 				{
 					targetRadius -= 0.5f * this->zoomSpeed * Input::Mouse::getWheelDelta();
 
+					if (!this->smoothZoom)
+					{
+						currentRadius = targetRadius;
+					}
+
 					if (targetRadius < 0.1f)
 					{
 						targetRadius = 0.1f;
@@ -70,7 +75,10 @@ namespace Gear
 
 		void OrbitCamera::applyInput(const float dt)
 		{
-			currentRadius = Utils::Math::lerp(currentRadius, targetRadius, Utils::Math::clamp(dt * 20.f, 0.f, 1.f));
+			if (smoothZoom)
+			{
+				currentRadius = Utils::Math::lerp(currentRadius, targetRadius, Utils::Math::clamp(dt * 20.f, 0.f, 1.f));
+			}
 
 			Core::MainCamera::setView(DirectX::XMVectorScale(eye, currentRadius), { 0,0,0 }, up);
 		}

@@ -19,7 +19,7 @@ namespace Gear
 
 			void operator=(const OrbitCamera&) = delete;
 
-			OrbitCamera(const DirectX::XMVECTOR& eye, const DirectX::XMVECTOR& up, const float zoomSpeed);
+			OrbitCamera(const DirectX::XMVECTOR& eye, const DirectX::XMVECTOR& up, const float zoomSpeed, const bool smoothZoom = true);
 
 			~OrbitCamera();
 
@@ -44,6 +44,8 @@ namespace Gear
 			DirectX::XMVECTOR eye;
 
 			const DirectX::XMVECTOR up;
+
+			const bool smoothZoom;
 
 		};
 	}

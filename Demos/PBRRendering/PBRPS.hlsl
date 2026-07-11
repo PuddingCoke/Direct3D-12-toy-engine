@@ -44,7 +44,7 @@ float4 main(PixelInput input) : SV_TARGET
     
     float3 L = normalize(lightPos.xyz - input.pos.xyz);
     
-    float3 V = normalize(perframeResource.eyePos.xyz - input.pos.xyz);
+    float3 V = normalize(perframeResource.cameraPos.xyz - input.pos.xyz);
     
     float3 F0 = float3(0.04, 0.04, 0.04);
     

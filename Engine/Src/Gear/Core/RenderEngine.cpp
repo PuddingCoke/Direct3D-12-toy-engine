@@ -489,7 +489,29 @@ namespace Gear::Core::RenderEngine
 			//逆的转置的转置等于没有转置
 			perframeResource.normalMatrix = DirectX::XMMatrixInverse(nullptr, MainCamera::getView());
 
-			DirectX::XMStoreFloat4(&perframeResource.eyePos, MainCamera::getEyePos());
+			DirectX::XMStoreFloat4(&perframeResource.cameraPos, MainCamera::getEyePos());
+
+			perframeResource.cameraPos.w = 1.0f;
+
+			//归一化保险一点
+			DirectX::XMStoreFloat4(&perframeResource.cameraRight, DirectX::XMVector3Normalize(perframeResource.view.r[0]));
+
+			DirectX::XMStoreFloat4(&perframeResource.cameraUp, DirectX::XMVector3Normalize(perframeResource.view.r[1]));
+
+			DirectX::XMStoreFloat4(&perframeResource.cameraForward, DirectX::XMVector3Normalize(perframeResource.view.r[2]));
+
+			//方向w要置零
+			perframeResource.cameraRight.w = 0.0f;
+
+			perframeResource.cameraUp.w = 0.0f;
+
+			perframeResource.cameraForward.w = 0.0f;
+
+			perframeResource.fovAngleY = MainCamera::getFovAngleY();
+
+			perframeResource.zNear = MainCamera::getZNear();
+
+			perframeResource.zFar = MainCamera::getZFar();
 		}
 		//关于为什么要转置我找到了一篇有关的文章
 		//https://www.douduck08.com/zh-tw/why-dx11-need-matrix-transpose-before-cbuffer-mapping/

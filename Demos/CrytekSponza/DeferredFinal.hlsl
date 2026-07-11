@@ -75,7 +75,7 @@ float4 main(float2 texCoord : TEXCOORD) : SV_TARGET
     
     float3 L = normalize(volume.lightDir.xyz);
     
-    float3 V = normalize(perframeResource.eyePos.xyz - position);
+    float3 V = normalize(perframeResource.cameraPos.xyz - position);
     
     float metallic = positionMetallic.a;
     
