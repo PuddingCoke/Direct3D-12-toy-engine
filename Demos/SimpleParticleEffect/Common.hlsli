@@ -14,8 +14,6 @@ struct PerframeResource
     matrix prevViewProj;
     matrix viewProj;
     matrix normalMatrix;
-    float2 screenSize;
-    float2 screenTexelSize;
     float4 cameraPos;
     float4 cameraRight;
     float4 cameraUp;
@@ -23,6 +21,9 @@ struct PerframeResource
     float fovAngleY;
     float zNear;
     float zFar;
+    float aspectRatio;
+    float2 screenSize;
+    float2 screenTexelSize;
 };
 
 ConstantBuffer<PerframeResource> perframeResource : register(ENGINE_GLOBAL_CBUFFER);

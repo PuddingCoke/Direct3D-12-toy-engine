@@ -26,8 +26,6 @@ namespace Gear
 					DirectX::XMMATRIX prevViewProj;
 					DirectX::XMMATRIX viewProj;
 					DirectX::XMMATRIX normalMatrix;
-					DirectX::XMFLOAT2 screenSize;
-					DirectX::XMFLOAT2 screenTexelSize;
 					DirectX::XMFLOAT4 cameraPos;
 					DirectX::XMFLOAT4 cameraRight;
 					DirectX::XMFLOAT4 cameraUp;
@@ -35,7 +33,9 @@ namespace Gear
 					float fovAngleY;
 					float zNear;
 					float zFar;
-					uint32_t padding0;
+					float aspectRatio;
+					DirectX::XMFLOAT2 screenSize;
+					DirectX::XMFLOAT2 screenTexelSize;
 					DirectX::XMUINT4 padding1[5];
 				};
 

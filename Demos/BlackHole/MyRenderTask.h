@@ -72,8 +72,6 @@ protected:
 
 		context->setPrimitiveTopology(TOPOLOGY::TRIANGLELIST);
 
-		perframeData.resolution = { static_cast<float>(Graphics::getWidth()) ,static_cast<float>(Graphics::getHeight()) };
-
 		//perframeData.timeElapsed = perframeData.texturePeriod * 3.f + sinf(Graphics::getTimeElapsed()) * 1.f;
 
 		perframeData.timeElapsed = Graphics::getTimeElapsed();
@@ -132,7 +130,6 @@ private:
 
 	struct PerframeData
 	{
-		DirectX::XMFLOAT2 resolution;
 		float timeElapsed;
 		uint32_t useOriginalVer = false;
 		float texturePeriod = 120.f;

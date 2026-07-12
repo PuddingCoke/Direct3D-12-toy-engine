@@ -466,14 +466,6 @@ namespace Gear::Core::RenderEngine
 			perframeResource.uintSeed = Utils::Random::genUint();
 
 			perframeResource.floatSeed = Utils::Random::genFloat();
-
-			perframeResource.screenSize = DirectX::XMFLOAT2(
-				static_cast<float>(Graphics::getWidth()),
-				static_cast<float>(Graphics::getHeight()));
-
-			perframeResource.screenTexelSize = DirectX::XMFLOAT2(
-				1.f / perframeResource.screenSize.x,
-				1.f / perframeResource.screenSize.y);
 		}
 
 		//主相机相关信息的设置
@@ -520,6 +512,19 @@ namespace Gear::Core::RenderEngine
 		//在DirectXMath中我们一般使用DirectX::XMVector4Transform，它背后的数学运算是 vec*matrix
 		//如果数据原封不动上传到显存上，那么这个矩阵会被HLSL用另一种方式来解释，我们因此需要的数学运算是 matrix*vec，即mul(matrix,vec)
 		//然而，mul(vec,matrix)是有一些性能优势的，为了利用这个性能优势，矩阵在上传前要被转置
+
+		//屏幕相关信息的设置
+		{
+			perframeResource.aspectRatio = Graphics::getAspectRatio();
+
+			perframeResource.screenSize = DirectX::XMFLOAT2(
+				static_cast<float>(Graphics::getWidth()),
+				static_cast<float>(Graphics::getHeight()));
+
+			perframeResource.screenTexelSize = DirectX::XMFLOAT2(
+				1.f / perframeResource.screenSize.x,
+				1.f / perframeResource.screenSize.y);
+		}
 
 		engineGlobalCBuffer->updateData(&perframeResource);
 

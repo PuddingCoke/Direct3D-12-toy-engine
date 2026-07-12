@@ -10,7 +10,6 @@ cbuffer RenderParameters : register(PER_INVOKE_CONSTANTS)
 {
     uint noiseTextureIndex;
     uint diskTextureIndex;
-    float2 iResolution;
     float timeElapsed;
     uint useOriginalVer;
     float texturePeriod;
@@ -317,8 +316,8 @@ float3 rotate(float3 p, float x, float y, float z)
 
 void RotateCamera(inout float3 eyevec, inout float3 eyepos)
 {
-    float mousePosY = iMouse.y / iResolution.y;
-    float mousePosX = iMouse.x / iResolution.x;
+    float mousePosY = iMouse.y / perframeResource.screenSize.y;
+    float mousePosX = iMouse.x / perframeResource.screenSize.x;
 
     float3 angle = float3(mousePosY * 0.05 + 0.05, 1.0 + mousePosX * 1.0, -0.45);
 
@@ -347,14 +346,12 @@ float rand(float2 coord)
 
 float4 main(float2 uv : TEXCOORD) : SV_TARGET
 {
-    float aspect = iResolution.x / iResolution.y;
-
     float2 uveye = uv;
     
-    float3 eyevec = normalize(float3((uveye * 2.0 - 1.0) * float2(aspect, 1.0), 6.0));
+    float3 eyevec = normalize(float3((uveye * 2.0 - 1.0) * float2(perframeResource.aspectRatio, 1.0), 6.0));
     float3 eyepos = float3(0.0, -0.0, -10.0);
     
-    float2 mousepos = iMouse.xy / iResolution.xy;
+    float2 mousepos = iMouse.xy / perframeResource.screenSize;
     if (mousepos.x == 0.0)
     {
         mousepos.x = 0.35;

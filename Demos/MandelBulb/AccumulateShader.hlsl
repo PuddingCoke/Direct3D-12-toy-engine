@@ -140,9 +140,7 @@ float4 main(float2 texCoord : TEXCOORD, float4 pixelCoord : SV_POSITION) : SV_TA
     //pixelCoord屏幕左上坐标为(1/texelSize).xx
     float2 planePos = (floor(pixelCoord.xy) + Hash2(hashSeed)) / screenSize * 2.0 - 1.0;
     
-    planePos.y *= -1.0;
-    
-    planePos.x *= screenSize.x / screenSize.y;
+    planePos *= float2(perframeResource.aspectRatio, -1.f);
     
     float3 cameraPos = perframeResource.cameraPos.xyz;
     
