@@ -72,15 +72,16 @@ constexpr std::string_view getShortFuncName(const char* const funcName)
 		}
 		else
 		{
-			const auto prevPrevPos = sv.rfind("::", prevPos - 1ull);
-
 			//::ASDFGH -> ::ASDFGH
 			if (prevPos == 0ull)
 			{
 				return sv;
 			}
+
+			const auto prevPrevPos = sv.rfind("::", prevPos - 1ull);
+
 			//ASDFG::ASDFG::ASDFG -> ASDFG::ASDFG
-			else if (prevPrevPos != std::string_view::npos)
+			if (prevPrevPos != std::string_view::npos)
 			{
 				return sv.substr(prevPrevPos + 2ull);
 			}
