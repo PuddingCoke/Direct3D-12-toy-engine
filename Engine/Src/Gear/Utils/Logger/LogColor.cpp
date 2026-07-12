@@ -49,6 +49,8 @@ namespace Gear::Utils::Logger
 
 	const LogColor LogColor::functionNameColor = LogColor::yellow;
 
+	const LogColor LogColor::filePathColor = LogColor::brightBlue;
+
 	const LogColor LogColor::successColor = LogColor::brightGreen;
 
 	const LogColor LogColor::errorColor = LogColor::brightRed;

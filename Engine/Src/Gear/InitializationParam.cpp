@@ -35,6 +35,8 @@ namespace Gear
 
 		param.videoRender.maxBFrames = maxBFrames;
 
+		param.videoRender.hardwareEncode = true;
+
 		return param;
 	}
 

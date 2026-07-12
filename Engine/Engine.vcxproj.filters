@@ -462,7 +462,7 @@
     <ClInclude Include="Inc\Gear\Core\D3D12Core\Fence.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="Inc\Gear\Core\VideoEncoder\X264Encoder.h">
+    <ClInclude Include="Inc\Gear\Core\VideoEncoder\SoftwareEncoder.h">
       <Filter>Header</Filter>
     </ClInclude>
   </ItemGroup>
@@ -729,6 +729,9 @@
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="Src\Gear\Core\D3D12Core\CommandQueue.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gear\Core\VideoEncoder\SoftwareEncoder.cpp">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>

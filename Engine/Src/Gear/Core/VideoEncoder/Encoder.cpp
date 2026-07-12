@@ -2,8 +2,8 @@
 
 namespace Gear::Core::VideoEncoder
 {
-	Encoder::Encoder(const uint32_t frameToEncode, const uint32_t maxBFrames, const VideoFormat videoFormat) :
-		frameEncoded(0), frameToEncode(frameToEncode), encodeTime(0.f), maxBFrames(maxBFrames)
+	Encoder::Encoder(const uint32_t frameToEncode, const VideoFormat videoFormat) :
+		frameEncoded(0), frameToEncode(frameToEncode)
 	{
 		avformat_network_init();
 
@@ -15,13 +15,11 @@ namespace Gear::Core::VideoEncoder
 
 		outStream->id = 0;
 
-		LOGENGINE("视频名称", "output.mp4");
+		LOGENGINE("视频名称", LogColor::filePathColor, "output.mp4");
 
 		LOGENGINE("视频时间", FloatPrecision(1), static_cast<float>(frameToEncode) / static_cast<float>(frameRate), "秒");
 
 		LOGENGINE("视频帧率", frameRate);
-
-		LOGENGINE("最多B帧", maxBFrames);
 
 		AVCodecParameters* const param = outStream->codecpar;
 
@@ -53,8 +51,6 @@ namespace Gear::Core::VideoEncoder
 		param->framerate = AVRational{ static_cast<int32_t>(frameRate),1 };
 
 		avio_open(&outContext->pb, outContext->url, AVIO_FLAG_WRITE);
-
-		avformat_write_header(outContext, nullptr);
 
 		LOGENGINE("待编码帧数", frameToEncode);
 
@@ -101,20 +97,34 @@ namespace Gear::Core::VideoEncoder
 		avformat_network_deinit();
 	}
 
+	bool Encoder::encode(D3D12Resource::Texture* const inputTexture)
+	{
+		return false;
+	}
+
+	bool Encoder::encode(const uint8_t* const data)
+	{
+		return false;
+	}
+
 	void Encoder::waitFor(D3D12Core::CommandQueue* const queueWaitFor, D3D12Core::Fence* const fence)
 	{
 		vpCommandQueue->waitFor(queueWaitFor, fence);
 	}
 
-	bool Encoder::writeFrame(void* const bitstreamPtr, const uint32_t bitstreamSize, const bool syncPoint, const uint32_t presentFrameIndex)
+	void Encoder::writeHeader() const
+	{
+		avformat_write_header(outContext, nullptr);
+	}
+
+	bool Encoder::writeFrame(void* const bitstreamPtr, const uint32_t bitstreamSize, const bool syncPoint,
+		const int64_t decodeFrameIndex, const int64_t presentFrameIndex)
 	{
 		AVPacket* packet = av_packet_alloc();
 
-		packet->pts = av_rescale_q(static_cast<int64_t>(presentFrameIndex), AVRational{ 1,static_cast<int32_t>(frameRate) }, outStream->time_base);
+		packet->pts = av_rescale_q(presentFrameIndex, AVRational{ 1,static_cast<int32_t>(frameRate) }, outStream->time_base);
 
-		//[mp4 @ 000001bdb1381100] pts (46500) < dts (48000) in stream 0 报错
-		//解决方法 https://github.com/FFmpeg/FFmpeg/commit/670ff6c7ce0c70798a9909b334310625fe067a34?diff=split
-		packet->dts = av_rescale_q(static_cast<int64_t>(frameEncoded) - static_cast<int64_t>(maxBFrames), AVRational{ 1,static_cast<int32_t>(frameRate) }, outStream->time_base);
+		packet->dts = av_rescale_q(decodeFrameIndex, AVRational{ 1,static_cast<int32_t>(frameRate) }, outStream->time_base);
 
 		packet->duration = av_rescale_q(1, AVRational{ 1,static_cast<int32_t>(frameRate) }, outStream->time_base);
 
@@ -140,6 +150,19 @@ namespace Gear::Core::VideoEncoder
 		return frameEncoded != frameToEncode;
 	}
 
+	bool Encoder::writeFrame(AVPacket* const packet)
+	{
+		av_interleaved_write_frame(outContext, packet);
+
+		av_packet_unref(packet);
+
+		frameEncoded++;
+
+		displayProgress();
+
+		return frameEncoded != frameToEncode;
+	}
+
 	void Encoder::bgraToNV12(D3D12Resource::Texture* inputTexture, D3D12Resource::VideoTexture* nv12Texture, D3D12Core::Fence* const fence)
 	{
 		vpCommandQueue->begin();
@@ -155,6 +178,16 @@ namespace Gear::Core::VideoEncoder
 		vpCommandQueue->waitFrameGPUComplete();
 
 		vpCommandQueue->signal(fence);
+	}
+
+	uint32_t Encoder::getFrameEncoded() const
+	{
+		return frameEncoded;
+	}
+
+	AVStream* Encoder::getOutStream() const
+	{
+		return outStream;
 	}
 
 	void Encoder::displayProgress() const

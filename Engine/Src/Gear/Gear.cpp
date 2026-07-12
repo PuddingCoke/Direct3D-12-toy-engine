@@ -76,7 +76,7 @@ namespace Gear
 
 		UniquePtr<Game> game;
 
-		//用于截屏
+		//用于截屏和视频渲染
 		UniquePtr<D3D12Resource::ReadbackHeap> backBufferHeap;
 
 		InitializationParam::EngineUsage usage;
@@ -101,7 +101,7 @@ namespace Gear
 
 		fileToken = makeUnique<File::Internal::InitializeToken>(File::backslashToSlash(File::getParentFolder(argv[0])));
 
-		LOGENGINE("EXE根目录", LogColor::brightBlue, File::getWRootFolder());
+		LOGENGINE("EXE根目录", LogColor::filePathColor, File::getWRootFolder());
 
 		MainMonitor::Internal::getCurrentSettings();
 
@@ -136,6 +136,8 @@ namespace Gear
 			ShowWindow(Window::Win32Form::getHandle(), SW_HIDE);
 
 			renderEngineToken = makeUnique<RenderEngine::Internal::InitializeToken>(videoRender.width, videoRender.height, Window::Win32Form::getHandle(), false, false);
+
+			backBufferHeap = makeUnique<D3D12Resource::ReadbackHeap>(FMT::getByteSize(Graphics::backBufferFormat) * videoRender.width * videoRender.height);
 
 			LOGENGINE("引擎用途", "视频渲染");
 
@@ -294,18 +296,27 @@ namespace Gear
 
 		const uint32_t frameToEncode = videoRender.second * VideoEncoder::Encoder::frameRate;
 
-		switch (vendor)
+		LOGENGINE("编码方式", LogColor::yellow, videoRender.hardwareEncode ? "硬件编码" : "软件编码");
+
+		if (videoRender.hardwareEncode)
 		{
-		case AdapterVendor::NVIDIA:
-			encoder = makeUnique<VideoEncoder::NVIDIAEncoder>(frameToEncode, videoRender.maxBFrames);
-			break;
-		case AdapterVendor::AMD:
-		case AdapterVendor::INTEL:
-		case AdapterVendor::UNKNOWN:
-			LOGERROR("目前只为英伟达的GPU做了视频编码的适配");
-			break;
-		default:
-			break;
+			switch (vendor)
+			{
+			case AdapterVendor::NVIDIA:
+				encoder = makeUnique<VideoEncoder::NVIDIAEncoder>(frameToEncode, videoRender.maxBFrames);
+				break;
+			case AdapterVendor::AMD:
+			case AdapterVendor::INTEL:
+			case AdapterVendor::UNKNOWN:
+				LOGERROR("目前只为英伟达的GPU做了硬件编码适配");
+				break;
+			default:
+				break;
+			}
+		}
+		else
+		{
+			//software
 		}
 
 		UniquePtr<D3D12Resource::Texture> renderTexture = makeUnique<D3D12Resource::Texture>(Graphics::getWidth(), Graphics::getHeight(), Graphics::backBufferFormat, 1, 1, true, D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET, nullptr);
@@ -330,27 +341,64 @@ namespace Gear
 
 		D3D12Core::FencePtr vpSyncFence = makeUnique<D3D12Core::Fence>();
 
-		do
+		bool encoding = true;
+
+		if (videoRender.hardwareEncode)
 		{
+			do
+			{
 
-			RenderEngine::Internal::setRenderTexture(renderTexture.get(), textureHandle);
+				RenderEngine::Internal::setRenderTexture(renderTexture.get(), textureHandle);
 
-			RenderEngine::Internal::beginFrame();
+				RenderEngine::Internal::beginFrame();
 
-			game->update(Graphics::getDeltaTime());
+				game->update(Graphics::getDeltaTime());
 
-			game->render();
+				game->render();
 
-			RenderEngine::Internal::endFrame();
+				RenderEngine::Internal::endFrame();
 
-			RenderEngine::Internal::updateTimeElapsed();
+				RenderEngine::Internal::waitFrameGPUComplete();
 
-			RenderEngine::Internal::waitFrameGPUComplete();
+				//编码器管理的命令队列需要等待渲染引擎管理的命令队列完成工作
+				encoder->waitFor(RenderEngine::getCommandQueue(), vpSyncFence.get());
 
-			//编码器管理的命令队列需要等待渲染引擎管理的命令队列完成工作
-			encoder->waitFor(RenderEngine::getCommandQueue(), vpSyncFence.get());
+				encoding = encoder->encode(RenderEngine::getRenderTexture());
 
-		} while (encoder->encode(RenderEngine::getRenderTexture()));
+				RenderEngine::Internal::updateTimeElapsed();
+
+			} while (encoding);
+		}
+		else
+		{
+			do
+			{
+
+				RenderEngine::Internal::setRenderTexture(renderTexture.get(), textureHandle);
+
+				RenderEngine::Internal::beginFrame();
+
+				game->update(Graphics::getDeltaTime());
+
+				game->render();
+
+				RenderEngine::Internal::saveBackBuffer(backBufferHeap.get());
+
+				RenderEngine::Internal::endFrame();
+
+				RenderEngine::Internal::waitFrameGPUComplete();
+
+				const uint8_t* const data = reinterpret_cast<uint8_t*>(backBufferHeap->map(CD3DX12_RANGE(0ull,
+					FMT::getByteSize(Graphics::backBufferFormat) * videoRender.width * videoRender.height)));
+
+				encoding = encoder->encode(data);
+
+				backBufferHeap->unmap();
+
+				RenderEngine::Internal::updateTimeElapsed();
+
+			} while (encoding);
+		}
 	}
 
 	void GearImpl::runWallpaper()

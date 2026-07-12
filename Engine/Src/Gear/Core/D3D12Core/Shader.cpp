@@ -37,7 +37,7 @@ namespace Gear::Core::D3D12Core
 		{
 			shaderBlob = DXCCompiler::read(filePath);
 
-			LOGSUCCESS("读取", LogColor::brightBlue, filePath);
+			LOGSUCCESS("读取", LogColor::filePathColor, filePath);
 		}
 		else
 		{
@@ -58,7 +58,7 @@ namespace Gear::Core::D3D12Core
 		{
 			shaderBlob = DXCCompiler::compile(filePath, profile);
 
-			LOGSUCCESS("编译", LogColor::brightBlue, filePath);
+			LOGSUCCESS("编译", LogColor::filePathColor, filePath);
 		}
 		else
 		{

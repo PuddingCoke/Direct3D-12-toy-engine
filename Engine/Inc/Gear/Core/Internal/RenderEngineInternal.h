@@ -33,6 +33,7 @@ namespace Gear::Core::RenderEngine::Internal
 	void waitFrameCPUReusable();
 
 	//开始一帧
+	//后备缓冲被转换到STATE_RENDER_TARGET
 	void beginFrame();
 
 	//结束这一帧，调用ExecuteCommandLists
@@ -43,6 +44,7 @@ namespace Gear::Core::RenderEngine::Internal
 
 	void setDeltaTime(const float deltaTime);
 
+	//更新总时间并使总帧数渲染自增1
 	void updateTimeElapsed();
 
 	void saveBackBuffer(D3D12Resource::ReadbackHeap* const readbackHeap);

@@ -54,6 +54,13 @@ namespace Gear::Utils::Math
 		return (a + b - static_cast<T>(1)) / b;
 	}
 
+	template<typename T>
+		requires std::is_same_v<T, uint32_t> || std::is_same_v<T, uint64_t>
+	constexpr T align(const T a, const T b)
+	{
+		return ceil(a, b) * b;
+	}
+
 	//a是否拥有b？
 	template<typename T>
 		requires std::is_same_v<T, uint32_t> || std::is_same_v<T, uint64_t>

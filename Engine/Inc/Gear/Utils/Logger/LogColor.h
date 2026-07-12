@@ -54,6 +54,8 @@ namespace Gear::Utils::Logger
 
 		static const LogColor functionNameColor;
 
+		static const LogColor filePathColor;
+
 		static const LogColor successColor;
 
 		static const LogColor errorColor;

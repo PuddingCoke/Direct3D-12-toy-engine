@@ -44,6 +44,8 @@ namespace Gear
 			uint32_t second;
 
 			uint32_t maxBFrames;
+
+			bool hardwareEncode;
 		};
 
 		union

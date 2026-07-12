@@ -184,7 +184,7 @@ namespace Gear::Core
 			LOGERROR(fileExtension, "是不被支持的文件扩展名！");
 		}
 
-		LOGSUCCESS("读取", LogColor::brightBlue, filePath);
+		LOGSUCCESS("读取", LogColor::filePathColor, filePath);
 
 		return texture;
 	}

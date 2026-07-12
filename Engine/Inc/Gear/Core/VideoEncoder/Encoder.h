@@ -41,11 +41,13 @@ namespace Gear::Core::VideoEncoder
 
 		void operator=(const Encoder&) = delete;
 
-		Encoder(const uint32_t frameToEncode, const uint32_t maxBFrames, const VideoFormat videoFormat);
+		Encoder(const uint32_t frameToEncode, const VideoFormat videoFormat);
 
 		virtual ~Encoder();
 
-		virtual bool encode(D3D12Resource::Texture* const inputTexture) = 0;
+		virtual bool encode(D3D12Resource::Texture* const inputTexture);
+
+		virtual bool encode(const uint8_t* const data);
 
 		static constexpr uint32_t frameRate = 60;
 
@@ -53,17 +55,27 @@ namespace Gear::Core::VideoEncoder
 
 	protected:
 
+		void writeHeader() const;
+
 		/// <summary>
 		/// 封装裸的比特流
 		/// </summary>
 		/// <param name="bitstreamPtr">比特流指针</param>
 		/// <param name="bitstreamSize">比特流字节大小</param>
-		/// <param name="cleanPoint">同步点 pictureType == IDR 用于视频的正确跳转</param>
-		/// <param name="pts">呈现时间戳 0、1、2、3.....</param>
-		/// <returns></returns>
-		bool writeFrame(void* const bitstreamPtr, const uint32_t bitstreamSize, const bool syncPoint, const uint32_t presentFrameIndex);
+		/// <param name="syncPoint">同步点 pictureType == IDR 用于视频的正确跳转</param>
+		/// <param name="decodeFrameIndex">解压帧索引必须小于等于presentFrameIndex</param>
+		/// <param name="presentFrameIndex">呈现帧索引 0、1、2、3、4</param>
+		/// <returns>是否继续编码</returns>
+		bool writeFrame(void* const bitstreamPtr, const uint32_t bitstreamSize, const bool syncPoint,
+			const int64_t decodeFrameIndex, const int64_t presentFrameIndex);
+
+		bool writeFrame(AVPacket* const packet);
 
 		void bgraToNV12(D3D12Resource::Texture* inputTexture, D3D12Resource::VideoTexture* nv12Texture, D3D12Core::Fence* const fence);
+
+		uint32_t getFrameEncoded() const;
+
+		AVStream* getOutStream() const;
 
 	private:
 
@@ -75,14 +87,6 @@ namespace Gear::Core::VideoEncoder
 		uint32_t frameEncoded;
 
 		const uint32_t frameToEncode;
-
-		std::chrono::steady_clock::time_point startPoint;
-
-		std::chrono::steady_clock::time_point endPoint;
-
-		float encodeTime;
-
-		const uint32_t maxBFrames;
 
 		AVFormatContext* outContext;
 
