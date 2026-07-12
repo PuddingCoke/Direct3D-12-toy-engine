@@ -85,13 +85,13 @@ namespace Gear::Core::VideoEncoder
 
 		std::queue<uint64_t> decodeFrameIndices;
 
+		std::queue<NV_ENC_INPUT_PTR> mappedInputResourcePtrs;
+
+		std::queue<NV_ENC_INPUT_PTR> mappedOutputResourcePtrs;
+
 		UniquePtr<NV_ENC_REGISTERED_PTR[]> registeredInputResourcePtrs;
 
-		UniquePtr<NV_ENC_INPUT_PTR[]> mappedInputResourcePtrs;
-
 		UniquePtr<NV_ENC_REGISTERED_PTR[]> registeredOutputResourcePtrs;
-
-		UniquePtr<NV_ENC_INPUT_PTR[]> mappedOutputResourcePtrs;
 
 		UniquePtr<D3D12Resource::VideoTexturePtr[]> nv12Textures;
 

@@ -116,11 +116,7 @@ namespace Gear::Core::VideoEncoder
 
 		registeredInputResourcePtrs = makeUnique<NV_ENC_REGISTERED_PTR[]>(numNV12Textures);
 
-		mappedInputResourcePtrs = makeUnique<NV_ENC_INPUT_PTR[]>(numNV12Textures);
-
 		registeredOutputResourcePtrs = makeUnique<NV_ENC_REGISTERED_PTR[]>(numNV12Textures);
-
-		mappedOutputResourcePtrs = makeUnique<NV_ENC_INPUT_PTR[]>(numNV12Textures);
 
 		for (uint32_t i = 0; i < numNV12Textures; i++)
 		{
@@ -143,13 +139,6 @@ namespace Gear::Core::VideoEncoder
 
 			registeredInputResourcePtrs[i] = registerInputResource.registeredResource;
 
-			NV_ENC_MAP_INPUT_RESOURCE mapInputResource = { NV_ENC_MAP_INPUT_RESOURCE_VER };
-			mapInputResource.registeredResource = registerInputResource.registeredResource;
-
-			NVENCCALL(nvencAPI.nvEncMapInputResource(encoder, &mapInputResource));
-
-			mappedInputResourcePtrs[i] = mapInputResource.mappedResource;
-
 			NV_ENC_REGISTER_RESOURCE registerOutputResource = { NV_ENC_REGISTER_RESOURCE_VER };
 			registerOutputResource.bufferFormat = NV_ENC_BUFFER_FORMAT_U8;
 			registerOutputResource.bufferUsage = NV_ENC_OUTPUT_BITSTREAM;
@@ -164,13 +153,6 @@ namespace Gear::Core::VideoEncoder
 			NVENCCALL(nvencAPI.nvEncRegisterResource(encoder, &registerOutputResource));
 
 			registeredOutputResourcePtrs[i] = registerOutputResource.registeredResource;
-
-			NV_ENC_MAP_INPUT_RESOURCE mapOutputResource = { NV_ENC_MAP_INPUT_RESOURCE_VER };
-			mapOutputResource.registeredResource = registerOutputResource.registeredResource;
-
-			NVENCCALL(nvencAPI.nvEncMapInputResource(encoder, &mapOutputResource));
-
-			mappedOutputResourcePtrs[i] = mapOutputResource.mappedResource;
 		}
 
 		writeHeader();
@@ -201,13 +183,23 @@ namespace Gear::Core::VideoEncoder
 				outputResources.pop();
 			}
 
+			while (mappedInputResourcePtrs.size())
+			{
+				nvencAPI.nvEncUnmapInputResource(encoder, mappedInputResourcePtrs.front());
+
+				mappedInputResourcePtrs.pop();
+			}
+
+			while (mappedOutputResourcePtrs.size())
+			{
+				nvencAPI.nvEncUnmapInputResource(encoder, mappedOutputResourcePtrs.front());
+
+				mappedOutputResourcePtrs.pop();
+			}
+
 			for (uint32_t i = 0; i < numNV12Textures; i++)
 			{
-				nvencAPI.nvEncUnmapInputResource(encoder, mappedOutputResourcePtrs[i]);
-
 				nvencAPI.nvEncUnregisterResource(encoder, registeredOutputResourcePtrs[i]);
-
-				nvencAPI.nvEncUnmapInputResource(encoder, mappedInputResourcePtrs[i]);
 
 				nvencAPI.nvEncUnregisterResource(encoder, registeredInputResourcePtrs[i]);
 			}
@@ -224,8 +216,22 @@ namespace Gear::Core::VideoEncoder
 
 		bool encoding = true;
 
+		NV_ENC_MAP_INPUT_RESOURCE mapInputResource = { NV_ENC_MAP_INPUT_RESOURCE_VER };
+		mapInputResource.registeredResource = registeredInputResourcePtrs[nv12TextureIndex];
+
+		NVENCCALL(nvencAPI.nvEncMapInputResource(encoder, &mapInputResource));
+
+		mappedInputResourcePtrs.push(mapInputResource.mappedResource);
+
+		NV_ENC_MAP_INPUT_RESOURCE mapOutputResource = { NV_ENC_MAP_INPUT_RESOURCE_VER };
+		mapOutputResource.registeredResource = registeredOutputResourcePtrs[nv12TextureIndex];
+
+		NVENCCALL(nvencAPI.nvEncMapInputResource(encoder, &mapOutputResource));
+
+		mappedOutputResourcePtrs.push(mapOutputResource.mappedResource);
+
 		NV_ENC_INPUT_RESOURCE_D3D12 inputResource = { NV_ENC_INPUT_RESOURCE_D3D12_VER };
-		inputResource.pInputBuffer = mappedInputResourcePtrs[nv12TextureIndex];
+		inputResource.pInputBuffer = mapInputResource.mappedResource;
 		inputResource.inputFencePoint = NV_ENC_FENCE_POINT_D3D12{ NV_ENC_FENCE_POINT_D3D12_VER };
 		inputResource.inputFencePoint.pFence = inputFence->get();
 		inputResource.inputFencePoint.waitValue = inputFence->getCurrentFenceValue();
@@ -234,7 +240,7 @@ namespace Gear::Core::VideoEncoder
 		outputFence->increment();
 
 		NV_ENC_OUTPUT_RESOURCE_D3D12 outputResource = { NV_ENC_OUTPUT_RESOURCE_D3D12_VER };
-		outputResource.pOutputBuffer = mappedOutputResourcePtrs[nv12TextureIndex];
+		outputResource.pOutputBuffer = mapOutputResource.mappedResource;
 		outputResource.outputFencePoint = NV_ENC_FENCE_POINT_D3D12{ NV_ENC_FENCE_POINT_D3D12_VER };
 		outputResource.outputFencePoint.pFence = outputFence->get();
 		outputResource.outputFencePoint.signalValue = outputFence->getCurrentFenceValue();
@@ -276,9 +282,9 @@ namespace Gear::Core::VideoEncoder
 
 			lockBitstream.doNotWait = 1;
 
-			const NVENCSTATUS status = nvencAPI.nvEncLockBitstream(encoder, &lockBitstream); NVENCCALL(status);
+			const NVENCSTATUS lockStatus = nvencAPI.nvEncLockBitstream(encoder, &lockBitstream); NVENCCALL(lockStatus);
 
-			if (status != NV_ENC_SUCCESS)
+			if (lockStatus != NV_ENC_SUCCESS)
 			{
 				break;
 			}
@@ -295,9 +301,17 @@ namespace Gear::Core::VideoEncoder
 
 			NVENCCALL(nvencAPI.nvEncUnlockBitstream(encoder, lockBitstream.outputBitstream));
 
+			NVENCCALL(nvencAPI.nvEncUnmapInputResource(encoder, mappedInputResourcePtrs.front()));
+
+			NVENCCALL(nvencAPI.nvEncUnmapInputResource(encoder, mappedOutputResourcePtrs.front()));
+
 			outputResources.pop();
 
 			decodeFrameIndices.pop();
+
+			mappedInputResourcePtrs.pop();
+
+			mappedOutputResourcePtrs.pop();
 
 			if (!encoding)
 			{
