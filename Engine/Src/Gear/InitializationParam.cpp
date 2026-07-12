@@ -19,7 +19,7 @@ namespace Gear
 		return param;
 	}
 
-	InitializationParam InitializationParam::VideoRender(const uint32_t width, const uint32_t height, const uint32_t second)
+	InitializationParam InitializationParam::VideoRender(const uint32_t width, const uint32_t height, const uint32_t second, const uint32_t maxBFrames)
 	{
 		InitializationParam param = {};
 
@@ -33,7 +33,7 @@ namespace Gear
 
 		param.videoRender.second = second;
 
-		param.videoRender.bFrames = 2;
+		param.videoRender.maxBFrames = maxBFrames;
 
 		return param;
 	}

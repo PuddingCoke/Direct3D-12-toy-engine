@@ -14,13 +14,13 @@ LOGERROR("调用", #func, "时发生错误，错误码", static_cast<uint32_t>(_
 
 namespace Gear::Core::VideoEncoder
 {
-	NVIDIAEncoder::NVIDIAEncoder(const uint32_t frameToEncode, const uint32_t bFrames) :
-		Encoder(frameToEncode, videoFormat, bFrames),
+	NVIDIAEncoder::NVIDIAEncoder(const uint32_t frameToEncode, const uint32_t maxBFrames) :
+		Encoder(frameToEncode, maxBFrames, videoFormat),
 		moduleNvEncAPI(nullptr),
 		nvencAPI{ NV_ENCODE_API_FUNCTION_LIST_VER },
 		encoder(nullptr),
 		dts(0ull),
-		frameIntervalP(bFrames + 1u),
+		frameIntervalP(maxBFrames + 1u),
 		numNV12Textures(lookaheadDepth + frameIntervalP + extraOutput),
 		inputFence(makeUnique<D3D12Core::Fence>()),
 		outputFence(makeUnique<D3D12Core::Fence>()),
@@ -109,10 +109,6 @@ namespace Gear::Core::VideoEncoder
 		encoderParams.enableEncodeAsync = 0;
 
 		NVENCCALL(nvencAPI.nvEncInitializeEncoder(encoder, &encoderParams));
-
-		LOGENGINE("B帧", bFrames);
-
-		LOGENGINE("开始编码");
 
 		nv12Textures = makeUnique<D3D12Resource::VideoTexturePtr[]>(numNV12Textures);
 

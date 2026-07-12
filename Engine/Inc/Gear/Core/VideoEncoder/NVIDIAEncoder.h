@@ -41,7 +41,7 @@ namespace Gear::Core::VideoEncoder
 
 		NVIDIAEncoder(const NVIDIAEncoder&) = delete;
 
-		NVIDIAEncoder(const uint32_t frameToEncode, const uint32_t bFrames);
+		NVIDIAEncoder(const uint32_t frameToEncode, const uint32_t maxBFrames);
 
 		~NVIDIAEncoder();
 

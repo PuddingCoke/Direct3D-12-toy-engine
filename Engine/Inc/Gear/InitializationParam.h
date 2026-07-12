@@ -13,7 +13,7 @@ namespace Gear
 		static InitializationParam RealTime(const uint32_t width, const uint32_t height, const std::wstring& title, const bool enableImGuiSurface = true);
 
 		//对于可循环动画来说，持续时间必须是2s的倍数
-		static InitializationParam VideoRender(const uint32_t width, const uint32_t height, const uint32_t second = 60u);
+		static InitializationParam VideoRender(const uint32_t width, const uint32_t height, const uint32_t second = 60u, const uint32_t maxBFrames = 2);
 
 		static InitializationParam Wallpaper();
 
@@ -43,7 +43,7 @@ namespace Gear
 
 			uint32_t second;
 
-			uint32_t bFrames;
+			uint32_t maxBFrames;
 		};
 
 		union

@@ -2,7 +2,7 @@
 
 namespace Gear::Core::VideoEncoder
 {
-	Encoder::Encoder(const uint32_t frameToEncode, const VideoFormat videoFormat, const uint32_t maxBFrames) :
+	Encoder::Encoder(const uint32_t frameToEncode, const uint32_t maxBFrames, const VideoFormat videoFormat) :
 		frameEncoded(0), frameToEncode(frameToEncode), encodeTime(0.f), maxBFrames(maxBFrames)
 	{
 		avformat_network_init();
@@ -20,6 +20,8 @@ namespace Gear::Core::VideoEncoder
 		LOGENGINE("视频时间", FloatPrecision(1), static_cast<float>(frameToEncode) / static_cast<float>(frameRate), "秒");
 
 		LOGENGINE("视频帧率", frameRate);
+
+		LOGENGINE("最多B帧", maxBFrames);
 
 		AVCodecParameters* const param = outStream->codecpar;
 
@@ -55,6 +57,8 @@ namespace Gear::Core::VideoEncoder
 		avformat_write_header(outContext, nullptr);
 
 		LOGENGINE("待编码帧数", frameToEncode);
+
+		LOGENGINE("开始编码");
 
 		D3D12_VIDEO_PROCESS_INPUT_STREAM_DESC inputDesc =
 		{

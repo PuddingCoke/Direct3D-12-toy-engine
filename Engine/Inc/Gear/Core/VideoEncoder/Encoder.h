@@ -41,7 +41,7 @@ namespace Gear::Core::VideoEncoder
 
 		void operator=(const Encoder&) = delete;
 
-		Encoder(const uint32_t frameToEncode, const VideoFormat videoFormat, const uint32_t maxBFrames);
+		Encoder(const uint32_t frameToEncode, const uint32_t maxBFrames, const VideoFormat videoFormat);
 
 		virtual ~Encoder();
 
