@@ -77,6 +77,8 @@ namespace Gear::Core::VideoEncoder
 
 		AVStream* getOutStream() const;
 
+		const uint32_t frameToEncode;
+
 	private:
 
 		void displayProgress() const;
@@ -85,8 +87,6 @@ namespace Gear::Core::VideoEncoder
 		static constexpr uint32_t progressBarWidth = 32;
 
 		uint32_t frameEncoded;
-
-		const uint32_t frameToEncode;
 
 		AVFormatContext* outContext;
 

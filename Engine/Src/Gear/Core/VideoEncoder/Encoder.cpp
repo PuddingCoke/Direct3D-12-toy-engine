@@ -99,12 +99,12 @@ namespace Gear::Core::VideoEncoder
 
 	bool Encoder::encode(D3D12Resource::Texture* const inputTexture)
 	{
-		return false;
+		LOGERROR("禁止调用未被覆写的encode方法");
 	}
 
 	bool Encoder::encode(const uint8_t* const data)
 	{
-		return false;
+		LOGERROR("禁止调用未被覆写的encode方法");
 	}
 
 	void Encoder::waitFor(D3D12Core::CommandQueue* const queueWaitFor, D3D12Core::Fence* const fence)
@@ -153,8 +153,6 @@ namespace Gear::Core::VideoEncoder
 	bool Encoder::writeFrame(AVPacket* const packet)
 	{
 		av_interleaved_write_frame(outContext, packet);
-
-		av_packet_unref(packet);
 
 		frameEncoded++;
 

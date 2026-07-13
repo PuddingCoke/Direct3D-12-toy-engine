@@ -21,6 +21,14 @@ namespace Gear::Core::VideoEncoder
 
 		codecContext->gop_size = static_cast<int>(frameRate);
 
+		codecContext->color_primaries = AVCOL_PRI_BT709;
+
+		codecContext->color_trc = AVCOL_TRC_IEC61966_2_1;
+
+		codecContext->colorspace = AVCOL_SPC_BT709;
+
+		codecContext->color_range = AVCOL_RANGE_MPEG;
+
 		AVDictionary* opts = nullptr;
 
 		av_dict_set(&opts, "preset", "veryslow", 0);
@@ -53,7 +61,20 @@ namespace Gear::Core::VideoEncoder
 
 	SoftwareEncoder::~SoftwareEncoder()
 	{
-		/*待实现*/
+		avcodec_send_frame(codecContext, nullptr);
+
+		while (avcodec_receive_packet(codecContext, packet) == 0)
+		{
+			av_packet_unref(packet);
+		}
+
+		av_packet_free(&packet);
+
+		av_frame_free(&yuvFrame);
+
+		sws_freeContext(swsContext);
+
+		avcodec_free_context(&codecContext);
 	}
 
 	bool SoftwareEncoder::encode(const uint8_t* const data)
@@ -64,16 +85,37 @@ namespace Gear::Core::VideoEncoder
 
 		sws_scale(swsContext, sourceData, sourceStride, 0, codecContext->height, yuvFrame->data, yuvFrame->linesize);
 
+		//强制尾帧为P帧
+		//因为libx264可能不会以编码顺序输出编码后的比特流
+		//另外，这也可以支持循环动画
+		yuvFrame->pict_type = ((Graphics::getRenderedFrameCount() >= frameToEncode - 1u) ? AV_PICTURE_TYPE_P : AV_PICTURE_TYPE_NONE);
+
+		//YUV帧的呈现时间戳应该等于已渲染帧数
 		yuvFrame->pts = static_cast<int64_t>(Graphics::getRenderedFrameCount());
 
 		avcodec_send_frame(codecContext, yuvFrame);
 
 		while (avcodec_receive_packet(codecContext, packet) == 0)
 		{
-			if (!writeFrame(packet))
+			//抛弃在视频时间轴之外的packet
+			//这么做需要强制末尾几帧为P或I帧
+			if (packet->pts < static_cast<int64_t>(frameToEncode))
 			{
-				return false;
+				av_packet_rescale_ts(packet, codecContext->time_base, getOutStream()->time_base);
+
+				packet->duration = av_rescale_q(1, AVRational{ 1, static_cast<int32_t>(frameRate) }, getOutStream()->time_base);
+
+				packet->stream_index = getOutStream()->index;
+
+				if (!writeFrame(packet))
+				{
+					av_packet_unref(packet);
+
+					return false;
+				}
 			}
+
+			av_packet_unref(packet);
 		}
 
 		return true;

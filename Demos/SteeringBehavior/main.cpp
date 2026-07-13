@@ -6,7 +6,7 @@ int wmain(int argc, const wchar_t* argv[])
 {
 	//InitializationParam param = InitializationParam::RealTime(1920, 1080, L"Steering Behavior", true);
 
-	InitializationParam param = InitializationParam::VideoRender(1920, 1080, 30);
+	InitializationParam param = InitializationParam::VideoRender(1920, 1080, 10, true);
 
 	try
 	{

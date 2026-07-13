@@ -28,6 +28,8 @@
 
 #include<Gear/Core/VideoEncoder/NVIDIAEncoder.h>
 
+#include<Gear/Core/VideoEncoder/SoftwareEncoder.h>
+
 #include<iostream>
 
 #include<locale>
@@ -359,7 +361,7 @@ namespace Gear
 		}
 		else
 		{
-			//software
+			encoder = makeUnique<VideoEncoder::SoftwareEncoder>(frameToEncode);
 		}
 
 		UniquePtr<D3D12Resource::Texture> renderTexture = makeUnique<D3D12Resource::Texture>(Graphics::getWidth(), Graphics::getHeight(), Graphics::backBufferFormat, 1, 1, true, D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET, nullptr);

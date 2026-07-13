@@ -12,7 +12,6 @@ extern "C"
 
 namespace Gear::Core::VideoEncoder
 {
-	//施工中
 	class SoftwareEncoder :public Encoder
 	{
 	public:
@@ -26,8 +25,6 @@ namespace Gear::Core::VideoEncoder
 	private:
 
 		static constexpr VideoFormat videoFormat = VideoFormat::H264;
-
-		static constexpr AVCodecID codecID = AV_CODEC_ID_H264;
 
 		static constexpr AVPixelFormat sourceFormat = AV_PIX_FMT_BGRA;
 

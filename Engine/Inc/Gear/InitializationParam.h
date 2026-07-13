@@ -12,8 +12,9 @@ namespace Gear
 		//使用nsight调试前请关闭ImGui，否则程序会莫名崩溃
 		static InitializationParam RealTime(const uint32_t width, const uint32_t height, const std::wstring& title, const bool enableImGuiSurface = true);
 
-		//对于可循环动画来说，持续时间必须是2s的倍数
-		static InitializationParam VideoRender(const uint32_t width, const uint32_t height, const uint32_t seconds = 60u, const uint32_t maxBFrames = 2);
+		//如果使用硬件编码器，循环视频的持续时间必须是2秒的倍数，软件编码器没有要求
+		//软件编码器的压缩质量和压缩率均显著由于硬件编码器，但是编码速度极慢
+		static InitializationParam VideoRender(const uint32_t width, const uint32_t height, const uint32_t seconds = 60u, const bool hardWareEncode = true, const uint32_t maxBFrames = 2);
 
 		static InitializationParam Wallpaper();
 
@@ -38,9 +39,9 @@ namespace Gear
 
 			uint32_t seconds;//视频时间
 
-			uint32_t maxBFrames;//最多连续B帧
-
 			bool hardwareEncode;//是否使用硬件编码，若追求最高质量，请使用软件编码
+
+			uint32_t maxBFrames;//最多连续B帧，仅硬件编码器使用
 
 		} videoRender;
 
