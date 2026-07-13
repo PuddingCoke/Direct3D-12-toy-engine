@@ -7,15 +7,15 @@
 
 namespace Gear::Core::RenderEngine::Internal
 {
-	void initialize(const uint32_t width, const uint32_t height, const HWND hwnd, const bool useSwapChainBuffer, const bool initializeImGuiSurface);
+	void initialize(const uint32_t width, const uint32_t height, const HWND hWnd, const bool useSwapChainBuffer, const bool initializeImGuiSurface);
 
 	void release();
 
 	struct InitializeToken
 	{
-		InitializeToken(const uint32_t width, const uint32_t height, const HWND hwnd, const bool useSwapChainBuffer, const bool initializeImGuiSurface)
+		InitializeToken(const uint32_t width, const uint32_t height, const HWND hWnd, const bool useSwapChainBuffer, const bool initializeImGuiSurface)
 		{
-			initialize(width, height, hwnd, useSwapChainBuffer, initializeImGuiSurface);
+			initialize(width, height, hWnd, useSwapChainBuffer, initializeImGuiSurface);
 		}
 
 		~InitializeToken()

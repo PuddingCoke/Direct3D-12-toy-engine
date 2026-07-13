@@ -780,9 +780,9 @@ namespace Gear::Core::RenderEngine
 
 	namespace Internal
 	{
-		void initialize(const uint32_t width, const uint32_t height, const HWND hwnd, const bool useSwapChainBuffer, const bool initializeImGuiSurface)
+		void initialize(const uint32_t width, const uint32_t height, const HWND hWnd, const bool useSwapChainBuffer, const bool initializeImGuiSurface)
 		{
-			impl = makeUnique<RenderEngineImpl>(width, height, hwnd, useSwapChainBuffer, initializeImGuiSurface);
+			impl = makeUnique<RenderEngineImpl>(width, height, hWnd, useSwapChainBuffer, initializeImGuiSurface);
 		}
 
 		void release()

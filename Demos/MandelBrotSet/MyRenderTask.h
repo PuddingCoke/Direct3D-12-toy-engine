@@ -19,12 +19,6 @@ public:
 		Graphics::setGamma(1.2f);
 
 		effect->setIntensity(0.45f);
-
-		param.scale = 0.4f;
-
-		param.lerpFactor = 0.7f;
-
-		param.lerpFactor2 = 1.0f;
 	}
 
 	~MyRenderTask()
@@ -34,9 +28,9 @@ public:
 	void imGuiCall() override
 	{
 		ImGui::Begin("Simulation Parameters");
-		ImGui::SliderFloat("scale", &param.scale, 0.f, 1.f);
-		ImGui::SliderFloat("lerpFactor", &param.lerpFactor, 0.f, 1.f);
-		ImGui::SliderFloat("lerpFactor2", &param.lerpFactor2, 0.f, 1.f);
+		ImGui::SliderFloat("scale", &scale, 0.f, 1.f);
+		ImGui::SliderFloat("lerpFactor", &lerpFactor, 0.f, 1.f);
+		ImGui::SliderFloat("lerpFactor2", &lerpFactor2, 0.f, 1.f);
 		ImGui::Text("Position (%f,%f)", param.location.x, param.location.y);
 		ImGui::Text("Scale %f", param.scale);
 		ImGui::End();
@@ -48,25 +42,44 @@ protected:
 
 	void recordCommand() override
 	{
-		if (Mouse::onScroll())
-		{
-			if (Mouse::getWheelDelta() > 0.f)
-			{
-				param.scale *= 0.85f;
-			}
-			else
-			{
-				param.scale /= 0.85f;
-			}
-
-			accParam.frameIndex = 0;
-		}
-
 		if (Mouse::getLeftDown() && Mouse::onMove())
 		{
 			param.location.x -= Graphics::getDeltaTime() * Mouse::getDX() * param.scale;
 
 			param.location.y += Graphics::getDeltaTime() * Mouse::getDY() * param.scale;
+
+			accParam.frameIndex = 0;
+		}
+
+		if (Mouse::onScroll())
+		{
+			if (Mouse::getWheelDelta() > 0.f)
+			{
+				scale *= 0.85f;
+			}
+			else
+			{
+				scale /= 0.85f;
+			}
+		}
+
+		if (param.scale != scale)
+		{
+			param.scale = scale;
+
+			accParam.frameIndex = 0;
+		}
+
+		if (param.lerpFactor != lerpFactor)
+		{
+			param.lerpFactor = lerpFactor;
+
+			accParam.frameIndex = 0;
+		}
+
+		if (param.lerpFactor2 != lerpFactor2)
+		{
+			param.lerpFactor2 = lerpFactor2;
 
 			accParam.frameIndex = 0;
 		}
@@ -105,11 +118,17 @@ private:
 	struct SimulationParam
 	{
 		DirectX::XMFLOAT2 location = { 0.f,0.f };
-		float scale = { 1.f };
+		float scale = { 0.f };
 		const DirectX::XMFLOAT2 texelSize = { 1.f / static_cast<float>(Graphics::getWidth()),1.f / static_cast<float>(Graphics::getHeight()) };
 		float lerpFactor = 0.f;
 		float lerpFactor2 = 0.f;
 	} param;
+
+	float scale = 0.4f;
+
+	float lerpFactor = 0.7f;
+
+	float lerpFactor2 = 1.0f;
 
 	struct AccumulateParam
 	{

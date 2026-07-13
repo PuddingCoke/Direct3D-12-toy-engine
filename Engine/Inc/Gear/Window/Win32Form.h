@@ -42,9 +42,9 @@ namespace Gear::Window::Win32Form
 
 	constexpr DWORD wallpaperWindowStyle = WS_POPUP;
 
-	LRESULT CALLBACK windowCallback(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam);
+	LRESULT CALLBACK realTimeRenderCallback(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam);
 
-	LRESULT CALLBACK encodeCallback(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam);
+	LRESULT CALLBACK videoRenderCallback(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam);
 
 	LRESULT CALLBACK wallpaperCallBack(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam);
 

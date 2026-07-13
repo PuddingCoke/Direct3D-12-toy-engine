@@ -79,20 +79,14 @@ namespace Gear
 		//用于截屏和视频渲染
 		UniquePtr<D3D12Resource::ReadbackHeap> backBufferHeap;
 
-		InitializationParam::EngineUsage usage;
-
-		union
-		{
-			InitializationParam::RealTimeRenderParam realTimeRender;
-
-			InitializationParam::VideoRenderParam videoRender;
-		};
+		InitializationParam initParam;
 
 		static constexpr Input::Keyboard::Key screenGrabKey = Input::Keyboard::F11;
 
 	};
 
-	GearImpl::GearImpl(const InitializationParam& param, const int32_t argc, const wchar_t* argv[])
+	GearImpl::GearImpl(const InitializationParam& param, const int32_t argc, const wchar_t* argv[]) :
+		initParam(param)
 	{
 		//设置locale为.UTF-8用于多语言支持
 		std::locale::global(std::locale(".UTF-8"));
@@ -105,55 +99,78 @@ namespace Gear
 
 		MainMonitor::Internal::getCurrentSettings();
 
-		usage = param.usage;
-
-		switch (usage)
+		if (initParam.usage == InitializationParam::VIDEORENDER || initParam.usage == InitializationParam::WALLPAPER)
 		{
-		case InitializationParam::EngineUsage::REALTIMERENDER:
+			initParam.enableImGuiSurface = false;
+		}
 
-			realTimeRender = param.realTimeRender;
+		uint32_t windowStartX = 0u;
 
-			windowToken = makeUnique<Window::Win32Form::InitializeToken>(param.title,
-				(MainMonitor::getWidth() - realTimeRender.width) / 2, (MainMonitor::getHeight() - realTimeRender.height) / 2,
-				realTimeRender.width, realTimeRender.height, Window::Win32Form::normalWindowStyle, Window::Win32Form::windowCallback);
+		uint32_t windowStartY = 0u;
 
-			renderEngineToken = makeUnique<RenderEngine::Internal::InitializeToken>(realTimeRender.width, realTimeRender.height, Window::Win32Form::getHandle(), true, realTimeRender.enableImGuiSurface);
+		uint32_t windowWidth = 0u;
 
-			backBufferHeap = makeUnique<D3D12Resource::ReadbackHeap>(FMT::getByteSize(Graphics::backBufferFormat) * realTimeRender.width * realTimeRender.height);
+		uint32_t windowHeight = 0u;
 
-			SetForegroundWindow(Window::Win32Form::getHandle());
+		DWORD windowStyle = 0u;
+
+		LRESULT(*windowCallback)(HWND hWnd, uint32_t msg, WPARAM wParam, LPARAM lParam) = nullptr;
+
+		switch (initParam.usage)
+		{
+		case InitializationParam::REALTIMERENDER:
+
+			windowStartX = (MainMonitor::getWidth() - initParam.width) / 2u;
+
+			windowStartY = (MainMonitor::getHeight() - initParam.height) / 2u;
+
+			windowWidth = initParam.width;
+
+			windowHeight = initParam.height;
+
+			windowStyle = Window::Win32Form::normalWindowStyle;
+
+			windowCallback = Window::Win32Form::realTimeRenderCallback;
 
 			LOGENGINE("引擎用途", "实时渲染");
 
 			break;
 
-		case InitializationParam::EngineUsage::VIDEORENDER:
+		case InitializationParam::VIDEORENDER:
 
-			videoRender = param.videoRender;
+			windowStartX = 100u;
 
-			windowToken = makeUnique<Window::Win32Form::InitializeToken>(param.title, 100, 100, 100, 100, Window::Win32Form::normalWindowStyle, Window::Win32Form::encodeCallback);
+			windowStartY = 100u;
 
-			ShowWindow(Window::Win32Form::getHandle(), SW_HIDE);
+			windowWidth = 100u;
 
-			renderEngineToken = makeUnique<RenderEngine::Internal::InitializeToken>(videoRender.width, videoRender.height, Window::Win32Form::getHandle(), false, false);
+			windowHeight = 100u;
 
-			backBufferHeap = makeUnique<D3D12Resource::ReadbackHeap>(FMT::getByteSize(Graphics::backBufferFormat) * videoRender.width * videoRender.height);
+			windowStyle = Window::Win32Form::normalWindowStyle;
+
+			windowCallback = Window::Win32Form::videoRenderCallback;
 
 			LOGENGINE("引擎用途", "视频渲染");
 
 			break;
 
-		case InitializationParam::EngineUsage::WALLPAPER:
+		case InitializationParam::WALLPAPER:
 
-			windowToken = makeUnique<Window::Win32Form::InitializeToken>(param.title, 0, 0, MainMonitor::getWidth(), MainMonitor::getHeight(), Window::Win32Form::wallpaperWindowStyle, Window::Win32Form::wallpaperCallBack);
+			initParam.width = MainMonitor::getWidth();
 
-			{
-				const HWND parentHWND = WallpaperHelper::getWallpaperHWND();
+			initParam.height = MainMonitor::getHeight();
 
-				SetParent(Window::Win32Form::getHandle(), parentHWND);
-			}
+			windowStartX = 0u;
 
-			renderEngineToken = makeUnique<RenderEngine::Internal::InitializeToken>(MainMonitor::getWidth(), MainMonitor::getHeight(), Window::Win32Form::getHandle(), true, false);
+			windowStartY = 0u;
+
+			windowWidth = initParam.width;
+
+			windowHeight = initParam.height;
+
+			windowStyle = Window::Win32Form::wallpaperWindowStyle;
+
+			windowCallback = Window::Win32Form::wallpaperCallBack;
 
 			LOGENGINE("引擎用途", "动态壁纸");
 
@@ -161,6 +178,28 @@ namespace Gear
 
 		default:
 			break;
+		}
+
+		windowToken = makeUnique<Window::Win32Form::InitializeToken>(param.title, windowStartX, windowStartY, windowWidth, windowHeight, windowStyle, windowCallback);
+
+		if (initParam.usage == InitializationParam::WALLPAPER)
+		{
+			const HWND parentHWND = WallpaperHelper::getWallpaperHWND();
+
+			SetParent(Window::Win32Form::getHandle(), parentHWND);
+		}
+		else if (initParam.usage == InitializationParam::VIDEORENDER)
+		{
+			ShowWindow(Window::Win32Form::getHandle(), SW_HIDE);
+		}
+
+		const bool useSwapChainBuffer = (initParam.usage != InitializationParam::VIDEORENDER);
+
+		renderEngineToken = makeUnique<RenderEngine::Internal::InitializeToken>(initParam.width, initParam.height, Window::Win32Form::getHandle(), useSwapChainBuffer, initParam.enableImGuiSurface);
+
+		if (initParam.usage == InitializationParam::REALTIMERENDER || initParam.usage == InitializationParam::VIDEORENDER)
+		{
+			backBufferHeap = makeUnique<D3D12Resource::ReadbackHeap>(FMT::getByteSize(Graphics::backBufferFormat) * initParam.width * initParam.height);
 		}
 
 		LOGENGINE("分辨率", Graphics::getWidth(), "x", Graphics::getHeight());
@@ -196,13 +235,13 @@ namespace Gear
 
 		RenderEngine::Internal::initializeResources();
 
-		switch (usage)
+		switch (initParam.usage)
 		{
-		case InitializationParam::EngineUsage::REALTIMERENDER:
+		case InitializationParam::REALTIMERENDER:
 			return runRealTimeRender();
-		case InitializationParam::EngineUsage::VIDEORENDER:
+		case InitializationParam::VIDEORENDER:
 			return runVideoRender();
-		case InitializationParam::EngineUsage::WALLPAPER:
+		case InitializationParam::WALLPAPER:
 			return runWallpaper();
 		default:
 			return;
@@ -211,6 +250,8 @@ namespace Gear
 
 	void GearImpl::runRealTimeRender()
 	{
+		SetForegroundWindow(Window::Win32Form::getHandle());
+
 		DeltaTimeEstimator dtEstimator;
 
 		RenderEngine::Internal::setDeltaTime(1.f / static_cast<float>(MainMonitor::getRefreshRate()));
@@ -263,11 +304,11 @@ namespace Gear
 			if (needScreenGrab)
 			{
 				const uint8_t* const dataPtr = reinterpret_cast<uint8_t*>(backBufferHeap->map(CD3DX12_RANGE(0ull,
-					FMT::getByteSize(Graphics::backBufferFormat) * realTimeRender.width * realTimeRender.height)));
+					FMT::getByteSize(Graphics::backBufferFormat) * initParam.width * initParam.height)));
 
-				UniquePtr<uint8_t[]> colors = makeUnique<uint8_t[]>(FMT::getByteSize(Graphics::backBufferFormat) * realTimeRender.width * realTimeRender.height);
+				UniquePtr<uint8_t[]> colors = makeUnique<uint8_t[]>(FMT::getByteSize(Graphics::backBufferFormat) * initParam.width * initParam.height);
 
-				for (uint32_t i = 0; i < realTimeRender.width * realTimeRender.height; i++)
+				for (uint32_t i = 0; i < initParam.width * initParam.height; i++)
 				{
 					const uint32_t pixel = 4 * i;
 
@@ -283,7 +324,7 @@ namespace Gear
 
 				backBufferHeap->unmap();
 
-				stbi_write_png("output.png", realTimeRender.width, realTimeRender.height, 4, colors.get(), FMT::getByteSize(Graphics::backBufferFormat) * realTimeRender.width);
+				stbi_write_png("output.png", initParam.width, initParam.height, 4, colors.get(), FMT::getByteSize(Graphics::backBufferFormat) * initParam.width);
 
 				LOGSUCCESS("截屏保存到", "output.png");
 			}
@@ -296,16 +337,16 @@ namespace Gear
 
 		UniquePtr<VideoEncoder::Encoder> encoder;
 
-		const uint32_t frameToEncode = videoRender.second * VideoEncoder::Encoder::frameRate;
+		const uint32_t frameToEncode = initParam.videoRender.seconds * VideoEncoder::Encoder::frameRate;
 
-		LOGENGINE("编码方式", LogColor::yellow, videoRender.hardwareEncode ? "硬件编码" : "软件编码");
+		LOGENGINE("编码方式", LogColor::yellow, initParam.videoRender.hardwareEncode ? "硬件编码" : "软件编码");
 
-		if (videoRender.hardwareEncode)
+		if (initParam.videoRender.hardwareEncode)
 		{
 			switch (vendor)
 			{
 			case AdapterVendor::NVIDIA:
-				encoder = makeUnique<VideoEncoder::NVIDIAEncoder>(frameToEncode, videoRender.maxBFrames);
+				encoder = makeUnique<VideoEncoder::NVIDIAEncoder>(frameToEncode, initParam.videoRender.maxBFrames);
 				break;
 			case AdapterVendor::AMD:
 			case AdapterVendor::INTEL:
@@ -345,66 +386,47 @@ namespace Gear
 
 		bool encoding = true;
 
-		if (videoRender.hardwareEncode)
+		do
 		{
-			do
+			RenderEngine::Internal::setRenderTexture(renderTexture.get(), textureHandle);
+
+			RenderEngine::Internal::beginFrame();
+
+			game->update(Graphics::getDeltaTime());
+
+			game->render();
+
+			if (!initParam.videoRender.hardwareEncode)
 			{
+				RenderEngine::Internal::saveBackBuffer(backBufferHeap.get());
+			}
 
-				RenderEngine::Internal::setRenderTexture(renderTexture.get(), textureHandle);
+			RenderEngine::Internal::endFrame();
 
-				RenderEngine::Internal::beginFrame();
+			RenderEngine::Internal::waitFrameGPUComplete();
 
-				game->update(Graphics::getDeltaTime());
-
-				game->render();
-
-				RenderEngine::Internal::endFrame();
-
-				RenderEngine::Internal::waitFrameGPUComplete();
-
+			if (initParam.videoRender.hardwareEncode)
+			{
 				//编码器管理的命令队列需要等待渲染引擎管理的命令队列完成工作
 				encoder->waitFor(RenderEngine::getCommandQueue(), vpSyncFence.get());
 
 				encoding = encoder->encode(RenderEngine::getRenderTexture());
-
-				RenderEngine::Internal::updateTimeElapsed();
-
-				RenderEngine::Internal::renderedFrameCountInc();
-
-			} while (encoding);
-		}
-		else
-		{
-			do
+			}
+			else
 			{
-
-				RenderEngine::Internal::setRenderTexture(renderTexture.get(), textureHandle);
-
-				RenderEngine::Internal::beginFrame();
-
-				game->update(Graphics::getDeltaTime());
-
-				game->render();
-
-				RenderEngine::Internal::saveBackBuffer(backBufferHeap.get());
-
-				RenderEngine::Internal::endFrame();
-
-				RenderEngine::Internal::waitFrameGPUComplete();
-
 				const uint8_t* const data = reinterpret_cast<uint8_t*>(backBufferHeap->map(CD3DX12_RANGE(0ull,
-					FMT::getByteSize(Graphics::backBufferFormat) * videoRender.width * videoRender.height)));
+					FMT::getByteSize(Graphics::backBufferFormat) * initParam.width * initParam.height)));
 
 				encoding = encoder->encode(data);
 
 				backBufferHeap->unmap();
+			}
 
-				RenderEngine::Internal::updateTimeElapsed();
+			RenderEngine::Internal::updateTimeElapsed();
 
-				RenderEngine::Internal::renderedFrameCountInc();
+			RenderEngine::Internal::renderedFrameCountInc();
 
-			} while (encoding);
-		}
+		} while (encoding);
 	}
 
 	void GearImpl::runWallpaper()

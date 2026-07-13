@@ -13,47 +13,36 @@ namespace Gear
 		static InitializationParam RealTime(const uint32_t width, const uint32_t height, const std::wstring& title, const bool enableImGuiSurface = true);
 
 		//对于可循环动画来说，持续时间必须是2s的倍数
-		static InitializationParam VideoRender(const uint32_t width, const uint32_t height, const uint32_t second = 60u, const uint32_t maxBFrames = 2);
+		static InitializationParam VideoRender(const uint32_t width, const uint32_t height, const uint32_t seconds = 60u, const uint32_t maxBFrames = 2);
 
 		static InitializationParam Wallpaper();
 
-		enum class EngineUsage
+		enum EngineUsage
 		{
-			REALTIMERENDER,
-			VIDEORENDER,
-			WALLPAPER
+			REALTIMERENDER,//实时模式
+			VIDEORENDER,//视频渲染模式
+			WALLPAPER//动态壁纸模式
 		}usage;
 
-		std::wstring title;
+		std::wstring title;//窗口标题
 
-		struct RealTimeRenderParam
-		{
-			uint32_t width;
+		uint32_t width;//后备缓冲宽度，仅用于实时模式和视频渲染模式
 
-			uint32_t height;
+		uint32_t height;//后备缓冲高度，仅用于实时模式和视频渲染模式
 
-			bool enableImGuiSurface;
-		};
+		bool enableImGuiSurface;//是否开启ImGui界面，仅用于实时模式
 
+		//视频渲染模式配置
 		struct VideoRenderParam
 		{
-			uint32_t width;
 
-			uint32_t height;
+			uint32_t seconds;//视频时间
 
-			uint32_t second;
+			uint32_t maxBFrames;//最多连续B帧
 
-			uint32_t maxBFrames;
+			bool hardwareEncode;//是否使用硬件编码，若追求最高质量，请使用软件编码
 
-			bool hardwareEncode;
-		};
-
-		union
-		{
-			RealTimeRenderParam realTimeRender;
-
-			VideoRenderParam videoRender;
-		};
+		} videoRender;
 
 	};
 }

@@ -10,16 +10,16 @@ namespace Gear
 
 		param.title = title;
 
-		param.realTimeRender.width = width;
+		param.width = width;
 
-		param.realTimeRender.height = height;
+		param.height = height;
 
-		param.realTimeRender.enableImGuiSurface = enableImGuiSurface;
+		param.enableImGuiSurface = enableImGuiSurface;
 
 		return param;
 	}
 
-	InitializationParam InitializationParam::VideoRender(const uint32_t width, const uint32_t height, const uint32_t second, const uint32_t maxBFrames)
+	InitializationParam InitializationParam::VideoRender(const uint32_t width, const uint32_t height, const uint32_t seconds, const uint32_t maxBFrames)
 	{
 		InitializationParam param = {};
 
@@ -27,11 +27,13 @@ namespace Gear
 
 		param.title = L"Video Render";
 
-		param.videoRender.width = width;
+		param.width = width;
 
-		param.videoRender.height = height;
+		param.height = height;
 
-		param.videoRender.second = second;
+		param.enableImGuiSurface = false;
+
+		param.videoRender.seconds = seconds;
 
 		param.videoRender.maxBFrames = maxBFrames;
 
@@ -47,6 +49,12 @@ namespace Gear
 		param.usage = EngineUsage::WALLPAPER;
 
 		param.title = L"Wallpaper";
+
+		param.width = 0u;//由引擎设置
+
+		param.height = 0u;//由引擎设置
+
+		param.enableImGuiSurface = false;
 
 		return param;
 	}

@@ -41,9 +41,9 @@ namespace Gear::Window::Win32Form
 
 		HWND getHandle() const;
 
-		LRESULT CALLBACK windowProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam) const;
+		LRESULT CALLBACK realTimeRenderProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam) const;
 
-		LRESULT CALLBACK encodeProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam) const;
+		LRESULT CALLBACK videoRenderProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam) const;
 
 		LRESULT CALLBACK wallpaperProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam) const;
 
@@ -185,7 +185,7 @@ namespace Gear::Window::Win32Form
 		return windowHandle;
 	}
 
-	LRESULT Win32FormImpl::windowProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam) const
+	LRESULT Win32FormImpl::realTimeRenderProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam) const
 	{
 		if (ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam))
 			return true;
@@ -269,7 +269,7 @@ namespace Gear::Window::Win32Form
 		return 0;
 	}
 
-	LRESULT Win32FormImpl::encodeProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam) const
+	LRESULT Win32FormImpl::videoRenderProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam) const
 	{
 		switch (uMsg)
 		{
@@ -400,14 +400,14 @@ namespace Gear::Window::Win32Form
 		return impl->getHandle();
 	}
 
-	LRESULT CALLBACK windowCallback(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam)
+	LRESULT CALLBACK realTimeRenderCallback(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam)
 	{
-		return impl->windowProc(hWnd, uMsg, wParam, lParam);
+		return impl->realTimeRenderProc(hWnd, uMsg, wParam, lParam);
 	}
 
-	LRESULT CALLBACK encodeCallback(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam)
+	LRESULT CALLBACK videoRenderCallback(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam)
 	{
-		return impl->encodeProc(hWnd, uMsg, wParam, lParam);
+		return impl->videoRenderProc(hWnd, uMsg, wParam, lParam);
 	}
 
 	LRESULT CALLBACK wallpaperCallBack(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam)
