@@ -26,6 +26,17 @@ namespace Gear::Utils::Logger
 		inUseCV.wait(inUseLock, [this]() { return writeIndex == readIndex; });
 	}
 
+	void LogContext::readIndexIncrement()
+	{
+		{
+			std::lock_guard<std::mutex> inUseLock(inUseMutex);
+
+			readIndex++;
+		}
+
+		inUseCV.notify_one();
+	}
+
 	void LogContext::packRestArgument()
 	{
 	}

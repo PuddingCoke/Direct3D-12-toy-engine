@@ -27,17 +27,15 @@ namespace Gear::Utils::Logger
 		LOG_USER
 	};
 
+	class LogContext;
+
 	struct LogMessage
 	{
 		const std::string& str;
 
+		LogContext* const context;
+
 		const LogType type;
-
-		std::mutex& inUseMutex;
-
-		std::condition_variable& inUseCV;
-
-		uint64_t& readIndex;
 	};
 
 	class LogContext
@@ -66,6 +64,8 @@ namespace Gear::Utils::Logger
 
 		template<typename... Args>
 		static LogMessage createLogMessage(const std::string_view& functionName, const LogType& type, const Args&... args);
+
+		void readIndexIncrement();
 
 	private:
 
@@ -192,7 +192,7 @@ namespace Gear::Utils::Logger
 
 		messageStr = &slots[modWriteIndex];
 
-		const LogMessage message = { slots[modWriteIndex],type,inUseMutex,inUseCV,readIndex };
+		const LogMessage message = { slots[modWriteIndex],this,type };
 
 		messageStr->clear();
 

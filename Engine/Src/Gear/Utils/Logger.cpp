@@ -117,13 +117,7 @@ namespace Gear::Utils::Logger
 
 				temp = message.str;
 
-				{
-					std::lock_guard<std::mutex> inUseLock(message.inUseMutex);
-
-					message.readIndex++;
-				}
-
-				message.inUseCV.notify_one();
+				message.context->readIndexIncrement();
 
 				if (fileHandle)
 				{
@@ -157,13 +151,7 @@ namespace Gear::Utils::Logger
 
 					temp = message.str;
 
-					{
-						std::lock_guard<std::mutex> inUseLock(message.inUseMutex);
-
-						message.readIndex++;
-					}
-
-					message.inUseCV.notify_one();
+					message.context->readIndexIncrement();
 
 					//ERROR类型在Gear::failureExit处被统一处理
 					if (consoleHandle && message.type != LogType::LOG_ERROR)
