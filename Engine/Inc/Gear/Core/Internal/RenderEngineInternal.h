@@ -44,8 +44,11 @@ namespace Gear::Core::RenderEngine::Internal
 
 	void setDeltaTime(const float deltaTime);
 
-	//更新总时间并使总帧数渲染自增1
+	//更新总时间
 	void updateTimeElapsed();
+
+	//使总帧数渲染自增1
+	void renderedFrameCountInc();
 
 	void saveBackBuffer(D3D12Resource::ReadbackHeap* const readbackHeap);
 

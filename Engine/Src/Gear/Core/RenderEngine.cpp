@@ -167,6 +167,8 @@ namespace Gear::Core::RenderEngine
 
 		void updateTimeElapsed() const;
 
+		void renderedFrameCountInc() const;
+
 		void setDefRenderTexture();
 
 		void setRenderTexture(D3D12Resource::Texture* const texture, const D3D12_CPU_DESCRIPTOR_HANDLE handle);
@@ -561,7 +563,10 @@ namespace Gear::Core::RenderEngine
 	void RenderEngineImpl::updateTimeElapsed() const
 	{
 		Graphics::Internal::updateTimeElapsed();
+	}
 
+	void RenderEngineImpl::renderedFrameCountInc() const
+	{
 		Graphics::Internal::renderedFrameCountInc();
 	}
 
@@ -833,6 +838,11 @@ namespace Gear::Core::RenderEngine
 		void updateTimeElapsed()
 		{
 			impl->updateTimeElapsed();
+		}
+
+		void renderedFrameCountInc()
+		{
+			impl->renderedFrameCountInc();
 		}
 
 		void saveBackBuffer(D3D12Resource::ReadbackHeap* const readbackHeap)

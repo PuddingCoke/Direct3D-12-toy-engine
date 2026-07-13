@@ -258,6 +258,8 @@ namespace Gear
 
 			RenderEngine::Internal::updateTimeElapsed();
 
+			RenderEngine::Internal::renderedFrameCountInc();
+
 			if (needScreenGrab)
 			{
 				const uint8_t* const dataPtr = reinterpret_cast<uint8_t*>(backBufferHeap->map(CD3DX12_RANGE(0ull,
@@ -367,6 +369,8 @@ namespace Gear
 
 				RenderEngine::Internal::updateTimeElapsed();
 
+				RenderEngine::Internal::renderedFrameCountInc();
+
 			} while (encoding);
 		}
 		else
@@ -396,6 +400,8 @@ namespace Gear
 				backBufferHeap->unmap();
 
 				RenderEngine::Internal::updateTimeElapsed();
+
+				RenderEngine::Internal::renderedFrameCountInc();
 
 			} while (encoding);
 		}
@@ -447,6 +453,8 @@ namespace Gear
 			RenderEngine::Internal::setDeltaTime(lerpDeltaTime);
 
 			RenderEngine::Internal::updateTimeElapsed();
+
+			RenderEngine::Internal::renderedFrameCountInc();
 		}
 	}
 
