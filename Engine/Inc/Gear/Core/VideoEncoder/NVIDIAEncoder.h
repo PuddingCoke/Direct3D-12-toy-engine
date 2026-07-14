@@ -93,7 +93,7 @@ namespace Gear::Core::VideoEncoder
 
 		UniquePtr<NV_ENC_REGISTERED_PTR[]> registeredOutputResourcePtrs;
 
-		UniquePtr<D3D12Resource::VideoTexturePtr[]> nv12Textures;
+		UniquePtr<D3D12Resource::TexturePtr[]> nv12Textures;
 
 		UniquePtr<D3D12Resource::ReadbackHeapPtr[]> readbackHeaps;
 

@@ -14,6 +14,8 @@
 
 #include<Gear/Core/GraphicsDevice.h>
 
+#include<Gear/Core/Internal/FMTInternal.h>
+
 #include<Gear/Utils/Random.h>
 
 #include<Gear/Utils/File.h>
@@ -284,6 +286,9 @@ namespace Gear::Core::RenderEngine
 		//检查并输出一些特性的支持情况
 		//不支持Shader Model 6.6或有类型UAV读取会报错
 		Device::checkFeatureSupport();
+
+		//初始化格式表用于查询
+		FMT::Internal::initialize();
 
 		//初始化图形设备后创建命令队列
 		commandQueue = makeUnique<D3D12Core::CommandQueue>(D3D12_COMMAND_LIST_TYPE_DIRECT);

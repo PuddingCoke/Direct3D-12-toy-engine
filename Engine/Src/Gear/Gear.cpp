@@ -34,6 +34,8 @@
 
 #include<locale>
 
+#include<chrono>
+
 #include<dxgidebug.h>
 
 #include<dxgi1_6.h>

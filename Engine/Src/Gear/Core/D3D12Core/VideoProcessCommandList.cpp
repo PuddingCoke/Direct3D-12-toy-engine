@@ -2,17 +2,8 @@
 
 namespace Gear::Core::D3D12Core
 {
-	VPInputArguments::VPInputArguments(D3D12Resource::VideoTexture* const videoTexture) :
-		args{}, textureType(VPTextureType::VIDEOTEXTURE), videoTexture(videoTexture)
-	{
-		args.InputStream[0].pTexture2D = videoTexture->getResource();
-		args.InputStream[0].Subresource = 0;
-		args.Transform.SourceRectangle = { 0, 0, static_cast<LONG>(videoTexture->getWidth()), static_cast<LONG>(videoTexture->getHeight()) };
-		args.Transform.DestinationRectangle = { 0, 0, static_cast<LONG>(videoTexture->getWidth()), static_cast<LONG>(videoTexture->getHeight()) };
-	}
-
 	VPInputArguments::VPInputArguments(D3D12Resource::Texture* const texture) :
-		args{}, textureType(VPTextureType::TEXTURE), texture(texture)
+		args{}, texture(texture)
 	{
 		args.InputStream[0].pTexture2D = texture->getResource();
 		args.InputStream[0].Subresource = 0;
@@ -20,16 +11,8 @@ namespace Gear::Core::D3D12Core
 		args.Transform.DestinationRectangle = { 0, 0, static_cast<LONG>(texture->getWidth()), static_cast<LONG>(texture->getHeight()) };
 	}
 
-	VPOutputArguments::VPOutputArguments(D3D12Resource::VideoTexture* const videoTexture) :
-		args{}, textureType(VPTextureType::VIDEOTEXTURE), videoTexture(videoTexture)
-	{
-		args.OutputStream[0].pTexture2D = videoTexture->getResource();
-		args.OutputStream[0].Subresource = 0;
-		args.TargetRectangle = { 0, 0, static_cast<LONG>(videoTexture->getWidth()), static_cast<LONG>(videoTexture->getHeight()) };
-	}
-
-	VPOutputArguments::VPOutputArguments(D3D12Resource::Texture* const texture):
-		args{}, textureType(VPTextureType::TEXTURE), texture(texture)
+	VPOutputArguments::VPOutputArguments(D3D12Resource::Texture* const texture) :
+		args{}, texture(texture)
 	{
 		args.OutputStream[0].pTexture2D = texture->getResource();
 		args.OutputStream[0].Subresource = 0;

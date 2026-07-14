@@ -110,7 +110,7 @@ namespace Gear::Core::VideoEncoder
 
 		NVENCCALL(nvencAPI.nvEncInitializeEncoder(encoder, &encoderParams));
 
-		nv12Textures = makeUnique<D3D12Resource::VideoTexturePtr[]>(numNV12Textures);
+		nv12Textures = makeUnique<D3D12Resource::TexturePtr[]>(numNV12Textures);
 
 		readbackHeaps = makeUnique<D3D12Resource::ReadbackHeapPtr[]>(numNV12Textures);
 
@@ -120,7 +120,7 @@ namespace Gear::Core::VideoEncoder
 
 		for (uint32_t i = 0; i < numNV12Textures; i++)
 		{
-			nv12Textures[i] = makeUnique<D3D12Resource::VideoTexture>(Graphics::getWidth(), Graphics::getHeight(), FMT::NV12);
+			nv12Textures[i] = makeUnique<D3D12Resource::Texture>(Graphics::getWidth(), Graphics::getHeight(), FMT::NV12, 1, 1, true, D3D12_RESOURCE_FLAG_NONE, nullptr, D3D12_RESOURCE_STATE_COMMON);
 
 			readbackHeaps[i] = makeUnique<D3D12Resource::ReadbackHeap>(readbackHeapSize);
 

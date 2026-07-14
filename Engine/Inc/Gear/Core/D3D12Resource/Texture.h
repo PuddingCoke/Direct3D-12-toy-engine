@@ -19,7 +19,7 @@ namespace Gear::Core::D3D12Resource
 
 		void operator=(const Texture&) = delete;
 
-		Texture(const uint32_t width, const uint32_t height, const DXGI_FORMAT format, const uint32_t arraySize, const uint32_t mipLevels, const bool stateTracking, const D3D12_RESOURCE_FLAGS resFlags, const D3D12_CLEAR_VALUE* const clearValue = nullptr);
+		Texture(const uint32_t width, const uint32_t height, const DXGI_FORMAT format, const uint32_t arraySize, const uint32_t mipLevels, const bool stateTracking, const D3D12_RESOURCE_FLAGS resFlags, const D3D12_CLEAR_VALUE* const clearValue = nullptr, const uint32_t initialState = D3D12_RESOURCE_STATE_COPY_DEST);
 
 		Texture(const ComPtr<ID3D12Resource>& texture, const bool stateTracking, const uint32_t initialState);
 
@@ -64,6 +64,8 @@ namespace Gear::Core::D3D12Resource
 		uint32_t mipLevels;
 
 		DXGI_FORMAT format;
+
+		uint32_t planeCount;
 
 		struct States
 		{

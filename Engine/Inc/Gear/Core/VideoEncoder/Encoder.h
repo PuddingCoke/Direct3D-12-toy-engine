@@ -7,15 +7,9 @@
 
 #include<Gear/Core/VideoDevice.h>
 
-#include<Gear/Core/D3D12Resource/Texture.h>
-
-#include<Gear/Core/D3D12Resource/VideoTexture.h>
-
 #include<Gear/Core/D3D12Core/VideoProcessCommandList.h>
 
 #include<Gear/Core/D3D12Core/CommandQueue.h>
-
-#include<chrono>
 
 extern "C"
 {
@@ -71,7 +65,7 @@ namespace Gear::Core::VideoEncoder
 
 		bool writeFrame(AVPacket* const packet);
 
-		void bgraToNV12(D3D12Resource::Texture* inputTexture, D3D12Resource::VideoTexture* nv12Texture, D3D12Core::Fence* const fence);
+		void bgraToNV12(D3D12Resource::Texture* const inputBGRATexture, D3D12Resource::Texture* const outputNV12Texture, D3D12Core::Fence* const fence);
 
 		uint32_t getFrameEncoded() const;
 

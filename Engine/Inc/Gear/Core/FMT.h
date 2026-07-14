@@ -11,6 +11,8 @@
 
 #include<cstdint>
 
+#include<type_traits>
+
 #include<D3D12Headers/dxgiformat.h>
 
 /// <summary>
@@ -253,6 +255,33 @@ namespace Gear::Core::FMT
 			return 0;
 		}
 	}
+
+	static_assert(FMT::UNKNOWN == 0, "DXGI_FORMAT_UNKNOWN must be 0");
+
+	constexpr uint32_t formatTableLength = DXGI_FORMAT_A4B4G4R4_UNORM + 1u;
+
+	//[0,255]
+	using PlaneCountType = uint8_t;
+
+	//自动推导格式索引类型
+	using FormatIndexType = std::conditional_t<
+		(formatTableLength <= 256u), uint8_t,
+		std::conditional_t<
+		(formatTableLength <= 65536u), uint16_t,
+		uint32_t //DXGI_FORMAT_FORCE_UINT 0xFFFFFFFF
+		>
+	>;
+
+	PlaneCountType getPlaneCount(const DXGI_FORMAT format);
+
+	FormatIndexType getRTVFormatIndex(const DXGI_FORMAT format);
+
+	FormatIndexType getDSVFormatIndex(const DXGI_FORMAT format);
+
+	uint32_t getRTVFormatBits();
+
+	uint32_t getDSVFormatBits();
+
 }
 
 #endif // !_GEAR_CORE_FMT_H_

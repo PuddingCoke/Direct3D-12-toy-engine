@@ -5,51 +5,29 @@
 
 #include"CommandList.h"
 
+#include<D3D12Headers/d3d12video.h>
+
 namespace Gear::Core::D3D12Core
 {
-	enum class VPTextureType
-	{
-		TEXTURE,
-		VIDEOTEXTURE
-	};
-
 	struct VPInputArguments
 	{
-
-		VPInputArguments(D3D12Resource::VideoTexture* const videoTexture);
 
 		VPInputArguments(D3D12Resource::Texture* const texture);
 
 		D3D12_VIDEO_PROCESS_INPUT_STREAM_ARGUMENTS args;
 
-		const VPTextureType textureType;
-
-		union
-		{
-			D3D12Resource::VideoTexture* videoTexture;
-
-			D3D12Resource::Texture* texture;
-		};
+		D3D12Resource::Texture* const texture;
 
 	};
 
 	struct VPOutputArguments
 	{
 
-		VPOutputArguments(D3D12Resource::VideoTexture* const videoTexture);
-
 		VPOutputArguments(D3D12Resource::Texture* const texture);
 
 		D3D12_VIDEO_PROCESS_OUTPUT_STREAM_ARGUMENTS args;
 
-		const VPTextureType textureType;
-
-		union
-		{
-			D3D12Resource::VideoTexture* videoTexture;
-
-			D3D12Resource::Texture* texture;
-		};
+		D3D12Resource::Texture* const texture;
 
 	};
 
@@ -81,25 +59,11 @@ namespace Gear::Core::D3D12Core
 	template<size_t N>
 	inline void VideoProcessCommandList::processFrames(ID3D12VideoProcessor* const vp, const VPOutputArguments& outputArgs, const VPInputArguments(&inputArgs)[N])
 	{
-		if (outputArgs.textureType == VPTextureType::TEXTURE)
-		{
-			trackAndSetResourceState(outputArgs.texture, D3D12Resource::D3D12_TRANSITION_ALL_MIPLEVELS, D3D12_RESOURCE_STATE_VIDEO_PROCESS_WRITE);
-		}
-		else
-		{
-			trackAndSetResourceState(outputArgs.videoTexture, D3D12_RESOURCE_STATE_VIDEO_PROCESS_WRITE);
-		}
+		trackAndSetResourceState(outputArgs.texture, D3D12Resource::D3D12_TRANSITION_ALL_MIPLEVELS, D3D12_RESOURCE_STATE_VIDEO_PROCESS_WRITE);
 
 		for (uint32_t i = 0; i < N; i++)
 		{
-			if (inputArgs[i].textureType == VPTextureType::TEXTURE)
-			{
-				trackAndSetResourceState(inputArgs[i].texture, D3D12Resource::D3D12_TRANSITION_ALL_MIPLEVELS, D3D12_RESOURCE_STATE_VIDEO_PROCESS_READ);
-			}
-			else
-			{
-				trackAndSetResourceState(inputArgs[i].videoTexture, D3D12_RESOURCE_STATE_VIDEO_PROCESS_READ);
-			}
+			trackAndSetResourceState(inputArgs[i].texture, D3D12Resource::D3D12_TRANSITION_ALL_MIPLEVELS, D3D12_RESOURCE_STATE_VIDEO_PROCESS_READ);
 		}
 
 		const D3D12_VIDEO_PROCESS_OUTPUT_STREAM_ARGUMENTS d3d12OutputArgs = outputArgs.args;
@@ -115,25 +79,11 @@ namespace Gear::Core::D3D12Core
 
 		commandList->ProcessFrames(vp, &d3d12OutputArgs, N, d3d12InputArgs);
 
-		if (outputArgs.textureType == VPTextureType::TEXTURE)
-		{
-			trackAndSetResourceState(outputArgs.texture, D3D12Resource::D3D12_TRANSITION_ALL_MIPLEVELS, D3D12_RESOURCE_STATE_COMMON);
-		}
-		else
-		{
-			trackAndSetResourceState(outputArgs.videoTexture, D3D12_RESOURCE_STATE_COMMON);
-		}
+		trackAndSetResourceState(outputArgs.texture, D3D12Resource::D3D12_TRANSITION_ALL_MIPLEVELS, D3D12_RESOURCE_STATE_COMMON);
 
 		for (uint32_t i = 0; i < N; i++)
 		{
-			if (inputArgs[i].textureType == VPTextureType::TEXTURE)
-			{
-				trackAndSetResourceState(inputArgs[i].texture, D3D12Resource::D3D12_TRANSITION_ALL_MIPLEVELS, D3D12_RESOURCE_STATE_COMMON);
-			}
-			else
-			{
-				trackAndSetResourceState(inputArgs[i].videoTexture, D3D12_RESOURCE_STATE_COMMON);
-			}
+			trackAndSetResourceState(inputArgs[i].texture, D3D12Resource::D3D12_TRANSITION_ALL_MIPLEVELS, D3D12_RESOURCE_STATE_COMMON);
 		}
 
 		flushResourceBarriers();

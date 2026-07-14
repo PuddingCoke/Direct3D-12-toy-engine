@@ -429,9 +429,6 @@
     <ClInclude Include="Inc\Gear\Core\VideoEncoder\D3D12Encoder.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="Inc\Gear\Core\D3D12Resource\VideoTexture.h">
-      <Filter>Header</Filter>
-    </ClInclude>
     <ClInclude Include="Inc\Gear\Core\D3D12Core\GraphicsCommandList.h">
       <Filter>Header</Filter>
     </ClInclude>
@@ -463,6 +460,9 @@
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="Inc\Gear\Core\VideoEncoder\SoftwareEncoder.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Inc\Gear\Core\Internal\FMTInternal.h">
       <Filter>Header</Filter>
     </ClInclude>
   </ItemGroup>
@@ -689,9 +689,6 @@
     <ClCompile Include="Src\Gear\Resource\SwapBuffer.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Core\D3D12Resource\VideoTexture.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
     <ClCompile Include="Src\Gear\Core\D3D12Core\GraphicsCommandList.cpp">
       <Filter>Source</Filter>
     </ClCompile>
@@ -732,6 +729,9 @@
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="Src\Gear\Core\VideoEncoder\SoftwareEncoder.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gear\Core\FMT.cpp">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>

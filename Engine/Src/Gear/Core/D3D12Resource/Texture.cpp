@@ -2,17 +2,20 @@
 
 #include<Gear/Utils/Math.h>
 
+#include<Gear/Core/FMT.h>
+
 namespace Gear::Core::D3D12Resource
 {
-	Texture::Texture(const uint32_t width, const uint32_t height, const DXGI_FORMAT format, const uint32_t arraySize, const uint32_t mipLevels, const bool stateTracking, const D3D12_RESOURCE_FLAGS resFlags, const D3D12_CLEAR_VALUE* const clearValue) :
-		D3D12ResourceBase(CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE, CD3DX12_RESOURCE_DESC::Tex2D(format, width, height, static_cast<uint16_t>(arraySize), static_cast<uint16_t>(mipLevels), 1, 0, resFlags), stateTracking, D3D12_RESOURCE_STATE_COPY_DEST, clearValue),
+	Texture::Texture(const uint32_t width, const uint32_t height, const DXGI_FORMAT format, const uint32_t arraySize, const uint32_t mipLevels, const bool stateTracking, const D3D12_RESOURCE_FLAGS resFlags, const D3D12_CLEAR_VALUE* const clearValue, const uint32_t initialState) :
+		D3D12ResourceBase(CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), D3D12_HEAP_FLAG_NONE, CD3DX12_RESOURCE_DESC::Tex2D(format, width, height, static_cast<uint16_t>(arraySize), static_cast<uint16_t>(mipLevels), 1, 0, resFlags), stateTracking, static_cast<D3D12_RESOURCE_STATES>(initialState), clearValue),
 		width(width),
 		height(height),
 		arraySize(arraySize),
 		mipLevels(mipLevels),
 		format(format),
-		globalState(makeShared<States>(D3D12_RESOURCE_STATE_COPY_DEST, mipLevels)),
-		internalState(makeUnique<States>(D3D12_RESOURCE_STATE_COPY_DEST, mipLevels)),
+		planeCount(FMT::getPlaneCount(format)),
+		globalState(makeShared<States>(initialState, mipLevels)),
+		internalState(makeUnique<States>(initialState, mipLevels)),
 		transitionState(makeUnique<States>(D3D12_RESOURCE_STATE_UNKNOWN, mipLevels)),
 		pendingState(makeUnique<States>(D3D12_RESOURCE_STATE_UNKNOWN, mipLevels))
 	{
@@ -28,6 +31,7 @@ namespace Gear::Core::D3D12Resource
 		arraySize = desc.DepthOrArraySize;
 		mipLevels = desc.MipLevels;
 		format = desc.Format;
+		planeCount = FMT::getPlaneCount(desc.Format);
 
 		globalState = makeShared<States>(initialState, mipLevels);
 		internalState = makeUnique<States>(initialState, mipLevels);
@@ -42,6 +46,7 @@ namespace Gear::Core::D3D12Resource
 		arraySize(tex.arraySize),
 		mipLevels(tex.mipLevels),
 		format(tex.format),
+		planeCount(tex.planeCount),
 		globalState(tex.globalState),
 		internalState(makeUnique<States>(D3D12_RESOURCE_STATE_UNKNOWN, mipLevels)),
 		transitionState(makeUnique<States>(D3D12_RESOURCE_STATE_UNKNOWN, mipLevels)),
@@ -175,15 +180,18 @@ namespace Gear::Core::D3D12Resource
 
 									for (uint32_t arraySlice = 0; arraySlice < arraySize; arraySlice++)
 									{
-										D3D12_RESOURCE_BARRIER barrier = {};
-										barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-										barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-										barrier.Transition.pResource = getResource();
-										barrier.Transition.Subresource = D3D12CalcSubresource(mipSlice, arraySlice, 0, mipLevels, arraySize);
-										barrier.Transition.StateBefore = static_cast<D3D12_RESOURCE_STATES>(internalState->mipLevelStates[mipSlice]);
-										barrier.Transition.StateAfter = static_cast<D3D12_RESOURCE_STATES>(transitionState->mipLevelStates[mipSlice]);
+										for (uint32_t planeSlice = 0; planeSlice < planeCount; planeSlice++)
+										{
+											D3D12_RESOURCE_BARRIER barrier = {};
+											barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+											barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+											barrier.Transition.pResource = getResource();
+											barrier.Transition.Subresource = D3D12CalcSubresource(mipSlice, arraySlice, planeSlice, mipLevels, arraySize);
+											barrier.Transition.StateBefore = static_cast<D3D12_RESOURCE_STATES>(internalState->mipLevelStates[mipSlice]);
+											barrier.Transition.StateAfter = static_cast<D3D12_RESOURCE_STATES>(transitionState->mipLevelStates[mipSlice]);
 
-										resourceBarriers.push_back(barrier);
+											resourceBarriers.push_back(barrier);
+										}
 									}
 
 									internalState->mipLevelStates[mipSlice] = transitionState->mipLevelStates[mipSlice];
@@ -267,15 +275,18 @@ namespace Gear::Core::D3D12Resource
 
 								for (uint32_t arraySlice = 0; arraySlice < arraySize; arraySlice++)
 								{
-									D3D12_RESOURCE_BARRIER barrier = {};
-									barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-									barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-									barrier.Transition.pResource = getResource();
-									barrier.Transition.Subresource = D3D12CalcSubresource(mipSlice, arraySlice, 0, mipLevels, arraySize);
-									barrier.Transition.StateBefore = static_cast<D3D12_RESOURCE_STATES>(internalState->mipLevelStates[mipSlice]);
-									barrier.Transition.StateAfter = static_cast<D3D12_RESOURCE_STATES>(transitionState->mipLevelStates[mipSlice]);
+									for (uint32_t planeSlice = 0; planeSlice < planeCount; planeSlice++)
+									{
+										D3D12_RESOURCE_BARRIER barrier = {};
+										barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+										barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+										barrier.Transition.pResource = getResource();
+										barrier.Transition.Subresource = D3D12CalcSubresource(mipSlice, arraySlice, planeSlice, mipLevels, arraySize);
+										barrier.Transition.StateBefore = static_cast<D3D12_RESOURCE_STATES>(internalState->mipLevelStates[mipSlice]);
+										barrier.Transition.StateAfter = static_cast<D3D12_RESOURCE_STATES>(transitionState->mipLevelStates[mipSlice]);
 
-									resourceBarriers.push_back(barrier);
+										resourceBarriers.push_back(barrier);
+									}
 								}
 
 								internalState->mipLevelStates[mipSlice] = transitionState->mipLevelStates[mipSlice];
@@ -369,15 +380,18 @@ namespace Gear::Core::D3D12Resource
 						{
 							for (uint32_t arraySlice = 0; arraySlice < arraySize; arraySlice++)
 							{
-								D3D12_RESOURCE_BARRIER barrier = {};
-								barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-								barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-								barrier.Transition.pResource = getResource();
-								barrier.Transition.Subresource = D3D12CalcSubresource(mipSlice, arraySlice, 0, mipLevels, arraySize);
-								barrier.Transition.StateBefore = static_cast<D3D12_RESOURCE_STATES>(globalState->mipLevelStates[mipSlice]);
-								barrier.Transition.StateAfter = static_cast<D3D12_RESOURCE_STATES>(pendingState->mipLevelStates[mipSlice]);
+								for (uint32_t planeSlice = 0; planeSlice < planeCount; planeSlice++)
+								{
+									D3D12_RESOURCE_BARRIER barrier = {};
+									barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+									barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+									barrier.Transition.pResource = getResource();
+									barrier.Transition.Subresource = D3D12CalcSubresource(mipSlice, arraySlice, planeSlice, mipLevels, arraySize);
+									barrier.Transition.StateBefore = static_cast<D3D12_RESOURCE_STATES>(globalState->mipLevelStates[mipSlice]);
+									barrier.Transition.StateAfter = static_cast<D3D12_RESOURCE_STATES>(pendingState->mipLevelStates[mipSlice]);
 
-								resourceBarriers.push_back(barrier);
+									resourceBarriers.push_back(barrier);
+								}
 							}
 						}
 						else if (!insertUAVBarrier && globalState->mipLevelStates[mipSlice] == D3D12_RESOURCE_STATE_UNORDERED_ACCESS && pendingState->mipLevelStates[mipSlice] == D3D12_RESOURCE_STATE_UNORDERED_ACCESS)
@@ -428,15 +442,18 @@ namespace Gear::Core::D3D12Resource
 						{
 							for (uint32_t arraySlice = 0; arraySlice < arraySize; arraySlice++)
 							{
-								D3D12_RESOURCE_BARRIER barrier = {};
-								barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-								barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-								barrier.Transition.pResource = getResource();
-								barrier.Transition.Subresource = D3D12CalcSubresource(mipSlice, arraySlice, 0, mipLevels, arraySize);
-								barrier.Transition.StateBefore = static_cast<D3D12_RESOURCE_STATES>(globalState->mipLevelStates[mipSlice]);
-								barrier.Transition.StateAfter = static_cast<D3D12_RESOURCE_STATES>(pendingState->mipLevelStates[mipSlice]);
+								for (uint32_t planeSlice = 0; planeSlice < planeCount; planeSlice++)
+								{
+									D3D12_RESOURCE_BARRIER barrier = {};
+									barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+									barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+									barrier.Transition.pResource = getResource();
+									barrier.Transition.Subresource = D3D12CalcSubresource(mipSlice, arraySlice, planeSlice, mipLevels, arraySize);
+									barrier.Transition.StateBefore = static_cast<D3D12_RESOURCE_STATES>(globalState->mipLevelStates[mipSlice]);
+									barrier.Transition.StateAfter = static_cast<D3D12_RESOURCE_STATES>(pendingState->mipLevelStates[mipSlice]);
 
-								resourceBarriers.push_back(barrier);
+									resourceBarriers.push_back(barrier);
+								}
 							}
 						}
 						else if (!insertUAVBarrier && globalState->mipLevelStates[mipSlice] == D3D12_RESOURCE_STATE_UNORDERED_ACCESS && pendingState->mipLevelStates[mipSlice] == D3D12_RESOURCE_STATE_UNORDERED_ACCESS)

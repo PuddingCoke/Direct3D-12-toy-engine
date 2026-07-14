@@ -99,12 +99,12 @@ namespace Gear::Core::VideoEncoder
 
 	bool Encoder::encode(D3D12Resource::Texture* const inputTexture)
 	{
-		LOGERROR("禁止调用未被覆写的encode方法");
+		LOGERROR("禁止调用未被覆写的encode方法", reinterpret_cast<uint64_t>(inputTexture));
 	}
 
 	bool Encoder::encode(const uint8_t* const data)
 	{
-		LOGERROR("禁止调用未被覆写的encode方法");
+		LOGERROR("禁止调用未被覆写的encode方法", reinterpret_cast<uint64_t>(data));
 	}
 
 	void Encoder::waitFor(D3D12Core::CommandQueue* const queueWaitFor, D3D12Core::Fence* const fence)
@@ -161,13 +161,13 @@ namespace Gear::Core::VideoEncoder
 		return frameEncoded != frameToEncode;
 	}
 
-	void Encoder::bgraToNV12(D3D12Resource::Texture* inputTexture, D3D12Resource::VideoTexture* nv12Texture, D3D12Core::Fence* const fence)
+	void Encoder::bgraToNV12(D3D12Resource::Texture* const inputBGRATexture, D3D12Resource::Texture* const outputNV12Texture, D3D12Core::Fence* const fence)
 	{
 		vpCommandQueue->begin();
 
-		D3D12Core::VPInputArguments inputArgs = D3D12Core::VPInputArguments(inputTexture);
+		D3D12Core::VPInputArguments inputArgs = D3D12Core::VPInputArguments(inputBGRATexture);
 
-		D3D12Core::VPOutputArguments outputArgs = D3D12Core::VPOutputArguments(nv12Texture);
+		D3D12Core::VPOutputArguments outputArgs = D3D12Core::VPOutputArguments(outputNV12Texture);
 
 		vpCommandList->processFrames(videoProcessor.Get(), outputArgs, { inputArgs });
 
