@@ -2,10 +2,12 @@
 
 #include<algorithm>
 
+#include<numeric>
+
 namespace Gear::Utils
 {
 	DeltaTimeEstimator::DeltaTimeEstimator() :
-		historyDeltatime{}, sortedDeltaTime{}, historyDeltaTimeIndex(0), populated(false)
+		historyDeltatime{}, sortedDeltaTime{}, historyDeltaTimeIndex(0), frameRate(0.f), populated(false)
 	{
 	}
 
@@ -26,6 +28,10 @@ namespace Gear::Utils
 
 		if (!populated)
 		{
+			const float sumTime = std::accumulate(historyDeltatime, historyDeltatime + historyDeltaTimeIndex, 0.f);
+
+			frameRate = historyDeltaTimeIndex / sumTime;
+
 			return lastDeltaTime;
 		}
 
@@ -33,17 +39,19 @@ namespace Gear::Utils
 
 		std::sort(sortedDeltaTime, sortedDeltaTime + numRecord);
 
-		float averageDeltaTime = 0.f;
+		const float sumTime = std::accumulate(sortedDeltaTime + numDiscard, sortedDeltaTime + numRecord - numDiscard, 0.f);
 
-		for (uint32_t i = numDiscard; i < numRecord - numDiscard; i++)
-		{
-			averageDeltaTime += sortedDeltaTime[i];
-		}
+		const float averageDeltaTime = sumTime / (numRecord - 2 * numDiscard);
 
-		averageDeltaTime /= static_cast<float>(numRecord - 2 * numDiscard);
+		frameRate = (numRecord - 2 * numDiscard) / sumTime;
 
 		const float lerpDeltaTime = averageDeltaTime * (1.f - lerpFactor) + lastDeltaTime * lerpFactor;
 
 		return lerpDeltaTime;
+	}
+
+	float DeltaTimeEstimator::getFrameRate() const
+	{
+		return frameRate;
 	}
 }

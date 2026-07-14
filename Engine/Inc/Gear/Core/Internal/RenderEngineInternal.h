@@ -47,8 +47,12 @@ namespace Gear::Core::RenderEngine::Internal
 	//更新总时间
 	void updateTimeElapsed();
 
+	void setFrameRate(const float frameRate);
+
 	//使总帧数渲染自增1
 	void renderedFrameCountInc();
+
+	void setSyncInterval(const int32_t syncInterval);
 
 	void saveBackBuffer(D3D12Resource::ReadbackHeap* const readbackHeap);
 

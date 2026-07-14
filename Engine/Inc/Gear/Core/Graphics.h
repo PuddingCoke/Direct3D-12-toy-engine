@@ -25,6 +25,8 @@ namespace Gear::Core::Graphics
 
 	float getTimeElapsed();
 
+	float getFrameRate();
+
 	uint32_t getWidth();
 
 	uint32_t getHeight();

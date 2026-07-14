@@ -303,6 +303,8 @@ namespace Gear
 
 			RenderEngine::Internal::updateTimeElapsed();
 
+			RenderEngine::Internal::setFrameRate(dtEstimator.getFrameRate());
+
 			RenderEngine::Internal::renderedFrameCountInc();
 
 			if (needScreenGrab)
@@ -385,6 +387,8 @@ namespace Gear
 		}
 
 		RenderEngine::Internal::setDeltaTime(1.f / static_cast<float>(VideoEncoder::Encoder::frameRate));
+
+		RenderEngine::Internal::setFrameRate(VideoEncoder::Encoder::frameRate);
 
 		D3D12Core::FencePtr vpSyncFence = makeUnique<D3D12Core::Fence>();
 
@@ -479,6 +483,8 @@ namespace Gear
 			RenderEngine::Internal::setDeltaTime(lerpDeltaTime);
 
 			RenderEngine::Internal::updateTimeElapsed();
+
+			RenderEngine::Internal::setFrameRate(dtEstimator.getFrameRate());
 
 			RenderEngine::Internal::renderedFrameCountInc();
 		}

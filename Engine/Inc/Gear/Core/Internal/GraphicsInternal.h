@@ -17,6 +17,8 @@ namespace Gear::Core::Graphics::Internal
 
 	void updateTimeElapsed();
 
+	void setFrameRate(const float frameRate);
+
 	void setBackBufferHandle(const D3D12_CPU_DESCRIPTOR_HANDLE backBufferHandle);
 
 	void setEngineGlobalCBuffer(Resource::ImmutableCBuffer* const engineGlobalCBuffer);

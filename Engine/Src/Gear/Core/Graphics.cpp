@@ -29,6 +29,8 @@ namespace Gear::Core::Graphics
 
 		float timeElapsed = 0.f;
 
+		float frameRate = 0.f;
+
 		D3D12_CPU_DESCRIPTOR_HANDLE backBufferHandle = {};
 
 		Resource::ImmutableCBuffer* engineGlobalCBuffer = nullptr;
@@ -66,6 +68,11 @@ namespace Gear::Core::Graphics
 		void updateTimeElapsed()
 		{
 			impl.timeElapsed += impl.deltaTime;
+		}
+
+		void setFrameRate(const float frameRate)
+		{
+			impl.frameRate = frameRate;
 		}
 
 		void setBackBufferHandle(const D3D12_CPU_DESCRIPTOR_HANDLE backBufferHandle)
@@ -125,6 +132,11 @@ namespace Gear::Core::Graphics
 	float getTimeElapsed()
 	{
 		return impl.timeElapsed;
+	}
+
+	float getFrameRate()
+	{
+		return impl.frameRate;
 	}
 
 	uint32_t getWidth()

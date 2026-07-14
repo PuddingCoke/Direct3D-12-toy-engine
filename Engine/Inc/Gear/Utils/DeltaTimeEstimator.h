@@ -26,6 +26,8 @@ namespace Gear::Utils
 
 		float getDeltaTime(const float lastDeltaTime);
 
+		float getFrameRate() const;
+
 	private:
 
 		static constexpr float lerpFactor = 0.065f;
@@ -39,6 +41,8 @@ namespace Gear::Utils
 		float sortedDeltaTime[numRecord];
 
 		uint32_t historyDeltaTimeIndex;
+
+		float frameRate;
 
 		bool populated;
 

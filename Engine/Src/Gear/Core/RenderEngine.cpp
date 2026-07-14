@@ -169,7 +169,11 @@ namespace Gear::Core::RenderEngine
 
 		void updateTimeElapsed() const;
 
+		void setFrameRate(const float frameRate) const;
+
 		void renderedFrameCountInc() const;
+
+		void setSyncInterval(int32_t interval);
 
 		void setDefRenderTexture();
 
@@ -570,9 +574,28 @@ namespace Gear::Core::RenderEngine
 		Graphics::Internal::updateTimeElapsed();
 	}
 
+	void RenderEngineImpl::setFrameRate(const float frameRate) const
+	{
+		Graphics::Internal::setFrameRate(frameRate);
+	}
+
 	void RenderEngineImpl::renderedFrameCountInc() const
 	{
 		Graphics::Internal::renderedFrameCountInc();
+	}
+
+	void RenderEngineImpl::setSyncInterval(int32_t interval)
+	{
+		if (interval > 4)
+		{
+			interval = 4;
+		}
+		else if (interval < 0)
+		{
+			interval = 0;
+		}
+
+		syncInterval = interval;
 	}
 
 	void RenderEngineImpl::setDefRenderTexture()
@@ -754,9 +777,9 @@ namespace Gear::Core::RenderEngine
 			{
 				ImGui::Begin("Frame Profile");
 				ImGui::Text("TimeElapsed %.2f", Graphics::getTimeElapsed());
-				ImGui::Text("FrameTime %.8f", ImGui::GetIO().DeltaTime * 1000.f);
-				ImGui::Text("FrameRate %.1f", ImGui::GetIO().Framerate);
-				ImGui::SliderInt("Sync Interval", &syncInterval, 0, 3);
+				ImGui::Text("FrameTime %.8f", Graphics::getDeltaTime() * 1000.f);
+				ImGui::Text("FrameRate %.1f", Graphics::getFrameRate());
+				ImGui::SliderInt("Sync Interval", &syncInterval, 0, 4);
 				ImGui::End();
 
 				Graphics::Internal::imGuiCall();
@@ -845,9 +868,19 @@ namespace Gear::Core::RenderEngine
 			impl->updateTimeElapsed();
 		}
 
+		void setFrameRate(const float frameRate)
+		{
+			impl->setFrameRate(frameRate);
+		}
+
 		void renderedFrameCountInc()
 		{
 			impl->renderedFrameCountInc();
+		}
+
+		void setSyncInterval(const int32_t syncInterval)
+		{
+			impl->setSyncInterval(syncInterval);
 		}
 
 		void saveBackBuffer(D3D12Resource::ReadbackHeap* const readbackHeap)
