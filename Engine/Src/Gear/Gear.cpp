@@ -256,13 +256,19 @@ namespace Gear
 	{
 		SetForegroundWindow(Window::Win32Form::getHandle());
 
-		DeltaTimeEstimator dtEstimator;
+		DeltaTimeEstimator deltaTimeEstimator;
 
 		RenderEngine::Internal::setDeltaTime(1.f / static_cast<float>(MainMonitor::getRefreshRate()));
 
+		std::chrono::high_resolution_clock::time_point startPoint = std::chrono::high_resolution_clock::now();
+
 		while (Window::Win32Form::pollEvents())
 		{
-			const std::chrono::high_resolution_clock::time_point startPoint = std::chrono::high_resolution_clock::now();
+			const std::chrono::high_resolution_clock::time_point endPoint = std::chrono::high_resolution_clock::now();
+
+			const float deltaTime = std::chrono::duration<float>(endPoint - startPoint).count();
+
+			startPoint = endPoint;
 
 			//帧索引的更新必须置于首位
 			RenderEngine::Internal::updateFrameIndex();
@@ -293,17 +299,11 @@ namespace Gear
 				RenderEngine::Internal::waitFrameGPUComplete();
 			}
 
-			const std::chrono::high_resolution_clock::time_point endPoint = std::chrono::high_resolution_clock::now();
-
-			const float deltaTime = std::chrono::duration<float>(endPoint - startPoint).count();
-
-			const float lerpDeltaTime = dtEstimator.getDeltaTime(deltaTime);
-
-			RenderEngine::Internal::setDeltaTime(lerpDeltaTime);
+			RenderEngine::Internal::setDeltaTime(deltaTimeEstimator.getDeltaTime(deltaTime));
 
 			RenderEngine::Internal::updateTimeElapsed();
 
-			RenderEngine::Internal::setFrameRate(dtEstimator.getFrameRate());
+			RenderEngine::Internal::setFrameRate(deltaTimeEstimator.getFrameRate());
 
 			RenderEngine::Internal::renderedFrameCountInc();
 
@@ -333,6 +333,8 @@ namespace Gear
 				stbi_write_png("output.png", initParam.width, initParam.height, 4, colors.get(), FMT::getByteSize(Graphics::backBufferFormat) * initParam.width);
 
 				LOGSUCCESS("截屏保存到", "output.png");
+
+				startPoint = std::chrono::high_resolution_clock::now();
 			}
 		}
 	}
@@ -439,11 +441,13 @@ namespace Gear
 
 	void GearImpl::runWallpaper()
 	{
-		DeltaTimeEstimator dtEstimator;
+		DeltaTimeEstimator deltaTimeEstimator;
 
 		WallpaperHelper::DetectThreadToken detectThreadToken;
 
 		RenderEngine::Internal::setDeltaTime(1.f / static_cast<float>(MainMonitor::getRefreshRate()));
+
+		std::chrono::high_resolution_clock::time_point startPoint = std::chrono::high_resolution_clock::now();
 
 		while (Window::Win32Form::pollEvents())
 		{
@@ -453,9 +457,15 @@ namespace Gear
 				{
 					return;
 				}
+
+				startPoint = std::chrono::high_resolution_clock::now();
 			}
 
-			const std::chrono::high_resolution_clock::time_point startPoint = std::chrono::high_resolution_clock::now();
+			const std::chrono::high_resolution_clock::time_point endPoint = std::chrono::high_resolution_clock::now();
+
+			const float deltaTime = std::chrono::duration<float>(endPoint - startPoint).count();
+
+			startPoint = endPoint;
 
 			//帧索引的更新必须置于首位
 			RenderEngine::Internal::updateFrameIndex();
@@ -474,17 +484,11 @@ namespace Gear
 
 			RenderEngine::Internal::present();
 
-			const std::chrono::high_resolution_clock::time_point endPoint = std::chrono::high_resolution_clock::now();
-
-			const float deltaTime = std::chrono::duration<float>(endPoint - startPoint).count();
-
-			const float lerpDeltaTime = dtEstimator.getDeltaTime(deltaTime);
-
-			RenderEngine::Internal::setDeltaTime(lerpDeltaTime);
+			RenderEngine::Internal::setDeltaTime(deltaTimeEstimator.getDeltaTime(deltaTime));
 
 			RenderEngine::Internal::updateTimeElapsed();
 
-			RenderEngine::Internal::setFrameRate(dtEstimator.getFrameRate());
+			RenderEngine::Internal::setFrameRate(deltaTimeEstimator.getFrameRate());
 
 			RenderEngine::Internal::renderedFrameCountInc();
 		}
