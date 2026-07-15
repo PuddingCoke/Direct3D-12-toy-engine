@@ -120,7 +120,7 @@ namespace Gear::Core
 	void GraphicsContext::setVSConstants(const uint32_t numValues, const void* const data, uint32_t& offset) const
 	{
 #ifdef _DEBUG
-		constantsWriteCheck(D3D12Core::RootSignature::ShaderType::VERTEX, numValues, offset);
+		constantsWriteCheck(D3D12Core::ShaderType::VERTEX, numValues, offset);
 #endif // _DEBUG
 
 		commandList->setGraphicsRootConstants(getGraphicsRootSignature()->getVSConstantsParameterIndex(), numValues, data, offset);
@@ -131,7 +131,7 @@ namespace Gear::Core
 	void GraphicsContext::setHSConstants(const uint32_t numValues, const void* const data, uint32_t& offset) const
 	{
 #ifdef _DEBUG
-		constantsWriteCheck(D3D12Core::RootSignature::ShaderType::HULL, numValues, offset);
+		constantsWriteCheck(D3D12Core::ShaderType::HULL, numValues, offset);
 #endif // _DEBUG
 
 		commandList->setGraphicsRootConstants(getGraphicsRootSignature()->getHSConstantsParameterIndex(), numValues, data, offset);
@@ -142,7 +142,7 @@ namespace Gear::Core
 	void GraphicsContext::setDSConstants(const uint32_t numValues, const void* const data, uint32_t& offset) const
 	{
 #ifdef _DEBUG
-		constantsWriteCheck(D3D12Core::RootSignature::ShaderType::DOMAIN, numValues, offset);
+		constantsWriteCheck(D3D12Core::ShaderType::DOMAIN, numValues, offset);
 #endif // _DEBUG
 
 		commandList->setGraphicsRootConstants(getGraphicsRootSignature()->getDSConstantsParameterIndex(), numValues, data, offset);
@@ -153,7 +153,7 @@ namespace Gear::Core
 	void GraphicsContext::setGSConstants(const uint32_t numValues, const void* const data, uint32_t& offset) const
 	{
 #ifdef _DEBUG
-		constantsWriteCheck(D3D12Core::RootSignature::ShaderType::GEOMETRY, numValues, offset);
+		constantsWriteCheck(D3D12Core::ShaderType::GEOMETRY, numValues, offset);
 #endif // _DEBUG
 
 		commandList->setGraphicsRootConstants(getGraphicsRootSignature()->getGSConstantsParameterIndex(), numValues, data, offset);
@@ -164,7 +164,7 @@ namespace Gear::Core
 	void GraphicsContext::setPSConstants(const uint32_t numValues, const void* const data, uint32_t& offset) const
 	{
 #ifdef _DEBUG
-		constantsWriteCheck(D3D12Core::RootSignature::ShaderType::PIXEL, numValues, offset);
+		constantsWriteCheck(D3D12Core::ShaderType::PIXEL, numValues, offset);
 #endif // _DEBUG
 
 		commandList->setGraphicsRootConstants(getGraphicsRootSignature()->getPSConstantsParameterIndex(), numValues, data, offset);
@@ -175,7 +175,7 @@ namespace Gear::Core
 	void GraphicsContext::setCSConstants(const uint32_t numValues, const void* const data, uint32_t& offset) const
 	{
 #ifdef _DEBUG
-		constantsWriteCheck(D3D12Core::RootSignature::ShaderType::COMPUTE, numValues, offset);
+		constantsWriteCheck(D3D12Core::ShaderType::COMPUTE, numValues, offset);
 #endif // _DEBUG
 
 		commandList->setComputeRootConstants(getComputeRootSignature()->getCSConstantsParameterIndex(), numValues, data, offset);
@@ -784,20 +784,22 @@ namespace Gear::Core
 		userGlobalCBuffer = nullptr;
 	}
 
-	void GraphicsContext::constantsWriteCheck(const D3D12Core::RootSignature::ShaderType shaderType, const uint32_t numWrite, const uint32_t offset) const
+	void GraphicsContext::constantsWriteCheck(const D3D12Core::ShaderType shaderType, const uint32_t numWrite, const uint32_t offset) const
 	{
 		uint32_t numShaderConstants = 0u;
 
 		switch (shaderType)
 		{
-		case D3D12Core::RootSignature::ShaderType::VERTEX:
-		case D3D12Core::RootSignature::ShaderType::HULL:
-		case D3D12Core::RootSignature::ShaderType::DOMAIN:
-		case D3D12Core::RootSignature::ShaderType::GEOMETRY:
-		case D3D12Core::RootSignature::ShaderType::PIXEL:
+		case D3D12Core::ShaderType::VERTEX:
+		case D3D12Core::ShaderType::HULL:
+		case D3D12Core::ShaderType::DOMAIN:
+		case D3D12Core::ShaderType::GEOMETRY:
+		case D3D12Core::ShaderType::PIXEL:
+		case D3D12Core::ShaderType::AMPLIFICATION:
+		case D3D12Core::ShaderType::MESH:
 			numShaderConstants = getGraphicsRootSignature()->getNumShaderConstants(shaderType);
 			break;
-		case D3D12Core::RootSignature::ShaderType::COMPUTE:
+		case D3D12Core::ShaderType::COMPUTE:
 			numShaderConstants = getComputeRootSignature()->getNumShaderConstants(shaderType);
 			break;
 		default:
@@ -810,23 +812,29 @@ namespace Gear::Core
 
 			switch (shaderType)
 			{
-			case D3D12Core::RootSignature::ShaderType::VERTEX:
+			case D3D12Core::ShaderType::VERTEX:
 				shaderName = "顶点着色器";
 				break;
-			case D3D12Core::RootSignature::ShaderType::HULL:
+			case D3D12Core::ShaderType::HULL:
 				shaderName = "外壳着色器";
 				break;
-			case D3D12Core::RootSignature::ShaderType::DOMAIN:
+			case D3D12Core::ShaderType::DOMAIN:
 				shaderName = "域着色器";
 				break;
-			case D3D12Core::RootSignature::ShaderType::GEOMETRY:
+			case D3D12Core::ShaderType::GEOMETRY:
 				shaderName = "几何着色器";
 				break;
-			case D3D12Core::RootSignature::ShaderType::PIXEL:
+			case D3D12Core::ShaderType::PIXEL:
 				shaderName = "像素着色器";
 				break;
-			case D3D12Core::RootSignature::ShaderType::COMPUTE:
+			case D3D12Core::ShaderType::COMPUTE:
 				shaderName = "计算着色器";
+				break;
+			case D3D12Core::ShaderType::AMPLIFICATION:
+				shaderName = "放大着色器";
+				break;
+			case D3D12Core::ShaderType::MESH:
+				shaderName = "网格着色器";
 				break;
 			default:
 				break;

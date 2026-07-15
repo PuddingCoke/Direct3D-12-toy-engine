@@ -10,13 +10,13 @@ public:
 
 	MyRenderTask()
 	{
-		particleVS = Shader::create(L"ParticleVS.hlsl", ShaderProfile::VERTEX);
+		particleVS = Shader::create(L"ParticleVS.hlsl", ShaderType::VERTEX);
 
-		particleGS = Shader::create(L"ParticleGS.hlsl", ShaderProfile::GEOMETRY);
+		particleGS = Shader::create(L"ParticleGS.hlsl", ShaderType::GEOMETRY);
 
-		particlePS = Shader::create(L"ParticlePS.hlsl", ShaderProfile::PIXEL);
+		particlePS = Shader::create(L"ParticlePS.hlsl", ShaderType::PIXEL);
 
-		particleComputeState = PipelineStateBuilder::build(Shader::create(L"ParticleCS.hlsl", ShaderProfile::COMPUTE));
+		particleComputeState = PipelineStateBuilder::build(Shader::create(L"ParticleCS.hlsl", ShaderType::COMPUTE));
 
 		particleRenderState = PipelineStateBuilder()
 			.setInputElements({

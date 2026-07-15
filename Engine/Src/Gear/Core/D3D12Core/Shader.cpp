@@ -1,5 +1,7 @@
 #include<Gear/Core/D3D12Core/Shader.h>
 
+#include<Gear/Core/D3D12Core/DXCCompiler.h>
+
 #include<Gear/Utils/File.h>
 
 namespace Gear::Core::D3D12Core
@@ -14,9 +16,9 @@ namespace Gear::Core::D3D12Core
 		return makeUnique<Shader>(filePath);
 	}
 
-	ShaderPtr Shader::create(const std::wstring& filePath, const DXCCompiler::ShaderProfile profile)
+	ShaderPtr Shader::create(const std::wstring& filePath, const ShaderType type)
 	{
-		return makeUnique<Shader>(filePath, profile);
+		return makeUnique<Shader>(filePath, type);
 	}
 
 	Shader::Shader(const uint8_t* const bytes, const size_t byteSize)
@@ -47,7 +49,7 @@ namespace Gear::Core::D3D12Core
 		shaderReflection = DXCCompiler::getReflectionBlob(shaderBlob);
 	}
 
-	Shader::Shader(const std::wstring& filePath, const DXCCompiler::ShaderProfile profile)
+	Shader::Shader(const std::wstring& filePath, const ShaderType type)
 	{
 		if (!Utils::File::exist(filePath))
 		{
@@ -56,7 +58,7 @@ namespace Gear::Core::D3D12Core
 
 		if (Utils::File::getExtension(filePath) == L"hlsl")
 		{
-			shaderBlob = DXCCompiler::compile(filePath, profile);
+			shaderBlob = DXCCompiler::compile(filePath, type);
 
 			LOGSUCCESS("编译", LogColor::filePathColor, filePath);
 		}

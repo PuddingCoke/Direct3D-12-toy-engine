@@ -22,7 +22,7 @@ namespace Gear::Core::D3D12Core::DXCCompiler
 		ComPtr<IDxcBlob> load(const uint8_t* const bytes, const size_t byteSize);
 
 		//hlsl
-		ComPtr<IDxcBlob> compile(const std::wstring& filePath, const ShaderProfile profile) const;
+		ComPtr<IDxcBlob> compile(const std::wstring& filePath, const ShaderType type) const;
 
 		//cso
 		ComPtr<IDxcBlob> read(const std::wstring& filePath) const;
@@ -69,8 +69,13 @@ namespace Gear::Core::D3D12Core::DXCCompiler
 		return shaderBlob;
 	}
 
-	ComPtr<IDxcBlob> DXCCompilerImpl::compile(const std::wstring& filePath, const ShaderProfile profile) const
+	ComPtr<IDxcBlob> DXCCompilerImpl::compile(const std::wstring& filePath, const ShaderType type) const
 	{
+		if (type == ShaderType::TYPECOUNT)
+		{
+			LOGERROR(TOSTRING(type), "不得为", TOSTRING(ShaderType::TYPECOUNT));
+		}
+
 		const std::vector<uint8_t> bytes = Utils::File::readAllBinary(filePath);
 
 		ComPtr<IDxcBlobEncoding> textBlob;
@@ -84,37 +89,36 @@ namespace Gear::Core::D3D12Core::DXCCompiler
 
 		ComPtr<IDxcCompilerArgs> args;
 
-		switch (profile)
+		switch (type)
 		{
-		case ShaderProfile::VERTEX:
+		case ShaderType::VERTEX:
 			dxcUtils->BuildArguments(filePath.c_str(), L"main", L"vs_6_6", nullptr, 0, nullptr, 0, &args);
 			break;
-		case ShaderProfile::HULL:
+		case ShaderType::HULL:
 			dxcUtils->BuildArguments(filePath.c_str(), L"main", L"hs_6_6", nullptr, 0, nullptr, 0, &args);
 			break;
-		case ShaderProfile::DOMAIN:
+		case ShaderType::DOMAIN:
 			dxcUtils->BuildArguments(filePath.c_str(), L"main", L"ds_6_6", nullptr, 0, nullptr, 0, &args);
 			break;
-		case ShaderProfile::GEOMETRY:
+		case ShaderType::GEOMETRY:
 			dxcUtils->BuildArguments(filePath.c_str(), L"main", L"gs_6_6", nullptr, 0, nullptr, 0, &args);
 			break;
-		case ShaderProfile::PIXEL:
+		case ShaderType::PIXEL:
 			dxcUtils->BuildArguments(filePath.c_str(), L"main", L"ps_6_6", nullptr, 0, nullptr, 0, &args);
 			break;
-		case ShaderProfile::AMPLIFICATION:
-			dxcUtils->BuildArguments(filePath.c_str(), L"main", L"as_6_6", nullptr, 0, nullptr, 0, &args);
-			break;
-		case ShaderProfile::MESH:
-			dxcUtils->BuildArguments(filePath.c_str(), L"main", L"ms_6_6", nullptr, 0, nullptr, 0, &args);
-			break;
-		case ShaderProfile::COMPUTE:
+		case ShaderType::COMPUTE:
 			dxcUtils->BuildArguments(filePath.c_str(), L"main", L"cs_6_6", nullptr, 0, nullptr, 0, &args);
 			break;
-		case ShaderProfile::LIBRARY:
+		case ShaderType::AMPLIFICATION:
+			dxcUtils->BuildArguments(filePath.c_str(), L"main", L"as_6_6", nullptr, 0, nullptr, 0, &args);
+			break;
+		case ShaderType::MESH:
+			dxcUtils->BuildArguments(filePath.c_str(), L"main", L"ms_6_6", nullptr, 0, nullptr, 0, &args);
+			break;
+		case ShaderType::LIBRARY:
 			dxcUtils->BuildArguments(filePath.c_str(), L"", L"lib_6_6", nullptr, 0, nullptr, 0, &args);
 			break;
 		default:
-			LOGERROR("不被支持的着色器配置！");
 			break;
 		}
 
@@ -183,9 +187,9 @@ namespace Gear::Core::D3D12Core::DXCCompiler
 		return impl->load(bytes, byteSize);
 	}
 
-	ComPtr<IDxcBlob> compile(const std::wstring& filePath, const ShaderProfile profile)
+	ComPtr<IDxcBlob> compile(const std::wstring& filePath, const ShaderType type)
 	{
-		return impl->compile(filePath, profile);
+		return impl->compile(filePath, type);
 	}
 
 	ComPtr<IDxcBlob> read(const std::wstring& filePath)

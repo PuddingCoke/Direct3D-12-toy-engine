@@ -2,7 +2,18 @@
 
 namespace Gear::Core::D3D12Core
 {
-	RootSignature::RootSignature(const uint32_t numVSConstants, const uint32_t numHSConstants, const uint32_t numDSConstants, const uint32_t numGSConstants, const uint32_t numPSConstants, const uint32_t numCSConstants, CD3DX12_STATIC_SAMPLER_DESC* const samplerDescs, const uint32_t samplerCount, const D3D12_ROOT_SIGNATURE_FLAGS signatureFlags)
+	RootSignature::RootSignature(
+		const uint32_t numVSConstants,
+		const uint32_t numHSConstants,
+		const uint32_t numDSConstants,
+		const uint32_t numGSConstants,
+		const uint32_t numPSConstants,
+		const uint32_t numCSConstants,
+		const uint32_t numASConstants,
+		const uint32_t numMSConstants,
+		CD3DX12_STATIC_SAMPLER_DESC* const samplerDescs,
+		const uint32_t samplerCount,
+		const D3D12_ROOT_SIGNATURE_FLAGS signatureFlags)
 	{
 		numShaderConstants[static_cast<uint32_t>(ShaderType::VERTEX)] = numVSConstants;
 		numShaderConstants[static_cast<uint32_t>(ShaderType::HULL)] = numHSConstants;
@@ -10,6 +21,8 @@ namespace Gear::Core::D3D12Core
 		numShaderConstants[static_cast<uint32_t>(ShaderType::GEOMETRY)] = numGSConstants;
 		numShaderConstants[static_cast<uint32_t>(ShaderType::PIXEL)] = numPSConstants;
 		numShaderConstants[static_cast<uint32_t>(ShaderType::COMPUTE)] = numCSConstants;
+		numShaderConstants[static_cast<uint32_t>(ShaderType::AMPLIFICATION)] = numASConstants;
+		numShaderConstants[static_cast<uint32_t>(ShaderType::MESH)] = numMSConstants;
 
 		for (uint32_t i = 0; i < static_cast<uint32_t>(ShaderType::TYPECOUNT); i++)
 		{
@@ -37,6 +50,12 @@ namespace Gear::Core::D3D12Core
 				case ShaderType::COMPUTE:
 					errorString += "计算着色器";
 					break;
+				case ShaderType::AMPLIFICATION:
+					errorString += "放大着色器";
+					break;
+				case ShaderType::MESH:
+					errorString += "网格着色器";
+					break;
 				default:
 					break;
 				}
@@ -52,7 +71,9 @@ namespace Gear::Core::D3D12Core
 				+ static_cast<bool>(numDSConstants)
 				+ static_cast<bool>(numGSConstants)
 				+ static_cast<bool>(numPSConstants)
-				+ static_cast<bool>(numCSConstants)) * static_cast<uint32_t>(sizeof(CommonShaderLayout::ShaderLocalParameterIndices) / sizeof(uint32_t));
+				+ static_cast<bool>(numCSConstants)
+				+ static_cast<bool>(numASConstants)
+				+ static_cast<bool>(numMSConstants)) * static_cast<uint32_t>(sizeof(CommonShaderLayout::ShaderLocalParameterIndices) / sizeof(uint32_t));
 
 		std::vector<CD3DX12_ROOT_PARAMETER1> rootParameters;
 
@@ -93,6 +114,12 @@ namespace Gear::Core::D3D12Core
 					case ShaderType::COMPUTE:
 						shaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
 						break;
+					case ShaderType::AMPLIFICATION:
+						shaderVisibility = D3D12_SHADER_VISIBILITY_AMPLIFICATION;
+						break;
+					case ShaderType::MESH:
+						shaderVisibility = D3D12_SHADER_VISIBILITY_MESH;
+						break;
 					default:
 						LOGERROR("无法为", TOSTRING(ShaderType), static_cast<uint32_t>(shaderType), "找到对应的", TOSTRING(D3D12_SHADER_VISIBILITY));
 						break;
@@ -129,23 +156,21 @@ namespace Gear::Core::D3D12Core
 					setShaderLocalConstantBufferParameter(localParameterIndices[static_cast<uint32_t>(shaderType)], rootParameters, rootParameterIndex, shaderType);
 				};
 
-			if (numVSConstants)
-				setShaderLocalParameter(rootParameters.data(), rootParameterIndex, ShaderType::VERTEX, numVSConstants);
+			if (numVSConstants)setShaderLocalParameter(rootParameters.data(), rootParameterIndex, ShaderType::VERTEX, numVSConstants);
 
-			if (numHSConstants)
-				setShaderLocalParameter(rootParameters.data(), rootParameterIndex, ShaderType::HULL, numHSConstants);
+			if (numHSConstants)setShaderLocalParameter(rootParameters.data(), rootParameterIndex, ShaderType::HULL, numHSConstants);
 
-			if (numDSConstants)
-				setShaderLocalParameter(rootParameters.data(), rootParameterIndex, ShaderType::DOMAIN, numDSConstants);
+			if (numDSConstants)setShaderLocalParameter(rootParameters.data(), rootParameterIndex, ShaderType::DOMAIN, numDSConstants);
 
-			if (numGSConstants)
-				setShaderLocalParameter(rootParameters.data(), rootParameterIndex, ShaderType::GEOMETRY, numGSConstants);
+			if (numGSConstants)setShaderLocalParameter(rootParameters.data(), rootParameterIndex, ShaderType::GEOMETRY, numGSConstants);
 
-			if (numPSConstants)
-				setShaderLocalParameter(rootParameters.data(), rootParameterIndex, ShaderType::PIXEL, numPSConstants);
+			if (numPSConstants)setShaderLocalParameter(rootParameters.data(), rootParameterIndex, ShaderType::PIXEL, numPSConstants);
 
-			if (numCSConstants)
-				setShaderLocalParameter(rootParameters.data(), rootParameterIndex, ShaderType::COMPUTE, numCSConstants);
+			if (numCSConstants)setShaderLocalParameter(rootParameters.data(), rootParameterIndex, ShaderType::COMPUTE, numCSConstants);
+
+			if (numASConstants)setShaderLocalParameter(rootParameters.data(), rootParameterIndex, ShaderType::AMPLIFICATION, numASConstants);
+
+			if (numMSConstants)setShaderLocalParameter(rootParameters.data(), rootParameterIndex, ShaderType::MESH, numMSConstants);
 		}
 
 		CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC rootSignatureDesc{};
@@ -278,6 +303,12 @@ namespace Gear::Core::D3D12Core
 				break;
 			case ShaderType::COMPUTE:
 				errorString += "计算着色器";
+				break;
+			case ShaderType::AMPLIFICATION:
+				errorString += "放大着色器";
+				break;
+			case ShaderType::MESH:
+				errorString += "网格着色器";
 				break;
 			default:
 				break;

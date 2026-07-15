@@ -67,6 +67,4 @@ using namespace Gear::Utils;
 
 using namespace Gear::Core::D3D12Core;
 
-using Gear::Core::D3D12Core::DXCCompiler::ShaderProfile;
-
 #endif // !_GEAR_DEVESSENTIAL_H_

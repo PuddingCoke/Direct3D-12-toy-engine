@@ -334,7 +334,9 @@ namespace Gear::Core
 		void resetUserGlobalCBuffer();
 
 		//DEBUG用
-		void constantsWriteCheck(const D3D12Core::RootSignature::ShaderType shaderType, const uint32_t numWrite, const uint32_t offset) const;
+		void constantsWriteCheck(const D3D12Core::ShaderType shaderType, const uint32_t numWrite, const uint32_t offset) const;
+
+		std::array<uint32_t, D3D12Core::RootSignature::maxPerShaderConstants> transientResourceIndices;
 
 		D3D12_VIEWPORT vp;
 
@@ -355,17 +357,16 @@ namespace Gear::Core
 
 		//以下是用于每次draw call或dispatch call的临时资源
 
-		//这里有个假设，微软的官方文档说每个根签名最多有 64 个 DWORD
-		//如果根签名全部都是根常量缓冲，那么最多有 64/2 = 32 个根常量缓冲
-		//这个想法是我在优化 GraphicsContext 时一瞬之间想到的
+		std::array<uint32_t, D3D12Core::RootSignature::maxPerShaderConstants> shaderConstants[static_cast<uint32_t>(D3D12Core::ShaderType::TYPECOUNT)];
 
+		uint32_t numShaderConstantsValues[static_cast<uint32_t>(D3D12Core::ShaderType::TYPECOUNT)];
+
+		//这里有个假设，微软的官方文档说每个根签名最多有 64 个 DWORD
 		Utils::StaticVector<RootConstantBufferDesc, D3D12Core::RootSignature::maxDWORD / D3D12Core::RootSignature::perDescriptorDWORD> rootConstantBufferDescs;
 
 		Utils::StaticVector<RenderTargetClearDesc, D3D12_SIMULTANEOUS_RENDER_TARGET_COUNT> renderTargetClearDescs;
 
 		DepthStencilClearDesc depthStencilClearDesc;
-
-		std::array<uint32_t, D3D12Core::RootSignature::maxPerShaderConstants> transientResourceIndices;
 
 		std::array<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_SIMULTANEOUS_RENDER_TARGET_COUNT> transientRTVHandles;
 

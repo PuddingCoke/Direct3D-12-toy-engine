@@ -5,7 +5,11 @@
 
 #include<Gear/Core/GraphicsDevice.h>
 
-#include"DXCCompiler.h"
+#include"ShaderType.h"
+
+#include<dxccompiler/dxcapi.h>
+
+#include<D3D12Headers/d3d12shader.h>
 
 namespace Gear::Core::D3D12Core
 {
@@ -27,7 +31,7 @@ namespace Gear::Core::D3D12Core
 
 		static ShaderPtr create(const std::wstring& filePath);
 
-		static ShaderPtr create(const std::wstring& filePath, const DXCCompiler::ShaderProfile profile);
+		static ShaderPtr create(const std::wstring& filePath, const ShaderType type);
 
 		//raw bytes
 		Shader(const uint8_t* const bytes, const size_t byteSize);
@@ -36,7 +40,7 @@ namespace Gear::Core::D3D12Core
 		Shader(const std::wstring& filePath);
 
 		//hlsl
-		Shader(const std::wstring& filePath, const DXCCompiler::ShaderProfile profile);
+		Shader(const std::wstring& filePath, const ShaderType type);
 
 		ComPtr<ID3D12ShaderReflection> getReflection() const;
 

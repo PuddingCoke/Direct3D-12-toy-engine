@@ -29,8 +29,12 @@ SharedPtr<T> makeShared(Args&&... args)
 	return std::make_shared<T>(std::forward<Args>(args)...);
 }
 
+#ifdef min
 #undef min
+#endif // min
 
+#ifdef max
 #undef max
+#endif // max
 
 #endif // !_GEAR_UTILS_MEMORY_H_

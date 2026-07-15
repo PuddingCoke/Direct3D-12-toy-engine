@@ -7,6 +7,8 @@
 
 #include"CommonShaderLayout.h"
 
+#include"ShaderType.h"
+
 namespace Gear::Core::D3D12Core
 {
 	class RootSignature
@@ -26,6 +28,8 @@ namespace Gear::Core::D3D12Core
 			const uint32_t numGSConstants,
 			const uint32_t numPSConstants,
 			const uint32_t numCSConstants,
+			const uint32_t numASConstants,
+			const uint32_t numMSConstants,
 			CD3DX12_STATIC_SAMPLER_DESC* const samplerDescs, const uint32_t samplerCount,
 			const D3D12_ROOT_SIGNATURE_FLAGS signatureFlags);
 
@@ -61,17 +65,6 @@ namespace Gear::Core::D3D12Core
 
 		uint32_t getCSConstantBufferParameterIndex() const;
 
-		enum class ShaderType
-		{
-			VERTEX,
-			HULL,
-			DOMAIN,
-			GEOMETRY,
-			PIXEL,
-			COMPUTE,
-			TYPECOUNT
-		};
-
 		uint32_t getNumShaderConstants(const ShaderType shaderType) const;
 
 		void setName(const wchar_t* const name);
@@ -89,7 +82,7 @@ namespace Gear::Core::D3D12Core
 
 		std::array<uint32_t, static_cast<uint32_t>(ShaderType::TYPECOUNT)> numShaderConstants;
 
-		//V H G D P C，与ShaderType中枚举表示的整数值一一对应
+		//V H G D P C A M，与ShaderType中枚举表示的整数值一一对应
 		CommonShaderLayout::ShaderLocalParameterIndices localParameterIndices[static_cast<uint32_t>(ShaderType::TYPECOUNT)];
 
 		CommonShaderLayout::ShaderLocalParameterIndices getLocalParameterIndices(const ShaderType shaderType) const;

@@ -9,27 +9,16 @@
 
 #include<D3D12Headers/d3d12shader.h>
 
+#include"ShaderType.h"
+
 namespace Gear::Core::D3D12Core::DXCCompiler
 {
-
-	enum class ShaderProfile
-	{
-		VERTEX,
-		HULL,
-		DOMAIN,
-		GEOMETRY,
-		PIXEL,
-		AMPLIFICATION,
-		MESH,
-		COMPUTE,
-		LIBRARY
-	};
 
 	//raw bytes
 	ComPtr<IDxcBlob> load(const uint8_t* const bytes, const size_t byteSize);
 
 	//hlsl
-	ComPtr<IDxcBlob> compile(const std::wstring& filePath, const ShaderProfile profile);
+	ComPtr<IDxcBlob> compile(const std::wstring& filePath, const ShaderType type);
 
 	//cso
 	ComPtr<IDxcBlob> read(const std::wstring& filePath);

@@ -125,6 +125,7 @@
     <ClInclude Include="Inc\Gear\Core\D3D12Core\Fence.h" />
     <ClInclude Include="Inc\Gear\Core\D3D12Core\GraphicsCommandList.h" />
     <ClInclude Include="Inc\Gear\Core\D3D12Core\GraphicsState.h" />
+    <ClInclude Include="Inc\Gear\Core\D3D12Core\ShaderType.h" />
     <ClInclude Include="Inc\Gear\Core\Internal\DeviceInternal.h" />
     <ClInclude Include="Inc\Gear\Core\D3D12Core\Internal\DXCCompilerInternal.h" />
     <ClInclude Include="Inc\Gear\Core\D3D12Core\PipelineState.h" />

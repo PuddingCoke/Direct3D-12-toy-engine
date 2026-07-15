@@ -465,6 +465,9 @@
     <ClInclude Include="Inc\Gear\Core\Internal\FMTInternal.h">
       <Filter>Header</Filter>
     </ClInclude>
+    <ClInclude Include="Inc\Gear\Core\D3D12Core\ShaderType.h">
+      <Filter>Header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Gear\InitializationParam.cpp">

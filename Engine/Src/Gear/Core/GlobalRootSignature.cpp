@@ -110,7 +110,7 @@ namespace Gear::Core::GlobalRootSignature
 		}
 
 		//总计 48 DWORDS
-		basicShaderRootSignature = makeUnique<D3D12Core::RootSignature>(8u, 0u, 0u, 0u, 32u, 0u, samplerDesc, static_cast<uint32_t>(_countof(samplerDesc)),
+		basicShaderRootSignature = makeUnique<D3D12Core::RootSignature>(8u, 0u, 0u, 0u, 32u, 0u, 0u, 0u, samplerDesc, static_cast<uint32_t>(_countof(samplerDesc)),
 			D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT |
 			D3D12_ROOT_SIGNATURE_FLAG_DENY_AMPLIFICATION_SHADER_ROOT_ACCESS |
 			D3D12_ROOT_SIGNATURE_FLAG_DENY_MESH_SHADER_ROOT_ACCESS |
@@ -125,7 +125,7 @@ namespace Gear::Core::GlobalRootSignature
 		LOGSUCCESS("创建", LogColor::brightMagenta, TOSTRING(basicShaderRootSignature));
 
 		//总计 56 DWORDS
-		tessellationRootSignature = makeUnique<D3D12Core::RootSignature>(4u, 4u, 12u, 0u, 24u, 0u, samplerDesc, static_cast<uint32_t>(_countof(samplerDesc)),
+		tessellationRootSignature = makeUnique<D3D12Core::RootSignature>(4u, 4u, 12u, 0u, 24u, 0u, 0u, 0u, samplerDesc, static_cast<uint32_t>(_countof(samplerDesc)),
 			D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT |
 			D3D12_ROOT_SIGNATURE_FLAG_DENY_AMPLIFICATION_SHADER_ROOT_ACCESS |
 			D3D12_ROOT_SIGNATURE_FLAG_DENY_MESH_SHADER_ROOT_ACCESS |
@@ -138,7 +138,7 @@ namespace Gear::Core::GlobalRootSignature
 		LOGSUCCESS("创建", LogColor::brightMagenta, TOSTRING(tessellationRootSignature));
 
 		//总计 54 DWORDS
-		geometryShaderRootSignature = makeUnique<D3D12Core::RootSignature>(8u, 0u, 0u, 8u, 28u, 0u, samplerDesc, static_cast<uint32_t>(_countof(samplerDesc)),
+		geometryShaderRootSignature = makeUnique<D3D12Core::RootSignature>(8u, 0u, 0u, 8u, 28u, 0u, 0u, 0u, samplerDesc, static_cast<uint32_t>(_countof(samplerDesc)),
 			D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT |
 			D3D12_ROOT_SIGNATURE_FLAG_DENY_AMPLIFICATION_SHADER_ROOT_ACCESS |
 			D3D12_ROOT_SIGNATURE_FLAG_DENY_MESH_SHADER_ROOT_ACCESS |
@@ -152,7 +152,7 @@ namespace Gear::Core::GlobalRootSignature
 		LOGSUCCESS("创建", LogColor::brightMagenta, TOSTRING(geometryShaderRootSignature));
 
 		//总计 58 DWORDS
-		allGraphicsShaderRootSignature = makeUnique<D3D12Core::RootSignature>(4u, 4u, 8u, 4u, 24u, 0u, samplerDesc, static_cast<uint32_t>(_countof(samplerDesc)),
+		allGraphicsShaderRootSignature = makeUnique<D3D12Core::RootSignature>(4u, 4u, 8u, 4u, 24u, 0u, 0u, 0u, samplerDesc, static_cast<uint32_t>(_countof(samplerDesc)),
 			D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT |
 			D3D12_ROOT_SIGNATURE_FLAG_DENY_AMPLIFICATION_SHADER_ROOT_ACCESS |
 			D3D12_ROOT_SIGNATURE_FLAG_DENY_MESH_SHADER_ROOT_ACCESS |
@@ -164,7 +164,7 @@ namespace Gear::Core::GlobalRootSignature
 		LOGSUCCESS("创建", LogColor::brightMagenta, TOSTRING(allGraphicsShaderRootSignature));
 
 		//总计 38 DWORDS
-		computeShaderRootSignature = makeUnique<D3D12Core::RootSignature>(0u, 0u, 0u, 0u, 0u, 32u, samplerDesc, static_cast<uint32_t>(_countof(samplerDesc)),
+		computeShaderRootSignature = makeUnique<D3D12Core::RootSignature>(0u, 0u, 0u, 0u, 0u, 32u, 0u, 0u, samplerDesc, static_cast<uint32_t>(_countof(samplerDesc)),
 			D3D12_ROOT_SIGNATURE_FLAG_CBV_SRV_UAV_HEAP_DIRECTLY_INDEXED |
 			D3D12_ROOT_SIGNATURE_FLAG_SAMPLER_HEAP_DIRECTLY_INDEXED);
 
