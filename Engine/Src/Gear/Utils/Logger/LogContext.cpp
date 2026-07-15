@@ -2,10 +2,12 @@
 
 #include<Gear/Utils/String.h>
 
+#include<Gear/Utils/Math.h>
+
 namespace Gear::Utils::Logger
 {
 	LogContext::FloatPrecision::FloatPrecision(const int32_t precision) :
-		precision(std::max(std::min(precision, 16), 0))
+		precision(Math::clamp(precision, 0, 16))
 	{
 	}
 

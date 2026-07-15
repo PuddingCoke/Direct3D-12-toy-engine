@@ -194,7 +194,7 @@ namespace Gear::Core::VideoEncoder
 		{
 			const float progress = Utils::Math::saturate(static_cast<float>(frameEncoded) / static_cast<float>(frameToEncode));
 
-			const uint32_t num = static_cast<uint32_t>(std::max(std::min(static_cast<int32_t>(progressBarWidth * progress), static_cast<int32_t>(progressBarWidth)), 0));
+			const uint32_t num = static_cast<uint32_t>(Utils::Math::clamp(static_cast<int32_t>(progressBarWidth * progress), 0, static_cast<int32_t>(progressBarWidth)));
 
 			const uint32_t buffLength = 13 + 2 + progressBarWidth + 1 + 6 + 1 + 1 + 8;
 

@@ -23,12 +23,16 @@ namespace Gear::Utils::Math
 
 	constexpr float degToRad = 1.f / radToDeg;
 
-	constexpr float lerp(const float x, const float y, const float s)
+	template<typename T>
+		requires std::is_same_v<T, float> || std::is_same_v<T, double>
+	constexpr T lerp(const T x, const T y, const T s)
 	{
-		return x * (1.f - s) + y * s;
+		return x * (static_cast<T>(1) - s) + y * s;
 	}
 
-	constexpr float clamp(const float value, const float min, const float max)
+	template<typename T>
+		requires std::is_same_v<T, float> || std::is_same_v<T, double> || std::is_same_v<T, int32_t> || std::is_same_v<T, int64_t> || std::is_same_v<T, uint32_t> || std::is_same_v<T, uint64_t>
+	constexpr T clamp(const T value, const T min, const T max)
 	{
 		if (value < min)
 		{
@@ -38,13 +42,17 @@ namespace Gear::Utils::Math
 		{
 			return max;
 		}
-
-		return value;
+		else
+		{
+			return value;
+		}
 	}
 
-	constexpr float saturate(const float value)
+	template<typename T>
+		requires std::is_same_v<T, float> || std::is_same_v<T, double>
+	constexpr T saturate(const T value)
 	{
-		return clamp(value, 0.f, 1.f);
+		return clamp(value, static_cast<T>(0), static_cast<T>(1));
 	}
 
 	template<typename T>
