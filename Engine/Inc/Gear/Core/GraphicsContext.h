@@ -84,39 +84,39 @@ namespace Gear::Core
 
 		template<typename StructType>
 			requires std::is_class_v<StructType>
-		void setVSConstants(const StructType& structVal, uint32_t& offset) const;
+		void setVSConstants(const StructType& structVal, uint32_t& offset);
 
 		template<typename StructType>
 			requires std::is_class_v<StructType>
-		void setHSConstants(const StructType& structVal, uint32_t& offset) const;
+		void setHSConstants(const StructType& structVal, uint32_t& offset);
 
 		template<typename StructType>
 			requires std::is_class_v<StructType>
-		void setDSConstants(const StructType& structVal, uint32_t& offset) const;
+		void setDSConstants(const StructType& structVal, uint32_t& offset);
 
 		template<typename StructType>
 			requires std::is_class_v<StructType>
-		void setGSConstants(const StructType& structVal, uint32_t& offset) const;
+		void setGSConstants(const StructType& structVal, uint32_t& offset);
 
 		template<typename StructType>
 			requires std::is_class_v<StructType>
-		void setPSConstants(const StructType& structVal, uint32_t& offset) const;
+		void setPSConstants(const StructType& structVal, uint32_t& offset);
 
 		template<typename StructType>
 			requires std::is_class_v<StructType>
-		void setCSConstants(const StructType& structVal, uint32_t& offset) const;
+		void setCSConstants(const StructType& structVal, uint32_t& offset);
 
-		void setVSConstants(const uint32_t numValues, const void* const data, uint32_t& offset) const;
+		void setVSConstants(const uint32_t numValues, const void* const data, uint32_t& offset);
 
-		void setHSConstants(const uint32_t numValues, const void* const data, uint32_t& offset) const;
+		void setHSConstants(const uint32_t numValues, const void* const data, uint32_t& offset);
 
-		void setDSConstants(const uint32_t numValues, const void* const data, uint32_t& offset) const;
+		void setDSConstants(const uint32_t numValues, const void* const data, uint32_t& offset);
 
-		void setGSConstants(const uint32_t numValues, const void* const data, uint32_t& offset) const;
+		void setGSConstants(const uint32_t numValues, const void* const data, uint32_t& offset);
 
-		void setPSConstants(const uint32_t numValues, const void* const data, uint32_t& offset) const;
+		void setPSConstants(const uint32_t numValues, const void* const data, uint32_t& offset);
 
-		void setCSConstants(const uint32_t numValues, const void* const data, uint32_t& offset) const;
+		void setCSConstants(const uint32_t numValues, const void* const data, uint32_t& offset);
 
 		//以下的方法用于设置每个着色器独享的常量缓冲
 
@@ -324,6 +324,15 @@ namespace Gear::Core
 
 		D3D12Resource::D3D12ResourceBase* setResourceState(const Resource::UAVClearDesc& desc);
 
+		void setShaderConstants(const D3D12Core::ShaderType shaderType, const uint32_t numValues, const void* const data, uint32_t& offset);
+
+		template<auto ShaderType>
+		void setRootConstants();
+
+		void prepareDrawCallResources();
+
+		void prepareDispatchCallResources();
+
 		//重置内部追踪的状态
 		void resetGraphicsRootSignature();
 
@@ -360,6 +369,8 @@ namespace Gear::Core
 		std::array<uint32_t, D3D12Core::RootSignature::maxPerShaderConstants> shaderConstants[static_cast<uint32_t>(D3D12Core::ShaderType::TYPECOUNT)];
 
 		uint32_t numShaderConstantsValues[static_cast<uint32_t>(D3D12Core::ShaderType::TYPECOUNT)];
+
+		uint32_t shaderConstantsStartOffset[static_cast<uint32_t>(D3D12Core::ShaderType::TYPECOUNT)];
 
 		//这里有个假设，微软的官方文档说每个根签名最多有 64 个 DWORD
 		Utils::StaticVector<RootConstantBufferDesc, D3D12Core::RootSignature::maxDWORD / D3D12Core::RootSignature::perDescriptorDWORD> rootConstantBufferDescs;
@@ -453,7 +464,7 @@ namespace Gear::Core
 
 	template<typename StructType>
 		requires std::is_class_v<StructType>
-	inline void GraphicsContext::setVSConstants(const StructType& structVal, uint32_t& offset) const
+	inline void GraphicsContext::setVSConstants(const StructType& structVal, uint32_t& offset)
 	{
 		const uint32_t numElements = sizeof(StructType) / sizeof(uint32_t);
 
@@ -462,7 +473,7 @@ namespace Gear::Core
 
 	template<typename StructType>
 		requires std::is_class_v<StructType>
-	inline void GraphicsContext::setHSConstants(const StructType& structVal, uint32_t& offset) const
+	inline void GraphicsContext::setHSConstants(const StructType& structVal, uint32_t& offset)
 	{
 		const uint32_t numElements = sizeof(StructType) / sizeof(uint32_t);
 
@@ -471,7 +482,7 @@ namespace Gear::Core
 
 	template<typename StructType>
 		requires std::is_class_v<StructType>
-	inline void GraphicsContext::setDSConstants(const StructType& structVal, uint32_t& offset) const
+	inline void GraphicsContext::setDSConstants(const StructType& structVal, uint32_t& offset)
 	{
 		const uint32_t numElements = sizeof(StructType) / sizeof(uint32_t);
 
@@ -480,7 +491,7 @@ namespace Gear::Core
 
 	template<typename StructType>
 		requires std::is_class_v<StructType>
-	inline void GraphicsContext::setGSConstants(const StructType& structVal, uint32_t& offset) const
+	inline void GraphicsContext::setGSConstants(const StructType& structVal, uint32_t& offset)
 	{
 		const uint32_t numElements = sizeof(StructType) / sizeof(uint32_t);
 
@@ -489,7 +500,7 @@ namespace Gear::Core
 
 	template<typename StructType>
 		requires std::is_class_v<StructType>
-	inline void GraphicsContext::setPSConstants(const StructType& structVal, uint32_t& offset) const
+	inline void GraphicsContext::setPSConstants(const StructType& structVal, uint32_t& offset)
 	{
 		const uint32_t numElements = sizeof(StructType) / sizeof(uint32_t);
 
@@ -498,7 +509,7 @@ namespace Gear::Core
 
 	template<typename StructType>
 		requires std::is_class_v<StructType>
-	inline void GraphicsContext::setCSConstants(const StructType& structVal, uint32_t& offset) const
+	inline void GraphicsContext::setCSConstants(const StructType& structVal, uint32_t& offset)
 	{
 		const uint32_t numElements = sizeof(StructType) / sizeof(uint32_t);
 
@@ -518,6 +529,78 @@ namespace Gear::Core
 		for (uint32_t i = 0; i < N; i++)
 		{
 			transientResourceIndices[i] = *descs[i].resourceIndex;
+		}
+	}
+
+	template<auto ShaderType>
+	inline void GraphicsContext::setRootConstants()
+	{
+		constexpr uint32_t shaderIndex = static_cast<uint32_t>(ShaderType);
+
+		if (numShaderConstantsValues[shaderIndex])
+		{
+			uint32_t rootParameterIndex = 0;
+
+			if constexpr (ShaderType == D3D12Core::ShaderType::VERTEX)
+			{
+				rootParameterIndex = getGraphicsRootSignature()->getVSConstantsParameterIndex();
+			}
+
+			if constexpr (ShaderType == D3D12Core::ShaderType::HULL)
+			{
+				rootParameterIndex = getGraphicsRootSignature()->getHSConstantsParameterIndex();
+			}
+
+			if constexpr (ShaderType == D3D12Core::ShaderType::DOMAIN)
+			{
+				rootParameterIndex = getGraphicsRootSignature()->getDSConstantsParameterIndex();
+			}
+
+			if constexpr (ShaderType == D3D12Core::ShaderType::GEOMETRY)
+			{
+				rootParameterIndex = getGraphicsRootSignature()->getGSConstantsParameterIndex();
+			}
+
+			if constexpr (ShaderType == D3D12Core::ShaderType::PIXEL)
+			{
+				rootParameterIndex = getGraphicsRootSignature()->getPSConstantsParameterIndex();
+			}
+
+			if constexpr (ShaderType == D3D12Core::ShaderType::COMPUTE)
+			{
+				rootParameterIndex = getComputeRootSignature()->getCSConstantsParameterIndex();
+			}
+
+			if constexpr (ShaderType == D3D12Core::ShaderType::AMPLIFICATION)
+			{
+				rootParameterIndex = getGraphicsRootSignature()->getASConstantsParameterIndex();
+			}
+
+			if constexpr (ShaderType == D3D12Core::ShaderType::MESH)
+			{
+				rootParameterIndex = getGraphicsRootSignature()->getMSConstantsParameterIndex();
+			}
+
+			if constexpr (ShaderType == D3D12Core::ShaderType::COMPUTE)
+			{
+				commandList->setComputeRootConstants(
+					rootParameterIndex,
+					numShaderConstantsValues[shaderIndex],
+					shaderConstants[shaderIndex].data() + shaderConstantsStartOffset[shaderIndex],
+					shaderConstantsStartOffset[shaderIndex]);
+			}
+			else
+			{
+				commandList->setGraphicsRootConstants(
+					rootParameterIndex,
+					numShaderConstantsValues[shaderIndex],
+					shaderConstants[shaderIndex].data() + shaderConstantsStartOffset[shaderIndex],
+					shaderConstantsStartOffset[shaderIndex]);
+			}
+
+			numShaderConstantsValues[shaderIndex] = 0u;
+
+			shaderConstantsStartOffset[shaderIndex] = UINT32_MAX;
 		}
 	}
 

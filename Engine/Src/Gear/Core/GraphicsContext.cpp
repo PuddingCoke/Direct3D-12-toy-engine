@@ -80,8 +80,14 @@ namespace Gear::Core
 	GraphicsContext::GraphicsContext() :
 		commandList(makeUnique<D3D12Core::GraphicsCommandList>()),
 		vp{ 0.f,0.f,0.f,0.f,0.f,1.f },
-		rt{ 0,0,0,0 }
+		rt{ 0,0,0,0 },
+		numShaderConstantsValues{}
 	{
+		for (uint32_t i = 0; i < static_cast<uint32_t>(D3D12Core::ShaderType::TYPECOUNT); i++)
+		{
+			shaderConstantsStartOffset[i] = UINT32_MAX;
+		}
+
 		resetTrackedStates();
 	}
 
@@ -117,70 +123,34 @@ namespace Gear::Core
 		}
 	}
 
-	void GraphicsContext::setVSConstants(const uint32_t numValues, const void* const data, uint32_t& offset) const
+	void GraphicsContext::setVSConstants(const uint32_t numValues, const void* const data, uint32_t& offset)
 	{
-#ifdef _DEBUG
-		constantsWriteCheck(D3D12Core::ShaderType::VERTEX, numValues, offset);
-#endif // _DEBUG
-
-		commandList->setGraphicsRootConstants(getGraphicsRootSignature()->getVSConstantsParameterIndex(), numValues, data, offset);
-
-		offset += numValues;
+		setShaderConstants(D3D12Core::ShaderType::VERTEX, numValues, data, offset);
 	}
 
-	void GraphicsContext::setHSConstants(const uint32_t numValues, const void* const data, uint32_t& offset) const
+	void GraphicsContext::setHSConstants(const uint32_t numValues, const void* const data, uint32_t& offset)
 	{
-#ifdef _DEBUG
-		constantsWriteCheck(D3D12Core::ShaderType::HULL, numValues, offset);
-#endif // _DEBUG
-
-		commandList->setGraphicsRootConstants(getGraphicsRootSignature()->getHSConstantsParameterIndex(), numValues, data, offset);
-
-		offset += numValues;
+		setShaderConstants(D3D12Core::ShaderType::HULL, numValues, data, offset);
 	}
 
-	void GraphicsContext::setDSConstants(const uint32_t numValues, const void* const data, uint32_t& offset) const
+	void GraphicsContext::setDSConstants(const uint32_t numValues, const void* const data, uint32_t& offset)
 	{
-#ifdef _DEBUG
-		constantsWriteCheck(D3D12Core::ShaderType::DOMAIN, numValues, offset);
-#endif // _DEBUG
-
-		commandList->setGraphicsRootConstants(getGraphicsRootSignature()->getDSConstantsParameterIndex(), numValues, data, offset);
-
-		offset += numValues;
+		setShaderConstants(D3D12Core::ShaderType::DOMAIN, numValues, data, offset);
 	}
 
-	void GraphicsContext::setGSConstants(const uint32_t numValues, const void* const data, uint32_t& offset) const
+	void GraphicsContext::setGSConstants(const uint32_t numValues, const void* const data, uint32_t& offset)
 	{
-#ifdef _DEBUG
-		constantsWriteCheck(D3D12Core::ShaderType::GEOMETRY, numValues, offset);
-#endif // _DEBUG
-
-		commandList->setGraphicsRootConstants(getGraphicsRootSignature()->getGSConstantsParameterIndex(), numValues, data, offset);
-
-		offset += numValues;
+		setShaderConstants(D3D12Core::ShaderType::GEOMETRY, numValues, data, offset);
 	}
 
-	void GraphicsContext::setPSConstants(const uint32_t numValues, const void* const data, uint32_t& offset) const
+	void GraphicsContext::setPSConstants(const uint32_t numValues, const void* const data, uint32_t& offset)
 	{
-#ifdef _DEBUG
-		constantsWriteCheck(D3D12Core::ShaderType::PIXEL, numValues, offset);
-#endif // _DEBUG
-
-		commandList->setGraphicsRootConstants(getGraphicsRootSignature()->getPSConstantsParameterIndex(), numValues, data, offset);
-
-		offset += numValues;
+		setShaderConstants(D3D12Core::ShaderType::PIXEL, numValues, data, offset);
 	}
 
-	void GraphicsContext::setCSConstants(const uint32_t numValues, const void* const data, uint32_t& offset) const
+	void GraphicsContext::setCSConstants(const uint32_t numValues, const void* const data, uint32_t& offset)
 	{
-#ifdef _DEBUG
-		constantsWriteCheck(D3D12Core::ShaderType::COMPUTE, numValues, offset);
-#endif // _DEBUG
-
-		commandList->setComputeRootConstants(getComputeRootSignature()->getCSConstantsParameterIndex(), numValues, data, offset);
-
-		offset += numValues;
+		setShaderConstants(D3D12Core::ShaderType::COMPUTE, numValues, data, offset);
 	}
 
 	void GraphicsContext::setVSConstantBuffer(const Resource::ImmutableCBuffer& immutableCBuffer)
@@ -429,25 +399,7 @@ namespace Gear::Core
 
 	void GraphicsContext::draw(const uint32_t vertexCountPerInstance, const uint32_t instanceCount, const uint32_t startVertexLocation, const uint32_t startInstanceLocation)
 	{
-		transitionResources();
-
-		flushRootConstantBufferDescs(true);
-
-		flushRenderTargetClearDescs();
-
-		resetDepthStencilClearDesc();
-
-		//只有调用setRenderTargets后才需要检测是否需要并绑定新的管线状态
-		//setPipelineState调用后必定跟随至少一次setRenderTargets
-		//所以能保证切换图形管线状态时setPipelineState被调用
-		if (switchGraphicsPipelineState)
-		{
-			graphicsState->updatePipelineState(transientRTVFormats.data(), transientNumRTV, transientDSVFormat, transientPrimitiveTopologyType);
-
-			setPipelineState(graphicsState->getPipelineState());
-
-			switchGraphicsPipelineState = false;
-		}
+		prepareDrawCallResources();
 
 		commandList->drawInstanced(vertexCountPerInstance, instanceCount, startVertexLocation, startInstanceLocation);
 	}
@@ -459,31 +411,14 @@ namespace Gear::Core
 
 	void GraphicsContext::drawIndexed(const uint32_t indexCountPerInstance, const uint32_t instanceCount, const uint32_t startIndexLocation, const int32_t baseVertexLocation, const uint32_t startInstanceLocation)
 	{
-		transitionResources();
-
-		flushRootConstantBufferDescs(true);
-
-		flushRenderTargetClearDescs();
-
-		resetDepthStencilClearDesc();
-
-		if (switchGraphicsPipelineState)
-		{
-			graphicsState->updatePipelineState(transientRTVFormats.data(), transientNumRTV, transientDSVFormat, transientPrimitiveTopologyType);
-
-			setPipelineState(graphicsState->getPipelineState());
-
-			switchGraphicsPipelineState = false;
-		}
+		prepareDrawCallResources();
 
 		commandList->drawIndexedInstanced(indexCountPerInstance, instanceCount, startIndexLocation, baseVertexLocation, startInstanceLocation);
 	}
 
 	void GraphicsContext::dispatchGrp(const uint32_t threadGroupCountX, const uint32_t threadGroupCountY, const uint32_t threadGroupCountZ)
 	{
-		transitionResources();
-
-		flushRootConstantBufferDescs(false);
+		prepareDispatchCallResources();
 
 		commandList->dispatch(threadGroupCountX, threadGroupCountY, threadGroupCountZ);
 	}
@@ -760,6 +695,68 @@ namespace Gear::Core
 		}
 
 		return resource;
+	}
+
+	void GraphicsContext::setShaderConstants(const D3D12Core::ShaderType shaderType, const uint32_t numValues, const void* const data, uint32_t& offset)
+	{
+#ifdef _DEBUG
+		constantsWriteCheck(shaderType, numValues, offset);
+#endif // _DEBUG
+
+		const uint32_t shaderIndex = static_cast<uint32_t>(shaderType);
+
+		memcpy(shaderConstants[shaderIndex].data() + offset, data, sizeof(uint32_t) * numValues);
+
+		numShaderConstantsValues[shaderIndex] += numValues;
+
+		if (offset < shaderConstantsStartOffset[shaderIndex])
+		{
+			shaderConstantsStartOffset[shaderIndex] = offset;
+		}
+
+		offset += numValues;
+	}
+
+	void GraphicsContext::prepareDrawCallResources()
+	{
+		//只有调用setRenderTargets后才需要检测是否需要并绑定新的管线状态
+		//setPipelineState调用后必定跟随至少一次setRenderTargets
+		//所以能保证切换图形管线状态时setPipelineState被调用
+		if (switchGraphicsPipelineState)
+		{
+			graphicsState->updatePipelineState(transientRTVFormats.data(), transientNumRTV, transientDSVFormat, transientPrimitiveTopologyType);
+
+			setPipelineState(graphicsState->getPipelineState());
+
+			switchGraphicsPipelineState = false;
+		}
+
+		transitionResources();
+
+		setRootConstants<D3D12Core::ShaderType::VERTEX>();
+
+		setRootConstants<D3D12Core::ShaderType::HULL>();
+
+		setRootConstants<D3D12Core::ShaderType::DOMAIN>();
+
+		setRootConstants<D3D12Core::ShaderType::GEOMETRY>();
+
+		setRootConstants<D3D12Core::ShaderType::PIXEL>();
+
+		flushRootConstantBufferDescs(true);
+
+		flushRenderTargetClearDescs();
+
+		resetDepthStencilClearDesc();
+	}
+
+	void GraphicsContext::prepareDispatchCallResources()
+	{
+		transitionResources();
+
+		setRootConstants<D3D12Core::ShaderType::COMPUTE>();
+
+		flushRootConstantBufferDescs(false);
 	}
 
 	void GraphicsContext::resetGraphicsRootSignature()

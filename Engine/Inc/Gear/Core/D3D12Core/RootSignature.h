@@ -65,6 +65,14 @@ namespace Gear::Core::D3D12Core
 
 		uint32_t getCSConstantBufferParameterIndex() const;
 
+		uint32_t getASConstantsParameterIndex() const;
+
+		uint32_t getASConstantBufferParameterIndex() const;
+
+		uint32_t getMSConstantsParameterIndex() const;
+
+		uint32_t getMSConstantBufferParameterIndex() const;
+
 		uint32_t getNumShaderConstants(const ShaderType shaderType) const;
 
 		void setName(const wchar_t* const name);

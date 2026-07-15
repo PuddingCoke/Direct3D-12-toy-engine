@@ -265,6 +265,26 @@ namespace Gear::Core::D3D12Core
 		return getLocalConstantBufferParameterIndex(ShaderType::COMPUTE);
 	}
 
+	uint32_t RootSignature::getASConstantsParameterIndex() const
+	{
+		return getLocalConstantsParameterIndex(ShaderType::AMPLIFICATION);
+	}
+
+	uint32_t RootSignature::getASConstantBufferParameterIndex() const
+	{
+		return getLocalConstantBufferParameterIndex(ShaderType::AMPLIFICATION);
+	}
+
+	uint32_t RootSignature::getMSConstantsParameterIndex() const
+	{
+		return getLocalConstantsParameterIndex(ShaderType::MESH);
+	}
+
+	uint32_t RootSignature::getMSConstantBufferParameterIndex() const
+	{
+		return getLocalConstantBufferParameterIndex(ShaderType::MESH);
+	}
+
 	uint32_t RootSignature::getNumShaderConstants(const ShaderType shaderType) const
 	{
 		return numShaderConstants[static_cast<uint32_t>(shaderType)];
