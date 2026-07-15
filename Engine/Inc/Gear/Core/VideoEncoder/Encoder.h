@@ -63,9 +63,14 @@ namespace Gear::Core::VideoEncoder
 		bool writeFrame(void* const bitstreamPtr, const uint32_t bitstreamSize, const bool syncPoint,
 			const int64_t decodeFrameIndex, const int64_t presentFrameIndex);
 
+		/// <summary>
+		/// 封装Packet，必须设置好packet的duration和stream_index
+		/// </summary>
+		/// <returns>是否继续编码</returns>
 		bool writeFrame(AVPacket* const packet);
 
-		void bgraToNV12(D3D12Resource::Texture* const inputBGRATexture, D3D12Resource::Texture* const outputNV12Texture, D3D12Core::Fence* const fence);
+		//返回等待值
+		uint64_t bgraToNV12(D3D12Resource::Texture* const inputBGRATexture, D3D12Resource::Texture* const outputNV12Texture, D3D12Core::Fence* const fence);
 
 		uint32_t getFrameEncoded() const;
 

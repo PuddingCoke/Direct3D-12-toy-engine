@@ -19,19 +19,16 @@ namespace Gear::Core::D3D12Core
 
 		ID3D12Fence* get() const;
 
-		void increment();
-
-		//CPU等待
-		void waitCurrentValue();
+		//返回自增后的值
+		//注意：仅用于内部使用和第三方库
+		uint64_t increment();
 
 		//CPU等待
 		void waitValue(const uint64_t value);
 
-		void signal(ID3D12CommandQueue* const commandQueue);
+		uint64_t signal(ID3D12CommandQueue* const commandQueue);
 
-		void wait(ID3D12CommandQueue* const commandQueue);
-
-		uint64_t getCurrentFenceValue() const;
+		void wait(ID3D12CommandQueue* const commandQueue, const uint64_t waitValue);
 
 		uint64_t getCompletedValue() const;
 
@@ -41,7 +38,7 @@ namespace Gear::Core::D3D12Core
 
 		HANDLE fenceEvent;
 
-		uint64_t currentFenceValue;
+		std::atomic<uint64_t> currentFenceValue;
 
 	};
 }

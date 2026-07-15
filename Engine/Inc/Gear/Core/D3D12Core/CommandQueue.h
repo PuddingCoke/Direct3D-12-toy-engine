@@ -39,9 +39,9 @@ namespace Gear::Core::D3D12Core
 
 		void processCommandLists();
 
-		void signal(Fence* const fence);
+		uint64_t signal(Fence* const fence);
 
-		void wait(Fence* const fence);
+		void wait(Fence* const fence, const uint64_t waitValue);
 
 		//等待另一个命令队列
 		void waitFor(CommandQueue* const queueWaitFor, Fence* const fence);
@@ -60,6 +60,8 @@ namespace Gear::Core::D3D12Core
 		FencePtr frameBufferFence;
 
 		UniquePtr<uint64_t[]> frameBufferFenceValues;
+
+		uint64_t currentFrameBufferFenceValue;
 
 		static constexpr uint64_t recordCommandListsLength = 32ull;
 

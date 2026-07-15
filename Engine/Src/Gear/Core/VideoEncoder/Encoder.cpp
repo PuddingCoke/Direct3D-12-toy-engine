@@ -161,7 +161,7 @@ namespace Gear::Core::VideoEncoder
 		return frameEncoded != frameToEncode;
 	}
 
-	void Encoder::bgraToNV12(D3D12Resource::Texture* const inputBGRATexture, D3D12Resource::Texture* const outputNV12Texture, D3D12Core::Fence* const fence)
+	uint64_t Encoder::bgraToNV12(D3D12Resource::Texture* const inputBGRATexture, D3D12Resource::Texture* const outputNV12Texture, D3D12Core::Fence* const fence)
 	{
 		vpCommandQueue->begin();
 
@@ -175,7 +175,7 @@ namespace Gear::Core::VideoEncoder
 
 		vpCommandQueue->waitFrameGPUComplete();
 
-		vpCommandQueue->signal(fence);
+		return vpCommandQueue->signal(fence);
 	}
 
 	uint32_t Encoder::getFrameEncoded() const

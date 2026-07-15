@@ -212,7 +212,7 @@ namespace Gear::Core::VideoEncoder
 
 	bool NVIDIAEncoder::encode(D3D12Resource::Texture* const inputTexture)
 	{
-		bgraToNV12(inputTexture, nv12Textures[nv12TextureIndex].get(), inputFence.get());
+		const uint64_t inputFenceWaitValue = bgraToNV12(inputTexture, nv12Textures[nv12TextureIndex].get(), inputFence.get());
 
 		bool encoding = true;
 
@@ -234,16 +234,14 @@ namespace Gear::Core::VideoEncoder
 		inputResource.pInputBuffer = mapInputResource.mappedResource;
 		inputResource.inputFencePoint = NV_ENC_FENCE_POINT_D3D12{ NV_ENC_FENCE_POINT_D3D12_VER };
 		inputResource.inputFencePoint.pFence = inputFence->get();
-		inputResource.inputFencePoint.waitValue = inputFence->getCurrentFenceValue();
+		inputResource.inputFencePoint.waitValue = inputFenceWaitValue;
 		inputResource.inputFencePoint.bWait = true;
-
-		outputFence->increment();
 
 		NV_ENC_OUTPUT_RESOURCE_D3D12 outputResource = { NV_ENC_OUTPUT_RESOURCE_D3D12_VER };
 		outputResource.pOutputBuffer = mapOutputResource.mappedResource;
 		outputResource.outputFencePoint = NV_ENC_FENCE_POINT_D3D12{ NV_ENC_FENCE_POINT_D3D12_VER };
 		outputResource.outputFencePoint.pFence = outputFence->get();
-		outputResource.outputFencePoint.signalValue = outputFence->getCurrentFenceValue();
+		outputResource.outputFencePoint.signalValue = outputFence->increment();
 		outputResource.outputFencePoint.bSignal = true;
 
 		outputResources.push(outputResource);

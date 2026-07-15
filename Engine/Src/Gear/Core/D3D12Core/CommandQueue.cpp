@@ -6,7 +6,7 @@ namespace Gear::Core::D3D12Core
 {
 	CommandQueue::CommandQueue(const D3D12_COMMAND_LIST_TYPE type) :
 		prepareCommandList(nullptr), lastUsableCommandList(nullptr), commandQueueType(type),
-		frameBufferFence(makeUnique<Fence>())
+		frameBufferFence(makeUnique<Fence>()), currentFrameBufferFenceValue(0ull)
 	{
 		D3D12_COMMAND_QUEUE_DESC queueDesc = {};
 		queueDesc.Type = commandQueueType;
@@ -50,6 +50,7 @@ namespace Gear::Core::D3D12Core
 
 	void CommandQueue::waitFrameCPUReusable()
 	{
+		//如果completedValue小于记录的fenceValue，那么要等待CPU可复用
 		if (frameBufferFence->getCompletedValue() < frameBufferFenceValues[Graphics::getFrameIndex()])
 		{
 			frameBufferFence->waitValue(frameBufferFenceValues[Graphics::getFrameIndex()]);
@@ -58,7 +59,7 @@ namespace Gear::Core::D3D12Core
 
 	void CommandQueue::waitFrameGPUComplete()
 	{
-		frameBufferFence->waitCurrentValue();
+		frameBufferFence->waitValue(currentFrameBufferFenceValue);
 	}
 
 	void CommandQueue::begin()
@@ -146,21 +147,19 @@ namespace Gear::Core::D3D12Core
 		signalFrameCPUReusable();
 	}
 
-	void CommandQueue::signal(Fence* const fence)
+	uint64_t CommandQueue::signal(Fence* const fence)
 	{
-		fence->signal(commandQueue.Get());
+		return fence->signal(commandQueue.Get());
 	}
 
-	void CommandQueue::wait(Fence* const fence)
+	void CommandQueue::wait(Fence* const fence, const uint64_t waitValue)
 	{
-		commandQueue->Wait(fence->get(), fence->getCurrentFenceValue());
+		commandQueue->Wait(fence->get(), waitValue);
 	}
 
 	void CommandQueue::waitFor(CommandQueue* const queueWaitFor, Fence* const fence)
 	{
-		queueWaitFor->signal(fence);
-
-		wait(fence);
+		wait(fence, queueWaitFor->signal(fence));
 	}
 
 	CommandList* CommandQueue::getLastUsableCommandList() const
@@ -170,10 +169,12 @@ namespace Gear::Core::D3D12Core
 
 	void CommandQueue::signalFrameCPUReusable()
 	{
-		signal(frameBufferFence.get());
+		//Signal后要记录自增后的fenceValue
 
-		//Signal后要记录fenceValue
-		//如果fence->getCompletedValue小于记录的fenceValue，那么要等待CPU可复用
-		frameBufferFenceValues[Graphics::getFrameIndex()] = frameBufferFence->getCurrentFenceValue();
+		//用于等待GPU完成
+		currentFrameBufferFenceValue = signal(frameBufferFence.get());
+
+		//用于多重缓冲机制
+		frameBufferFenceValues[Graphics::getFrameIndex()] = currentFrameBufferFenceValue;
 	}
 }

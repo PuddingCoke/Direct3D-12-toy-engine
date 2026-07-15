@@ -21,16 +21,9 @@ namespace Gear::Core::D3D12Core
 		return fence.Get();
 	}
 
-	void Fence::increment()
+	uint64_t Fence::increment()
 	{
-		currentFenceValue++;
-	}
-
-	void Fence::waitCurrentValue()
-	{
-		fence->SetEventOnCompletion(currentFenceValue, fenceEvent);
-
-		WaitForSingleObjectEx(fenceEvent, INFINITE, FALSE);
+		return ++currentFenceValue;
 	}
 
 	void Fence::waitValue(const uint64_t value)
@@ -40,21 +33,18 @@ namespace Gear::Core::D3D12Core
 		WaitForSingleObjectEx(fenceEvent, INFINITE, FALSE);
 	}
 
-	void Fence::signal(ID3D12CommandQueue* const commandQueue)
+	uint64_t Fence::signal(ID3D12CommandQueue* const commandQueue)
 	{
-		increment();
+		const uint64_t signalValue = increment();
 
-		commandQueue->Signal(fence.Get(), currentFenceValue);
+		commandQueue->Signal(fence.Get(), signalValue);
+
+		return signalValue;
 	}
 
-	void Fence::wait(ID3D12CommandQueue* const commandQueue)
+	void Fence::wait(ID3D12CommandQueue* const commandQueue, const uint64_t waitValue)
 	{
-		commandQueue->Wait(fence.Get(), currentFenceValue);
-	}
-
-	uint64_t Fence::getCurrentFenceValue() const
-	{
-		return currentFenceValue;
+		commandQueue->Wait(fence.Get(), waitValue);
 	}
 
 	uint64_t Fence::getCompletedValue() const
