@@ -297,7 +297,8 @@ namespace Gear::Core
 
 		void pushRootConstantBufferDesc(const RootConstantBufferDesc& desc);
 
-		void flushRootConstantBufferDescs(const bool isGraphicsRootSignature);
+		template<auto IsGraphicsRootSignature>
+		void flushRootConstantBufferDescs();
 
 		void flushRenderTargetClearDescs();
 
@@ -529,6 +530,38 @@ namespace Gear::Core
 		for (uint32_t i = 0; i < N; i++)
 		{
 			transientResourceIndices[i] = *descs[i].resourceIndex;
+		}
+	}
+
+	template<auto IsGraphicsRootSignature>
+	inline void GraphicsContext::flushRootConstantBufferDescs()
+	{
+		if (rootConstantBufferDescs.size())
+		{
+			if constexpr (IsGraphicsRootSignature)
+			{
+				for (const RootConstantBufferDesc& desc : rootConstantBufferDescs)
+				{
+					const uint32_t rootParameterIndex = desc.rootParameterIndex;
+
+					const D3D12_GPU_VIRTUAL_ADDRESS gpuAddress = desc.gpuAddress;
+
+					commandList->setGraphicsRootConstantBuffer(rootParameterIndex, gpuAddress);
+				}
+			}
+			else
+			{
+				for (const RootConstantBufferDesc& desc : rootConstantBufferDescs)
+				{
+					const uint32_t rootParameterIndex = desc.rootParameterIndex;
+
+					const D3D12_GPU_VIRTUAL_ADDRESS gpuAddress = desc.gpuAddress;
+
+					commandList->setComputeRootConstantBuffer(rootParameterIndex, gpuAddress);
+				}
+			}
+
+			rootConstantBufferDescs.clear();
 		}
 	}
 

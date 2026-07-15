@@ -509,37 +509,6 @@ namespace Gear::Core
 		rootConstantBufferDescs.push(desc);
 	}
 
-	void GraphicsContext::flushRootConstantBufferDescs(const bool isGraphicsRootSignature)
-	{
-		if (rootConstantBufferDescs.size())
-		{
-			if (isGraphicsRootSignature)
-			{
-				for (const RootConstantBufferDesc& desc : rootConstantBufferDescs)
-				{
-					const uint32_t rootParameterIndex = desc.rootParameterIndex;
-
-					const D3D12_GPU_VIRTUAL_ADDRESS gpuAddress = desc.gpuAddress;
-
-					commandList->setGraphicsRootConstantBuffer(rootParameterIndex, gpuAddress);
-				}
-			}
-			else
-			{
-				for (const RootConstantBufferDesc& desc : rootConstantBufferDescs)
-				{
-					const uint32_t rootParameterIndex = desc.rootParameterIndex;
-
-					const D3D12_GPU_VIRTUAL_ADDRESS gpuAddress = desc.gpuAddress;
-
-					commandList->setComputeRootConstantBuffer(rootParameterIndex, gpuAddress);
-				}
-			}
-
-			rootConstantBufferDescs.clear();
-		}
-	}
-
 	void GraphicsContext::flushRenderTargetClearDescs()
 	{
 		if (renderTargetClearDescs.size())
@@ -743,7 +712,7 @@ namespace Gear::Core
 
 		setRootConstants<D3D12Core::ShaderType::PIXEL>();
 
-		flushRootConstantBufferDescs(true);
+		flushRootConstantBufferDescs<true>();
 
 		flushRenderTargetClearDescs();
 
@@ -756,7 +725,7 @@ namespace Gear::Core
 
 		setRootConstants<D3D12Core::ShaderType::COMPUTE>();
 
-		flushRootConstantBufferDescs(false);
+		flushRootConstantBufferDescs<false>();
 	}
 
 	void GraphicsContext::resetGraphicsRootSignature()
