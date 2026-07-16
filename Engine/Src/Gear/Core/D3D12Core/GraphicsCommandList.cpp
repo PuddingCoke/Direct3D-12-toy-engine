@@ -1,6 +1,6 @@
 #include<Gear/Core/D3D12Core/GraphicsCommandList.h>
 
-#include<Gear/Core/Graphics.h>
+#include<Gear/Core/RenderEngine.h>
 
 namespace Gear::Core::D3D12Core
 {
@@ -120,9 +120,14 @@ namespace Gear::Core::D3D12Core
 
 	void GraphicsCommandList::setDefRenderTarget() const
 	{
-		const D3D12_CPU_DESCRIPTOR_HANDLE backBufferHandle = Graphics::getBackBufferHandle();
+		const D3D12_CPU_DESCRIPTOR_HANDLE backBufferHandle = RenderEngine::getBackBufferHandle();
 
 		setRenderTargets(1, &backBufferHandle, FALSE, nullptr);
+	}
+
+	void GraphicsCommandList::clearDefRenderTarget(const float clearValue[4]) const
+	{
+		clearRenderTarget(RenderEngine::getBackBufferHandle(), clearValue, 0, nullptr);
 	}
 
 	void GraphicsCommandList::clearRenderTarget(const D3D12_CPU_DESCRIPTOR_HANDLE renderTargetView, const float colorRGBA[4], const uint32_t numRects, const D3D12_RECT* pRects) const

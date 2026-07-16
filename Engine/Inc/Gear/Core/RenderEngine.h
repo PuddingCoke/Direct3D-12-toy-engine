@@ -7,6 +7,13 @@ struct ImFont;
 
 struct ID3D12CommandQueue;
 
+struct D3D12_CPU_DESCRIPTOR_HANDLE;
+
+namespace Gear::Resource
+{
+	class ImmutableCBuffer;
+}
+
 namespace Gear::Core
 {
 	namespace D3D12Core
@@ -37,7 +44,11 @@ namespace Gear::Core
 
 		D3D12Resource::Texture* getRenderTexture();
 
+		D3D12_CPU_DESCRIPTOR_HANDLE getBackBufferHandle();
+
 		D3D12Core::CommandQueue* getCommandQueue();
+
+		const Resource::ImmutableCBuffer* getEngineGlobalCBuffer();
 
 		bool getDisplayImGuiSurface();
 

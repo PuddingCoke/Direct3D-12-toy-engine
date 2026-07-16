@@ -1,5 +1,7 @@
 #include<Gear/Core/GraphicsContext.h>
 
+#include<Gear/Core/RenderEngine.h>
+
 #include<Gear/Core/Graphics.h>
 
 #include<Gear/Core/TOPOLOGY.h>
@@ -253,7 +255,7 @@ namespace Gear::Core
 
 	void GraphicsContext::clearDefRenderTarget(const float clearValue[4]) const
 	{
-		commandList->clearRenderTarget(Graphics::getBackBufferHandle(), clearValue, 0, nullptr);
+		commandList->clearDefRenderTarget(clearValue);
 	}
 
 	void GraphicsContext::clearRenderTarget(const Resource::RenderTargetDesc& desc, const float clearValue[4])
@@ -544,7 +546,7 @@ namespace Gear::Core
 
 			commandList->setGraphicsRootSignature(rootSignature->get());
 
-			commandList->setGraphicsRootConstantBuffer(D3D12Core::RootSignature::getEngineGlobalConstantBufferParameterIndex(), Graphics::getEngineGlobalCBuffer()->getGPUAddress());
+			commandList->setGraphicsRootConstantBuffer(D3D12Core::RootSignature::getEngineGlobalConstantBufferParameterIndex(), RenderEngine::getEngineGlobalCBuffer()->getGPUAddress());
 
 			if (userGlobalCBuffer)
 			{
@@ -561,7 +563,7 @@ namespace Gear::Core
 
 			commandList->setComputeRootSignature(rootSignature->get());
 
-			commandList->setComputeRootConstantBuffer(D3D12Core::RootSignature::getEngineGlobalConstantBufferParameterIndex(), Graphics::getEngineGlobalCBuffer()->getGPUAddress());
+			commandList->setComputeRootConstantBuffer(D3D12Core::RootSignature::getEngineGlobalConstantBufferParameterIndex(), RenderEngine::getEngineGlobalCBuffer()->getGPUAddress());
 
 			if (userGlobalCBuffer)
 			{

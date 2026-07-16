@@ -1,5 +1,7 @@
 #include<Gear/Core/VideoEncoder/Encoder.h>
 
+#include<Gear/Utils/Math.h>
+
 namespace Gear::Core::VideoEncoder
 {
 	Encoder::Encoder(const uint32_t frameToEncode, const VideoFormat videoFormat) :

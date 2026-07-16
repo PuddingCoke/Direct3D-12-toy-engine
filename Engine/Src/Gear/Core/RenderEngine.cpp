@@ -147,7 +147,11 @@ namespace Gear::Core::RenderEngine
 
 		D3D12Resource::Texture* getRenderTexture() const;
 
+		D3D12_CPU_DESCRIPTOR_HANDLE getBackBufferHandle() const;
+
 		D3D12Core::CommandQueue* getCommandQueue() const;
+
+		const Resource::ImmutableCBuffer* getEngineGlobalCBuffer() const;
 
 		void updateFrameIndex();
 
@@ -164,14 +168,6 @@ namespace Gear::Core::RenderEngine
 		void processCommandLists();
 
 		void present() const;
-
-		void setDeltaTime(const float deltaTime) const;
-
-		void updateTimeElapsed() const;
-
-		void setFrameRate(const float frameRate) const;
-
-		void renderedFrameCountInc() const;
 
 		void setSyncInterval(int32_t interval);
 
@@ -244,6 +240,9 @@ namespace Gear::Core::RenderEngine
 		//引用
 		D3D12Resource::Texture* renderTexture;
 
+		//引用
+		D3D12_CPU_DESCRIPTOR_HANDLE backBufferHandle;
+
 		int32_t syncInterval;
 
 		D3D12Core::CommonShaderLayout::PerframeResource perframeResource;
@@ -256,8 +255,11 @@ namespace Gear::Core::RenderEngine
 		initializeImGuiSurface(initializeImGuiSurface),
 		displayImGuiSurface(false),
 		displayEngineImGuiSurface(true),
+		mediumFont(nullptr),
+		largeFont(nullptr),
+		renderTexture(nullptr),
+		backBufferHandle{},
 		syncInterval(1),
-		resManager(nullptr),
 		perframeResource{}
 	{
 		//初始化一些渲染需要的信息，如width、height、frameIndex等
@@ -312,8 +314,6 @@ namespace Gear::Core::RenderEngine
 
 		//引擎需要使用一个动态常量缓冲为每一帧的渲染提供有用的信息
 		engineGlobalCBuffer = ResourceManager::createDynamicCBuffer(sizeof(perframeResource));
-
-		Graphics::Internal::setEngineGlobalCBuffer(engineGlobalCBuffer.get());
 
 		//把准备命令列表推入容器中，因为资源的初始化可能需要动态常量缓冲
 		//而动态常量缓冲更新的指令记录是由prepareCommandList负责的
@@ -421,9 +421,19 @@ namespace Gear::Core::RenderEngine
 		return renderTexture;
 	}
 
+	D3D12_CPU_DESCRIPTOR_HANDLE RenderEngineImpl::getBackBufferHandle() const
+	{
+		return backBufferHandle;
+	}
+
 	D3D12Core::CommandQueue* RenderEngineImpl::getCommandQueue() const
 	{
 		return commandQueue.get();
+	}
+
+	const Resource::ImmutableCBuffer* RenderEngineImpl::getEngineGlobalCBuffer() const
+	{
+		return engineGlobalCBuffer.get();
 	}
 
 	void RenderEngineImpl::updateFrameIndex()
@@ -564,26 +574,6 @@ namespace Gear::Core::RenderEngine
 		swapChain->Present(static_cast<uint32_t>(syncInterval), 0);
 	}
 
-	void RenderEngineImpl::setDeltaTime(const float deltaTime) const
-	{
-		Graphics::Internal::setDeltaTime(deltaTime);
-	}
-
-	void RenderEngineImpl::updateTimeElapsed() const
-	{
-		Graphics::Internal::updateTimeElapsed();
-	}
-
-	void RenderEngineImpl::setFrameRate(const float frameRate) const
-	{
-		Graphics::Internal::setFrameRate(frameRate);
-	}
-
-	void RenderEngineImpl::renderedFrameCountInc() const
-	{
-		Graphics::Internal::renderedFrameCountInc();
-	}
-
 	void RenderEngineImpl::setSyncInterval(int32_t interval)
 	{
 		if (interval > 4)
@@ -609,7 +599,7 @@ namespace Gear::Core::RenderEngine
 		renderTexture = texture;
 
 		//获取CPU描述符句柄供GraphicsContext在这一帧使用
-		Graphics::Internal::setBackBufferHandle(handle);
+		backBufferHandle = handle;
 	}
 
 	void RenderEngineImpl::initializeResources()
@@ -858,26 +848,6 @@ namespace Gear::Core::RenderEngine
 			impl->present();
 		}
 
-		void setDeltaTime(const float deltaTime)
-		{
-			impl->setDeltaTime(deltaTime);
-		}
-
-		void updateTimeElapsed()
-		{
-			impl->updateTimeElapsed();
-		}
-
-		void setFrameRate(const float frameRate)
-		{
-			impl->setFrameRate(frameRate);
-		}
-
-		void renderedFrameCountInc()
-		{
-			impl->renderedFrameCountInc();
-		}
-
 		void setSyncInterval(const int32_t syncInterval)
 		{
 			impl->setSyncInterval(syncInterval);
@@ -902,6 +872,26 @@ namespace Gear::Core::RenderEngine
 		{
 			impl->initializeResources();
 		}
+
+		void setDeltaTime(const float deltaTime)
+		{
+			Graphics::Internal::setDeltaTime(deltaTime);
+		}
+
+		void updateTimeElapsed()
+		{
+			Graphics::Internal::updateTimeElapsed();
+		}
+
+		void setFrameRate(const float frameRate)
+		{
+			Graphics::Internal::setFrameRate(frameRate);
+		}
+
+		void renderedFrameCountInc()
+		{
+			Graphics::Internal::renderedFrameCountInc();
+		}
 	}
 
 	void submitCommandList(D3D12Core::CommandList* const commandList)
@@ -919,9 +909,19 @@ namespace Gear::Core::RenderEngine
 		return impl->getRenderTexture();
 	}
 
+	D3D12_CPU_DESCRIPTOR_HANDLE getBackBufferHandle()
+	{
+		return impl->getBackBufferHandle();
+	}
+
 	D3D12Core::CommandQueue* getCommandQueue()
 	{
 		return impl->getCommandQueue();
+	}
+
+	const Resource::ImmutableCBuffer* getEngineGlobalCBuffer()
+	{
+		return impl->getEngineGlobalCBuffer();
 	}
 
 	bool getDisplayImGuiSurface()

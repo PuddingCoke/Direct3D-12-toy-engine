@@ -31,10 +31,6 @@ namespace Gear::Core::Graphics
 
 		float frameRate = 0.f;
 
-		D3D12_CPU_DESCRIPTOR_HANDLE backBufferHandle = {};
-
-		Resource::ImmutableCBuffer* engineGlobalCBuffer = nullptr;
-
 	}impl;
 
 	namespace Internal
@@ -73,16 +69,6 @@ namespace Gear::Core::Graphics
 		void setFrameRate(const float frameRate)
 		{
 			impl.frameRate = frameRate;
-		}
-
-		void setBackBufferHandle(const D3D12_CPU_DESCRIPTOR_HANDLE backBufferHandle)
-		{
-			impl.backBufferHandle = backBufferHandle;
-		}
-
-		void setEngineGlobalCBuffer(Resource::ImmutableCBuffer* const engineGlobalCBuffer)
-		{
-			impl.engineGlobalCBuffer = engineGlobalCBuffer;
 		}
 
 		void imGuiCall()
@@ -157,15 +143,5 @@ namespace Gear::Core::Graphics
 	uint64_t getRenderedFrameCount()
 	{
 		return impl.renderedFrameCount;
-	}
-
-	D3D12_CPU_DESCRIPTOR_HANDLE getBackBufferHandle()
-	{
-		return impl.backBufferHandle;
-	}
-
-	Resource::ImmutableCBuffer* getEngineGlobalCBuffer()
-	{
-		return impl.engineGlobalCBuffer;
 	}
 }

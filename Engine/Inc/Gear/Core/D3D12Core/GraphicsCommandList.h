@@ -53,6 +53,8 @@ namespace Gear::Core::D3D12Core
 
 		void setDefRenderTarget() const;
 
+		void clearDefRenderTarget(const float clearValue[4]) const;
+
 		void clearRenderTarget(const D3D12_CPU_DESCRIPTOR_HANDLE renderTargetView, const float colorRGBA[4], const uint32_t numRects, const D3D12_RECT* pRects) const;
 
 		void clearDepthStencil(const D3D12_CPU_DESCRIPTOR_HANDLE depthStencilView, const D3D12_CLEAR_FLAGS clearFlags, const float depth, const uint8_t stencil, const uint32_t numRects, const D3D12_RECT* const pRects) const;
