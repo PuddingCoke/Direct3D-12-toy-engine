@@ -59,6 +59,8 @@ namespace Gear::Core::VideoEncoder
 		config.rcParams.enableLookahead = 1;
 		config.rcParams.lookaheadDepth = lookaheadDepth;
 		config.rcParams.rateControlMode = NV_ENC_PARAMS_RC_VBR;
+		config.rcParams.targetQuality = 18;
+		config.rcParams.averageBitRate = 0;
 		config.rcParams.enableAQ = 1;
 		config.rcParams.enableTemporalAQ = 1;
 		config.rcParams.multiPass = NV_ENC_TWO_PASS_FULL_RESOLUTION;
@@ -67,12 +69,10 @@ namespace Gear::Core::VideoEncoder
 		//小于2K
 		if (Graphics::getWidth() < 2048u)
 		{
-			config.rcParams.averageBitRate = 40000000U;
 			config.rcParams.maxBitRate = 80000000U;
 		}
 		else
 		{
-			config.rcParams.averageBitRate = 80000000U;
 			config.rcParams.maxBitRate = 160000000U;
 		}
 
