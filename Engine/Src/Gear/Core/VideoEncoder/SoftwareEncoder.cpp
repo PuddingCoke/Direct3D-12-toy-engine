@@ -19,7 +19,7 @@ namespace Gear::Core::VideoEncoder
 
 		codecContext->pix_fmt = destFormat;
 
-		codecContext->gop_size = static_cast<int>(frameRate);
+		codecContext->gop_size = static_cast<int>(gopLength);
 
 		codecContext->color_primaries = AVCOL_PRI_BT709;
 
@@ -85,10 +85,10 @@ namespace Gear::Core::VideoEncoder
 
 		sws_scale(swsContext, sourceData, sourceStride, 0, codecContext->height, yuvFrame->data, yuvFrame->linesize);
 
-		//强制尾帧为P帧
+		//强制尾帧为P帧（编译器有可能决定其为I帧，但不可能为B帧）
 		//因为libx264可能不会以编码顺序输出编码后的比特流
 		//另外，这也可以支持循环动画
-		yuvFrame->pict_type = ((Graphics::getRenderedFrameCount() >= frameToEncode - 1u) ? AV_PICTURE_TYPE_P : AV_PICTURE_TYPE_NONE);
+		yuvFrame->pict_type = ((Graphics::getRenderedFrameCount() == frameToEncode - 1u) ? AV_PICTURE_TYPE_P : AV_PICTURE_TYPE_NONE);
 
 		//YUV帧的呈现时间戳应该等于已渲染帧数
 		yuvFrame->pts = static_cast<int64_t>(Graphics::getRenderedFrameCount());

@@ -45,6 +45,10 @@ namespace Gear::Core::VideoEncoder
 
 		static constexpr uint32_t frameRate = 60;
 
+		static constexpr uint32_t gopSeconds = 10;
+
+		static constexpr uint32_t gopLength = frameRate * gopSeconds;
+
 		void waitFor(D3D12Core::CommandQueue* const queueWaitFor, D3D12Core::Fence* const fence);
 
 	protected:

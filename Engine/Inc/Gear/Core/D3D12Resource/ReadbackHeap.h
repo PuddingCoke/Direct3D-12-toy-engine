@@ -25,9 +25,15 @@ namespace Gear::Core::D3D12Resource
 
 		virtual ~ReadbackHeap();
 
-		void* map(const D3D12_RANGE readRange) const;
+		const void* map(const uint64_t begin, const uint64_t end) const;
+
+		const void* map() const;
 
 		void unmap() const;
+
+	private:
+
+		const uint64_t size;
 
 	};
 }

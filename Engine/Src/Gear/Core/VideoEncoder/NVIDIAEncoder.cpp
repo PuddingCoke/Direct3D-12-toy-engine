@@ -54,7 +54,7 @@ namespace Gear::Core::VideoEncoder
 		config.profileGUID = profile;
 
 		//高质量编码
-		config.gopLength = 120;
+		config.gopLength = gopLength;
 		config.frameIntervalP = frameIntervalP;
 		config.rcParams.enableLookahead = 1;
 		config.rcParams.lookaheadDepth = lookaheadDepth;

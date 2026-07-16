@@ -309,14 +309,13 @@ namespace Gear
 
 			if (needScreenGrab)
 			{
-				const uint8_t* const dataPtr = reinterpret_cast<uint8_t*>(backBufferHeap->map(CD3DX12_RANGE(0ull,
-					FMT::getByteSize(Graphics::backBufferFormat) * initParam.width * initParam.height)));
+				const uint8_t* const dataPtr = reinterpret_cast<const uint8_t*>(backBufferHeap->map());
 
 				UniquePtr<uint8_t[]> colors = makeUnique<uint8_t[]>(FMT::getByteSize(Graphics::backBufferFormat) * initParam.width * initParam.height);
 
 				for (uint32_t i = 0; i < initParam.width * initParam.height; i++)
 				{
-					const uint32_t pixel = 4 * i;
+					const uint32_t pixel = 4u * i;
 
 					//RGBA <- BGRA
 					colors[pixel] = dataPtr[pixel + 2];
@@ -424,8 +423,7 @@ namespace Gear
 			}
 			else
 			{
-				const uint8_t* const data = reinterpret_cast<uint8_t*>(backBufferHeap->map(CD3DX12_RANGE(0ull,
-					FMT::getByteSize(Graphics::backBufferFormat) * initParam.width * initParam.height)));
+				const uint8_t* const data = reinterpret_cast<const uint8_t*>(backBufferHeap->map());
 
 				encoding = encoder->encode(data);
 

@@ -651,7 +651,7 @@ namespace Gear::Core::RenderEngine
 
 		if (!lastUsableGraphicsCommandList)
 		{
-			lastUsableGraphicsCommandList = dynamic_cast<D3D12Core::GraphicsCommandList*>(commandQueue->getLastUsableCommandList());
+			lastUsableGraphicsCommandList = static_cast<D3D12Core::GraphicsCommandList*>(commandQueue->getLastUsableCommandList());
 		}
 
 		lastUsableGraphicsCommandList->trackAndSetResourceState(getRenderTexture(), D3D12Resource::D3D12_TRANSITION_ALL_MIPLEVELS, D3D12_RESOURCE_STATE_COPY_SOURCE);
@@ -787,7 +787,7 @@ namespace Gear::Core::RenderEngine
 
 			if (!lastUsableGraphicsCommandList)
 			{
-				lastUsableGraphicsCommandList = dynamic_cast<D3D12Core::GraphicsCommandList*>(commandQueue->getLastUsableCommandList());
+				lastUsableGraphicsCommandList = static_cast<D3D12Core::GraphicsCommandList*>(commandQueue->getLastUsableCommandList());
 			}
 
 			lastUsableGraphicsCommandList->trackAndSetResourceState(getRenderTexture(), D3D12Resource::D3D12_TRANSITION_ALL_MIPLEVELS, D3D12_RESOURCE_STATE_RENDER_TARGET);
