@@ -86,6 +86,9 @@ if (offsetBits > bitsInTotal)\
 #endif // _DEBUG
 		}
 
+		//填充0
+		offsetBits += (static_cast<uint32_t>(D3D12_SIMULTANEOUS_RENDER_TARGET_COUNT) - graphicsDesc.NumRenderTargets) * FMT::getRTVFormatBits();
+
 		uid |= (static_cast<uint64_t>(FMT::getDSVFormatIndex(graphicsDesc.DSVFormat)) << offsetBits);
 
 		offsetBits += FMT::getDSVFormatBits();
@@ -99,8 +102,8 @@ if (offsetBits > bitsInTotal)\
 			LOGERROR("图元拓扑类型不得为", TOSTRING(TOPOLOGY::TYPE::UNDEFINED));
 		}
 
-		//2比特位
 		//这里减一可以省一个比特位
+		//2比特位可以表示POINT LINE TRIANGLE PATCH类型
 		uid |= ((static_cast<uint64_t>(graphicsDesc.PrimitiveTopologyType) - 1ull) << offsetBits);
 
 		offsetBits += primitiveTopologyTypeBits;

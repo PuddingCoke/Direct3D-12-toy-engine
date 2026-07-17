@@ -156,21 +156,21 @@ namespace Gear::Core::D3D12Core
 					setShaderLocalConstantBufferParameter(localParameterIndices[static_cast<uint32_t>(shaderType)], rootParameters, rootParameterIndex, shaderType);
 				};
 
-			if (numVSConstants)setShaderLocalParameter(rootParameters.data(), rootParameterIndex, ShaderType::VERTEX, numVSConstants);
+			if (numVSConstants) setShaderLocalParameter(rootParameters.data(), rootParameterIndex, ShaderType::VERTEX, numVSConstants);
 
-			if (numHSConstants)setShaderLocalParameter(rootParameters.data(), rootParameterIndex, ShaderType::HULL, numHSConstants);
+			if (numHSConstants) setShaderLocalParameter(rootParameters.data(), rootParameterIndex, ShaderType::HULL, numHSConstants);
 
-			if (numDSConstants)setShaderLocalParameter(rootParameters.data(), rootParameterIndex, ShaderType::DOMAIN, numDSConstants);
+			if (numDSConstants) setShaderLocalParameter(rootParameters.data(), rootParameterIndex, ShaderType::DOMAIN, numDSConstants);
 
-			if (numGSConstants)setShaderLocalParameter(rootParameters.data(), rootParameterIndex, ShaderType::GEOMETRY, numGSConstants);
+			if (numGSConstants) setShaderLocalParameter(rootParameters.data(), rootParameterIndex, ShaderType::GEOMETRY, numGSConstants);
 
-			if (numPSConstants)setShaderLocalParameter(rootParameters.data(), rootParameterIndex, ShaderType::PIXEL, numPSConstants);
+			if (numPSConstants) setShaderLocalParameter(rootParameters.data(), rootParameterIndex, ShaderType::PIXEL, numPSConstants);
 
-			if (numCSConstants)setShaderLocalParameter(rootParameters.data(), rootParameterIndex, ShaderType::COMPUTE, numCSConstants);
+			if (numCSConstants) setShaderLocalParameter(rootParameters.data(), rootParameterIndex, ShaderType::COMPUTE, numCSConstants);
 
-			if (numASConstants)setShaderLocalParameter(rootParameters.data(), rootParameterIndex, ShaderType::AMPLIFICATION, numASConstants);
+			if (numASConstants) setShaderLocalParameter(rootParameters.data(), rootParameterIndex, ShaderType::AMPLIFICATION, numASConstants);
 
-			if (numMSConstants)setShaderLocalParameter(rootParameters.data(), rootParameterIndex, ShaderType::MESH, numMSConstants);
+			if (numMSConstants) setShaderLocalParameter(rootParameters.data(), rootParameterIndex, ShaderType::MESH, numMSConstants);
 		}
 
 		CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC rootSignatureDesc{};

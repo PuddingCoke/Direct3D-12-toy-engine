@@ -14,11 +14,8 @@
 				<![CDATA[PipelineStateBuilder()
 	.setInputElements($inputDesc$)
 	.setBlendState(PipelineStateHelper::$blend$)
-	.setPrimitiveTopologyType(TOPOLOGY::TYPE::$topo$)
 	.setRasterizerState(PipelineStateHelper::$raster$)
 	.setDepthStencilState(PipelineStateHelper::$depth$)
-	.setRTVFormats({ $rtvFormats$ })
-	.setDSVFormat($dsvFormat$)
 	.setVS(*$vertexShader$)
 	.setPS(*$pixelShader$)
 	.build();]]>
