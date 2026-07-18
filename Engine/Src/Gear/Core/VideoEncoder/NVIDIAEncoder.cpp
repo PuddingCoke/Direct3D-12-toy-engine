@@ -84,8 +84,8 @@ namespace Gear::Core::VideoEncoder
 		vuiParameters.videoFullRangeFlag = 0;
 		vuiParameters.colourDescriptionPresentFlag = 1;
 		vuiParameters.colourPrimaries = NV_ENC_VUI_COLOR_PRIMARIES_BT709;
-		vuiParameters.transferCharacteristics = NV_ENC_VUI_TRANSFER_CHARACTERISTIC_BT709;
 		vuiParameters.colourMatrix = NV_ENC_VUI_MATRIX_COEFFS_BT709;
+		vuiParameters.transferCharacteristics = NV_ENC_VUI_TRANSFER_CHARACTERISTIC_BT470M;
 		vuiParameters.chromaSampleLocationFlag = 1;
 		vuiParameters.chromaSampleLocationTop = 0;
 		vuiParameters.chromaSampleLocationBot = 0;

@@ -23,7 +23,7 @@ namespace Gear::Core::VideoEncoder
 
 		codecContext->color_primaries = AVCOL_PRI_BT709;
 
-		codecContext->color_trc = AVCOL_TRC_IEC61966_2_1;
+		codecContext->color_trc = AVCOL_TRC_GAMMA22;
 
 		codecContext->colorspace = AVCOL_SPC_BT709;
 
@@ -132,7 +132,7 @@ namespace Gear::Core::VideoEncoder
 
 		sws_scale(swsContext, sourceData, sourceStride, 0, codecContext->height, yuvFrame->data, yuvFrame->linesize);
 
-		//强制尾帧为P帧（编译器有可能决定其为I帧，但不可能为B帧）
+		//强制尾帧为P帧（编码器有可能覆盖为I帧，但不可能为B帧）
 		//因为libx264可能不会以编码顺序输出编码后的比特流
 		//另外，这也可以支持循环动画
 		yuvFrame->pict_type = ((Graphics::getRenderedFrameCount() == frameToEncode - 1u) ? AV_PICTURE_TYPE_P : AV_PICTURE_TYPE_NONE);
