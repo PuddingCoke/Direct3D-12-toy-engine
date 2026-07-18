@@ -54,6 +54,8 @@ namespace Gear::Core::VideoEncoder
 
 		avio_open(&outContext->pb, outContext->url, AVIO_FLAG_WRITE);
 
+		rawStreamPacket = av_packet_alloc();
+
 		LOGENGINE("待编码帧数", frameToEncode);
 
 		LOGENGINE("开始编码");
@@ -88,6 +90,11 @@ namespace Gear::Core::VideoEncoder
 			vpCommandQueue->waitDestroyable();
 		}
 
+		if (rawStreamPacket)
+		{
+			av_packet_free(&rawStreamPacket);
+		}
+
 		av_write_trailer(outContext);
 
 		avio_close(outContext->pb);
@@ -110,28 +117,26 @@ namespace Gear::Core::VideoEncoder
 	bool Encoder::writeFrame(void* const bitstreamPtr, const uint32_t bitstreamSize, const bool syncPoint,
 		const int64_t decodeFrameIndex, const int64_t presentFrameIndex)
 	{
-		AVPacket* packet = av_packet_alloc();
+		rawStreamPacket->pts = av_rescale_q(presentFrameIndex, AVRational{ 1,static_cast<int32_t>(frameRate) }, outStream->time_base);
 
-		packet->pts = av_rescale_q(presentFrameIndex, AVRational{ 1,static_cast<int32_t>(frameRate) }, outStream->time_base);
+		rawStreamPacket->dts = av_rescale_q(decodeFrameIndex, AVRational{ 1,static_cast<int32_t>(frameRate) }, outStream->time_base);
 
-		packet->dts = av_rescale_q(decodeFrameIndex, AVRational{ 1,static_cast<int32_t>(frameRate) }, outStream->time_base);
+		rawStreamPacket->duration = av_rescale_q(1, AVRational{ 1,static_cast<int32_t>(frameRate) }, outStream->time_base);
 
-		packet->duration = av_rescale_q(1, AVRational{ 1,static_cast<int32_t>(frameRate) }, outStream->time_base);
+		rawStreamPacket->stream_index = outStream->index;
 
-		packet->stream_index = outStream->index;
+		rawStreamPacket->data = static_cast<uint8_t*>(bitstreamPtr);
 
-		packet->data = static_cast<uint8_t*>(bitstreamPtr);
-
-		packet->size = bitstreamSize;
+		rawStreamPacket->size = bitstreamSize;
 
 		if (syncPoint)
 		{
-			packet->flags |= AV_PKT_FLAG_KEY;
+			rawStreamPacket->flags |= AV_PKT_FLAG_KEY;
 		}
 
-		av_interleaved_write_frame(outContext, packet);
+		av_interleaved_write_frame(outContext, rawStreamPacket);
 
-		av_packet_free(&packet);
+		av_packet_unref(rawStreamPacket);
 
 		frameEncoded++;
 

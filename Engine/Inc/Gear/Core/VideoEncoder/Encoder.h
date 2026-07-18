@@ -98,6 +98,8 @@ namespace Gear::Core::VideoEncoder
 
 		AVStream* outStream;
 
+		AVPacket* rawStreamPacket;
+
 		ComPtr<ID3D12VideoProcessor> videoProcessor;
 
 		D3D12Core::VideoProcessCommandListPtr vpCommandList;
