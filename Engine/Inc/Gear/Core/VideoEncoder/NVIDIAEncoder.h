@@ -7,8 +7,6 @@
 
 #include<NvEnc/nvEncodeAPI.h>
 
-#include<queue>
-
 //基本的工作流程
 
 //准备
@@ -47,6 +45,8 @@ namespace Gear::Core::VideoEncoder
 
 	private:
 
+		void workerLoop();
+
 		static constexpr uint32_t lookaheadDepth = 31;
 
 		static constexpr uint32_t extraOutput = 8;
@@ -79,13 +79,17 @@ namespace Gear::Core::VideoEncoder
 
 		D3D12Core::FencePtr outputFence;
 
-		std::queue<NV_ENC_OUTPUT_RESOURCE_D3D12> outputResources;
+		HANDLE eosEvent;
 
-		std::queue<uint64_t> decodeFrameIndices;
+		UniquePtr<HANDLE[]> completionEvents;
 
-		std::queue<NV_ENC_INPUT_PTR> mappedInputResourcePtrs;
+		UniquePtr<NV_ENC_OUTPUT_RESOURCE_D3D12[]> outputResources;
 
-		std::queue<NV_ENC_INPUT_PTR> mappedOutputResourcePtrs;
+		UniquePtr<uint64_t[]> decodeFrameIndices;
+
+		UniquePtr<NV_ENC_INPUT_PTR[]> mappedInputResourcePtrs;
+
+		UniquePtr<NV_ENC_INPUT_PTR[]> mappedOutputResourcePtrs;
 
 		UniquePtr<NV_ENC_REGISTERED_PTR[]> registeredInputResourcePtrs;
 
@@ -95,7 +99,21 @@ namespace Gear::Core::VideoEncoder
 
 		UniquePtr<D3D12Resource::ReadbackHeapPtr[]> readbackHeaps;
 
-		uint64_t nv12TextureIndex;
+		std::mutex readIndexMutex;
+
+		std::mutex writeIndexMutex;
+
+		std::condition_variable readCV;
+
+		std::condition_variable writeCV;
+
+		uint64_t writeIndex;
+
+		uint64_t readIndex;
+
+		std::thread workerThread;
+
+		std::atomic<bool> encoding;
 
 	};
 }

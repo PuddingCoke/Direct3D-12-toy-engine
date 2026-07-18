@@ -23,7 +23,9 @@ namespace Gear::Core::VideoEncoder
 		numNV12Textures(lookaheadDepth + frameIntervalP + extraOutput),
 		inputFence(makeUnique<D3D12Core::Fence>()),
 		outputFence(makeUnique<D3D12Core::Fence>()),
-		nv12TextureIndex(0)
+		readIndex(0ull),
+		writeIndex(0ull),
+		encoding(true)
 	{
 		LOGENGINE("最多B帧", maxBFrames);
 
@@ -106,9 +108,21 @@ namespace Gear::Core::VideoEncoder
 		encoderParams.frameRateDen = 1;
 		encoderParams.enablePTD = 1;
 		encoderParams.enableOutputInVidmem = 0;
-		encoderParams.enableEncodeAsync = 0;
+		encoderParams.enableEncodeAsync = 1;
 
 		NVENCCALL(nvencAPI.nvEncInitializeEncoder(encoder, &encoderParams));
+
+		eosEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);;
+
+		completionEvents = makeUnique<HANDLE[]>(numNV12Textures);
+
+		outputResources = makeUnique<NV_ENC_OUTPUT_RESOURCE_D3D12[]>(numNV12Textures);
+
+		decodeFrameIndices = makeUnique<uint64_t[]>(numNV12Textures);
+
+		mappedInputResourcePtrs = makeUnique<NV_ENC_INPUT_PTR[]>(numNV12Textures);
+
+		mappedOutputResourcePtrs = makeUnique<NV_ENC_INPUT_PTR[]>(numNV12Textures);
 
 		nv12Textures = makeUnique<D3D12Resource::TexturePtr[]>(numNV12Textures);
 
@@ -120,6 +134,8 @@ namespace Gear::Core::VideoEncoder
 
 		for (uint32_t i = 0; i < numNV12Textures; i++)
 		{
+			completionEvents[i] = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+
 			nv12Textures[i] = makeUnique<D3D12Resource::Texture>(Graphics::getWidth(), Graphics::getHeight(), FMT::NV12, 1, 1, true, D3D12_RESOURCE_FLAG_NONE, nullptr, D3D12_RESOURCE_STATE_COMMON);
 
 			readbackHeaps[i] = makeUnique<D3D12Resource::ReadbackHeap>(readbackHeapSize);
@@ -156,18 +172,42 @@ namespace Gear::Core::VideoEncoder
 		}
 
 		writeHeader();
+
+		workerThread = std::thread(&NVIDIAEncoder::workerLoop, this);
 	}
 
 	NVIDIAEncoder::~NVIDIAEncoder()
 	{
 		if (moduleNvEncAPI)
 		{
-			//进行冲刷
-			while (outputResources.size())
+			if (workerThread.joinable())
 			{
+				workerThread.join();
+			}
+
+			//发送EOS结束编码
+			{
+				NV_ENC_PIC_PARAMS eosParams = { NV_ENC_PIC_PARAMS_VER };
+
+				eosParams.encodePicFlags = NV_ENC_PIC_FLAG_EOS;
+
+				eosParams.completionEvent = eosEvent;
+
+				nvencAPI.nvEncEncodePicture(encoder, &eosParams);
+
+				WaitForSingleObject(eosEvent, INFINITE);
+			}
+
+			//编码结束后进行冲刷
+			while (readIndex < writeIndex)
+			{
+				const uint64_t modReadIndex = readIndex % numNV12Textures;
+
+				WaitForSingleObject(completionEvents[modReadIndex], INFINITE);
+
 				NV_ENC_LOCK_BITSTREAM lockBitstream = { NV_ENC_LOCK_BITSTREAM_VER };
 
-				lockBitstream.outputBitstream = &outputResources.front();
+				lockBitstream.outputBitstream = &outputResources[modReadIndex];
 
 				lockBitstream.doNotWait = 0;
 
@@ -175,26 +215,35 @@ namespace Gear::Core::VideoEncoder
 
 				if (status != NV_ENC_SUCCESS)
 				{
+					nvencAPI.nvEncUnmapInputResource(encoder, mappedInputResourcePtrs[modReadIndex]);
+
+					nvencAPI.nvEncUnmapInputResource(encoder, mappedOutputResourcePtrs[modReadIndex]);
+
+					readIndex++;
+
 					break;
 				}
 
 				nvencAPI.nvEncUnlockBitstream(encoder, lockBitstream.outputBitstream);
 
-				outputResources.pop();
+				nvencAPI.nvEncUnmapInputResource(encoder, mappedInputResourcePtrs[modReadIndex]);
+
+				nvencAPI.nvEncUnmapInputResource(encoder, mappedOutputResourcePtrs[modReadIndex]);
+
+				readIndex++;
 			}
 
-			while (mappedInputResourcePtrs.size())
+			while (readIndex < writeIndex)
 			{
-				nvencAPI.nvEncUnmapInputResource(encoder, mappedInputResourcePtrs.front());
+				const uint64_t modReadIndex = readIndex % numNV12Textures;
 
-				mappedInputResourcePtrs.pop();
-			}
+				WaitForSingleObject(completionEvents[modReadIndex], INFINITE);
 
-			while (mappedOutputResourcePtrs.size())
-			{
-				nvencAPI.nvEncUnmapInputResource(encoder, mappedOutputResourcePtrs.front());
+				nvencAPI.nvEncUnmapInputResource(encoder, mappedInputResourcePtrs[modReadIndex]);
 
-				mappedOutputResourcePtrs.pop();
+				nvencAPI.nvEncUnmapInputResource(encoder, mappedOutputResourcePtrs[modReadIndex]);
+
+				readIndex++;
 			}
 
 			for (uint32_t i = 0; i < numNV12Textures; i++)
@@ -204,6 +253,13 @@ namespace Gear::Core::VideoEncoder
 				nvencAPI.nvEncUnregisterResource(encoder, registeredInputResourcePtrs[i]);
 			}
 
+			for (uint32_t i = 0; i < numNV12Textures; i++)
+			{
+				CloseHandle(completionEvents[i]);
+			}
+
+			CloseHandle(eosEvent);
+
 			nvencAPI.nvEncDestroyEncoder(encoder);
 
 			FreeLibrary(moduleNvEncAPI);
@@ -212,23 +268,30 @@ namespace Gear::Core::VideoEncoder
 
 	bool NVIDIAEncoder::encode(D3D12Resource::Texture* const inputTexture)
 	{
-		const uint64_t inputFenceWaitValue = bgraToNV12(inputTexture, nv12Textures[nv12TextureIndex].get(), inputFence.get());
+		if (writeIndex >= readIndex + numNV12Textures)
+		{
+			std::unique_lock<std::mutex> readIndexLock(readIndexMutex);
 
-		bool encoding = true;
+			readCV.wait(readIndexLock, [this] {return writeIndex < readIndex + numNV12Textures; });
+		}
+
+		const uint64_t modWriteIndex = writeIndex % numNV12Textures;
+
+		const uint64_t inputFenceWaitValue = bgraToNV12(inputTexture, nv12Textures[modWriteIndex].get(), inputFence.get());
 
 		NV_ENC_MAP_INPUT_RESOURCE mapInputResource = { NV_ENC_MAP_INPUT_RESOURCE_VER };
-		mapInputResource.registeredResource = registeredInputResourcePtrs[nv12TextureIndex];
+		mapInputResource.registeredResource = registeredInputResourcePtrs[modWriteIndex];
 
 		NVENCCALL(nvencAPI.nvEncMapInputResource(encoder, &mapInputResource));
 
-		mappedInputResourcePtrs.push(mapInputResource.mappedResource);
+		mappedInputResourcePtrs[modWriteIndex] = mapInputResource.mappedResource;
 
 		NV_ENC_MAP_INPUT_RESOURCE mapOutputResource = { NV_ENC_MAP_INPUT_RESOURCE_VER };
-		mapOutputResource.registeredResource = registeredOutputResourcePtrs[nv12TextureIndex];
+		mapOutputResource.registeredResource = registeredOutputResourcePtrs[modWriteIndex];
 
 		NVENCCALL(nvencAPI.nvEncMapInputResource(encoder, &mapOutputResource));
 
-		mappedOutputResourcePtrs.push(mapOutputResource.mappedResource);
+		mappedOutputResourcePtrs[modWriteIndex] = mapOutputResource.mappedResource;
 
 		NV_ENC_INPUT_RESOURCE_D3D12 inputResource = { NV_ENC_INPUT_RESOURCE_D3D12_VER };
 		inputResource.pInputBuffer = mapInputResource.mappedResource;
@@ -244,9 +307,7 @@ namespace Gear::Core::VideoEncoder
 		outputResource.outputFencePoint.signalValue = outputFence->increment();
 		outputResource.outputFencePoint.bSignal = true;
 
-		outputResources.push(outputResource);
-
-		nv12TextureIndex = (nv12TextureIndex + 1) % numNV12Textures;
+		outputResources[modWriteIndex] = outputResource;
 
 		NV_ENC_PIC_PARAMS picParams = { NV_ENC_PIC_PARAMS_VER };
 
@@ -262,30 +323,49 @@ namespace Gear::Core::VideoEncoder
 
 		picParams.inputHeight = Graphics::getHeight();
 
-		picParams.completionEvent = nullptr;
+		picParams.completionEvent = completionEvents[modWriteIndex];
 
 		picParams.frameIdx = static_cast<uint32_t>(Graphics::getRenderedFrameCount());
 
 		picParams.inputTimeStamp = Graphics::getRenderedFrameCount();
 
-		decodeFrameIndices.push(Graphics::getRenderedFrameCount());
+		decodeFrameIndices[modWriteIndex] = Graphics::getRenderedFrameCount();
 
 		NVENCCALL(nvencAPI.nvEncEncodePicture(encoder, &picParams));
 
-		while (!outputResources.empty())
 		{
+			std::lock_guard<std::mutex> writeIndexLock(writeIndexMutex);
+
+			writeIndex++;
+		}
+
+		writeCV.notify_one();
+
+		return encoding;
+	}
+
+	void NVIDIAEncoder::workerLoop()
+	{
+		while (true)
+		{
+			if (readIndex >= writeIndex)
+			{
+				std::unique_lock<std::mutex> writeIndexLock(writeIndexMutex);
+
+				writeCV.wait(writeIndexLock, [this] {return readIndex < writeIndex; });
+			}
+
+			const uint64_t modReadIndex = readIndex % numNV12Textures;
+
+			WaitForSingleObject(completionEvents[modReadIndex], INFINITE);
+
 			NV_ENC_LOCK_BITSTREAM lockBitstream = { NV_ENC_LOCK_BITSTREAM_VER };
 
-			lockBitstream.outputBitstream = &outputResources.front();
+			lockBitstream.outputBitstream = &outputResources[modReadIndex];
 
-			lockBitstream.doNotWait = 1;
+			lockBitstream.doNotWait = 0;
 
-			const NVENCSTATUS lockStatus = nvencAPI.nvEncLockBitstream(encoder, &lockBitstream); NVENCCALL(lockStatus);
-
-			if (lockStatus != NV_ENC_SUCCESS)
-			{
-				break;
-			}
+			NVENCCALL(nvencAPI.nvEncLockBitstream(encoder, &lockBitstream));
 
 			//[mp4 @ 000001bdb1381100] pts (46500) < dts (48000) in stream 0 报错
 			//解决方法 https://github.com/FFmpeg/FFmpeg/commit/670ff6c7ce0c70798a9909b334310625fe067a34?diff=split
@@ -293,36 +373,28 @@ namespace Gear::Core::VideoEncoder
 				lockBitstream.bitstreamBufferPtr,
 				lockBitstream.bitstreamSizeInBytes,
 				lockBitstream.pictureType == NV_ENC_PIC_TYPE_IDR,
-				static_cast<int64_t>(decodeFrameIndices.front()) - static_cast<int64_t>(frameIntervalP - 1u),
+				static_cast<int64_t>(decodeFrameIndices[modReadIndex]) - static_cast<int64_t>(frameIntervalP - 1u),
 				static_cast<int64_t>(lockBitstream.outputTimeStamp)
 			);
 
 			NVENCCALL(nvencAPI.nvEncUnlockBitstream(encoder, lockBitstream.outputBitstream));
 
-			NVENCCALL(nvencAPI.nvEncUnmapInputResource(encoder, mappedInputResourcePtrs.front()));
+			NVENCCALL(nvencAPI.nvEncUnmapInputResource(encoder, mappedInputResourcePtrs[modReadIndex]));
 
-			NVENCCALL(nvencAPI.nvEncUnmapInputResource(encoder, mappedOutputResourcePtrs.front()));
+			NVENCCALL(nvencAPI.nvEncUnmapInputResource(encoder, mappedOutputResourcePtrs[modReadIndex]));
 
-			outputResources.pop();
+			{
+				std::lock_guard<std::mutex> readIndexLock(readIndexMutex);
 
-			decodeFrameIndices.pop();
+				readIndex++;
+			}
 
-			mappedInputResourcePtrs.pop();
-
-			mappedOutputResourcePtrs.pop();
+			readCV.notify_one();
 
 			if (!encoding)
 			{
-				NV_ENC_PIC_PARAMS eosParams = { NV_ENC_PIC_PARAMS_VER };
-
-				eosParams.encodePicFlags = NV_ENC_PIC_FLAG_EOS;
-
-				NVENCCALL(nvencAPI.nvEncEncodePicture(encoder, &eosParams));
-
-				break;
+				return;
 			}
 		}
-
-		return encoding;
 	}
 }

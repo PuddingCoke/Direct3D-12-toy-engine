@@ -3,6 +3,5 @@
   "copyDescriptors优化",
   "DXR支持（垂涎已久）",
   "开场动画，实现TextBatch、SpriteBatch还有视频解码框架",
-  "动态壁纸模式需要帧率控制类",
-  "NVIDIAEncoder改进成异步编码模式"
+  "动态壁纸模式需要帧率控制类"
 ]
