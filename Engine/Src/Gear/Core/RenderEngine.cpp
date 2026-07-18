@@ -201,9 +201,9 @@ namespace Gear::Core::RenderEngine
 
 		UniquePtr<Device::Internal::InitializeToken> deviceToken;
 
-		D3D12Core::CommandQueuePtr commandQueue;
-
 		UniquePtr<D3D12Core::GraphicsCommandList> prepareGraphicsCommandList;
+
+		D3D12Core::CommandQueuePtr commandQueue;
 
 		D3D12Core::GraphicsCommandList* lastUsableGraphicsCommandList;
 
@@ -296,15 +296,13 @@ namespace Gear::Core::RenderEngine
 		//初始化格式表用于查询
 		FMT::Internal::initialize();
 
-		//初始化图形设备后创建命令队列
-		commandQueue = makeUnique<D3D12Core::CommandQueue>(D3D12_COMMAND_LIST_TYPE_DIRECT);
-
-		commandQueue->setName(L"Graphics Command Queue");
-
 		//创建准备命令列表
 		prepareGraphicsCommandList = makeUnique<D3D12Core::GraphicsCommandList>();
 
-		commandQueue->setPrepareCommandList(prepareGraphicsCommandList.get());
+		//创建命令队列
+		commandQueue = makeUnique<D3D12Core::CommandQueue>(prepareGraphicsCommandList.get());
+
+		commandQueue->setName(L"Graphics Command Queue");
 
 		//初始化线程局部资源
 		renderThreadLocalToken = makeUnique<RenderThreadLocal::Internal::InitializeToken>();

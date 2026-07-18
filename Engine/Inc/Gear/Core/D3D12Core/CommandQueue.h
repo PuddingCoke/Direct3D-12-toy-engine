@@ -17,15 +17,13 @@ namespace Gear::Core::D3D12Core
 	{
 	public:
 
-		CommandQueue(const D3D12_COMMAND_LIST_TYPE type);
+		CommandQueue(CommandList* const prepareCommandList);
 
 		virtual ~CommandQueue();
 
 		ID3D12CommandQueue* get() const;
 
 		void setName(const wchar_t* const name);
-
-		void setPrepareCommandList(CommandList* const commandList);
 
 		void waitDestroyable();
 

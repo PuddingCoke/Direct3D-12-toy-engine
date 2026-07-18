@@ -33,7 +33,8 @@ namespace Gear::Core::D3D12Core
 
 		static ShaderPtr create(const std::wstring& filePath, const ShaderType type);
 
-		//raw bytes
+		//bytes
+		//注意：字节的生命周期必须大于等于着色器的生命周期
 		Shader(const uint8_t* const bytes, const size_t byteSize);
 
 		//cso

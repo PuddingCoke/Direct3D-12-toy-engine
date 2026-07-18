@@ -7,15 +7,20 @@
 
 #include<Gear/Core/VideoDevice.h>
 
+#include<Gear/Core/D3D12Core/GraphicsCommandList.h>
+
 #include<Gear/Core/D3D12Core/VideoProcessCommandList.h>
 
 #include<Gear/Core/D3D12Core/CommandQueue.h>
+
+#include<Gear/Core/D3D12Resource/ReadbackHeap.h>
 
 extern "C"
 {
 #include<ffmpeg/libavutil/avutil.h>
 #include<ffmpeg/libavformat/avformat.h>
 #include<ffmpeg/libavcodec/avcodec.h>
+#include<ffmpeg/libswscale/swscale.h>
 }
 
 namespace Gear::Core::VideoEncoder
@@ -39,9 +44,7 @@ namespace Gear::Core::VideoEncoder
 
 		virtual ~Encoder();
 
-		virtual bool encode(D3D12Resource::Texture* const inputTexture);
-
-		virtual bool encode(const uint8_t* const data);
+		virtual bool encode(D3D12Resource::Texture* const inputTexture) = 0;
 
 		static constexpr uint32_t frameRate = 60;
 

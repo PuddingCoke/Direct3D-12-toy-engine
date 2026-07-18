@@ -3,8 +3,6 @@
 #ifndef _GEAR_CORE_VIDEOENCODER_NVIDIAENCODER_H_
 #define _GEAR_CORE_VIDEOENCODER_NVIDIAENCODER_H_
 
-#include<Gear/Core/D3D12Resource/ReadbackHeap.h>
-
 #include"Encoder.h"
 
 #include<NvEnc/nvEncodeAPI.h>

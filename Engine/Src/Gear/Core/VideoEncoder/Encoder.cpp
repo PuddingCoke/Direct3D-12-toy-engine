@@ -78,9 +78,7 @@ namespace Gear::Core::VideoEncoder
 
 		vpCommandList = makeUnique<D3D12Core::VideoProcessCommandList>();
 
-		vpCommandQueue = makeUnique<D3D12Core::CommandQueue>(D3D12_COMMAND_LIST_TYPE_VIDEO_PROCESS);
-
-		vpCommandQueue->setPrepareCommandList(vpCommandList.get());
+		vpCommandQueue = makeUnique<D3D12Core::CommandQueue>(vpCommandList.get());
 	}
 
 	Encoder::~Encoder()
@@ -97,16 +95,6 @@ namespace Gear::Core::VideoEncoder
 		avformat_free_context(outContext);
 
 		avformat_network_deinit();
-	}
-
-	bool Encoder::encode(D3D12Resource::Texture* const inputTexture)
-	{
-		LOGERROR("禁止调用未被覆写的encode方法", reinterpret_cast<uint64_t>(inputTexture));
-	}
-
-	bool Encoder::encode(const uint8_t* const data)
-	{
-		LOGERROR("禁止调用未被覆写的encode方法", reinterpret_cast<uint64_t>(data));
 	}
 
 	void Encoder::waitFor(D3D12Core::CommandQueue* const queueWaitFor, D3D12Core::Fence* const fence)

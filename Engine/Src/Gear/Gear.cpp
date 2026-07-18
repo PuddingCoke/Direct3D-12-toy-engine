@@ -80,7 +80,7 @@ namespace Gear
 
 		UniquePtr<Game> game;
 
-		//用于截屏和视频渲染
+		//用于截屏
 		UniquePtr<D3D12Resource::ReadbackHeap> backBufferHeap;
 
 		InitializationParam initParam;
@@ -120,6 +120,7 @@ namespace Gear
 
 		LRESULT(*windowCallback)(HWND hWnd, uint32_t msg, WPARAM wParam, LPARAM lParam) = nullptr;
 
+		//根据初始化参数配置窗口的初始化参数
 		switch (initParam.usage)
 		{
 		case InitializationParam::REALTIMERENDER:
@@ -201,7 +202,7 @@ namespace Gear
 
 		renderEngineToken = makeUnique<RenderEngine::Internal::InitializeToken>(initParam.width, initParam.height, Window::Win32Form::getHandle(), useSwapChainBuffer, initParam.enableImGuiSurface);
 
-		if (initParam.usage == InitializationParam::REALTIMERENDER || initParam.usage == InitializationParam::VIDEORENDER)
+		if (initParam.usage == InitializationParam::REALTIMERENDER)
 		{
 			backBufferHeap = makeUnique<D3D12Resource::ReadbackHeap>(FMT::getByteSize(Graphics::backBufferFormat) * initParam.width * initParam.height);
 		}
@@ -257,8 +258,6 @@ namespace Gear
 		SetForegroundWindow(Window::Win32Form::getHandle());
 
 		DeltaTimeEstimator deltaTimeEstimator;
-
-		RenderEngine::Internal::setDeltaTime(1.f / static_cast<float>(MainMonitor::getRefreshRate()));
 
 		std::chrono::high_resolution_clock::time_point startPoint = std::chrono::high_resolution_clock::now();
 
@@ -405,30 +404,14 @@ namespace Gear
 
 			game->render();
 
-			if (!initParam.videoRender.hardwareEncode)
-			{
-				RenderEngine::Internal::saveBackBuffer(backBufferHeap.get());
-			}
-
 			RenderEngine::Internal::endFrame();
 
 			RenderEngine::Internal::waitFrameGPUComplete();
 
-			if (initParam.videoRender.hardwareEncode)
-			{
-				//编码器管理的命令队列需要等待渲染引擎管理的命令队列完成工作
-				encoder->waitFor(RenderEngine::getCommandQueue(), vpSyncFence.get());
+			//编码器管理的视频处理命令队列需要等待渲染引擎管理的命令队列完成工作
+			encoder->waitFor(RenderEngine::getCommandQueue(), vpSyncFence.get());
 
-				encoding = encoder->encode(RenderEngine::getRenderTexture());
-			}
-			else
-			{
-				const uint8_t* const data = reinterpret_cast<const uint8_t*>(backBufferHeap->map());
-
-				encoding = encoder->encode(data);
-
-				backBufferHeap->unmap();
-			}
+			encoding = encoder->encode(RenderEngine::getRenderTexture());
 
 			RenderEngine::Internal::updateTimeElapsed();
 
@@ -442,8 +425,6 @@ namespace Gear
 		DeltaTimeEstimator deltaTimeEstimator;
 
 		WallpaperHelper::DetectThreadToken detectThreadToken;
-
-		RenderEngine::Internal::setDeltaTime(1.f / static_cast<float>(MainMonitor::getRefreshRate()));
 
 		std::chrono::high_resolution_clock::time_point startPoint = std::chrono::high_resolution_clock::now();
 

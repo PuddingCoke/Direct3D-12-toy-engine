@@ -267,14 +267,14 @@ namespace Gear::Utils::Logger
 	template<typename Arg>
 	inline void LogContext::packArgument(const Arg& arg)
 	{
-		static_assert(0, "not supported type");
+		static_assert(0, "不支持的类型");
 
 		//用于测试
 		/*setDisplayColor(textColor);
 
 		const std::string ty = typeid(Arg).name();
 
-		packArgument(std::wstring(ty.cbegin(), ty.cend()));*/
+		packArgument(ty);*/
 	}
 
 	template<typename Arg>

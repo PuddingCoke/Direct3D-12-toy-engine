@@ -14,7 +14,7 @@
 namespace Gear::Core::D3D12Core::DXCCompiler
 {
 
-	//raw bytes
+	//bytes
 	ComPtr<IDxcBlob> load(const uint8_t* const bytes, const size_t byteSize);
 
 	//hlsl

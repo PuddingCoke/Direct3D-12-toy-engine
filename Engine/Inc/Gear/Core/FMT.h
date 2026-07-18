@@ -256,7 +256,7 @@ namespace Gear::Core::FMT
 		}
 	}
 
-	static_assert(FMT::UNKNOWN == 0, "DXGI_FORMAT_UNKNOWN must be 0");
+	static_assert(FMT::UNKNOWN == 0, "DXGI_FORMAT_UNKNOWN整数值必须是0");
 
 	constexpr uint32_t formatTableLength = DXGI_FORMAT_A4B4G4R4_UNORM + 1u;
 

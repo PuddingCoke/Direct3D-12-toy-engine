@@ -5,11 +5,6 @@
 
 #include"Encoder.h"
 
-extern "C"
-{
-#include<ffmpeg/libswscale/swscale.h>
-}
-
 namespace Gear::Core::VideoEncoder
 {
 	class SoftwareEncoder :public Encoder
@@ -20,7 +15,7 @@ namespace Gear::Core::VideoEncoder
 
 		~SoftwareEncoder();
 
-		bool encode(const uint8_t* const data) override;
+		bool encode(D3D12Resource::Texture* const inputTexture) override;
 
 	private:
 
@@ -37,6 +32,12 @@ namespace Gear::Core::VideoEncoder
 		SwsContext* swsContext = nullptr;
 
 		AVPacket* packet = nullptr;
+
+		D3D12Core::GraphicsCommandListPtr cpCommandList;
+
+		D3D12Core::CommandQueuePtr cpCommandQueue;
+
+		D3D12Resource::ReadbackHeapPtr readbackHeap;
 
 	};
 }

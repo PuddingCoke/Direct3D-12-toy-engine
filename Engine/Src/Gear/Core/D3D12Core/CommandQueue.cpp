@@ -4,9 +4,12 @@
 
 namespace Gear::Core::D3D12Core
 {
-	CommandQueue::CommandQueue(const D3D12_COMMAND_LIST_TYPE type) :
-		prepareCommandList(nullptr), lastUsableCommandList(nullptr), commandQueueType(type),
-		frameBufferFence(makeUnique<Fence>()), currentFrameBufferFenceValue(0ull)
+	CommandQueue::CommandQueue(CommandList* const prepareCommandList) :
+		prepareCommandList(prepareCommandList),
+		commandQueueType(prepareCommandList->getType()),
+		frameBufferFence(makeUnique<Fence>()),
+		currentFrameBufferFenceValue(0ull),
+		lastUsableCommandList(nullptr)
 	{
 		D3D12_COMMAND_QUEUE_DESC queueDesc = {};
 		queueDesc.Type = commandQueueType;
@@ -34,11 +37,6 @@ namespace Gear::Core::D3D12Core
 	void CommandQueue::setName(const wchar_t* const name)
 	{
 		commandQueue->SetName(name);
-	}
-
-	void CommandQueue::setPrepareCommandList(CommandList* const commandList)
-	{
-		prepareCommandList = commandList;
 	}
 
 	void CommandQueue::waitDestroyable()

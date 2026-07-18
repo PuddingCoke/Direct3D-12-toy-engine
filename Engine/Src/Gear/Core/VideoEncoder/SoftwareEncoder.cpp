@@ -57,6 +57,10 @@ namespace Gear::Core::VideoEncoder
 		packet = av_packet_alloc();
 
 		writeHeader();
+
+		cpCommandList = makeUnique<D3D12Core::GraphicsCommandList>(D3D12_COMMAND_LIST_TYPE_COPY);
+
+		cpCommandQueue = makeUnique<D3D12Core::CommandQueue>(cpCommandList.get());
 	}
 
 	SoftwareEncoder::~SoftwareEncoder()
@@ -77,8 +81,49 @@ namespace Gear::Core::VideoEncoder
 		avcodec_free_context(&codecContext);
 	}
 
-	bool SoftwareEncoder::encode(const uint8_t* const data)
+	bool SoftwareEncoder::encode(D3D12Resource::Texture* const inputTexture)
 	{
+		if (!readbackHeap)
+		{
+			readbackHeap = makeUnique<D3D12Resource::ReadbackHeap>(inputTexture->getWidth() * inputTexture->getHeight() * FMT::getByteSize(Graphics::backBufferFormat));
+		}
+
+		cpCommandQueue->begin();
+
+		{
+			D3D12_PLACED_SUBRESOURCE_FOOTPRINT bufferFootprint = {};
+
+			bufferFootprint.Footprint.Width = inputTexture->getWidth();
+
+			bufferFootprint.Footprint.Height = inputTexture->getHeight();
+
+			bufferFootprint.Footprint.Depth = 1;
+
+			bufferFootprint.Footprint.RowPitch = FMT::getByteSize(Graphics::backBufferFormat) * inputTexture->getWidth();
+
+			bufferFootprint.Footprint.Format = Graphics::backBufferFormat;
+
+			const CD3DX12_TEXTURE_COPY_LOCATION copyDest(readbackHeap->getResource(), bufferFootprint);
+
+			const CD3DX12_TEXTURE_COPY_LOCATION copySrc(inputTexture->getResource(), 0);
+
+			cpCommandList->trackAndSetResourceState(inputTexture, D3D12Resource::D3D12_TRANSITION_ALL_MIPLEVELS, D3D12_RESOURCE_STATE_COPY_SOURCE);
+
+			cpCommandList->flushResourceBarriers();
+
+			cpCommandList->get()->CopyTextureRegion(&copyDest, 0, 0, 0, &copySrc, nullptr);
+
+			cpCommandList->trackAndSetResourceState(inputTexture, D3D12Resource::D3D12_TRANSITION_ALL_MIPLEVELS, D3D12_RESOURCE_STATE_COMMON);
+
+			cpCommandList->flushResourceBarriers();
+		}
+
+		cpCommandQueue->processCommandLists();
+
+		cpCommandQueue->waitFrameGPUComplete();
+
+		const uint8_t* const data = reinterpret_cast<const uint8_t*>(readbackHeap->map());
+
 		const uint8_t* sourceData[] = { data };
 
 		const int32_t sourceStride[] = { static_cast<int32_t>(codecContext->width) * static_cast<int32_t>(FMT::getByteSize(Graphics::backBufferFormat)) };
@@ -111,12 +156,16 @@ namespace Gear::Core::VideoEncoder
 				{
 					av_packet_unref(packet);
 
+					readbackHeap->unmap();
+
 					return false;
 				}
 			}
 
 			av_packet_unref(packet);
 		}
+
+		readbackHeap->unmap();
 
 		return true;
 	}

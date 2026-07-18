@@ -3,11 +3,11 @@
 #ifndef _GEAR_CORE_GRAPHICSDEVICE_H_
 #define _GEAR_CORE_GRAPHICSDEVICE_H_
 
-static_assert(sizeof(int) == 4, "size of int must be 4");
+static_assert(sizeof(int) == 4, "int类型的大小必须是4");
 
-static_assert(sizeof(float) == 4, "size of float must be 4");
+static_assert(sizeof(float) == 4, "float类型的大小必须是4");
 
-static_assert(sizeof(double) == 8, "size of double must be 8");
+static_assert(sizeof(double) == 8, "double类型的大小必须是8");
 
 #include<Gear/Utils/Logger.h>
 
