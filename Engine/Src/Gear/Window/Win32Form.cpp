@@ -35,9 +35,7 @@ namespace Gear::Window::Win32Form
 
 		~Win32FormImpl();
 
-		bool pollEvents();
-
-		bool pollEvents(const DWORD millisecond);
+		bool pollEvents(const DWORD milliseconds);
 
 		HWND getHandle() const;
 
@@ -46,8 +44,6 @@ namespace Gear::Window::Win32Form
 		LRESULT CALLBACK videoRenderProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam) const;
 
 		LRESULT CALLBACK wallpaperProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam) const;
-
-		LRESULT CALLBACK mouseHookProc(int nCode, WPARAM wParam, LPARAM lParam) const;
 
 	private:
 
@@ -59,12 +55,10 @@ namespace Gear::Window::Win32Form
 
 		NOTIFYICONDATA nid;
 
-		HHOOK mouseHook;
-
 	};
 
 	Win32FormImpl::Win32FormImpl(const std::wstring& title, const uint32_t startX, const uint32_t startY, const uint32_t width, const uint32_t height, const DWORD windowStyle, LRESULT(*windowCallback)(HWND hwnd, uint32_t msg, WPARAM wParam, LPARAM lParam)) :
-		windowHandle(nullptr), initTrayIcon(windowCallback == wallpaperCallBack), menuHandle(nullptr), nid{}, mouseHook(nullptr)
+		windowHandle(nullptr), initTrayIcon(windowCallback == wallpaperCallBack), menuHandle(nullptr), nid{}
 	{
 		//传入的width、height是像素尺度
 		//因此不能让窗口被自动缩放
@@ -114,8 +108,6 @@ namespace Gear::Window::Win32Form
 			menuHandle = CreatePopupMenu();
 
 			AppendMenu(menuHandle, MF_STRING, EXITUID, L"退出程序");
-
-			mouseHook = SetWindowsHookEx(WH_MOUSE_LL, Win32Form::mouseHookProc, nullptr, 0);
 		}
 	}
 
@@ -123,8 +115,6 @@ namespace Gear::Window::Win32Form
 	{
 		if (initTrayIcon)
 		{
-			UnhookWindowsHookEx(mouseHook);
-
 			DestroyMenu(menuHandle);
 
 			Shell_NotifyIcon(NIM_DELETE, &nid);
@@ -133,37 +123,18 @@ namespace Gear::Window::Win32Form
 		DestroyWindow(windowHandle);
 	}
 
-	bool Win32FormImpl::pollEvents()
+	bool Win32FormImpl::pollEvents(const DWORD milliseconds)
 	{
 		Input::Mouse::Internal::resetDeltaValue();
 
 		Input::Keyboard::Internal::resetDeltaValue();
 
-		MSG msg = {};
+		MSG msg;
 
-		while (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
-		{
-			TranslateMessage(&msg);
-
-			DispatchMessage(&msg);
-
-			if (msg.message == WM_QUIT)
-			{
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	bool Win32FormImpl::pollEvents(const DWORD millisecond)
-	{
-		const DWORD result = MsgWaitForMultipleObjectsEx(0, nullptr, millisecond, QS_POSTMESSAGE | QS_SENDMESSAGE, 0);
+		const DWORD result = MsgWaitForMultipleObjectsEx(0, nullptr, milliseconds, QS_ALLINPUT, 0);
 
 		if (result == WAIT_OBJECT_0)
 		{
-			MSG msg;
-
 			while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
 			{
 				TranslateMessage(&msg);
@@ -339,40 +310,6 @@ namespace Gear::Window::Win32Form
 		return 0;
 	}
 
-	LRESULT Win32FormImpl::mouseHookProc(int nCode, WPARAM wParam, LPARAM lParam) const
-	{
-		if (nCode == HC_ACTION)
-		{
-			const MSLLHOOKSTRUCT* const pMouseStruct = reinterpret_cast<MSLLHOOKSTRUCT*>(lParam);
-
-			switch (wParam)
-			{
-			case WM_MOUSEMOVE:
-				Input::Mouse::Internal::move(static_cast<float>(pMouseStruct->pt.x), static_cast<float>(Core::Graphics::getHeight()) - static_cast<float>(pMouseStruct->pt.y));
-				break;
-
-			case WM_LBUTTONDOWN:
-				Input::Mouse::Internal::pressLeft();
-				break;
-
-			case WM_RBUTTONDOWN:
-				Input::Mouse::Internal::pressRight();
-				break;
-
-			case WM_LBUTTONUP:
-				Input::Mouse::Internal::releaseLeft();
-				break;
-
-			case WM_RBUTTONUP:
-				Input::Mouse::Internal::releaseRight();
-				break;
-			}
-
-		}
-
-		return CallNextHookEx(mouseHook, nCode, wParam, lParam);
-	}
-
 	UniquePtr<Win32FormImpl> impl;
 
 	void initialize(const std::wstring& title, const uint32_t startX, const uint32_t startY, const uint32_t width, const uint32_t height, const DWORD windowStyle, LRESULT(*windowCallback)(HWND hwnd, uint32_t msg, WPARAM wParam, LPARAM lParam))
@@ -385,14 +322,9 @@ namespace Gear::Window::Win32Form
 		impl.reset();
 	}
 
-	bool pollEvents()
+	bool pollEvents(const DWORD milliseconds)
 	{
-		return impl->pollEvents();
-	}
-
-	bool pollEvents(const DWORD millisecond)
-	{
-		return impl->pollEvents(millisecond);
+		return impl->pollEvents(milliseconds);
 	}
 
 	HWND getHandle()
@@ -413,10 +345,5 @@ namespace Gear::Window::Win32Form
 	LRESULT CALLBACK wallpaperCallBack(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam)
 	{
 		return impl->wallpaperProc(hWnd, uMsg, wParam, lParam);
-	}
-
-	LRESULT mouseHookProc(int nCode, WPARAM wParam, LPARAM lParam)
-	{
-		return impl->mouseHookProc(nCode, wParam, lParam);
 	}
 }

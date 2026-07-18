@@ -32,9 +32,7 @@ namespace Gear::Window::Win32Form
 		}
 	};
 
-	bool pollEvents();
-
-	bool pollEvents(const DWORD millisecond);
+	bool pollEvents(const DWORD milliseconds = 0u);
 
 	HWND getHandle();
 
@@ -47,8 +45,6 @@ namespace Gear::Window::Win32Form
 	LRESULT CALLBACK videoRenderCallback(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam);
 
 	LRESULT CALLBACK wallpaperCallBack(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam);
-
-	LRESULT CALLBACK mouseHookProc(int nCode, WPARAM wParam, LPARAM lParam);
 }
 
 #endif // !_GEAR_WINDOW_WIN32FORM_H_
