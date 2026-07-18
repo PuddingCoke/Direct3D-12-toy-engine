@@ -42,7 +42,7 @@ namespace Gear
 		return param;
 	}
 
-	InitializationParam InitializationParam::Wallpaper()
+	InitializationParam InitializationParam::Wallpaper(const int64_t targetFrameRate)
 	{
 		InitializationParam param = {};
 
@@ -55,6 +55,8 @@ namespace Gear
 		param.height = 0u;//由引擎设置
 
 		param.enableImGuiSurface = false;
+
+		param.wallpaper.targetFrameRate = targetFrameRate;
 
 		return param;
 	}

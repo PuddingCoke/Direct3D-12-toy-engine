@@ -424,11 +424,25 @@ namespace Gear
 
 	void GearImpl::runWallpaper()
 	{
+		RenderEngine::Internal::setSyncInterval(0);
+
+		const HANDLE timerHandle = CreateWaitableTimerExW(nullptr, nullptr, CREATE_WAITABLE_TIMER_HIGH_RESOLUTION, TIMER_ALL_ACCESS);
+
+		if (!timerHandle)
+		{
+			LOGERROR("创建帧率限制计时器失败");
+		}
+
 		DeltaTimeEstimator deltaTimeEstimator;
 
 		WallpaperHelper::DetectThreadToken detectThreadToken;
 
 		std::chrono::high_resolution_clock::time_point startPoint = std::chrono::high_resolution_clock::now();
+
+		std::chrono::high_resolution_clock::time_point targetEndPoint = startPoint;
+
+		const std::chrono::high_resolution_clock::duration targetFrameDuration = std::chrono::duration_cast<std::chrono::high_resolution_clock::duration>(
+			std::chrono::duration<double>(1.0 / static_cast<double>(initParam.wallpaper.targetFrameRate)));
 
 		while (Window::Win32Form::pollEvents())
 		{
@@ -436,10 +450,14 @@ namespace Gear
 			{
 				if (!Window::Win32Form::pollEvents(static_cast<DWORD>(WallpaperHelper::obscureCheckInterval / 2ull - 75ull)))
 				{
+					CloseHandle(timerHandle);
+
 					return;
 				}
 
 				startPoint = std::chrono::high_resolution_clock::now();
+
+				targetEndPoint = startPoint;
 			}
 
 			const std::chrono::high_resolution_clock::time_point endPoint = std::chrono::high_resolution_clock::now();
@@ -472,7 +490,40 @@ namespace Gear
 			RenderEngine::Internal::present();
 
 			RenderEngine::Internal::renderedFrameCountInc();
+
+			targetEndPoint += targetFrameDuration;
+
+			const std::chrono::high_resolution_clock::time_point currentTimePoint = std::chrono::high_resolution_clock::now();
+
+			if (currentTimePoint < targetEndPoint)
+			{
+				const long long remainingUs = std::chrono::duration_cast<std::chrono::microseconds>(targetEndPoint - currentTimePoint).count();
+
+				LARGE_INTEGER li;
+
+				li.QuadPart = remainingUs * -10ll;
+
+				SetWaitableTimer(timerHandle, &li, 0, nullptr, nullptr, FALSE);
+
+				WaitForSingleObject(timerHandle, INFINITE);
+
+				while (std::chrono::high_resolution_clock::now() < targetEndPoint)
+				{
+					if (!Window::Win32Form::pollEvents())
+					{
+						CloseHandle(timerHandle);
+
+						return;
+					}
+				}
+			}
+			else if (currentTimePoint - targetEndPoint > targetFrameDuration)
+			{
+				targetEndPoint = currentTimePoint;
+			}
 		}
+
+		CloseHandle(timerHandle);
 	}
 
 	void GearImpl::reportLiveObjects() const

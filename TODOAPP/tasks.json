@@ -3,5 +3,5 @@
   "copyDescriptors优化",
   "DXR支持（垂涎已久）",
   "开场动画，实现TextBatch、SpriteBatch还有视频解码框架",
-  "动态壁纸模式需要帧率控制类"
+  "TrackPopUpMenu导致动态壁纸冻结，需要解决这个问题"
 ]

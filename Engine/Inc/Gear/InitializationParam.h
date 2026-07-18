@@ -16,7 +16,7 @@ namespace Gear
 		//软件编码器的压缩质量和压缩率均显著由于硬件编码器，但是编码速度极慢
 		static InitializationParam VideoRender(const uint32_t width, const uint32_t height, const uint32_t seconds = 60u, const bool hardWareEncode = true, const uint32_t maxBFrames = 2);
 
-		static InitializationParam Wallpaper();
+		static InitializationParam Wallpaper(const int64_t targetFrameRate = 60ll);
 
 		enum EngineUsage
 		{
@@ -44,6 +44,13 @@ namespace Gear
 			uint32_t maxBFrames;//最多连续B帧，仅硬件编码器使用
 
 		} videoRender;
+
+		struct WallpaperParam
+		{
+
+			int64_t targetFrameRate;
+
+		}wallpaper;
 
 	};
 }
