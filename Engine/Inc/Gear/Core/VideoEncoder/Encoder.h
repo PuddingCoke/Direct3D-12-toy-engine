@@ -52,7 +52,7 @@ namespace Gear::Core::VideoEncoder
 
 		static constexpr uint32_t gopLength = frameRate * gopSeconds;
 
-		void waitFor(D3D12Core::CommandQueue* const queueWaitFor, D3D12Core::Fence* const fence);
+		D3D12Core::CommandQueue* getVPCommandQueue() const;
 
 	protected:
 

@@ -97,9 +97,9 @@ namespace Gear::Core::VideoEncoder
 		avformat_network_deinit();
 	}
 
-	void Encoder::waitFor(D3D12Core::CommandQueue* const queueWaitFor, D3D12Core::Fence* const fence)
+	D3D12Core::CommandQueue* Encoder::getVPCommandQueue() const
 	{
-		vpCommandQueue->waitFor(queueWaitFor, fence);
+		return vpCommandQueue.get();
 	}
 
 	void Encoder::writeHeader() const

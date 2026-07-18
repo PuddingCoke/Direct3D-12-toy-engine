@@ -269,7 +269,7 @@ namespace Gear::Core
 
 		setResourceState(desc);
 
-		transitionResources();
+		commandList->flushResourceBarriers();
 
 		flushRenderTargetClearDescs();
 	}
@@ -283,7 +283,7 @@ namespace Gear::Core
 	{
 		setResourceState(desc);
 
-		transitionResources();
+		commandList->flushResourceBarriers();
 
 		depthStencilClearDesc.setHandle(desc.dsvHandle);
 
@@ -481,11 +481,6 @@ namespace Gear::Core
 	D3D12Core::GraphicsCommandList* GraphicsContext::getCommandList() const
 	{
 		return commandList.get();
-	}
-
-	void GraphicsContext::transitionResources()
-	{
-		commandList->flushResourceBarriers();
 	}
 
 	void GraphicsContext::setPipelineState(ID3D12PipelineState* const pipelineState)
@@ -702,7 +697,7 @@ namespace Gear::Core
 			switchGraphicsPipelineState = false;
 		}
 
-		transitionResources();
+		commandList->flushResourceBarriers();
 
 		setRootConstants<D3D12Core::ShaderType::VERTEX>();
 
@@ -723,7 +718,7 @@ namespace Gear::Core
 
 	void GraphicsContext::prepareDispatchCallResources()
 	{
-		transitionResources();
+		commandList->flushResourceBarriers();
 
 		setRootConstants<D3D12Core::ShaderType::COMPUTE>();
 

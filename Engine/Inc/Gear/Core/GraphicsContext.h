@@ -282,8 +282,6 @@ namespace Gear::Core
 			uint8_t stencil = 0;
 		};
 
-		void transitionResources();
-
 		void setPipelineState(ID3D12PipelineState* const pipelineState);
 
 		void setShaderResources(const std::vector<Resource::ShaderResourceDesc>& descs, const uint32_t targetSRVState);

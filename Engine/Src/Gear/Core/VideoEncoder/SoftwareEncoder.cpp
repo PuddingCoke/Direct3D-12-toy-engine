@@ -61,6 +61,20 @@ namespace Gear::Core::VideoEncoder
 		cpCommandList = makeUnique<D3D12Core::GraphicsCommandList>(D3D12_COMMAND_LIST_TYPE_COPY);
 
 		cpCommandQueue = makeUnique<D3D12Core::CommandQueue>(cpCommandList.get());
+
+		cpSyncFence = makeUnique<D3D12Core::Fence>();
+
+		nv12Texture = makeUnique<D3D12Resource::Texture>(Graphics::getWidth(), Graphics::getHeight(), FMT::NV12, 1, 1, true, D3D12_RESOURCE_FLAG_NONE, nullptr, D3D12_RESOURCE_STATE_COMMON);
+
+		{
+			uint64_t totalBytes;
+
+			const D3D12_RESOURCE_DESC resourceDesc = nv12Texture->getResource()->GetDesc();
+
+			GraphicsDevice::get()->GetCopyableFootprints(&resourceDesc, 0, 2, 0, cpFootPrints, nullptr, nullptr, &totalBytes);
+
+			nv12ReadbackHeap = makeUnique<D3D12Resource::ReadbackHeap>(totalBytes);
+		}
 	}
 
 	SoftwareEncoder::~SoftwareEncoder()
@@ -83,50 +97,38 @@ namespace Gear::Core::VideoEncoder
 
 	bool SoftwareEncoder::encode(D3D12Resource::Texture* const inputTexture)
 	{
-		if (!readbackHeap)
-		{
-			readbackHeap = makeUnique<D3D12Resource::ReadbackHeap>(inputTexture->getWidth() * inputTexture->getHeight() * FMT::getByteSize(Graphics::backBufferFormat));
-		}
+		const uint64_t waitValue = bgraToNV12(inputTexture, nv12Texture.get(), cpSyncFence.get());
+
+		cpCommandQueue->wait(cpSyncFence.get(), waitValue);
 
 		cpCommandQueue->begin();
 
+		cpCommandList->trackAndSetResourceState(nv12Texture.get(), D3D12Resource::D3D12_TRANSITION_ALL_MIPLEVELS, D3D12_RESOURCE_STATE_COPY_SOURCE);
+
+		cpCommandList->flushResourceBarriers();
+
+		for (uint32_t i = 0; i < 2; i++)
 		{
-			D3D12_PLACED_SUBRESOURCE_FOOTPRINT bufferFootprint = {};
+			const CD3DX12_TEXTURE_COPY_LOCATION copyDest(nv12ReadbackHeap->getResource(), cpFootPrints[i]);
 
-			bufferFootprint.Footprint.Width = inputTexture->getWidth();
-
-			bufferFootprint.Footprint.Height = inputTexture->getHeight();
-
-			bufferFootprint.Footprint.Depth = 1;
-
-			bufferFootprint.Footprint.RowPitch = FMT::getByteSize(Graphics::backBufferFormat) * inputTexture->getWidth();
-
-			bufferFootprint.Footprint.Format = Graphics::backBufferFormat;
-
-			const CD3DX12_TEXTURE_COPY_LOCATION copyDest(readbackHeap->getResource(), bufferFootprint);
-
-			const CD3DX12_TEXTURE_COPY_LOCATION copySrc(inputTexture->getResource(), 0);
-
-			cpCommandList->trackAndSetResourceState(inputTexture, D3D12Resource::D3D12_TRANSITION_ALL_MIPLEVELS, D3D12_RESOURCE_STATE_COPY_SOURCE);
-
-			cpCommandList->flushResourceBarriers();
+			const CD3DX12_TEXTURE_COPY_LOCATION copySrc(nv12Texture->getResource(), D3D12CalcSubresource(0, 0, i, 1, 1));
 
 			cpCommandList->get()->CopyTextureRegion(&copyDest, 0, 0, 0, &copySrc, nullptr);
-
-			cpCommandList->trackAndSetResourceState(inputTexture, D3D12Resource::D3D12_TRANSITION_ALL_MIPLEVELS, D3D12_RESOURCE_STATE_COMMON);
-
-			cpCommandList->flushResourceBarriers();
 		}
+
+		cpCommandList->trackAndSetResourceState(nv12Texture.get(), D3D12Resource::D3D12_TRANSITION_ALL_MIPLEVELS, D3D12_RESOURCE_STATE_COMMON);
+
+		cpCommandList->flushResourceBarriers();
 
 		cpCommandQueue->processCommandLists();
 
 		cpCommandQueue->waitFrameGPUComplete();
 
-		const uint8_t* const data = reinterpret_cast<const uint8_t*>(readbackHeap->map());
+		const uint8_t* const data = reinterpret_cast<const uint8_t*>(nv12ReadbackHeap->map());
 
-		const uint8_t* sourceData[] = { data };
+		const uint8_t* sourceData[2] = { data + cpFootPrints[0].Offset,data + cpFootPrints[1].Offset };
 
-		const int32_t sourceStride[] = { static_cast<int32_t>(codecContext->width) * static_cast<int32_t>(FMT::getByteSize(Graphics::backBufferFormat)) };
+		const int32_t sourceStride[2] = { static_cast<int32_t>(cpFootPrints[0].Footprint.RowPitch),static_cast<int32_t>(cpFootPrints[1].Footprint.RowPitch) };
 
 		sws_scale(swsContext, sourceData, sourceStride, 0, codecContext->height, yuvFrame->data, yuvFrame->linesize);
 
@@ -156,7 +158,7 @@ namespace Gear::Core::VideoEncoder
 				{
 					av_packet_unref(packet);
 
-					readbackHeap->unmap();
+					nv12ReadbackHeap->unmap();
 
 					return false;
 				}
@@ -165,7 +167,7 @@ namespace Gear::Core::VideoEncoder
 			av_packet_unref(packet);
 		}
 
-		readbackHeap->unmap();
+		nv12ReadbackHeap->unmap();
 
 		return true;
 	}

@@ -267,9 +267,15 @@ namespace Gear
 
 			const float deltaTime = std::chrono::duration<float>(endPoint - startPoint).count();
 
+			RenderEngine::Internal::setDeltaTime(deltaTimeEstimator.getDeltaTime(deltaTime));
+
+			RenderEngine::Internal::updateTimeElapsed();
+
+			RenderEngine::Internal::setFrameRate(deltaTimeEstimator.getFrameRate());
+
 			startPoint = endPoint;
 
-			//帧索引的更新必须置于首位
+			//更新帧索引，使用交换链指定的帧缓冲
 			RenderEngine::Internal::updateFrameIndex();
 
 			RenderEngine::Internal::waitFrameCPUReusable();
@@ -297,12 +303,6 @@ namespace Gear
 			{
 				RenderEngine::Internal::waitFrameGPUComplete();
 			}
-
-			RenderEngine::Internal::setDeltaTime(deltaTimeEstimator.getDeltaTime(deltaTime));
-
-			RenderEngine::Internal::updateTimeElapsed();
-
-			RenderEngine::Internal::setFrameRate(deltaTimeEstimator.getFrameRate());
 
 			RenderEngine::Internal::renderedFrameCountInc();
 
@@ -408,8 +408,10 @@ namespace Gear
 
 			RenderEngine::Internal::waitFrameGPUComplete();
 
-			//编码器管理的视频处理命令队列需要等待渲染引擎管理的命令队列完成工作
-			encoder->waitFor(RenderEngine::getCommandQueue(), vpSyncFence.get());
+			D3D12Core::CommandQueue* const vpCommandQueue = encoder->getVPCommandQueue();
+
+			//编码器管理的视频处理命令队列需要等待渲染引擎管理的图形命令队列完成工作
+			vpCommandQueue->waitFor(RenderEngine::getCommandQueue(), vpSyncFence.get());
 
 			encoding = encoder->encode(RenderEngine::getRenderTexture());
 
@@ -444,9 +446,15 @@ namespace Gear
 
 			const float deltaTime = std::chrono::duration<float>(endPoint - startPoint).count();
 
+			RenderEngine::Internal::setDeltaTime(deltaTimeEstimator.getDeltaTime(deltaTime));
+
+			RenderEngine::Internal::updateTimeElapsed();
+
+			RenderEngine::Internal::setFrameRate(deltaTimeEstimator.getFrameRate());
+
 			startPoint = endPoint;
 
-			//帧索引的更新必须置于首位
+			//更新帧索引，使用交换链指定的帧缓冲
 			RenderEngine::Internal::updateFrameIndex();
 
 			RenderEngine::Internal::waitFrameCPUReusable();
@@ -462,12 +470,6 @@ namespace Gear
 			RenderEngine::Internal::endFrame();
 
 			RenderEngine::Internal::present();
-
-			RenderEngine::Internal::setDeltaTime(deltaTimeEstimator.getDeltaTime(deltaTime));
-
-			RenderEngine::Internal::updateTimeElapsed();
-
-			RenderEngine::Internal::setFrameRate(deltaTimeEstimator.getFrameRate());
 
 			RenderEngine::Internal::renderedFrameCountInc();
 		}
