@@ -20,6 +20,8 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, uint32_t
 
 namespace Gear::Window::Win32Form
 {
+	LRESULT CALLBACK menuWindowCallBack(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+
 	class Win32FormImpl
 	{
 	public:
@@ -39,26 +41,32 @@ namespace Gear::Window::Win32Form
 
 		HWND getHandle() const;
 
-		LRESULT CALLBACK realTimeRenderProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam) const;
+		LRESULT CALLBACK realTimeRenderProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam);
 
-		LRESULT CALLBACK videoRenderProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam) const;
+		LRESULT CALLBACK videoRenderProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam);
 
-		LRESULT CALLBACK wallpaperProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam) const;
+		LRESULT CALLBACK wallpaperProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam);
+
+		LRESULT CALLBACK menuWindowProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam);
 
 	private:
 
+		static constexpr int32_t menuWidth = 80;
+
+		static constexpr int32_t menuHeight = 40;
+
 		HWND windowHandle;
 
-		const bool initTrayIcon;
+		HWND menuWindowHandle;
 
-		HMENU menuHandle;
+		const bool initTrayIcon;
 
 		NOTIFYICONDATA nid;
 
 	};
 
 	Win32FormImpl::Win32FormImpl(const std::wstring& title, const uint32_t startX, const uint32_t startY, const uint32_t width, const uint32_t height, const DWORD windowStyle, LRESULT(*windowCallback)(HWND hwnd, uint32_t msg, WPARAM wParam, LPARAM lParam)) :
-		windowHandle(nullptr), initTrayIcon(windowCallback == wallpaperCallBack), menuHandle(nullptr), nid{}
+		windowHandle(nullptr), menuWindowHandle(nullptr), initTrayIcon(windowCallback == wallpaperCallBack), nid{}
 	{
 		//传入的width、height是像素尺度
 		//因此不能让窗口被自动缩放
@@ -66,18 +74,31 @@ namespace Gear::Window::Win32Form
 
 		const HINSTANCE hInstance = GetModuleHandle(0);
 
-		WNDCLASSEX wcex = {};
-		wcex.cbSize = sizeof(WNDCLASSEX);
-		wcex.style = CS_HREDRAW | CS_VREDRAW;
-		wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
-		wcex.hbrBackground = reinterpret_cast<HBRUSH>(GetStockObject(NULL_BRUSH));
-		wcex.hIcon = LoadIcon(0, IDI_APPLICATION);
-		wcex.hIconSm = LoadIcon(0, IDI_APPLICATION);
-		wcex.lpszClassName = L"MyWindowClass";
-		wcex.hInstance = hInstance;
-		wcex.lpfnWndProc = windowCallback;
+		{
+			WNDCLASSEX wcex = {};
+			wcex.cbSize = sizeof(WNDCLASSEX);
+			wcex.style = CS_HREDRAW | CS_VREDRAW;
+			wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
+			wcex.hbrBackground = reinterpret_cast<HBRUSH>(GetStockObject(NULL_BRUSH));
+			wcex.hIcon = LoadIcon(0, IDI_APPLICATION);
+			wcex.hIconSm = LoadIcon(0, IDI_APPLICATION);
+			wcex.lpszClassName = L"MyWindowClass";
+			wcex.hInstance = hInstance;
+			wcex.lpfnWndProc = windowCallback;
+			RegisterClassEx(&wcex);
+		}
 
-		RegisterClassEx(&wcex);
+		{
+			WNDCLASSEX wcex = {};
+			wcex.cbSize = sizeof(WNDCLASSEX);
+			wcex.style = CS_HREDRAW | CS_VREDRAW | CS_DROPSHADOW;
+			wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
+			wcex.hbrBackground = reinterpret_cast<HBRUSH>(GetStockObject(WHITE_BRUSH));
+			wcex.lpszClassName = L"MenuWindowClass";
+			wcex.hInstance = hInstance;
+			wcex.lpfnWndProc = menuWindowCallBack;
+			RegisterClassEx(&wcex);
+		}
 
 		RECT rect = { 0,0,static_cast<LONG>(width),static_cast<LONG>(height) };
 
@@ -104,10 +125,6 @@ namespace Gear::Window::Win32Form
 			wcscpy_s(nid.szTip, L"动态壁纸");
 
 			Shell_NotifyIcon(NIM_ADD, &nid);
-
-			menuHandle = CreatePopupMenu();
-
-			AppendMenu(menuHandle, MF_STRING, EXITUID, L"退出程序");
 		}
 	}
 
@@ -115,9 +132,14 @@ namespace Gear::Window::Win32Form
 	{
 		if (initTrayIcon)
 		{
-			DestroyMenu(menuHandle);
-
 			Shell_NotifyIcon(NIM_DELETE, &nid);
+
+			if (menuWindowHandle)
+			{
+				DestroyWindow(menuWindowHandle);
+
+				menuWindowHandle = nullptr;
+			}
 		}
 
 		DestroyWindow(windowHandle);
@@ -156,7 +178,7 @@ namespace Gear::Window::Win32Form
 		return windowHandle;
 	}
 
-	LRESULT Win32FormImpl::realTimeRenderProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam) const
+	LRESULT Win32FormImpl::realTimeRenderProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam)
 	{
 		if (ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam))
 			return true;
@@ -230,17 +252,20 @@ namespace Gear::Window::Win32Form
 			break;
 
 		case WM_DESTROY:
+
 			PostQuitMessage(0);
+
 			break;
 
 		default:
+
 			return DefWindowProc(hWnd, uMsg, wParam, lParam);
 		}
 
 		return 0;
 	}
 
-	LRESULT Win32FormImpl::videoRenderProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam) const
+	LRESULT Win32FormImpl::videoRenderProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam)
 	{
 		switch (uMsg)
 		{
@@ -255,17 +280,20 @@ namespace Gear::Window::Win32Form
 		break;
 
 		case WM_DESTROY:
+
 			PostQuitMessage(0);
+
 			break;
 
 		default:
+
 			return DefWindowProc(hWnd, uMsg, wParam, lParam);
 		}
 
 		return 0;
 	}
 
-	LRESULT Win32FormImpl::wallpaperProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam) const
+	LRESULT Win32FormImpl::wallpaperProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam)
 	{
 		switch (uMsg)
 		{
@@ -280,7 +308,9 @@ namespace Gear::Window::Win32Form
 		break;
 
 		case WM_DESTROY:
+
 			PostQuitMessage(0);
+
 			break;
 
 		case WM_TRAYICON:
@@ -292,7 +322,21 @@ namespace Gear::Window::Win32Form
 
 				SetForegroundWindow(hWnd);
 
-				TrackPopupMenu(menuHandle, TPM_RIGHTBUTTON, pt.x, pt.y, 0, hWnd, nullptr);
+				if (menuWindowHandle)
+				{
+					DestroyWindow(menuWindowHandle);
+				}
+
+				menuWindowHandle = CreateWindowEx(
+					WS_EX_TOOLWINDOW | WS_EX_TOPMOST,
+					L"MenuWindowClass", L"",
+					WS_POPUP | WS_BORDER | WS_VISIBLE,
+					pt.x, pt.y - menuHeight, menuWidth, menuHeight,
+					hWnd, nullptr, GetModuleHandle(0), nullptr);
+
+				ShowWindow(menuWindowHandle, SW_SHOW);
+
+				SetCapture(menuWindowHandle);
 			}
 			break;
 
@@ -302,8 +346,68 @@ namespace Gear::Window::Win32Form
 				PostQuitMessage(0);
 			}
 			break;
+		default:
+
+			return DefWindowProc(hWnd, uMsg, wParam, lParam);
+		}
+
+		return 0;
+	}
+
+	LRESULT Win32FormImpl::menuWindowProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam)
+	{
+		switch (uMsg)
+		{
+		case WM_PAINT:
+		{
+			PAINTSTRUCT ps;
+
+			HDC hdc = BeginPaint(hWnd, &ps);
+
+			RECT rc;
+
+			GetClientRect(hWnd, &rc);
+
+			SetBkMode(hdc, TRANSPARENT);
+
+			SetTextColor(hdc, RGB(0, 0, 0));
+
+			DrawTextW(hdc, L"退出程序", -1, &rc, DT_VCENTER | DT_CENTER | DT_SINGLELINE);
+
+			EndPaint(hWnd, &ps);
+
+			break;
+		}
+
+		case WM_LBUTTONUP:
+		{
+			POINT pt = { LOWORD(lParam), HIWORD(lParam) };
+
+			ClientToScreen(hWnd, &pt);
+
+			RECT rc;
+
+			GetWindowRect(hWnd, &rc);
+
+			if (PtInRect(&rc, pt))
+			{
+				PostMessage(GetParent(hWnd), WM_COMMAND, EXITUID, 0);
+			}
+
+			ReleaseCapture();
+
+			if (menuWindowHandle)
+			{
+				DestroyWindow(menuWindowHandle);
+
+				menuWindowHandle = nullptr;
+			}
+
+			break;
+		}
 
 		default:
+
 			return DefWindowProc(hWnd, uMsg, wParam, lParam);
 		}
 
@@ -345,5 +449,10 @@ namespace Gear::Window::Win32Form
 	LRESULT CALLBACK wallpaperCallBack(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam)
 	{
 		return impl->wallpaperProc(hWnd, uMsg, wParam, lParam);
+	}
+
+	LRESULT CALLBACK menuWindowCallBack(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+	{
+		return impl->menuWindowProc(hWnd, uMsg, wParam, lParam);
 	}
 }
