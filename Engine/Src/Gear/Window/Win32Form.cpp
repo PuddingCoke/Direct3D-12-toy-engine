@@ -63,10 +63,12 @@ namespace Gear::Window::Win32Form
 
 		NOTIFYICONDATA nid;
 
+		RAWINPUTDEVICE rid;
+
 	};
 
 	Win32FormImpl::Win32FormImpl(const std::wstring& title, const uint32_t startX, const uint32_t startY, const uint32_t width, const uint32_t height, const DWORD windowStyle, LRESULT(*windowCallback)(HWND hwnd, uint32_t msg, WPARAM wParam, LPARAM lParam)) :
-		windowHandle(nullptr), menuWindowHandle(nullptr), initTrayIcon(windowCallback == wallpaperCallBack), nid{}
+		windowHandle(nullptr), menuWindowHandle(nullptr), initTrayIcon(windowCallback == wallpaperCallBack), nid{}, rid{}
 	{
 		//传入的width、height是像素尺度
 		//因此不能让窗口被自动缩放
@@ -88,18 +90,6 @@ namespace Gear::Window::Win32Form
 			RegisterClassEx(&wcex);
 		}
 
-		{
-			WNDCLASSEX wcex = {};
-			wcex.cbSize = sizeof(WNDCLASSEX);
-			wcex.style = CS_HREDRAW | CS_VREDRAW | CS_DROPSHADOW;
-			wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
-			wcex.hbrBackground = reinterpret_cast<HBRUSH>(GetStockObject(WHITE_BRUSH));
-			wcex.lpszClassName = L"MenuWindowClass";
-			wcex.hInstance = hInstance;
-			wcex.lpfnWndProc = menuWindowCallBack;
-			RegisterClassEx(&wcex);
-		}
-
 		RECT rect = { 0,0,static_cast<LONG>(width),static_cast<LONG>(height) };
 
 		AdjustWindowRect(&rect, windowStyle, false);
@@ -109,34 +99,58 @@ namespace Gear::Window::Win32Form
 
 		if (!windowHandle)
 		{
-			LOGERROR("创建窗体失败！");
+			LOGERROR("主窗口创建失败");
 		}
 
 		ShowWindow(windowHandle, SW_SHOW);
 
 		if (initTrayIcon)
 		{
+			rid.usUsagePage = 0x01;
+			rid.usUsage = 0x02;
+			rid.dwFlags = RIDEV_INPUTSINK;
+			rid.hwndTarget = windowHandle;
+
+			if (!RegisterRawInputDevices(&rid, 1, sizeof(rid)))
+			{
+				LOGERROR(TOSTRING(RegisterRawInputDevices), "调用失败，失败值", IntegerMode::HEX, static_cast<uint32_t>(GetLastError()));
+			}
+
+			{
+				WNDCLASSEX wcex = {};
+				wcex.cbSize = sizeof(WNDCLASSEX);
+				wcex.style = CS_HREDRAW | CS_VREDRAW | CS_DROPSHADOW;
+				wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
+				wcex.hbrBackground = reinterpret_cast<HBRUSH>(GetStockObject(WHITE_BRUSH));
+				wcex.lpszClassName = L"MenuWindowClass";
+				wcex.hInstance = hInstance;
+				wcex.lpfnWndProc = menuWindowCallBack;
+				RegisterClassEx(&wcex);
+			}
+
+			menuWindowHandle = CreateWindowEx(
+				WS_EX_TOOLWINDOW,
+				L"MenuWindowClass", L"",
+				WS_POPUP | WS_BORDER,
+				0, 0, menuWidth, menuHeight,
+				windowHandle, nullptr, GetModuleHandle(0), nullptr);
+
+			if (!menuWindowHandle)
+			{
+				LOGERROR("菜单窗口创建失败");
+			}
+
 			nid.cbSize = sizeof(NOTIFYICONDATA);
-			nid.hWnd = windowHandle;
+			nid.hWnd = menuWindowHandle;
 			nid.uID = 0;
 			nid.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP;
 			nid.uCallbackMessage = WM_TRAYICON;
 			nid.hIcon = LoadIcon(nullptr, IDI_APPLICATION);
 			wcscpy_s(nid.szTip, L"动态壁纸");
 
-			Shell_NotifyIcon(NIM_ADD, &nid);
-
+			if (!Shell_NotifyIcon(NIM_ADD, &nid))
 			{
-				RAWINPUTDEVICE rid;
-				rid.usUsagePage = 0x01;
-				rid.usUsage = 0x02;
-				rid.dwFlags = RIDEV_INPUTSINK;
-				rid.hwndTarget = windowHandle;
-
-				if (!RegisterRawInputDevices(&rid, 1, sizeof(rid)))
-				{
-					LOGERROR(TOSTRING(RegisterRawInputDevices), "调用失败，失败值", IntegerMode::HEX, static_cast<uint32_t>(GetLastError()));
-				}
+				LOGERROR("托盘图标创建失败");
 			}
 		}
 	}
@@ -145,26 +159,25 @@ namespace Gear::Window::Win32Form
 	{
 		if (initTrayIcon)
 		{
-			{
-				RAWINPUTDEVICE rid;
-				rid.usUsagePage = 0x01;
-				rid.usUsage = 0x02;
-				rid.dwFlags = RIDEV_REMOVE;
-				rid.hwndTarget = nullptr;
-				RegisterRawInputDevices(&rid, 1, sizeof(rid));
-			}
-
 			Shell_NotifyIcon(NIM_DELETE, &nid);
 
 			if (menuWindowHandle)
 			{
 				DestroyWindow(menuWindowHandle);
-
-				menuWindowHandle = nullptr;
 			}
+
+			rid.usUsagePage = 0x01;
+			rid.usUsage = 0x02;
+			rid.dwFlags = RIDEV_REMOVE;
+			rid.hwndTarget = nullptr;
+
+			RegisterRawInputDevices(&rid, 1, sizeof(rid));
 		}
 
-		DestroyWindow(windowHandle);
+		if (windowHandle)
+		{
+			DestroyWindow(windowHandle);
+		}
 	}
 
 	bool Win32FormImpl::pollEvents(const DWORD milliseconds)
@@ -410,33 +423,6 @@ namespace Gear::Window::Win32Form
 		}
 		break;
 
-		case WM_TRAYICON:
-
-			if (LOWORD(lParam) == WM_RBUTTONUP)
-			{
-				POINT pt;
-
-				GetCursorPos(&pt);
-
-				SetForegroundWindow(hWnd);
-
-				if (menuWindowHandle)
-				{
-					DestroyWindow(menuWindowHandle);
-
-					menuWindowHandle = nullptr;
-				}
-
-				menuWindowHandle = CreateWindowEx(
-					WS_EX_TOOLWINDOW | WS_EX_TOPMOST,
-					L"MenuWindowClass", L"",
-					WS_POPUP | WS_BORDER | WS_VISIBLE,
-					pt.x, pt.y - menuHeight, menuWidth, menuHeight,
-					hWnd, nullptr, GetModuleHandle(0), nullptr);
-			}
-
-			break;
-
 		case WM_COMMAND:
 
 			if (LOWORD(wParam) == EXITUID)
@@ -479,9 +465,22 @@ namespace Gear::Window::Win32Form
 			break;
 		}
 
-		case WM_CREATE:
+		case WM_TRAYICON:
 
-			SetCapture(hWnd);
+			if (LOWORD(lParam) == WM_RBUTTONUP)
+			{
+				POINT pt;
+
+				GetCursorPos(&pt);
+
+				SetWindowPos(hWnd, HWND_TOPMOST,
+					pt.x, pt.y - menuHeight, menuWidth, menuHeight,
+					SWP_NOACTIVATE | SWP_SHOWWINDOW);
+
+				SetForegroundWindow(hWnd);
+
+				SetCapture(hWnd);
+			}
 
 			break;
 
@@ -508,12 +507,7 @@ namespace Gear::Window::Win32Form
 
 		case WM_CAPTURECHANGED:
 
-			if (menuWindowHandle)
-			{
-				DestroyWindow(menuWindowHandle);
-
-				menuWindowHandle = nullptr;
-			}
+			ShowWindow(hWnd, SW_HIDE);
 
 			break;
 
