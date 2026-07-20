@@ -125,6 +125,19 @@ namespace Gear::Window::Win32Form
 			wcscpy_s(nid.szTip, L"动态壁纸");
 
 			Shell_NotifyIcon(NIM_ADD, &nid);
+
+			{
+				RAWINPUTDEVICE rid;
+				rid.usUsagePage = 0x01;
+				rid.usUsage = 0x02;
+				rid.dwFlags = RIDEV_INPUTSINK;
+				rid.hwndTarget = windowHandle;
+
+				if (!RegisterRawInputDevices(&rid, 1, sizeof(rid)))
+				{
+					LOGERROR(TOSTRING(RegisterRawInputDevices), "调用失败，失败值", IntegerMode::HEX, static_cast<uint32_t>(GetLastError()));
+				}
+			}
 		}
 	}
 
@@ -132,6 +145,15 @@ namespace Gear::Window::Win32Form
 	{
 		if (initTrayIcon)
 		{
+			{
+				RAWINPUTDEVICE rid;
+				rid.usUsagePage = 0x01;
+				rid.usUsage = 0x02;
+				rid.dwFlags = RIDEV_REMOVE;
+				rid.hwndTarget = nullptr;
+				RegisterRawInputDevices(&rid, 1, sizeof(rid));
+			}
+
 			Shell_NotifyIcon(NIM_DELETE, &nid);
 
 			if (menuWindowHandle)
@@ -199,7 +221,9 @@ namespace Gear::Window::Win32Form
 
 			if (!ImGui::GetCurrentContext() || !ImGui::GetIO().WantCaptureMouse)
 			{
-				Input::Mouse::Internal::move(static_cast<float>(LOWORD(lParam)), static_cast<float>(Core::Graphics::getHeight()) - static_cast<float>(HIWORD(lParam)));
+				Input::Mouse::Internal::move(
+					static_cast<float>(LOWORD(lParam)),
+					static_cast<float>(Core::Graphics::getHeight()) - static_cast<float>(HIWORD(lParam)));
 			}
 
 			break;
@@ -329,6 +353,63 @@ namespace Gear::Window::Win32Form
 
 			break;
 
+		case WM_INPUT:
+		{
+			uint32_t dataSize = 0;
+
+			if (!GetRawInputData(reinterpret_cast<HRAWINPUT>(lParam), RID_INPUT, nullptr, &dataSize, sizeof(RAWINPUTHEADER)) && dataSize <= sizeof(RAWINPUT))
+			{
+				RAWINPUT raw;
+
+				if (GetRawInputData(reinterpret_cast<HRAWINPUT>(lParam), RID_INPUT, &raw, &dataSize, sizeof(RAWINPUTHEADER)) == dataSize
+					&& raw.header.dwType == RIM_TYPEMOUSE)
+				{
+					const RAWMOUSE& mouse = raw.data.mouse;
+
+					if (mouse.usButtonFlags & RI_MOUSE_LEFT_BUTTON_DOWN)
+					{
+						Input::Mouse::Internal::pressLeft();
+					}
+
+					if (mouse.usButtonFlags & RI_MOUSE_LEFT_BUTTON_UP)
+					{
+						Input::Mouse::Internal::releaseLeft();
+					}
+
+					if (mouse.usButtonFlags & RI_MOUSE_RIGHT_BUTTON_DOWN)
+					{
+						Input::Mouse::Internal::pressRight();
+					}
+
+					if (mouse.usButtonFlags & RI_MOUSE_RIGHT_BUTTON_UP)
+					{
+						Input::Mouse::Internal::releaseRight();
+					}
+
+					if (mouse.usButtonFlags & RI_MOUSE_WHEEL)
+					{
+						const float delta = static_cast<float>(static_cast<SHORT>(mouse.usButtonData)) / static_cast<float>(WHEEL_DELTA);
+
+						Input::Mouse::Internal::scroll(delta);
+					}
+
+					if (mouse.usFlags == MOUSE_MOVE_RELATIVE)
+					{
+						POINT pt;
+
+						GetCursorPos(&pt);
+
+						ScreenToClient(hWnd, &pt);
+
+						Input::Mouse::Internal::move(
+							static_cast<float>(pt.x),
+							static_cast<float>(Core::Graphics::getHeight()) - static_cast<float>(pt.y));
+					}
+				}
+			}
+		}
+		break;
+
 		case WM_TRAYICON:
 
 			if (LOWORD(lParam) == WM_RBUTTONUP)
@@ -404,7 +485,7 @@ namespace Gear::Window::Win32Form
 
 			break;
 
-		//https://cloud.tencent.com/developer/article/2091013
+			//https://cloud.tencent.com/developer/article/2091013
 		case WM_LBUTTONUP:
 		{
 			POINT pt = { LOWORD(lParam), HIWORD(lParam) };
