@@ -42,7 +42,7 @@ namespace Gear::Core::VideoEncoder
 		avcodec_parameters_from_context(getOutStream()->codecpar, codecContext);
 
 		swsContext = sws_getContext(codecContext->width, codecContext->height, sourceFormat,
-			codecContext->width, codecContext->height, destFormat, SWS_BILINEAR, nullptr, nullptr, nullptr);
+			codecContext->width, codecContext->height, destFormat, SWS_POINT, nullptr, nullptr, nullptr);
 
 		yuvFrame = av_frame_alloc();
 
