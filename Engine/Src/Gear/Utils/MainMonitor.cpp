@@ -25,7 +25,7 @@ namespace Gear::Utils::MainMonitor
 	{
 		void getCurrentSettings()
 		{
-			HMONITOR monitor = MonitorFromWindow(GetDesktopWindow(), MONITOR_DEFAULTTONEAREST);
+			HMONITOR monitor = MonitorFromWindow(GetDesktopWindow(), MONITOR_DEFAULTTOPRIMARY);
 
 			MONITORINFOEX monitorInfo;
 			monitorInfo.cbSize = sizeof(MONITORINFOEX);

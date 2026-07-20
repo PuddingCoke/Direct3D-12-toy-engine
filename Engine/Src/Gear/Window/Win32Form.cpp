@@ -196,59 +196,75 @@ namespace Gear::Window::Win32Form
 		break;
 
 		case WM_MOUSEMOVE:
+
 			if (!ImGui::GetCurrentContext() || !ImGui::GetIO().WantCaptureMouse)
 			{
 				Input::Mouse::Internal::move(static_cast<float>(LOWORD(lParam)), static_cast<float>(Core::Graphics::getHeight()) - static_cast<float>(HIWORD(lParam)));
 			}
+
 			break;
 
 		case WM_LBUTTONDOWN:
+
 			if (!ImGui::GetCurrentContext() || !ImGui::GetIO().WantCaptureMouse)
 			{
 				Input::Mouse::Internal::pressLeft();
 			}
+
 			break;
 
 		case WM_RBUTTONDOWN:
+
 			if (!ImGui::GetCurrentContext() || !ImGui::GetIO().WantCaptureMouse)
 			{
 				Input::Mouse::Internal::pressRight();
 			}
+
 			break;
 
 		case WM_LBUTTONUP:
+
 			if (!ImGui::GetCurrentContext() || !ImGui::GetIO().WantCaptureMouse)
 			{
 				Input::Mouse::Internal::releaseLeft();
 			}
+
 			break;
 
 		case WM_RBUTTONUP:
+
 			if (!ImGui::GetCurrentContext() || !ImGui::GetIO().WantCaptureMouse)
 			{
 				Input::Mouse::Internal::releaseRight();
 			}
+
 			break;
 
 		case WM_MOUSEWHEEL:
+
 			if (!ImGui::GetCurrentContext() || !ImGui::GetIO().WantCaptureMouse)
 			{
 				Input::Mouse::Internal::scroll(GET_WHEEL_DELTA_WPARAM(wParam) / 120.f);
 			}
+
 			break;
 
 		case WM_KEYDOWN:
+
 			if (((HIWORD(lParam) & KF_REPEAT) == 0) && (!ImGui::GetCurrentContext() || !ImGui::GetIO().WantCaptureKeyboard))
 			{
 				Input::Keyboard::Internal::pressKey(static_cast<Input::Keyboard::Key>(wParam));
 			}
+
 			break;
 
 		case WM_KEYUP:
+
 			if (!ImGui::GetCurrentContext() || !ImGui::GetIO().WantCaptureKeyboard)
 			{
 				Input::Keyboard::Internal::releaseKey(static_cast<Input::Keyboard::Key>(wParam));
 			}
+
 			break;
 
 		case WM_DESTROY:
@@ -314,6 +330,7 @@ namespace Gear::Window::Win32Form
 			break;
 
 		case WM_TRAYICON:
+
 			if (LOWORD(lParam) == WM_RBUTTONUP)
 			{
 				POINT pt;
@@ -325,6 +342,8 @@ namespace Gear::Window::Win32Form
 				if (menuWindowHandle)
 				{
 					DestroyWindow(menuWindowHandle);
+
+					menuWindowHandle = nullptr;
 				}
 
 				menuWindowHandle = CreateWindowEx(
@@ -333,19 +352,19 @@ namespace Gear::Window::Win32Form
 					WS_POPUP | WS_BORDER | WS_VISIBLE,
 					pt.x, pt.y - menuHeight, menuWidth, menuHeight,
 					hWnd, nullptr, GetModuleHandle(0), nullptr);
-
-				ShowWindow(menuWindowHandle, SW_SHOW);
-
-				SetCapture(menuWindowHandle);
 			}
+
 			break;
 
 		case WM_COMMAND:
+
 			if (LOWORD(wParam) == EXITUID)
 			{
 				PostQuitMessage(0);
 			}
+
 			break;
+
 		default:
 
 			return DefWindowProc(hWnd, uMsg, wParam, lParam);
@@ -379,6 +398,13 @@ namespace Gear::Window::Win32Form
 			break;
 		}
 
+		case WM_CREATE:
+
+			SetCapture(hWnd);
+
+			break;
+
+		//https://cloud.tencent.com/developer/article/2091013
 		case WM_LBUTTONUP:
 		{
 			POINT pt = { LOWORD(lParam), HIWORD(lParam) };
@@ -396,6 +422,11 @@ namespace Gear::Window::Win32Form
 
 			ReleaseCapture();
 
+			break;
+		}
+
+		case WM_CAPTURECHANGED:
+
 			if (menuWindowHandle)
 			{
 				DestroyWindow(menuWindowHandle);
@@ -404,7 +435,6 @@ namespace Gear::Window::Win32Form
 			}
 
 			break;
-		}
 
 		default:
 
