@@ -17,7 +17,12 @@ namespace Gear::Input::Mouse::Internal
 
 	void scroll(const float delta);
 
-	void move(const float curX, const float curY);
+	void setPosition(const float x, const float y);
+
+	void move(const float deltaX, const float deltaY);
+
+	void triggerEvents();
+
 }
 
 #endif // !_GEAR_INPUT_MOUSE_INTERNAL_H_

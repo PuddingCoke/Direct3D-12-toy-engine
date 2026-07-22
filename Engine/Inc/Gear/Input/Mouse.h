@@ -9,27 +9,44 @@
 
 namespace Gear::Input::Mouse
 {
+	//横坐标 左侧为 0
 	float getX();
 
+	//纵坐标 底部为 0
 	float getY();
 
+	//横坐标的变化量 向右为正
 	float getDeltaX();
 
+	//纵坐标的变化量 向上为正
 	float getDeltaY();
 
+	//向前 +1 向后 -1
 	float getWheelDelta();
 
+	//获取左键按下状态
 	bool getLeftDown();
 
+	//获取右键按下状态
 	bool getRightDown();
 
-	bool onMove();
+	//这一帧是否移动
+	bool getOnMove();
 
-	bool onLeftDown();
+	//这一帧是否按下左键
+	bool getOnLeftDown();
 
-	bool onRightDown();
+	//这一帧是否按下右键
+	bool getOnRightDown();
 
-	bool onScroll();
+	//这一帧是否弹起左键
+	bool getOnLeftUp();
+
+	//这一帧是否弹起右键
+	bool getOnRightUp();
+
+	//这一帧滚轮是否滚动
+	bool getOnScroll();
 
 	uint64_t addMoveEvent(const std::function<void(void)>& func);
 

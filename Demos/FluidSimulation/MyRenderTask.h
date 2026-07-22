@@ -124,7 +124,7 @@ public:
 
 	void splatVelocityAndColor()
 	{
-		if (config.vortex || (Mouse::onMove() && Mouse::getLeftDown()))
+		if (config.vortex || (Mouse::getOnMove() && Mouse::getLeftDown()))
 		{
 			context->setPipelineState(*splatVelocityState);
 			SETCONSTS({
@@ -250,9 +250,9 @@ public:
 
 	void recordCommand() override
 	{
-		const DirectX::XMFLOAT2 pos = { (float)Mouse::getX(),(float)(Graphics::getHeight() - Mouse::getY()) };
+		const DirectX::XMFLOAT2 pos = { Mouse::getX(),Graphics::getHeight() - Mouse::getY() };
 
-		const DirectX::XMFLOAT2 posDelta = { (pos.x - simulationParam.pos.x) * config.force,(pos.y - simulationParam.pos.y) * config.force };
+		const DirectX::XMFLOAT2 posDelta = { Input::Mouse::getDeltaX() * config.force,-Input::Mouse::getDeltaY() * config.force };
 
 		if (config.vortex)
 		{

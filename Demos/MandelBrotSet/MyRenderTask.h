@@ -42,16 +42,16 @@ protected:
 
 	void recordCommand() override
 	{
-		if (Mouse::getLeftDown() && Mouse::onMove())
+		if (Mouse::getLeftDown() && Mouse::getOnMove())
 		{
-			param.location.x -= Graphics::getDeltaTime() * Mouse::getDeltaX() * param.scale;
+			param.location.x -= Mouse::getDeltaX() * param.scale * 1.5f / Graphics::getHeight();
 
-			param.location.y += Graphics::getDeltaTime() * Mouse::getDeltaY() * param.scale;
+			param.location.y += Mouse::getDeltaY() * param.scale * 1.5f / Graphics::getHeight();
 
 			accParam.frameIndex = 0;
 		}
 
-		if (Mouse::onScroll())
+		if (Mouse::getOnScroll())
 		{
 			if (Mouse::getWheelDelta() > 0.f)
 			{

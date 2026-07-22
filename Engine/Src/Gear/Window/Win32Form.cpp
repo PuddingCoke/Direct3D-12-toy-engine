@@ -12,9 +12,9 @@
 
 #include<ImGUI/imgui.h>
 
-#define WM_TRAYICON WM_USER
+#include<hidusage.h>
 
-#define EXITUID 0
+#define WM_TRAYICON WM_USER
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam);
 
@@ -104,18 +104,18 @@ namespace Gear::Window::Win32Form
 
 		ShowWindow(windowHandle, SW_SHOW);
 
+		rid.usUsagePage = HID_USAGE_PAGE_GENERIC;
+		rid.usUsage = HID_USAGE_GENERIC_MOUSE;
+		rid.dwFlags = initTrayIcon ? RIDEV_INPUTSINK : 0;
+		rid.hwndTarget = windowHandle;
+
+		if (!RegisterRawInputDevices(&rid, 1, sizeof(rid)))
+		{
+			LOGERROR(TOSTRING(RegisterRawInputDevices), "调用失败，失败值", IntegerMode::HEX, static_cast<uint32_t>(GetLastError()));
+		}
+
 		if (initTrayIcon)
 		{
-			rid.usUsagePage = 0x01;
-			rid.usUsage = 0x02;
-			rid.dwFlags = RIDEV_INPUTSINK;
-			rid.hwndTarget = windowHandle;
-
-			if (!RegisterRawInputDevices(&rid, 1, sizeof(rid)))
-			{
-				LOGERROR(TOSTRING(RegisterRawInputDevices), "调用失败，失败值", IntegerMode::HEX, static_cast<uint32_t>(GetLastError()));
-			}
-
 			{
 				WNDCLASSEX wcex = {};
 				wcex.cbSize = sizeof(WNDCLASSEX);
@@ -165,14 +165,12 @@ namespace Gear::Window::Win32Form
 			{
 				DestroyWindow(menuWindowHandle);
 			}
-
-			rid.usUsagePage = 0x01;
-			rid.usUsage = 0x02;
-			rid.dwFlags = RIDEV_REMOVE;
-			rid.hwndTarget = nullptr;
-
-			RegisterRawInputDevices(&rid, 1, sizeof(rid));
 		}
+
+		rid.dwFlags = RIDEV_REMOVE;
+		rid.hwndTarget = nullptr;
+
+		RegisterRawInputDevices(&rid, 1, sizeof(rid));
 
 		if (windowHandle)
 		{
@@ -205,6 +203,8 @@ namespace Gear::Window::Win32Form
 			}
 		}
 
+		Input::Mouse::Internal::triggerEvents();
+
 		return true;
 	}
 
@@ -234,57 +234,65 @@ namespace Gear::Window::Win32Form
 
 			if (!ImGui::GetCurrentContext() || !ImGui::GetIO().WantCaptureMouse)
 			{
-				Input::Mouse::Internal::move(
-					static_cast<float>(LOWORD(lParam)),
-					static_cast<float>(Core::Graphics::getHeight()) - static_cast<float>(HIWORD(lParam)));
+				Input::Mouse::Internal::setPosition(static_cast<float>(LOWORD(lParam)), static_cast<float>(Core::Graphics::getHeight()) - static_cast<float>(HIWORD(lParam)));
 			}
 
 			break;
 
-		case WM_LBUTTONDOWN:
+		case WM_INPUT:
+		{
+			uint32_t dataSize = 0;
 
-			if (!ImGui::GetCurrentContext() || !ImGui::GetIO().WantCaptureMouse)
+			if (!GetRawInputData(reinterpret_cast<HRAWINPUT>(lParam), RID_INPUT, nullptr, &dataSize, sizeof(RAWINPUTHEADER)) && dataSize <= sizeof(RAWINPUT))
 			{
-				Input::Mouse::Internal::pressLeft();
+				RAWINPUT raw;
+
+				if (GetRawInputData(reinterpret_cast<HRAWINPUT>(lParam), RID_INPUT, &raw, &dataSize, sizeof(RAWINPUTHEADER)) == dataSize)
+				{
+					if (raw.header.dwType == RIM_TYPEMOUSE)
+					{
+						const RAWMOUSE& mouse = raw.data.mouse;
+
+						if (!ImGui::GetCurrentContext() || !ImGui::GetIO().WantCaptureMouse)
+						{
+							if (mouse.usButtonFlags & RI_MOUSE_LEFT_BUTTON_DOWN)
+							{
+								Input::Mouse::Internal::pressLeft();
+							}
+
+							if (mouse.usButtonFlags & RI_MOUSE_LEFT_BUTTON_UP)
+							{
+								Input::Mouse::Internal::releaseLeft();
+							}
+
+							if (mouse.usButtonFlags & RI_MOUSE_RIGHT_BUTTON_DOWN)
+							{
+								Input::Mouse::Internal::pressRight();
+							}
+
+							if (mouse.usButtonFlags & RI_MOUSE_RIGHT_BUTTON_UP)
+							{
+								Input::Mouse::Internal::releaseRight();
+							}
+
+							if (mouse.usButtonFlags & RI_MOUSE_WHEEL)
+							{
+								const float delta = static_cast<float>(static_cast<SHORT>(mouse.usButtonData)) / static_cast<float>(WHEEL_DELTA);
+
+								Input::Mouse::Internal::scroll(delta);
+							}
+
+							if ((mouse.usFlags & MOUSE_MOVE_ABSOLUTE) == MOUSE_MOVE_RELATIVE)
+							{
+								Input::Mouse::Internal::move(static_cast<float>(mouse.lLastX), static_cast<float>(-mouse.lLastY));
+							}
+						}
+					}
+				}
 			}
+		}
 
-			break;
-
-		case WM_RBUTTONDOWN:
-
-			if (!ImGui::GetCurrentContext() || !ImGui::GetIO().WantCaptureMouse)
-			{
-				Input::Mouse::Internal::pressRight();
-			}
-
-			break;
-
-		case WM_LBUTTONUP:
-
-			if (!ImGui::GetCurrentContext() || !ImGui::GetIO().WantCaptureMouse)
-			{
-				Input::Mouse::Internal::releaseLeft();
-			}
-
-			break;
-
-		case WM_RBUTTONUP:
-
-			if (!ImGui::GetCurrentContext() || !ImGui::GetIO().WantCaptureMouse)
-			{
-				Input::Mouse::Internal::releaseRight();
-			}
-
-			break;
-
-		case WM_MOUSEWHEEL:
-
-			if (!ImGui::GetCurrentContext() || !ImGui::GetIO().WantCaptureMouse)
-			{
-				Input::Mouse::Internal::scroll(GET_WHEEL_DELTA_WPARAM(wParam) / 120.f);
-			}
-
-			break;
+		break;
 
 		case WM_KEYDOWN:
 
@@ -374,63 +382,55 @@ namespace Gear::Window::Win32Form
 			{
 				RAWINPUT raw;
 
-				if (GetRawInputData(reinterpret_cast<HRAWINPUT>(lParam), RID_INPUT, &raw, &dataSize, sizeof(RAWINPUTHEADER)) == dataSize
-					&& raw.header.dwType == RIM_TYPEMOUSE)
+				if (GetRawInputData(reinterpret_cast<HRAWINPUT>(lParam), RID_INPUT, &raw, &dataSize, sizeof(RAWINPUTHEADER)) == dataSize)
 				{
-					const RAWMOUSE& mouse = raw.data.mouse;
-
-					if (mouse.usButtonFlags & RI_MOUSE_LEFT_BUTTON_DOWN)
+					if (raw.header.dwType == RIM_TYPEMOUSE)
 					{
-						Input::Mouse::Internal::pressLeft();
-					}
+						const RAWMOUSE& mouse = raw.data.mouse;
 
-					if (mouse.usButtonFlags & RI_MOUSE_LEFT_BUTTON_UP)
-					{
-						Input::Mouse::Internal::releaseLeft();
-					}
+						if (mouse.usButtonFlags & RI_MOUSE_LEFT_BUTTON_DOWN)
+						{
+							Input::Mouse::Internal::pressLeft();
+						}
 
-					if (mouse.usButtonFlags & RI_MOUSE_RIGHT_BUTTON_DOWN)
-					{
-						Input::Mouse::Internal::pressRight();
-					}
+						if (mouse.usButtonFlags & RI_MOUSE_LEFT_BUTTON_UP)
+						{
+							Input::Mouse::Internal::releaseLeft();
+						}
 
-					if (mouse.usButtonFlags & RI_MOUSE_RIGHT_BUTTON_UP)
-					{
-						Input::Mouse::Internal::releaseRight();
-					}
+						if (mouse.usButtonFlags & RI_MOUSE_RIGHT_BUTTON_DOWN)
+						{
+							Input::Mouse::Internal::pressRight();
+						}
 
-					if (mouse.usButtonFlags & RI_MOUSE_WHEEL)
-					{
-						const float delta = static_cast<float>(static_cast<SHORT>(mouse.usButtonData)) / static_cast<float>(WHEEL_DELTA);
+						if (mouse.usButtonFlags & RI_MOUSE_RIGHT_BUTTON_UP)
+						{
+							Input::Mouse::Internal::releaseRight();
+						}
 
-						Input::Mouse::Internal::scroll(delta);
-					}
+						if (mouse.usButtonFlags & RI_MOUSE_WHEEL)
+						{
+							const float delta = static_cast<float>(static_cast<SHORT>(mouse.usButtonData)) / static_cast<float>(WHEEL_DELTA);
 
-					if (mouse.usFlags == MOUSE_MOVE_RELATIVE)
-					{
-						POINT pt;
+							Input::Mouse::Internal::scroll(delta);
+						}
 
-						GetCursorPos(&pt);
+						if ((mouse.usFlags & MOUSE_MOVE_ABSOLUTE) == MOUSE_MOVE_RELATIVE)
+						{
+							POINT pt;
 
-						ScreenToClient(hWnd, &pt);
+							GetPhysicalCursorPos(&pt);
 
-						Input::Mouse::Internal::move(
-							static_cast<float>(pt.x),
-							static_cast<float>(Core::Graphics::getHeight()) - static_cast<float>(pt.y));
+							Input::Mouse::Internal::setPosition(static_cast<float>(pt.x), static_cast<float>(Core::Graphics::getHeight()) - static_cast<float>(pt.y));
+
+							Input::Mouse::Internal::move(static_cast<float>(mouse.lLastX), static_cast<float>(-mouse.lLastY));
+						}
 					}
 				}
 			}
 		}
+
 		break;
-
-		case WM_COMMAND:
-
-			if (LOWORD(wParam) == EXITUID)
-			{
-				PostQuitMessage(0);
-			}
-
-			break;
 
 		default:
 
@@ -497,7 +497,7 @@ namespace Gear::Window::Win32Form
 
 			if (PtInRect(&rc, pt))
 			{
-				PostMessage(GetParent(hWnd), WM_COMMAND, EXITUID, 0);
+				PostQuitMessage(0);
 			}
 
 			ReleaseCapture();

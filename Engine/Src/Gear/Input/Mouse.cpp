@@ -23,13 +23,17 @@ namespace Gear::Input::Mouse
 
 		bool rightDown = false;
 
-		bool onMoved = false;
+		bool onMove = false;
 
-		bool onLeftDowned = false;
+		bool onLeftDown = false;
 
-		bool onRightDowned = false;
+		bool onRightDown = false;
 
-		bool onScrolled = false;
+		bool onLeftUp = false;
+
+		bool onRightUp = false;
+
+		bool onScroll = false;
 
 		Event moveEvent;
 
@@ -49,73 +53,107 @@ namespace Gear::Input::Mouse
 	{
 		void resetDeltaValue()
 		{
-			impl.deltaX = 0;
+			impl.deltaX = 0.f;
 
-			impl.deltaY = 0;
+			impl.deltaY = 0.f;
 
-			impl.onMoved = false;
+			impl.wheelDelta = 0.f;
 
-			impl.onLeftDowned = false;
+			impl.onMove = false;
 
-			impl.onRightDowned = false;
+			impl.onLeftDown = false;
 
-			impl.onScrolled = false;
+			impl.onRightDown = false;
+
+			impl.onLeftUp = false;
+
+			impl.onRightUp = false;
+
+			impl.onScroll = false;
 		}
 
 		void pressLeft()
 		{
 			impl.leftDown = true;
 
-			impl.onLeftDowned = true;
-
-			impl.leftDownEvent();
+			impl.onLeftDown = true;
 		}
 
 		void pressRight()
 		{
 			impl.rightDown = true;
 
-			impl.onRightDowned = true;
-
-			impl.rightDownEvent();
+			impl.onRightDown = true;
 		}
 
 		void releaseLeft()
 		{
 			impl.leftDown = false;
 
-			impl.leftUpEvent();
+			impl.onLeftUp = true;
 		}
 
 		void releaseRight()
 		{
 			impl.rightDown = false;
 
-			impl.rightUpEvent();
+			impl.onRightUp = true;
 		}
 
 		void scroll(const float delta)
 		{
-			impl.wheelDelta = delta;
+			impl.wheelDelta += delta;
 
-			impl.onScrolled = true;
-
-			impl.scrollEvent();
+			impl.onScroll = true;
 		}
 
-		void move(const float curX, const float curY)
+		void setPosition(const float x, const float y)
 		{
-			impl.deltaX = curX - impl.x;
+			impl.x = x;
 
-			impl.deltaY = curY - impl.y;
+			impl.y = y;
+		}
 
-			impl.x = curX;
+		void move(const float deltaX, const float deltaY)
+		{
+			impl.deltaX += deltaX;
 
-			impl.y = curY;
+			impl.deltaY += deltaY;
 
-			impl.onMoved = true;
+			impl.onMove = true;
+		}
 
-			impl.moveEvent();
+		void triggerEvents()
+		{
+			if (impl.onMove)
+			{
+				impl.moveEvent();
+			}
+
+			if (impl.onScroll)
+			{
+				impl.scrollEvent();
+			}
+
+			if (impl.onLeftDown)
+			{
+				impl.leftDownEvent();
+			}
+
+			if (impl.onLeftUp)
+			{
+				impl.leftUpEvent();
+			}
+
+			if (impl.onRightDown)
+			{
+				impl.rightDownEvent();
+			}
+
+			if (impl.onRightUp)
+			{
+				impl.rightUpEvent();
+			}
 		}
 	}
 
@@ -154,24 +192,34 @@ namespace Gear::Input::Mouse
 		return impl.rightDown;
 	}
 
-	bool onMove()
+	bool getOnMove()
 	{
-		return impl.onMoved;
+		return impl.onMove;
 	}
 
-	bool onLeftDown()
+	bool getOnLeftDown()
 	{
-		return impl.onLeftDowned;
+		return impl.onLeftDown;
 	}
 
-	bool onRightDown()
+	bool getOnRightDown()
 	{
-		return impl.onRightDowned;
+		return impl.onRightDown;
 	}
 
-	bool onScroll()
+	bool getOnLeftUp()
 	{
-		return impl.onScrolled;
+		return impl.onLeftUp;
+	}
+
+	bool getOnRightUp()
+	{
+		return impl.onRightUp;
+	}
+
+	bool getOnScroll()
+	{
+		return impl.onScroll;
 	}
 
 	uint64_t addMoveEvent(const std::function<void(void)>& func)
