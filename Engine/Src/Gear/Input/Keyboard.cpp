@@ -6,25 +6,25 @@
 
 namespace Gear::Input::Keyboard
 {
+	struct KeyboardImpl
+	{
+
+		static constexpr size_t maxKey = 512;
+
+		Event keyDownEvents[maxKey] = {};
+
+		Event keyUpEvents[maxKey] = {};
+
+		bool keyDownStates[maxKey] = {};
+
+		bool onKeyDownStates[maxKey] = {};
+
+		std::vector<uint32_t> onKeyDownClearList = std::vector<uint32_t>();
+
+	} impl;
+
 	namespace Internal
 	{
-		struct KeyboardImpl
-		{
-
-			static constexpr size_t maxKey = 512;
-
-			Event keyDownEvents[maxKey] = {};
-
-			Event keyUpEvents[maxKey] = {};
-
-			bool keyDownStates[maxKey] = {};
-
-			bool onKeyDownStates[maxKey] = {};
-
-			std::vector<uint32_t> onKeyDownClearList = std::vector<uint32_t>();
-
-		} impl;
-
 		void resetDeltaValue()
 		{
 			if (impl.onKeyDownClearList.size())
@@ -62,31 +62,31 @@ namespace Gear::Input::Keyboard
 
 	bool getKeyDown(const Key key)
 	{
-		return Internal::impl.keyDownStates[key];
+		return impl.keyDownStates[key];
 	}
 
 	bool onKeyDown(const Key key)
 	{
-		return Internal::impl.onKeyDownStates[key];
+		return impl.onKeyDownStates[key];
 	}
 
 	uint64_t addKeyDownEvent(const Key key, const std::function<void(void)>& func)
 	{
-		return Internal::impl.keyDownEvents[key] += func;
+		return impl.keyDownEvents[key] += func;
 	}
 
 	uint64_t addKeyUpEvent(const Key key, const std::function<void(void)>& func)
 	{
-		return Internal::impl.keyUpEvents[key] += func;
+		return impl.keyUpEvents[key] += func;
 	}
 
 	void removeKeyDownEvent(const Key key, const uint64_t id)
 	{
-		Internal::impl.keyDownEvents[key] -= id;
+		impl.keyDownEvents[key] -= id;
 	}
 
 	void removeKeyUpEvent(const Key key, const uint64_t id)
 	{
-		Internal::impl.keyUpEvents[key] -= id;
+		impl.keyUpEvents[key] -= id;
 	}
 }

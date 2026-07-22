@@ -19,7 +19,7 @@ namespace Gear
 				{
 					if (Input::Mouse::getLeftDown())
 					{
-						const DirectX::XMMATRIX rotMat = DirectX::XMMatrixRotationAxis(this->up, Input::Mouse::getDX() / 120.f);
+						const DirectX::XMMATRIX rotMat = DirectX::XMMatrixRotationAxis(this->up, Input::Mouse::getDeltaX() / 120.f);
 
 						this->lookDir = DirectX::XMVector3Transform(this->lookDir, rotMat);
 
@@ -29,9 +29,9 @@ namespace Gear
 
 						DirectX::XMStoreFloat(&lookUpAngle, DirectX::XMVector3AngleBetweenNormals(this->lookDir, this->up));
 
-						const float destAngle = lookUpAngle - Input::Mouse::getDY() / 120.f;
+						const float destAngle = lookUpAngle - Input::Mouse::getDeltaY() / 120.f;
 
-						float rotAngle = -Input::Mouse::getDY() / 120.f;
+						float rotAngle = -Input::Mouse::getDeltaY() / 120.f;
 
 						if (destAngle > Utils::Math::pi - Core::MainCamera::epsilon)
 						{

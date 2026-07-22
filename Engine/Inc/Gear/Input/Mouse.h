@@ -13,9 +13,9 @@ namespace Gear::Input::Mouse
 
 	float getY();
 
-	float getDX();
+	float getDeltaX();
 
-	float getDY();
+	float getDeltaY();
 
 	float getWheelDelta();
 

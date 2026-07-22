@@ -44,9 +44,9 @@ protected:
 	{
 		if (Mouse::getLeftDown() && Mouse::onMove())
 		{
-			param.location.x -= Graphics::getDeltaTime() * Mouse::getDX() * param.scale;
+			param.location.x -= Graphics::getDeltaTime() * Mouse::getDeltaX() * param.scale;
 
-			param.location.y += Graphics::getDeltaTime() * Mouse::getDY() * param.scale;
+			param.location.y += Graphics::getDeltaTime() * Mouse::getDeltaY() * param.scale;
 
 			accParam.frameIndex = 0;
 		}
