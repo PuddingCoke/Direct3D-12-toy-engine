@@ -2,6 +2,8 @@
 
 #include<Gear/Utils/Logger.h>
 
+#include<Gear/Utils/WallpaperHelper.h>
+
 #include<Gear/Core/Graphics.h> 
 
 #include<Gear/Input/Keyboard.h>
@@ -106,7 +108,7 @@ namespace Gear::Window::Win32Form
 
 		rid.usUsagePage = HID_USAGE_PAGE_GENERIC;
 		rid.usUsage = HID_USAGE_GENERIC_MOUSE;
-		rid.dwFlags = initTrayIcon ? RIDEV_INPUTSINK : 0;
+		rid.dwFlags = initTrayIcon ? RIDEV_EXINPUTSINK : 0;
 		rid.hwndTarget = windowHandle;
 
 		if (!RegisterRawInputDevices(&rid, 1, sizeof(rid)))
@@ -386,44 +388,47 @@ namespace Gear::Window::Win32Form
 				{
 					if (raw.header.dwType == RIM_TYPEMOUSE)
 					{
-						const RAWMOUSE& mouse = raw.data.mouse;
-
-						if (mouse.usButtonFlags & RI_MOUSE_LEFT_BUTTON_DOWN)
+						if (Utils::WallpaperHelper::isOnDesktop(GetForegroundWindow()))
 						{
-							Input::Mouse::Internal::pressLeft();
-						}
+							const RAWMOUSE& mouse = raw.data.mouse;
 
-						if (mouse.usButtonFlags & RI_MOUSE_LEFT_BUTTON_UP)
-						{
-							Input::Mouse::Internal::releaseLeft();
-						}
+							if (mouse.usButtonFlags & RI_MOUSE_LEFT_BUTTON_DOWN)
+							{
+								Input::Mouse::Internal::pressLeft();
+							}
 
-						if (mouse.usButtonFlags & RI_MOUSE_RIGHT_BUTTON_DOWN)
-						{
-							Input::Mouse::Internal::pressRight();
-						}
+							if (mouse.usButtonFlags & RI_MOUSE_LEFT_BUTTON_UP)
+							{
+								Input::Mouse::Internal::releaseLeft();
+							}
 
-						if (mouse.usButtonFlags & RI_MOUSE_RIGHT_BUTTON_UP)
-						{
-							Input::Mouse::Internal::releaseRight();
-						}
+							if (mouse.usButtonFlags & RI_MOUSE_RIGHT_BUTTON_DOWN)
+							{
+								Input::Mouse::Internal::pressRight();
+							}
 
-						if (mouse.usButtonFlags & RI_MOUSE_WHEEL)
-						{
-							const float delta = static_cast<float>(static_cast<SHORT>(mouse.usButtonData)) / static_cast<float>(WHEEL_DELTA);
+							if (mouse.usButtonFlags & RI_MOUSE_RIGHT_BUTTON_UP)
+							{
+								Input::Mouse::Internal::releaseRight();
+							}
 
-							Input::Mouse::Internal::scroll(delta);
-						}
+							if (mouse.usButtonFlags & RI_MOUSE_WHEEL)
+							{
+								const float delta = static_cast<float>(static_cast<SHORT>(mouse.usButtonData)) / static_cast<float>(WHEEL_DELTA);
 
-						if ((mouse.usFlags & MOUSE_MOVE_ABSOLUTE) == MOUSE_MOVE_RELATIVE)
-						{
-							POINT pt;
+								Input::Mouse::Internal::scroll(delta);
+							}
 
-							GetPhysicalCursorPos(&pt);
+							if ((mouse.usFlags & MOUSE_MOVE_ABSOLUTE) == MOUSE_MOVE_RELATIVE)
+							{
+								POINT pt;
 
-							Input::Mouse::Internal::setPosition(static_cast<float>(pt.x), static_cast<float>(Core::Graphics::getHeight()) - static_cast<float>(pt.y));
+								GetPhysicalCursorPos(&pt);
 
-							Input::Mouse::Internal::move(static_cast<float>(mouse.lLastX), static_cast<float>(-mouse.lLastY));
+								Input::Mouse::Internal::setPosition(static_cast<float>(pt.x), static_cast<float>(Core::Graphics::getHeight()) - static_cast<float>(pt.y));
+
+								Input::Mouse::Internal::move(static_cast<float>(mouse.lLastX), static_cast<float>(-mouse.lLastY));
+							}
 						}
 					}
 				}

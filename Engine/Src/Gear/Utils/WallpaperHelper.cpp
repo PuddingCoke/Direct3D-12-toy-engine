@@ -77,50 +77,6 @@ namespace Gear::Utils::WallpaperHelper
 
 		uint32_t taskBarHeight;
 
-		//用Spy++查看了下，我的win11系统是这个结构，目前用着没太大的问题
-		bool isDesktop(const LONG x, const LONG y) const
-		{
-			const HWND hWnd = WindowFromPoint({ x, y });
-
-			if (!hWnd || !IsWindowVisible(hWnd))
-			{
-				return true;
-			}
-
-			wchar_t className[256];
-
-			GetClassNameW(hWnd, className, 256);
-
-			bool isDesktop = ((_wcsicmp(className, L"Progman") == 0) || (_wcsicmp(className, L"WorkerW") == 0) || (hWnd == GetDesktopWindow()));
-
-			if (!isDesktop && _wcsicmp(className, L"SysListView32") == 0)
-			{
-				const HWND parent = GetParent(hWnd);
-
-				if (parent)
-				{
-					GetClassNameW(parent, className, 256);
-
-					if (_wcsicmp(className, L"SHELLDLL_DefView") == 0)
-					{
-						const HWND root = GetAncestor(hWnd, GA_ROOT);
-
-						if (root)
-						{
-							GetClassNameW(root, className, 256);
-
-							if (_wcsicmp(className, L"Progman") == 0 || _wcsicmp(className, L"WorkerW") == 0)
-							{
-								isDesktop = true;
-							}
-						}
-					}
-				}
-			}
-
-			return isDesktop;
-		}
-
 		//AI生成的，后续可能要改改，目前用着没太大问题
 		bool detectPoints() const
 		{
@@ -182,7 +138,7 @@ namespace Gear::Utils::WallpaperHelper
 				{
 					LONG x = static_cast<LONG>(xPos[xi]);
 
-					if (!isDesktop(x, y))
+					if (!isOnDesktop(x, y))
 					{
 						covered++;
 					}
@@ -213,6 +169,48 @@ namespace Gear::Utils::WallpaperHelper
 	bool isDesktopObscured()
 	{
 		return detectThread->getObscured();
+	}
+
+	bool isOnDesktop(const LONG x, const LONG y)
+	{
+		const HWND hWnd = WindowFromPoint({ x, y });
+
+		return isOnDesktop(hWnd);
+	}
+
+	//用Spy++查看了下，我的win11系统是这个结构，目前用着没太大的问题
+	bool isOnDesktop(HWND hWnd)
+	{
+		if (!hWnd || !IsWindowVisible(hWnd))
+		{
+			return true;
+		}
+
+		wchar_t className[16];
+
+		GetClassNameW(hWnd, className, _countof(className));
+
+		if ((_wcsicmp(className, L"Progman") == 0) || (_wcsicmp(className, L"WorkerW") == 0) || (hWnd == GetDesktopWindow()))
+		{
+			return true;
+		}
+		else
+		{
+			//这里用GetAncestor + GA_ROOT更好，能跳过无用层级
+			const HWND root = GetAncestor(hWnd, GA_ROOT);
+
+			if (root)
+			{
+				GetClassNameW(root, className, _countof(className));
+
+				if ((_wcsicmp(className, L"Progman") == 0) || (_wcsicmp(className, L"WorkerW") == 0) || (root == GetDesktopWindow()))
+				{
+					return true;
+				}
+			}
+		}
+
+		return false;
 	}
 
 	void initialize()

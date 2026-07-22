@@ -15,6 +15,10 @@ namespace Gear::Utils::WallpaperHelper
 
 	bool isDesktopObscured();
 
+	bool isOnDesktop(const LONG x, const LONG y);
+
+	bool isOnDesktop(HWND hWnd);
+
 	void initialize();
 
 	void release();
