@@ -554,9 +554,6 @@
     <ClCompile Include="Src\Gear\Utils\DeltaTimeEstimator.cpp">
       <Filter>Source\Utils</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Utils\Math.cpp">
-      <Filter>Source\Utils</Filter>
-    </ClCompile>
     <ClCompile Include="Src\Gear\Utils\Random.cpp">
       <Filter>Source\Utils</Filter>
     </ClCompile>

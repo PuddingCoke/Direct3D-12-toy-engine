@@ -14,6 +14,8 @@
 
 #include<ImGUI/imgui.h>
 
+#include<shellapi.h>
+
 #include<hidusage.h>
 
 #define WM_TRAYICON WM_USER

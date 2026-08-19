@@ -1,8 +1,12 @@
-#include<Gear/Utils/String.h>
-
 #ifndef NOMINMAX
 #define NOMINMAX
 #endif // !NOMINMAX
+
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif // !WIN32_LEAN_AND_MEAN
+
+#include<Gear/Utils/String.h>
 
 #include<Windows.h>
 

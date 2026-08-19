@@ -14,6 +14,10 @@ namespace Gear::Core::D3D12Resource
 	{
 	}
 
+	ReadbackHeap::~ReadbackHeap()
+	{
+	}
+
 	const void* ReadbackHeap::map(const uint64_t begin, const uint64_t end) const
 	{
 		void* dataPtr = nullptr;
@@ -35,7 +39,8 @@ namespace Gear::Core::D3D12Resource
 		getResource()->Unmap(0, nullptr);
 	}
 
-	ReadbackHeap::~ReadbackHeap()
+	uint64_t ReadbackHeap::getSize() const
 	{
+		return size;
 	}
 }

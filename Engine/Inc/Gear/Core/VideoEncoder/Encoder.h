@@ -21,6 +21,7 @@ extern "C"
 #include<ffmpeg/libavformat/avformat.h>
 #include<ffmpeg/libavcodec/avcodec.h>
 #include<ffmpeg/libswscale/swscale.h>
+#include<ffmpeg/libavutil/log.h>
 }
 
 namespace Gear::Core::VideoEncoder

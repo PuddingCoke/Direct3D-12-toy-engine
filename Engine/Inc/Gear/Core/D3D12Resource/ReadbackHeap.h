@@ -31,6 +31,8 @@ namespace Gear::Core::D3D12Resource
 
 		void unmap() const;
 
+		uint64_t getSize() const;
+
 	private:
 
 		const uint64_t size;

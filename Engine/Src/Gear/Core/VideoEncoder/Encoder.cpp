@@ -4,9 +4,34 @@
 
 namespace Gear::Core::VideoEncoder
 {
+	void logCallback(void* avcl, int level, const char* fmt, va_list vl)
+	{
+		if (level > av_log_get_level())
+		{
+			return;
+		}
+
+		char buff[4096] = {};
+
+		int printPrefix = 1;
+
+		av_log_format_line(avcl, level, fmt, vl, buff, sizeof(buff), &printPrefix);
+
+		const size_t len = strlen(buff);
+
+		if (len && buff[len - 1] == '\n')
+		{
+			buff[len - 1] = '\0';
+		}
+
+		LOGENGINE(buff);
+	}
+
 	Encoder::Encoder(const uint32_t frameToEncode, const VideoFormat videoFormat) :
 		frameEncoded(0), frameToEncode(frameToEncode)
 	{
+		av_log_set_callback(logCallback);
+
 		avformat_network_init();
 
 		avformat_alloc_output_context2(&outContext, nullptr, "mp4", "output.mp4");

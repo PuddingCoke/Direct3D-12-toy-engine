@@ -177,7 +177,7 @@ namespace Gear::Core::RenderEngine
 
 		void initializeResources();
 
-		void saveBackBuffer(D3D12Resource::ReadbackHeap* const readbackHeap);
+		void saveBackBuffer(D3D12Resource::ReadbackHeapPtr& readbackHeap, D3D12_PLACED_SUBRESOURCE_FOOTPRINT& backBufferFootprint);
 
 		bool getDisplayImGuiSurface() const;
 
@@ -332,7 +332,7 @@ namespace Gear::Core::RenderEngine
 		//创建交换链
 		{
 			DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
-			swapChainDesc.BufferCount = useSwapChainBuffer ? Graphics::getFrameBufferCount() : 2;
+			swapChainDesc.BufferCount = Utils::Math::max(Graphics::getFrameBufferCount(), 2u);
 			swapChainDesc.Width = Graphics::getWidth();
 			swapChainDesc.Height = Graphics::getHeight();
 			swapChainDesc.Format = Graphics::backBufferFormat;
@@ -574,16 +574,7 @@ namespace Gear::Core::RenderEngine
 
 	void RenderEngineImpl::setSyncInterval(int32_t interval)
 	{
-		if (interval > 4)
-		{
-			interval = 4;
-		}
-		else if (interval < 0)
-		{
-			interval = 0;
-		}
-
-		syncInterval = interval;
+		syncInterval = Utils::Math::clamp(interval, 0, 4);
 	}
 
 	void RenderEngineImpl::setDefRenderTexture()
@@ -619,21 +610,20 @@ namespace Gear::Core::RenderEngine
 		resManager->cleanTransientResources();
 	}
 
-	void RenderEngineImpl::saveBackBuffer(D3D12Resource::ReadbackHeap* const readbackHeap)
+	void RenderEngineImpl::saveBackBuffer(D3D12Resource::ReadbackHeapPtr& readbackHeap, D3D12_PLACED_SUBRESOURCE_FOOTPRINT& backBufferFootprint)
 	{
-		D3D12_PLACED_SUBRESOURCE_FOOTPRINT bufferFootprint = {};
+		const D3D12_RESOURCE_DESC backBufferDesc = getRenderTexture()->getResource()->GetDesc();
 
-		bufferFootprint.Footprint.Width = getRenderTexture()->getWidth();
+		uint64_t backBufferByteSize = 0ull;
 
-		bufferFootprint.Footprint.Height = getRenderTexture()->getHeight();
+		GraphicsDevice::get()->GetCopyableFootprints(&backBufferDesc, 0, 1, 0, &backBufferFootprint, nullptr, nullptr, &backBufferByteSize);
 
-		bufferFootprint.Footprint.Depth = 1;
+		if (readbackHeap == nullptr || readbackHeap->getSize() != backBufferByteSize)
+		{
+			readbackHeap = makeUnique<D3D12Resource::ReadbackHeap>(backBufferByteSize);
+		}
 
-		bufferFootprint.Footprint.RowPitch = FMT::getByteSize(Graphics::backBufferFormat) * getRenderTexture()->getWidth();
-
-		bufferFootprint.Footprint.Format = Graphics::backBufferFormat;
-
-		const CD3DX12_TEXTURE_COPY_LOCATION copyDest(readbackHeap->getResource(), bufferFootprint);
+		const CD3DX12_TEXTURE_COPY_LOCATION copyDest(readbackHeap->getResource(), backBufferFootprint);
 
 		const CD3DX12_TEXTURE_COPY_LOCATION copySrc(getRenderTexture()->getResource(), 0);
 
@@ -851,9 +841,9 @@ namespace Gear::Core::RenderEngine
 			impl->setSyncInterval(syncInterval);
 		}
 
-		void saveBackBuffer(D3D12Resource::ReadbackHeap* const readbackHeap)
+		void saveBackBuffer(D3D12Resource::ReadbackHeapPtr& readbackHeap, D3D12_PLACED_SUBRESOURCE_FOOTPRINT& backBufferFootprint)
 		{
-			impl->saveBackBuffer(readbackHeap);
+			impl->saveBackBuffer(readbackHeap, backBufferFootprint);
 		}
 
 		void setDefRenderTexture()

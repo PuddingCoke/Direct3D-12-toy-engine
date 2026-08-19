@@ -202,11 +202,6 @@ namespace Gear
 
 		renderEngineToken = makeUnique<RenderEngine::Internal::InitializeToken>(initParam.width, initParam.height, Window::Win32Form::getHandle(), useSwapChainBuffer, initParam.enableImGuiSurface);
 
-		if (initParam.usage == InitializationParam::REALTIMERENDER)
-		{
-			backBufferHeap = makeUnique<D3D12Resource::ReadbackHeap>(FMT::getByteSize(Graphics::backBufferFormat) * initParam.width * initParam.height);
-		}
-
 		LOGENGINE("分辨率", Graphics::getWidth(), "x", Graphics::getHeight());
 
 		LOGENGINE("横纵比", Graphics::getAspectRatio());
@@ -257,6 +252,8 @@ namespace Gear
 	{
 		SetForegroundWindow(Window::Win32Form::getHandle());
 
+		D3D12_PLACED_SUBRESOURCE_FOOTPRINT backBufferFootprint = {};
+
 		DeltaTimeEstimator deltaTimeEstimator;
 
 		std::chrono::high_resolution_clock::time_point startPoint = std::chrono::high_resolution_clock::now();
@@ -292,7 +289,7 @@ namespace Gear
 
 			if (needScreenGrab)
 			{
-				RenderEngine::Internal::saveBackBuffer(backBufferHeap.get());
+				RenderEngine::Internal::saveBackBuffer(backBufferHeap, backBufferFootprint);
 			}
 
 			RenderEngine::Internal::endFrame();
@@ -312,18 +309,23 @@ namespace Gear
 
 				UniquePtr<uint8_t[]> colors = makeUnique<uint8_t[]>(FMT::getByteSize(Graphics::backBufferFormat) * initParam.width * initParam.height);
 
-				for (uint32_t i = 0; i < initParam.width * initParam.height; i++)
+				for (uint32_t row = 0; row < initParam.height; row++)
 				{
-					const uint32_t pixel = 4u * i;
+					for (uint32_t col = 0; col < initParam.width; col++)
+					{
+						const uint32_t writePixel = (row * initParam.width + col) * 4u;
 
-					//RGBA <- BGRA
-					colors[pixel] = dataPtr[pixel + 2];
+						const uint32_t readPixel = static_cast<uint32_t>(backBufferFootprint.Offset) + backBufferFootprint.Footprint.RowPitch * row + 4u * col;
 
-					colors[pixel + 1] = dataPtr[pixel + 1];
+						//RGBA <- BGRA
+						colors[writePixel] = dataPtr[readPixel + 2];
 
-					colors[pixel + 2] = dataPtr[pixel];
+						colors[writePixel + 1] = dataPtr[readPixel + 1];
 
-					colors[pixel + 3] = 0xFFu;
+						colors[writePixel + 2] = dataPtr[readPixel];
+
+						colors[writePixel + 3] = 0xFFu;
+					}
 				}
 
 				backBufferHeap->unmap();

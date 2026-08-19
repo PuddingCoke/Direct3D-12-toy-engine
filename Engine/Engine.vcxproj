@@ -314,7 +314,6 @@
     <ClCompile Include="Src\Gear\Utils\Logger\LogColor.cpp" />
     <ClCompile Include="Src\Gear\Utils\Logger\LogContext.cpp" />
     <ClCompile Include="Src\Gear\Utils\MainMonitor.cpp" />
-    <ClCompile Include="Src\Gear\Utils\Math.cpp" />
     <ClCompile Include="Src\Gear\Utils\Random.cpp" />
     <ClCompile Include="Src\Gear\Utils\String.cpp" />
     <ClCompile Include="Src\Gear\Utils\Timer.cpp" />

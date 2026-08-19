@@ -325,7 +325,7 @@ namespace Gear::Core
 
 		void setShaderConstants(const D3D12Core::ShaderType shaderType, const uint32_t numValues, const void* const data, uint32_t& offset);
 
-		template<auto ShaderType>
+		template<D3D12Core::ShaderType ShaderType>
 		void setRootConstants();
 
 		void prepareDrawCallResources();
@@ -563,7 +563,7 @@ namespace Gear::Core
 		}
 	}
 
-	template<auto ShaderType>
+	template<D3D12Core::ShaderType ShaderType>
 	inline void GraphicsContext::setRootConstants()
 	{
 		constexpr uint32_t shaderIndex = static_cast<uint32_t>(ShaderType);
@@ -576,38 +576,31 @@ namespace Gear::Core
 			{
 				rootParameterIndex = getGraphicsRootSignature()->getVSConstantsParameterIndex();
 			}
-
-			if constexpr (ShaderType == D3D12Core::ShaderType::HULL)
+			else if constexpr (ShaderType == D3D12Core::ShaderType::HULL)
 			{
 				rootParameterIndex = getGraphicsRootSignature()->getHSConstantsParameterIndex();
 			}
-
-			if constexpr (ShaderType == D3D12Core::ShaderType::DOMAIN)
+			else if constexpr (ShaderType == D3D12Core::ShaderType::DOMAIN)
 			{
 				rootParameterIndex = getGraphicsRootSignature()->getDSConstantsParameterIndex();
 			}
-
-			if constexpr (ShaderType == D3D12Core::ShaderType::GEOMETRY)
+			else if constexpr (ShaderType == D3D12Core::ShaderType::GEOMETRY)
 			{
 				rootParameterIndex = getGraphicsRootSignature()->getGSConstantsParameterIndex();
 			}
-
-			if constexpr (ShaderType == D3D12Core::ShaderType::PIXEL)
+			else if constexpr (ShaderType == D3D12Core::ShaderType::PIXEL)
 			{
 				rootParameterIndex = getGraphicsRootSignature()->getPSConstantsParameterIndex();
 			}
-
-			if constexpr (ShaderType == D3D12Core::ShaderType::COMPUTE)
+			else if constexpr (ShaderType == D3D12Core::ShaderType::COMPUTE)
 			{
 				rootParameterIndex = getComputeRootSignature()->getCSConstantsParameterIndex();
 			}
-
-			if constexpr (ShaderType == D3D12Core::ShaderType::AMPLIFICATION)
+			else if constexpr (ShaderType == D3D12Core::ShaderType::AMPLIFICATION)
 			{
 				rootParameterIndex = getGraphicsRootSignature()->getASConstantsParameterIndex();
 			}
-
-			if constexpr (ShaderType == D3D12Core::ShaderType::MESH)
+			else if constexpr (ShaderType == D3D12Core::ShaderType::MESH)
 			{
 				rootParameterIndex = getGraphicsRootSignature()->getMSConstantsParameterIndex();
 			}

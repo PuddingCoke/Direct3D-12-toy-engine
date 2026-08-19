@@ -51,7 +51,7 @@ namespace Gear::Core::RenderEngine::Internal
 	void setSyncInterval(const int32_t syncInterval);
 
 	//将后备缓冲拷贝到指定读回堆上
-	void saveBackBuffer(D3D12Resource::ReadbackHeap* const readbackHeap);
+	void saveBackBuffer(D3D12Resource::ReadbackHeapPtr& readbackHeap, D3D12_PLACED_SUBRESOURCE_FOOTPRINT& backBufferFootprint);
 
 	//设置后备缓冲为渲染纹理
 	void setDefRenderTexture();
