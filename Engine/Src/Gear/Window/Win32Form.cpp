@@ -65,14 +65,16 @@ namespace Gear::Window::Win32Form
 
 		const bool initTrayIcon;
 
-		NOTIFYICONDATA nid;
+		NOTIFYICONDATA trayIconData;
 
-		RAWINPUTDEVICE rid;
+		RAWINPUTDEVICE rawInputMouse;
+
+		RAWINPUTDEVICE rawInputKeyboard;
 
 	};
 
 	Win32FormImpl::Win32FormImpl(const std::wstring& title, const uint32_t startX, const uint32_t startY, const uint32_t width, const uint32_t height, const DWORD windowStyle, LRESULT(*windowCallback)(HWND hwnd, uint32_t msg, WPARAM wParam, LPARAM lParam)) :
-		windowHandle(nullptr), menuWindowHandle(nullptr), initTrayIcon(windowCallback == wallpaperCallBack), nid{}, rid{}
+		windowHandle(nullptr), menuWindowHandle(nullptr), initTrayIcon(windowCallback == wallpaperCallBack), trayIconData{}, rawInputMouse{}, rawInputKeyboard{}
 	{
 		//传入的width、height是像素尺度
 		//因此不能让窗口被自动缩放
@@ -108,14 +110,28 @@ namespace Gear::Window::Win32Form
 
 		ShowWindow(windowHandle, SW_SHOW);
 
-		rid.usUsagePage = HID_USAGE_PAGE_GENERIC;
-		rid.usUsage = HID_USAGE_GENERIC_MOUSE;
-		rid.dwFlags = initTrayIcon ? RIDEV_EXINPUTSINK : 0;
-		rid.hwndTarget = windowHandle;
-
-		if (!RegisterRawInputDevices(&rid, 1, sizeof(rid)))
 		{
-			LOGERROR(TOSTRING(RegisterRawInputDevices), "调用失败，失败值", IntegerMode::HEX, static_cast<uint32_t>(GetLastError()));
+			rawInputMouse.usUsagePage = HID_USAGE_PAGE_GENERIC;
+			rawInputMouse.usUsage = HID_USAGE_GENERIC_MOUSE;
+			rawInputMouse.dwFlags = initTrayIcon ? RIDEV_EXINPUTSINK : 0;
+			rawInputMouse.hwndTarget = windowHandle;
+
+			if (!RegisterRawInputDevices(&rawInputMouse, 1, sizeof(rawInputMouse)))
+			{
+				LOGERROR(TOSTRING(RegisterRawInputDevices), "调用失败，失败值", IntegerMode::HEX, static_cast<uint32_t>(GetLastError()));
+			}
+		}
+
+		{
+			rawInputKeyboard.usUsagePage = HID_USAGE_PAGE_GENERIC;
+			rawInputKeyboard.usUsage = HID_USAGE_GENERIC_KEYBOARD;
+			rawInputKeyboard.dwFlags = initTrayIcon ? RIDEV_EXINPUTSINK : 0;
+			rawInputKeyboard.hwndTarget = windowHandle;
+
+			if (!RegisterRawInputDevices(&rawInputKeyboard, 1, sizeof(rawInputKeyboard)))
+			{
+				LOGERROR(TOSTRING(RegisterRawInputDevices), "调用失败，失败值", IntegerMode::HEX, static_cast<uint32_t>(GetLastError()));
+			}
 		}
 
 		if (initTrayIcon)
@@ -144,15 +160,15 @@ namespace Gear::Window::Win32Form
 				LOGERROR("菜单窗口创建失败");
 			}
 
-			nid.cbSize = sizeof(NOTIFYICONDATA);
-			nid.hWnd = menuWindowHandle;
-			nid.uID = 0;
-			nid.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP;
-			nid.uCallbackMessage = WM_TRAYICON;
-			nid.hIcon = LoadIcon(nullptr, IDI_APPLICATION);
-			wcscpy_s(nid.szTip, L"动态壁纸");
+			trayIconData.cbSize = sizeof(NOTIFYICONDATA);
+			trayIconData.hWnd = menuWindowHandle;
+			trayIconData.uID = 0;
+			trayIconData.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP;
+			trayIconData.uCallbackMessage = WM_TRAYICON;
+			trayIconData.hIcon = LoadIcon(nullptr, IDI_APPLICATION);
+			wcscpy_s(trayIconData.szTip, L"动态壁纸");
 
-			if (!Shell_NotifyIcon(NIM_ADD, &nid))
+			if (!Shell_NotifyIcon(NIM_ADD, &trayIconData))
 			{
 				LOGERROR("托盘图标创建失败");
 			}
@@ -163,7 +179,7 @@ namespace Gear::Window::Win32Form
 	{
 		if (initTrayIcon)
 		{
-			Shell_NotifyIcon(NIM_DELETE, &nid);
+			Shell_NotifyIcon(NIM_DELETE, &trayIconData);
 
 			if (menuWindowHandle)
 			{
@@ -171,10 +187,19 @@ namespace Gear::Window::Win32Form
 			}
 		}
 
-		rid.dwFlags = RIDEV_REMOVE;
-		rid.hwndTarget = nullptr;
+		{
+			rawInputMouse.dwFlags = RIDEV_REMOVE;
+			rawInputMouse.hwndTarget = nullptr;
 
-		RegisterRawInputDevices(&rid, 1, sizeof(rid));
+			RegisterRawInputDevices(&rawInputMouse, 1, sizeof(rawInputMouse));
+		}
+
+		{
+			rawInputKeyboard.dwFlags = RIDEV_REMOVE;
+			rawInputKeyboard.hwndTarget = nullptr;
+
+			RegisterRawInputDevices(&rawInputKeyboard, 1, sizeof(rawInputKeyboard));
+		}
 
 		if (windowHandle)
 		{
@@ -294,29 +319,33 @@ namespace Gear::Window::Win32Form
 							}
 						}
 					}
+					else if (raw.header.dwType == RIM_TYPEKEYBOARD)
+					{
+						const RAWKEYBOARD& keyboard = raw.data.keyboard;
+
+						if (!ImGui::GetCurrentContext() || !ImGui::GetIO().WantCaptureKeyboard)
+						{
+							const Input::Keyboard::Key key = static_cast<Input::Keyboard::Key>(keyboard.VKey);
+
+							if ((keyboard.Flags & RI_KEY_BREAK) == 0)
+							{
+								//不处理持续触发的情况
+								if (!Input::Keyboard::getKeyDown(key))
+								{
+									Input::Keyboard::Internal::pressKey(key);
+								}
+							}
+							else
+							{
+								Input::Keyboard::Internal::releaseKey(key);
+							}
+						}
+					}
 				}
 			}
 		}
 
 		break;
-
-		case WM_KEYDOWN:
-
-			if (((HIWORD(lParam) & KF_REPEAT) == 0) && (!ImGui::GetCurrentContext() || !ImGui::GetIO().WantCaptureKeyboard))
-			{
-				Input::Keyboard::Internal::pressKey(static_cast<Input::Keyboard::Key>(wParam));
-			}
-
-			break;
-
-		case WM_KEYUP:
-
-			if (!ImGui::GetCurrentContext() || !ImGui::GetIO().WantCaptureKeyboard)
-			{
-				Input::Keyboard::Internal::releaseKey(static_cast<Input::Keyboard::Key>(wParam));
-			}
-
-			break;
 
 		case WM_DESTROY:
 
@@ -432,6 +461,28 @@ namespace Gear::Window::Win32Form
 								Input::Mouse::Internal::setPosition(static_cast<float>(pt.x), static_cast<float>(Core::Graphics::getHeight()) - static_cast<float>(pt.y));
 
 								Input::Mouse::Internal::move(static_cast<float>(mouse.lLastX), static_cast<float>(-mouse.lLastY));
+							}
+						}
+					}
+					else if (raw.header.dwType == RIM_TYPEKEYBOARD)
+					{
+						if (Utils::WallpaperHelper::isOnDesktop(GetForegroundWindow()))
+						{
+							const RAWKEYBOARD& keyboard = raw.data.keyboard;
+
+							const Input::Keyboard::Key key = static_cast<Input::Keyboard::Key>(keyboard.VKey);
+
+							if ((keyboard.Flags & RI_KEY_BREAK) == 0)
+							{
+								//不处理持续触发的情况
+								if (!Input::Keyboard::getKeyDown(key))
+								{
+									Input::Keyboard::Internal::pressKey(key);
+								}
+							}
+							else
+							{
+								Input::Keyboard::Internal::releaseKey(key);
 							}
 						}
 					}
