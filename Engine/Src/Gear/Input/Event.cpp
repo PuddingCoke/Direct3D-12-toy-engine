@@ -3,7 +3,7 @@
 namespace Gear::Input
 {
 	Event::Event() :
-		idx(0ull)
+		idx(0ull), triggerCount(0u)
 	{
 	}
 
@@ -16,7 +16,7 @@ namespace Gear::Input
 		}
 	}
 
-	uint64_t Event::operator+=(const std::function<void(void)>& func)
+	uint64_t Event::operator+=(const std::function<void(const uint32_t)>& func)
 	{
 		const uint64_t retIndex = idx.fetch_add(1ull, std::memory_order_relaxed);
 
@@ -29,11 +29,30 @@ namespace Gear::Input
 		return retIndex;
 	}
 
-	void Event::operator()()
+	void Event::trigger() const
 	{
-		for (auto& i : functions)
+		if (triggerCount)
 		{
-			i.second();
+			for (auto& i : functions)
+			{
+				i.second(triggerCount);
+			}
 		}
 	}
+
+	uint32_t Event::getTriggerCount() const
+	{
+		return triggerCount;
+	}
+
+	void Event::increaseTriggerCount()
+	{
+		triggerCount++;
+	}
+
+	void Event::resetTriggerCount()
+	{
+		triggerCount = 0u;
+	}
+
 }

@@ -5,6 +5,7 @@
 
 namespace Gear::Input::Mouse::Internal
 {
+
 	void resetDeltaValue();
 
 	void pressLeft();

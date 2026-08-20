@@ -209,6 +209,8 @@ namespace Gear::Window::Win32Form
 
 		Input::Mouse::Internal::triggerEvents();
 
+		Input::Keyboard::Internal::triggerEvents();
+
 		return true;
 	}
 

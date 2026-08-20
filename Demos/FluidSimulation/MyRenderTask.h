@@ -85,7 +85,7 @@ public:
 
 		effect->setThreshold(0.f);
 
-		kDownEventID = Keyboard::addKeyDownEvent(Keyboard::K, [this]()
+		kDownEventID = Keyboard::addKeyDownEvent(Keyboard::K, [this](const uint32_t)
 			{
 				config.logicRunning = !config.logicRunning;
 			});

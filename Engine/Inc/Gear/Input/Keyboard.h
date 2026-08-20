@@ -124,11 +124,17 @@ namespace Gear::Input::Keyboard
 
 	bool getKeyDown(const Key key);
 
+	uint32_t getKeyDownTriggerCount(const Key key);
+
+	uint32_t getKeyUpTriggerCount(const Key key);
+
 	bool onKeyDown(const Key key);
 
-	uint64_t addKeyDownEvent(const Key key, const std::function<void(void)>& func);
+	bool onKeyUp(const Key key);
 
-	uint64_t addKeyUpEvent(const Key key, const std::function<void(void)>& func);
+	uint64_t addKeyDownEvent(const Key key, const std::function<void(const uint32_t triggerCount)>& func);
+
+	uint64_t addKeyUpEvent(const Key key, const std::function<void(const uint32_t triggerCount)>& func);
 
 	void removeKeyDownEvent(const Key key, const uint64_t id);
 

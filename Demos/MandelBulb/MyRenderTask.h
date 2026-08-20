@@ -20,7 +20,7 @@ public:
 			.setPS(*accumulateShader)
 			.build();
 
-		Mouse::addMoveEvent([this]()
+		Mouse::addMoveEvent([this](const uint32_t)
 			{
 				if (Mouse::getLeftDown())
 				{
@@ -28,7 +28,7 @@ public:
 				}
 			});
 
-		Mouse::addScrollEvent([this]()
+		Mouse::addScrollEvent([this](const uint32_t)
 			{
 				accumulateParam.frameIndex = 0;
 			});

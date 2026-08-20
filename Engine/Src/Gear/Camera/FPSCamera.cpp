@@ -15,7 +15,7 @@ namespace Gear
 		{
 			this->lookDir = DirectX::XMVector3Normalize(this->lookDir);
 
-			moveEventID = Input::Mouse::addMoveEvent([this]()
+			moveEventID = Input::Mouse::addMoveEvent([this](const uint32_t)
 				{
 					if (Input::Mouse::getLeftDown())
 					{

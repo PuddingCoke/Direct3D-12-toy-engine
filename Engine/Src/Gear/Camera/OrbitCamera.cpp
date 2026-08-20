@@ -17,7 +17,7 @@ namespace Gear
 
 			currentRadius = targetRadius;
 
-			moveEventID = Input::Mouse::addMoveEvent([this]()
+			moveEventID = Input::Mouse::addMoveEvent([this](const uint32_t)
 				{
 					if (Input::Mouse::getLeftDown())
 					{
@@ -50,7 +50,7 @@ namespace Gear
 					}
 				});
 
-			scrollEventID = Input::Mouse::addScrollEvent([this]()
+			scrollEventID = Input::Mouse::addScrollEvent([this](const uint32_t)
 				{
 					targetRadius -= 0.5f * this->zoomSpeed * Input::Mouse::getWheelDelta();
 

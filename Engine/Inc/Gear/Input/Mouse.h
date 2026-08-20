@@ -30,6 +30,24 @@ namespace Gear::Input::Mouse
 	//获取右键按下状态
 	bool getRightDown();
 
+	//获取移动触发次数
+	uint32_t getMoveTriggerCount();
+
+	//获取左键按下触发次数
+	uint32_t getLeftDownTriggerCount();
+
+	//获取右键按下触发次数
+	uint32_t getRightDownTriggerCount();
+
+	//获取左键弹起触发次数
+	uint32_t getLeftUpTriggerCount();
+
+	//获取右键弹起触发次数
+	uint32_t getRightUpTriggerCount();
+
+	//获取滚轮滚动触发次数
+	uint32_t getScrollTriggerCount();
+
 	//这一帧是否移动
 	bool getOnMove();
 
@@ -48,17 +66,17 @@ namespace Gear::Input::Mouse
 	//这一帧滚轮是否滚动
 	bool getOnScroll();
 
-	uint64_t addMoveEvent(const std::function<void(void)>& func);
+	uint64_t addMoveEvent(const std::function<void(const uint32_t triggerCount)>& func);
 
-	uint64_t addLeftDownEvent(const std::function<void(void)>& func);
+	uint64_t addLeftDownEvent(const std::function<void(const uint32_t triggerCount)>& func);
 
-	uint64_t addRightDownEvent(const std::function<void(void)>& func);
+	uint64_t addRightDownEvent(const std::function<void(const uint32_t triggerCount)>& func);
 
-	uint64_t addLeftUpEvent(const std::function<void(void)>& func);
+	uint64_t addLeftUpEvent(const std::function<void(const uint32_t triggerCount)>& func);
 
-	uint64_t addRightUpEvent(const std::function<void(void)>& func);
+	uint64_t addRightUpEvent(const std::function<void(const uint32_t triggerCount)>& func);
 
-	uint64_t addScrollEvent(const std::function<void(void)>& func);
+	uint64_t addScrollEvent(const std::function<void(const uint32_t triggerCount)>& func);
 
 	void removeMoveEvent(const uint64_t id);
 

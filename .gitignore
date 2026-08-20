@@ -362,6 +362,8 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 
+.vscode/
+
 Engine.lib
 Engine-d.lib
 Engine-d.idb

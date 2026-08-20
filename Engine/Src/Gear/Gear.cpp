@@ -80,6 +80,8 @@ namespace Gear
 
 		UniquePtr<Game> game;
 
+		D3D12_PLACED_SUBRESOURCE_FOOTPRINT backBufferFootprint;
+
 		//用于截屏
 		UniquePtr<D3D12Resource::ReadbackHeap> backBufferHeap;
 
@@ -90,7 +92,7 @@ namespace Gear
 	};
 
 	GearImpl::GearImpl(const InitializationParam& param, const int32_t argc, const wchar_t* argv[]) :
-		initParam(param)
+		backBufferFootprint{}, initParam(param)
 	{
 		//设置locale为.UTF-8用于多语言支持
 		std::locale::global(std::locale(".UTF-8"));
@@ -251,8 +253,6 @@ namespace Gear
 	void GearImpl::runRealTimeRender()
 	{
 		SetForegroundWindow(Window::Win32Form::getHandle());
-
-		D3D12_PLACED_SUBRESOURCE_FOOTPRINT backBufferFootprint = {};
 
 		DeltaTimeEstimator deltaTimeEstimator;
 

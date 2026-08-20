@@ -23,18 +23,6 @@ namespace Gear::Input::Mouse
 
 		bool rightDown = false;
 
-		bool onMove = false;
-
-		bool onLeftDown = false;
-
-		bool onRightDown = false;
-
-		bool onLeftUp = false;
-
-		bool onRightUp = false;
-
-		bool onScroll = false;
-
 		Event moveEvent;
 
 		Event leftDownEvent;
@@ -47,7 +35,9 @@ namespace Gear::Input::Mouse
 
 		Event scrollEvent;
 
-	}impl;
+		std::vector<Event*> mouseEventList = std::vector<Event*>();
+
+	} impl;
 
 	namespace Internal
 	{
@@ -59,52 +49,75 @@ namespace Gear::Input::Mouse
 
 			impl.wheelDelta = 0.f;
 
-			impl.onMove = false;
+			if (impl.mouseEventList.size())
+			{
+				for (auto& eventPtr : impl.mouseEventList)
+				{
+					eventPtr->resetTriggerCount();
+				}
 
-			impl.onLeftDown = false;
-
-			impl.onRightDown = false;
-
-			impl.onLeftUp = false;
-
-			impl.onRightUp = false;
-
-			impl.onScroll = false;
+				impl.mouseEventList.clear();
+			}
 		}
 
 		void pressLeft()
 		{
+			if (!getOnLeftDown())
+			{
+				impl.mouseEventList.emplace_back(&impl.leftDownEvent);
+			}
+
 			impl.leftDown = true;
 
-			impl.onLeftDown = true;
+			impl.leftDownEvent.increaseTriggerCount();
 		}
 
 		void pressRight()
 		{
+			if (!getOnRightDown())
+			{
+				impl.mouseEventList.emplace_back(&impl.rightDownEvent);
+			}
+
 			impl.rightDown = true;
 
-			impl.onRightDown = true;
+			impl.rightDownEvent.increaseTriggerCount();
 		}
 
 		void releaseLeft()
 		{
+			if (!getOnLeftUp())
+			{
+				impl.mouseEventList.emplace_back(&impl.leftUpEvent);
+			}
+
 			impl.leftDown = false;
 
-			impl.onLeftUp = true;
+			impl.leftUpEvent.increaseTriggerCount();
 		}
 
 		void releaseRight()
 		{
+			if (!getOnRightUp())
+			{
+				impl.mouseEventList.emplace_back(&impl.rightUpEvent);
+			}
+
 			impl.rightDown = false;
 
-			impl.onRightUp = true;
+			impl.rightUpEvent.increaseTriggerCount();
 		}
 
 		void scroll(const float delta)
 		{
+			if (!getOnScroll())
+			{
+				impl.mouseEventList.emplace_back(&impl.scrollEvent);
+			}
+
 			impl.wheelDelta += delta;
 
-			impl.onScroll = true;
+			impl.scrollEvent.increaseTriggerCount();
 		}
 
 		void setPosition(const float x, const float y)
@@ -116,43 +129,26 @@ namespace Gear::Input::Mouse
 
 		void move(const float deltaX, const float deltaY)
 		{
+			if (!getOnMove())
+			{
+				impl.mouseEventList.emplace_back(&impl.moveEvent);
+			}
+
 			impl.deltaX += deltaX;
 
 			impl.deltaY += deltaY;
 
-			impl.onMove = true;
+			impl.moveEvent.increaseTriggerCount();
 		}
 
 		void triggerEvents()
 		{
-			if (impl.onMove)
+			if (impl.mouseEventList.size())
 			{
-				impl.moveEvent();
-			}
-
-			if (impl.onScroll)
-			{
-				impl.scrollEvent();
-			}
-
-			if (impl.onLeftDown)
-			{
-				impl.leftDownEvent();
-			}
-
-			if (impl.onLeftUp)
-			{
-				impl.leftUpEvent();
-			}
-
-			if (impl.onRightDown)
-			{
-				impl.rightDownEvent();
-			}
-
-			if (impl.onRightUp)
-			{
-				impl.rightUpEvent();
+				for (auto& eventPtr : impl.mouseEventList)
+				{
+					eventPtr->trigger();
+				}
 			}
 		}
 	}
@@ -192,62 +188,92 @@ namespace Gear::Input::Mouse
 		return impl.rightDown;
 	}
 
+	uint32_t getMoveTriggerCount()
+	{
+		return impl.moveEvent.getTriggerCount();
+	}
+
+	uint32_t getLeftDownTriggerCount()
+	{
+		return impl.leftDownEvent.getTriggerCount();
+	}
+
+	uint32_t getRightDownTriggerCount()
+	{
+		return impl.rightDownEvent.getTriggerCount();
+	}
+
+	uint32_t getLeftUpTriggerCount()
+	{
+		return impl.leftUpEvent.getTriggerCount();
+	}
+
+	uint32_t getRightUpTriggerCount()
+	{
+		return impl.rightUpEvent.getTriggerCount();
+	}
+
+	uint32_t getScrollTriggerCount()
+	{
+		return impl.scrollEvent.getTriggerCount();
+	}
+
 	bool getOnMove()
 	{
-		return impl.onMove;
+		return getMoveTriggerCount();
 	}
 
 	bool getOnLeftDown()
 	{
-		return impl.onLeftDown;
+		return getLeftDownTriggerCount();
 	}
 
 	bool getOnRightDown()
 	{
-		return impl.onRightDown;
+		return getRightDownTriggerCount();
 	}
 
 	bool getOnLeftUp()
 	{
-		return impl.onLeftUp;
+		return getLeftUpTriggerCount();
 	}
 
 	bool getOnRightUp()
 	{
-		return impl.onRightUp;
+		return getRightUpTriggerCount();
 	}
 
 	bool getOnScroll()
 	{
-		return impl.onScroll;
+		return getScrollTriggerCount();
 	}
 
-	uint64_t addMoveEvent(const std::function<void(void)>& func)
+	uint64_t addMoveEvent(const std::function<void(const uint32_t)>& func)
 	{
 		return impl.moveEvent += func;
 	}
 
-	uint64_t addLeftDownEvent(const std::function<void(void)>& func)
+	uint64_t addLeftDownEvent(const std::function<void(const uint32_t)>& func)
 	{
 		return impl.leftDownEvent += func;
 	}
 
-	uint64_t addRightDownEvent(const std::function<void(void)>& func)
+	uint64_t addRightDownEvent(const std::function<void(const uint32_t)>& func)
 	{
 		return impl.rightDownEvent += func;
 	}
 
-	uint64_t addLeftUpEvent(const std::function<void(void)>& func)
+	uint64_t addLeftUpEvent(const std::function<void(const uint32_t)>& func)
 	{
 		return impl.leftUpEvent += func;
 	}
 
-	uint64_t addRightUpEvent(const std::function<void(void)>& func)
+	uint64_t addRightUpEvent(const std::function<void(const uint32_t)>& func)
 	{
 		return impl.rightUpEvent += func;
 	}
 
-	uint64_t addScrollEvent(const std::function<void(void)>& func)
+	uint64_t addScrollEvent(const std::function<void(const uint32_t)>& func)
 	{
 		return impl.scrollEvent += func;
 	}
@@ -282,4 +308,3 @@ namespace Gear::Input::Mouse
 		impl.scrollEvent -= id;
 	}
 }
-

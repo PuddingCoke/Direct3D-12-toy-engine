@@ -23,17 +23,25 @@ namespace Gear::Input
 
 		void operator-=(const uint64_t id);
 
-		uint64_t operator+=(const std::function<void(void)>& func);
+		uint64_t operator+=(const std::function<void(const uint32_t)>& func);
 
-		void operator()();
+		void trigger() const;
+
+		uint32_t getTriggerCount() const;
+
+		void increaseTriggerCount();
+
+		void resetTriggerCount();
 
 	private:
 
 		std::atomic<uint64_t> idx;
 
-		std::unordered_map<uint64_t, std::function<void(void)>> functions;
+		std::unordered_map<uint64_t, std::function<void(const uint32_t)>> functions;
 
 		std::mutex containerMutex;
+
+		uint32_t triggerCount;
 
 	};
 }

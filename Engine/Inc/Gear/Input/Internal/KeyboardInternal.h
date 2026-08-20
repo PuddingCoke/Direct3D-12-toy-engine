@@ -5,11 +5,15 @@
 
 namespace Gear::Input::Keyboard::Internal
 {
+
 	void resetDeltaValue();
 
 	void pressKey(const Key key);
 
 	void releaseKey(const Key key);
+
+	void triggerEvents();
+
 }
 
 #endif // !_GEAR_INPUT_KEYBOARD_INTERNAL_H_

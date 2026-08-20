@@ -17,45 +17,59 @@ namespace Gear::Input::Keyboard
 
 		bool keyDownStates[maxKey] = {};
 
-		bool onKeyDownStates[maxKey] = {};
-
-		std::vector<uint32_t> onKeyDownClearList = std::vector<uint32_t>();
+		std::vector<Event*> keyEventList = std::vector<Event*>();
 
 	} impl;
 
 	namespace Internal
 	{
+
 		void resetDeltaValue()
 		{
-			if (impl.onKeyDownClearList.size())
+			if (impl.keyEventList.size())
 			{
-				for (uint32_t i = 0; i < impl.onKeyDownClearList.size(); i++)
+				for (auto& eventPtr : impl.keyEventList)
 				{
-					const uint32_t idx = impl.onKeyDownClearList[i];
-
-					impl.onKeyDownStates[idx] = false;
+					eventPtr->resetTriggerCount();
 				}
 
-				impl.onKeyDownClearList.clear();
+				impl.keyEventList.clear();
 			}
 		}
 
 		void pressKey(const Key key)
 		{
+			if (!onKeyDown(key))
+			{
+				impl.keyEventList.emplace_back(&impl.keyDownEvents[key]);
+			}
+
 			impl.keyDownStates[key] = true;
 
-			impl.onKeyDownStates[key] = true;
-
-			impl.onKeyDownClearList.emplace_back(key);
-
-			impl.keyDownEvents[key]();
+			impl.keyDownEvents[key].increaseTriggerCount();
 		}
 
 		void releaseKey(const Key key)
 		{
+			if (!onKeyUp(key))
+			{
+				impl.keyEventList.emplace_back(&impl.keyUpEvents[key]);
+			}
+
 			impl.keyDownStates[key] = false;
 
-			impl.keyUpEvents[key]();
+			impl.keyUpEvents[key].increaseTriggerCount();
+		}
+
+		void triggerEvents()
+		{
+			if (impl.keyEventList.size())
+			{
+				for (auto& eventPtr : impl.keyEventList)
+				{
+					eventPtr->trigger();
+				}
+			}
 		}
 
 	}
@@ -65,17 +79,32 @@ namespace Gear::Input::Keyboard
 		return impl.keyDownStates[key];
 	}
 
-	bool onKeyDown(const Key key)
+	uint32_t getKeyDownTriggerCount(const Key key)
 	{
-		return impl.onKeyDownStates[key];
+		return impl.keyDownEvents[key].getTriggerCount();
 	}
 
-	uint64_t addKeyDownEvent(const Key key, const std::function<void(void)>& func)
+	uint32_t getKeyUpTriggerCount(const Key key)
+	{
+		return impl.keyUpEvents[key].getTriggerCount();
+	}
+
+	bool onKeyDown(const Key key)
+	{
+		return getKeyDownTriggerCount(key);
+	}
+
+	bool onKeyUp(const Key key)
+	{
+		return getKeyUpTriggerCount(key);
+	}
+
+	uint64_t addKeyDownEvent(const Key key, const std::function<void(const uint32_t)>& func)
 	{
 		return impl.keyDownEvents[key] += func;
 	}
 
-	uint64_t addKeyUpEvent(const Key key, const std::function<void(void)>& func)
+	uint64_t addKeyUpEvent(const Key key, const std::function<void(const uint32_t)>& func)
 	{
 		return impl.keyUpEvents[key] += func;
 	}
