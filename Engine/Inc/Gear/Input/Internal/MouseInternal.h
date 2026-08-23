@@ -22,8 +22,6 @@ namespace Gear::Input::Mouse::Internal
 
 	void move(const float deltaX, const float deltaY);
 
-	void triggerEvents();
-
 }
 
 #endif // !_GEAR_INPUT_MOUSE_INTERNAL_H_

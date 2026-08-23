@@ -468,6 +468,9 @@
     <ClInclude Include="Inc\Gear\Core\D3D12Core\ShaderType.h">
       <Filter>Header</Filter>
     </ClInclude>
+    <ClInclude Include="Inc\Gear\Input\Internal\InputInternal.h">
+      <Filter>Header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Gear\InitializationParam.cpp">
@@ -732,6 +735,9 @@
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="Src\Gear\Core\FMT.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gear\Input\Input.cpp">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>

@@ -2,7 +2,7 @@
 
 #include<Gear/Input/Internal/KeyboardInternal.h>
 
-#include<Gear/Input/Event.h>
+#include<Gear/Input/Internal/InputInternal.h>
 
 namespace Gear::Input::Keyboard
 {
@@ -17,61 +17,28 @@ namespace Gear::Input::Keyboard
 
 		bool keyDownStates[maxKey] = {};
 
-		std::vector<Event*> keyEventList = std::vector<Event*>();
-
 	} impl;
 
 	namespace Internal
 	{
-
 		void resetDeltaValue()
 		{
-			if (impl.keyEventList.size())
-			{
-				for (auto& eventPtr : impl.keyEventList)
-				{
-					eventPtr->resetTriggerCount();
-				}
-
-				impl.keyEventList.clear();
-			}
+			
 		}
 
 		void pressKey(const Key key)
 		{
-			if (!onKeyDown(key))
-			{
-				impl.keyEventList.emplace_back(&impl.keyDownEvents[key]);
-			}
+			Input::Internal::pushToEventTriggerList(impl.keyDownEvents[key]);
 
 			impl.keyDownStates[key] = true;
-
-			impl.keyDownEvents[key].increaseTriggerCount();
 		}
 
 		void releaseKey(const Key key)
 		{
-			if (!onKeyUp(key))
-			{
-				impl.keyEventList.emplace_back(&impl.keyUpEvents[key]);
-			}
+			Input::Internal::pushToEventTriggerList(impl.keyUpEvents[key]);
 
 			impl.keyDownStates[key] = false;
-
-			impl.keyUpEvents[key].increaseTriggerCount();
 		}
-
-		void triggerEvents()
-		{
-			if (impl.keyEventList.size())
-			{
-				for (auto& eventPtr : impl.keyEventList)
-				{
-					eventPtr->trigger();
-				}
-			}
-		}
-
 	}
 
 	bool getKeyDown(const Key key)

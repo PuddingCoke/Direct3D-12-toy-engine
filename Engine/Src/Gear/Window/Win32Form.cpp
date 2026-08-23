@@ -8,6 +8,8 @@
 
 #include<Gear/Input/Keyboard.h>
 
+#include<Gear/Input/Internal/InputInternal.h>
+
 #include<Gear/Input/Internal/KeyboardInternal.h>
 
 #include<Gear/Input/Internal/MouseInternal.h>
@@ -209,6 +211,8 @@ namespace Gear::Window::Win32Form
 
 	bool Win32FormImpl::pollEvents(const DWORD milliseconds)
 	{
+		Input::Internal::clearEventTriggerList();
+
 		Input::Mouse::Internal::resetDeltaValue();
 
 		Input::Keyboard::Internal::resetDeltaValue();
@@ -232,9 +236,7 @@ namespace Gear::Window::Win32Form
 			}
 		}
 
-		Input::Mouse::Internal::triggerEvents();
-
-		Input::Keyboard::Internal::triggerEvents();
+		Input::Internal::triggerEvents();
 
 		return true;
 	}

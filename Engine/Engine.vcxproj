@@ -160,6 +160,7 @@
     <ClInclude Include="Inc\Gear\Core\PipelineStateBuilder.h" />
     <ClInclude Include="Inc\Gear\Core\RenderTask.h" />
     <ClInclude Include="Inc\Gear\Core\RenderThread.h" />
+    <ClInclude Include="Inc\Gear\Input\Internal\InputInternal.h" />
     <ClInclude Include="Inc\Gear\Resource\PipelineResourceDesc.h" />
     <ClInclude Include="Inc\Gear\Resource\DynamicCBuffer.h" />
     <ClInclude Include="Inc\Gear\Resource\DefaultCBuffer.h" />
@@ -246,6 +247,7 @@
     <ClCompile Include="Src\Gear\Core\D3D12Core\VideoProcessCommandList.cpp" />
     <ClCompile Include="Src\Gear\Core\FMT.cpp" />
     <ClCompile Include="Src\Gear\Core\VideoEncoder\SoftwareEncoder.cpp" />
+    <ClCompile Include="Src\Gear\Input\Input.cpp" />
     <ClCompile Include="Src\Gear\Resource\SwapBuffer.cpp" />
     <ClCompile Include="Src\Gear\Core\D3D12Core\GraphicsState.cpp" />
     <ClCompile Include="Src\Gear\Core\D3D12Core\ComputeState.cpp" />

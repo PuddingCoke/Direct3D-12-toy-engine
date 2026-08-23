@@ -12,8 +12,6 @@ namespace Gear::Input::Keyboard::Internal
 
 	void releaseKey(const Key key);
 
-	void triggerEvents();
-
 }
 
 #endif // !_GEAR_INPUT_KEYBOARD_INTERNAL_H_
