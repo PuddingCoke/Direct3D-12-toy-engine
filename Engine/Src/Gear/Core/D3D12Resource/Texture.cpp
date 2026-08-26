@@ -303,7 +303,7 @@ namespace Gear::Core::D3D12Resource
 			}
 			else
 			{
-				LOGERROR("当转变只有一个miplevel的纹理时，它的allState必须是已知的！");
+				THROWLOG(LOGERROR() << "当转变只有一个miplevel的纹理时，它的allState必须是已知的！");
 			}
 		}
 
@@ -467,7 +467,7 @@ namespace Gear::Core::D3D12Resource
 			}
 			else
 			{
-				LOGERROR("当转变只有一个miplevel的纹理时，它的allState必须是已知的！");
+				THROWLOG(LOGERROR() << "当转变只有一个miplevel的纹理时，它的allState必须是已知的！");
 			}
 		}
 	}

@@ -60,7 +60,7 @@ namespace Gear::Core::D3D12Core
 					break;
 				}
 
-				LOGERROR(errorString, "常量个数分配的限制为", maxPerShaderConstants, "个");
+				THROWLOG(LOGERROR() << errorString << "常量个数分配的限制为" << maxPerShaderConstants << "个");
 			}
 		}
 
@@ -121,7 +121,7 @@ namespace Gear::Core::D3D12Core
 						shaderVisibility = D3D12_SHADER_VISIBILITY_MESH;
 						break;
 					default:
-						LOGERROR("无法为", TOSTRING(ShaderType), static_cast<uint32_t>(shaderType), "找到对应的", TOSTRING(D3D12_SHADER_VISIBILITY));
+						THROWLOG(LOGERROR() << "无法为" << TOSTRING(ShaderType) << static_cast<uint32_t>(shaderType) << "找到对应的" << TOSTRING(D3D12_SHADER_VISIBILITY));
 						break;
 					}
 
@@ -336,7 +336,7 @@ namespace Gear::Core::D3D12Core
 
 			errorString += "没有被分配根参数！";
 
-			LOGERROR(errorString);
+			THROWLOG(LOGERROR() << errorString);
 		}
 #endif // _DEBUG
 

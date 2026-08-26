@@ -73,7 +73,7 @@ namespace Gear::Core::D3D12Core::DXCCompiler
 	{
 		if (type == ShaderType::TYPECOUNT)
 		{
-			LOGERROR(TOSTRING(type), "不得为", TOSTRING(ShaderType::TYPECOUNT));
+			THROWLOG(LOGERROR() << TOSTRING(type) << "不得为" << TOSTRING(ShaderType::TYPECOUNT));
 		}
 
 		const std::vector<uint8_t> bytes = Utils::File::readAllBinary(filePath);

@@ -61,7 +61,7 @@ namespace Gear::Core::D3D12Core
 #define OFFSETCHECKOUTOFBOUNDS() \
 if (offsetBits > bitsInTotal)\
 {\
-	LOGERROR("侦测到", TOSTRING(offsetBits), "越界");\
+	THROWLOG(LOGERROR() << "侦测到" << TOSTRING(offsetBits) << "越界");\
 }\
 
 	//前几天在研究unordered_map，看了boost那个魔法方法后感觉闹袋有点疼
@@ -99,7 +99,7 @@ if (offsetBits > bitsInTotal)\
 
 		if (static_cast<uint64_t>(graphicsDesc.PrimitiveTopologyType) == 0ull)
 		{
-			LOGERROR("图元拓扑类型不得为", TOSTRING(TOPOLOGY::TYPE::UNDEFINED));
+			THROWLOG(LOGERROR() << "图元拓扑类型不得为" << TOSTRING(TOPOLOGY::TYPE::UNDEFINED));
 		}
 
 		//这里减一可以省一个比特位

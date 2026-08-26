@@ -12,7 +12,7 @@ namespace Gear::Resource
 		{
 			if (buffer->getSize() % 256ull != 0)
 			{
-				LOGERROR("常量缓冲的字节大小必须是256的倍数！");
+				THROWLOG(LOGERROR() << "常量缓冲的字节大小必须是256的倍数！");
 			}
 
 			D3D12_CONSTANT_BUFFER_VIEW_DESC desc = {};

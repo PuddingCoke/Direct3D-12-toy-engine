@@ -24,7 +24,7 @@ namespace Gear::Core::VideoEncoder
 			buff[len - 1] = '\0';
 		}
 
-		LOGENGINE(buff);
+		LOGENGINE() << buff;
 	}
 
 	Encoder::Encoder(const uint32_t frameToEncode, const VideoFormat videoFormat) :
@@ -42,30 +42,30 @@ namespace Gear::Core::VideoEncoder
 
 		outStream->id = 0;
 
-		LOGENGINE("视频名称", LogColor::filePathColor, "output.mp4");
+		LOGENGINE() << "视频名称" << LogColor::filePathColor << "output.mp4";
 
-		LOGENGINE("视频时间", LogFloatPrecision(1), static_cast<float>(frameToEncode) / static_cast<float>(frameRate), "秒");
+		LOGENGINE() << "视频时间" << LogFloatPrecision(1) << static_cast<float>(frameToEncode) / static_cast<float>(frameRate) << "秒";
 
-		LOGENGINE("视频帧率", frameRate);
+		LOGENGINE() << "视频帧率" << frameRate;
 
 		AVCodecParameters* const param = outStream->codecpar;
 
 		switch (videoFormat)
 		{
 		case VideoFormat::H264:
-			LOGENGINE("视频格式", LogColor::brightMagenta, "H264");
+			LOGENGINE() << "视频格式" << LogColor::brightMagenta << "H264";
 			param->codec_id = AV_CODEC_ID_H264;
 			break;
 		case VideoFormat::HEVC:
-			LOGENGINE("视频格式", LogColor::brightMagenta, "HEVC");
+			LOGENGINE() << "视频格式" << LogColor::brightMagenta << "HEVC";
 			param->codec_id = AV_CODEC_ID_HEVC;
 			break;
 		case VideoFormat::AV1:
-			LOGENGINE("视频格式", LogColor::brightMagenta, "AV1");
+			LOGENGINE() << "视频格式" << LogColor::brightMagenta << "AV1";
 			param->codec_id = AV_CODEC_ID_AV1;
 			break;
 		default:
-			LOGERROR("不被支持的视频格式！");
+			THROWLOG(LOGERROR() << "不被支持的视频格式！");
 			break;
 		}
 
@@ -81,9 +81,9 @@ namespace Gear::Core::VideoEncoder
 
 		rawStreamPacket = av_packet_alloc();
 
-		LOGENGINE("待编码帧数", frameToEncode);
+		LOGENGINE() << "待编码帧数" << frameToEncode;
 
-		LOGENGINE("开始编码");
+		LOGENGINE() << "开始编码";
 
 		D3D12_VIDEO_PROCESS_INPUT_STREAM_DESC inputDesc =
 		{
@@ -225,7 +225,7 @@ namespace Gear::Core::VideoEncoder
 				progressBarWidth - num, "////////////////////////////////",
 				100.f * progress);
 
-			LOGENGINE(str);
+			LOGENGINE() << str;
 		}
 	}
 }

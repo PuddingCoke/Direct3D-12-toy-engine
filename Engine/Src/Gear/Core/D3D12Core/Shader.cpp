@@ -32,18 +32,18 @@ namespace Gear::Core::D3D12Core
 	{
 		if (!Utils::File::exist(filePath))
 		{
-			LOGERROR(filePath, "指定路径下未找到文件");
+			THROWLOG(LOGERROR() << filePath << "指定路径下未找到文件");
 		}
 
 		if (Utils::File::getExtension(filePath) == L"cso")
 		{
 			shaderBlob = DXCCompiler::read(filePath);
 
-			LOGSUCCESS("读取", LogColor::filePathColor, filePath);
+			LOGSUCCESS() << "读取" << LogColor::filePathColor << filePath;
 		}
 		else
 		{
-			LOGERROR("文件的扩展名必须为.cso");
+			THROWLOG(LOGERROR() << "文件的扩展名必须为.cso");
 		}
 
 		shaderReflection = DXCCompiler::getReflectionBlob(shaderBlob);
@@ -53,18 +53,18 @@ namespace Gear::Core::D3D12Core
 	{
 		if (!Utils::File::exist(filePath))
 		{
-			LOGERROR(filePath, "指定路径下未找到文件");
+			THROWLOG(LOGERROR() << filePath << "指定路径下未找到文件");
 		}
 
 		if (Utils::File::getExtension(filePath) == L"hlsl")
 		{
 			shaderBlob = DXCCompiler::compile(filePath, type);
 
-			LOGSUCCESS("编译", LogColor::filePathColor, filePath);
+			LOGSUCCESS() << "编译" << LogColor::filePathColor << filePath;
 		}
 		else
 		{
-			LOGERROR("文件的扩展名必须为.hlsl");
+			THROWLOG(LOGERROR() << "文件的扩展名必须为.hlsl");
 		}
 
 		shaderReflection = DXCCompiler::getReflectionBlob(shaderBlob);

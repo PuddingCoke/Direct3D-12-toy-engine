@@ -55,7 +55,7 @@ TextBatch::TextBatch(ResourceManager& resManager, const std::wstring& filePath) 
 
 	if (fileStream.bad())
 	{
-		LOGERROR("字体描述文件打开失败");
+		THROWLOG(LOGERROR() << "字体描述文件打开失败");
 	}
 
 	std::wstring str;
@@ -72,7 +72,7 @@ TextBatch::TextBatch(ResourceManager& resManager, const std::wstring& filePath) 
 
 			currentFontSize = fontSize;
 
-			LOGUSER("字体大小", fontSize);
+			LOGUSER() << "字体大小" << fontSize;
 		}
 
 		if (splitResult.front() == L"file")
@@ -153,7 +153,7 @@ TextBatch::TextBatch(ResourceManager& resManager, const std::wstring& filePath) 
 
 			characterMap.insert(std::pair<wchar_t, const Character>(static_cast<wchar_t>(id), character));
 
-			//LOGUSER(id, startX, startY, width, height, xoffset, yoffset, xadvance);
+			//LOGUSER() << id << startX << startY << width << height << xoffset << yoffset << xadvance;
 		}
 
 		fileStream >> str;

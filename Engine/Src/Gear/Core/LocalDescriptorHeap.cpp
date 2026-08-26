@@ -28,7 +28,7 @@ namespace Gear::Core::LocalDescriptorHeap
 
 		depthStencilHeap = makeUnique<D3D12Core::DescriptorHeap>(Internal::numRTVDescriptors, Internal::numRTVDescriptors - Internal::numStaticRTVDescriptors, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, D3D12_DESCRIPTOR_HEAP_FLAG_NONE);
 
-		LOGSUCCESS("创建", LogColor::brightMagenta, TOSTRING(LocalDescriptorHeap));
+		LOGSUCCESS() << "创建" << LogColor::brightMagenta << TOSTRING(LocalDescriptorHeap);
 	}
 
 	thread_local UniquePtr<LocalDescriptorHeapImpl> impl;
@@ -51,7 +51,7 @@ namespace Gear::Core::LocalDescriptorHeap
 #ifdef _DEBUG
 		if (!impl.get())
 		{
-			LOGERROR("你还没有申请线程局部描述符堆!");
+			THROWLOG(LOGERROR() << "你还没有申请线程局部描述符堆!");
 		}
 #endif // _DEBUG
 
@@ -63,7 +63,7 @@ namespace Gear::Core::LocalDescriptorHeap
 #ifdef _DEBUG
 		if (!impl.get())
 		{
-			LOGERROR("你还没有申请线程局部描述符堆!");
+			THROWLOG(LOGERROR() << "你还没有申请线程局部描述符堆!");
 		}
 #endif // _DEBUG
 
@@ -75,7 +75,7 @@ namespace Gear::Core::LocalDescriptorHeap
 #ifdef _DEBUG
 		if (!impl.get())
 		{
-			LOGERROR("你还没有申请线程局部描述符堆!");
+			THROWLOG(LOGERROR() << "你还没有申请线程局部描述符堆!");
 		}
 #endif // _DEBUG
 

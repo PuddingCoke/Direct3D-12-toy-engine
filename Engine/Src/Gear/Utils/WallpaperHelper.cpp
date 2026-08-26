@@ -50,7 +50,7 @@ namespace Gear::Utils::WallpaperHelper
 				taskBarHeight = 72u;
 			}
 
-			LOGENGINE("任务栏高度", taskBarHeight);
+			LOGENGINE() << "任务栏高度" << taskBarHeight;
 
 			detectThread = std::thread(&ObscureDetectThread::detectLoop, this);
 		}
@@ -147,7 +147,7 @@ namespace Gear::Utils::WallpaperHelper
 
 			const float coverage = static_cast<float>(covered) / static_cast<float>(total);
 
-			//LOGENGINE(coverage);
+			//LOGENGINE() << coverage;
 
 			return coverage > 0.96f;
 		}

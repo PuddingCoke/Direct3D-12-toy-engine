@@ -8,7 +8,7 @@ const NVENCSTATUS _status_ = func;\
 if(_status_ != NV_ENC_SUCCESS && _status_ != NV_ENC_ERR_LOCK_BUSY && _status_ != NV_ENC_ERR_NEED_MORE_INPUT && _status_ != NV_ENC_ERR_NEED_MORE_OUTPUT)\
 {\
 const std::string errorString = nvencAPI.nvEncGetLastErrorString(encoder);\
-LOGERROR("调用", #func, "时发生错误，错误码", static_cast<uint32_t>(_status_), "错误信息", errorString);\
+THROWLOG(LOGERROR() << "调用" << #func << "时发生错误，错误码" << static_cast<uint32_t>(_status_) << "错误信息" << errorString);\
 }\
 }\
 
@@ -27,18 +27,18 @@ namespace Gear::Core::VideoEncoder
 		writeIndex(0ull),
 		encoding(true)
 	{
-		LOGENGINE("最多B帧", maxBFrames);
+		LOGENGINE() << "最多B帧" << maxBFrames;
 
 		moduleNvEncAPI = LoadLibraryA("nvEncodeAPI64.dll");
 
 		if (moduleNvEncAPI == nullptr)
 		{
-			LOGERROR("无法读取nvEncodeAPI64.dll！");
+			THROWLOG(LOGERROR() << "无法读取nvEncodeAPI64.dll！");
 		}
 
 		NVENCSTATUS(__stdcall * NVENCAPICreateInstance)(NV_ENCODE_API_FUNCTION_LIST*) = (NVENCSTATUS(*)(NV_ENCODE_API_FUNCTION_LIST*))GetProcAddress(moduleNvEncAPI, "NvEncodeAPICreateInstance");
 
-		LOGENGINE(TOSTRING(NVENCAPICreateInstance), "状态", static_cast<uint32_t>(NVENCAPICreateInstance(&nvencAPI)));
+		LOGENGINE() << TOSTRING(NVENCAPICreateInstance) << "状态" << static_cast<uint32_t>(NVENCAPICreateInstance(&nvencAPI));
 
 		NV_ENC_OPEN_ENCODE_SESSION_EX_PARAMS sessionParams = { NV_ENC_OPEN_ENCODE_SESSION_EX_PARAMS_VER };
 		sessionParams.device = GraphicsDevice::get();

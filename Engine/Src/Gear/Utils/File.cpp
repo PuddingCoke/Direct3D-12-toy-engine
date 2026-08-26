@@ -95,7 +95,7 @@ namespace Gear::Utils::File
 
 		if (!file.is_open())
 		{
-			LOGERROR("打开文件", filePath, "失败！");
+			THROWLOG(LOGERROR() << "打开文件" << filePath << "失败！");
 		}
 
 		std::wstringstream stringStream;
@@ -111,7 +111,7 @@ namespace Gear::Utils::File
 
 		if (!file.is_open())
 		{
-			LOGERROR("打开文件", filePath, "失败！");
+			THROWLOG(LOGERROR() << "打开文件" << filePath << "失败！");
 		}
 
 		const size_t fileSize = static_cast<size_t>(file.tellg());

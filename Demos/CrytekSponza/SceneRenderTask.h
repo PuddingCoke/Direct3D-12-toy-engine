@@ -191,13 +191,13 @@ public:
 
 		if (!irradianceDataExist && !depthDataExist)
 		{
-			LOGUSER("未侦测到预烘焙数据，开始计算辐照度场与距离场");
+			LOGUSER() << "未侦测到预烘焙数据，开始计算辐照度场与距离场";
 
 			updateLightProbe();
 		}
 		else
 		{
-			LOGUSER("侦测到预烘焙数据，直接读取对应文件");
+			LOGUSER() << "侦测到预烘焙数据，直接读取对应文件";
 		}
 	}
 

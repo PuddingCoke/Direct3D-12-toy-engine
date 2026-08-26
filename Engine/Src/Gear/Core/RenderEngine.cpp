@@ -268,7 +268,7 @@ namespace Gear::Core::RenderEngine
 		ComPtr<IDXGIFactory7> factory;
 
 #ifdef _DEBUG
-		LOGENGINE(LogColor::brightGreen, "开启", LogColor::brightMagenta, "调试层");
+		LOGENGINE() << LogColor::brightGreen << "开启" << LogColor::brightMagenta << "调试层";
 
 		ComPtr<ID3D12Debug> debugController;
 
@@ -278,7 +278,7 @@ namespace Gear::Core::RenderEngine
 
 		CreateDXGIFactory2(DXGI_CREATE_FACTORY_DEBUG, IID_PPV_ARGS(&factory));
 #else
-		LOGENGINE(LogColor::brightRed, "关闭", LogColor::brightMagenta, "调试层");
+		LOGENGINE() << LogColor::brightRed << "关闭" << LogColor::brightMagenta << "调试层";
 
 		CreateDXGIFactory2(0, IID_PPV_ARGS(&factory));
 #endif // _DEBUG
@@ -384,13 +384,13 @@ namespace Gear::Core::RenderEngine
 		//如果有需要，那么初始化ImGUI
 		if (initializeImGuiSurface)
 		{
-			LOGENGINE(LogColor::brightGreen, "开启", LogColor::brightMagenta, "ImGui");
+			LOGENGINE() << LogColor::brightGreen << "开启" << LogColor::brightMagenta << "ImGui";
 
 			imGuiToken = makeUnique<ImGuiToken>(hWnd, &mediumFont, &largeFont);
 		}
 		else
 		{
-			LOGENGINE(LogColor::brightRed, "关闭", LogColor::brightMagenta, "ImGui");
+			LOGENGINE() << LogColor::brightRed << "关闭" << LogColor::brightMagenta << "ImGui";
 		}
 
 		//设置默认的2D投影矩阵
@@ -715,15 +715,15 @@ namespace Gear::Core::RenderEngine
 					vendorName = "UNKNOWN";
 				}
 
-				LOGENGINE("以下是适配器的相关信息");
+				LOGENGINE() << "以下是适配器的相关信息";
 
-				LOGENGINE("适配器名称", LogColor::brightMagenta, desc.Description);
+				LOGENGINE() << "适配器名称" << LogColor::brightMagenta << desc.Description;
 
-				LOGENGINE("适配器生产商ID", LogIntegerMode::HEX, vendorID);
+				LOGENGINE() << "适配器生产商ID" << LogIntegerMode::HEX << vendorID;
 
-				LOGENGINE("适配器生产商", LogColor::brightMagenta, vendorName);
+				LOGENGINE() << "适配器生产商" << LogColor::brightMagenta << vendorName;
 
-				LOGENGINE("适配器专有视频内存", static_cast<float>(desc.DedicatedVideoMemory) / 1024.f / 1024.f / 1024.f, "GB");
+				LOGENGINE() << "适配器专有视频内存" << static_cast<float>(desc.DedicatedVideoMemory) / 1024.f / 1024.f / 1024.f << "GB";
 
 				break;
 			}

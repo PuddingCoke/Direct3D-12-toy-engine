@@ -101,7 +101,7 @@ namespace Gear
 
 		fileToken = makeUnique<File::Internal::InitializeToken>(File::backslashToSlash(File::getParentFolder(argv[0])));
 
-		LOGENGINE("EXE根目录", LogColor::filePathColor, File::getWRootFolder());
+		LOGENGINE() << "EXE根目录" << LogColor::filePathColor << File::getWRootFolder();
 
 		MainMonitor::Internal::getCurrentSettings();
 
@@ -139,7 +139,7 @@ namespace Gear
 
 			windowCallback = Window::Win32Form::realTimeRenderCallback;
 
-			LOGENGINE("引擎用途", "实时渲染");
+			LOGENGINE() << "引擎用途" << "实时渲染";
 
 			break;
 
@@ -157,7 +157,7 @@ namespace Gear
 
 			windowCallback = Window::Win32Form::videoRenderCallback;
 
-			LOGENGINE("引擎用途", "视频渲染");
+			LOGENGINE() << "引擎用途" << "视频渲染";
 
 			break;
 
@@ -179,7 +179,7 @@ namespace Gear
 
 			windowCallback = Window::Win32Form::wallpaperCallBack;
 
-			LOGENGINE("引擎用途", "动态壁纸");
+			LOGENGINE() << "引擎用途" << "动态壁纸";
 
 			break;
 
@@ -204,11 +204,11 @@ namespace Gear
 
 		renderEngineToken = makeUnique<RenderEngine::Internal::InitializeToken>(initParam.width, initParam.height, Window::Win32Form::getHandle(), useSwapChainBuffer, initParam.enableImGuiSurface);
 
-		LOGENGINE("分辨率", Graphics::getWidth(), "x", Graphics::getHeight());
+		LOGENGINE() << "分辨率" << Graphics::getWidth() << "x" << Graphics::getHeight();
 
-		LOGENGINE("横纵比", Graphics::getAspectRatio());
+		LOGENGINE() << "横纵比" << Graphics::getAspectRatio();
 
-		LOGENGINE("后备缓冲数量", Graphics::getFrameBufferCount());
+		LOGENGINE() << "后备缓冲数量" << Graphics::getFrameBufferCount();
 	}
 
 	GearImpl::~GearImpl()
@@ -228,7 +228,7 @@ namespace Gear
 
 #endif // _DEBUG
 
-		LOGENGINE("资源销毁完毕");
+		LOGENGINE() << "资源销毁完毕";
 	}
 
 	void GearImpl::initGame(UniquePtr<Game> gamePtr)
@@ -332,7 +332,7 @@ namespace Gear
 
 				stbi_write_png("output.png", initParam.width, initParam.height, 4, colors.get(), FMT::getByteSize(Graphics::backBufferFormat) * initParam.width);
 
-				LOGSUCCESS("截屏保存到", "output.png");
+				LOGSUCCESS() << "截屏保存到" << "output.png";
 
 				startPoint = std::chrono::high_resolution_clock::now();
 			}
@@ -347,7 +347,7 @@ namespace Gear
 
 		const uint32_t frameToEncode = initParam.videoRender.seconds * VideoEncoder::Encoder::frameRate;
 
-		LOGENGINE("编码方式", LogColor::yellow, initParam.videoRender.hardwareEncode ? "硬件编码" : "软件编码");
+		LOGENGINE() << "编码方式" << LogColor::yellow << (initParam.videoRender.hardwareEncode ? "硬件编码" : "软件编码");
 
 		if (initParam.videoRender.hardwareEncode)
 		{
@@ -359,7 +359,7 @@ namespace Gear
 			case AdapterVendor::AMD:
 			case AdapterVendor::INTEL:
 			case AdapterVendor::UNKNOWN:
-				LOGERROR("目前只为英伟达的GPU做了硬件编码适配");
+				THROWLOG(LOGERROR() << "目前只为英伟达的GPU做了硬件编码适配");
 				break;
 			default:
 				break;
@@ -432,7 +432,7 @@ namespace Gear
 
 		if (!timerHandle)
 		{
-			LOGERROR("创建帧率限制计时器失败");
+			THROWLOG(LOGERROR() << "创建帧率限制计时器失败");
 		}
 
 		DeltaTimeEstimator deltaTimeEstimator;

@@ -10,35 +10,35 @@ public:
 
 	MyRenderTask()
 	{
-		LOGUSER("窄字符串测试", "日志测试", "Log Testing", "Проверка журнала");
+		LOGUSER() << "窄字符串测试" << "日志测试" << "Log Testing" << "Проверка журнала";
 
-		LOGUSER(L"宽字符串测试", L"日志测试", L"Log Testing", L"Проверка журнала");
+		LOGUSER() << L"宽字符串测试" << L"日志测试" << L"Log Testing" << L"Проверка журнала";
 
-		LOGUSER(u8"UTF8字符串测试", u8"日志测试", u8"Log Testing", u8"Проверка журнала");
+		LOGUSER() << u8"UTF8字符串测试" << u8"日志测试" << u8"Log Testing" << u8"Проверка журнала";
 
-		LOGUSER("表情", "😎😂🎉🔥👍🏻");
+		LOGUSER() << "表情" << "😎😂🎉🔥👍🏻";
 
-		LOGUSER("组合字符", "e\u0301 ñ");
+		LOGUSER() << "组合字符" << "e\u0301 ñ";
 
-		LOGUSER("零宽空间", "Hel\u200Blo");
+		LOGUSER() << "零宽空间" << "Hel\u200Blo";
 
-		LOGUSER("极长连字", "﷽");
+		LOGUSER() << "极长连字" << "﷽";
 
-		LOGUSER("单线程测试");
+		LOGUSER() << "单线程测试";
 
-		LOGUSER("32位有符号整数测试", IntegerMode::HEX, 12895, -123456, INT_MAX, INT_MIN, IntegerMode::DEC, 12895, -123456, INT_MAX, INT_MIN);
+		LOGUSER() << "32位有符号整数测试" << LogIntegerMode::HEX << 12895 << -123456 << INT_MAX << INT_MIN << LogIntegerMode::DEC << 12895 << -123456 << INT_MAX << INT_MIN;
 
-		LOGUSER("32位无符号整数测试", IntegerMode::HEX, 13689u, UINT_MAX, IntegerMode::DEC, 13689u, UINT_MAX);
+		LOGUSER() << "32位无符号整数测试" << LogIntegerMode::HEX << 13689u << UINT_MAX << LogIntegerMode::DEC << 13689u << UINT_MAX;
 
-		LOGUSER("64位有符号整数测试", IntegerMode::HEX, 1222222ll, -188888ll, INT64_MAX, INT64_MIN, IntegerMode::DEC, 1222222ll, -188888ll, INT64_MAX, INT64_MIN);
+		LOGUSER() << "64位有符号整数测试" << LogIntegerMode::HEX << 1222222ll << -188888ll << INT64_MAX << INT64_MIN << LogIntegerMode::DEC << 1222222ll << -188888ll << INT64_MAX << INT64_MIN;
 
-		LOGUSER("64位无符号整数测试", IntegerMode::HEX, 13579ull, UINT64_MAX, IntegerMode::DEC, 13579ull, UINT64_MAX);
+		LOGUSER() << "64位无符号整数测试" << LogIntegerMode::HEX << 13579ull << UINT64_MAX << LogIntegerMode::DEC << 13579ull << UINT64_MAX;
 
-		LOGUSER("32位浮点测试", FloatPrecision(4), 125.6f, FLT_MAX, FloatPrecision(2), 125.6f, FLT_MAX);
+		LOGUSER() << "32位浮点测试" << LogFloatPrecision(4) << 125.6f << FLT_MAX << LogFloatPrecision(2) << 125.6f << FLT_MAX;
 
-		LOGUSER("64位浮点测试", FloatPrecision(6), 200.123, DBL_MAX, FloatPrecision(5), 200.123, DBL_MAX);
+		LOGUSER() << "64位浮点测试" << LogFloatPrecision(6) << 200.123 << DBL_MAX << LogFloatPrecision(5) << 200.123 << DBL_MAX;
 
-		LOGUSER("多线程测试");
+		LOGUSER() << "多线程测试";
 
 		const size_t threadCount = 16;
 
@@ -52,7 +52,7 @@ public:
 				{
 					for (int j = 0; j < 11; j++)
 					{
-						LOGUSER("子线程", i, "值", j);
+						LOGUSER() << "子线程" << i << "值" << j;
 					}
 				});
 		}

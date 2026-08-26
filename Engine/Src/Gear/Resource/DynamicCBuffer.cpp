@@ -30,7 +30,7 @@ namespace Gear::Resource
 				factor <<= 1u;
 			}
 
-			LOGERROR(errorString);
+			THROWLOG(LOGERROR() << errorString);
 		}
 	}
 
@@ -48,12 +48,12 @@ namespace Gear::Resource
 #ifdef _DEBUG
 		if (Graphics::getRenderedFrameCount() == *acquireFrameIndex)
 		{
-			LOGERROR("对于动态常量缓冲来说，每帧的数据指针获取只能有一次！");
+			THROWLOG(LOGERROR() << "对于动态常量缓冲来说，每帧的数据指针获取只能有一次！");
 		}
 
 		if (regionIndex >= DynamicCBufferManager::getNumRegion())
 		{
-			LOGERROR("这个动态常量缓冲没有被分配位置");
+			THROWLOG(LOGERROR() << "这个动态常量缓冲没有被分配位置");
 		}
 #endif // _DEBUG
 
@@ -73,12 +73,12 @@ namespace Gear::Resource
 #ifdef _DEBUG
 		if (Graphics::getRenderedFrameCount() != *acquireFrameIndex)
 		{
-			LOGERROR("你还没有为这个动态常量缓冲获取这一帧可用的数据指针！");
+			THROWLOG(LOGERROR() << "你还没有为这个动态常量缓冲获取这一帧可用的数据指针！");
 		}
 
 		if (Graphics::getRenderedFrameCount() == *updateFrameIndex)
 		{
-			LOGERROR("一个动态常量缓冲每帧只能更新一次！");
+			THROWLOG(LOGERROR() << "一个动态常量缓冲每帧只能更新一次！");
 		}
 #endif // _DEBUG
 

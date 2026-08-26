@@ -89,7 +89,7 @@ namespace Gear::Core
 		}
 		else if (inputElements.size() != N)
 		{
-			LOGERROR("侦测到", TOSTRING(descs), "与", TOSTRING(inputElements.size()), "数量不匹配");
+			THROWLOG(LOGERROR() << "侦测到" << TOSTRING(descs) << "与" << TOSTRING(inputElements.size()) << "数量不匹配");
 		}
 
 		for (uint32_t i = 0; i < N; i++)

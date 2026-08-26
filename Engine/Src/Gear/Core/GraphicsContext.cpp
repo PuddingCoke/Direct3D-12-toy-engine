@@ -572,7 +572,7 @@ namespace Gear::Core
 #ifdef _DEBUG
 		if (nullptr == graphicsRootSignature)
 		{
-			LOGERROR("没有检测到图形根签名绑定，是否忘记设置管线状态？");
+			THROWLOG(LOGERROR() << "没有检测到图形根签名绑定，是否忘记设置管线状态？");
 		}
 #endif // _DEBUG
 
@@ -584,7 +584,7 @@ namespace Gear::Core
 #ifdef _DEBUG
 		if (nullptr == computeRootSignature)
 		{
-			LOGERROR("没有检测到计算根签名绑定，是否忘记设置管线状态？");
+			THROWLOG(LOGERROR() << "没有检测到计算根签名绑定，是否忘记设置管线状态？");
 		}
 #endif // _DEBUG
 
@@ -803,7 +803,7 @@ namespace Gear::Core
 				break;
 			}
 
-			LOGERROR("侦测到常量写入终止位置", offset + numWrite - 1u, "越界", shaderName, "的常量写入终止位置最高为", numShaderConstants - 1u);
+			THROWLOG(LOGERROR() << "侦测到常量写入终止位置" << offset + numWrite - 1u << "越界" << shaderName << "的常量写入终止位置最高为" << numShaderConstants - 1u);
 		}
 	}
 

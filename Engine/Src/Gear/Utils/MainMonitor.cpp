@@ -46,7 +46,7 @@ namespace Gear::Utils::MainMonitor
 
 			if (!EnumDisplaySettings(monitorInfo.szDevice, ENUM_CURRENT_SETTINGS, &devMode))
 			{
-				LOGERROR("无法获取主监视器信息");
+				THROWLOG(LOGERROR() << "无法获取主监视器信息");
 			}
 
 			impl.width = devMode.dmPelsWidth;
@@ -64,15 +64,15 @@ namespace Gear::Utils::MainMonitor
 
 			impl.scale = static_cast<float>(devMode.dmLogPixels) / 96.f;
 
-			LOGENGINE("以下是主监视器信息");
+			LOGENGINE() << "以下是主监视器信息";
 
-			LOGENGINE("主监视器宽", impl.width);
+			LOGENGINE() << "主监视器宽" << impl.width;
 
-			LOGENGINE("主监视器高", impl.height);
+			LOGENGINE() << "主监视器高" << impl.height;
 
-			LOGENGINE("主监视器刷新率", impl.refreshRate);
+			LOGENGINE() << "主监视器刷新率" << impl.refreshRate;
 
-			LOGENGINE("主监视器缩放比率", impl.scale);
+			LOGENGINE() << "主监视器缩放比率" << impl.scale;
 		}
 	}
 

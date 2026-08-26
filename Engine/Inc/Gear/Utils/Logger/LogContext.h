@@ -71,10 +71,6 @@ namespace Gear::Utils::Logger
 		//创建新的日志消息
 		void createLogMessage(const std::string_view& functionName, const LogType& type);
 
-		//匹配模板函数是禁止的，在这种情况下会抛出编译错误
-		template<typename Arg>
-		void packArgument(const Arg& arg);
-
 		//宽字符串
 		void packArgument(const std::wstring& arg);
 
@@ -177,19 +173,6 @@ namespace Gear::Utils::Logger
 		char convertBuffer[convertBufferLength];
 
 	};
-
-	template<typename Arg>
-	inline void LogContext::packArgument(const Arg& arg)
-	{
-		static_assert(0, "不支持的类型");
-
-		//用于测试
-		/*setDisplayColor(textColor);
-
-		const std::string ty = typeid(Arg).name();
-
-		packArgument(ty);*/
-	}
 
 	template<typename Arg>
 		requires std::is_floating_point_v<Arg>

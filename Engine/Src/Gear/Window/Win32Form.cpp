@@ -107,7 +107,7 @@ namespace Gear::Window::Win32Form
 
 		if (!windowHandle)
 		{
-			LOGERROR("主窗口创建失败");
+			THROWLOG(LOGERROR() << "主窗口创建失败");
 		}
 
 		ShowWindow(windowHandle, SW_SHOW);
@@ -120,7 +120,7 @@ namespace Gear::Window::Win32Form
 
 			if (!RegisterRawInputDevices(&rawInputMouse, 1, sizeof(rawInputMouse)))
 			{
-				LOGERROR(TOSTRING(RegisterRawInputDevices), "调用失败，失败值", LogIntegerMode::HEX, static_cast<uint32_t>(GetLastError()));
+				THROWLOG(LOGERROR() << TOSTRING(RegisterRawInputDevices) << "调用失败，失败值" << LogIntegerMode::HEX << static_cast<uint32_t>(GetLastError()));
 			}
 		}
 
@@ -132,7 +132,7 @@ namespace Gear::Window::Win32Form
 
 			if (!RegisterRawInputDevices(&rawInputKeyboard, 1, sizeof(rawInputKeyboard)))
 			{
-				LOGERROR(TOSTRING(RegisterRawInputDevices), "调用失败，失败值", LogIntegerMode::HEX, static_cast<uint32_t>(GetLastError()));
+				THROWLOG(LOGERROR() << TOSTRING(RegisterRawInputDevices) << "调用失败，失败值" << LogIntegerMode::HEX << static_cast<uint32_t>(GetLastError()));
 			}
 		}
 
@@ -159,7 +159,7 @@ namespace Gear::Window::Win32Form
 
 			if (!menuWindowHandle)
 			{
-				LOGERROR("菜单窗口创建失败");
+				THROWLOG(LOGERROR() << "菜单窗口创建失败");
 			}
 
 			trayIconData.cbSize = sizeof(NOTIFYICONDATA);
@@ -172,7 +172,7 @@ namespace Gear::Window::Win32Form
 
 			if (!Shell_NotifyIcon(NIM_ADD, &trayIconData))
 			{
-				LOGERROR("托盘图标创建失败");
+				THROWLOG(LOGERROR() << "托盘图标创建失败");
 			}
 		}
 	}

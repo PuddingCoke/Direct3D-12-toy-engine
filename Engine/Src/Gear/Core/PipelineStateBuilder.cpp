@@ -111,7 +111,7 @@ namespace Gear::Core
 			}
 		}
 
-		LOGERROR("无法得到", static_cast<uint32_t>(componentType), "和", static_cast<uint32_t>(mask), "表示的", TOSTRING(DXGI_FORMAT));
+		THROWLOG(LOGERROR() << "无法得到" << static_cast<uint32_t>(componentType) << "和" << static_cast<uint32_t>(mask) << "表示的" << TOSTRING(DXGI_FORMAT));
 	}
 
 	PipelineStateBuilder& PipelineStateBuilder::setVS(const D3D12Core::Shader& vs)
@@ -154,7 +154,7 @@ namespace Gear::Core
 		}
 		else if (inputElements.size() != numInputElements)
 		{
-			LOGERROR("侦测到", TOSTRING(numInputElements), "与", TOSTRING(inputElements.size()), "数量不匹配");
+			THROWLOG(LOGERROR() << "侦测到" << TOSTRING(numInputElements) << "与" << TOSTRING(inputElements.size()) << "数量不匹配");
 		}
 
 		semanticNames.resize(numInputElements);
@@ -262,11 +262,11 @@ namespace Gear::Core
 
 		if (!hasVertexShader)
 		{
-			LOGERROR("必须设置顶点着色器！");
+			THROWLOG(LOGERROR() << "必须设置顶点着色器！");
 		}
 		else if ((!hasHullShader && hasDomainShader) || (hasHullShader && !hasDomainShader))
 		{
-			LOGERROR("如果需要镶嵌细分，那么外壳着色器和域着色器必须都被设置！");
+			THROWLOG(LOGERROR() << "如果需要镶嵌细分，那么外壳着色器和域着色器必须都被设置！");
 		}
 
 		if (!hasHullShader && !hasDomainShader && !hasGeometryShader)
@@ -311,7 +311,7 @@ namespace Gear::Core
 
 			if (static_cast<D3D12_SHADER_VERSION_TYPE>(rawType) != D3D12_SHVER_COMPUTE_SHADER)
 			{
-				LOGERROR("侦测到非计算着色器传入！是否读取了错误的文件路径或字节码？");
+				THROWLOG(LOGERROR() << "侦测到非计算着色器传入！是否读取了错误的文件路径或字节码？");
 			}
 		}
 
@@ -333,7 +333,7 @@ namespace Gear::Core
 
 		if (groupDimension.x == 0 || groupDimension.y == 0 || groupDimension.z == 0)
 		{
-			LOGERROR("无法获取计算着色器的线程组维度信息");
+			THROWLOG(LOGERROR() << "无法获取计算着色器的线程组维度信息");
 		}
 
 		pipelineStateData.computeData.groupDimension = groupDimension;
