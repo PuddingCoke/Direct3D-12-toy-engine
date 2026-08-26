@@ -7,7 +7,7 @@
 
 #include<Gear/Utils/Memory.h>
 
-#include<thread>
+#include<mutex>
 
 #include<condition_variable>
 
@@ -54,6 +54,8 @@ namespace Gear::Utils::Logger
 			int32_t precision;
 		};
 
+		struct NewLine {};
+
 		LogContext(const LogContext&) = delete;
 
 		void operator=(const LogContext&) = delete;
@@ -62,20 +64,12 @@ namespace Gear::Utils::Logger
 
 		~LogContext();
 
-		template<typename... Args>
-		static LogMessage createLogMessage(const std::string_view& functionName, const LogType& type, const Args&... args);
+		static LogContext& get();
 
 		void readIndexIncrement();
 
-	private:
-
-		template<typename... Args>
-		LogMessage getLogMessage(const std::string_view& functionName, const LogType& type, const Args&... args);
-
-		template<typename First, typename... Rest>
-		void packRestArgument(const First& first, const Rest&... rest);
-
-		void packRestArgument();
+		//创建新的日志消息
+		void createLogMessage(const std::string_view& functionName, const LogType& type);
 
 		//匹配模板函数是禁止的，在这种情况下会抛出编译错误
 		template<typename Arg>
@@ -118,25 +112,43 @@ namespace Gear::Utils::Logger
 			requires std::is_floating_point_v<Arg>
 		void packFloatPoint(const Arg& arg);
 
-		//浮点数
+		//单精度浮点数
 		void packArgument(const float_t& arg);
 
 		//双精度浮点数
 		void packArgument(const double_t& arg);
 
 		//改变整数模式
-		void packArgument(const IntegerMode& mode);
+		void packArgument(const IntegerMode& arg);
 
 		//改变浮点精度
-		void packArgument(const FloatPrecision& precision);
+		void packArgument(const FloatPrecision& arg);
 
 		//改变正文颜色
 		void packArgument(const LogColor& arg);
 
+		//换行
+		void packArgument(const NewLine&);
+
+		LogType getLogType() const;
+
+		LogMessage getLogMessage();
+
+	private:
+
+		//重置状态
+		void resetState();
+
+		//获取可复用的槽位
+		void acquireReusableSlot();
+
+		//添加头部信息
+		void packHeader(const std::string_view& functionName, const LogType& type);
+
 		//改变显示颜色
 		void setDisplayColor(const LogColor& color);
 
-		void resetState();
+		LogType logType;
 
 		IntegerMode integerMode;
 
@@ -156,7 +168,7 @@ namespace Gear::Utils::Logger
 
 		std::string* messageStr;
 
-		std::mutex inUseMutex;
+		std::mutex readIndexMutex;
 
 		std::condition_variable inUseCV;
 
@@ -165,104 +177,6 @@ namespace Gear::Utils::Logger
 		char convertBuffer[convertBufferLength];
 
 	};
-
-	template<typename ...Args>
-	inline LogMessage LogContext::createLogMessage(const std::string_view& functionName, const LogType& type, const Args & ...args)
-	{
-		thread_local UniquePtr<LogContext> context = makeUnique<LogContext>();
-
-		context->resetState();
-
-		return context->getLogMessage(functionName, type, args...);
-	}
-
-	template<typename ...Args>
-	inline LogMessage LogContext::getLogMessage(const std::string_view& functionName, const LogType& type, const Args & ...args)
-	{
-		writeIndex++;
-
-		if (!(writeIndex - readIndex < slotNum))
-		{
-			std::unique_lock<std::mutex> inUseLock(inUseMutex);
-
-			inUseCV.wait(inUseLock, [this]() { return writeIndex - readIndex < slotNum; });
-		}
-
-		const uint64_t modWriteIndex = writeIndex % slotNum;
-
-		messageStr = &slots[modWriteIndex];
-
-		const LogMessage message = { slots[modWriteIndex],this,type };
-
-		messageStr->clear();
-
-		{
-			const time_t currentTime = time(nullptr);
-
-			tm localTime = {};
-
-			localtime_s(&localTime, &currentTime);
-
-			const std::thread::id id = std::this_thread::get_id();
-
-			const uint32_t threadId = *(uint32_t*)&id;
-
-			//headerStrLen = 5+2+8+1+5+2+1+10+1+5+2+length(functionName)+1+1
-			//			   = 44+length(functionName)
-			sprintf_s(convertBuffer, convertBufferLength, "%s[%d:%d:%d] %s{T%u} %s(%s) ", LogColor::timeStampColor.code, localTime.tm_hour, localTime.tm_min, localTime.tm_sec,
-				LogColor::threadIdColor.code, threadId, LogColor::functionNameColor.code, functionName.data());
-
-			*messageStr += convertBuffer;
-		}
-
-		switch (type)
-		{
-		case LogType::LOG_SUCCESS:
-
-			packArgument(LogColor::successColor);
-
-			packArgument("<SUCCESS>");
-
-			break;
-		case LogType::LOG_ERROR:
-
-			packArgument(LogColor::errorColor);
-
-			packArgument("<ERROR>");
-
-			break;
-		case LogType::LOG_ENGINE:
-
-			packArgument(LogColor::engineColor);
-
-			packArgument("<ENGINE>");
-
-			break;
-		case LogType::LOG_USER:
-
-			packArgument(LogColor::userColor);
-
-			packArgument("<USER>");
-
-			break;
-		}
-
-		packArgument(LogColor::defaultColor);
-
-		packRestArgument(args...);
-
-		*messageStr += "\n";
-
-		return message;
-	}
-
-	template<typename First, typename ...Rest>
-	inline void LogContext::packRestArgument(const First& first, const Rest& ...rest)
-	{
-		packArgument(first);
-
-		packRestArgument(rest...);
-	}
 
 	template<typename Arg>
 	inline void LogContext::packArgument(const Arg& arg)

@@ -719,7 +719,7 @@ namespace Gear::Core::RenderEngine
 
 				LOGENGINE("适配器名称", LogColor::brightMagenta, desc.Description);
 
-				LOGENGINE("适配器生产商ID", IntegerMode::HEX, vendorID);
+				LOGENGINE("适配器生产商ID", LogIntegerMode::HEX, vendorID);
 
 				LOGENGINE("适配器生产商", LogColor::brightMagenta, vendorName);
 

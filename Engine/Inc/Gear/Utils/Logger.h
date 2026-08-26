@@ -3,14 +3,6 @@
 #ifndef _GEAR_UTILS_LOGGER_H_
 #define _GEAR_UTILS_LOGGER_H_
 
-#include"Logger/LogContext.h"
-
-using IntegerMode = Gear::Utils::Logger::LogContext::IntegerMode;
-
-using FloatPrecision = Gear::Utils::Logger::LogContext::FloatPrecision;
-
-using LogColor = Gear::Utils::Logger::LogColor;
-
 /// <summary>
 /// 一个可以输出不同颜色的日志记录器
 /// int32_t、uint32_t、float_t这类数值类型会有特殊的颜色
@@ -26,14 +18,12 @@ using LogColor = Gear::Utils::Logger::LogColor;
 /// LOGUSER("32位无符号整数测试", IntegerMode::HEX, 13689u, UINT_MAX, IntegerMode::DEC, 13689u, UINT_MAX);
 /// 
 /// 你可以使用FloatPrecision来调整小数点后位数，下方为示例代码
-/// such as LOGUSER("浮点测试", FloatPrecision(4), 125.6f, FloatPrecision(2), 125.7);
+/// LOGUSER("浮点测试", FloatPrecision(4), 125.6f, FloatPrecision(2), 125.7);
 /// 
 /// LogColor这个类中有很多可用的颜色
 /// </summary>
-namespace Gear::Utils::Logger
-{
-	void submitLogMessage(const LogMessage& msg);
-}
+
+#include"Logger/Log.h"
 
 constexpr std::string_view getShortFuncName(const char* const funcName)
 {
@@ -100,17 +90,19 @@ constexpr std::string_view getShortFuncName(const char* const funcName)
 
 #define TOSHORTFUNCNAME(x) getShortFuncName(x)
 
-#define LOGSUCCESS(...) Gear::Utils::Logger::submitLogMessage(Gear::Utils::Logger::LogContext::createLogMessage(TOSHORTFUNCNAME(__FUNCTION__),Gear::Utils::Logger::LogType::LOG_SUCCESS,__VA_ARGS__))
+#define LOGSUCCESS() Gear::Utils::Logger::Log(TOSHORTFUNCNAME(__FUNCTION__),Gear::Utils::Logger::LogType::LOG_SUCCESS)
 
-#define LOGENGINE(...) Gear::Utils::Logger::submitLogMessage(Gear::Utils::Logger::LogContext::createLogMessage(TOSHORTFUNCNAME(__FUNCTION__),Gear::Utils::Logger::LogType::LOG_ENGINE,__VA_ARGS__))
+#define LOGENGINE() Gear::Utils::Logger::Log(TOSHORTFUNCNAME(__FUNCTION__),Gear::Utils::Logger::LogType::LOG_ENGINE)
 
-#define LOGUSER(...) Gear::Utils::Logger::submitLogMessage(Gear::Utils::Logger::LogContext::createLogMessage(TOSHORTFUNCNAME(__FUNCTION__),Gear::Utils::Logger::LogType::LOG_USER,__VA_ARGS__))
+#define LOGUSER() Gear::Utils::Logger::Log(TOSHORTFUNCNAME(__FUNCTION__),Gear::Utils::Logger::LogType::LOG_USER)
 
-#define LOGERROR(...) do { \
-const Gear::Utils::Logger::LogMessage _logMessage_ = Gear::Utils::Logger::LogContext::createLogMessage(TOSHORTFUNCNAME(__FUNCTION__),Gear::Utils::Logger::LogType::LOG_ERROR,__FILE__,"LINE",static_cast<int32_t>(__LINE__),__VA_ARGS__); \
-const std::string _errorStr_ = _logMessage_.str; \
-Gear::Utils::Logger::submitLogMessage(_logMessage_); \
-throw std::runtime_error(_errorStr_); \
-} while(0)\
+#define LOGERROR() Gear::Utils::Logger::Log(TOSHORTFUNCNAME(__FUNCTION__),Gear::Utils::Logger::LogType::LOG_ERROR) << __FILE__ << "LINE" << static_cast<int32_t>(__LINE__)
+
+#define THROWLOG(_log_) Gear::Utils::Logger::ThrowLog(_log_)
+
+namespace Gear::Utils::Logger
+{
+	void submitLogMessage(const LogMessage& msg);
+}
 
 #endif // !_GEAR_UTILS_LOGGER_H_

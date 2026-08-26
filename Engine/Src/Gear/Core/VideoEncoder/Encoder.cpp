@@ -44,7 +44,7 @@ namespace Gear::Core::VideoEncoder
 
 		LOGENGINE("视频名称", LogColor::filePathColor, "output.mp4");
 
-		LOGENGINE("视频时间", FloatPrecision(1), static_cast<float>(frameToEncode) / static_cast<float>(frameRate), "秒");
+		LOGENGINE("视频时间", LogFloatPrecision(1), static_cast<float>(frameToEncode) / static_cast<float>(frameRate), "秒");
 
 		LOGENGINE("视频帧率", frameRate);
 

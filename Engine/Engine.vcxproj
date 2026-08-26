@@ -183,6 +183,7 @@
     <ClInclude Include="Inc\Gear\Utils\Internal\MainMonitorInternal.h" />
     <ClInclude Include="Inc\Gear\Utils\Logger.h" />
     <ClInclude Include="Inc\Gear\Utils\Internal\LoggerInternal.h" />
+    <ClInclude Include="Inc\Gear\Utils\Logger\Log.h" />
     <ClInclude Include="Inc\Gear\Utils\Logger\LogColor.h" />
     <ClInclude Include="Inc\Gear\Utils\Logger\LogContext.h" />
     <ClInclude Include="Inc\Gear\Utils\Internal\FileInternal.h" />
@@ -313,6 +314,7 @@
     <ClCompile Include="Src\Gear\Input\Mouse.cpp" />
     <ClCompile Include="Src\Gear\Utils\Color.cpp" />
     <ClCompile Include="Src\Gear\Utils\Logger.cpp" />
+    <ClCompile Include="Src\Gear\Utils\Logger\Log.cpp" />
     <ClCompile Include="Src\Gear\Utils\Logger\LogColor.cpp" />
     <ClCompile Include="Src\Gear\Utils\Logger\LogContext.cpp" />
     <ClCompile Include="Src\Gear\Utils\MainMonitor.cpp" />

@@ -23,15 +23,22 @@ namespace Gear::Utils::Logger
 
 	LogContext::~LogContext()
 	{
-		std::unique_lock<std::mutex> inUseLock(inUseMutex);
+		std::unique_lock<std::mutex> readIndexLock(readIndexMutex);
 
-		inUseCV.wait(inUseLock, [this]() { return writeIndex == readIndex; });
+		inUseCV.wait(readIndexLock, [this]() { return writeIndex == readIndex; });
+	}
+
+	LogContext& LogContext::get()
+	{
+		thread_local UniquePtr<LogContext> context = makeUnique<LogContext>();
+
+		return *context;
 	}
 
 	void LogContext::readIndexIncrement()
 	{
 		{
-			std::lock_guard<std::mutex> inUseLock(inUseMutex);
+			std::lock_guard<std::mutex> readIndexLock(readIndexMutex);
 
 			readIndex++;
 		}
@@ -39,8 +46,15 @@ namespace Gear::Utils::Logger
 		inUseCV.notify_one();
 	}
 
-	void LogContext::packRestArgument()
+	void LogContext::createLogMessage(const std::string_view& functionName, const LogType& type)
 	{
+		resetState();
+
+		acquireReusableSlot();
+
+		packHeader(functionName, type);
+
+		packArgument(LogColor::defaultColor);
 	}
 
 	void LogContext::packArgument(const std::wstring& arg)
@@ -257,14 +271,14 @@ namespace Gear::Utils::Logger
 		packFloatPoint(arg);
 	}
 
-	void LogContext::packArgument(const IntegerMode& mode)
+	void LogContext::packArgument(const IntegerMode& arg)
 	{
-		integerMode = mode;
+		integerMode = arg;
 	}
 
-	void LogContext::packArgument(const FloatPrecision& precision)
+	void LogContext::packArgument(const FloatPrecision& arg)
 	{
-		floatPrecision = precision;
+		floatPrecision = arg;
 	}
 
 	void LogContext::packArgument(const LogColor& arg)
@@ -272,6 +286,100 @@ namespace Gear::Utils::Logger
 		if (textColor != arg)
 		{
 			textColor = arg;
+		}
+	}
+
+	void LogContext::packArgument(const NewLine&)
+	{
+		*messageStr += "\n";
+	}
+
+	LogType LogContext::getLogType() const
+	{
+		return logType;
+	}
+
+	LogMessage LogContext::getLogMessage()
+	{
+		return LogMessage{ *messageStr,this,logType };
+	}
+
+	void LogContext::resetState()
+	{
+		integerMode = IntegerMode::DEC;
+
+		floatPrecision = 5;
+
+		displayColor = LogColor::functionNameColor;
+	}
+
+	void LogContext::acquireReusableSlot()
+	{
+		writeIndex++;
+
+		if (!(writeIndex - readIndex < slotNum))
+		{
+			std::unique_lock<std::mutex> readIndexLock(readIndexMutex);
+
+			inUseCV.wait(readIndexLock, [this]() { return writeIndex - readIndex < slotNum; });
+		}
+
+		messageStr = &slots[writeIndex % slotNum];
+
+		messageStr->clear();
+	}
+
+	void LogContext::packHeader(const std::string_view& functionName, const LogType& type)
+	{
+		logType = type;
+
+		const time_t currentTime = time(nullptr);
+
+		tm localTime = {};
+
+		localtime_s(&localTime, &currentTime);
+
+		const std::thread::id id = std::this_thread::get_id();
+
+		const uint32_t threadId = *(uint32_t*)&id;
+
+		//headerStrLen = 5+2+8+1+5+2+1+10+1+5+2+length(functionName)+1+1
+		//			   = 44+length(functionName)
+		sprintf_s(convertBuffer, convertBufferLength, "%s[%d:%d:%d] %s{T%u} %s(%s) ", LogColor::timeStampColor.code, localTime.tm_hour, localTime.tm_min, localTime.tm_sec,
+			LogColor::threadIdColor.code, threadId, LogColor::functionNameColor.code, functionName.data());
+
+		*messageStr += convertBuffer;
+
+		switch (type)
+		{
+		case LogType::LOG_SUCCESS:
+
+			packArgument(LogColor::successColor);
+
+			packArgument("<SUCCESS>");
+
+			break;
+		case LogType::LOG_ERROR:
+
+			packArgument(LogColor::errorColor);
+
+			packArgument("<ERROR>");
+
+			break;
+		case LogType::LOG_ENGINE:
+
+			packArgument(LogColor::engineColor);
+
+			packArgument("<ENGINE>");
+
+			break;
+		case LogType::LOG_USER:
+
+			packArgument(LogColor::userColor);
+
+			packArgument("<USER>");
+
+			break;
 		}
 	}
 
@@ -283,14 +391,5 @@ namespace Gear::Utils::Logger
 
 			*messageStr += displayColor.code;
 		}
-	}
-
-	void LogContext::resetState()
-	{
-		integerMode = IntegerMode::DEC;
-
-		floatPrecision = 5;
-
-		displayColor = LogColor::functionNameColor;
 	}
 }

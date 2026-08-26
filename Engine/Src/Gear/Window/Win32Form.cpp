@@ -120,7 +120,7 @@ namespace Gear::Window::Win32Form
 
 			if (!RegisterRawInputDevices(&rawInputMouse, 1, sizeof(rawInputMouse)))
 			{
-				LOGERROR(TOSTRING(RegisterRawInputDevices), "调用失败，失败值", IntegerMode::HEX, static_cast<uint32_t>(GetLastError()));
+				LOGERROR(TOSTRING(RegisterRawInputDevices), "调用失败，失败值", LogIntegerMode::HEX, static_cast<uint32_t>(GetLastError()));
 			}
 		}
 
@@ -132,7 +132,7 @@ namespace Gear::Window::Win32Form
 
 			if (!RegisterRawInputDevices(&rawInputKeyboard, 1, sizeof(rawInputKeyboard)))
 			{
-				LOGERROR(TOSTRING(RegisterRawInputDevices), "调用失败，失败值", IntegerMode::HEX, static_cast<uint32_t>(GetLastError()));
+				LOGERROR(TOSTRING(RegisterRawInputDevices), "调用失败，失败值", LogIntegerMode::HEX, static_cast<uint32_t>(GetLastError()));
 			}
 		}
 

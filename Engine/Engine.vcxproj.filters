@@ -471,6 +471,9 @@
     <ClInclude Include="Inc\Gear\Input\Internal\InputInternal.h">
       <Filter>Header</Filter>
     </ClInclude>
+    <ClInclude Include="Inc\Gear\Utils\Logger\Log.h">
+      <Filter>Header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Gear\InitializationParam.cpp">
@@ -738,6 +741,9 @@
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="Src\Gear\Input\Input.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Gear\Utils\Logger\Log.cpp">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>
