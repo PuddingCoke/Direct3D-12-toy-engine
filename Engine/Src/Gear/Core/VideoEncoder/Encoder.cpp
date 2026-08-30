@@ -42,7 +42,7 @@ namespace Gear::Core::VideoEncoder
 
 		outStream->id = 0;
 
-		LOGENGINE() << "视频名称" << LogColor::filePathColor << "output.mp4";
+		LOGENGINE() << "视频名称" << COLORIZEPATH("output.mp4");
 
 		LOGENGINE() << "视频时间" << LogFloatPrecision(1) << static_cast<float>(frameToEncode) / static_cast<float>(frameRate) << "秒";
 
@@ -53,15 +53,15 @@ namespace Gear::Core::VideoEncoder
 		switch (videoFormat)
 		{
 		case VideoFormat::H264:
-			LOGENGINE() << "视频格式" << LogColor::brightMagenta << "H264";
+			LOGENGINE() << "视频格式" << COLORIZEENUM(AV_CODEC_ID_H264);
 			param->codec_id = AV_CODEC_ID_H264;
 			break;
 		case VideoFormat::HEVC:
-			LOGENGINE() << "视频格式" << LogColor::brightMagenta << "HEVC";
+			LOGENGINE() << "视频格式" << COLORIZEENUM(AV_CODEC_ID_HEVC);
 			param->codec_id = AV_CODEC_ID_HEVC;
 			break;
 		case VideoFormat::AV1:
-			LOGENGINE() << "视频格式" << LogColor::brightMagenta << "AV1";
+			LOGENGINE() << "视频格式" << COLORIZEENUM(AV_CODEC_ID_AV1);
 			param->codec_id = AV_CODEC_ID_AV1;
 			break;
 		default:

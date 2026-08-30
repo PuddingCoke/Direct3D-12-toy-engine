@@ -21,11 +21,11 @@ namespace Gear::Core::Device
 		{
 			if (SUCCEEDED(D3D12CreateDevice(adapter, D3D_FEATURE_LEVEL_12_0, IID_PPV_ARGS(&impl.device))))
 			{
-				LOGSUCCESS() << "创建" << LogColor::brightMagenta << TOSTRING(D3D_FEATURE_LEVEL_12_0) << LogColor::defaultColor << "特性等级的" << LogColor::brightMagenta << TOSTRING(ID3D12Device);
+				LOGSUCCESS() << "创建" << COLORIZEENUM(D3D_FEATURE_LEVEL_12_0) << "特性等级的" << COLORIZESTRUCT(ID3D12Device);
 			}
 			else
 			{
-				THROWLOG(LOGERROR() << "找到的性能最强适配器不支持" << TOSTRING(D3D_FEATURE_LEVEL_12_0));
+				THROWLOG(LOGERROR() << "找到的性能最强适配器不支持" << COLORIZEENUM(D3D_FEATURE_LEVEL_12_0));
 			}
 
 			CHECKERROR(impl.device->QueryInterface(IID_PPV_ARGS(&impl.videoDevice)));
@@ -50,76 +50,68 @@ namespace Gear::Core::Device
 		{
 			const D3D12_RESOURCE_BINDING_TIER resourceBindingTier = features.ResourceBindingTier();
 
-			std::string bindingTierString;
-
 			switch (resourceBindingTier)
 			{
 			default:
 			case D3D12_RESOURCE_BINDING_TIER_1:
-				bindingTierString = TOSTRING(D3D12_RESOURCE_BINDING_TIER_1);
+				LOGENGINE() << "资源绑定等级" << COLORIZEENUM(D3D12_RESOURCE_BINDING_TIER_1);
 				break;
 			case D3D12_RESOURCE_BINDING_TIER_2:
-				bindingTierString = TOSTRING(D3D12_RESOURCE_BINDING_TIER_2);
+				LOGENGINE() << "资源绑定等级" << COLORIZEENUM(D3D12_RESOURCE_BINDING_TIER_2);
 				break;
 			case D3D12_RESOURCE_BINDING_TIER_3:
-				bindingTierString = TOSTRING(D3D12_RESOURCE_BINDING_TIER_3);
+				LOGENGINE() << "资源绑定等级" << COLORIZEENUM(D3D12_RESOURCE_BINDING_TIER_3);
 				break;
 			}
-
-			LOGENGINE() << "资源绑定等级" << LogColor::brightMagenta << bindingTierString;
 		}
 
 		{
 			const D3D_SHADER_MODEL shaderModel = features.HighestShaderModel();
 
-			std::string shaderModelString;
-
 			switch (shaderModel)
 			{
 			default:
 			case D3D_SHADER_MODEL_5_1:
-				shaderModelString = TOSTRING(D3D_SHADER_MODEL_5_1);
+				LOGENGINE() << "最高支持的着色模型" << COLORIZEENUM(D3D_SHADER_MODEL_5_1);
 				break;
 			case D3D_SHADER_MODEL_6_0:
-				shaderModelString = TOSTRING(D3D_SHADER_MODEL_6_0);
+				LOGENGINE() << "最高支持的着色模型" << COLORIZEENUM(D3D_SHADER_MODEL_6_0);
 				break;
 			case D3D_SHADER_MODEL_6_1:
-				shaderModelString = TOSTRING(D3D_SHADER_MODEL_6_1);
+				LOGENGINE() << "最高支持的着色模型" << COLORIZEENUM(D3D_SHADER_MODEL_6_1);
 				break;
 			case D3D_SHADER_MODEL_6_2:
-				shaderModelString = TOSTRING(D3D_SHADER_MODEL_6_2);
+				LOGENGINE() << "最高支持的着色模型" << COLORIZEENUM(D3D_SHADER_MODEL_6_2);
 				break;
 			case D3D_SHADER_MODEL_6_3:
-				shaderModelString = TOSTRING(D3D_SHADER_MODEL_6_3);
+				LOGENGINE() << "最高支持的着色模型" << COLORIZEENUM(D3D_SHADER_MODEL_6_3);
 				break;
 			case D3D_SHADER_MODEL_6_4:
-				shaderModelString = TOSTRING(D3D_SHADER_MODEL_6_4);
+				LOGENGINE() << "最高支持的着色模型" << COLORIZEENUM(D3D_SHADER_MODEL_6_4);
 				break;
 			case D3D_SHADER_MODEL_6_5:
-				shaderModelString = TOSTRING(D3D_SHADER_MODEL_6_5);
+				LOGENGINE() << "最高支持的着色模型" << COLORIZEENUM(D3D_SHADER_MODEL_6_5);
 				break;
 			case D3D_SHADER_MODEL_6_6:
-				shaderModelString = TOSTRING(D3D_SHADER_MODEL_6_6);
+				LOGENGINE() << "最高支持的着色模型" << COLORIZEENUM(D3D_SHADER_MODEL_6_6);
 				break;
 			case D3D_SHADER_MODEL_6_7:
-				shaderModelString = TOSTRING(D3D_SHADER_MODEL_6_7);
+				LOGENGINE() << "最高支持的着色模型" << COLORIZEENUM(D3D_SHADER_MODEL_6_7);
 				break;
 			case D3D_SHADER_MODEL_6_8:
-				shaderModelString = TOSTRING(D3D_SHADER_MODEL_6_8);
+				LOGENGINE() << "最高支持的着色模型" << COLORIZEENUM(D3D_SHADER_MODEL_6_8);
 				break;
 			case D3D_SHADER_MODEL_6_9:
-				shaderModelString = TOSTRING(D3D_SHADER_MODEL_6_9);
+				LOGENGINE() << "最高支持的着色模型" << COLORIZEENUM(D3D_SHADER_MODEL_6_9);
 				break;
 			case D3D_SHADER_MODEL_6_10:
-				shaderModelString = TOSTRING(D3D_SHADER_MODEL_6_10);
+				LOGENGINE() << "最高支持的着色模型" << COLORIZEENUM(D3D_SHADER_MODEL_6_10);
 				break;
 			}
 
-			LOGENGINE() << "最高支持的着色模型" << LogColor::brightMagenta << shaderModelString;
-
 			if (shaderModel < D3D_SHADER_MODEL_6_6)
 			{
-				THROWLOG(LOGERROR() << "你的适配器不支持" << TOSTRING(D3D_SHADER_MODEL_6_6));
+				THROWLOG(LOGERROR() << "你的适配器不支持" << COLORIZEENUM(D3D_SHADER_MODEL_6_6));
 			}
 		}
 
@@ -137,26 +129,22 @@ namespace Gear::Core::Device
 		{
 			const D3D12_RAYTRACING_TIER rayTracingTier = features.RaytracingTier();
 
-			std::string raytracingTierString;
-
 			switch (rayTracingTier)
 			{
 			default:
 			case D3D12_RAYTRACING_TIER_NOT_SUPPORTED:
-				raytracingTierString = TOSTRING(D3D12_RAYTRACING_TIER_NOT_SUPPORTED);
+				LOGENGINE() << "光线追踪等级" << COLORIZEENUM(D3D12_RAYTRACING_TIER_NOT_SUPPORTED);
 				break;
 			case D3D12_RAYTRACING_TIER_1_0:
-				raytracingTierString = TOSTRING(D3D12_RAYTRACING_TIER_1_0);
+				LOGENGINE() << "光线追踪等级" << COLORIZEENUM(D3D12_RAYTRACING_TIER_1_0);
 				break;
 			case D3D12_RAYTRACING_TIER_1_1:
-				raytracingTierString = TOSTRING(D3D12_RAYTRACING_TIER_1_1);
+				LOGENGINE() << "光线追踪等级" << COLORIZEENUM(D3D12_RAYTRACING_TIER_1_1);
 				break;
 			case D3D12_RAYTRACING_TIER_1_2:
-				raytracingTierString = TOSTRING(D3D12_RAYTRACING_TIER_1_2);
+				LOGENGINE() << "光线追踪等级" << COLORIZEENUM(D3D12_RAYTRACING_TIER_1_2);
 				break;
 			}
-
-			LOGENGINE() << "光线追踪等级" << LogColor::brightMagenta << raytracingTierString;
 		}
 	}
 }

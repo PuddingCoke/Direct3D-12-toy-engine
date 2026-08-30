@@ -101,7 +101,7 @@ namespace Gear
 
 		fileToken = makeUnique<File::Internal::InitializeToken>(File::backslashToSlash(File::getParentFolder(argv[0])));
 
-		LOGENGINE() << "EXE根目录" << LogColor::filePathColor << File::getWRootFolder();
+		LOGENGINE() << "EXE根目录" << COLORIZEPATH(File::getWRootFolder());
 
 		MainMonitor::Internal::getCurrentSettings();
 
@@ -332,7 +332,7 @@ namespace Gear
 
 				stbi_write_png("output.png", initParam.width, initParam.height, 4, colors.get(), FMT::getByteSize(Graphics::backBufferFormat) * initParam.width);
 
-				LOGSUCCESS() << "截屏保存到" << "output.png";
+				LOGSUCCESS() << "截屏保存到" << COLORIZEPATH("output.png");
 
 				startPoint = std::chrono::high_resolution_clock::now();
 			}

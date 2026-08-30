@@ -34,7 +34,7 @@ namespace Gear::Effect::GammaCorrectEffect
 
 		outputTexture->getTexture()->setName(L"Gamma Corrected Texture");
 
-		LOGSUCCESS() << "创建" << LogColor::brightMagenta << TOSTRING(GammaCorrectEffect);
+		LOGSUCCESS() << "创建" << COLORIZESTRUCT(GammaCorrectEffect);
 	}
 
 	RenderTextureView* GammaCorrectEffectImpl::process(GraphicsContext& refContext, RenderTextureView& inputTexture)

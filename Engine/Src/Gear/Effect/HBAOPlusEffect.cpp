@@ -40,7 +40,7 @@ namespace Gear::Effect
 
 		if (status == GFSDK_SSAO_OK)
 		{
-			LOGENGINE() << "初始化" << LogColor::brightMagenta << TOSTRING(HBAOPlusEffect);
+			LOGENGINE() << "初始化" << COLORIZESTRUCT(HBAOPlusEffect);
 		}
 		else
 		{

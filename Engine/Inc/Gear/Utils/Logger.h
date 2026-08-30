@@ -100,6 +100,16 @@ constexpr std::string_view getShortFuncName(const char* const funcName)
 
 #define THROWLOG(_log_) Gear::Utils::Logger::ThrowLog(_log_)
 
+#define COLORIZE(_content_ , _color_) _color_ << _content_ << Gear::Utils::Logger::LogColor::defaultColor
+
+#define COLORIZESTRUCT(_struct_) COLORIZE(TOSTRING(_struct_), Gear::Utils::Logger::LogColor::brightMagenta)
+
+#define COLORIZEVAR(_var_) COLORIZE(TOSTRING(_var_), Gear::Utils::Logger::LogColor::brightYellow)
+
+#define COLORIZEENUM(_enum_) COLORIZE(TOSTRING(_enum_), Gear::Utils::Logger::LogColor::blue)
+
+#define COLORIZEPATH(_path_) COLORIZE(_path_, Gear::Utils::Logger::LogColor::brightBlue)
+
 namespace Gear::Utils::Logger
 {
 	void submitLogMessage(const LogMessage& msg);

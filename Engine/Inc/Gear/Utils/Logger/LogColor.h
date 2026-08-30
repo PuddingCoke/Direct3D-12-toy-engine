@@ -43,7 +43,7 @@ namespace Gear::Utils::Logger
 
 		static const LogColor brightWhite;
 
-		//正文颜色
+		//默认正文颜色
 		static const LogColor defaultColor;
 
 		static const LogColor numericColor;
@@ -53,8 +53,6 @@ namespace Gear::Utils::Logger
 		static const LogColor threadIdColor;
 
 		static const LogColor functionNameColor;
-
-		static const LogColor filePathColor;
 
 		static const LogColor successColor;
 
