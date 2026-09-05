@@ -6,11 +6,6 @@
 
 namespace Gear::Utils::Logger
 {
-	LogContext::FloatPrecision::FloatPrecision(const int32_t precision) :
-		precision(Math::clamp(precision, 0, 16))
-	{
-	}
-
 	LogContext::LogContext() :
 		textColor{ "" },
 		displayColor{ "" },
@@ -25,7 +20,7 @@ namespace Gear::Utils::Logger
 	{
 		std::unique_lock<std::mutex> readIndexLock(readIndexMutex);
 
-		inUseCV.wait(readIndexLock, [this]() { return writeIndex == readIndex; });
+		readIndexCV.wait(readIndexLock, [this]() { return writeIndex == readIndex; });
 	}
 
 	LogContext& LogContext::get()
@@ -43,7 +38,7 @@ namespace Gear::Utils::Logger
 			readIndex++;
 		}
 
-		inUseCV.notify_one();
+		readIndexCV.notify_one();
 	}
 
 	void LogContext::createLogMessage(const std::string_view& functionName, const LogType& type)
@@ -161,7 +156,7 @@ namespace Gear::Utils::Logger
 	{
 		setDisplayColor(LogColor::numericColor);
 
-		if (integerMode == IntegerMode::HEX)
+		if (integerMode == LogIntegerMode::HEX)
 		{
 			_itoa_s(arg, convertBuffer + 2, convertBufferLength - 2ull, 16);
 
@@ -187,7 +182,7 @@ namespace Gear::Utils::Logger
 	{
 		setDisplayColor(LogColor::numericColor);
 
-		if (integerMode == IntegerMode::HEX)
+		if (integerMode == LogIntegerMode::HEX)
 		{
 			_i64toa_s(arg, convertBuffer + 2, convertBufferLength - 2ull, 16);
 
@@ -213,7 +208,7 @@ namespace Gear::Utils::Logger
 	{
 		setDisplayColor(LogColor::numericColor);
 
-		if (integerMode == IntegerMode::HEX)
+		if (integerMode == LogIntegerMode::HEX)
 		{
 			_ultoa_s(arg, convertBuffer + 2, convertBufferLength - 2ull, 16);
 
@@ -239,7 +234,7 @@ namespace Gear::Utils::Logger
 	{
 		setDisplayColor(LogColor::numericColor);
 
-		if (integerMode == IntegerMode::HEX)
+		if (integerMode == LogIntegerMode::HEX)
 		{
 			_ui64toa_s(arg, convertBuffer + 2, convertBufferLength - 2ull, 16);
 
@@ -271,12 +266,12 @@ namespace Gear::Utils::Logger
 		packFloatPoint(arg);
 	}
 
-	void LogContext::packArgument(const IntegerMode& arg)
+	void LogContext::packArgument(const LogIntegerMode& arg)
 	{
 		integerMode = arg;
 	}
 
-	void LogContext::packArgument(const FloatPrecision& arg)
+	void LogContext::packArgument(const LogFloatPrecision& arg)
 	{
 		floatPrecision = arg;
 	}
@@ -289,7 +284,7 @@ namespace Gear::Utils::Logger
 		}
 	}
 
-	void LogContext::packArgument(const NewLine&)
+	void LogContext::packArgument(const LogNewLine&)
 	{
 		*messageStr += "\n";
 	}
@@ -306,7 +301,7 @@ namespace Gear::Utils::Logger
 
 	void LogContext::resetState()
 	{
-		integerMode = IntegerMode::DEC;
+		integerMode = LogIntegerMode::DEC;
 
 		floatPrecision = 5;
 
@@ -321,7 +316,7 @@ namespace Gear::Utils::Logger
 		{
 			std::unique_lock<std::mutex> readIndexLock(readIndexMutex);
 
-			inUseCV.wait(readIndexLock, [this]() { return writeIndex - readIndex < slotNum; });
+			readIndexCV.wait(readIndexLock, [this]() { return writeIndex - readIndex < slotNum; });
 		}
 
 		messageStr = &slots[writeIndex % slotNum];

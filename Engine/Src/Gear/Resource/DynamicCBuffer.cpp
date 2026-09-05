@@ -4,8 +4,6 @@
 
 #include<Gear/Core/Graphics.h>
 
-#include<Gear/Utils/Logger.h>
-
 #include<Gear/Utils/Math.h>
 
 namespace Gear::Resource

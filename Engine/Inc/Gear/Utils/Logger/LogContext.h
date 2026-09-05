@@ -3,7 +3,7 @@
 #ifndef _GEAR_UTILS_LOGGER_LOGCONTEXT_H_
 #define _GEAR_UTILS_LOGGER_LOGCONTEXT_H_
 
-#include"LogColor.h"
+#include"LogStructs.h"
 
 #include<Gear/Utils/Memory.h>
 
@@ -19,14 +19,6 @@
 
 namespace Gear::Utils::Logger
 {
-	enum class LogType
-	{
-		LOG_SUCCESS,
-		LOG_ERROR,
-		LOG_ENGINE,
-		LOG_USER
-	};
-
 	class LogContext;
 
 	struct LogMessage
@@ -41,20 +33,6 @@ namespace Gear::Utils::Logger
 	class LogContext
 	{
 	public:
-
-		enum class IntegerMode
-		{
-			DEC, HEX
-		};
-
-		struct FloatPrecision
-		{
-			FloatPrecision(const int32_t precision = 5);
-
-			int32_t precision;
-		};
-
-		struct NewLine {};
 
 		LogContext(const LogContext&) = delete;
 
@@ -111,16 +89,16 @@ namespace Gear::Utils::Logger
 		void packArgument(const double_t& arg);
 
 		//改变整数模式
-		void packArgument(const IntegerMode& arg);
+		void packArgument(const LogIntegerMode& arg);
 
 		//改变浮点精度
-		void packArgument(const FloatPrecision& arg);
+		void packArgument(const LogFloatPrecision& arg);
 
 		//改变正文颜色
 		void packArgument(const LogColor& arg);
 
 		//换行
-		void packArgument(const NewLine&);
+		void packArgument(const LogNewLine&);
 
 		LogType getLogType() const;
 
@@ -146,9 +124,9 @@ namespace Gear::Utils::Logger
 
 		LogType logType;
 
-		IntegerMode integerMode;
+		LogIntegerMode integerMode;
 
-		FloatPrecision floatPrecision;
+		LogFloatPrecision floatPrecision;
 
 		LogColor textColor;
 
@@ -166,7 +144,7 @@ namespace Gear::Utils::Logger
 
 		std::mutex readIndexMutex;
 
-		std::condition_variable inUseCV;
+		std::condition_variable readIndexCV;
 
 		static constexpr uint64_t convertBufferLength = 512ull;
 

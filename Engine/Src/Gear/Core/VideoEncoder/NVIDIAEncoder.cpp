@@ -1,7 +1,5 @@
 #include<Gear/Core/VideoEncoder/NVIDIAEncoder.h>
 
-#include<Gear/Utils/Logger.h>
-
 #define NVENCCALL(func) \
 {\
 const NVENCSTATUS _status_ = func;\

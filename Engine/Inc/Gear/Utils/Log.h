@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef _GEAR_UTILS_LOGGER_H_
-#define _GEAR_UTILS_LOGGER_H_
+#ifndef _GEAR_UTILS_LOGGER_LOG_H_
+#define _GEAR_UTILS_LOGGER_LOG_H_
 
 /// <summary>
 /// 一个可以输出不同颜色的日志记录器
@@ -11,19 +11,56 @@
 /// 以下是支持的数据类型
 /// 整形：int32_t、int64_t、uint32_t、uint64_t
 /// 浮点：float_t、double_t
-/// 字符串：字面窄字符串、const char*、std::string、字面宽字符串、const wchar_t*、std::wstring
+/// 字符串：字面窄字符串、const char*、std::string、字面宽字符串、const wchar_t*、std::wstring、字面u8字符串、const char8_t*、std::u8string
 /// 布尔类型：会被转换为亮绿色的TRUE和亮红色的FALSE
 /// 
-/// 你可以使用IntegerType来指定整数的输出进制，下方为示例代码
-/// LOGUSER("32位无符号整数测试", IntegerMode::HEX, 13689u, UINT_MAX, IntegerMode::DEC, 13689u, UINT_MAX);
+/// 你可以使用LogIntegerMode来指定整数的输出进制，下方为示例代码
+/// LOGUSER() << "32位无符号整数测试" << LogIntegerMode::HEX << 13689u << UINT_MAX << LogIntegerMode::DEC << 13689u << UINT_MAX;
 /// 
-/// 你可以使用FloatPrecision来调整小数点后位数，下方为示例代码
-/// LOGUSER("浮点测试", FloatPrecision(4), 125.6f, FloatPrecision(2), 125.7);
+/// 你可以使用LogFloatPrecision来调整小数点后位数，下方为示例代码
+/// LOGUSER() << "32位浮点测试" << LogFloatPrecision(4) << 125.6f << FLT_MAX << LogFloatPrecision(2) << 125.6f << FLT_MAX;
 /// 
-/// LogColor这个类中有很多可用的颜色
+/// LogColor这个结构体中有很多可用的颜色
 /// </summary>
 
-#include"Logger/Log.h"
+#include"Logger/LogContext.h"
+
+namespace Gear::Utils::Logger
+{
+	class Log
+	{
+	public:
+
+		Log(const std::string_view& functionName, const LogType& type);
+
+		~Log();
+
+		template<typename T>
+		const Log& operator<<(const T& arg) const;
+
+		void finishAndThrowMessage() const;
+
+	private:
+
+		bool needThrow() const;
+
+		void finishAndPostMessage() const;
+
+		LogContext& context;
+
+	};
+
+	template<typename T>
+	inline const Log& Log::operator<<(const T& arg) const
+	{
+		context.packArgument(arg);
+
+		return *this;
+	}
+
+	void ThrowLog(const Log& log);
+
+}
 
 constexpr std::string_view getShortFuncName(const char* const funcName)
 {
@@ -84,6 +121,14 @@ constexpr std::string_view getShortFuncName(const char* const funcName)
 	}
 }
 
+using Gear::Utils::Logger::LogIntegerMode;
+
+using Gear::Utils::Logger::LogFloatPrecision;
+
+using Gear::Utils::Logger::LogColor;
+
+using Gear::Utils::Logger::LogNewLine;
+
 #define TOSTRING(x) #x
 
 #define TOWSTRING(x) L#x
@@ -100,19 +145,14 @@ constexpr std::string_view getShortFuncName(const char* const funcName)
 
 #define THROWLOG(_log_) Gear::Utils::Logger::ThrowLog(_log_)
 
-#define COLORIZE(_content_ , _color_) _color_ << _content_ << Gear::Utils::Logger::LogColor::defaultColor
+#define COLORIZE(_content_ , _color_) _color_ << _content_ << LogColor::defaultColor
 
-#define COLORIZESTRUCT(_struct_) COLORIZE(TOSTRING(_struct_), Gear::Utils::Logger::LogColor::brightMagenta)
+#define COLORIZESTRUCT(_struct_) COLORIZE(TOSTRING(_struct_), LogColor::brightMagenta)
 
-#define COLORIZEVAR(_var_) COLORIZE(TOSTRING(_var_), Gear::Utils::Logger::LogColor::brightYellow)
+#define COLORIZEVAR(_var_) COLORIZE(TOSTRING(_var_), LogColor::brightYellow)
 
-#define COLORIZEENUM(_enum_) COLORIZE(TOSTRING(_enum_), Gear::Utils::Logger::LogColor::blue)
+#define COLORIZEENUM(_enum_) COLORIZE(TOSTRING(_enum_), LogColor::blue)
 
-#define COLORIZEPATH(_path_) COLORIZE(_path_, Gear::Utils::Logger::LogColor::brightBlue)
+#define COLORIZEPATH(_path_) COLORIZE(_path_, LogColor::brightBlue)
 
-namespace Gear::Utils::Logger
-{
-	void submitLogMessage(const LogMessage& msg);
-}
-
-#endif // !_GEAR_UTILS_LOGGER_H_
+#endif // !_GEAR_UTILS_LOGGER_LOG_H_

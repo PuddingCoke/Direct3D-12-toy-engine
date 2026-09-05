@@ -276,7 +276,7 @@
     <ClInclude Include="Inc\Gear\Effect\BackBufferBlitEffect.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="Inc\Gear\Utils\Logger\LogColor.h">
+    <ClInclude Include="Inc\Gear\Utils\Logger\LogStructs.h">
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="Inc\Gear\Utils\Logger\LogContext.h">
@@ -303,7 +303,7 @@
     <ClInclude Include="Inc\Gear\Utils\Internal\LoggerInternal.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="Inc\Gear\Utils\Logger.h">
+    <ClInclude Include="Inc\Gear\Utils\Logger\Logger.h">
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="Inc\Gear\Input\Internal\KeyboardInternal.h">
@@ -471,7 +471,7 @@
     <ClInclude Include="Inc\Gear\Input\Internal\InputInternal.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="Inc\Gear\Utils\Logger\Log.h">
+    <ClInclude Include="Inc\Gear\Utils\Log.h">
       <Filter>Header</Filter>
     </ClInclude>
   </ItemGroup>
@@ -623,7 +623,7 @@
     <ClCompile Include="Src\Gear\Effect\BackBufferBlitEffect.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Utils\Logger\LogColor.cpp">
+    <ClCompile Include="Src\Gear\Utils\Logger\LogStructs.cpp">
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="Src\Gear\Utils\Logger\LogContext.cpp">
@@ -638,7 +638,7 @@
     <ClCompile Include="Src\Gear\Resource\DefaultCBuffer.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Utils\Logger.cpp">
+    <ClCompile Include="Src\Gear\Utils\Logger\Logger.cpp">
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="Src\Gear\Core\GlobalShader.cpp">
@@ -743,7 +743,7 @@
     <ClCompile Include="Src\Gear\Input\Input.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Gear\Utils\Logger\Log.cpp">
+    <ClCompile Include="Src\Gear\Utils\Log.cpp">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>

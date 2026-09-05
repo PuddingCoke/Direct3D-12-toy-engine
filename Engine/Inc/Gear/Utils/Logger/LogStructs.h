@@ -1,10 +1,25 @@
 #pragma once
 
-#ifndef _GEAR_UTILS_LOGGER_LOGCOLOR_H_
-#define _GEAR_UTILS_LOGGER_LOGCOLOR_H_
+#ifndef _GEAR_UTILS_LOGGER_LOGSTRUCTS_H_
+#define _GEAR_UTILS_LOGGER_LOGSTRUCTS_H_
+
+#include<cstdint>
 
 namespace Gear::Utils::Logger
 {
+	enum class LogType
+	{
+		LOG_SUCCESS,
+		LOG_ERROR,
+		LOG_ENGINE,
+		LOG_USER
+	};
+
+	enum class LogIntegerMode
+	{
+		DEC, HEX
+	};
+
 	struct LogColor
 	{
 		const char* code;
@@ -62,6 +77,15 @@ namespace Gear::Utils::Logger
 
 		static const LogColor userColor;
 	};
+
+	struct LogFloatPrecision
+	{
+		LogFloatPrecision(const int32_t precision = 5);
+
+		int32_t precision;
+	};
+
+	struct LogNewLine {};
 }
 
-#endif // !_GEAR_UTILS_LOGGER_LOGCOLOR_H_
+#endif // !_GEAR_UTILS_LOGGER_LOGSTRUCTS_H_

@@ -1,4 +1,6 @@
-#include<Gear/Utils/Logger/LogColor.h>
+#include<Gear/Utils/Logger/LogStructs.h>
+
+#include<Gear/Utils/Math.h>
 
 namespace Gear::Utils::Logger
 {
@@ -56,4 +58,9 @@ namespace Gear::Utils::Logger
 	const LogColor LogColor::engineColor = LogColor::brightYellow;
 
 	const LogColor LogColor::userColor = LogColor::brightWhite;
+
+	LogFloatPrecision::LogFloatPrecision(const int32_t precision) :
+		precision(Math::clamp(precision, 0, 16))
+	{
+	}
 }

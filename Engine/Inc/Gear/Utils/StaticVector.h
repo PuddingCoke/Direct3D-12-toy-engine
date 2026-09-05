@@ -5,7 +5,7 @@
 
 #include<array>
 
-#include"Logger.h"
+#include"Log.h"
 
 namespace Gear::Utils
 {

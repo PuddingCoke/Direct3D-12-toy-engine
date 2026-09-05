@@ -10,7 +10,7 @@
 
 #include<Gear/Utils/Internal/FileInternal.h>
 
-#include<Gear/Utils/Logger.h>
+#include<Gear/Utils/Log.h>
 
 #include<Gear/Utils/String.h>
 

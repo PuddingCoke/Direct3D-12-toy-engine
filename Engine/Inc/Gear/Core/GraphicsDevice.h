@@ -9,7 +9,7 @@ static_assert(sizeof(float) == 4, "float类型的大小必须是4");
 
 static_assert(sizeof(double) == 8, "double类型的大小必须是8");
 
-#include<Gear/Utils/Logger.h>
+#include<Gear/Utils/Log.h>
 
 #include<Gear/Utils/Memory.h>
 

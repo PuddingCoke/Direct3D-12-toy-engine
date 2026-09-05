@@ -10,7 +10,7 @@
 
 #include<Gear/Utils/Internal/MainMonitorInternal.h>
 
-#include<Gear/Utils/Logger.h>
+#include<Gear/Utils/Log.h>
 
 #include<Windows.h>
 

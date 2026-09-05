@@ -2,7 +2,7 @@
 
 #include<Gear/Utils/MainMonitor.h>
 
-#include<Gear/Utils/Logger.h>
+#include<Gear/Utils/Log.h>
 
 #include<cstdint>
 

@@ -1,7 +1,5 @@
 #include<Gear/Core/D3D12Core/GraphicsState.h>
 
-#include<Gear/Utils/Logger.h>
-
 #include<Gear/Core/TOPOLOGY.h>
 
 #include<Gear/Core/FMT.h>

@@ -1,6 +1,6 @@
 #include<Gear/Window/Win32Form.h>
 
-#include<Gear/Utils/Logger.h>
+#include<Gear/Utils/Log.h>
 
 #include<Gear/Utils/WallpaperHelper.h>
 

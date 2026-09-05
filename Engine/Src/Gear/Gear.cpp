@@ -18,8 +18,6 @@
 
 #include<Gear/Utils/Internal/FileInternal.h>
 
-#include<Gear/Utils/Logger.h>
-
 #include<Gear/Utils/Internal/LoggerInternal.h>
 
 #include<Gear/Utils/WallpaperHelper.h>
