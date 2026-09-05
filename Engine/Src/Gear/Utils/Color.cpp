@@ -2,6 +2,8 @@
 
 #include<Gear/Utils/Random.h>
 
+#include<Gear/Utils/Math.h>
+
 #include<memory.h>
 
 namespace Gear::Utils
@@ -18,7 +20,10 @@ namespace Gear::Utils
 
 	uint32_t Color::toUint() const
 	{
-		return (static_cast<uint32_t>(255.f * a) << 24) | (static_cast<uint32_t>(255.f * b) << 16) | (static_cast<uint32_t>(255.f * g) << 8) | (static_cast<uint32_t>(255.f * r));
+		return (static_cast<uint32_t>(Math::clamp(255.f * a, 0.f, 255.f)) << 24) |
+			(static_cast<uint32_t>(Math::clamp(255.f * b, 0.f, 255.f)) << 16) |
+			(static_cast<uint32_t>(Math::clamp(255.f * g, 0.f, 255.f)) << 8) |
+			(static_cast<uint32_t>(Math::clamp(255.f * r, 0.f, 255.f)));
 	}
 
 	Color Color::random()

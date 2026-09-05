@@ -430,9 +430,9 @@ namespace Gear::Core
 		const DirectX::XMUINT3 groupDimension = computeState->getPipelineStateData().computeData.groupDimension;
 
 		dispatchGrp(
-			Utils::Math::ceil(dispatchThreadCountX, groupDimension.x),
-			Utils::Math::ceil(dispatchThreadCountY, groupDimension.y),
-			Utils::Math::ceil(dispatchThreadCountZ, groupDimension.z)
+			Utils::Math::divCeil(dispatchThreadCountX, groupDimension.x),
+			Utils::Math::divCeil(dispatchThreadCountY, groupDimension.y),
+			Utils::Math::divCeil(dispatchThreadCountZ, groupDimension.z)
 		);
 	}
 

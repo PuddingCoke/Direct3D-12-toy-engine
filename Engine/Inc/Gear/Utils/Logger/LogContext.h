@@ -80,14 +80,14 @@ namespace Gear::Utils::Logger
 		//窄字符串
 		void packArgument(const std::string& arg);
 
+		//原生窄字符串
+		void packArgument(const char* arg);
+
 		//UTF8字符串
 		void packArgument(const std::u8string& arg);
 
 		//原生UTF8字符串
 		void packArgument(const char8_t* arg);
-
-		//原生窄字符串
-		void packArgument(const char* arg);
 
 		//布尔类型
 		void packArgument(const bool& arg);
@@ -103,10 +103,6 @@ namespace Gear::Utils::Logger
 
 		//无符号64位整数
 		void packArgument(const uint64_t& arg);
-
-		template<typename Arg>
-			requires std::is_floating_point_v<Arg>
-		void packFloatPoint(const Arg& arg);
 
 		//单精度浮点数
 		void packArgument(const float_t& arg);
@@ -131,6 +127,10 @@ namespace Gear::Utils::Logger
 		LogMessage getLogMessage();
 
 	private:
+
+		template<typename Arg>
+			requires std::is_floating_point_v<Arg>
+		void packFloatPoint(const Arg& arg);
 
 		//重置状态
 		void resetState();

@@ -12,17 +12,11 @@ namespace Gear::Utils
 	struct Color
 	{
 
-		float r;
-
-		float g;
-
-		float b;
-
-		float a;
-
 		Color(const float* const color);
 
 		Color(const float r, const float g, const float b, const float a = 1.f);
+
+		Color(const Color&) = default;
 
 		uint32_t toUint() const;
 
@@ -39,6 +33,14 @@ namespace Gear::Utils
 		static Color random();
 
 		static Color hsvToRgb(const Color& c);
+
+		float r;
+
+		float g;
+
+		float b;
+
+		float a;
 
 	};
 }

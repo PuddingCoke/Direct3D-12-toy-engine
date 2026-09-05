@@ -69,8 +69,43 @@ namespace Gear::Utils::Math
 	}
 
 	template<typename T>
+		requires std::is_floating_point_v<T>
+	T floor(const T value)
+	{
+		return std::floor(value);
+	}
+
+	template<typename T>
+		requires std::is_floating_point_v<T>
+	T ceil(const T value)
+	{
+		return std::ceil(value);
+	}
+
+	template<typename T>
+		requires std::is_floating_point_v<T>
+	T divFloor(const T a, const T b)
+	{
+		return floor(a / b);
+	}
+
+	template<typename T>
 		requires std::is_same_v<T, uint8_t> || std::is_same_v<T, uint16_t> || std::is_same_v<T, uint32_t> || std::is_same_v<T, uint64_t>
-	constexpr T ceil(const T a, const T b)
+	constexpr T divFloor(const T a, const T b)
+	{
+		return a / b;
+	}
+
+	template<typename T>
+		requires std::is_floating_point_v<T>
+	T divCeil(const T a, const T b)
+	{
+		return ceil(a / b);
+	}
+
+	template<typename T>
+		requires std::is_same_v<T, uint8_t> || std::is_same_v<T, uint16_t> || std::is_same_v<T, uint32_t> || std::is_same_v<T, uint64_t>
+	constexpr T divCeil(const T a, const T b)
 	{
 		return (a + b - static_cast<T>(1)) / b;
 	}
@@ -79,7 +114,7 @@ namespace Gear::Utils::Math
 		requires std::is_same_v<T, uint8_t> || std::is_same_v<T, uint16_t> || std::is_same_v<T, uint32_t> || std::is_same_v<T, uint64_t>
 	constexpr T align(const T a, const T b)
 	{
-		return ceil(a, b) * b;
+		return divCeil(a, b) * b;
 	}
 
 	//a是否拥有b？

@@ -778,9 +778,6 @@
     <FxCompile Include="Shaders\TextureCube\TextureCubeVS.hlsl">
       <Filter>Shaders\TextureCube</Filter>
     </FxCompile>
-    <FxCompile Include="Shaders\VideoEncoder\RGBToNV12CS.hlsl">
-      <Filter>Shaders\VideoEncoder</Filter>
-    </FxCompile>
     <FxCompile Include="Shaders\PrimitiveBatch\PrimitiveBatchCircleVS.hlsl">
       <Filter>Shaders\PrimitiveBatch</Filter>
     </FxCompile>
